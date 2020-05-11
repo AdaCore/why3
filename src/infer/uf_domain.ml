@@ -76,10 +76,13 @@ module Make(S:sig
 
   let create_manager () =
     let var_pool = build_var_pool npool in
-    let vars = Array.of_list (VarPool.elements var_pool @ tmp_pool) in
+    let vars = Array.of_list (VarPool.elements var_pool
+                              @ tmp_pool) in
+    let variable_mapping = Hashtbl.create 512 in
+    let apron_mapping = Mterm.empty in
     let uf_man = {
-        variable_mapping = Hashtbl.create 512;
-        apron_mapping = Mterm.empty;
+        variable_mapping;
+        apron_mapping;
         region_mapping = Ity.Mreg.empty;
         region_var = Ity.Mreg.empty;
         env = Environment.make vars [||];
@@ -97,7 +100,34 @@ module Make(S:sig
     Dom.bottom man uf_man.env, empty_uf_domain
 
   let top (man, uf_man) _ =
-    Dom.top man uf_man.env, empty_uf_domain
+
+    let vt,vf = Var.of_string "true", Var.of_string "false" in
+    uf_man.env <- Environment.add uf_man.env [|vt;vf|] [||];
+    Hashtbl.add uf_man.variable_mapping vt t_bool_true;
+    Hashtbl.add uf_man.variable_mapping vf t_bool_false;
+    uf_man.apron_mapping <-
+      Mterm.(add t_bool_true vt
+               (add t_bool_false vf uf_man.apron_mapping));
+
+    let dom = Dom.top man uf_man.env in
+
+    let vt = Mterm.find t_bool_true uf_man.apron_mapping in
+    let expr1 = Linexpr1.make uf_man.env in
+    Linexpr1.set_coeff expr1 vt (Coeff.s_of_int 1);
+    Linexpr1.set_cst expr1 (Coeff.s_of_int (-1));
+    let lincons1 = Lincons1.make expr1 Lincons1.EQ in
+
+    let vf = Mterm.find t_bool_false uf_man.apron_mapping in
+    let expr2 = Linexpr1.make uf_man.env in
+    Linexpr1.set_coeff expr2 vf (Coeff.s_of_int 1);
+    let lincons2 = Lincons1.make expr2 Lincons1.EQ in
+
+    let lincons_array = Lincons1.array_make uf_man.env 2 in
+    Lincons1.array_set lincons_array 0 lincons1;
+    Lincons1.array_set lincons_array 1 lincons2;
+    let dom = Dom.meet_lincons_array man dom lincons_array in
+
+    dom, empty_uf_domain
 
   let canonicalize (man, _) (a, _) =
     Dom.canonicalize man a
@@ -211,8 +241,6 @@ module Make(S:sig
         let all_values = Union_find.flat uf_t.classes in
         let all_terms = List.map (TermToClass.to_term
                           uf_man.class_to_term) all_values in
-        (* let all_values = Mterm.of_list all_terms in
-         * let all_terms = List.map fst all_terms in *)
         List.fold_left (fun (dom, uf_t) t ->
             (* This is far from perfect. If there is a function f,
                then terms `f a` and `f b` will be marked as equal.
@@ -441,12 +469,14 @@ module Make(S:sig
 
   let rec extract_term (man, uf_man) is_in (dom_t, uf_t) v =
     let find_var v =
-      try let candidate = Hashtbl.find uf_man.variable_mapping v in
-          if is_in candidate then raise Not_found else candidate
-      with Not_found ->
-        try TermToVar.to_term uf_t.uf_to_var v
+      let t =
+        try let candidate = Hashtbl.find uf_man.variable_mapping v in
+            if is_in candidate then raise Not_found else candidate
         with Not_found ->
-          raise (Bad_domain (Dom.forget_array man dom_t [|v|] false)) in
+          try TermToVar.to_term uf_t.uf_to_var v with Not_found ->
+            raise (Bad_domain (Dom.forget_array man dom_t [|v|] false)) in
+      if Ty.ty_equal (t_type t) Ty.ty_bool then raise Not_found else t
+    in
     match Dom.get_linexpr man dom_t v with
     | Some x -> begin
         try let t = varlist_to_term find_var x in
@@ -458,16 +488,39 @@ module Make(S:sig
 
   let to_term (man, uf_man) (dom_t, uf_t) =
     let find_var v =
-      try Hashtbl.find uf_man.variable_mapping v with Not_found ->
-        try TermToVar.to_term uf_t.uf_to_var v with Not_found ->
-          Format.eprintf "Couldn't find variable %a@." Var.print v;
-          raise Not_found in
+      let t =
+        try Hashtbl.find uf_man.variable_mapping v with Not_found ->
+          try TermToVar.to_term uf_t.uf_to_var v with Not_found ->
+            Format.eprintf "Couldn't find variable %a@." Var.print v;
+            raise Not_found in
+      if Ty.ty_equal (t_type t) Ty.ty_bool then raise Not_found else t
+    in
     let t = Dom.to_term S.Infer_why3.env
       (S.Infer_why3.th_known, S.Infer_why3.mod_known) man dom_t find_var in
+    let mix_int_bool ty1 ty2 =
+      Ty.((ty_equal ty_bool ty1 && ty_equal ty_int ty2) ||
+        (ty_equal ty_int ty1 && ty_equal ty_bool ty2)) in
     Union_find.fold_class (fun t uf1 uf2 ->
         let t1 = TermToClass.to_term uf_man.class_to_term uf1 in
         let t2 = TermToClass.to_term uf_man.class_to_term uf2 in
-        t_and t (t_equ t1 t2)) t uf_t.classes
+        match t1.t_ty, t2.t_ty with
+        | Some ty1, Some ty2 when mix_int_bool ty1 ty2 -> t
+        | _ -> t_and t (t_equ t1 t2)) t uf_t.classes
+
+  let try_mk_eq (man, uf_man) t1 t2 (dom,uf_t) =
+    try
+      let v1 = try Mterm.find t1 uf_man.apron_mapping with Not_found ->
+          TermToVar.to_t uf_t.uf_to_var t1 in
+      let v2 = try Mterm.find t2 uf_man.apron_mapping with Not_found ->
+                 TermToVar.to_t uf_t.uf_to_var t2 in
+      let expr = Linexpr1.make uf_man.env in
+      Linexpr1.set_coeff expr v1 (Coeff.s_of_int (-1));
+      Linexpr1.set_coeff expr v2 (Coeff.s_of_int 1);
+      let lincons = Lincons1.make expr Lincons1.EQ in
+      let lincons_array = Lincons1.array_make uf_man.env 1 in
+      Lincons1.array_set lincons_array 0 lincons;
+      Dom.meet_lincons_array man dom lincons_array, uf_t
+    with Not_found -> dom,uf_t
 
 
   (* Get a set of (apron) linear expressions from a constraint stated
@@ -586,13 +639,14 @@ module Make(S:sig
                Lincons1.array_set arr 0 cons;
                Dom.meet_lincons_array man dom arr, !ruf)
           | Tapp (ls, [t1;t2]) when ls_equal ps_equ ls ->
+            let f_eq = try_mk_eq (man,uf_man) t1 t2 in
             let f_uf = do_eq (man, uf_man) t1 t2 in
             let subv_1 = get_subvalues t1 None in
             let subv_2 = get_subvalues t2 None in
             List.fold_left (fun acc_f ((t1, _), (t2, _)) ->
                 let f_eq = abstract (t_app ps_equ [t1; t2] None) in
                 (fun abs -> acc_f (f_eq abs)))
-              f_uf (List.combine subv_1 subv_2)
+              (fun d -> f_eq (f_uf d)) (List.combine subv_1 subv_2)
           | Tif (t1, t2, t3) ->
             let f1 = abstract t1 in
             let f1_not = abstract (t_push_negation (t_not t1)) in
@@ -739,9 +793,7 @@ module Make(S:sig
   let rec tdepth t = 1 + t_fold (fun i t -> max (tdepth t) i) 0 t
 
   let rec forget_term (man, uf_man) t =
-    Format.eprintf "Forget term %a@." Pretty.print_term t;
     let forget_fun (dom_t, uf_t) =
-      Format.eprintf "Dom: %a@." print (dom_t,uf_t);
       let dom_t, uf_t =
         (* do t = t', where t' is the value of t in dom_t *)
         try
