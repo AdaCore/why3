@@ -239,7 +239,7 @@ LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer dri
 		parse_smtv2_model
 
 LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
-          pinterp
+          reduction_engine pinterp
 
 ifeq (@enable_infer@,yes)
 LIB_INFER = o2oterm domain infer_why3 quant_domain union_find disjunctive_term_domain uf_domain infer_cfg infer_loop
@@ -251,7 +251,7 @@ LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
 LIB_PARSER = ptree glob typing parser_messages parser typing report lexer mlw_printer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
-		args_wrapper detect_polymorphism reduction_engine compute \
+		args_wrapper detect_polymorphism compute \
 		eliminate_definition eliminate_algebraic \
 		abstract_quantifiers eliminate_unknown_types \
 		eliminate_unknown_lsymbols eliminate_symbol \
