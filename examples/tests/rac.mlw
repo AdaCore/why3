@@ -1,0 +1,163 @@
+module Local
+
+  use int.Int
+
+  let c0 () =
+    let x = 1 in
+    assert { x >= 0 };
+    assert { x > 10 }
+
+  predicate p (_: unit) = false
+
+  let c1 () =
+    let ref x = () in
+    assert { not p x }
+
+  let c2 () =
+    let ref x = 1 in
+    assert { x >= 0 };
+    assert { x > 10 }
+
+  let c_or () =
+    assert { 4 >= 3 || 1 < 3 }
+
+  let f2_aux (ref x:int)
+    requires { x = 0 }
+  =
+    for i = 1 to 10 do
+      invariant { x = 0 || x = 1 }
+      x <- x + 1
+    done
+
+  let f2 () =
+    let ref z = 42 in f2_aux z
+
+  let f3 () =
+    let x = True in assert { x = True }
+end
+
+module Global
+
+  use int.Int
+
+  let ref x = 0
+
+  let c2 () =
+    assert { x >= 0 };
+    assert { x > 10 }
+
+end
+
+
+module Functions
+
+  use int.Int
+
+  let function fff (x: int): int = x+100
+
+  let ref x = 0
+
+  let f1 () =
+    let function ggg (x: int) (_: int) : int = x+200 in
+    assert { 101 = fff 1 };
+    assert { 200 = ggg 0 1 };
+    assert { forall x. ggg x 1 = x };
+    assert { fff 0 = ggg 0 1 }
+
+  let f2 () requires { x = 0 } =
+    for i = 1 to 10 do
+      invariant { 0 < i <= 10 }
+    done
+
+  let f3 () requires { x = 0 } =
+    for i = 0 to 5 do
+      invariant { x = 0 || x = 1 }
+      x <- x + 1
+    done
+
+  let f4 ()  =
+    while x < 10 do
+      variant { 10 - x }
+      invariant { 5 >= x }
+      x <- x + 1
+    done;
+    assert { x = 100 }
+
+  let f5_aux (y: int) : int
+    requires { y > 0 }
+    ensures { result = 1 }
+  = y
+
+  let f5a () =
+    let _ = f5_aux 0 in
+    ()
+
+  let f5b () =
+    let _ = f5_aux 1 in
+    let _ = f5_aux 2 in
+    ()
+
+  let f5c () =
+    let _ = f5_aux 0 in
+    ()
+
+  exception E int
+
+  let f6_aux () : unit raises { E j -> j = x } =
+    x <- x + 1;
+    raise (E 0)
+
+  let f6 () =
+    try f6_aux ()
+    with E _ -> () end
+
+  let f7_aux ()
+    (* ensures { x = old x } (\* How to recover [old x] in Pinterp? *\) *)
+  = x <- x + 1
+
+  let f7 () =
+    f7_aux ()
+
+  let f8 () =
+    let ref r = 0 in
+    assert { r = 1 }
+
+  let f9_aux (ref x: 'a) (y: 'a)
+    requires { x <> y }
+    ensures { result = y }
+  = x <- y;
+    x
+
+  let f9 () =
+    let ref r = 1 in
+    let _ = f9_aux r 42 in
+    let _ = f9_aux r 42 in
+    ()
+end
+
+module PolyRefContracts
+  use int.Int
+  use ref.Ref
+
+  let f1 () =
+    let myref = ref 0 in
+    myref := !myref + 1
+
+  let f2_aux (ref argref: 'a) (argx argy: 'a)
+    requires { argref <> argx }
+    ensures { result = argx }
+    ensures { result = argy }
+  = argref <- argx;
+    argref
+
+  let ref myref = 0
+
+  let f2a () =
+    f2_aux myref 1 1 (* OK *)
+
+  let f2b () =
+    f2_aux myref 0 1 (* PRE fails *)
+
+  let f2c () =
+    f2_aux myref 1 2 (* POST fails *)
+end

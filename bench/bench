@@ -302,6 +302,12 @@ test_mlw_printer () {
     bench/test_mlw_printer bench/typing/good/*.mlw
 }
 
+rac () {
+    file=$1
+    func=$2
+    "bin/why3execute$suffix" --rac "$file" "$func" 2>&1
+}
+
 echo "=== Checking stdlib ==="
 goods stdlib
 goods stdlib/mach
@@ -359,6 +365,36 @@ echo ""
 
 echo "=== Checking invalid goals ==="
 invalid_goals bench/invalid
+echo ""
+
+echo "=== Checking RAC ==="
+mlw_file="examples/tests/rac.mlw"
+out_file="$(dirname "$mlw_file")/$(basename "$mlw_file" .mlw).out"
+oracle_file="$(dirname "$mlw_file")/$(basename "$mlw_file" .mlw).oracle"
+(
+    echo "  $mlw_file.Local" >&2
+    for func in c0 c1 c2 c_or f2 f3; do
+        rac "$mlw_file" Local."$func"
+    done
+    echo "  $mlw_file.Global" >&2
+    for func in c2; do
+        rac "$mlw_file" Global."$func"
+    done
+    echo "  $mlw_file.Functions" >&2
+    for func in f1 f2 f3 f4 f5a f5b f5c f6 f7 f8 f9; do
+        rac "$mlw_file" Functions."$func"
+    done
+    echo "  $mlw_file.PolyRefContracts" >&2
+    for func in f1 f2a f2b f2c; do
+        rac "$mlw_file" PolyRefContracts."$func"
+    done
+) > "$out_file"
+if diff -u "$oracle_file" "$out_file"; then
+    echo "RAC: ok"
+else
+    echo "RAC: diff in output $out_file"
+    exit 1
+fi
 echo ""
 
 echo "=== Checking execution ==="
