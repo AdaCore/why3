@@ -480,7 +480,7 @@ module Make(S:sig
     match Dom.get_linexpr man dom_t v with
     | Some x -> begin
         try let t = varlist_to_term find_var x in
-            assert (Ty.ty_equal (t_type t) Ty.ty_int); Some t
+            (* assert (Ty.ty_equal (t_type t) Ty.ty_int); *) Some t
         with Bad_domain dom_t ->
           extract_term (man, uf_man) is_in (dom_t, uf_t) v
       end
@@ -792,6 +792,16 @@ module Make(S:sig
 
   let rec tdepth t = 1 + t_fold (fun i t -> max (tdepth t) i) 0 t
 
+  let adjust_term t ty =
+    if Ty.(ty_equal ty ty_bool) then
+      match t.t_node with
+      | Tconst (Constant.ConstInt n)
+           when BigInt.to_int n.il_int = 1 -> t_bool_true
+      | Tconst (Constant.ConstInt n)
+           when BigInt.to_int n.il_int = 0 -> t_bool_false
+      | _ -> assert false
+    else t
+
   let rec forget_term (man, uf_man) t =
     let forget_fun (dom_t, uf_t) =
       let dom_t, uf_t =
@@ -800,7 +810,9 @@ module Make(S:sig
           let var = Mterm.find t uf_man.apron_mapping in
           let dom_t, uf_t =
             match extract_term (man, uf_man) (is_in t) (dom_t, uf_t) var with
-            | Some t2 -> do_eq (man, uf_man) t t2 (dom_t, uf_t)
+            | Some t2 ->
+               let t2 = adjust_term t2 (t_type t) in
+               do_eq (man, uf_man) t t2 (dom_t, uf_t)
             | None -> dom_t, uf_t in
           Dom.forget_array man dom_t [|var|] false, uf_t
         with Not_found -> dom_t, uf_t in
