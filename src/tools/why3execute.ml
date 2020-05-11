@@ -33,6 +33,8 @@ let prec = ref None
 
 let opt_parser = ref None
 
+let enable_rac = ref false
+
 let option_list =
   let open Getopt in
   [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
@@ -40,7 +42,9 @@ let option_list =
     KLong "real", Hnd1 (APair (',', AInt, APair (',', AInt, AInt)),
       fun (i1, (i2, i3)) -> prec := Some (i1, i2, i3)),
     "<emin>,<emax>,<prec> set format used for real computations\n\
-     (e.g., -148,128,24 for float32)"
+     (e.g., -148,128,24 for float32)";
+    KLong "rac", Hnd0 (fun () -> enable_rac := true),
+    " enable runtime basic runtime assertion checking"
   ]
 
 let config, _, env =
