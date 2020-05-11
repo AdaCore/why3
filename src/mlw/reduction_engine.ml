@@ -694,7 +694,7 @@ let rec extract_first n acc l =
 let rec reduce engine c =
   match c.value_stack, c.cont_stack with
   | _, [] -> assert false
-  | st, (Keval (t,sigma),orig) :: rem -> reduce_eval st t ~orig sigma rem
+  | st, (Keval (t,sigma),orig) :: rem -> reduce_eval engine st t ~orig sigma rem
   | [], (Kif _, _) :: _ -> assert false
   | v :: st, (Kif(t2,t3,sigma), orig) :: rem ->
     begin
@@ -817,26 +817,44 @@ and reduce_match st u ~orig tbl sigma cont =
     }
 
 
-and reduce_eval st t ~orig sigma rem =
+and reduce_eval eng st t ~orig sigma rem =
   let orig = t_attr_copy orig t in
   match t.t_node with
   | Tvar v ->
     begin
-      try
-        let t = Mvs.find v sigma in
-        incr(rec_step_limit);
-        { value_stack = Term (t_attr_copy orig t) :: st ;
-          cont_stack = rem;
-        }
-      with Not_found ->
-        (* this may happen, e.g when computing below a quantified formula *)
-        (*
-          Format.eprintf "Tvar not found: %a@." Pretty.print_vs v;
-          assert false
-        *)
-        { value_stack = Term orig :: st ;
-          cont_stack = rem;
-        }
+      match Ident.Mid.find v.vs_name eng.known_map with
+      | Decl.{d_node = Dlogic [(_ls, ls_defn)]} ->
+        incr rec_step_limit ;
+        let vs, t = Decl.open_ls_defn ls_defn in
+        let aux vs t =
+          (* ε fc. λ vs. fc @ vs = t *)
+          let ty = Opt.get t.t_ty in
+          let app_ty = Ty.ty_func vs.vs_ty ty in
+          let fc = create_vsymbol (Ident.id_fresh "fc") app_ty in
+          t_eps
+            (t_close_bound fc
+               (t_quant Tforall
+                  (t_close_quant [vs] []
+                     (t_app ps_equ
+                        [t_app fs_func_app [t_var fc; t_var vs] (Some ty); t]
+                        None)))) in
+        let t = List.fold_right aux vs t in
+        {value_stack = Term t :: st; cont_stack = rem}
+      | _ -> assert false
+      | exception Not_found ->
+        match Mvs.find v sigma with
+        | t ->
+          incr(rec_step_limit);
+          { value_stack = Term (t_attr_copy orig t) :: st ;
+            cont_stack = rem;
+          }
+        | exception Not_found ->
+          (* this may happen, e.g when computing below a quantified formula *)
+          (* Format.eprintf "Tvar not found: %a@." Pretty.print_vs v;
+              assert false *)
+          { value_stack = Term orig :: st ;
+            cont_stack = rem;
+          }
     end
   | Tif(t1,t2,t3) ->
     { value_stack = st;
@@ -1000,16 +1018,21 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
     }
   with Not_found | Undetermined ->
     let args = List.map term_of_value args in
-    let d = try Ident.Mid.find ls.ls_name engine.known_map
-      with Not_found -> assert false in
-    let rewrite () =
+    match Ident.Mid.find ls.ls_name engine.known_map with
+    | exception Not_found ->
+      Format.eprintf "Reduction engine, ident not found: %s@."
+        ls.ls_name.Ident.id_string ;
+      { value_stack = Term (t_attr_copy orig (t_app ls args ty)) :: rem_st;
+        cont_stack = rem_cont;
+      }
+    | d ->
+      let rewrite () =
       (* try a rewrite rule *)
-        begin
-          try
+        try
 (*
             Format.eprintf "try a rewrite rule on %a@." Pretty.print_ls ls;
 *)
-            let (mt,mv),rhs = one_step_reduce engine ls args in
+          let (mt,mv),rhs = one_step_reduce engine ls args in
 (*
             Format.eprintf "rhs = %a@." Pretty.print_term rhs;
             Format.eprintf "sigma = ";
@@ -1042,16 +1065,16 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
               sigma;
             Format.eprintf "@.";
 *)
-            let mv,rhs = t_subst_types mt mv rhs in
-            incr(rec_step_limit);
-            { value_stack = rem_st;
-              cont_stack = (Keval(rhs,mv),orig) :: rem_cont;
-            }
-          with Irreducible ->
-            { value_stack =
-                Term (t_attr_copy orig (t_app ls args ty)) :: rem_st;
-              cont_stack = rem_cont; }
-        end in
+          let mv,rhs = t_subst_types mt mv rhs in
+          incr(rec_step_limit);
+          { value_stack = rem_st;
+            cont_stack = (Keval(rhs,mv),orig) :: rem_cont;
+          }
+        with Irreducible ->
+          { value_stack = Term (t_attr_copy orig (t_app ls args ty)) :: rem_st;
+            cont_stack = rem_cont;
+          }
+      in
       match d.Decl.d_node with
       | Decl.Dtype _ | Decl.Dprop _ -> assert false
       | Decl.Dlogic dl ->
