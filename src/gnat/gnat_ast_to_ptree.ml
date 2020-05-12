@@ -127,22 +127,7 @@ let short_name Node_id =
 
 let mk_idents_of_type (node: type_id) =
   let Type r = node.desc in
-  let idents =
-    if true (* Present (Name) *) then
-      mk_idents_of_name ~notation:None [] r.name
-    else
-      (* TODO Name cannot be empty in Gnat_ast, why has it multiplicity Id_One in
-         gnat2why? *)
-      match r.type_kind with
-      | Abstract ->
-          (* assert (present node.info.node); *)
-          let n = node.info.node in
-          [mk_ident [] (String.capitalize_ascii (full_name n));
-           mk_ident [] (short_name n)]
-      | Builtin -> (* As in why-atree-sprint.adb *)
-          [mk_ident [] "EW_Builtin"]
-      | Split -> (*  As in why-atree-sprint.adb *)
-          [mk_ident [] "EW_Split"] in
+  let idents = mk_idents_of_name ~notation:None [] r.name in
   if r.is_mutable then
     List.map_last (ident_add_suffix "__ref") idents
   else
