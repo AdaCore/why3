@@ -1188,6 +1188,12 @@ let read_channel env path filename c =
     try From_json.file_from_json json
     with From_json.Unexpected_Json (s, node) ->
       raise (Unexpected_json (s, find_path node json)) in
+  (* Debug printing of intermediate GNAT ast *)
+  if Debug.test_flag debug then begin
+      let out = open_out (filename^".gnat_ast") in
+      Format.fprintf (Format.formatter_of_out_channel out) "%a@."
+        Gnat_ast_pretty.pp_file gnat_file
+  end;
   let mlw_file = mlw_file gnat_file.theory_declarations in
   (* Defer printing of mlw file until after the typing, to set the marker of located
      exceptions *)
