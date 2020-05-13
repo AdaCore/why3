@@ -373,7 +373,7 @@ let read_channel env _path file c =
     Loc.Located(loc,e) ->
     let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
     Format.eprintf "%a%s@." Loc.report_position loc msg;
-    Format.eprintf "%a@."
+    Debug.dprintf debug "%a@."
       (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
       ptree;
     exit 1
@@ -381,18 +381,3 @@ let read_channel env _path file c =
 let () =
   Env.register_format mlw_language "mlcfg" ["mlcfg"] read_channel
     ~desc:"whyml extending with functions implemented by control-flow-graphs"
-
-(*
-(* Add an extension of task printing *)
-let () = Itp_server.add_registered_lang "micro-C"
-    (fun _ -> Mc_printer.microc_ext_printer)
-
-(* Add transformation arguments parsing *)
-let () = Args_wrapper.set_argument_parsing_functions "micro-C"
-    ~parse_term:(fun _ lb -> Mc_lexer.parse_term lb)
-    ~parse_term_list:(fun _ lb -> Mc_lexer.parse_term_list lb)
-    ~parse_list_ident:(fun lb -> Mc_lexer.parse_list_ident lb)
-    (* TODO for qualids, add a similar funciton *)
-    ~parse_qualid:(fun lb -> Lexer.parse_qualid lb)
-    ~parse_list_qualid:(fun lb -> Lexer.parse_list_qualid lb)
- *)
