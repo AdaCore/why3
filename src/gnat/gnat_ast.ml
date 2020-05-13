@@ -91,8 +91,6 @@ type record_definition_tag = [`Record_definition]
 type range_type_definition_tag = [`Range_type_definition]
 type triggers_tag = [`Triggers]
 type trigger_tag = [`Trigger]
-type postcondition_tag = [`Postcondition]
-type exn_condition_tag = [`Exn_condition]
 type handler_tag = [`Handler]
 type field_association_tag = [`Field_association]
 type universal_quantif_tag = [`Universal_quantif]
@@ -285,8 +283,6 @@ type any_node_tag = [
  | `Range_type_definition
  | `Triggers
  | `Trigger
- | `Postcondition
- | `Exn_condition
  | `Handler
  | `Field_association
  | `Universal_quantif
@@ -362,8 +358,6 @@ and 'a why_node_desc =
   | Range_type_definition : {first: uint; last: uint} -> [> range_type_definition_tag] why_node_desc
   | Triggers : {triggers: trigger_list} -> [> triggers_tag] why_node_desc
   | Trigger : {terms: expr_list} -> [> trigger_tag] why_node_desc
-  | Postcondition : {pred: pred_id; handlers: exn_condition_olist} -> [> postcondition_tag] why_node_desc
-  | Exn_condition : {exn_case: identifier_id; pred: pred_id} -> [> exn_condition_tag] why_node_desc
   | Handler : {name: name_id; arg: prog_oid; def: prog_id} -> [> handler_tag] why_node_desc
   | Field_association : {field: identifier_id; value: expr_id} -> [> field_association_tag] why_node_desc
   | Universal_quantif : {variables: identifier_list; labels: symbol_set; var_type: type_id; triggers: triggers_oid; pred: pred_id} -> [> universal_quantif_tag] why_node_desc
@@ -472,16 +466,6 @@ and trigger_oid = trigger_tag why_node_oid
 and trigger_olist = trigger_tag why_node_olist
 and trigger_id = trigger_tag why_node_id
 and trigger_list = trigger_tag why_node_list
-
-and postcondition_oid = postcondition_tag why_node_oid
-and postcondition_olist = postcondition_tag why_node_olist
-and postcondition_id = postcondition_tag why_node_id
-and postcondition_list = postcondition_tag why_node_list
-
-and exn_condition_oid = exn_condition_tag why_node_oid
-and exn_condition_olist = exn_condition_tag why_node_olist
-and exn_condition_id = exn_condition_tag why_node_id
-and exn_condition_list = exn_condition_tag why_node_list
 
 and handler_oid = handler_tag why_node_oid
 and handler_olist = handler_tag why_node_olist
@@ -832,16 +816,6 @@ let trigger_coercion (node : any_node_tag why_node) : trigger_tag why_node =
   match node.desc with
   | Trigger _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "trigger_coercion"
-
-let postcondition_coercion (node : any_node_tag why_node) : postcondition_tag why_node =
-  match node.desc with
-  | Postcondition _ as desc -> {info=node.info; desc}
-  | _ -> invalid_arg "postcondition_coercion"
-
-let exn_condition_coercion (node : any_node_tag why_node) : exn_condition_tag why_node =
-  match node.desc with
-  | Exn_condition _ as desc -> {info=node.info; desc}
-  | _ -> invalid_arg "exn_condition_coercion"
 
 let handler_coercion (node : any_node_tag why_node) : handler_tag why_node =
   match node.desc with
@@ -1257,8 +1231,6 @@ let any_node_coercion (node : any_node_tag why_node) : any_node_tag why_node =
   | Range_type_definition _ as desc -> {info=node.info; desc}
   | Triggers _ as desc -> {info=node.info; desc}
   | Trigger _ as desc -> {info=node.info; desc}
-  | Postcondition _ as desc -> {info=node.info; desc}
-  | Exn_condition _ as desc -> {info=node.info; desc}
   | Handler _ as desc -> {info=node.info; desc}
   | Field_association _ as desc -> {info=node.info; desc}
   | Universal_quantif _ as desc -> {info=node.info; desc}
@@ -1581,32 +1553,6 @@ module From_json = struct
       } in
       let desc = Trigger {
         terms = expr_opaque_list_from_json terms;
-      } in
-      {info; desc}
-    | `List [`String "W_POSTCONDITION"; id; node; domain; link; checked; pred; handlers] ->
-      let info = {
-        id = int_from_json id;
-        node = node_id_from_json node;
-        domain = domain_from_json domain;
-        link = why_node_set_from_json link;
-        checked = boolean_from_json checked;
-      } in
-      let desc = Postcondition {
-        pred = pred_opaque_id_from_json pred;
-        handlers = exn_condition_opaque_olist_from_json handlers;
-      } in
-      {info; desc}
-    | `List [`String "W_EXN_CONDITION"; id; node; domain; link; checked; exn_case; pred] ->
-      let info = {
-        id = int_from_json id;
-        node = node_id_from_json node;
-        domain = domain_from_json domain;
-        link = why_node_set_from_json link;
-        checked = boolean_from_json checked;
-      } in
-      let desc = Exn_condition {
-        exn_case = identifier_opaque_id_from_json exn_case;
-        pred = pred_opaque_id_from_json pred;
       } in
       {info; desc}
     | `List [`String "W_HANDLER"; id; node; domain; link; checked; name; arg; def] ->
@@ -2407,16 +2353,6 @@ module From_json = struct
   and trigger_opaque_olist_from_json json =  why_node_olist_from_json trigger_coercion json
   and trigger_opaque_id_from_json json =  why_node_id_from_json trigger_coercion json
   and trigger_opaque_list_from_json json =  why_node_list_from_json trigger_coercion json
-
-  and postcondition_opaque_oid_from_json json =  why_node_oid_from_json postcondition_coercion json
-  and postcondition_opaque_olist_from_json json =  why_node_olist_from_json postcondition_coercion json
-  and postcondition_opaque_id_from_json json =  why_node_id_from_json postcondition_coercion json
-  and postcondition_opaque_list_from_json json =  why_node_list_from_json postcondition_coercion json
-
-  and exn_condition_opaque_oid_from_json json =  why_node_oid_from_json exn_condition_coercion json
-  and exn_condition_opaque_olist_from_json json =  why_node_olist_from_json exn_condition_coercion json
-  and exn_condition_opaque_id_from_json json =  why_node_id_from_json exn_condition_coercion json
-  and exn_condition_opaque_list_from_json json =  why_node_list_from_json exn_condition_coercion json
 
   and handler_opaque_oid_from_json json =  why_node_oid_from_json handler_coercion json
   and handler_opaque_olist_from_json json =  why_node_olist_from_json handler_coercion json
