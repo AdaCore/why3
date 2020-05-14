@@ -119,12 +119,6 @@ let mk_ident_of_symbol id ~notation attrs sym =
   let notation = Opt.get (fun s -> s) notation in
   mk_ident attrs (notation (Opt.force (conversion_error id "empty symbol") (string_of_symbol sym)))
 
-let full_name Node_id =
-  failwith "full_name"
-
-let short_name Node_id =
-  failwith "short_name"
-
 let mk_idents_of_type (node: type_id) =
   let Type r = node.desc in
   let idents = mk_idents_of_name ~notation:None [] r.name in
@@ -250,6 +244,69 @@ module Curr = struct
           | Symbol s -> "'@"^s^"@'" in
         Opt.(to_list (map mk_pos (mk_location (Source_ptr {r with filename=mark^r.filename}))))
 end
+
+let is_true t = match t.term_desc with
+  | Ttrue -> true
+  | _ -> false
+
+let no_vcs_in_spec spec =
+  spec.sp_post = [] && spec.sp_xpost = [] && spec.sp_variant = []
+
+(** Check (syntactically) if an expression does not trigger any VCs, i.e. it does
+    not contain any application (idapp, apply, infix, or innfix, any, which may
+    generate preconditions), declaration (fun, rec, which may generate
+    postconditions), or logical statement (absurd, assert, check). *)
+let rec no_vcs_in_expr e = match e.expr_desc with
+  | Eref | Etrue | Efalse | Econst _ | Eident _ | Easref _ ->
+      true
+  | Eidapp _ | Eapply _ | Einfix _ | Einnfix _ ->
+      false (* preconditions of the callee *)
+  | Elet (_, _, _, e1, e2) ->
+      no_vcs_in_expr e1 && no_vcs_in_expr e2
+  | Erec (funs, e) ->
+      let aux (_, _, _, _, _, _, _, spec, e) =
+        no_vcs_in_spec spec && no_vcs_in_expr e in
+      List.for_all aux funs && no_vcs_in_expr e
+  | Efun (_, _, _, _, spec, e) ->
+      no_vcs_in_spec spec && no_vcs_in_expr e
+  | Eany (_, _, _, _, _, spec) ->
+      spec.sp_pre = [] (* existence *)
+  | Etuple es ->
+      List.for_all no_vcs_in_expr es
+  | Erecord fs ->
+      List.for_all (fun (_, e) -> no_vcs_in_expr e) fs
+  | Eupdate (e, fs) ->
+      no_vcs_in_expr e &&
+      List.for_all (fun (_, e) -> no_vcs_in_expr e) fs
+  | Eassign ans ->
+      List.for_all (fun (e1, _, e2) -> no_vcs_in_expr e1 && no_vcs_in_expr e2) ans
+  | Esequence (e1, e2) ->
+      no_vcs_in_expr e1 && no_vcs_in_expr e2
+  | Eif (e1, e2, e3) ->
+      no_vcs_in_expr e1 && no_vcs_in_expr e2 && no_vcs_in_expr e3
+  | Ewhile (e1, inv, var, e2) ->
+      inv = [] && var = [] &&
+      no_vcs_in_expr e1 && no_vcs_in_expr e2
+  | Eand (e1, e2) | Eor (e1, e2) ->
+      no_vcs_in_expr e1 && no_vcs_in_expr e2
+  | Enot e ->
+      no_vcs_in_expr e
+  | Ematch (e, regs, exns) ->
+      no_vcs_in_expr e &&
+      List.for_all (fun (_, e) -> no_vcs_in_expr e) regs &&
+      List.for_all (fun (_, _, e) -> no_vcs_in_expr e) exns
+  | Eabsurd ->
+      false
+  | Epure _ | Eidpur _ | Eraise (_, None) ->
+      true
+  | Eraise (_, Some e) | Eexn (_, _, _, e) | Eoptexn (_, _, e) ->
+      no_vcs_in_expr e
+  | Efor (_, e1, _, e2, inv, e3) ->
+      inv = [] && no_vcs_in_expr e1 && no_vcs_in_expr e2 && no_vcs_in_expr e3
+  | Eassert (Expr.(Assert|Check), _) -> false
+  | Eassert (Expr.Assume, _) -> true
+  | Escope (_, e) | Elabel (_, e) | Ecast (e, _) | Eghost e | Eattr (_, e) ->
+      no_vcs_in_expr e
 
 (* The conversion from Gnat_ast to Ptree is parameterized in ['a]/[t] by the targeted type
    ([Ptree.expr] or [Ptree.term]) and the corresponding smart constructors from
@@ -693,8 +750,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
 
     | Statement_sequence r ->
         expr_only
-          (let firsts, last =
-             let statements =
+          E.(let firsts, last =
                let rec flatten_seq (node: prog_id) =
                  match node.desc with
                  | Statement_sequence r ->
@@ -702,25 +758,35 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
                  | _ -> [node]
                and flatten_seqs (nodes: prog_list) =
                  List.(concat (map flatten_seq (list_of_nonempty nodes))) in
-               List.map mk_expr_of_prog
-                 (flatten_seqs r.statements) in
-             match List.rev statements with
-             | last :: firsts -> List.rev firsts, last
-             | _ -> assert false in
-           List.fold_right (E.mk_seq ?loc:None) firsts last)
+               let not_unit = function
+                 | {expr_desc = Etuple []} -> false
+                 | _ -> true in
+               let statements =
+                 List.filter not_unit
+                   (List.map mk_expr_of_prog
+                      (flatten_seqs r.statements)) in
+               match List.rev statements with
+               | [] -> [], mk_tuple []
+               | last :: firsts -> List.rev firsts, last in
+             List.fold_right (mk_seq ?loc:None) firsts last)
 
     | Abstract_expr r ->
+        (* begin ensures { <r.post> } let _ = <r.expr> in () end *)
         expr_only
-          (let pat = P.mk_wild () in
-           let spec =
-             let post = [ensures (mk_term_of_pred r.post)] in
-             mk_spec ~post () in
-           let body =
-             let id = mk_ident [] "_" in
-             let value = mk_expr_of_prog r.expr in
-             let body = E.mk_tuple [] in
-             E.mk_let id value body in
-           E.mk_fun [] None pat Ity.MaskVisible spec body)
+          E.(let post = mk_term_of_pred r.post in
+             let expr = mk_expr_of_prog r.expr in
+             if is_true post && no_vcs_in_expr expr then
+               mk_tuple []
+             else
+               let pat = P.mk_wild () in
+               let spec =
+                 let post = [ensures post] in
+                 mk_spec ~post () in
+               let body =
+                 let id = mk_ident [] "_" in
+                 let body = mk_tuple [] in
+                 mk_let id expr body in
+               mk_fun [] None pat Ity.MaskVisible spec body)
 
     | Assert r ->
         expr_only
