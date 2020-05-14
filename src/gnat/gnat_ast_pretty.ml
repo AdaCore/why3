@@ -91,6 +91,8 @@ let rec pp_why_node : type a . Format.formatter -> a why_node -> unit =
   | { desc = Trigger _ } as n -> pp_trigger fmt n
   | { desc = Handler _ } as n -> pp_handler fmt n
   | { desc = Field_association _ } as n -> pp_field_association fmt n
+  | { desc = Variant _ } as n -> pp_variant fmt n
+  | { desc = Variants _ } as n -> pp_variants fmt n
   | { desc = Universal_quantif _ } as n -> pp_universal_quantif fmt n
   | { desc = Existential_quantif _ } as n -> pp_existential_quantif fmt n
   | { desc = Not _ } as n -> pp_not fmt n
@@ -119,7 +121,7 @@ let rec pp_why_node : type a . Format.formatter -> a why_node -> unit =
   | { desc = Any_expr _ } as n -> pp_any_expr fmt n
   | { desc = Assignment _ } as n -> pp_assignment fmt n
   | { desc = Binding_ref _ } as n -> pp_binding_ref fmt n
-  | { desc = While_loop _ } as n -> pp_while_loop fmt n
+  | { desc = Loop _ } as n -> pp_loop fmt n
   | { desc = Statement_sequence _ } as n -> pp_statement_sequence fmt n
   | { desc = Abstract_expr _ } as n -> pp_abstract_expr fmt n
   | { desc = Assert _ } as n -> pp_assert fmt n
@@ -441,6 +443,45 @@ and pp_float_constant fmt (n : float_constant_id) =
   | Float_constant r ->
     Format.fprintf fmt "%a" pp_ureal r.value
 
+and pp_loop fmt (n : loop_id) =
+  match n.desc with
+  | Loop r ->
+    Format.fprintf fmt "@[<hov 2>loop@ %a@\n%a@\n%a@\n%a@\n end loop@]"
+      pp_why_node r.code_before pp_invariant_list r.invariants
+      pp_variants_list r.variants pp_why_node r.code_after
+
+and pp_invariant_list fmt (n : pred_olist) =
+  let print_inv fmt n = Format.fprintf fmt "invariant@ {@[%a@]}" pp_why_node n in
+  pp_print_list ~pp_sep:Why3.Pp.newline print_inv fmt n
+
+and pp_variants_list fmt (n : variants_olist) =
+  pp_print_list ~pp_sep:Why3.Pp.newline pp_why_node fmt n
+
+and pp_variants fmt (n : variants_id) =
+  match n.desc with
+  | Variants r ->
+    Format.fprintf fmt "variant @ {@[%a@]}"
+      (pp_print_list ~pp_sep:Why3.Pp.newline pp_why_node)
+      (r.variants.elt0 :: r.variants.elts)
+
+and pp_variant fmt (n : variant_id) =
+  match n.desc with
+  | Variant r ->
+    Format.fprintf fmt "%a@ =>@ @[%a@]"
+      pp_why_node r.cmp_op pp_why_node r.expr
+
+and pp_any_expr fmt (n : any_expr_id) =
+  let Any_expr r = n.desc in
+  Format.fprintf fmt "(@[<hov 2>%a any@ %a@ pre@ {@[%a@]@]}@ post@ {@[%a@]}@ return@ %a)@]"
+  pp_symbol_set_label r.labels pp_why_node_option r.effects
+  pp_why_node_option r.pre pp_why_node_option r.post
+  pp_why_node r.return_type
+
+and pp_epsilon fmt (n : epsilon_id) =
+  let Epsilon r = n.desc in
+  Format.fprintf fmt "@[(epsilon %a : %a {@[%a@]})@]"
+    pp_why_node r.name pp_why_node r.typ pp_why_node r.pred
+
 and pp_effects fmt (n : effects_id) = Format.fprintf fmt "--pp_effects NOT IMPLEMENTED"
 and pp_transparent_type_definition fmt (n : transparent_type_definition_id) = Format.fprintf fmt "--pp_transparent_type_definition NOT IMPLEMENTED"
 and pp_triggers fmt (n : triggers_id) = Format.fprintf fmt "--pp_triggers NOT IMPLEMENTED"
@@ -450,12 +491,9 @@ and pp_universal_quantif fmt (n : universal_quantif_id) = Format.fprintf fmt "--
 and pp_existential_quantif fmt (n : existential_quantif_id) = Format.fprintf fmt "--pp_existential_quantif NOT IMPLEMENTED"
 and pp_not fmt (n : not_id) = Format.fprintf fmt "--pp_not NOT IMPLEMENTED"
 and pp_tagged fmt (n : tagged_id) = Format.fprintf fmt "--pp_tagged NOT IMPLEMENTED"
-and pp_epsilon fmt (n : epsilon_id) = Format.fprintf fmt "--pp_epsilon NOT IMPLEMENTED"
 and pp_record_update fmt (n : record_update_id) = Format.fprintf fmt "--pp_record_update NOT IMPLEMENTED"
 and pp_record_aggregate fmt (n : record_aggregate_id) = Format.fprintf fmt "--pp_record_aggregate NOT IMPLEMENTED"
-and pp_any_expr fmt (n : any_expr_id) = Format.fprintf fmt "--pp_any_expr NOT IMPLEMENTED"
 and pp_binding_ref fmt (n : binding_ref_id) = Format.fprintf fmt "--pp_binding_ref NOT IMPLEMENTED"
-and pp_while_loop fmt (n : while_loop_id) = Format.fprintf fmt "--pp_while_loop NOT IMPLEMENTED"
 and pp_exception_declaration fmt (n : exception_declaration_id) = Format.fprintf fmt "--pp_exception_declaration NOT IMPLEMENTED"
 and pp_custom_substitution fmt (n : custom_substitution_id) = Format.fprintf fmt "--pp_custom_substitution NOT IMPLEMENTED"
 and pp_custom_declaration fmt (n : custom_declaration_id) = Format.fprintf fmt "--pp_custom_declaration NOT IMPLEMENTED"

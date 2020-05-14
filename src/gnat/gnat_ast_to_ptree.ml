@@ -315,6 +315,52 @@ let rec no_vcs_in_expr e = match e.expr_desc with
    the target type raise an exception [Failure] (but that should only happen when there is
    a problem in the generated [Gnat_ast]). *)
 
+let process_call : 'a . (module E_or_T with type t = 'a) -> 'b why_node_id -> identifier_id -> 'a list  -> 'a =
+  fun (type t) (module E_or_T : E_or_T with type t = t) (node : 'b why_node_id) id args : t ->
+  (* Convert unquantified op1 operations (=, <, etc.) to innfix, binary only *)
+  let open E_or_T in
+  if is_infix_identifier id && is_op1 id then begin
+    let op =
+      List.get_last (conversion_error node.info.id "empty operator name")
+        (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] id) in
+    match args with
+    | [arg0;arg1] -> mk_innfix arg0 op arg1
+    | _ -> conversion_error node.info.id "op1 operations must be binary" ()
+  end
+  (* Convert unqualified op234 prefix operations (/, *, !, etc.) *)
+  else if is_infix_identifier id && is_op234 id then begin
+    match args with
+    | [_] ->
+      let qid =
+        let ident =
+          List.get_last (conversion_error node.info.id "empty operator name")
+            (mk_idents_of_identifier ~notation:(Some Ident.op_prefix) [] id) in
+        mk_qualid [ident] in
+      mk_idapp qid args
+    | [_;_] ->
+    let qid =
+      let ident =
+        List.get_last (conversion_error node.info.id "empty operator name")
+          (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] id) in
+      mk_qualid [ident] in
+      mk_idapp qid args
+    | _ ->
+        conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
+  end else (begin
+    if is_infix_identifier id then
+      Format.ksprintf (conversion_error node.info.id) "infix identifier %s must be op1 or op234"
+        (String.concat "." (strings_of_name (name_of_identifier id))) ();
+    let notation =
+      if is_op1 id || is_op234 id then
+        match List.length args with
+        | 1 -> Some Ident.op_prefix
+        | 2 -> Some Ident.op_infix
+        | _ -> conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
+      else None in
+      let f = mk_var (mk_qualid (mk_idents_of_identifier ~notation [] id)) in
+      List.fold_left (mk_apply ?loc:None) f args
+  end)
+
 let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
   (* Signature type ^^^^^ variable ['a] required to make [mk_of_expr] strongly polymorphic *)
   fun (type t) (module E_or_T : E_or_T with type t = t) (node: expr_id) : t ->
@@ -337,6 +383,16 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
   let mk_identifier_labels (node : identifier_id) =
     let Identifier r = node.desc in
     List.filter_map mk_label r.labels in
+  let mk_seqs l =
+    let not_unit = function
+      | {expr_desc = Etuple []} -> false
+      | _ -> true in
+    let statements = List.filter not_unit l in
+    let firsts, last =
+      match List.rev statements with
+      | [] -> [], E.mk_tuple []
+      | last :: firsts -> List.rev firsts, last in
+    List.fold_right (E.mk_seq ?loc:None) firsts last in
   let mk_comment s e =
     match mk_comment_attr s with
     | None -> e
@@ -373,50 +429,6 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
           mk_const (Constant.real_const ~pow2 ~pow5:BigInt.zero int)
       | _ ->
           conversion_error id ("unsupported base "^string_of_int r.base^" for ureal") () in
-
-  let process_call node id args =
-    (* Convert unquantified op1 operations (=, <, etc.) to innfix, binary only *)
-    if is_infix_identifier id && is_op1 id then begin
-      let op =
-        List.get_last (conversion_error node.info.id "empty operator name")
-          (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] id) in
-      match args with
-      | [arg0;arg1] -> mk_innfix arg0 op arg1
-      | _ -> conversion_error node.info.id "op1 operations must be binary" ()
-    end
-    (* Convert unqualified op234 prefix operations (/, *, !, etc.) *)
-    else if is_infix_identifier id && is_op234 id then begin
-      match args with
-      | [_] ->
-        let qid =
-          let ident =
-            List.get_last (conversion_error node.info.id "empty operator name")
-              (mk_idents_of_identifier ~notation:(Some Ident.op_prefix) [] id) in
-          mk_qualid [ident] in
-        mk_idapp qid args
-      | [_;_] ->
-      let qid =
-        let ident =
-          List.get_last (conversion_error node.info.id "empty operator name")
-            (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] id) in
-        mk_qualid [ident] in
-        mk_idapp qid args
-      | _ ->
-          conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
-    end else begin
-      if is_infix_identifier id then
-        Format.ksprintf (conversion_error node.info.id) "infix identifier %s must be op1 or op234"
-          (String.concat "." (strings_of_name (name_of_identifier id))) ();
-      let notation =
-        if is_op1 id || is_op234 id then
-          match List.length args with
-          | 1 -> Some Ident.op_prefix
-          | 2 -> Some Ident.op_infix
-          | _ -> conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
-        else None in
-        let f = mk_var (mk_qualid (mk_idents_of_identifier ~notation [] id)) in
-        List.fold_left (mk_apply ?loc:None) f args
-    end in
 
   let curr_attrs = Curr.mk_attrs () in
 
@@ -552,7 +564,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
 
     | Call r ->
         let args = List.map mk_of_expr r.args in
-        process_call node r.name args
+        process_call (module E_or_T: E_or_T with type t = t) node r.name args
 
     | Literal r ->
         if node.info.domain = Pred then
@@ -737,34 +749,100 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
            let body = mk_expr_of_prog r.context in
            mk_let id ref body)
 
-    | While_loop r ->
+    | Loop r ->
+        (* Loops in the GNAT AST are of the form
+            loop
+              code before invariants
+              invariants/variants
+              code after invariants
+            end
+
+            We transform these loops into Why3 loops of the form
+            code before
+            while True loop
+              invariant
+              compute old values for variants
+              code after
+              code before
+              compute new values for variants, compare with old values
+            end
+
+        *)
         expr_only
-          (let condition = mk_expr_of_prog r.condition in
+          (let true_expr = E.mk_var (mk_qualid [(mk_ident [] "True")]) in
+           let false_pred = T.mk_var (mk_qualid [mk_ident [] "False"]) in
            let invariants = List.(map (T.name_term "LoopInvariant") (map mk_term_of_pred r.invariants)) in
-           let body = mk_expr_of_prog r.loop_content in
-           E.mk_while condition invariants [] body)
+           let mk_variant_ident (v : variant_id) =
+             (* creating a unique tmp var for this loop variant, by using the node id *)
+              mk_ident [] ("loop_var___" ^ string_of_int v.info.id) in
+           let check_variant (v : variant_id) acc =
+             (* checking a single variant; we compare the old value (stored in
+                the tmp var) to the new value computed by the term. The
+                comparison operator is provided in the tree.
+                The accumulator contains the check coditions if this variant
+                doesn't progress (stays the same). *)
+              let Variant r = v.desc in
+              let new_ = mk_term_of_term r.expr in
+              let old = T.mk_var (mk_qualid [mk_variant_ident v]) in
+              let expr = process_call (module T) v r.cmp_op [new_;old] in
+              let eq = mk_ident [] (Ident.op_infix "=") in
+              T.mk_attrs (List.filter_map mk_label r.labels)
+                (T.mk_binop
+                  expr
+                  `Or_asym
+                  (T.mk_binop (T.mk_infix new_ eq old) `And_asym acc)) in
+           (* checking all variants of a given Variants node is just a fold
+              which starts at the end, starting with the false condition. *)
+           let check_variants (v : variants_id) =
+              let Variants v = v.desc in
+              let pred =
+                List.fold_right check_variant (v.variants.elt0 :: v.variants.elts)
+                  false_pred in
+              E.mk_assert Expr.Assert pred in
+           (* Each Variants node is checked indepently of the others, so here
+              we just map over the list of Variants nodes.
+            *)
+           let check_variants =
+             List.fold_right (E.mk_seq ?loc:None)
+                (List.map check_variants r.variants)
+                (E.mk_tuple []) in
+           (* we introduce the temp vars to hold the old values of the variant
+              nodes. We can do this in a single fold (no need to group by
+              Variants). *)
+           let intro_vars =
+             List.fold_right (fun (v : variants_id) acc ->
+                let Variants vs = v.desc in
+                List.fold_right (fun v acc ->
+                  let Variant r = v.desc in
+                  let value = mk_expr_of_term r.expr in
+                  E.mk_let (mk_variant_ident v) value acc)
+                  (vs.variants.elt0 :: vs.variants.elts) acc) r.variants in
+           let code_after = mk_expr_of_prog r.code_after in
+           let code_before = mk_expr_of_prog r.code_before in
+           let loop_body =
+              mk_seqs
+                [mk_comment
+                  (Symbol "gnat_ast_to_ptree: code after the loop invariant")
+                   code_after;
+                 mk_comment (Symbol "gnat_ast_to_ptree: code before the loop invariant")
+                   code_before;
+                 mk_comment (Symbol "gnat_ast_to_ptree: code checking the variants")
+                   check_variants
+                ] in
+           let loop_body = intro_vars loop_body in
+           let loop = E.mk_while true_expr invariants [] loop_body in
+           E.mk_seq code_before loop)
 
     | Statement_sequence r ->
         expr_only
-          E.(let firsts, last =
-               let rec flatten_seq (node: prog_id) =
-                 match node.desc with
-                 | Statement_sequence r ->
-                     flatten_seqs r.statements
-                 | _ -> [node]
-               and flatten_seqs (nodes: prog_list) =
-                 List.(concat (map flatten_seq (list_of_nonempty nodes))) in
-               let not_unit = function
-                 | {expr_desc = Etuple []} -> false
-                 | _ -> true in
-               let statements =
-                 List.filter not_unit
-                   (List.map mk_expr_of_prog
-                      (flatten_seqs r.statements)) in
-               match List.rev statements with
-               | [] -> [], mk_tuple []
-               | last :: firsts -> List.rev firsts, last in
-             List.fold_right (mk_seq ?loc:None) firsts last)
+          (let rec flatten_seq (node: prog_id) =
+               match node.desc with
+               | Statement_sequence r ->
+                   flatten_seqs r.statements
+               | _ -> [node]
+             and flatten_seqs (nodes: prog_list) =
+               List.(concat (map flatten_seq (list_of_nonempty nodes))) in
+             mk_seqs (List.map mk_expr_of_prog (flatten_seqs r.statements)))
 
     | Abstract_expr r ->
         (* begin ensures { <r.post> } let _ = <r.expr> in () end *)
@@ -820,7 +898,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
 
   let res =
     match node.desc with
-    | Raise _ | While_loop _ | Abstract_expr _ | Any_expr _ | Assert _ | Assignment _ | Binding_ref _ | Try_block _ ->
+    | Raise _ | Loop _ | Abstract_expr _ | Any_expr _ | Assert _ | Assignment _ | Binding_ref _ | Try_block _ ->
         mk_attrs curr_attrs res
     | _ -> res in
   res
@@ -833,13 +911,22 @@ and mk_expr_of_expr (node : expr_id) : expr =
 and mk_term_of_expr (node : expr_id) : term =
   mk_of_expr (module T) node
 
+and mk_expr_of_term (node : term_id) : expr =
+  match node.desc with
+ | Label _ | Loc_label _ | Identifier _ | Tagged _ | Call _ | Literal _
+ | Binding _ | Elsif _ | Epsilon _ | Conditional _ | Integer_constant _
+ | Range_constant _ | Modular_constant _ | Fixed_constant _ | Real_constant _
+ | Float_constant _ | Comment _ | Deref _ | Record_access _
+ | Record_update _ | Record_aggregate _ as desc ->
+      mk_expr_of_expr {node with desc}
+
 and mk_expr_of_prog (node : prog_id) =
   match node.desc with
   | Not _ | Connection _ | Label _ | Loc_label _ | Identifier _ | Tagged _ | Call _
   | Literal _ | Binding _ | Elsif _ | Epsilon _ | Conditional _ | Integer_constant _
   | Range_constant _ | Modular_constant _ | Fixed_constant _ | Real_constant _
   | Float_constant _ | Comment _ | Deref _ | Record_access _ | Record_update _
-  | Record_aggregate _ | Any_expr _ | Assignment _ | Binding_ref _ | While_loop _
+  | Record_aggregate _ | Any_expr _ | Assignment _ | Binding_ref _ | Loop _
   | Statement_sequence _ | Abstract_expr _ | Assert _ | Raise _ | Try_block _ as desc ->
       mk_expr_of_expr {node with desc}
 
@@ -849,6 +936,16 @@ and mk_term_of_pred (node : pred_id) : term =
   | Label _ | Loc_label _ | Identifier _ | Tagged _ | Call _ | Literal _
   | Binding _ | Elsif _ | Epsilon _ | Conditional _ as desc ->
       mk_term_of_expr {node with desc}
+
+and mk_term_of_term (node : term_id) : term =
+  match node.desc with
+ | Label _ | Loc_label _ | Identifier _ | Tagged _ | Call _ | Literal _
+ | Binding _ | Elsif _ | Epsilon _ | Conditional _ | Integer_constant _
+ | Range_constant  _ | Modular_constant _ | Fixed_constant _
+ | Real_constant _ | Float_constant _ | Comment _ | Deref _
+ | Record_access _ | Record_update _ | Record_aggregate _  as desc ->
+  mk_term_of_expr {node with desc}
+
 
 let mk_function_decl (node: function_decl_id) =
   let Function_decl r = node.desc in

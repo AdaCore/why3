@@ -93,6 +93,8 @@ type triggers_tag = [`Triggers]
 type trigger_tag = [`Trigger]
 type handler_tag = [`Handler]
 type field_association_tag = [`Field_association]
+type variant_tag = [`Variant]
+type variants_tag = [`Variants]
 type universal_quantif_tag = [`Universal_quantif]
 type existential_quantif_tag = [`Existential_quantif]
 type not_tag = [`Not]
@@ -121,7 +123,7 @@ type record_aggregate_tag = [`Record_aggregate]
 type any_expr_tag = [`Any_expr]
 type assignment_tag = [`Assignment]
 type binding_ref_tag = [`Binding_ref]
-type while_loop_tag = [`While_loop]
+type loop_tag = [`Loop]
 type statement_sequence_tag = [`Statement_sequence]
 type abstract_expr_tag = [`Abstract_expr]
 type assert_tag = [`Assert]
@@ -174,7 +176,7 @@ type expr_tag = [
  | `Any_expr
  | `Assignment
  | `Binding_ref
- | `While_loop
+ | `Loop
  | `Statement_sequence
  | `Abstract_expr
  | `Assert
@@ -247,7 +249,7 @@ type prog_tag = [
  | `Any_expr
  | `Assignment
  | `Binding_ref
- | `While_loop
+ | `Loop
  | `Statement_sequence
  | `Abstract_expr
  | `Assert
@@ -285,6 +287,8 @@ type any_node_tag = [
  | `Trigger
  | `Handler
  | `Field_association
+ | `Variant
+ | `Variants
  | `Universal_quantif
  | `Existential_quantif
  | `Not
@@ -313,7 +317,7 @@ type any_node_tag = [
  | `Any_expr
  | `Assignment
  | `Binding_ref
- | `While_loop
+ | `Loop
  | `Statement_sequence
  | `Abstract_expr
  | `Assert
@@ -360,6 +364,8 @@ and 'a why_node_desc =
   | Trigger : {terms: expr_list} -> [> trigger_tag] why_node_desc
   | Handler : {name: name_id; arg: prog_oid; def: prog_id} -> [> handler_tag] why_node_desc
   | Field_association : {field: identifier_id; value: expr_id} -> [> field_association_tag] why_node_desc
+  | Variant : {cmp_op: identifier_id; labels: symbol_set; expr: term_id} -> [> variant_tag] why_node_desc
+  | Variants : {variants: variant_list} -> [> variants_tag] why_node_desc
   | Universal_quantif : {variables: identifier_list; labels: symbol_set; var_type: type_id; triggers: triggers_oid; pred: pred_id} -> [> universal_quantif_tag] why_node_desc
   | Existential_quantif : {variables: identifier_list; labels: symbol_set; var_type: type_id; pred: pred_id} -> [> existential_quantif_tag] why_node_desc
   | Not : {right: expr_id} -> [> not_tag] why_node_desc
@@ -388,7 +394,7 @@ and 'a why_node_desc =
   | Any_expr : {effects: effects_oid; pre: pred_oid; post: pred_oid; return_type: type_id; labels: symbol_set} -> [> any_expr_tag] why_node_desc
   | Assignment : {name: identifier_id; value: prog_id; typ: type_id; labels: symbol_set} -> [> assignment_tag] why_node_desc
   | Binding_ref : {name: identifier_id; def: prog_id; context: prog_id; typ: type_id} -> [> binding_ref_tag] why_node_desc
-  | While_loop : {condition: prog_id; invariants: pred_olist; loop_content: prog_id} -> [> while_loop_tag] why_node_desc
+  | Loop : {code_before: prog_id; invariants: pred_olist; variants: variants_olist; code_after: prog_id} -> [> loop_tag] why_node_desc
   | Statement_sequence : {statements: prog_list} -> [> statement_sequence_tag] why_node_desc
   | Abstract_expr : {expr: prog_id; post: pred_id; typ: type_oid} -> [> abstract_expr_tag] why_node_desc
   | Assert : {pred: pred_id; assert_kind: assert_kind} -> [> assert_tag] why_node_desc
@@ -476,6 +482,16 @@ and field_association_oid = field_association_tag why_node_oid
 and field_association_olist = field_association_tag why_node_olist
 and field_association_id = field_association_tag why_node_id
 and field_association_list = field_association_tag why_node_list
+
+and variant_oid = variant_tag why_node_oid
+and variant_olist = variant_tag why_node_olist
+and variant_id = variant_tag why_node_id
+and variant_list = variant_tag why_node_list
+
+and variants_oid = variants_tag why_node_oid
+and variants_olist = variants_tag why_node_olist
+and variants_id = variants_tag why_node_id
+and variants_list = variants_tag why_node_list
 
 and universal_quantif_oid = universal_quantif_tag why_node_oid
 and universal_quantif_olist = universal_quantif_tag why_node_olist
@@ -617,10 +633,10 @@ and binding_ref_olist = binding_ref_tag why_node_olist
 and binding_ref_id = binding_ref_tag why_node_id
 and binding_ref_list = binding_ref_tag why_node_list
 
-and while_loop_oid = while_loop_tag why_node_oid
-and while_loop_olist = while_loop_tag why_node_olist
-and while_loop_id = while_loop_tag why_node_id
-and while_loop_list = while_loop_tag why_node_list
+and loop_oid = loop_tag why_node_oid
+and loop_olist = loop_tag why_node_olist
+and loop_id = loop_tag why_node_id
+and loop_list = loop_tag why_node_list
 
 and statement_sequence_oid = statement_sequence_tag why_node_oid
 and statement_sequence_olist = statement_sequence_tag why_node_olist
@@ -827,6 +843,16 @@ let field_association_coercion (node : any_node_tag why_node) : field_associatio
   | Field_association _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "field_association_coercion"
 
+let variant_coercion (node : any_node_tag why_node) : variant_tag why_node =
+  match node.desc with
+  | Variant _ as desc -> {info=node.info; desc}
+  | _ -> invalid_arg "variant_coercion"
+
+let variants_coercion (node : any_node_tag why_node) : variants_tag why_node =
+  match node.desc with
+  | Variants _ as desc -> {info=node.info; desc}
+  | _ -> invalid_arg "variants_coercion"
+
 let universal_quantif_coercion (node : any_node_tag why_node) : universal_quantif_tag why_node =
   match node.desc with
   | Universal_quantif _ as desc -> {info=node.info; desc}
@@ -967,10 +993,10 @@ let binding_ref_coercion (node : any_node_tag why_node) : binding_ref_tag why_no
   | Binding_ref _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "binding_ref_coercion"
 
-let while_loop_coercion (node : any_node_tag why_node) : while_loop_tag why_node =
+let loop_coercion (node : any_node_tag why_node) : loop_tag why_node =
   match node.desc with
-  | While_loop _ as desc -> {info=node.info; desc}
-  | _ -> invalid_arg "while_loop_coercion"
+  | Loop _ as desc -> {info=node.info; desc}
+  | _ -> invalid_arg "loop_coercion"
 
 let statement_sequence_coercion (node : any_node_tag why_node) : statement_sequence_tag why_node =
   match node.desc with
@@ -1104,7 +1130,7 @@ let expr_coercion (node : any_node_tag why_node) : expr_tag why_node =
   | Any_expr _ as desc -> {info=node.info; desc}
   | Assignment _ as desc -> {info=node.info; desc}
   | Binding_ref _ as desc -> {info=node.info; desc}
-  | While_loop _ as desc -> {info=node.info; desc}
+  | Loop _ as desc -> {info=node.info; desc}
   | Statement_sequence _ as desc -> {info=node.info; desc}
   | Abstract_expr _ as desc -> {info=node.info; desc}
   | Assert _ as desc -> {info=node.info; desc}
@@ -1186,7 +1212,7 @@ let prog_coercion (node : any_node_tag why_node) : prog_tag why_node =
   | Any_expr _ as desc -> {info=node.info; desc}
   | Assignment _ as desc -> {info=node.info; desc}
   | Binding_ref _ as desc -> {info=node.info; desc}
-  | While_loop _ as desc -> {info=node.info; desc}
+  | Loop _ as desc -> {info=node.info; desc}
   | Statement_sequence _ as desc -> {info=node.info; desc}
   | Abstract_expr _ as desc -> {info=node.info; desc}
   | Assert _ as desc -> {info=node.info; desc}
@@ -1233,6 +1259,8 @@ let any_node_coercion (node : any_node_tag why_node) : any_node_tag why_node =
   | Trigger _ as desc -> {info=node.info; desc}
   | Handler _ as desc -> {info=node.info; desc}
   | Field_association _ as desc -> {info=node.info; desc}
+  | Variant _ as desc -> {info=node.info; desc}
+  | Variants _ as desc -> {info=node.info; desc}
   | Universal_quantif _ as desc -> {info=node.info; desc}
   | Existential_quantif _ as desc -> {info=node.info; desc}
   | Not _ as desc -> {info=node.info; desc}
@@ -1261,7 +1289,7 @@ let any_node_coercion (node : any_node_tag why_node) : any_node_tag why_node =
   | Any_expr _ as desc -> {info=node.info; desc}
   | Assignment _ as desc -> {info=node.info; desc}
   | Binding_ref _ as desc -> {info=node.info; desc}
-  | While_loop _ as desc -> {info=node.info; desc}
+  | Loop _ as desc -> {info=node.info; desc}
   | Statement_sequence _ as desc -> {info=node.info; desc}
   | Abstract_expr _ as desc -> {info=node.info; desc}
   | Assert _ as desc -> {info=node.info; desc}
@@ -1580,6 +1608,32 @@ module From_json = struct
       let desc = Field_association {
         field = identifier_opaque_id_from_json field;
         value = expr_opaque_id_from_json value;
+      } in
+      {info; desc}
+    | `List [`String "W_VARIANT"; id; node; domain; link; checked; cmp_op; labels; expr] ->
+      let info = {
+        id = int_from_json id;
+        node = node_id_from_json node;
+        domain = domain_from_json domain;
+        link = why_node_set_from_json link;
+        checked = boolean_from_json checked;
+      } in
+      let desc = Variant {
+        cmp_op = identifier_opaque_id_from_json cmp_op;
+        labels = symbol_set_from_json labels;
+        expr = term_opaque_id_from_json expr;
+      } in
+      {info; desc}
+    | `List [`String "W_VARIANTS"; id; node; domain; link; checked; variants] ->
+      let info = {
+        id = int_from_json id;
+        node = node_id_from_json node;
+        domain = domain_from_json domain;
+        link = why_node_set_from_json link;
+        checked = boolean_from_json checked;
+      } in
+      let desc = Variants {
+        variants = variant_opaque_list_from_json variants;
       } in
       {info; desc}
     | `List [`String "W_UNIVERSAL_QUANTIF"; id; node; domain; link; checked; variables; labels; var_type; triggers; pred] ->
@@ -1970,7 +2024,7 @@ module From_json = struct
         typ = type_opaque_id_from_json typ;
       } in
       {info; desc}
-    | `List [`String "W_WHILE_LOOP"; id; node; domain; link; checked; condition; invariants; loop_content] ->
+    | `List [`String "W_LOOP"; id; node; domain; link; checked; code_before; invariants; variants; code_after] ->
       let info = {
         id = int_from_json id;
         node = node_id_from_json node;
@@ -1978,10 +2032,11 @@ module From_json = struct
         link = why_node_set_from_json link;
         checked = boolean_from_json checked;
       } in
-      let desc = While_loop {
-        condition = prog_opaque_id_from_json condition;
+      let desc = Loop {
+        code_before = prog_opaque_id_from_json code_before;
         invariants = pred_opaque_olist_from_json invariants;
-        loop_content = prog_opaque_id_from_json loop_content;
+        variants = variants_opaque_olist_from_json variants;
+        code_after = prog_opaque_id_from_json code_after;
       } in
       {info; desc}
     | `List [`String "W_STATEMENT_SEQUENCE"; id; node; domain; link; checked; statements] ->
@@ -2364,6 +2419,16 @@ module From_json = struct
   and field_association_opaque_id_from_json json =  why_node_id_from_json field_association_coercion json
   and field_association_opaque_list_from_json json =  why_node_list_from_json field_association_coercion json
 
+  and variant_opaque_oid_from_json json =  why_node_oid_from_json variant_coercion json
+  and variant_opaque_olist_from_json json =  why_node_olist_from_json variant_coercion json
+  and variant_opaque_id_from_json json =  why_node_id_from_json variant_coercion json
+  and variant_opaque_list_from_json json =  why_node_list_from_json variant_coercion json
+
+  and variants_opaque_oid_from_json json =  why_node_oid_from_json variants_coercion json
+  and variants_opaque_olist_from_json json =  why_node_olist_from_json variants_coercion json
+  and variants_opaque_id_from_json json =  why_node_id_from_json variants_coercion json
+  and variants_opaque_list_from_json json =  why_node_list_from_json variants_coercion json
+
   and universal_quantif_opaque_oid_from_json json =  why_node_oid_from_json universal_quantif_coercion json
   and universal_quantif_opaque_olist_from_json json =  why_node_olist_from_json universal_quantif_coercion json
   and universal_quantif_opaque_id_from_json json =  why_node_id_from_json universal_quantif_coercion json
@@ -2504,10 +2569,10 @@ module From_json = struct
   and binding_ref_opaque_id_from_json json =  why_node_id_from_json binding_ref_coercion json
   and binding_ref_opaque_list_from_json json =  why_node_list_from_json binding_ref_coercion json
 
-  and while_loop_opaque_oid_from_json json =  why_node_oid_from_json while_loop_coercion json
-  and while_loop_opaque_olist_from_json json =  why_node_olist_from_json while_loop_coercion json
-  and while_loop_opaque_id_from_json json =  why_node_id_from_json while_loop_coercion json
-  and while_loop_opaque_list_from_json json =  why_node_list_from_json while_loop_coercion json
+  and loop_opaque_oid_from_json json =  why_node_oid_from_json loop_coercion json
+  and loop_opaque_olist_from_json json =  why_node_olist_from_json loop_coercion json
+  and loop_opaque_id_from_json json =  why_node_id_from_json loop_coercion json
+  and loop_opaque_list_from_json json =  why_node_list_from_json loop_coercion json
 
   and statement_sequence_opaque_oid_from_json json =  why_node_oid_from_json statement_sequence_coercion json
   and statement_sequence_opaque_olist_from_json json =  why_node_olist_from_json statement_sequence_coercion json
