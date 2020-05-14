@@ -21,6 +21,7 @@ type pattern = Ptree.pattern
 
 type spec = Ptree.spec
 
+(*
 type cfg_expr = {
     cfg_expr_desc : cfg_expr_desc;
     cfg_expr_loc  : Loc.position;
@@ -33,17 +34,35 @@ and cfg_expr_desc =
   (** Boolean literal [False] *)
   | CFGconst of Constant.constant
   (** Constant literals *)
-  | CFGlabel of ident * cfg_expr
-  (** declare a label *)
-  | CFGgoto of ident
-  (** goto a label *)
-  | CFGassert of Expr.assertion_kind * Ptree.term
-(* TODO: expand *)
+  (* TODO: expand -> variables, bin op, function call... or any Ptree.expr ! *)
+ *)
 
+type cfg_instr = {
+    cfg_instr_desc : cfg_instr_desc;
+    cfg_instr_loc  : Loc.position;
+  }
+
+and cfg_instr_desc =
+  | CFGgoto of ident
+(** goto a label "goto L" *)
+  | CFGexpr of Ptree.expr
+(*
+  | CFGassign of ident * cfg_expr
+  (** assignment "x <- e" *)
+  | CFGassert of Expr.assertion_kind * Ptree.term
+  (** assert or assume or check *)
+  (* TODO: expand -> branching, procedure call... or any Ptree.expr ! *)
+*)
+
+
+type block = cfg_instr list
+
+type label = Ptree.ident
 
 type cfg_fundef =
-  ident * binder list * pty * pattern * spec * binder list * cfg_expr
-(** function name, argument, return type, ?, contract, local variables, body *)
+  ident * binder list * pty * pattern * spec * binder list * block * (label * block) list
+(** function name, argument, return type, ?, contract,
+    local variables, first block, other blocks *)
 
 type cfg_decl =
   | Dmlw_decl of Ptree.decl

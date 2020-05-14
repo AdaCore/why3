@@ -4,6 +4,7 @@
 open Why3
 
 type token =
+  | VAR
   | CFG
   | GOTO
   | WRITES

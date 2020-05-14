@@ -41,6 +41,7 @@
       [
     "cfg", CFG;
     "goto", GOTO;
+    "var", VAR;
         "abstract", ABSTRACT;
         "absurd", ABSURD;
         "alias", ALIAS;
@@ -297,6 +298,6 @@ rule token = parse
     try
       Cfg_parser.cfgfile token lb
     with
-      Cfg_parser.Error as e -> raise (Loc.Located (Loc.extract (lb.lex_start_p,lb.lex_curr_p),e))
+      Cfg_parser.Error as e -> raise (Loc.Located (Loc.extract (lb.Lexing.lex_start_p,lb.Lexing.lex_curr_p),e))
 
 }

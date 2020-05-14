@@ -330,20 +330,31 @@ let rec pp_pty fmt t =
   | _ ->
      Format.fprintf fmt "@[<pp_pty>@]"
 
-let rec translate_cfg e =
+(*
+let translate_expr e =
   let loc = e.cfg_expr_loc in
   match e.cfg_expr_desc with
   | CFGtrue -> mk_expr loc Etrue
   | CFGfalse -> mk_expr loc Efalse
   | CFGconst c -> mk_expr loc (Econst c)
-  | CFGassert(k,t) -> mk_expr loc (Eassert(k,t))
-  | CFGlabel(_id,e) -> translate_cfg e
-  | CFGgoto _id -> mk_expr loc (Etuple [])
+ *)
 
-let translate_cfg (id,args,retty,pat,spec,_locals,body) =
+let translate_instr e =
+  let loc = e.cfg_instr_loc in
+  match e.cfg_instr_desc with
+(*
+  | CFGassert(k,t) -> mk_expr loc (Eassert(k,t))
+  | CFGassign(id,e) ->  mk_expr loc (Etuple [])
+ *)
+  | CFGgoto _id -> mk_expr loc (Etuple [])
+  | CFGexpr e -> e
+
+let translate_cfg block blocks = mk_expr Loc.dummy_position (Etuple [])
+
+let translate_letcfg (id,args,retty,pat,spec,_locals,block,blocks) =
   Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
   Debug.dprintf debug "return type is `%a`@." pp_pty retty;
-  let body = translate_cfg body in
+  let body = translate_cfg block blocks in
   let f =
       Efun(args, Some retty, pat, Ity.MaskVisible, spec, body)
   in
@@ -352,7 +363,7 @@ let translate_cfg (id,args,retty,pat,spec,_locals,body) =
 let translate_decl d acc =
   match d with
   | Dmlw_decl d -> d :: acc
-  | Dletcfg l -> List.fold_right (fun d acc -> (translate_cfg d)::acc) l acc
+  | Dletcfg l -> List.fold_right (fun d acc -> (translate_letcfg d)::acc) l acc
 
 let translate (m,dl) =
   (m,List.fold_right translate_decl dl [])
@@ -367,16 +378,19 @@ let read_channel env _path file c =
   in
   Debug.dprintf debug "%s parsed successfully.@." file;
   let ptree = Modules (List.map translate f) in
-  try
-    Typing.type_mlw_file env [] (file ^ ".mlw") ptree
-  with
-    Loc.Located(loc,e) ->
-    let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
-    Format.eprintf "%a%s@." Loc.report_position loc msg;
-    Debug.dprintf debug "%a@."
-      (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
-      ptree;
-    exit 1
+  let mm = try
+      Typing.type_mlw_file env [] (file ^ ".mlw") ptree
+    with
+      Loc.Located(loc,e) ->
+      let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
+      Format.eprintf "%a%s@." Loc.report_position loc msg;
+      Debug.dprintf debug "%a@."
+        (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
+        ptree;
+      exit 1
+  in
+  Debug.dprintf debug "%a@." Mlw_printer.pp_mlw_file ptree;
+  mm
 
 let () =
   Env.register_format mlw_language "mlcfg" ["mlcfg"] read_channel

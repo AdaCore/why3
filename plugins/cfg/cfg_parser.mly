@@ -16,15 +16,19 @@
 
   let floc s e = Loc.extract (s,e)
 
+(*
   let mk_cfgexpr d s e = { cfg_expr_desc = d; cfg_expr_loc = floc s e }
+*)
+  let mk_cfginstr d s e = { cfg_instr_desc = d; cfg_instr_loc = floc s e }
 
 %}
 
 (* extra tokens *)
-%token CFG GOTO
+%token CFG GOTO VAR
 
 %start cfgfile
 %type <Cfg_ast.cfg_file> cfgfile
+%type <Cfg_ast.binder list> vardecl
 
 %%
 
@@ -42,26 +46,51 @@ cfgdecl:
 ;
 
 recdefn:
-  | id=attrs(lident_rich) args=binders COLON ret=return_named sp=spec EQUAL b=body
+  | id=attrs(lident_rich) args=binders COLON ret=return_named sp=spec EQUAL
+      v=vardecls b=block bl=labelblock*
     { let pat, ty, _mask = ret in
       let spec = apply_return pat sp in
-      (id, args, ty, pat, spec, [], b) }
+      (id, args, ty, pat, spec, v, b, bl) }
 ;
 
-body:
-  | cfgexpr { $1 }
+vardecls:
+  | /* epsilon */ { [] }
+  | vardecl vardecls { $1 @ $2 }
 ;
 
+vardecl:
+  | VAR b=binder SEMICOLON { b }
+;
+
+labelblock:
+  | id = attrs(uident) b=block  { (id,b) }
+;
+
+block:
+  | LEFTBRC semicolon_list1(instr) RIGHTBRC { $2 }
+;
+
+instr:
+  | GOTO uident
+    { mk_cfginstr (CFGgoto $2) $startpos $endpos }
+  | contract_expr
+    { mk_cfginstr (CFGexpr $1) $startpos $endpos }
+(*
+  | lident LARROW cfgexpr
+    { mk_cfginstr (CFGassign ($1,$3)) $startpos $endpos }
+  | k=assertion_kind id=option(ident_nq) LEFTBRC t=term RIGHTBRC
+    { let (n,k)=k in
+      mk_cfginstr (CFGassert(k, name_term id n t)) $startpos $endpos }
+*)
+;
+
+(*
 cfgexpr:
   | TRUE
     { mk_cfgexpr CFGtrue $startpos $endpos }
   | FALSE
     { mk_cfgexpr CFGfalse $startpos $endpos }
-  | GOTO uident
-    { mk_cfgexpr (CFGgoto $2) $startpos $endpos }
-  | LABEL id = attrs(uident) IN e = cfgexpr
-    { mk_cfgexpr (CFGlabel(id,e)) $startpos $endpos }
-  | k=assertion_kind id=option(ident_nq) LEFTBRC t=term RIGHTBRC
-    { let (n,k)=k in
-      mk_cfgexpr (CFGassert(k, name_term id n t)) $startpos $endpos }
+  | numeral
+    { mk_cfgexpr (CFGconst $1) $startpos $endpos }
 ;
+*)

@@ -666,7 +666,7 @@ param:
     { let r = fst $3 in let ty = if r then PTref [$4] else $4 in
       List.map (fun (l,i) -> l, set_ref_opt l r i, true, ty) (snd $3) }
 
-binder:
+%public binder:
 | special_binder
     { let l,i = $1 in [l, i, false, None] }
 | lident_nq attr+
@@ -888,7 +888,7 @@ minus_numeral:
 | MINUS INTEGER { Constant.(ConstInt (Number.neg_int $2)) }
 | MINUS REAL    { Constant.(ConstReal (Number.neg_real $2))}
 
-numeral:
+%public numeral:
 | INTEGER { Constant.ConstInt $1 }
 | REAL    { Constant.ConstReal $1 }
 
@@ -975,7 +975,7 @@ seq_expr:
 | contract_expr SEMICOLON seq_expr
     { mk_expr (Esequence ($1, $3)) $startpos $endpos }
 
-contract_expr:
+%public contract_expr:
 | assign_expr %prec prec_no_spec  { $1 }
 | assign_expr single_spec spec
     { let p = mk_pat Pwild $startpos $endpos in
@@ -1503,7 +1503,7 @@ squalid:
 | CORE_UIDENT     { let loc = floc $startpos($1) $endpos($1) in
                     Loc.errorm ~loc core_ident_error $1 }
 
-lident:
+%public lident:
 | LIDENT          { mk_id $1 $startpos $endpos }
 | lident_keyword  { mk_id $1 $startpos $endpos }
 | CORE_LIDENT     { mk_id $1 $startpos $endpos }
@@ -1621,7 +1621,7 @@ comma_list2(X):
 comma_list0(X):
 | xl = separated_list(COMMA, X) { xl }
 
-semicolon_list1(X):
+%public semicolon_list1(X):
 | x = X ; ioption(SEMICOLON)                  { [x] }
 | x = X ; SEMICOLON ; xl = semicolon_list1(X) { x :: xl }
 

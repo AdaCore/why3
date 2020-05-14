@@ -8,13 +8,23 @@ val test (x:int) : unit
 let cfg cfgassert (x:int) : unit
   requires { x >= 0 }
   =
-  assert { 3 }
+  {
+  assert { 3 = 4 }
+  }
 
-let cfg cfggoto (x:int) : unit
+let cfg cfggoto (x:int) : int
   requires { x >= 0 }
+  ensures { result = x + 2 }
   =
-  label L in
+  var (y : int);
+  {
+  y <- x+1;
   goto L
+  }
+  L {
+  y <- y+1;
+  y
+  }
 
 let main () = cfgassert 42; cfggoto 43
 
