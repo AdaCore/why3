@@ -673,11 +673,23 @@ let add_known_rule_term id pdecl (known, rule_terms) =
   | [decl] -> Mid.add id decl known, rule_terms
   | Decl.[({d_node = Dparam _} as decl); {d_node = Dprop (Paxiom, _, t)}] ->
       (* let function: function + axiom *)
-      Mid.add id decl known, (id, t) :: rule_terms
-  | Decl.[{d_node = Dlogic [(_ls, _def)]}; {d_node = Dprop (Paxiom, _, _)}] ->
-      (* let (rec) predicate: predicate + axiom *)
-      (* TODO *)
-      failwith "eval_term: let-predicate not yet implemented"
+      Mid.add id decl known,
+      (id, t) :: rule_terms
+  | Decl.[({d_node = Dlogic [(_ls, _def)]} as decl); {d_node = Dprop (Paxiom, pr, t)}] ->
+      (* let (rec) predicate:
+         predicate + axiom *)
+      Mid.add pr.pr_name decl known,
+      (pr.Decl.pr_name, t) :: rule_terms
+  | Decl.[{d_node = Dparam _}; {d_node = Dprop (Paxiom, pr, t)}; {d_node = Dprop (Paxiom, _, _)}] ->
+      (* let (rec) function:
+         function f args : ty + axiom f'def : t + axiom f'spec : t *)
+      known,
+      (pr.Decl.pr_name, t) :: rule_terms
+  | Decl.{d_node = Dtype _} :: _ ->
+      (* - type declaration
+         - field function declarations (Dparam)
+         - type invariants (Dprop (Paxiom, _, _)) *)
+      known, rule_terms
   | _ ->
       Format.eprintf "@[<hv2>Cannot process pure declarations for %s:@ %a@]@."
         id.id_string
