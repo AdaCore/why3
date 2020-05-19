@@ -81,8 +81,8 @@ instr:
     { mk_cfginstr (CFGgoto $2) $startpos $endpos }
   | contract_expr
     { mk_cfginstr (CFGexpr $1) $startpos $endpos }
-  | SWITCH contract_expr cases END
-    { mk_cfginstr (CFGswitch ($2,$3)) $startpos $endpos }
+  | SWITCH contract_expr WITH cases END
+    { mk_cfginstr (CFGswitch ($2,$4)) $startpos $endpos }
   | INVARIANT ident LEFTBRC term RIGHTBRC
     { mk_cfginstr (CFGinvariant($2,$4)) $startpos $endpos }
 

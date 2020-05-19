@@ -379,7 +379,8 @@ let translate_cfg preconds block blocks =
       Wstdlib.Mstr.empty
       blocks
   in
-  let visited = ref [] in
+  let startlabel = "start" in
+  let visited = ref [startlabel] in
   let rec traverse startlabel preconds bl acc (funs,ret_funs) =
     match bl with
     | [] -> assert false
@@ -394,7 +395,11 @@ let translate_cfg preconds block blocks =
           traverse startlabel preconds bl acc (funs,ret_funs)
        | CFGinvariant(id,t) ->
           let funs = (startlabel, preconds, id, t, acc) :: funs in
-          traverse id.id_str [t] rem [] (funs,ret_funs)
+          if List.mem id.id_str !visited then (funs,ret_funs) else
+            begin
+              visited := id.id_str :: !visited;
+              traverse id.id_str [t] rem [] (funs,ret_funs)
+            end
        | CFGswitch _ ->
           failwith "switch not suported yet"
        | CFGexpr e when rem=[] ->
@@ -403,7 +408,7 @@ let translate_cfg preconds block blocks =
        | CFGexpr e ->
           traverse startlabel preconds rem (e::acc) (funs,ret_funs)
   in
-  traverse "start" preconds block [] ([],[])
+  traverse startlabel preconds block [] ([],[])
 
 let e_ref = mk_expr ~loc:Loc.dummy_position Eref
 

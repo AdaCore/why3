@@ -42,6 +42,7 @@
     "cfg", CFG;
     "goto", GOTO;
     "var", VAR;
+    "switch", SWITCH;
         "abstract", ABSTRACT;
         "absurd", ABSURD;
         "alias", ALIAS;
