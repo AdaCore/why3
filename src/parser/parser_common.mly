@@ -860,7 +860,7 @@ field_list1(X):
 match_cases(X):
 | cl = bar_list1(match_case(X)) { cl }
 
-match_case(X):
+%public match_case(X):
 | mc = separated_pair(pattern, ARROW, X) { mc }
 
 quant_vars:

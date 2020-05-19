@@ -17,21 +17,27 @@ open Ptree
 let debug = Debug.register_flag "cfg"
   ~desc:"CFG plugin debug flag"
 
-(*
 let mk_id ~loc name =
   { id_str = name; id_ats = []; id_loc = loc }
 
+(*
 let infix  ~loc s = Qident (mk_id ~loc (Ident.op_infix s))
 let prefix ~loc s = Qident (mk_id ~loc (Ident.op_prefix s))
 let get_op ~loc   = Qident (mk_id ~loc (Ident.op_get ""))
 let set_op ~loc   = Qident (mk_id ~loc (Ident.op_set ""))
+ *)
 
 let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }
-let mk_term ~loc d =
-  { term_desc = d; term_loc = loc }
+
 let mk_pat ~loc d =
   { pat_desc = d; pat_loc = loc }
+
+let pat_wild ~loc = mk_pat ~loc Pwild
+
+(*
+let mk_term ~loc d =
+  { term_desc = d; term_loc = loc }
 let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
 let mk_var ~loc id =
@@ -63,6 +69,8 @@ let array_make ~loc n v =
 let set_ref id =
   { id with id_ats = ATstr Pmodule.ref_attr :: id.id_ats }
 
+ *)
+
 let empty_spec = {
   sp_pre     = [];
   sp_post    = [];
@@ -76,6 +84,7 @@ let empty_spec = {
   sp_partial = false;
 }
 
+               (*
 type env = {
   vars: ident Mstr.t;
   for_index: int;
@@ -253,12 +262,19 @@ and block env ~loc = function
 let fresh_type_var =
   let r = ref 0 in
   fun loc -> incr r;
-    PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
+  PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
+                *)
 
 let type_unit loc = PTtyapp (Qident (mk_id ~loc "unit"), [])
 let type_int loc = PTtyapp (Qident (mk_id ~loc "int"), [])
-let type_array loc ty = PTtyapp (array_id ~loc (mk_id ~loc "array"), [ty])
 
+let ref_module ~loc id = Qdot (Qident (mk_id ~loc "Ref"), id)
+let ref_type ~loc ty = PTtyapp (ref_module ~loc (mk_id ~loc "ref"), [ty])
+(*
+let type_array loc ty = PTtyapp (array_id ~loc (mk_id ~loc "array"), [ty])
+ *)
+
+(*
 let type_ loc = function
   | Tvoid -> type_unit loc
   | Tint -> type_int loc
@@ -314,12 +330,14 @@ let decl = function
      Typing.add_decl id.id_loc (Dprop (pk, id, t))
  *)
 
-let mk_expr loc e = { expr_desc = e; expr_loc = loc }
+
+let pp_id fmt id =
+  Format.fprintf fmt "%s" id.id_str
 
 let rec pp_qid fmt qid =
   match qid with
-  | Qident id -> Format.fprintf fmt "%s" id.id_str
-  | Qdot(q,id) -> Format.fprintf fmt "%a.%s" pp_qid q id.id_str
+  | Qident id -> pp_id fmt id
+  | Qdot(q,id) -> Format.fprintf fmt "%a.%a" pp_qid q pp_id id
 
 let rec pp_pty fmt t =
   match t with
@@ -346,19 +364,76 @@ let translate_instr e =
   | CFGassert(k,t) -> mk_expr loc (Eassert(k,t))
   | CFGassign(id,e) ->  mk_expr loc (Etuple [])
  *)
-  | CFGgoto _id -> mk_expr loc (Etuple [])
+  | CFGgoto _id -> mk_expr ~loc (Etuple [])
+  | CFGswitch _ -> mk_expr ~loc (Etuple [])
   | CFGexpr e -> e
 
-let translate_cfg block blocks = mk_expr Loc.dummy_position (Etuple [])
+let build_return_function retty pat spec (startlabel, e, revbody) acc =
+  let body =
+    List.fold_left
+      (fun acc e -> mk_expr ~loc:e.expr_loc (Esequence (e, acc)))
+      e revbody
+  in
+  let f =
+    Efun([], Some retty, pat, Ity.MaskVisible, spec, body)
+  in
+  let loc = Loc.dummy_position in
+  let id = mk_id ~loc ("_" ^ startlabel ^ "_to_return") in
+  mk_expr ~loc (Elet (id,false,Expr.RKnone, mk_expr ~loc f, acc))
 
-let translate_letcfg (id,args,retty,pat,spec,_locals,block,blocks) =
+let translate_cfg block blocks =
+  let blocks =
+    List.fold_left
+      (fun acc (l,b) -> Wstdlib.Mstr.add l.id_str b acc)
+      Wstdlib.Mstr.empty
+      blocks
+  in
+  let rec traverse startlabel bl acc =
+    match bl with
+    | [] -> assert false
+    | { cfg_instr_desc = CFGgoto l} :: _ ->
+       let bl =
+         try
+           Wstdlib.Mstr.find l.id_str blocks
+         with Not_found -> Format.eprintf "Label %a not found for goto@." pp_id l; exit 1
+       in
+       traverse startlabel bl acc
+    | { cfg_instr_desc = CFGswitch _} :: _ ->
+       failwith "switch not suported yet"
+    | [{ cfg_instr_desc = CFGexpr e}]  ->
+       (startlabel, e, acc)
+    | { cfg_instr_desc = CFGexpr e} :: rem ->
+       traverse startlabel rem (e::acc)
+  in
+  traverse "start" block []
+
+let e_ref = mk_expr ~loc:Loc.dummy_position Eref
+
+let declare_local (loc,idopt,ghost,tyopt) body =
+  match idopt, tyopt with
+  | Some id, Some ty ->
+     Debug.dprintf debug "declaring local variable %a of type %a@." pp_id id pp_pty ty ;
+     let e = Eany([],Expr.RKnone,tyopt,pat_wild ~loc,Ity.MaskVisible,empty_spec) in
+     let e = mk_expr ~loc (Eapply(e_ref,mk_expr ~loc e)) in
+     let id = { id with id_ats = (ATstr Pmodule.ref_attr) :: id.id_ats } in
+     mk_expr ~loc:id.id_loc (Elet(id,ghost,Expr.RKnone,e,body))
+  | _ -> failwith "invalid variable declaration"
+
+let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
   Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
   Debug.dprintf debug "return type is `%a`@." pp_pty retty;
-  let body = translate_cfg block blocks in
-  let f =
-      Efun(args, Some retty, pat, Ity.MaskVisible, spec, body)
+  let fun_returning = translate_cfg block blocks in
+  let loc = Loc.dummy_position in
+  let body = Eany([],Expr.RKnone,Some retty,pat,Ity.MaskVisible,spec) in
+  let body =
+    build_return_function retty pat spec fun_returning
+      (mk_expr ~loc body)
   in
-  Dlet (id,false,Expr.RKnone,mk_expr id.id_loc f)
+  let body = List.fold_right declare_local locals body in
+  let f =
+    Efun(args, Some retty, pat, Ity.MaskVisible, spec, body)
+  in
+  Dlet (id,false,Expr.RKnone,mk_expr ~loc:id.id_loc f)
 
 let translate_decl d acc =
   match d with

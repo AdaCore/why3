@@ -21,6 +21,8 @@ type pattern = Ptree.pattern
 
 type spec = Ptree.spec
 
+type label = Ptree.ident
+
 (*
 type cfg_expr = {
     cfg_expr_desc : cfg_expr_desc;
@@ -43,8 +45,10 @@ type cfg_instr = {
   }
 
 and cfg_instr_desc =
-  | CFGgoto of ident
+  | CFGgoto of label
 (** goto a label "goto L" *)
+  | CFGswitch of Ptree.expr * switch_branch list
+(** pattern-matching *)
   | CFGexpr of Ptree.expr
 (*
   | CFGassign of ident * cfg_expr
@@ -54,10 +58,11 @@ and cfg_instr_desc =
   (* TODO: expand -> branching, procedure call... or any Ptree.expr ! *)
 *)
 
+and switch_branch = Ptree.pattern * block
+(** pattern -> regular WhyML expression ; goto ident *)
 
-type block = cfg_instr list
+and block = cfg_instr list
 
-type label = Ptree.ident
 
 type cfg_fundef =
   ident * binder list * pty * pattern * spec * binder list * block * (label * block) list

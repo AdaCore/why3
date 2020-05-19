@@ -24,11 +24,13 @@
 %}
 
 (* extra tokens *)
-%token CFG GOTO VAR
+%token CFG GOTO VAR SWITCH
 
 %start cfgfile
 %type <Cfg_ast.cfg_file> cfgfile
 %type <Cfg_ast.binder list> vardecl
+%type <Cfg_ast.cfg_instr list> sequence
+%type <(Ptree.pattern * Cfg_ast.cfg_instr list) list> cases
 
 %%
 
@@ -67,7 +69,11 @@ labelblock:
 ;
 
 block:
-  | LEFTBRC semicolon_list1(instr) RIGHTBRC { $2 }
+  | LEFTBRC sequence RIGHTBRC { $2 }
+;
+
+sequence:
+  | semicolon_list1(instr) { $1 }
 ;
 
 instr:
@@ -75,6 +81,8 @@ instr:
     { mk_cfginstr (CFGgoto $2) $startpos $endpos }
   | contract_expr
     { mk_cfginstr (CFGexpr $1) $startpos $endpos }
+  | SWITCH contract_expr cases END
+    { mk_cfginstr (CFGswitch ($2,$3)) $startpos $endpos }
 (*
   | lident LARROW cfgexpr
     { mk_cfginstr (CFGassign ($1,$3)) $startpos $endpos }
@@ -82,6 +90,13 @@ instr:
     { let (n,k)=k in
       mk_cfginstr (CFGassert(k, name_term id n t)) $startpos $endpos }
 *)
+;
+
+cases:
+  | BAR match_case(sequence)
+    { [$2] }
+  | BAR match_case(sequence) cases
+    { $2 :: $3 }
 ;
 
 (*
