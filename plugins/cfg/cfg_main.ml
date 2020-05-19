@@ -393,10 +393,12 @@ let translate_instr e =
   | CFGexpr e -> e
      *)
 
+(*
 let return_exn = mk_id ~loc:Loc.dummy_position "Return"
 
 let mk_return ~loc e =
   mk_expr ~loc (Eraise(Qident return_exn,Some e))
+ *)
 
 let divergent_attr = ATstr (Ident.create_attribute "vc:divergent")
 
@@ -445,7 +447,7 @@ let translate_cfg preconds block blocks =
               cases
           in
           mk_expr ~loc (Ematch(e,branches,[]))
-       | CFGexpr e when rem=[] -> mk_return ~loc e
+       | CFGexpr e when rem=[] -> e (* mk_return ~loc e *)
        | CFGexpr e1 ->
           let e2 = traverse_block rem in
           mk_seq ~loc e1 e2
@@ -472,7 +474,7 @@ let declare_local (loc,idopt,ghost,tyopt) body =
   | _ -> failwith "invalid variable declaration"
 
 
-let build_path_function xpostconds (startlabel, preconds, body) : Ptree.fundef =
+let build_path_function retty postconds (startlabel, preconds, body) : Ptree.fundef =
   let body =
     List.fold_left
       (fun acc t ->
@@ -482,15 +484,10 @@ let build_path_function xpostconds (startlabel, preconds, body) : Ptree.fundef =
       body preconds
   in
   let loc = Loc.dummy_position in
-  (* this function never returns normally so we put false as normal postcondition *)
-  let spec = { empty_spec with
-               sp_post = [(loc,[pat_wild ~loc,term_false ~loc])];
-               sp_xpost = xpostconds}
-  in
-  let loc = Loc.dummy_position in
+  let spec = { empty_spec with sp_post = postconds} in
   let id = mk_id ~loc ("_from_" ^ startlabel) in
   let arg = (loc,None,false,Some unit_type) in
-  (id,false,Expr.RKnone, [arg], Some unit_type, pat_wild ~loc, Ity.MaskVisible, spec, body)
+  (id,false,Expr.RKnone, [arg], Some retty, pat_wild ~loc, Ity.MaskVisible, spec, body)
 
 
 let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
@@ -501,17 +498,20 @@ let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
   let body =
     mk_expr ~loc (Eidapp(Qident (mk_id ~loc "_from_start"),[mk_unit ~loc]))
   in
+(*
   let body =
     mk_seq ~loc body (mk_expr ~loc Eabsurd)
   in
+ *)
+  (*
   let xpost =
     List.map
       (fun (loc,l) ->
         (loc,List.map (fun x -> (Qident return_exn, Some x)) l))
       spec.sp_post
   in
-  let defs =
-    List.map (build_path_function xpost) funs
+ *)  let defs =
+    List.map (build_path_function retty spec.sp_post) funs
   in
   let body =
     mk_expr ~loc (Erec(defs,body))
@@ -519,9 +519,11 @@ let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
   let body =
     List.fold_right declare_local locals body
   in
+(*
   let body =
     mk_expr ~loc (Eoptexn(return_exn,Ity.MaskVisible,body))
   in
+ *)
   (* ignore termination *)
   let body =
     mk_expr ~loc (Eattr(divergent_attr,body))

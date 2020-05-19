@@ -41,7 +41,7 @@ let cfg cfg_inv (x:int) : int
   y
   }
 
-(*
+
 let cfg cfg_infinite_loop (x:int) : int
   requires { x >= 0 }
   ensures { result >= 2 }
@@ -57,7 +57,7 @@ let cfg cfg_infinite_loop (x:int) : int
   y <- y + 1;
   goto L;
   }
-*)
+
 
 let cfg cfg_finite_loop (x:int) : int
   requires { x >= 0 }
