@@ -17,6 +17,8 @@ open Ptree
 let debug = Debug.register_flag "cfg"
   ~desc:"CFG plugin debug flag"
 
+let unit_type = PTtuple []
+
 let mk_id ~loc name =
   { id_str = name; id_ats = []; id_loc = loc }
 
@@ -27,8 +29,29 @@ let get_op ~loc   = Qident (mk_id ~loc (Ident.op_get ""))
 let set_op ~loc   = Qident (mk_id ~loc (Ident.op_set ""))
  *)
 
+let mk_term ~loc d =
+  { term_desc = d; term_loc = loc }
+
+let term_true ~loc = mk_term ~loc Ttrue
+
+let term_false ~loc = mk_term ~loc Tfalse
+
 let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }
+
+let mk_unit ~loc =
+  mk_expr ~loc (Etuple [])
+
+let mk_assert ~loc t =
+  mk_expr ~loc (Eassert(Expr.Assert,t))
+
+let mk_check ~loc t =
+  mk_expr ~loc (Eassert(Expr.Check,t))
+
+let mk_assume ~loc t =
+  mk_expr ~loc (Eassert(Expr.Assume,t))
+
+let mk_seq ~loc e1 e2 = mk_expr ~loc (Esequence(e1,e2))
 
 let mk_pat ~loc d =
   { pat_desc = d; pat_loc = loc }
@@ -36,10 +59,6 @@ let mk_pat ~loc d =
 let pat_wild ~loc = mk_pat ~loc Pwild
 
 (*
-let mk_term ~loc d =
-  { term_desc = d; term_loc = loc }
-let mk_unit ~loc =
-  mk_expr ~loc (Etuple [])
 let mk_var ~loc id =
   mk_expr ~loc (Eident (Qident id))
 let mk_tvar ~loc id =
@@ -357,6 +376,7 @@ let translate_expr e =
   | CFGconst c -> mk_expr loc (Econst c)
  *)
 
+    (*
 let translate_instr e =
   let loc = e.cfg_instr_loc in
   match e.cfg_instr_desc with
@@ -371,6 +391,12 @@ let translate_instr e =
      let t = { t with term_desc = Tattr(attr,t) } in
      mk_expr ~loc (Eassert(Expr.Assert,t))
   | CFGexpr e -> e
+     *)
+
+let return_exn = mk_id ~loc:Loc.dummy_position "Return"
+
+let mk_return ~loc e =
+  mk_expr ~loc (Eraise(Qident return_exn,Some e))
 
 let translate_cfg preconds block blocks =
   let blocks =
@@ -381,10 +407,12 @@ let translate_cfg preconds block blocks =
   in
   let startlabel = "start" in
   let visited = ref [startlabel] in
-  let rec traverse startlabel preconds bl acc (funs,ret_funs) =
+  let funs = ref [] in
+  let rec traverse_block bl : Ptree.expr =
     match bl with
-    | [] -> assert false
+    | [] -> mk_unit ~loc:Loc.dummy_position
     | i :: rem ->
+       let loc = i.cfg_instr_loc in
        match i.cfg_instr_desc with
        | CFGgoto l ->
           let bl =
@@ -392,23 +420,43 @@ let translate_cfg preconds block blocks =
               Wstdlib.Mstr.find l.id_str blocks
             with Not_found -> Format.eprintf "Label %a not found for goto@." pp_id l; exit 1
           in
-          traverse startlabel preconds bl acc (funs,ret_funs)
+          traverse_block bl
        | CFGinvariant(id,t) ->
-          let funs = (startlabel, preconds, id, t, acc) :: funs in
-          if List.mem id.id_str !visited then (funs,ret_funs) else
+          let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
+          (* TODO : add also an "expl:" *)
+          let t = { t with term_desc = Tattr(attr,t) } in
+          let e = mk_check ~loc t in
+          let k = mk_expr ~loc (Eidapp(Qident (mk_id ~loc ("_from_" ^ id.id_str)),[mk_unit ~loc])) in
+          let e = mk_seq ~loc e k in
+          if not (List.mem id.id_str !visited) then
             begin
               visited := id.id_str :: !visited;
-              traverse id.id_str [t] rem [] (funs,ret_funs)
-            end
-       | CFGswitch _ ->
-          failwith "switch not suported yet"
-       | CFGexpr e when rem=[] ->
-          let ret_funs = (startlabel, e, acc) :: ret_funs in
-          (funs, ret_funs)
-       | CFGexpr e ->
-          traverse startlabel preconds rem (e::acc) (funs,ret_funs)
+              traverse_from_entry_point id.id_str [t] rem
+            end;
+          e
+       | CFGswitch(e,cases) ->
+          failwith "unsupported switch"
+            (*
+          List.iter
+            (fun (pat,bl) ->
+            (* FIXME*)
+              traverse startlabel preconds bl acc
+            )
+            cases
+             *)
+       | CFGexpr e when rem=[] -> mk_return ~loc e
+       | CFGexpr e1 ->
+          let e2 = traverse_block rem in
+          mk_seq ~loc e1 e2
+
+  and traverse_from_entry_point startlabel preconds block =
+    let e = traverse_block block in
+    funs := (startlabel, preconds, e) :: !funs
+
   in
-  traverse startlabel preconds block [] ([],[])
+
+  traverse_from_entry_point startlabel preconds block;
+  !funs
 
 let e_ref = mk_expr ~loc:Loc.dummy_position Eref
 
@@ -423,59 +471,55 @@ let declare_local (loc,idopt,ghost,tyopt) body =
   | _ -> failwith "invalid variable declaration"
 
 
-let build_path_function (startlabel, preconds, id , t, revbody) acc =
-  let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
-  (* TODO : add also an "expl:" *)
-  let t = { t with term_desc = Tattr(attr,t) } in
-  let e = mk_expr ~loc:id.id_loc (Eassert(Expr.Assert,t)) in
-  let body =
-    List.fold_left
-      (fun acc e -> mk_expr ~loc:e.expr_loc (Esequence (e, acc)))
-      e revbody
-  in
+let build_path_function xpostconds (startlabel, preconds, body) : Ptree.fundef =
   let body =
     List.fold_left
       (fun acc t ->
-        let e = mk_expr ~loc:t.term_loc (Eassert(Expr.Assume,t)) in
-        mk_expr ~loc:acc.expr_loc (Esequence (e, acc)))
+        let loc = t.term_loc in
+        let e = mk_assume ~loc t in
+        mk_seq ~loc e acc)
       body preconds
   in
-  let f =
-    Efun([], None, pat_wild ~loc:Loc.dummy_position, Ity.MaskVisible, empty_spec, body)
+  let loc = Loc.dummy_position in
+  (* this function never returns normally so we put false as normal postcondition *)
+  let spec = { empty_spec with
+               sp_post = [(loc,[pat_wild ~loc,term_false ~loc])];
+               sp_xpost = xpostconds}
   in
   let loc = Loc.dummy_position in
-  let id = mk_id ~loc ("_" ^ startlabel ^ "_to_" ^ id.id_str) in
-  mk_expr ~loc (Elet (id,false,Expr.RKnone, mk_expr ~loc f, acc))
-
-let build_return_function retty pat spec (startlabel, e, revbody) acc =
-  let body =
-    List.fold_left
-      (fun acc e -> mk_expr ~loc:e.expr_loc (Esequence (e, acc)))
-      e revbody
-  in
-  let f =
-    Efun([], Some retty, pat, Ity.MaskVisible, spec, body)
-  in
-  let loc = Loc.dummy_position in
-  let id = mk_id ~loc ("_" ^ startlabel ^ "_to_return") in
-  mk_expr ~loc (Elet (id,false,Expr.RKnone, mk_expr ~loc f, acc))
+  let id = mk_id ~loc ("_from_" ^ startlabel) in
+  let arg = (loc,None,false,Some unit_type) in
+  (id,false,Expr.RKnone, [arg], Some unit_type, pat_wild ~loc, Ity.MaskVisible, spec, body)
 
 
 let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
   Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
   Debug.dprintf debug "return type is `%a`@." pp_pty retty;
-  let (funs,ret_funs) = translate_cfg spec.sp_pre block blocks in
+  let funs = translate_cfg spec.sp_pre block blocks in
   let loc = Loc.dummy_position in
-  let body = Eany([],Expr.RKnone,Some retty,pat,Ity.MaskVisible,spec) in
   let body =
-    List.fold_right (build_return_function retty pat spec) ret_funs
-      (mk_expr ~loc body)
+    mk_expr ~loc (Eidapp(Qident (mk_id ~loc "_from_start"),[mk_unit ~loc]))
   in
   let body =
-    List.fold_right build_path_function funs body
+    mk_seq ~loc body (mk_expr ~loc Eabsurd)
+  in
+  let xpost =
+    List.map
+      (fun (loc,l) ->
+        (loc,List.map (fun x -> (Qident return_exn, Some x)) l))
+      spec.sp_post
+  in
+  let defs =
+    List.map (build_path_function xpost) funs
+  in
+  let body =
+    mk_expr ~loc:Loc.dummy_position (Erec(defs,body))
   in
   let body =
     List.fold_right declare_local locals body
+  in
+  let body =
+    mk_expr ~loc:Loc.dummy_position (Eoptexn(return_exn,Ity.MaskVisible,body))
   in
   let f =
     Efun(args, Some retty, pat, Ity.MaskVisible, spec, body)

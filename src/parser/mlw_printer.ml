@@ -518,7 +518,7 @@ and pp_expr =
           | "'Break" -> "break"
           | "'Continue" -> "continue"
           | _ -> assert false in
-        fprintf fmt "@[hv 2%a%s%a@]" pp_maybe_marker id_loc keyword
+        fprintf fmt "@[<hv 2>%a%s%a@]" pp_maybe_marker id_loc keyword
           (pp_opt ~prefix:" " pp_expr.closed) opt_arg
     | Eraise (qid, opt_arg) ->
         fprintf fmt "raise %a%a" pp_qualid qid (pp_opt ~prefix:" " pp_expr.closed) opt_arg
