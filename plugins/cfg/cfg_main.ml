@@ -398,6 +398,8 @@ let return_exn = mk_id ~loc:Loc.dummy_position "Return"
 let mk_return ~loc e =
   mk_expr ~loc (Eraise(Qident return_exn,Some e))
 
+let divergent_attr = ATstr (Ident.create_attribute "vc:divergent")
+
 let translate_cfg preconds block blocks =
   let blocks =
     List.fold_left
@@ -435,15 +437,14 @@ let translate_cfg preconds block blocks =
             end;
           e
        | CFGswitch(e,cases) ->
-          failwith "unsupported switch"
-            (*
-          List.iter
-            (fun (pat,bl) ->
-            (* FIXME*)
-              traverse startlabel preconds bl acc
-            )
-            cases
-             *)
+          let branches =
+            List.map
+              (fun (pat,bl) ->
+                let e = traverse_block bl in
+                (pat,e))
+              cases
+          in
+          mk_expr ~loc (Ematch(e,branches,[]))
        | CFGexpr e when rem=[] -> mk_return ~loc e
        | CFGexpr e1 ->
           let e2 = traverse_block rem in
@@ -513,13 +514,17 @@ let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
     List.map (build_path_function xpost) funs
   in
   let body =
-    mk_expr ~loc:Loc.dummy_position (Erec(defs,body))
+    mk_expr ~loc (Erec(defs,body))
   in
   let body =
     List.fold_right declare_local locals body
   in
   let body =
-    mk_expr ~loc:Loc.dummy_position (Eoptexn(return_exn,Ity.MaskVisible,body))
+    mk_expr ~loc (Eoptexn(return_exn,Ity.MaskVisible,body))
+  in
+  (* ignore termination *)
+  let body =
+    mk_expr ~loc (Eattr(divergent_attr,body))
   in
   let f =
     Efun(args, Some retty, pat, Ity.MaskVisible, spec, body)
