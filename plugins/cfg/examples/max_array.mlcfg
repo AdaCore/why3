@@ -1,0 +1,58 @@
+
+module MaxArray
+
+  use int.Int
+
+  use array.Array
+
+  let cfg compute_max (a:array int) : (max: int, ind:int)
+    requires { a.length > 0 }
+    ensures { forall i. 0 <= i < a.length -> a[ind] >= a[i] }
+  =
+  (* simulation of the C code: (from ACSL Manual, section 2.4.2 Loop invariants)
+
+   i = 0;
+   goto L;
+   do {
+      if (t[i] > m) { L: m = t[i]; }
+      /*@ invariant
+        @  0 <= i < n && m == \max(0,i,\lambda integer k; t[k]);
+        @*/
+      i++;
+      }
+    while (i < n);
+    return m;
+
+  *)
+
+  var (i m:int);
+  var (ind:int); (* should be ghost *)
+  {
+  i <- 0;
+  goto L
+  }
+  L {
+    m <- a[i];
+    ind <- i;
+    goto L1
+    }
+  L1 {
+    invariant I { 0 <= i < a.length /\
+                  0 <= ind < a.length /\
+                  m = a[ind] /\
+                  forall j. 0 <= j <= i -> a[ind] >= a[j] };
+                  (* (yes, j <= i, not j < i !) *)
+    i <- i+1;
+    switch (i < a.length) with
+    | True -> goto L2
+    | False -> (m,ind)
+    end
+    }
+  L2 {
+    switch (a[i] > m) with
+    | True -> goto L
+    | False -> goto L1
+    end
+    }
+
+end
