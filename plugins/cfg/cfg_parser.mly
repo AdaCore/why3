@@ -83,6 +83,9 @@ instr:
     { mk_cfginstr (CFGexpr $1) $startpos $endpos }
   | SWITCH contract_expr cases END
     { mk_cfginstr (CFGswitch ($2,$3)) $startpos $endpos }
+  | INVARIANT ident LEFTBRC term RIGHTBRC
+    { mk_cfginstr (CFGinvariant($2,$4)) $startpos $endpos }
+
 (*
   | lident LARROW cfgexpr
     { mk_cfginstr (CFGassign ($1,$3)) $startpos $endpos }

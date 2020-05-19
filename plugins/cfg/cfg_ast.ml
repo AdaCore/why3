@@ -46,17 +46,13 @@ type cfg_instr = {
 
 and cfg_instr_desc =
   | CFGgoto of label
-(** goto a label "goto L" *)
+  (** goto a label "goto L" *)
   | CFGswitch of Ptree.expr * switch_branch list
-(** pattern-matching *)
+  (** pattern-matching *)
+  | CFGinvariant of ident * Ptree.term
+  (** named invariant *)
   | CFGexpr of Ptree.expr
-(*
-  | CFGassign of ident * cfg_expr
-  (** assignment "x <- e" *)
-  | CFGassert of Expr.assertion_kind * Ptree.term
-  (** assert or assume or check *)
-  (* TODO: expand -> branching, procedure call... or any Ptree.expr ! *)
-*)
+(** any other regular WhyML expressions *)
 
 and switch_branch = Ptree.pattern * block
 (** pattern -> regular WhyML expression ; goto ident *)

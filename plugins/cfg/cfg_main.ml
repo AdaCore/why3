@@ -366,7 +366,81 @@ let translate_instr e =
  *)
   | CFGgoto _id -> mk_expr ~loc (Etuple [])
   | CFGswitch _ -> mk_expr ~loc (Etuple [])
+  | CFGinvariant (id,t) ->
+     let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
+     let t = { t with term_desc = Tattr(attr,t) } in
+     mk_expr ~loc (Eassert(Expr.Assert,t))
   | CFGexpr e -> e
+
+let translate_cfg preconds block blocks =
+  let blocks =
+    List.fold_left
+      (fun acc (l,b) -> Wstdlib.Mstr.add l.id_str b acc)
+      Wstdlib.Mstr.empty
+      blocks
+  in
+  let visited = ref [] in
+  let rec traverse startlabel preconds bl acc (funs,ret_funs) =
+    match bl with
+    | [] -> assert false
+    | i :: rem ->
+       match i.cfg_instr_desc with
+       | CFGgoto l ->
+          let bl =
+            try
+              Wstdlib.Mstr.find l.id_str blocks
+            with Not_found -> Format.eprintf "Label %a not found for goto@." pp_id l; exit 1
+          in
+          traverse startlabel preconds bl acc (funs,ret_funs)
+       | CFGinvariant(id,t) ->
+          let funs = (startlabel, preconds, id, t, acc) :: funs in
+          traverse id.id_str [t] rem [] (funs,ret_funs)
+       | CFGswitch _ ->
+          failwith "switch not suported yet"
+       | CFGexpr e when rem=[] ->
+          let ret_funs = (startlabel, e, acc) :: ret_funs in
+          (funs, ret_funs)
+       | CFGexpr e ->
+          traverse startlabel preconds rem (e::acc) (funs,ret_funs)
+  in
+  traverse "start" preconds block [] ([],[])
+
+let e_ref = mk_expr ~loc:Loc.dummy_position Eref
+
+let declare_local (loc,idopt,ghost,tyopt) body =
+  match idopt, tyopt with
+  | Some id, Some ty ->
+     Debug.dprintf debug "declaring local variable %a of type %a@." pp_id id pp_pty ty ;
+     let e = Eany([],Expr.RKnone,tyopt,pat_wild ~loc,Ity.MaskVisible,empty_spec) in
+     let e = mk_expr ~loc (Eapply(e_ref,mk_expr ~loc e)) in
+     let id = { id with id_ats = (ATstr Pmodule.ref_attr) :: id.id_ats } in
+     mk_expr ~loc:id.id_loc (Elet(id,ghost,Expr.RKnone,e,body))
+  | _ -> failwith "invalid variable declaration"
+
+
+let build_path_function (startlabel, preconds, id , t, revbody) acc =
+  let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
+  (* TODO : add also an "expl:" *)
+  let t = { t with term_desc = Tattr(attr,t) } in
+  let e = mk_expr ~loc:id.id_loc (Eassert(Expr.Assert,t)) in
+  let body =
+    List.fold_left
+      (fun acc e -> mk_expr ~loc:e.expr_loc (Esequence (e, acc)))
+      e revbody
+  in
+  let body =
+    List.fold_left
+      (fun acc t ->
+        let e = mk_expr ~loc:t.term_loc (Eassert(Expr.Assume,t)) in
+        mk_expr ~loc:acc.expr_loc (Esequence (e, acc)))
+      body preconds
+  in
+  let f =
+    Efun([], None, pat_wild ~loc:Loc.dummy_position, Ity.MaskVisible, empty_spec, body)
+  in
+  let loc = Loc.dummy_position in
+  let id = mk_id ~loc ("_" ^ startlabel ^ "_to_" ^ id.id_str) in
+  mk_expr ~loc (Elet (id,false,Expr.RKnone, mk_expr ~loc f, acc))
 
 let build_return_function retty pat spec (startlabel, e, revbody) acc =
   let body =
@@ -381,55 +455,23 @@ let build_return_function retty pat spec (startlabel, e, revbody) acc =
   let id = mk_id ~loc ("_" ^ startlabel ^ "_to_return") in
   mk_expr ~loc (Elet (id,false,Expr.RKnone, mk_expr ~loc f, acc))
 
-let translate_cfg block blocks =
-  let blocks =
-    List.fold_left
-      (fun acc (l,b) -> Wstdlib.Mstr.add l.id_str b acc)
-      Wstdlib.Mstr.empty
-      blocks
-  in
-  let rec traverse startlabel bl acc =
-    match bl with
-    | [] -> assert false
-    | { cfg_instr_desc = CFGgoto l} :: _ ->
-       let bl =
-         try
-           Wstdlib.Mstr.find l.id_str blocks
-         with Not_found -> Format.eprintf "Label %a not found for goto@." pp_id l; exit 1
-       in
-       traverse startlabel bl acc
-    | { cfg_instr_desc = CFGswitch _} :: _ ->
-       failwith "switch not suported yet"
-    | [{ cfg_instr_desc = CFGexpr e}]  ->
-       (startlabel, e, acc)
-    | { cfg_instr_desc = CFGexpr e} :: rem ->
-       traverse startlabel rem (e::acc)
-  in
-  traverse "start" block []
-
-let e_ref = mk_expr ~loc:Loc.dummy_position Eref
-
-let declare_local (loc,idopt,ghost,tyopt) body =
-  match idopt, tyopt with
-  | Some id, Some ty ->
-     Debug.dprintf debug "declaring local variable %a of type %a@." pp_id id pp_pty ty ;
-     let e = Eany([],Expr.RKnone,tyopt,pat_wild ~loc,Ity.MaskVisible,empty_spec) in
-     let e = mk_expr ~loc (Eapply(e_ref,mk_expr ~loc e)) in
-     let id = { id with id_ats = (ATstr Pmodule.ref_attr) :: id.id_ats } in
-     mk_expr ~loc:id.id_loc (Elet(id,ghost,Expr.RKnone,e,body))
-  | _ -> failwith "invalid variable declaration"
 
 let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
   Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
   Debug.dprintf debug "return type is `%a`@." pp_pty retty;
-  let fun_returning = translate_cfg block blocks in
+  let (funs,ret_funs) = translate_cfg spec.sp_pre block blocks in
   let loc = Loc.dummy_position in
   let body = Eany([],Expr.RKnone,Some retty,pat,Ity.MaskVisible,spec) in
   let body =
-    build_return_function retty pat spec fun_returning
+    List.fold_right (build_return_function retty pat spec) ret_funs
       (mk_expr ~loc body)
   in
-  let body = List.fold_right declare_local locals body in
+  let body =
+    List.fold_right build_path_function funs body
+  in
+  let body =
+    List.fold_right declare_local locals body
+  in
   let f =
     Efun(args, Some retty, pat, Ity.MaskVisible, spec, body)
   in

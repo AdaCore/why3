@@ -26,6 +26,26 @@ let cfg cfggoto (x:int) : int
   y
   }
 
-let main () = cfgassert 42; cfggoto 43
+let cfg cfg_inv (x:int) : int
+  requires { x >= 0 }
+  ensures { result >= 2 }
+  =
+  var (y:int);
+  {
+  y <- x;
+  invariant I { y >= 0} ;
+  y <- y + 1;
+  invariant J { y >= 1} ;
+  y <- y + 1;
+  y
+  }
+
+
+
+
+let main () =
+  cfgassert 42;
+  let _ = cfggoto 43 in
+  cfg_inv 44
 
 end
