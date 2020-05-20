@@ -49,9 +49,8 @@ let next_pos =
     incr counter;
     Loc.user_position "" !counter 0 0
 
-let todo fmt _str =
-  fprintf fmt "__todo__"
-(* fprintf fmt "<NOT IMPLEMENTED: %s>" str *)
+let todo fmt str =
+  fprintf fmt "<Mlw_printer:not implemented> %s" str
 
 let pp_sep f fmt () =
   fprintf fmt f

@@ -16,9 +16,6 @@
 
   let floc s e = Loc.extract (s,e)
 
-(*
-  let mk_cfgexpr d s e = { cfg_expr_desc = d; cfg_expr_loc = floc s e }
-*)
   let mk_cfginstr d s e = { cfg_instr_desc = d; cfg_instr_loc = floc s e }
 
 %}

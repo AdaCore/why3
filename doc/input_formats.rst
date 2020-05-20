@@ -286,3 +286,28 @@ Limitations
 ~~~~~~~~~~~
 
 Python lists are modeled as arrays, whose size cannot be modified.
+
+
+.. index:: CFG
+.. _format.CFG:
+
+CFG: Control-Flow-Graph style function bodies
+---------------------------------------------
+
+CFG is an experimental extension of the regular WhyML language, in
+which the body of program functions can optionally be coded using
+labelled blocks and `goto` statements. CFG can be used to encoded
+algorithms which are presented in an unstructured fashion. It can be
+also used as a target for encoding unstructured programming languages
+in Why3, for example assembly code.
+
+Syntax of CFG
+~~~~~~~~~~~~~
+
+The syntax is an extension of the regular WhyML syntax. The additional rules are as follows
+
+.. productionlist:: CFG
+    file: `module`*
+    module: "module" `ident` `decl`* "end"
+    decl: "let" "cfg" `cfg_fundef` ("with" `cfg_fundef`)*
+    cfg_fundef: `ident` `binders` : `type` `spec` "=" `vardecl`* `block` `labelblock`*

@@ -26,6 +26,13 @@ where :math:`WP(e,Q)` is a formula computed automatically using rules defined re
 
 TODO: Refer to `A Pragmatic Type System for Deductive Verification <https://hal.archives-ouvertes.fr/hal-01256434v3>`_
 
+
+Attributes: :why3:attribute:`[@vc:divergent]` disables generation of VC for termination
+
+Other attributes: :why3:attribute:`[@vc:annotation]`, :why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]`, :why3:attribute:`[@vc:white_box]`, :why3:attribute:`[@vc:keep_precondition]`
+
+
+
 VC generated for type invariants
 --------------------------------
 
@@ -49,6 +56,7 @@ the :why3:attribute:`[@vc:sp]` attribute on that expression. Yet, the simplest u
 is to pose this attribute on the whole body of a program function.
 
 Show an example.
+
 
 .. _sec.runwithinferloop:
 
