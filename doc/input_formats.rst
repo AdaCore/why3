@@ -304,10 +304,93 @@ in Why3, for example assembly code.
 Syntax of CFG
 ~~~~~~~~~~~~~
 
-The syntax is an extension of the regular WhyML syntax. The additional rules are as follows
+The CFG syntax is an extension of the regular WhyML syntax : every
+WhyML declaration is allowed, plus an additional declaration of
+program function with following form, introduced by keywords `let cfg`:
+
+..
+
+  `let` `cfg` :math:`f (x_1:t_1) ... (x_n:t_n) : t`
+    `requires` { :math:`Pre` }
+    `ensures`  { :math:`Post` }
+    `=`
+    `var` :math:`y_1 : u_1`;
+    ...
+    `var` :math:`y_k : u_k`;
+    `{`
+      instructions
+    `}`
+    L_1
+    `{`
+      instructions
+    `}`
+    ...
+    L_j
+    `{`
+      instructions
+    `}`
+
+It defines a program function `f` as usual, with the same syntax for
+its contract. The difference is the body, which is made by a sequences
+of declaration of mutable variables with their type, an initial block
+of instructions, and a sequence of other blocks of instructions, each
+block being denoted by a label L1 .. Lj above. The instructions are
+semi-colon separated sequence of either regular WhyML expressions of
+type `unit`, or CFG-specific instructions below:
+
+  . a `goto` statement: `goto L` where L is one of the label of the
+  other blocks. It naturally instructs to continue execution at the
+  given block.
+
+  . a code invariant: `invariant I { t }` where `I` is a name and `t`
+  a predicate. It is similar as an assert expression, telling that `t`
+  must hold when execution reaches this statement. Additionally, it
+  acts as a cut in the generation of VC, similarly as a loop
+  invariant. See example below.
+
+  . a switch statement, of the form
+
+..
+
+  `switch` (e)
+  | pat_1 -> instructions_1
+  ...
+  | pat_k -> instructions_k
+  `end`
+
+  it is similar to a `match ... with ... end` expression, except that
+  the branches may recursively contain CFG instructions
+
+
+The extension of syntax is formally described by the following rules.
 
 .. productionlist:: CFG
     file: `module`*
     module: "module" `ident` `decl`* "end"
     decl: "let" "cfg" `cfg_fundef` ("with" `cfg_fundef`)*
-    cfg_fundef: `ident` `binders` : `type` `spec` "=" `vardecl`* `block` `labelblock`*
+    cfg_fundef: `ident` `binders` : `type` `spec` "=" `vardecl`* "{" `block` "}" `labelblock`*
+    vardecl: "var" `binder` ";"
+    block: `instruction` (";" `instruction`)*
+    labelblock: `ident` "{" `block` "}"
+    instruction:
+    | `expression`
+    | "goto" `ident`
+    | "invariant" `ident` "{" `term` "}"
+    | "switch" "(" expression ")" `switch_case`* "end"
+    switch_case: "|" `pattern` "->" `block`
+
+
+An example
+~~~~~~~~~~
+
+
+
+
+Limitations
+~~~~~~~~~~~
+
+Termination is never checked
+
+local variables cannot be declared ghost
+
+New keywords `cfg`, `goto`, `switch` and `var` cannot be used as regular identifiers anymore

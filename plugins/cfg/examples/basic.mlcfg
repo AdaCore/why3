@@ -72,7 +72,7 @@ let cfg cfg_finite_loop (x:int) : int
   y <- y + 1;
   invariant I { exists z. y = z+z+1 };
   y <- y + 1;
-  switch y <= x with
+  switch (y <= x)
   | True -> goto L
   | False -> y
   end

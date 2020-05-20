@@ -43,13 +43,13 @@ module MaxArray
                   forall j. 0 <= j <= i -> a[ind] >= a[j] };
                   (* (yes, j <= i, not j < i !) *)
     i <- i+1;
-    switch (i < a.length) with
+    switch (i < a.length)
     | True -> goto L2
     | False -> (m,ind)
     end
     }
   L2 {
-    switch (a[i] > m) with
+    switch (a[i] > m)
     | True -> goto L
     | False -> goto L1
     end
