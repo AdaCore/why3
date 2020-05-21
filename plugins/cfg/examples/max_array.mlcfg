@@ -5,7 +5,7 @@ module MaxArray
 
   use array.Array
 
-  let cfg compute_max (a:array int) : (max: int, ind:int)
+  let cfg compute_max (a:array int) : (max: int, ghost ind:int)
     requires { a.length > 0 }
     ensures { forall i. 0 <= i < a.length -> a[ind] >= a[i] }
   =
@@ -25,8 +25,8 @@ module MaxArray
 
   *)
 
-  var (i m:int);
-  var (ind:int); (* should be ghost *)
+  var i m:int;
+  ghost var ind:int;
   {
   i <- 0;
   goto L

@@ -108,6 +108,7 @@ let translate_cfg preconds block blocks =
           in
           traverse_block bl
        | CFGinvariant(id,t) ->
+          (* TODO: if next instruction is also an invariant, groupe them together *)
           let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
           (* TODO : add also an "expl:" *)
           let t = { t with term_desc = Tattr(attr,t) } in
@@ -145,18 +146,16 @@ let translate_cfg preconds block blocks =
 
 let e_ref = mk_expr ~loc:Loc.dummy_position Eref
 
-let declare_local (loc,idopt,ghost,tyopt) body =
-  match idopt, tyopt with
-  | Some id, Some ty ->
-     Debug.dprintf debug "declaring local variable %a of type %a@." pp_id id pp_pty ty ;
-     let e = Eany([],Expr.RKnone,tyopt,pat_wild ~loc,Ity.MaskVisible,empty_spec) in
-     let e = mk_expr ~loc (Eapply(e_ref,mk_expr ~loc e)) in
-     let id = { id with id_ats = (ATstr Pmodule.ref_attr) :: id.id_ats } in
-     mk_expr ~loc:id.id_loc (Elet(id,ghost,Expr.RKnone,e,body))
-  | _ -> failwith "invalid variable declaration"
+let declare_local (ghost,id,ty) body =
+  let loc = id.id_loc in
+  Debug.dprintf debug "declaring local variable %a of type %a@." pp_id id pp_pty ty ;
+  let e = Eany([],Expr.RKnone,Some ty,pat_wild ~loc,Ity.MaskVisible,empty_spec) in
+  let e = mk_expr ~loc (Eapply(e_ref,mk_expr ~loc e)) in
+  let id = { id with id_ats = (ATstr Pmodule.ref_attr) :: id.id_ats } in
+  mk_expr ~loc:id.id_loc (Elet(id,ghost,Expr.RKnone,e,body))
 
 
-let build_path_function retty postconds (startlabel, preconds, body) : Ptree.fundef =
+let build_path_function retty pat mask postconds (startlabel, preconds, body) : Ptree.fundef =
   let body =
     List.fold_left
       (fun acc t ->
@@ -169,10 +168,10 @@ let build_path_function retty postconds (startlabel, preconds, body) : Ptree.fun
   let spec = { empty_spec with sp_post = postconds} in
   let id = mk_id ~loc ("_from_" ^ startlabel) in
   let arg = (loc,None,false,Some unit_type) in
-  (id,false,Expr.RKnone, [arg], Some retty, pat_wild ~loc, Ity.MaskVisible, spec, body)
+  (id,false,Expr.RKnone, [arg], Some retty, pat, mask, spec, body)
 
 
-let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
+let translate_letcfg (id,args,retty,pat,mask,spec,locals,block,blocks) =
   Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
   Debug.dprintf debug "return type is `%a`@." pp_pty retty;
   let funs = translate_cfg spec.sp_pre block blocks in
@@ -181,7 +180,7 @@ let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
     mk_expr ~loc (Eidapp(Qident (mk_id ~loc "_from_start"),[mk_unit ~loc]))
   in
   let defs =
-    List.map (build_path_function retty spec.sp_post) funs
+    List.map (build_path_function retty pat mask spec.sp_post) funs
   in
   let body =
     mk_expr ~loc (Erec(defs,body))
@@ -194,7 +193,7 @@ let translate_letcfg (id,args,retty,pat,spec,locals,block,blocks) =
     mk_expr ~loc (Eattr(divergent_attr,body))
   in
   let f =
-    Efun(args, Some retty, pat, Ity.MaskVisible, spec, body)
+    Efun(args, Some retty, pat, mask, spec, body)
   in
   Dlet (id,false,Expr.RKnone,mk_expr ~loc:id.id_loc f)
 

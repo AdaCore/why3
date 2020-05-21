@@ -17,7 +17,7 @@ let cfg cfggoto (x:int) : int
   requires { x >= 0 }
   ensures { result = x + 2 }
   =
-  var (y : int);
+  var y : int;
   {
   y <- x+1;
   goto L
@@ -31,7 +31,7 @@ let cfg cfg_inv (x:int) : int
   requires { x >= 0 }
   ensures { result >= 2 }
   =
-  var (y:int);
+  var y:int;
   {
   y <- x;
   invariant I { y >= 0} ;
@@ -46,7 +46,7 @@ let cfg cfg_infinite_loop (x:int) : int
   requires { x >= 0 }
   ensures { result >= 2 }
   =
-  var (y:int);
+  var y:int;
   {
   y <- 0;
   goto L;
@@ -63,7 +63,7 @@ let cfg cfg_finite_loop (x:int) : int
   requires { x >= 0 }
   ensures { result >= 2 }
   =
-  var (y:int);
+  var y:int;
   {
   y <- 0;
   goto L;

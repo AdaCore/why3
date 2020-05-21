@@ -309,7 +309,6 @@ WhyML declaration is allowed, plus an additional declaration of
 program function with following form, introduced by keywords `let cfg`:
 
 ..
-
   `let` `cfg` :math:`f (x_1:t_1) ... (x_n:t_n) : t`
     `requires` { :math:`Pre` }
     `ensures`  { :math:`Post` }
@@ -318,7 +317,7 @@ program function with following form, introduced by keywords `let cfg`:
     ...
     `var` :math:`y_k : u_k`;
     `{`
-      instructions
+       instructions
     `}`
     L_1
     `{`
@@ -338,20 +337,19 @@ block being denoted by a label L1 .. Lj above. The instructions are
 semi-colon separated sequence of either regular WhyML expressions of
 type `unit`, or CFG-specific instructions below:
 
-  . a `goto` statement: `goto L` where L is one of the label of the
+- a `goto` statement: `goto L` where L is one of the label of the
   other blocks. It naturally instructs to continue execution at the
   given block.
 
-  . a code invariant: `invariant I { t }` where `I` is a name and `t`
+- a code invariant: `invariant I { t }` where `I` is a name and `t`
   a predicate. It is similar as an assert expression, telling that `t`
   must hold when execution reaches this statement. Additionally, it
   acts as a cut in the generation of VC, similarly as a loop
   invariant. See example below.
 
-  . a switch statement, of the form
+- a switch statement, of the form
 
 ..
-
   `switch` (e)
   | pat_1 -> instructions_1
   ...
@@ -369,7 +367,7 @@ The extension of syntax is formally described by the following rules.
     module: "module" `ident` `decl`* "end"
     decl: "let" "cfg" `cfg_fundef` ("with" `cfg_fundef`)*
     cfg_fundef: `ident` `binders` : `type` `spec` "=" `vardecl`* "{" `block` "}" `labelblock`*
-    vardecl: "var" `binder` ";"
+    vardecl: "var" `ident`* ":" `type` ";" | "ghost" "var" `ident`* ":" `type` ";"
     block: `instruction` (";" `instruction`)*
     labelblock: `ident` "{" `block` "}"
     instruction:
@@ -383,14 +381,78 @@ The extension of syntax is formally described by the following rules.
 An example
 ~~~~~~~~~~
 
+  The following example comes from the documentation of the ANSI C Specification Language
+  \cite{baudinXXacsl, section 2.4.2 Loop invariants).
+
+::
+
+   /*@ requires n >= 0 && \valid(a,0,n);
+     @ ensures \forall integer j ; 0 <= j < n ==> \result >= a[j])
+     @*/
+   int max_array(int a[], int n) {
+     int m, i = 0;
+     goto L;
+     do {
+        if (a[i] > m) { L: m = a[i]; }
+        /*@ invariant
+          @  0 <= i < n && \forall integer j ; 0 <= j <= i ==> m >= a[j]);
+          @*/
+        i++;
+        }
+      while (i < n);
+      return m;
+    }
+
+The code can be viewed as a control-flow graph as follows.
+
+.. figure:: images/cfg.mps
+
+Here is a version in the Why3-CFG language, where label L corresponds
+to node X, label L1 to node 'inv', label L2 to node YY.
+
+::
+
+  let cfg max_array (a:array int) : (max: int, ghost ind:int)
+    requires { a.length > 0 }
+    ensures { forall j. 0 <= j < a.length -> a[ind] >= a[j] }
+  =
+  var i m:int;
+  ghost var ind:int;
+  {
+  i <- 0;
+  goto L
+  }
+  L {
+    m <- a[i];
+    ind <- i;
+    goto L1
+    }
+  L1 {
+    invariant I { 0 <= i < a.length /\
+                  0 <= ind < a.length /\
+                  m = a[ind] /\
+                  forall j. 0 <= j <= i -> a[ind] >= a[j] };
+    i <- i+1;
+    switch (i < a.length)
+    | True -> goto L2
+    | False -> (m,ind)
+    end
+    }
+  L2 {
+    switch (a[i] > m)
+    | True -> goto L
+    | False -> goto L1
+    end
+    }
+
 
 
 
 Limitations
 ~~~~~~~~~~~
 
-Termination is never checked
+- Termination is never checked
 
-local variables cannot be declared ghost
+- New keywords "cfg", "goto", "switch" and "var" cannot be used as regular identifiers anymore
 
-New keywords `cfg`, `goto`, `switch` and `var` cannot be used as regular identifiers anymore
+- consecutive invariants are not seen as a conjunction of invariants

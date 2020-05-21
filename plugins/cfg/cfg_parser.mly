@@ -25,7 +25,6 @@
 
 %start cfgfile
 %type <Cfg_ast.cfg_file> cfgfile
-%type <Cfg_ast.binder list> vardecl
 %type <Cfg_ast.cfg_instr list> sequence
 %type <(Ptree.pattern * Cfg_ast.cfg_instr list) list> cases
 
@@ -47,9 +46,9 @@ cfgdecl:
 recdefn:
   | id=attrs(lident_rich) args=binders COLON ret=return_named sp=spec EQUAL
       v=vardecls b=block bl=labelblock*
-    { let pat, ty, _mask = ret in
+    { let pat, ty, mask = ret in
       let spec = apply_return pat sp in
-      (id, args, ty, pat, spec, v, b, bl) }
+      (id, args, ty, pat, mask, spec, v, b, bl) }
 ;
 
 vardecls:
@@ -58,8 +57,13 @@ vardecls:
 ;
 
 vardecl:
-  | VAR b=binder SEMICOLON { b }
+  | g=ghost VAR vl=attrs(lident_nq)* COLON t=ty SEMICOLON
+    { List.map (fun id -> (g,id,t)) vl }
 ;
+
+ghost:
+  | /* epsilon */ { false }
+  | GHOST         { true }
 
 labelblock:
   | id = attrs(uident) b=block  { (id,b) }

@@ -610,7 +610,7 @@ ind_case:
 
 (* Type expressions *)
 
-ty:
+%public ty:
 | ty_arg          { $1 }
 | lqualid ty_arg+ { PTtyapp ($1, $2) }
 | ty ARROW ty     { PTarrow ($1, $3) }
@@ -1512,7 +1512,7 @@ squalid:
    want it in lident_nq, not even with an error message.
    This avoids a conflict in "let ref x = ...". *)
 
-lident_nq:
+%public lident_nq:
 | LIDENT          { mk_id $1 $startpos $endpos }
 | lident_keyword  { mk_id $1 $startpos $endpos }
 | CORE_LIDENT     { let loc = floc $startpos($1) $endpos($1) in
