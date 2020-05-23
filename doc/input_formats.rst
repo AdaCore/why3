@@ -382,26 +382,26 @@ An example
 ~~~~~~~~~~
 
   The following example comes from the documentation of the ANSI C Specification Language
-  \cite{baudinXXacsl, section 2.4.2 Loop invariants).
+  (See :cite:`baudin18acsl`, section 2.4.2 Loop invariants, Example 2.27).
 
-::
+.. code-block:: C
 
    /*@ requires n >= 0 && \valid(a,0,n);
-     @ ensures \forall integer j ; 0 <= j < n ==> \result >= a[j])
+     @ ensures \forall integer j ; 0 <= j < n ==> \result >= a[j]);
      @*/
    int max_array(int a[], int n) {
      int m, i = 0;
      goto L;
      do {
-        if (a[i] > m) { L: m = a[i]; }
-        /*@ invariant
-          @  0 <= i < n && \forall integer j ; 0 <= j <= i ==> m >= a[j]);
-          @*/
-        i++;
-        }
-      while (i < n);
-      return m;
-    }
+       if (a[i] > m) { L: m = a[i]; }
+       /*@ invariant
+         @   0 <= i < n && \forall integer j ; 0 <= j <= i ==> m >= a[j]);
+         @*/
+       i++;
+     }
+     while (i < n);
+     return m;
+   }
 
 The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_array`.
 
@@ -409,8 +409,8 @@ The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_
    :caption: Control-Flow Graph of "max_array" example
    :name: fig.cfg.max_array
 
-Here is a version in the Why3-CFG language, where label L corresponds
-to node L, label L1 to node 'invariant', label L2 to node "do".
+Here is below a version of this code in the Why3-CFG language, where label "L" corresponds
+to node "L", label "L1" to node "invariant", label "L2" to node "do".
 
 ::
 
@@ -448,11 +448,12 @@ to node L, label L1 to node 'invariant', label L2 to node "do".
     end
     }
 
+The consecutive invariants act as one cut in the generation of VCs.
 
 
 
-Limitations
-~~~~~~~~~~~
+Current Limitations
+~~~~~~~~~~~~~~~~~~~
 
 - Termination is never checked
 
@@ -460,3 +461,6 @@ Limitations
 
 - Trailing code after "switch" is not supported: switch branches must
   return a value or end with a goto
+
+- Conditional statements "if e then i1 else i2" are not yet supported, but can be
+  simulated with "switch (e) | True -> i1 | False -> i2 end"
