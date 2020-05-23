@@ -1,0 +1,14 @@
+digraph G {
+	graph [nodesep=0.5,
+		rankdir=TB,
+		ranksep=0.5
+	];
+	node [margin=0.05,shape=ellipse];
+	"entry" -> "L"        [label=" i <- 0" ];
+	"L" -> "invariant"    [label=" m <- a[i]"];
+	"invariant" -> "cond" [label=" i <- i+1"];
+	"cond" -> "do"        [label=" i < n"];
+        "do" -> "L"           [label=" a[i] > m"];
+        "do" -> "invariant"   [label=" a[i] <= m"];
+        "cond" -> "exit"      [label=" i >= n"];
+}

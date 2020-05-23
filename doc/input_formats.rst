@@ -403,12 +403,14 @@ An example
       return m;
     }
 
-The code can be viewed as a control-flow graph as follows.
+The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_array`.
 
-.. figure:: images/cfg.mps
+.. graphviz:: images/max_array.dot
+   :caption: Control-Flow Graph of "max_array" example
+   :name: fig.cfg.max_array
 
 Here is a version in the Why3-CFG language, where label L corresponds
-to node X, label L1 to node 'inv', label L2 to node YY.
+to node L, label L1 to node 'invariant', label L2 to node "do".
 
 ::
 
