@@ -25,8 +25,8 @@ and cfg_instr_desc =
   (** goto a label "goto L" *)
   | CFGswitch of Ptree.expr * switch_branch list
   (** pattern-matching *)
-  | CFGinvariant of ident * Ptree.term
-  (** named invariant *)
+  | CFGinvariant of (ident * Ptree.term) list
+  (** named invariants *)
   | CFGexpr of Ptree.expr
   (** any other regular WhyML expressions *)
 

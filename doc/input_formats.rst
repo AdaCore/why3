@@ -366,7 +366,7 @@ The extension of syntax is formally described by the following rules.
     file: `module`*
     module: "module" `ident` `decl`* "end"
     decl: "let" "cfg" `cfg_fundef` ("with" `cfg_fundef`)*
-    cfg_fundef: `ident` `binders` : `type` `spec` "=" `vardecl`* "{" `block` "}" `labelblock`*
+    cfg_fundef: `ident` `binder`+ : `type` `spec` "=" `vardecl`* "{" `block` "}" `labelblock`*
     vardecl: "var" `ident`* ":" `type` ";" | "ghost" "var" `ident`* ":" `type` ";"
     block: `instruction` (";" `instruction`)*
     labelblock: `ident` "{" `block` "}"
@@ -428,10 +428,11 @@ to node X, label L1 to node 'inv', label L2 to node YY.
     goto L1
     }
   L1 {
-    invariant I { 0 <= i < a.length /\
-                  0 <= ind < a.length /\
-                  m = a[ind] /\
-                  forall j. 0 <= j <= i -> a[ind] >= a[j] };
+    invariant i_bounds   { 0 <= i < a.length };
+    invariant ind_bounds { 0 <= ind < a.length };
+    invariant m_and_ind  { m = a[ind] };
+    invariant m_is_max   { forall j. 0 <= j <= i -> m >= a[j] };
+                           (* (yes, j <= i, not j < i !) *)
     i <- i+1;
     switch (i < a.length)
     | True -> goto L2
@@ -455,4 +456,5 @@ Limitations
 
 - New keywords "cfg", "goto", "switch" and "var" cannot be used as regular identifiers anymore
 
-- consecutive invariants are not seen as a conjunction of invariants
+- Trailing code after "switch" is not supported: switch branches must
+  return a value or end with a goto

@@ -37,11 +37,11 @@ module MaxArray
     goto L1
     }
   L1 {
-    invariant I { 0 <= i < a.length /\
-                  0 <= ind < a.length /\
-                  m = a[ind] /\
-                  forall j. 0 <= j <= i -> a[ind] >= a[j] };
-                  (* (yes, j <= i, not j < i !) *)
+    invariant i_bounds   { 0 <= i < a.length };
+    invariant ind_bounds { 0 <= ind < a.length };
+    invariant m_and_ind  { m = a[ind] };
+    invariant m_is_max   { forall j. 0 <= j <= i -> m >= a[j] };
+                           (* (yes, j <= i, not j < i !) *)
     i <- i+1;
     switch (i < a.length)
     | True -> goto L2

@@ -84,6 +84,12 @@ let rec pp_pty fmt t =
 
 let divergent_attr = ATstr (Ident.create_attribute "vc:divergent")
 
+exception CFGError of string
+
+let () = Exn_printer.register (fun fmt exn -> match exn with
+  | CFGError msg -> Format.fprintf fmt "CFG translation error: %s" msg
+  | _ -> raise exn)
+
 let translate_cfg preconds block blocks =
   let blocks =
     List.fold_left
@@ -99,29 +105,46 @@ let translate_cfg preconds block blocks =
     | [] -> mk_unit ~loc:Loc.dummy_position
     | i :: rem ->
        let loc = i.cfg_instr_loc in
-       match i.cfg_instr_desc with
-       | CFGgoto l ->
+       match i.cfg_instr_desc, rem with
+       | CFGgoto l, [] ->
           let bl =
             try
               Wstdlib.Mstr.find l.id_str blocks
-            with Not_found -> Format.eprintf "Label %a not found for goto@." pp_id l; exit 1
+            with Not_found ->
+              raise (Loc.Located(l.id_loc,CFGError ("Label " ^ l.id_str ^ " not found for goto")))
           in
           traverse_block bl
-       | CFGinvariant(id,t) ->
-          (* TODO: if next instruction is also an invariant, groupe them together *)
-          let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
-          (* TODO : add also an "expl:" *)
-          let t = { t with term_desc = Tattr(attr,t) } in
-          let e = mk_check ~loc t in
-          let k = mk_expr ~loc (Eidapp(Qident (mk_id ~loc ("_from_" ^ id.id_str)),[mk_unit ~loc])) in
-          let e = mk_seq ~loc e k in
+       | CFGgoto _,_ -> raise (Loc.Located(loc,CFGError "Unreachable code after goto"))
+       | CFGinvariant l1, { cfg_instr_desc = CFGinvariant l2 } :: rem ->
+          traverse_block ({ i with cfg_instr_desc = CFGinvariant (l1 @ l2)}:: rem)
+       | CFGinvariant l, _ ->
+          let id =
+            match l with
+            | [] -> assert false
+            | (id,_)::_ -> id
+          in
+          let l = List.map
+                (fun (id,t) ->
+                  let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ id.id_str)) in
+                  (* TODO : add also an "expl:" *)
+                  { t with term_desc = Tattr(attr,t) })
+                l
+          in
           if not (List.mem id.id_str !visited) then
             begin
               visited := id.id_str :: !visited;
-              traverse_from_entry_point id.id_str [t] rem
+              traverse_from_entry_point id.id_str l rem
             end;
-          e
-       | CFGswitch(e,cases) ->
+          let k =
+            mk_expr ~loc (Eidapp(Qident (mk_id ~loc ("_from_" ^ id.id_str)),[mk_unit ~loc]))
+          in
+          List.fold_right
+            (fun t acc ->
+              let e = mk_check ~loc:t.term_loc t in
+              mk_seq ~loc e acc)
+            l
+            k
+       | CFGswitch(e,cases), [] ->
           let branches =
             List.map
               (fun (pat,bl) ->
@@ -130,8 +153,10 @@ let translate_cfg preconds block blocks =
               cases
           in
           mk_expr ~loc (Ematch(e,branches,[]))
-       | CFGexpr e when rem=[] -> e
-       | CFGexpr e1 ->
+       | CFGswitch _,_ ->
+          raise (Loc.Located(loc,CFGError "unsupported: trailing code after switch"))
+       | CFGexpr e, [] -> e
+       | CFGexpr e1,_ ->
           let e2 = traverse_block rem in
           mk_seq ~loc e1 e2
 

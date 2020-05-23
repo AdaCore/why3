@@ -85,15 +85,7 @@ instr:
   | SWITCH LEFTPAR contract_expr RIGHTPAR cases END
     { mk_cfginstr (CFGswitch ($3,$5)) $startpos $endpos }
   | INVARIANT ident LEFTBRC term RIGHTBRC
-    { mk_cfginstr (CFGinvariant($2,$4)) $startpos $endpos }
-
-(*
-  | lident LARROW cfgexpr
-    { mk_cfginstr (CFGassign ($1,$3)) $startpos $endpos }
-  | k=assertion_kind id=option(ident_nq) LEFTBRC t=term RIGHTBRC
-    { let (n,k)=k in
-      mk_cfginstr (CFGassert(k, name_term id n t)) $startpos $endpos }
-*)
+    { mk_cfginstr (CFGinvariant [$2,$4]) $startpos $endpos }
 ;
 
 cases:
@@ -102,14 +94,3 @@ cases:
   | BAR match_case(sequence) cases
     { $2 :: $3 }
 ;
-
-(*
-cfgexpr:
-  | TRUE
-    { mk_cfgexpr CFGtrue $startpos $endpos }
-  | FALSE
-    { mk_cfgexpr CFGfalse $startpos $endpos }
-  | numeral
-    { mk_cfgexpr (CFGconst $1) $startpos $endpos }
-;
-*)
