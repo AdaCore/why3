@@ -11,16 +11,14 @@ VC generation for program functions
 
 For each program function of the form
 
-..
-
-  `let` :math:`f (x_1:t_1) (x_n:t_n) : t`
-    `requires` { :math:`Pre` }
-    `ensures`  { :math:`Post` }
-    `=` :math:`body`
+|  let :math:`f (x_1:t_1) (x_n:t_n) : t`
+|    requires { :math:`Pre` }
+|    ensures  { :math:`Post` }
+|    `=` :math:`body`
 
 a new logic goal called `f'VC` is generated. Its shape is
 
-.. math:: \forall x_1,..,x_n.  Pre \rightarrow WP(body,Post)
+| :math:`\forall x_1,..,x_n.  Pre \rightarrow WP(body,Post)`
 
 where :math:`WP(e,Q)` is a formula computed automatically using rules defined recursively on :math:`e`.
 
