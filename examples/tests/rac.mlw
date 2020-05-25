@@ -161,3 +161,14 @@ module PolyRefContracts
   let f2c () =
     f2_aux myref 1 2 (* POST fails *)
 end
+
+module Arrays
+  use int.Int
+  (* use array.Array *)
+
+  type t = { elts: int -> int; length: int }
+
+  let f0 () =
+    let x = { elts= (fun (x:int) -> x); length= 2 } in
+    1 + x.length + x.elts 3
+end

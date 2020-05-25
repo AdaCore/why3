@@ -20,9 +20,9 @@ let debug =
 
 let debug_rac = Debug.register_info_flag "rac" ~desc:"trace evaluation for RAC"
 
-let pp_bindings sep pp_key pp_value =
-  Pp.print_list sep (fun fmt (k, v) ->
-      fprintf fmt "@[<h>%a ->@ %a@]" pp_key k pp_value v)
+let pp_bindings ?(sep=Pp.semi) ?(delims=Pp.(lbrace,rbrace)) pp_key pp_value fmt =
+  let pp_binding fmt (k, v) = fprintf fmt "@[<h>%a ->@ %a@]" pp_key k pp_value v in
+  fprintf fmt "%a%a%a" (fst delims) () (snd delims) () (Pp.print_list sep pp_binding)
 
 (* environment *)
 
@@ -46,6 +46,7 @@ type value =
   | Vbool of bool
   | Vvoid
   | Varray of value array
+  | Vfun of cexp
 
 and field = Fimmutable of value | Fmutable of value ref
 
@@ -83,6 +84,7 @@ let rec print_value fmt v =
       fprintf fmt "@[[%a]@]"
         (Pp.print_list Pp.comma print_value)
         (Array.to_list a)
+  | Vfun ce -> fprintf fmt "@[<v2><fun >: %a@]" pp_cexp ce
   | Vconstr (rs, vl) when is_rs_tuple rs ->
       fprintf fmt "@[(%a)@]" (Pp.print_list Pp.comma print_field) vl
   | Vconstr (rs, []) -> fprintf fmt "@[%a@]" print_rs rs
@@ -102,6 +104,10 @@ let rec term_of_value = function
   | Vconstr (rs, fs) ->
       t_app_infer (ls_of_rs rs) (List.map term_of_field fs)
       (* (Ity.ty_of_ity rs.rs_cty.cty_result) *)
+  | Vfun ce ->
+      Option.get (term_of_expr ~prop:false (e_exec ce))
+      (* let vs = List.map (fun pv -> pv.pv_vs) ce.c_cty.cty_args in
+       * t_lambda vs [] t *)
   | v -> Format.kasprintf failwith "term_of_value: %a" print_value v
 
 and term_of_field = function
@@ -133,12 +139,15 @@ let rec ty_of_value env mt = function
         ty_match mt ty0 ty in
       let mt = Array.fold_left aux mt vs in
       mt, ty_app tys [ty_inst mt ty0]
+  | Vfun {c_cty= cty} ->
+      let args = List.map (fun pv -> ty_of_ity pv.pv_ity) cty.cty_args in
+      mt, List.fold_right ty_func args (ty_of_ity cty.cty_result)
   | Vconstr (rs, fs) ->
       let mt, tys = tys_of_values env mt (List.map field_get fs) in
       let mt = ty_match_pvs_tys rs.rs_cty.cty_args tys mt in
       let ty0 = ty_of_ity rs.rs_cty.cty_result in
       mt, ty_inst mt ty0
-  | v -> Format.kasprintf failwith "term_of_value: %a" print_value v
+  | v -> Format.kasprintf failwith "ty_of_value: %a" print_value v
 
 and tys_of_values env = Lists.map_fold_left (ty_of_value env)
 
@@ -310,18 +319,15 @@ let rec default_value_of_type env ity =
   | Ityapp (ts, l1, l2) -> default_value_of_types env ts l1 l2
 
 and default_value_of_types env ts l1 l2 =
-  try
-    let d = Pdecl.find_its_defn env.known ts in
-    match d.Pdecl.itd_constructors with
+  match Pdecl.((find_its_defn env.known ts).itd_constructors) with
     | [] -> assert false
     | cs :: _ ->
         let subst = its_match_regs ts l1 l2 in
-        let tyl =
-          List.map (ity_full_inst subst)
+        let tyl = List.map (ity_full_inst subst)
             (List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args) in
         let vl = List.map (default_value_of_type env) tyl in
         Vconstr (cs, List.map (fun v -> Fmutable (ref v)) vl)
-  with Not_found -> assert false
+    | exception Not_found -> assert false
 
 type result =
   | Normal of value
@@ -626,8 +632,7 @@ let find_definition env rs =
   with Not_found -> (
     try
       (* then try if it is a local function *)
-      let f = Mrs.find rs env.funenv in
-      Function ([], f)
+      Function ([], Mrs.find rs env.funenv)
     with Not_found ->
       (* else look for a global function *)
       find_global_definition env.known rs )
@@ -663,7 +668,7 @@ let report_cntr fmt (ctx, msg, term) =
     fprintf fmt " at %a@," pp_pos (Opt.get term.t_loc) ;
   fprintf fmt "@[<hov2>Term: %a@]@," Pretty.print_term term ;
   fprintf fmt "@[<hov2>Variables: %a@]"
-    (pp_bindings Pp.comma Pretty.print_vs Pretty.print_term)
+    (pp_bindings ~delims:Pp.(nothing, nothing) Pretty.print_vs Pretty.print_term)
     (Mvs.bindings ctx.c_vsenv) ;
   fprintf fmt "@]"
 
@@ -761,7 +766,7 @@ let assert_term ctx t =
   match eval_term ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
   | {t_node = Ttrue} ->
       if Debug.test_flag debug_rac then
-        eprintf "%a@?" report_cntr (ctx, "is ok", t)
+        eprintf "%a@." report_cntr (ctx, "is ok", t)
   | {t_node = Tfalse} -> raise (Contr (ctx, t))
   | _ -> eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t)
 
@@ -803,13 +808,14 @@ let rec eval_expr ~rac env (e : expr) : result =
         Normal (Vfloat (make_from_str s))
   | Econst (Constant.ConstStr s) -> Normal (Vstring s)
   | Eexec (ce, cty) -> (
-      assert (cty.cty_args = []) ;
-      assert (ce.c_cty.cty_args = []) ;
       match ce.c_node with
       | Cpur _ -> assert false (* TODO ? *)
-      | Cfun _ -> assert false (* TODO ? *)
+      | Cfun e -> Normal (Vfun ce)
       | Cany -> raise CannotCompute
-      | Capp (rs, pvsl) -> exec_call ~rac ?loc:e.e_loc env rs pvsl e.e_ity )
+      | Capp (rs, pvsl) ->
+          assert (cty.cty_args = []) ;
+          assert (ce.c_cty.cty_args = []) ;
+          exec_call ~rac ?loc:e.e_loc env rs pvsl e.e_ity )
   | Eassign l ->
       List.iter
         (fun (pvs, rs, value) ->
@@ -960,16 +966,25 @@ and exec_match ~rac env t ebl =
 
 and exec_call ~rac ?loc env rs args ity_result =
   (* TODO variant *)
+  let func_app vs =
+    match vs with
+    | [Vfun {c_cty= {cty_args= [pv_arg]}; c_node= Cfun e}; arg] ->
+        let env = bind_pvs pv_arg arg env in
+        eval_expr ~rac env e
+    | _ -> assert false in
   let args' = List.map (get_pvs env) args in
   let mt, tys = tys_of_values env.env Mtv.empty args' in
   let mt = ty_match_pvs_tys rs.rs_cty.cty_args tys mt in
   let env' = multibind_pvs rs.rs_cty.cty_args args' env in
   if rac then
     assert_terms
-      (cntr_ctx "Precondition" ?trigger_loc:loc env')
+      (let desc = asprintf "Precondition of %a" print_decoded rs.rs_name.id_string in
+       cntr_ctx desc ?trigger_loc:loc env')
       (* List.map (t_ty_subst mt Mvs.empty) *) rs.rs_cty.cty_pre ;
   let res =
-    match find_definition env rs with
+    if rs_equal rs rs_func_app then
+      func_app args'
+    else match find_definition env rs with
     | Function (locals, d) -> (
         let env = add_local_funs locals env in
         match d.c_node with
@@ -1016,17 +1031,17 @@ and exec_call ~rac ?loc env rs args ity_result =
   ( if rac then
       match res with
       | Normal v ->
-          let desc = "Postcondition of " ^ rs.rs_name.id_string in
+          let desc = asprintf "Postcondition of %a" print_decoded rs.rs_name.id_string in
           let ctx = cntr_ctx desc ?trigger_loc:loc env' in
           let assrt = assert_post ctx (term_of_value v) in
           ignore (List.fold_left assrt mt rs.rs_cty.cty_post)
       | Excep (xs, v) ->
-          let desc = "Exceptional postcondition of " ^ rs.rs_name.id_string in
+          let desc = asprintf "Exceptional postcondition of %a" print_decoded rs.rs_name.id_string in
           let ctx = cntr_ctx desc ?trigger_loc:loc env' in
           let assrt = assert_post ctx (term_of_value v) in
           let xpost = Mxs.find xs rs.rs_cty.cty_xpost in
           ignore (List.fold_left assrt mt xpost)
-      | _ -> () ) ;
+      | _ -> () );
   res
 
 let eval_global_expr ~rac env km locals e =
