@@ -296,7 +296,7 @@ CFG: Control-Flow-Graph style function bodies
 
 CFG is an experimental extension of the regular WhyML language, in
 which the body of program functions can optionally be coded using
-labelled blocks and `goto` statements. CFG can be used to encoded
+labelled blocks and "goto" statements. CFG can be used to encode
 algorithms which are presented in an unstructured fashion. It can be
 also used as a target for encoding unstructured programming languages
 in Why3, for example assembly code.
@@ -306,36 +306,38 @@ Syntax of CFG
 
 The CFG syntax is an extension of the regular WhyML syntax : every
 WhyML declaration is allowed, plus an additional declaration of
-program function with following form, introduced by keywords `let cfg`:
+program function of the following form, introduced by keywords "let cfg":
 
-..
-  `let` `cfg` :math:`f (x_1:t_1) ... (x_n:t_n) : t`
-    `requires` { :math:`Pre` }
-    `ensures`  { :math:`Post` }
-    `=`
-    `var` :math:`y_1 : u_1`;
-    ...
-    `var` :math:`y_k : u_k`;
-    `{`
-       instructions
-    `}`
-    L_1
-    `{`
-      instructions
-    `}`
-    ...
-    L_j
-    `{`
-      instructions
-    `}`
+.. code-block:: whyml
+
+  `let` cfg :math:`f (x_1:t_1) ... (x_n:t_n) : t`
+    requires { :math:`Pre` }
+    ensures  { :math:`Post` }
+    =
+    var :math:`y_1 : u_1`;
+    :math:`\vdots`
+    var :math:`y_k : u_k`;
+    {
+      :math:`instructions`
+    }
+    :math:`L_1`
+    {
+      :math:`instructions`
+    }
+    :math:`\vdots`
+    :math:`L_j`
+    {
+      :math:`instructions`
+    }
 
 It defines a program function `f` as usual, with the same syntax for
 its contract. The difference is the body, which is made by a sequences
 of declaration of mutable variables with their type, an initial block
 of instructions, and a sequence of other blocks of instructions, each
-block being denoted by a label L1 .. Lj above. The instructions are
-semi-colon separated sequence of either regular WhyML expressions of
-type `unit`, or CFG-specific instructions below:
+block being denoted by a label like :math:`L_1 \ldots L_j` above. The
+instructions are semi-colon separated sequences of either regular
+WhyML expressions of type `unit` (except of course when returning a
+value and the end of sequence), or CFG-specific instructions below:
 
 - a `goto` statement: `goto L` where L is one of the label of the
   other blocks. It naturally instructs to continue execution at the
@@ -349,15 +351,16 @@ type `unit`, or CFG-specific instructions below:
 
 - a switch statement, of the form
 
-..
-  `switch` (e)
-  | pat_1 -> instructions_1
-  ...
-  | pat_k -> instructions_k
+.. code-block:: whyml
+
+  `switch` (:math:`e`)
+  | :math:`pat_1` -> :math:`instructions_1`
+  :math:`\vdots`
+  | :math:`pat_k` -> :math:`instructions_k`
   `end`
 
-  it is similar to a `match ... with ... end` expression, except that
-  the branches may recursively contain CFG instructions
+it is similar to a `match ... with ... end` expression, except that
+the branches may recursively contain CFG instructions
 
 
 The extension of syntax is formally described by the following rules.
@@ -381,8 +384,10 @@ The extension of syntax is formally described by the following rules.
 An example
 ~~~~~~~~~~
 
-  The following example comes from the documentation of the ANSI C Specification Language
-  (See :cite:`baudin18acsl`, section 2.4.2 Loop invariants, Example 2.27).
+The following example is inspired from the documentation of the ANSI C
+Specification Language (See :cite:`baudin18acsl`, section 2.4.2 Loop
+invariants, Example 2.27). It aims at computing the maximum value of
+an array of integers.
 
 .. code-block:: C
 
@@ -412,7 +417,7 @@ The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_
 Here is below a version of this code in the Why3-CFG language, where label "L" corresponds
 to node "L", label "L1" to node "invariant", label "L2" to node "do".
 
-::
+.. code-block:: whyml
 
   let cfg max_array (a:array int) : (max: int, ghost ind:int)
     requires { a.length > 0 }
@@ -451,16 +456,42 @@ to node "L", label "L1" to node "invariant", label "L2" to node "do".
 The consecutive invariants act as one cut in the generation of VCs.
 
 
+Error messages
+~~~~~~~~~~~~~~
+
+The translation from the CFG language to the regular WhyML may raise the following errors.
+
+- "cycle without invariant": in order to perform the translation, any
+  cycle on the control-flow graph must contain at least one
+  "invariant" clause. It corresponds to the idea that any loop must
+  contain a loop invariant.
+
+- "cycle without invariant (starting from :math:`I`)": some error as
+  above, except that the cycle was not reachable from the start of the
+  function body, but from the other "invariant" clause named
+  :math:`I`.
+
+- "label :math:`L` not found for goto": there is a "goto" instruction to a non-existent label.
+
+- "unreachable code after goto": any code occuring after a "goto"
+  statement is unreachable, so is certainly a user mistake.
+
+- "unsupported: trailing code after switch": see limitations below.
 
 Current Limitations
 ~~~~~~~~~~~~~~~~~~~
 
-- Termination is never checked
+- Termination is never checked.
 
-- New keywords "cfg", "goto", "switch" and "var" cannot be used as regular identifiers anymore
+- New keywords "cfg", "goto", "switch" and "var" cannot be used as
+  regular identifiers anymore.
 
-- Trailing code after "switch" is not supported: switch branches must
-  return a value or end with a goto
+- Trailing code after "switch" is not supported: in principle it
+  should be possible to end a "switch" branch with "()" and transfer
+  the execution to the instructions after the "switch". This is not
+  yet supported. A workaround is to place the trailing instructions in
+  another block and pose an extra "goto" to this block in all the
+  "switch" branches" that do not end with a "goto" yet.
 
 - Conditional statements "if e then i1 else i2" are not yet supported, but can be
   simulated with "switch (e) | True -> i1 | False -> i2 end"
