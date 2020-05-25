@@ -97,14 +97,23 @@ let translate_cfg preconds block blocks =
       Wstdlib.Mstr.empty
       blocks
   in
-  let startlabel = "start" in
-  let visited = ref [startlabel] in
+  let thestartlabel = "start" in
+  let visited_entry_points = ref [thestartlabel] in
   let funs = ref [] in
-  let rec traverse_block bl : Ptree.expr =
+  let rec traverse_block startlabel visited_instrs bl : Ptree.expr =
     match bl with
     | [] -> mk_unit ~loc:Loc.dummy_position
     | i :: rem ->
        let loc = i.cfg_instr_loc in
+       if List.memq i visited_instrs then
+         begin
+           let msg = "cycle without invariant" in
+           let msg = if startlabel = thestartlabel then msg else
+                       msg ^ " starting from `" ^ startlabel ^ "`"
+           in
+           raise (Loc.Located(loc,CFGError msg))
+         end;
+       let traverse_block = traverse_block startlabel (i::visited_instrs) in
        match i.cfg_instr_desc, rem with
        | CFGgoto l, [] ->
           let bl =
@@ -130,9 +139,9 @@ let translate_cfg preconds block blocks =
                   { t with term_desc = Tattr(attr,t) })
                 l
           in
-          if not (List.mem id.id_str !visited) then
+          if not (List.mem id.id_str !visited_entry_points) then
             begin
-              visited := id.id_str :: !visited;
+              visited_entry_points := id.id_str :: !visited_entry_points;
               traverse_from_entry_point id.id_str l rem
             end;
           let k =
@@ -161,12 +170,12 @@ let translate_cfg preconds block blocks =
           mk_seq ~loc e1 e2
 
   and traverse_from_entry_point startlabel preconds block =
-    let e = traverse_block block in
+    let e = traverse_block startlabel [] block in
     funs := (startlabel, preconds, e) :: !funs
 
   in
 
-  traverse_from_entry_point startlabel preconds block;
+  traverse_from_entry_point thestartlabel preconds block;
   !funs
 
 let e_ref = mk_expr ~loc:Loc.dummy_position Eref
