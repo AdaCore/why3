@@ -120,10 +120,10 @@ let translate_cfg preconds block blocks =
             try
               Wstdlib.Mstr.find l.id_str blocks
             with Not_found ->
-              raise (Loc.Located(l.id_loc,CFGError ("Label " ^ l.id_str ^ " not found for goto")))
+              raise (Loc.Located(l.id_loc,CFGError ("label " ^ l.id_str ^ " not found for goto")))
           in
           traverse_block bl
-       | CFGgoto _,_ -> raise (Loc.Located(loc,CFGError "Unreachable code after goto"))
+       | CFGgoto _,_ -> raise (Loc.Located(loc,CFGError "unreachable code after goto"))
        | CFGinvariant l1, { cfg_instr_desc = CFGinvariant l2 } :: rem ->
           traverse_block ({ i with cfg_instr_desc = CFGinvariant (l1 @ l2)}:: rem)
        | CFGinvariant l, _ ->
