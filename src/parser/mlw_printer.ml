@@ -49,9 +49,8 @@ let next_pos =
     incr counter;
     Loc.user_position "" !counter 0 0
 
-let todo fmt _str =
-  fprintf fmt "__todo__"
-(* fprintf fmt "<NOT IMPLEMENTED: %s>" str *)
+let todo fmt str =
+  fprintf fmt "<Mlw_printer:not implemented> %s" str
 
 let pp_sep f fmt () =
   fprintf fmt f
@@ -518,7 +517,7 @@ and pp_expr =
           | "'Break" -> "break"
           | "'Continue" -> "continue"
           | _ -> assert false in
-        fprintf fmt "@[hv 2%a%s%a@]" pp_maybe_marker id_loc keyword
+        fprintf fmt "@[<hv 2>%a%s%a@]" pp_maybe_marker id_loc keyword
           (pp_opt ~prefix:" " pp_expr.closed) opt_arg
     | Eraise (qid, opt_arg) ->
         fprintf fmt "raise %a%a" pp_qualid qid (pp_opt ~prefix:" " pp_expr.closed) opt_arg

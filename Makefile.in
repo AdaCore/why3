@@ -342,9 +342,11 @@ endif
 
 .PHONY: initialize_messages update-parsing-error-handling
 
-src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.messages
+PARSERS=src/parser/parser_common.mly src/parser/parser.mly
+
+src/parser/parser_messages.ml: src/parser/handcrafted.messages
 	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
-	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
+	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --update-errors \
 	src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
 	diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; \
 	RET_CODE=$$?; \
@@ -354,7 +356,7 @@ contains an updated version that must be checked before replacing 'src/parser/ha
 		exit 1; \
 	fi
 	rm -f src/parser/handcrafted.messages.temp
-	$(MENHIR) --explain --strict src/parser/parser.mly --compile-errors \
+	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --compile-errors \
 	src/parser/handcrafted.messages > src/parser/parser_messages.ml.tmp
 	mv src/parser/parser_messages.ml.tmp src/parser/parser_messages.ml
 
@@ -501,6 +503,8 @@ PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/python/py_parser.ml plugins/python/py_parser.mli \
 		plugins/microc/mc_lexer.ml \
 		plugins/microc/mc_parser.ml plugins/microc/mc_parser.mli \
+		plugins/cfg/cfg_lexer.ml \
+		plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli \
 		plugins/parser/dimacs.ml
 
 PLUG_PARSER = genequlin dimacs
@@ -509,12 +513,14 @@ PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_ast py_parser py_lexer py_main
 PLUG_MICROC = mc_ast mc_parser mc_lexer mc_printer mc_main
+PLUG_CFG = cfg_ast cfg_tokens cfg_parser cfg_lexer cfg_main
 
-PLUGINS = genequlin dimacs tptp python microc
+PLUGINS = genequlin dimacs tptp python microc cfg
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
 MICROCMODULES = $(addprefix plugins/microc/, $(PLUG_MICROC))
+CFGMODULES = $(addprefix plugins/cfg/, $(PLUG_CFG))
 
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
@@ -540,13 +546,14 @@ endif
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
-	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES)
+	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
+	      $(CFGMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 
-PLUGDIRS = parser printer transform tptp python microc
+PLUGDIRS = parser printer transform tptp python microc cfg
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 $(PLUGDEP) $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
@@ -582,6 +589,8 @@ lib/plugins/python.cmxs: $(PYTHONCMX)
 lib/plugins/python.cmo: $(PYTHONCMO)
 lib/plugins/microc.cmxs: $(MICROCCMX)
 lib/plugins/microc.cmo: $(MICROCCMO)
+lib/plugins/cfg.cmxs: $(addsuffix .cmx, $(CFGMODULES))
+lib/plugins/cfg.cmo: $(addsuffix .cmo, $(CFGMODULES))
 
 # depend and clean targets
 
@@ -2141,6 +2150,17 @@ clean::
 %.ml %.mli: %.mly
 	$(SHOW) 'Menhir $<'
 	$(HIDE)$(MENHIR) --table --explain --strict $<
+
+src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
+	$(SHOW) 'Menhir $<'
+	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser $^
+
+plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: plugins/cfg/cfg_parser.mly
+	$(SHOW) 'Menhir $<'
+	$(HIDE)$(MENHIR) --table --explain --base plugins/cfg/cfg_parser \
+		--external-tokens Cfg_tokens \
+		src/parser/parser_common.mly $^
+
 
 %.dep: %.ml %.mli
 	$(SHOW) 'Ocamldep $<'

@@ -156,7 +156,7 @@ type expr = {
 (** Expression kinds *)
 and expr_desc =
   | Eref
-  (** TODO: document *)
+  (** built-in operator [ref] for “auto-dereference” syntax *)
   | Etrue
   (** Boolean literal [True] *)
   | Efalse
@@ -371,4 +371,3 @@ type mlw_file =
   | Decls of decl list
   (** a list of declarations outside any module *)
 [@@deriving sexp_of]
-
