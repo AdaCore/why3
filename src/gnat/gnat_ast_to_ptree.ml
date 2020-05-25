@@ -374,6 +374,50 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
       | _ ->
           conversion_error id ("unsupported base "^string_of_int r.base^" for ureal") () in
 
+  let process_call node id args =
+    (* Convert unquantified op1 operations (=, <, etc.) to innfix, binary only *)
+    if is_infix_identifier id && is_op1 id then begin
+      let op =
+        List.get_last (conversion_error node.info.id "empty operator name")
+          (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] id) in
+      match args with
+      | [arg0;arg1] -> mk_innfix arg0 op arg1
+      | _ -> conversion_error node.info.id "op1 operations must be binary" ()
+    end
+    (* Convert unqualified op234 prefix operations (/, *, !, etc.) *)
+    else if is_infix_identifier id && is_op234 id then begin
+      match args with
+      | [_] ->
+        let qid =
+          let ident =
+            List.get_last (conversion_error node.info.id "empty operator name")
+              (mk_idents_of_identifier ~notation:(Some Ident.op_prefix) [] id) in
+          mk_qualid [ident] in
+        mk_idapp qid args
+      | [_;_] ->
+      let qid =
+        let ident =
+          List.get_last (conversion_error node.info.id "empty operator name")
+            (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] id) in
+        mk_qualid [ident] in
+        mk_idapp qid args
+      | _ ->
+          conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
+    end else begin
+      if is_infix_identifier id then
+        Format.ksprintf (conversion_error node.info.id) "infix identifier %s must be op1 or op234"
+          (String.concat "." (strings_of_name (name_of_identifier id))) ();
+      let notation =
+        if is_op1 id || is_op234 id then
+          match List.length args with
+          | 1 -> Some Ident.op_prefix
+          | 2 -> Some Ident.op_infix
+          | _ -> conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
+        else None in
+        let f = mk_var (mk_qualid (mk_idents_of_identifier ~notation [] id)) in
+        List.fold_left (mk_apply ?loc:None) f args
+    end in
+
   let curr_attrs = Curr.mk_attrs () in
 
   let res = match node.desc with
@@ -506,57 +550,9 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
              mk_ident [] s in
            T.mk_at body id)
 
-    (* Convert unquantified op1 operations (=, <, etc.) to innfix, binary only *)
-    | Call r when is_infix_identifier r.name && is_op1 r.name ->
-        assert (is_infix_identifier r.name);
-        if List.length r.args <> 2 then
-          conversion_error node.info.id "op1 operations must be binary" ();
-        let arg0 = mk_of_expr (List.nth r.args 0) in
-        let op =
-          List.get_last (conversion_error node.info.id "empty operator name")
-            (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] r.name) in
-        let arg1 = mk_of_expr (List.nth r.args 1) in
-        mk_innfix arg0 op arg1
-
-    (* Convert unqualified op234 prefix operations (/, *, !, etc.) *)
-    | Call r when is_infix_identifier r.name && is_op234 r.name -> begin
-        match List.length r.args with
-        | 1 -> (* Unary operation *)
-            let qid =
-              let ident =
-                List.get_last (conversion_error node.info.id "empty operator name")
-                  (mk_idents_of_identifier ~notation:(Some Ident.op_prefix) [] r.name) in
-              mk_qualid [ident] in
-            let arg = mk_of_expr (List.nth r.args 0) in
-            mk_idapp qid [arg]
-        | 2 -> (* Binary operation *)
-            let qid =
-              let ident =
-                List.get_last (conversion_error node.info.id "empty operator name")
-                  (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] r.name) in
-              mk_qualid [ident] in
-            let arg0 = mk_of_expr (List.nth r.args 0) in
-            let arg1 = mk_of_expr (List.nth r.args 1) in
-            mk_idapp qid [arg0; arg1]
-        | _ ->
-            conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
-      end
-
     | Call r ->
-        if is_infix_identifier r.name then
-          Format.ksprintf (conversion_error node.info.id) "infix identifier %s must be op1 or op234"
-            (String.concat "." (strings_of_name (name_of_identifier r.name))) ();
-        let notation =
-          if is_op1 r.name || is_op234 r.name then
-            match List.length r.args with
-            | 1 -> Some Ident.op_prefix
-            | 2 -> Some Ident.op_infix
-            | _ -> conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
-          else
-            None in
-        let f = mk_var (mk_qualid (mk_idents_of_identifier ~notation [] r.name)) in
         let args = List.map mk_of_expr r.args in
-        List.fold_left (mk_apply ?loc:None) f args
+        process_call node r.name args
 
     | Literal r ->
         if node.info.domain = Pred then
