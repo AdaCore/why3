@@ -388,6 +388,10 @@ oracle_file="$(dirname "$mlw_file")/$(basename "$mlw_file" .mlw).oracle"
     for func in f1 f2a f2b f2c; do
         rac "$mlw_file" PolyRefContracts."$func"
     done
+    echo "  $mlw_file.Record" >&2
+    for func in f0; do
+        rac "$mlw_file" Record."$func"
+    done
 ) > "$out_file"
 if diff -u "$oracle_file" "$out_file"; then
     echo "RAC: ok"

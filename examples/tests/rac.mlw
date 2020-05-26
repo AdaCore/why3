@@ -162,13 +162,60 @@ module PolyRefContracts
     f2_aux myref 1 2 (* POST fails *)
 end
 
-module Arrays
+module Record
   use int.Int
-  (* use array.Array *)
 
-  type t = { elts: int -> int; length: int }
+  type t = { mutable f: int -> int; ghost n: int }
 
   let f0 () =
-    let x = { elts= (fun (x:int) -> x); length= 2 } in
-    1 + x.length + x.elts 3
+    let x = { f= (fun (x:int) -> x); n= 2 } in
+    assert { x.n = 2 };
+    x.f <- (let g = x.f in (fun (z: int) -> if z = 3 then 13 else g z));
+    1 (* + x.n *) + x.f 3
+end
+
+module Arrays
+  use array.Array
+
+  let f1 () =
+    let a = make 10 0 in
+    let i = a[0] in
+    assert { i = 0 };
+    a[10]
+
+  let f3 () =
+    let a = make 10 0 in
+    assert { length a = 10 };
+    assert { a[0] = 0 }; (* OK *)
+    assert { a[10] = 0 } (* FAILS *)
+end
+
+
+module ArrayExec
+
+  type array = {
+      length : int ;
+      mutable contents : int -> int ;
+    }
+
+  use int.Int
+
+  let make (l: int) (v: int) : array
+  = { length= l; contents= fun _ -> v }
+
+  let function map_update (f:int -> int) (x:int) (y:int) =
+    fun (z:int) -> if z=x then y else f z
+
+  let function ([]) (a: array) (i: int) : int = a.contents i
+
+  let function ([<-]) (a: array) (i: int) (v: int): array
+    = { length = a.length ; contents = map_update a.contents i v }
+
+  let ([]<-) (a: array) (i: int) (v: int) : unit
+    = a.contents <- map_update a.contents i v
+
+  let f () =
+    let a = make 5 1 in
+    let x = a[0] in
+    assert { x = 1 }
 end
