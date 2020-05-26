@@ -20,9 +20,9 @@ let debug =
 
 let debug_rac = Debug.register_info_flag "rac" ~desc:"trace evaluation for RAC"
 
-let pp_bindings ?(sep=Pp.semi) ?(delims=Pp.(lbrace,rbrace)) pp_key pp_value fmt =
+let pp_bindings ?(sep=Pp.semi) ?(delims=Pp.(lbrace,rbrace)) pp_key pp_value fmt l =
   let pp_binding fmt (k, v) = fprintf fmt "@[<h>%a ->@ %a@]" pp_key k pp_value v in
-  fprintf fmt "%a%a%a" (fst delims) () (snd delims) () (Pp.print_list sep pp_binding)
+  fprintf fmt "%a%a%a" (fst delims) () (Pp.print_list sep pp_binding) l (snd delims) ()
 
 (* environment *)
 
@@ -305,10 +305,10 @@ let eval_real : type a. a real_arity -> a -> Expr.rsymbol -> value list -> value
   | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
   | _ -> assert false
 
-let rec default_value_of_type env ity =
+let rec default_value_of_type known ity =
   match ity.ity_node with
   | Ityvar _ -> assert false
-  | Ityreg r -> default_value_of_types env r.reg_its r.reg_args r.reg_regs
+  | Ityreg r -> default_value_of_types known r.reg_its r.reg_args r.reg_regs
   | Ityapp (ts, _, _) when its_equal ts its_int -> Vnum BigInt.zero
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
   | Ityapp (ts, _, _) when its_equal ts its_bool -> Vbool false
@@ -316,16 +316,16 @@ let rec default_value_of_type env ity =
   | Ityapp(ts,_,_) when is_its_tuple ts ->
     assert false (* TODO *)
 *)
-  | Ityapp (ts, l1, l2) -> default_value_of_types env ts l1 l2
+  | Ityapp (ts, l1, l2) -> default_value_of_types known ts l1 l2
 
-and default_value_of_types env ts l1 l2 =
-  match Pdecl.((find_its_defn env.known ts).itd_constructors) with
+and default_value_of_types known ts l1 l2 =
+  match Pdecl.((find_its_defn known ts).itd_constructors) with
     | [] -> assert false
     | cs :: _ ->
         let subst = its_match_regs ts l1 l2 in
         let tyl = List.map (ity_full_inst subst)
             (List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args) in
-        let vl = List.map (default_value_of_type env) tyl in
+        let vl = List.map (default_value_of_type known) tyl in
         Vconstr (cs, List.map (fun v -> Fmutable (ref v)) vl)
     | exception Not_found -> assert false
 
@@ -510,7 +510,7 @@ let add_builtin_mo env (l, n, t, d) =
       Hrs.add builtin_progs ps f)
     d
 
-let get_builtin_progs lib = List.iter (add_builtin_mo lib) (built_in_modules ())
+let get_builtin_progs env known = List.iter (add_builtin_mo env) (built_in_modules env known)
 
 let get_pvs env pvs =
   let t =
@@ -668,7 +668,7 @@ let report_cntr fmt (ctx, msg, term) =
     fprintf fmt " at %a@," pp_pos (Opt.get term.t_loc) ;
   fprintf fmt "@[<hov2>Term: %a@]@," Pretty.print_term term ;
   fprintf fmt "@[<hov2>Variables: %a@]"
-    (pp_bindings ~delims:Pp.(nothing, nothing) Pretty.print_vs Pretty.print_term)
+    (pp_bindings ~delims:Pp.(lbrace, rbrace) Pretty.print_vs Pretty.print_term)
     (Mvs.bindings ctx.c_vsenv) ;
   fprintf fmt "@]"
 
@@ -1055,7 +1055,7 @@ let eval_global_expr ~rac env km locals e =
           pvs.pv_vs.vs_name.id_string;
         *)
         let ity = pvs.pv_ity in
-        let v = default_value_of_type env' ity in
+        let v = default_value_of_type env'.known ity in
         Mvs.add pvs.pv_vs v acc
     | _ -> acc in
   let global_env = Mid.fold add_glob km Mvs.empty in
