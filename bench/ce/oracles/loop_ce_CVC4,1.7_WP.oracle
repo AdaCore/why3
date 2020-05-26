@@ -5,30 +5,30 @@ bench/ce/loop_ce.mlw M1 f'vc: Timeout or Unknown
 Counter-example model:
 File loop_ce.mlw:
   Line 9:
-    a, [[@mlw:reference_var], [@introduced], [@field:0:contents]] =
+    a, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "1" } }] } }
   Line 10:
-    b, [[@mlw:reference_var], [@introduced], [@field:0:contents]] =
+    b, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "2" } }] } }
   Line 11:
-    [previous iteration] b, [[@mlw:reference_var], [@introduced],
-                            [@field:0:contents]] =
+    [previous iteration] b,
+    [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "5" } }] } }
   Line 13:
-    [current iteration] a, [[@mlw:reference_var], [@introduced],
-                           [@field:0:contents], [@model_trace:a]] =
+    [current iteration] a,
+    [[@field:0:contents], [@introduced], [@mlw:reference_var], [@model_trace:a]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "1" } }] } }
-    [current iteration] b, [[@mlw:reference_var], [@introduced],
-                           [@field:0:contents], [@model_trace:b]] =
+    [current iteration] b,
+    [[@field:0:contents], [@introduced], [@mlw:reference_var], [@model_trace:b]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "6" } }] } }
   Line 14:
-    [current iteration] b, [[@mlw:reference_var], [@introduced],
-                           [@field:0:contents]] =
+    [current iteration] b,
+    [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "6" } }] } }
 
@@ -36,21 +36,21 @@ bench/ce/loop_ce.mlw M2 g'vc: Timeout or Unknown
 Counter-example model:
 File loop_ce.mlw:
   Line 20:
-    a, [[@mlw:reference_var], [@introduced], [@field:0:contents],
-       [@at:X:loc:location] =
+    a,
+    [[@at:X:loc:bench/ce/loop_ce.mlw:23], [@field:0:contents], [@introduced], [@mlw:reference_var]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 22:
-    a, [[@mlw:reference_var], [@introduced], [@field:0:contents]] =
+    a, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "1" } }] } }
   Line 23:
-    a, [[@mlw:reference_var], [@introduced], [@field:0:contents],
-       [@model_trace:a]] =
+    a,
+    [[@field:0:contents], [@introduced], [@mlw:reference_var], [@model_trace:a]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "1" } }] } }
-    a at X, [[@mlw:reference_var], [@introduced], [@field:0:contents],
-            [@at:X], [@model_trace:a], [@at:X:loc:location] =
+    a at X,
+    [[@at:X], [@at:X:loc:bench/ce/loop_ce.mlw:23], [@field:0:contents], [@introduced], [@mlw:reference_var], [@model_trace:a]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
@@ -60,8 +60,8 @@ bench/ce/loop_ce.mlw M2 g'vc: Timeout or Unknown
 Counter-example model:
 File loop_ce.mlw:
   Line 20:
-    old a, [[@mlw:reference_var], [@introduced], [@field:0:contents],
-           [@at:'Old:loc:location] =
+    old a,
+    [[@at:'Old:loc:bench/ce/loop_ce.mlw:20], [@field:0:contents], [@introduced], [@mlw:reference_var]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "10" } }] } }
 
