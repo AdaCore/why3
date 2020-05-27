@@ -298,8 +298,16 @@ list_stuff () {
 
 test_mlw_printer () {
     python3 -m sexpdata || return
-    bench/test_mlw_printer bench/valid/*.mlw
-    bench/test_mlw_printer bench/typing/good/*.mlw
+    find stdlib tests examples bench -name '*.mlw' \
+         -not -path '*/\.*' \
+         -not -path "bench/parsing/bad/*" \
+         -not -path "bench/programs/bad-to-keep/*" \
+         -not -path "bench/ce/strings.mlw" `: # The bracket character breaks the sexp parsing` \
+         -not -path "examples/in_progress/sudoku_reloaded.mlw" `: # Too deep nesting` |
+    sort | \
+    while read filename; do
+        bench/test_mlw_printer "$filename" || exit 1
+    done
 }
 
 echo "=== Checking stdlib ==="

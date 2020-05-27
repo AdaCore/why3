@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 import sys
 import sexpdata
-from subprocess import Popen, PIPE
+import math
+import os
+from subprocess import Popen, PIPE, DEVNULL
 
-# Read a whyml file as a s-exp
-def read(filename):
-    p = Popen(["bin/why3pp", "--output=sexp", filename], stdout=PIPE, encoding='utf8')
-    return sexpdata.loads(''.join(p.stdout.readlines()))
+debug = os.environ.get("DEBUG") != None
 
-# Pretty-print a whyml file and read the result as a s-exp
-def print_and_read(filename):
-    p = Popen(["bin/why3pp", "--output=mlw", filename], stdout=PIPE, encoding='utf8')
-    p1 = Popen(["bin/why3pp", "--output=sexp", "-"], stdin=p.stdout, stdout=PIPE, encoding='utf8')
-    return sexpdata.loads(''.join(p1.stdout.readlines()))
+class CommandFailed(Exception):
+    def __init__(self, msg, ok):
+        self.msg = msg
+        self.ok = ok
 
 class NotEqual(Exception):
     def __init__(self, path, sexp0, sexp1):
@@ -20,31 +18,108 @@ class NotEqual(Exception):
         self.sexp0 = sexp0
         self.sexp1 = sexp1
 
+# Read a whyml file as a s-exp
+def read(filename):
+    p = Popen(["bin/why3pp", "--output=sexp", filename], stdout=PIPE, stderr=DEVNULL, encoding='utf8')
+    outs, _ = p.communicate()
+    if p.returncode == 0:
+        return sexpdata.loads(outs)
+    if p.returncode == 2:
+        raise CommandFailed("syntax error in original file", True)
+    else:
+        raise CommandFailed("error printing sexp from original file", True)
+
+# Pretty-print a whyml file and read the result as a s-exp
+def print_and_read(filename):
+    p1 = Popen(["bin/why3pp", "--output=mlw", filename], stdout=PIPE, stderr=DEVNULL, encoding='utf8')
+    p2 = Popen(["bin/why3pp", "--output=sexp", "-"], stdin=p1.stdout, stdout=PIPE, stderr=DEVNULL, encoding='utf8')
+    outs, _ = p2.communicate()
+    if p2.returncode != 0:
+        raise CommandFailed("error printing sexp from pretty-printed", False)
+    return sexpdata.loads(outs)
+
 def is_location(sexp):
-    return (type(sexp) == list and
-            [type(x) for x in sexp] == [str, int, int, int])
+    try:
+        return [type(x) for x in sexp] == [str, int, int, int]
+    except:
+        return False
+
+def is_annots(sexp, strs):
+    try:
+        return len(sexp) == 1 and sexp[0][0].value() == "ATstr" and sexp[0][1][0][1].value() in strs
+    except AttributeError:
+        return False
+
+# Test for sexp (<field_name> _)
+def is_field(sexp, field_name):
+    try:
+        return len(sexp) == 2 and sexp[0].value() == field_name
+    except:
+        return False
 
 def assert_equal(path, sexp0, sexp1):
+    if sexp0 == sexp1:
+        return
     if is_location(sexp0) and is_location(sexp1):
         return # Don't bother with locations
-    elif sexp1 == sexpdata.Symbol("__todo__"):
-        return # And accept todos
-    elif type(sexp0) == list and type(sexp1) == list:
-        for i, (s0, s1) in enumerate(zip(sexp0, sexp1)):
-            return assert_equal(path+[i], s0, s1)
+    if is_field(sexp0, "attr_tag") and is_field(sexp1, "attr_tag"):
+        return # Don't bother with tags
+    if type(sexp0) == float and math.isnan(sexp0) and type(sexp1) == float and math.isnan(sexp1):
+        return # nan != nan
+    if type(sexp0) == list and type(sexp1) == list:
+        while True: # Ignore additional parentheses
+            try:
+                if sexp0[0].value() == "PTparen" and sexp1[0].value() != "PTparen":
+                    path = path+[1]
+                    sexp0 = sexp0[1]
+                elif sexp1[0].value() == "PTparen" and sexp0[0].value() != "PTparen":
+                    sexp1 = sexp1[1]
+                elif sexp0[0].value() == "Pparen" and sexp1[0].value() != "Pparen":
+                    path = path+[1]
+                    sexp0 = sexp0[1][0][1]
+                elif sexp1[0].value() == "Pparen" and sexp0[0].value() != "Pparen":
+                    sexp1 = sexp1[1][0][1]
+                elif sexp0[0].value() == "Ptuple" and len(sexp0[1]) == 1 and sexp1[0].value() != "Ptuple":
+                    path = path+[1]
+                    sexp0 = sexp0[1][0][1]
+                elif sexp1[0].value() == "Ptuple" and len(sexp1[1]) == 1 and sexp0[0].value() != "Ptuple":
+                    sexp1 = sexp1[1][0][1]
+                else:
+                    break
+            except AttributeError:
+                break
+        ignore_annots = [
+            "W:unused_variable:N", "extraction:array_make", "extraction:array",
+            "induction", "mlw:reference_var", "infer", "useraxiom", "W:non_conservative_extension:N",
+            "model_trace:flag", "model_trace:first_val", "model_trace:sec_val", "model_trace:TEMP_NAME",
+            "model",
+        ]
+        # Remove annotations that are not generated from the lists
+        sexp0 = [s for s in sexp0 if is_annots(sexp0, ignore_annots)]
+        sexp1 = [s for s in sexp1 if is_annots(sexp0, ignore_annots)]
         if len(sexp0) > len(sexp1):
+            if debug:
+                print("  ", sexpdata.dumps(sexp0))
+                print("  ", sexpdata.dumps(sexp1))
             raise NotEqual(path+[len(sexp1)], sexp0[len(sexp1)], None)
-        if len(sexp1) > len(sexp0):
+        if len(sexp0) < len(sexp1):
+            if debug:
+                print("  ", sexpdata.dumps(sexp0))
+                print("  ", sexpdata.dumps(sexp1))
             raise NotEqual(path+[len(sexp0)], None, sexp1[len(sexp0)])
-    elif sexp0 == sexp1:
-        return
+        for i, (s0, s1) in enumerate(zip(sexp0, sexp1)):
+            assert_equal(path+[i], s0, s1)
     else:
+        if debug:
+            print("  ", sexpdata.dumps(sexp0))
+            print("  ", sexpdata.dumps(sexp1))
         raise NotEqual(path, sexp0, sexp1)
 
 def trace(path, sexp, sexp1):
     if path == []:
-        return [sexpdata.Symbol("EXPECTED"), sexp,
-                sexpdata.Symbol("FOUND"), sexp1]
+        return [sexpdata.Symbol("ERROR"),
+                [sexpdata.Symbol("EXPECTED"), sexp],
+                [sexpdata.Symbol("FOUND"), sexp1]]
     elif type(sexp) == list:
         return [trace(path[1:], sexp[i], sexp1)
                 if i == path[0] else sexp[i]
@@ -52,19 +127,27 @@ def trace(path, sexp, sexp1):
     return sexp
 
 def test(filename):
-    sexp0 = read(filename)
+    print("  {}: ".format(filename), end='', flush=True)
     try:
+        sexp0 = read(filename)
         sexp1 = print_and_read(filename)
         assert_equal([], sexp0, sexp1)
-        print("OK:", filename)
+        print("ok")
         return True
-    except AssertionError:
-        print("CANT REPARSE:", filename)
-        return False
     except NotEqual as e:
-        print("FAILED:", filename)
-        # sexpdata.dump(trace(e.path, sexp0, e.sexp1), sys.stdout)
+        print("FAILED")
+        if debug:
+            sexpdata.dump(trace(e.path, sexp0, e.sexp1), sys.stdout)
         return False
+    except AssertionError:
+        print("CANT REPARSE")
+        return False
+    except CommandFailed as e:
+        print("COMMAND FAILED:", e.msg)
+        return e.ok
+    except IndexError:
+        print("S-EXP PROBLEM")
+        return True
 
 def main():
     res = all(test(f) for f in sys.argv[1:])
