@@ -288,47 +288,47 @@ Limitations
 Python lists are modeled as arrays, whose size cannot be modified.
 
 
+
 .. index:: CFG
 .. _format.CFG:
 
-CFG: Control-Flow-Graph style function bodies
----------------------------------------------
+MLCFG: Function Bodies on the Style of Control-Flow Graphs
+----------------------------------------------------------
 
-CFG is an experimental extension of the regular WhyML language, in
-which the body of program functions can optionally be coded using
-labelled blocks and "goto" statements. CFG can be used to encode
-algorithms which are presented in an unstructured fashion. It can be
-also used as a target for encoding unstructured programming languages
-in Why3, for example assembly code.
+The MLCFG language is an experimental extension of the regular WhyML
+language, in which the body of program functions can optionally be
+coded using labelled blocks and "goto" statements. MLCFG can be used to
+encode algorithms which are presented in an unstructured fashion. It
+can be also used as a target for encoding unstructured programming
+languages in Why3, for example assembly code.
 
-Syntax of CFG
-~~~~~~~~~~~~~
 
-The CFG syntax is an extension of the regular WhyML syntax : every
+Syntax of the MLCFG language
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The MLCFG syntax is an extension of the regular WhyML syntax : every
 WhyML declaration is allowed, plus an additional declaration of
 program function of the following form, introduced by keywords "let cfg":
 
-.. code-block:: whyml
-
-  `let` cfg :math:`f (x_1:t_1) ... (x_n:t_n) : t`
-    requires { :math:`Pre` }
-    ensures  { :math:`Post` }
-    =
-    var :math:`y_1 : u_1`;
-    :math:`\vdots`
-    var :math:`y_k : u_k`;
-    {
-      :math:`instructions`
-    }
-    :math:`L_1`
-    {
-      :math:`instructions`
-    }
-    :math:`\vdots`
-    :math:`L_j`
-    {
-      :math:`instructions`
-    }
+| let cfg :math:`f (x_1:t_1) ... (x_n:t_n) : t`
+|   requires { :math:`Pre` }
+|   ensures  { :math:`Post` }
+|   =
+|   var :math:`y_1 : u_1`;
+|   :math:`\vdots`
+|   var :math:`y_k : u_k`;
+|   {
+|     :math:`instructions`
+|   }
+|   :math:`L_1`
+|   {
+|     :math:`instructions`
+|   }
+|   :math:`\vdots`
+|   :math:`L_j`
+|   {
+|     :math:`instructions`
+|   }
 
 It defines a program function `f` as usual, with the same syntax for
 its contract. The difference is the body, which is made by a sequences
@@ -351,17 +351,14 @@ value and the end of sequence), or CFG-specific instructions below:
 
 - a switch statement, of the form
 
-.. code-block:: whyml
+  | switch (:math:`e`)
+  | | :math:`pat_1` -> :math:`instructions_1`
+  | :math:`\vdots`
+  | | :math:`pat_k` -> :math:`instructions_k`
+  | end
 
-  `switch` (:math:`e`)
-  | :math:`pat_1` -> :math:`instructions_1`
-  :math:`\vdots`
-  | :math:`pat_k` -> :math:`instructions_k`
-  `end`
-
-it is similar to a `match ... with ... end` expression, except that
-the branches may recursively contain CFG instructions
-
+  it is similar to a `match ... with ... end` expression, except that
+  the branches may recursively contain CFG instructions.
 
 The extension of syntax is formally described by the following rules.
 
@@ -379,6 +376,7 @@ The extension of syntax is formally described by the following rules.
     | "invariant" `ident` "{" `term` "}"
     | "switch" "(" expression ")" `switch_case`* "end"
     switch_case: "|" `pattern` "->" `block`
+
 
 
 An example
@@ -456,6 +454,9 @@ to node "L", label "L1" to node "invariant", label "L2" to node "do".
 The consecutive invariants act as one cut in the generation of VCs.
 
 
+
+
+
 Error messages
 ~~~~~~~~~~~~~~
 
@@ -477,6 +478,7 @@ The translation from the CFG language to the regular WhyML may raise the followi
   statement is unreachable, so is certainly a user mistake.
 
 - "unsupported: trailing code after switch": see limitations below.
+
 
 Current Limitations
 ~~~~~~~~~~~~~~~~~~~
