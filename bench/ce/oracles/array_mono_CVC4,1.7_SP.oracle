@@ -27,9 +27,8 @@ bench/ce/array_mono.mlw A f2'vc: Timeout or Unknown
 Counter-example model:
 File array_mono.mlw:
   Line 25:
-    old a, [[@introduced], [@at:'Old],
-           [@at:'Old:loc:location],
-           [@at:'Old:loc:location] =
+    old a,
+    [[@at:'Old], [@at:'Old:loc:bench/ce/array_mono.mlw:25], [@at:'Old:loc:bench/ce/array_mono.mlw:26], [@introduced]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "elts" ,
     "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
     "val" : "0" } , "value" : {"type" : "Integer" , "val" : "42" } },
@@ -48,8 +47,8 @@ File array_mono.mlw:
     {"field" : "length" , "value" : {"type" : "Integer" ,
     "val" : "2" } }] } }
   Line 38:
-    a, [[@introduced], [@at:'Old], [@at:'Old:loc:location],
-       [@at:'Old:loc:location] =
+    a,
+    [[@at:'Old], [@at:'Old:loc:bench/ce/array_mono.mlw:25], [@at:'Old:loc:bench/ce/array_mono.mlw:26], [@introduced]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "elts" ,
     "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
     "val" : "0" } , "value" : {"type" : "Integer" , "val" : "42" } },

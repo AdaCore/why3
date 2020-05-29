@@ -3,7 +3,7 @@ bench/ce/record_map.mlw M map_record_proj_test1'vc: Unknown (sat)
 Counter-example model:
 File record_map.mlw:
   Line 41:
-    map_rec, [[@model_projected], [@introduced]] = {"type" : "Array" ,
+    map_rec, [[@introduced], [@model_projected]] = {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Boolean" , "val" : true } ,
     "value" : {"type" : "Record" ,
     "val" : {"Field" : [{"field" : ".field_f" ,
@@ -14,7 +14,7 @@ File record_map.mlw:
     "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
     "value" : {"type" : "Boolean" , "val" : false } }] } } }] }
   Line 42:
-    map_rec, [[@model_projected], [@introduced], [@model_trace:map_rec]] =
+    map_rec, [[@introduced], [@model_projected], [@model_trace:map_rec]] =
     {"type" : "Array" , "val" : [{"indice" : {"type" : "Boolean" ,
     "val" : true } , "value" : {"type" : "Record" ,
     "val" : {"Field" : [{"field" : ".field_f" ,
@@ -29,7 +29,7 @@ bench/ce/record_map.mlw M record_map_proj_test2'vc: Unknown (sat)
 Counter-example model:
 File record_map.mlw:
   Line 46:
-    rec_map, [[@model_projected], [@introduced]] = {"type" : "Record" ,
+    rec_map, [[@introduced], [@model_projected]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Boolean" , "val" : true } ,
     "value" : {"type" : "Integer" , "val" : "-1" } },
@@ -37,7 +37,7 @@ File record_map.mlw:
     {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
     "val" : false } }] } }
   Line 47:
-    rec_map, [[@model_projected], [@introduced], [@model_trace:rec_map]] =
+    rec_map, [[@introduced], [@model_projected], [@model_trace:rec_map]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "f_map" ,
     "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Boolean" ,
     "val" : true } , "value" : {"type" : "Integer" , "val" : "-1" } },
@@ -49,25 +49,25 @@ bench/ce/record_map.mlw M record_map_proj_test3'vc: Unknown (sat)
 Counter-example model:
 File record_map.mlw:
   Line 51:
-    re_rec_map, [[@model_projected], [@introduced]] = {"type" : "Record" ,
+    re_rec_map, [[@introduced], [@model_projected]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
     "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
     {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
     "val" : true } }] } }
   Line 53:
-    rec_map, [[@model_projected], [@introduced]] = {"type" : "Record" ,
+    rec_map, [[@introduced], [@model_projected]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
     "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
     {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
     "val" : false } }] } }
   Line 54:
-    re_rec_map, [[@model_projected], [@introduced],
-                [@model_trace:re_rec_map]] =
+    re_rec_map,
+    [[@introduced], [@model_projected], [@model_trace:re_rec_map]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "f_map" ,
     "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
     "val" : "0" } }] } }, {"field" : "g_bool" ,
     "value" : {"type" : "Boolean" , "val" : true } }] } }
-    rec_map, [[@model_projected], [@introduced], [@model_trace:rec_map]] =
+    rec_map, [[@introduced], [@model_projected], [@model_trace:rec_map]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "f_map" ,
     "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
     "val" : "0" } }] } }, {"field" : "g_bool" ,
