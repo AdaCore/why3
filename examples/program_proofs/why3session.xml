@@ -4,6 +4,7 @@
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="program_proofs.mlw"/>
 <theory name="Mult" proved="true">
@@ -43,6 +44,41 @@
  </goal>
  <goal name="optimize_and_filter&#39;vc" expl="VC for optimize_and_filter" proved="true">
  <proof prover="1"><result status="valid" time="0.50" steps="95446"/></proof>
+ </goal>
+</theory>
+<theory name="PeanoNumbers" proved="true">
+ <goal name="to_int&#39;vc" expl="VC for to_int" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+ </goal>
+ <goal name="of_int&#39;vc" expl="VC for of_int" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+ </goal>
+ <goal name="to_int_of_int&#39;vc" expl="VC for to_int_of_int" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="29"/></proof>
+ </goal>
+ <goal name="of_int_to_int&#39;vc" expl="VC for of_int_to_int" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="69"/></proof>
+ </goal>
+ <goal name="less_transitive&#39;vc" expl="VC for less_transitive" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="313"/></proof>
+ </goal>
+ <goal name="add_correct&#39;vc" expl="VC for add_correct" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="128"/></proof>
+ </goal>
+ <goal name="sub&#39;vc" expl="VC for sub" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="165"/></proof>
+ </goal>
+ <goal name="sub_correct&#39;vc" expl="VC for sub_correct" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="413"/></proof>
+ </goal>
+ <goal name="mul_correct&#39;vc" expl="VC for mul_correct" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="279"/></proof>
+ </goal>
+ <goal name="div_mod&#39;vc" expl="VC for div_mod" proved="true">
+ <proof prover="4"><result status="valid" time="0.02" steps="11856"/></proof>
+ </goal>
+ <goal name="div_mod_correct&#39;vc" expl="VC for div_mod_correct" proved="true">
+ <proof prover="0"><result status="valid" time="0.12" steps="474"/></proof>
  </goal>
 </theory>
 </file>

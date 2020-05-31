@@ -134,3 +134,87 @@ module AST
     end
 
 end
+
+(* chapter 7 *)
+module PeanoNumbers
+
+  use int.Int
+
+  type unary = Zero | Succ unary
+
+  let rec function to_int (u: unary) : int
+    ensures { result >= 0 }
+  = match u with Zero -> 0 | Succ u' -> 1 + to_int u' end
+
+  let rec function of_int (n: int) : unary
+    requires { n >= 0 } variant { n }
+  = if n = 0 then Zero else Succ (of_int (n - 1))
+
+  let rec lemma to_int_of_int (n: int)
+    requires { n >= 0 } variant { n } ensures { to_int (of_int n) = n }
+   = if n > 0 then to_int_of_int (n - 1)
+
+  let rec lemma of_int_to_int (u: unary)
+    ensures { of_int (to_int u) = u }
+   = match u with Zero -> () | Succ u' -> of_int_to_int u' end
+
+  let rec predicate less (x y: unary)
+  = match x, y with
+    | Zero   , Succ  _ -> true
+    | _      , Zero    -> false
+    | Succ x', Succ y' -> less x' y'
+   end
+
+  let rec lemma less_transitive (x y: unary)
+    ensures { less x y <-> to_int x < to_int y }
+   = match x, y with Succ x', Succ y' -> less_transitive x' y' | _ -> () end
+
+  let rec function add (x y: unary) : unary
+  = match y with
+    | Zero    -> x
+    | Succ y' -> Succ (add x y')
+    end
+
+  let rec lemma add_correct (x y: unary)
+    ensures { to_int (add x y) = to_int x + to_int y }
+  = match y with Zero -> () | Succ y' -> add_correct x y' end
+
+  let rec function sub (x y: unary) : unary
+    requires { not (less x y) } variant { x }
+  = match x, y with
+    | _      , Zero    -> x
+    | Succ x', Succ y' -> sub x' y'
+    | _                -> absurd
+    end
+
+  let rec lemma sub_correct (x y: unary)
+    requires { not (less x y) }
+    ensures  { to_int (sub x y) = to_int x - to_int y }
+  = match x, y with Succ x', Succ y' -> sub_correct x' y' | _ -> () end
+
+  let rec function mul (x y: unary) : unary
+  = match x with
+    | Zero    -> Zero
+    | Succ x' -> add (mul x' y) y
+    end
+
+  let rec lemma mul_correct (x y: unary)
+    ensures  { to_int (mul x y) = to_int x * to_int y }
+  = match x with Zero -> () | Succ x' -> mul_correct x' y end
+
+  let rec function div_mod (x y: unary) : (unary, unary)
+    requires { y <> Zero }
+    variant  { to_int x }
+  = if less x y then
+      (Zero, x)
+    else
+      let q, m = div_mod (sub x y) y in
+      (Succ q, m)
+
+  let rec lemma div_mod_correct (x y: unary)
+    requires { y <> Zero }
+    ensures  { let q, m = div_mod x y in add (mul q y) m = x /\ less m y }
+    variant  { to_int x }
+  = if less x y then () else div_mod_correct (sub x y) y
+
+end
