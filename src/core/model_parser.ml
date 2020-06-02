@@ -522,20 +522,22 @@ let fix_loc_kind ~at_loc name =
       labels_added, name in
   snd (Sattr.fold aux name.men_attrs (Sstr.empty, name))
 
+let cmp_attrs a1 a2 =
+  String.compare a1.attr_string a2.attr_string
+
 let print_model_element ~at_loc ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message -> fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
       let m_element = {m_element with me_name=fix_loc_kind ~at_loc m_element.me_name} in
-      if print_attrs then
-        fprintf fmt "@[%s, @[[%a]@] =@ %a@]"
-          (me_name_trans m_element.me_name)
-          (Pp.print_list Pp.comma Pretty.print_attr)
-          (Sattr.elements m_element.me_name.men_attrs)
-          print_model_value m_element.me_value
-      else fprintf fmt "@[%s =@ %a@]"
-          (me_name_trans m_element.me_name)
-          print_model_value m_element.me_value
+      fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]"
+        (me_name_trans m_element.me_name)
+        (fun fmt ->
+           if print_attrs then
+             fprintf fmt ",@ [%a]"
+               (Pp.print_list Pp.comma Pretty.print_attr)
+               (List.sort cmp_attrs (Sattr.elements m_element.me_name.men_attrs)))
+        print_model_value m_element.me_value
 
 let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
@@ -691,7 +693,7 @@ let print_attrs_json (me : model_element_name) fmt =
   Json_base.list
     (fun fmt attr -> Json_base.string fmt attr.attr_string)
     fmt
-    (Sattr.elements me.men_attrs)
+    (List.sort cmp_attrs (Sattr.elements me.men_attrs))
 
 (* Compute the kind of a model_element using its attributes and location *)
 let compute_kind (me : model_element) =

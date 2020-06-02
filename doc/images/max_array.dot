@@ -1,0 +1,18 @@
+digraph G {
+	graph [bgcolor=lightgray; rankdir="TB"];
+	node [margin=0.05,shape=ellipse,style=filled,fillcolor="cyan"];
+	"entry"     [pos="2,3!"];
+	"L"         [pos="2,2!"];
+	"invariant" [pos="2,1!"];
+	"cond"      [pos="2,0!"];
+        "do"        [pos="0,1!"];
+        "exit"      [pos="4,0!"];
+
+        "entry" -> "L"        [label=" i <- 0"];
+	"L" -> "invariant"    [label=" m <- a[i]"];
+	"invariant" -> "cond" [label=" i <- i+1"];
+        "cond" -> "exit"      [label=" i >= n"];
+	"cond" -> "do"        [label=" i < n"];
+        "do" -> "L"           [label=" a[i] > m"; headport=e];
+        "do" -> "invariant"   [label=" a[i] <= m"];
+}

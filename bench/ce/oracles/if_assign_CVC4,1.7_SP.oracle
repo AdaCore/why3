@@ -3,11 +3,11 @@ bench/ce/if_assign.mlw Test f'vc: Timeout or Unknown
 Counter-example model:
 File if_assign.mlw:
   Line 10:
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
   Line 12:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
 
@@ -15,11 +15,11 @@ bench/ce/if_assign.mlw Test f2'vc: Timeout or Unknown
 Counter-example model:
 File if_assign.mlw:
   Line 16:
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
   Line 18:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
 
@@ -30,30 +30,26 @@ File int.mlw:
     a, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
 File ref.mlw:
   Line 18:
-    x, [[@introduced], [@field:0:contents],
-       [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-       [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x,
+    [[@field:0:contents], [@introduced], [@vc:written:25:4:20:bench/ce/if_assign.mlw], [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
 File if_assign.mlw:
   Line 21:
     a, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
   Line 22:
-    x, [[@introduced], [@field:0:contents],
-       [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-       [@vc:written:27:4:11:bench/ce/if_assign.mlw], [@model_trace:x]] =
+    x,
+    [[@field:0:contents], [@introduced], [@model_trace:x], [@vc:written:25:4:20:bench/ce/if_assign.mlw], [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
   Line 25:
-    x, [[@introduced], [@field:0:contents],
-       [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-       [@vc:written:27:4:11:bench/ce/if_assign.mlw], [@model_trace:x]] =
+    x,
+    [[@field:0:contents], [@introduced], [@model_trace:x], [@vc:written:25:4:20:bench/ce/if_assign.mlw], [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
   Line 27:
-    x, [[@introduced], [@field:0:contents],
-       [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-       [@vc:written:27:4:11:bench/ce/if_assign.mlw], [@model_trace:x]] =
+    x,
+    [[@field:0:contents], [@introduced], [@model_trace:x], [@vc:written:25:4:20:bench/ce/if_assign.mlw], [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
 
@@ -64,30 +60,26 @@ File int.mlw:
     a, [[@introduced]] = {"type" : "Integer" , "val" : "-1" }
 File ref.mlw:
   Line 18:
-    x, [[@introduced], [@field:0:contents],
-       [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-       [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x,
+    [[@field:0:contents], [@introduced], [@vc:written:25:4:20:bench/ce/if_assign.mlw], [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "18" } }] } }
 File if_assign.mlw:
   Line 21:
     a, [[@introduced]] = {"type" : "Integer" , "val" : "-1" }
   Line 22:
-    x, [[@introduced], [@field:0:contents],
-       [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-       [@vc:written:27:4:11:bench/ce/if_assign.mlw], [@model_trace:x]] =
+    x,
+    [[@field:0:contents], [@introduced], [@model_trace:x], [@vc:written:25:4:20:bench/ce/if_assign.mlw], [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "18" } }] } }
   Line 25:
-    x, [[@introduced], [@field:0:contents],
-       [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-       [@vc:written:27:4:11:bench/ce/if_assign.mlw], [@model_trace:x]] =
+    x,
+    [[@field:0:contents], [@introduced], [@model_trace:x], [@vc:written:25:4:20:bench/ce/if_assign.mlw], [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "18" } }] } }
   Line 27:
-    x, [[@introduced], [@field:0:contents],
-       [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-       [@vc:written:27:4:11:bench/ce/if_assign.mlw], [@model_trace:x]] =
+    x,
+    [[@field:0:contents], [@introduced], [@model_trace:x], [@vc:written:25:4:20:bench/ce/if_assign.mlw], [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "18" } }] } }
 
@@ -100,7 +92,7 @@ File if_assign.mlw:
   Line 30:
     a, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
   Line 34:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
 
@@ -112,7 +104,7 @@ File int.mlw:
     a, [[@introduced]] = {"type" : "Integer" , "val" : "-1" }
 File ref.mlw:
   Line 20:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "18" } }] } }
 File if_assign.mlw:
@@ -121,11 +113,11 @@ File if_assign.mlw:
   Line 31:
     the check fails with all inputs
   Line 34:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 36:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "18" } }] } }
 

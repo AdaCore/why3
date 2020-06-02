@@ -1492,6 +1492,12 @@ WhyML Attributes
 
 .. why3:attribute:: vc:sp
 
+.. why3:attribute:: vc:wp
+
+.. why3:attribute:: vc:white_box
+
+.. why3:attribute:: vc:keep_precondition
+
 .. _sec.meta:
 
 Why3 Metas

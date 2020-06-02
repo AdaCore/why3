@@ -597,6 +597,11 @@ collection. The former can be done simultaneously on a tuple of values:
 of the ternary bracket operator ``([]<-)`` and cannot be used in a
 multiple assignment.
 
+.. index:: auto-dereference
+.. rubric:: Auto-dereference: Simplified Usage of Mutable variables
+
+TODO: put here what is currently in the release notes.
+
 .. index:: evaluation order
 .. rubric:: Evaluation order
 

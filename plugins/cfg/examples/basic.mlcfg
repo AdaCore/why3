@@ -1,0 +1,88 @@
+
+module Basic
+
+use int.Int
+
+let cfg cfgassert (x:int) : int
+  requires { x >= 10 }
+  ensures { result >= x }
+  =
+  {
+  assert { x >= 0 };
+  x+1;
+  }
+
+
+let cfg cfggoto (x:int) : int
+  requires { x >= 0 }
+  ensures { result = x + 2 }
+  =
+  var y : int;
+  {
+  y <- x+1;
+  goto L
+  }
+  L {
+  y <- y+1;
+  y
+  }
+
+let cfg cfg_inv (x:int) : int
+  requires { x >= 0 }
+  ensures { result >= 2 }
+  =
+  var y:int;
+  {
+  y <- x;
+  invariant I { y >= 0} ;
+  y <- y + 1;
+  invariant J { y >= 1} ;
+  y <- y + 1;
+  y
+  }
+
+
+let cfg cfg_infinite_loop (x:int) : int
+  requires { x >= 0 }
+  ensures { result >= 2 }
+  =
+  var y:int;
+  {
+  y <- 0;
+  goto L;
+  }
+  L {
+  y <- y + 1;
+  invariant I { exists z. y = z+z+1 };
+  y <- y + 1;
+  goto L;
+  }
+
+
+let cfg cfg_finite_loop (x:int) : int
+  requires { x >= 0 }
+  ensures { result >= 2 }
+  =
+  var y:int;
+  {
+  y <- 0;
+  goto L;
+  }
+  L {
+  y <- y + 1;
+  invariant I { exists z. y = z+z+1 };
+  y <- y + 1;
+  switch (y <= x)
+  | True -> goto L
+  | False -> y
+  end
+  }
+
+
+let main () =
+  let _ = cfgassert 42 in
+  let _ = cfggoto 43 in
+  let _ = cfg_inv 44 in
+  ()
+
+end

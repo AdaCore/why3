@@ -286,3 +286,214 @@ Limitations
 ~~~~~~~~~~~
 
 Python lists are modeled as arrays, whose size cannot be modified.
+
+
+
+.. index:: CFG
+.. _format.CFG:
+
+MLCFG: Function Bodies on the Style of Control-Flow Graphs
+----------------------------------------------------------
+
+The MLCFG language is an experimental extension of the regular WhyML
+language, in which the body of program functions can optionally be
+coded using labelled blocks and "goto" statements. MLCFG can be used to
+encode algorithms which are presented in an unstructured fashion. It
+can be also used as a target for encoding unstructured programming
+languages in Why3, for example assembly code.
+
+
+Syntax of the MLCFG language
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The MLCFG syntax is an extension of the regular WhyML syntax : every
+WhyML declaration is allowed, plus an additional declaration of
+program function of the following form, introduced by keywords "let cfg":
+
+| let cfg :math:`f (x_1:t_1) ... (x_n:t_n) : t`
+|   requires { :math:`Pre` }
+|   ensures  { :math:`Post` }
+|   =
+|   var :math:`y_1 : u_1`;
+|   :math:`\vdots`
+|   var :math:`y_k : u_k`;
+|   {
+|     :math:`instructions`
+|   }
+|   :math:`L_1`
+|   {
+|     :math:`instructions`
+|   }
+|   :math:`\vdots`
+|   :math:`L_j`
+|   {
+|     :math:`instructions`
+|   }
+
+It defines a program function `f` as usual, with the same syntax for
+its contract. The difference is the body, which is made by a sequences
+of declaration of mutable variables with their type, an initial block
+of instructions, and a sequence of other blocks of instructions, each
+block being denoted by a label like :math:`L_1 \ldots L_j` above. The
+instructions are semi-colon separated sequences of either regular
+WhyML expressions of type `unit` (except of course when returning a
+value and the end of sequence), or CFG-specific instructions below:
+
+- a `goto` statement: `goto L` where L is one of the label of the
+  other blocks. It naturally instructs to continue execution at the
+  given block.
+
+- a code invariant: `invariant I { t }` where `I` is a name and `t`
+  a predicate. It is similar as an assert expression, telling that `t`
+  must hold when execution reaches this statement. Additionally, it
+  acts as a cut in the generation of VC, similarly as a loop
+  invariant. See example below.
+
+- a switch statement, of the form
+
+  | switch (:math:`e`)
+  | | :math:`pat_1` -> :math:`instructions_1`
+  | :math:`\vdots`
+  | | :math:`pat_k` -> :math:`instructions_k`
+  | end
+
+  it is similar to a `match ... with ... end` expression, except that
+  the branches may recursively contain CFG instructions.
+
+The extension of syntax is formally described by the following rules.
+
+.. productionlist:: CFG
+    file: `module`*
+    module: "module" `ident` `decl`* "end"
+    decl: "let" "cfg" `cfg_fundef` ("with" `cfg_fundef`)*
+    cfg_fundef: `ident` `binder`+ : `type` `spec` "=" `vardecl`* "{" `block` "}" `labelblock`*
+    vardecl: "var" `ident`* ":" `type` ";" | "ghost" "var" `ident`* ":" `type` ";"
+    block: `instruction` (";" `instruction`)*
+    labelblock: `ident` "{" `block` "}"
+    instruction:
+    | `expression`
+    | "goto" `ident`
+    | "invariant" `ident` "{" `term` "}"
+    | "switch" "(" expression ")" `switch_case`* "end"
+    switch_case: "|" `pattern` "->" `block`
+
+
+
+An example
+~~~~~~~~~~
+
+The following example is inspired from the documentation of the ANSI C
+Specification Language (See :cite:`baudin18acsl`, section 2.4.2 Loop
+invariants, Example 2.27). It aims at computing the maximum value of
+an array of integers.
+
+.. code-block:: C
+
+   /*@ requires n >= 0 && \valid(a,0,n);
+     @ ensures \forall integer j ; 0 <= j < n ==> \result >= a[j]);
+     @*/
+   int max_array(int a[], int n) {
+     int m, i = 0;
+     goto L;
+     do {
+       if (a[i] > m) { L: m = a[i]; }
+       /*@ invariant
+         @   0 <= i < n && \forall integer j ; 0 <= j <= i ==> m >= a[j]);
+         @*/
+       i++;
+     }
+     while (i < n);
+     return m;
+   }
+
+The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_array`.
+
+.. graphviz:: images/max_array.dot
+   :caption: Control-Flow Graph of "max_array" example
+   :name: fig.cfg.max_array
+
+Here is below a version of this code in the Why3-CFG language, where label "L" corresponds
+to node "L", label "L1" to node "invariant", label "L2" to node "do".
+
+.. code-block:: whyml
+
+  let cfg max_array (a:array int) : (max: int, ghost ind:int)
+    requires { a.length > 0 }
+    ensures { forall j. 0 <= j < a.length -> a[ind] >= a[j] }
+  =
+  var i m:int;
+  ghost var ind:int;
+  {
+  i <- 0;
+  goto L
+  }
+  L {
+    m <- a[i];
+    ind <- i;
+    goto L1
+    }
+  L1 {
+    invariant i_bounds   { 0 <= i < a.length };
+    invariant ind_bounds { 0 <= ind < a.length };
+    invariant m_and_ind  { m = a[ind] };
+    invariant m_is_max   { forall j. 0 <= j <= i -> m >= a[j] };
+                           (* (yes, j <= i, not j < i !) *)
+    i <- i+1;
+    switch (i < a.length)
+    | True -> goto L2
+    | False -> (m,ind)
+    end
+    }
+  L2 {
+    switch (a[i] > m)
+    | True -> goto L
+    | False -> goto L1
+    end
+    }
+
+The consecutive invariants act as one cut in the generation of VCs.
+
+
+
+
+
+Error messages
+~~~~~~~~~~~~~~
+
+The translation from the CFG language to the regular WhyML may raise the following errors.
+
+- "cycle without invariant": in order to perform the translation, any
+  cycle on the control-flow graph must contain at least one
+  "invariant" clause. It corresponds to the idea that any loop must
+  contain a loop invariant.
+
+- "cycle without invariant (starting from :math:`I`)": some error as
+  above, except that the cycle was not reachable from the start of the
+  function body, but from the other "invariant" clause named
+  :math:`I`.
+
+- "label :math:`L` not found for goto": there is a "goto" instruction to a non-existent label.
+
+- "unreachable code after goto": any code occuring after a "goto"
+  statement is unreachable, so is certainly a user mistake.
+
+- "unsupported: trailing code after switch": see limitations below.
+
+
+Current Limitations
+~~~~~~~~~~~~~~~~~~~
+
+- Termination is never checked.
+
+- New keywords "cfg", "goto", "switch" and "var" cannot be used as
+  regular identifiers anymore.
+
+- Trailing code after "switch" is not supported: in principle it
+  should be possible to end a "switch" branch with "()" and transfer
+  the execution to the instructions after the "switch". This is not
+  yet supported. A workaround is to place the trailing instructions in
+  another block and pose an extra "goto" to this block in all the
+  "switch" branches" that do not end with a "goto" yet.
+
+- Conditional statements "if e then i1 else i2" are not yet supported, but can be
+  simulated with "switch (e) | True -> i1 | False -> i2 end"

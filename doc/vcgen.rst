@@ -11,20 +11,25 @@ VC generation for program functions
 
 For each program function of the form
 
-..
-
-  `let` :math:`f (x_1:t_1) (x_n:t_n) : t`
-    `requires` { :math:`Pre` }
-    `ensures`  { :math:`Post` }
-    `=` :math:`body`
+|  let :math:`f (x_1:t_1) (x_n:t_n) : t`
+|    requires { :math:`Pre` }
+|    ensures  { :math:`Post` }
+|    `=` :math:`body`
 
 a new logic goal called `f'VC` is generated. Its shape is
 
-.. math:: \forall x_1,..,x_n.  Pre \rightarrow WP(body,Post)
+| :math:`\forall x_1,..,x_n.  Pre \rightarrow WP(body,Post)`
 
 where :math:`WP(e,Q)` is a formula computed automatically using rules defined recursively on :math:`e`.
 
 TODO: Refer to `A Pragmatic Type System for Deductive Verification <https://hal.archives-ouvertes.fr/hal-01256434v3>`_
+
+
+Attributes: :why3:attribute:`[@vc:divergent]` disables generation of VC for termination
+
+Other attributes: :why3:attribute:`[@vc:annotation]`, :why3:attribute:`[@vc:sp]`, :why3:attribute:`[@vc:wp]`, :why3:attribute:`[@vc:white_box]`, :why3:attribute:`[@vc:keep_precondition]`
+
+
 
 VC generated for type invariants
 --------------------------------
@@ -49,6 +54,7 @@ the :why3:attribute:`[@vc:sp]` attribute on that expression. Yet, the simplest u
 is to pose this attribute on the whole body of a program function.
 
 Show an example.
+
 
 .. _sec.runwithinferloop:
 
