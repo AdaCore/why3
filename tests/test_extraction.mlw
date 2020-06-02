@@ -239,6 +239,12 @@ module TestExtraction
     let incr_a (a: int) = sum a in
     incr_a x x
 
+  let test_partial4 : int =
+    let f (ghost x1:int) (y:int) (z:int) = y + z + 64 in
+    let g = f 1 in
+    let h = g 2 in
+    h 3
+
   let constr_partial (x: int) : list int =
     let x = Cons 42 in
     x Nil
@@ -391,6 +397,13 @@ module TestExtraction
 
   type poly_r 'a = { l : int63; b : bool }
   let test_underapplied_l () = l
+
+  let test_match (y:int) : int
+  =
+  match
+    (match y with x -> x + 42 end)
+  with _ -> 89
+  end
 
 end
 

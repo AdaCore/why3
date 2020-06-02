@@ -18,6 +18,7 @@ open Term
 type ty =
   | Tvar   of tvsymbol
   | Tapp   of ident * ty list
+  | Tarrow of ty * ty
   | Ttuple of ty list
 
 type is_ghost = bool
@@ -35,6 +36,7 @@ type pat =
   | Pas    of pat * vsymbol
 
 type is_rec = bool
+type is_partial = bool
 
 type binop = Band | Bor | Beq
 
@@ -43,6 +45,7 @@ type ity = I of Ity.ity | C of Ity.cty (* TODO: keep it like this? *)
 type expr = {
   e_node   : expr_node;
   e_ity    : ity;
+  e_mlty   : ty;
   e_effect : effect;
   e_attrs  : Sattr.t;
 }
@@ -50,16 +53,17 @@ type expr = {
 and expr_node =
   | Econst  of Constant.constant
   | Evar    of pvsymbol
-  | Eapp    of rsymbol * expr list
+  | Eapp    of rsymbol * expr list * is_partial
   | Efun    of var list * expr
   | Elet    of let_def * expr
   | Eif     of expr * expr * expr
-  | Eassign of (pvsymbol * rsymbol * expr) list
+  | Eassign of (expr * ty * rsymbol * expr) list
   | Ematch  of expr * reg_branch list * exn_branch list
   | Eblock  of expr list
   | Ewhile  of expr * expr
-  (* For loop for Why3's type int *)
-  | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
+  (* For loop on a range type *)
+  (* index var, index ty, start, direction, end, expr *)
+  | Efor    of pvsymbol * ty * pvsymbol * for_direction * pvsymbol * expr
   | Eraise  of xsymbol * expr option
   | Eexn    of xsymbol * ty option * expr
   | Eignore of expr
@@ -148,7 +152,8 @@ let rec add_known_decl decl k_map id =
 
 let rec iter_deps_ty f = function
   | Tvar _ -> ()
-  | Tapp (id, ty_l) -> f id; List.iter (iter_deps_ty f) ty_l
+  | Tarrow (ty1, ty2) -> iter_deps_ty f ty1; iter_deps_ty f ty2
+  | Tapp (s, ty_l) -> f s; List.iter (iter_deps_ty f) ty_l
   | Ttuple ty_l -> List.iter (iter_deps_ty f) ty_l
 
 let iter_deps_typedef f = function
@@ -185,7 +190,7 @@ and iter_deps_pat f = function
 and iter_deps_expr f e = match e.e_node with
   | Econst _ | Eabsurd -> ()
   | Evar pv -> f pv.pv_vs.vs_name
-  | Eapp (rs, exprl) ->
+  | Eapp (rs, exprl, _) ->
       f rs.rs_name; List.iter (iter_deps_expr f) exprl
   | Efun (args, e) ->
       List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg) args;
@@ -221,7 +226,8 @@ and iter_deps_expr f e = match e.e_node with
   | Ewhile (e1, e2) ->
       iter_deps_expr f e1;
       iter_deps_expr f e2
-  | Efor (_, _, _, _, e) ->
+  | Efor (_, ty, _, _, _, e) ->
+      iter_deps_ty f ty;
       iter_deps_expr f e
   | Eraise (xs, None) ->
       f xs.xs_name
@@ -233,8 +239,8 @@ and iter_deps_expr f e = match e.e_node with
   | Eexn (_xs, Some ty, e) -> (* FIXME? How come we never do binding here? *)
       iter_deps_ty f ty;
       iter_deps_expr f e
-  | Eassign assingl ->
-      List.iter (fun (_, rs, _) -> f rs.rs_name) assingl
+  | Eassign assignl ->
+      List.iter (fun (_, ty, rs, _) -> iter_deps_ty f ty; f rs.rs_name) assignl
   | Eignore e -> iter_deps_expr f e
 
 let rec iter_deps f = function
@@ -270,14 +276,27 @@ let ity_of_mask ity mask =
       I (ity_tuple tl)
   | _ -> ity (* FIXME ? *)
 
-let mk_expr e_node e_ity mask e_effect e_attrs =
-  { e_node; e_ity = ity_of_mask e_ity mask; e_effect; e_attrs; }
+let mk_expr e_node e_ity mask e_mlty e_effect e_attrs =
+  { e_node; e_ity = ity_of_mask e_ity mask; e_mlty; e_effect; e_attrs; }
 
 let tunit = Ttuple []
 
 let is_unit = function
   | I i -> ity_equal i Ity.ity_unit
   | _ -> false
+
+let is_true e = match e.e_node with
+  | Eapp (s, [], false) -> rs_equal s rs_true
+  | _ -> false
+
+let is_false e = match e.e_node with
+  | Eapp (s, [], false) -> rs_equal s rs_false
+  | _ -> false
+
+let t_arrow t1 t2 = Tarrow (t1, t2)
+
+let t_fun params res =
+  List.fold_right (fun (_, targ, _) ty -> t_arrow targ ty) params res
 
 let enope = Eblock []
 
@@ -292,7 +311,7 @@ let mk_its_defn its_name its_args its_private its_def =
 
 (* smart constructors *)
 let e_unit attrs =
-  mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty attrs
+  mk_expr enope (I Ity.ity_unit) MaskVisible tunit Ity.eff_empty attrs
 
 let dummy_expr_attr = Ident.create_attribute "__dummy_expr__"
 
@@ -313,15 +332,14 @@ let sym_defn f svars ty_res args e =
 
 let e_let ld e = mk_expr (Elet (ld, e))
 
-let e_app rs pvl =
-  mk_expr (Eapp (rs, pvl))
+let e_app rs pvl partial =
+  mk_expr (Eapp (rs, pvl, partial))
 
 let e_fun args e = mk_expr (Efun (args, e))
 
-let e_ignore e_ity e =
-  (* TODO : avoid ignore around a unit type expresson *)
-  if ity_equal e_ity Ity.ity_unit then e
-  else mk_expr (Eignore e) ity_unit MaskVisible e.e_effect e.e_attrs
+let e_ignore e =
+  if is_unit e.e_ity then e
+  else mk_expr (Eignore e) ity_unit MaskVisible tunit e.e_effect e.e_attrs
 
 let e_if e1 e2 e3 =
   mk_expr (Eif (e1, e2, e3)) e2.e_ity
@@ -329,8 +347,8 @@ let e_if e1 e2 e3 =
 let e_while e1 e2 =
   mk_expr (Ewhile (e1, e2)) ity_unit
 
-let e_for pv1 pv2 dir pv3 e1 =
-  mk_expr (Efor (pv1, pv2, dir, pv3, e1)) ity_unit
+let e_for pv1 ty pv2 dir pv3 e1 =
+  mk_expr (Efor (pv1, ty, pv2, dir, pv3, e1)) ity_unit
 
 let e_match e bl xl =
   mk_expr (Ematch (e, bl, xl))
@@ -343,7 +361,7 @@ let e_match e bl xl =
 *)
 
 let e_assign al ity mask eff attrs =
-  if al = [] then e_unit else mk_expr (Eassign al) ity mask eff attrs
+  if al = [] then e_unit else mk_expr (Eassign al) ity mask tunit eff attrs
 
 let e_absurd =
   mk_expr Eabsurd
@@ -357,10 +375,10 @@ let e_seq e1 e2 =
     | _ -> Eblock [e1; e2] in
   mk_expr e
 
-let var_list_of_pv_list pvl =
-  let mk_var pv = mk_expr (Evar pv) (I pv.pv_ity)
-      MaskVisible eff_empty Sattr.empty in
-  List.map mk_var pvl
+let var_list_of_pv_list pvl mltyl =
+  let mk_var pv mlty = mk_expr (Evar pv) (I pv.pv_ity)
+      MaskVisible mlty eff_empty Sattr.empty in
+  List.map2 mk_var pvl mltyl
 
 let ld_map fn ld = match ld with
   | Lsym (rs, tv, ty, vl, e) -> Lsym (rs, tv, ty, vl, fn e)
@@ -373,11 +391,11 @@ let e_map fn e =
   let mk en = { e with e_node = en } in
   match e.e_node with
   | Econst _ | Evar _ | Efun (_,_) | Eabsurd -> e
-  | Eapp (rs,el) -> mk (Eapp(rs,(List.map fn el)))
+  | Eapp (rs,el, p) -> mk (Eapp(rs,(List.map fn el), p))
   | Elet (ld,e) -> mk (Elet (ld_map fn ld, fn e))
   | Eif (c,t,e) -> mk (Eif (fn c, fn t, fn e))
   | Eassign al ->
-     let al' = List.map (fun (pv, rs, e) -> pv, rs, fn e) al in
+     let al' = List.map (fun (e1, ty, rs, e2) -> fn e1, ty, rs, fn e2) al in
      mk (Eassign al')
   | Ematch (e,bl,xl) ->
      let bl' = List.map (fun (p,e) -> (p, fn e)) bl in
@@ -385,7 +403,7 @@ let e_map fn e =
      mk (Ematch (fn e, bl', xl'))
   | Eblock el -> mk (Eblock (List.map fn el))
   | Ewhile (c,b) -> mk (Ewhile (fn c, fn b))
-  | Efor (i,vb,d,ve,e) -> mk (Efor (i, vb, d, ve, fn e))
+  | Efor (i,ty,vb,d,ve,e) -> mk (Efor (i, ty, vb, d, ve, fn e))
   | Eraise (_, None) -> e
   | Eraise (x, Some e) -> mk (Eraise (x, Some (fn e)))
   | Eexn (x,t,e) -> mk (Eexn (x, t, fn e))
@@ -401,20 +419,21 @@ let e_fold fn acc e =
   match e.e_node with
   | Econst _ | Evar _
   | Efun (_,_) | Eabsurd -> acc
-  | Eapp (_,el) -> List.fold_left fn acc el
+  | Eapp (_,el,_) -> List.fold_left fn acc el
   | Elet (ld,e) -> fn (ld_fold fn acc ld) e
   | Eif (c,t,e) ->
      let acc = fn acc c in
      let acc = fn acc t in
      fn acc e
-  | Eassign al -> List.fold_left (fun acc (_,_,e) -> fn acc e) acc al
+  | Eassign al ->
+     List.fold_left (fun acc (e1,_,_,e2) -> fn (fn acc e2) e1) acc al
   | Ematch (e,bl,xl) ->
      let acc = List.fold_left (fun acc (_p,e) -> fn acc e) acc bl in
      let acc = List.fold_left (fun acc (_x, _vl, e) -> fn acc e) acc xl in
      fn acc e
   | Eblock el -> List.fold_left fn acc el
   | Ewhile (c,b) -> fn (fn acc c) b
-  | Efor (_,_,_,_,e) -> fn acc e
+  | Efor (_,_,_,_,_,e) -> fn acc e
   | Eraise (_, None) -> acc
   | Eraise (_, Some e) -> fn acc e
   | Eexn (_x,_t,e) -> fn acc e
@@ -442,9 +461,9 @@ let e_map_fold fn acc e =
   match e.e_node with
   | Econst _ | Evar _
   | Efun (_,_) | Eabsurd -> acc, e
-  | Eapp (rs,el) ->
+  | Eapp (rs,el,p) ->
      let acc,el = Lists.map_fold_left fn acc el in
-     acc,mk (Eapp(rs,el))
+     acc,mk (Eapp(rs,el,p))
   | Elet (ld,e) ->
      let acc, ld = ld_map_fold fn acc ld in
      let acc, e = fn acc e in
@@ -457,9 +476,10 @@ let e_map_fold fn acc e =
   | Eassign al ->
      let acc,al' =
        Lists.map_fold_left
-         (fun acc (pv, rs, e) ->
-           let acc, e = fn acc e in
-           acc, (pv, rs, e))
+         (fun acc (e1, ty, rs, e2) ->
+           let acc, e2' = fn acc e2 in
+           let acc, e1' = fn acc e1 in
+           acc, (e1', ty, rs, e2'))
          acc al in
      acc, mk (Eassign al')
   | Ematch (e,bl,xl) ->
@@ -482,9 +502,9 @@ let e_map_fold fn acc e =
      let acc, c' = fn acc c in
      let acc, b' = fn acc b in
      acc, mk (Ewhile (c', b'))
-  | Efor (i,vb,d,ve,e) ->
+  | Efor (i,ty,vb,d,ve,e) ->
      let acc, e' = fn acc e in
-     acc, mk (Efor (i, vb, d, ve, e'))
+     acc, mk (Efor (i, ty, vb, d, ve, e'))
   | Eraise (_, None) -> acc, e
   | Eraise (x, Some e) ->
      let acc, e' = fn acc e in
