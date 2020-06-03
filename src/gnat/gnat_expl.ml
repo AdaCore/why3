@@ -49,6 +49,8 @@ type reason =
    | VC_Stronger_Post
    | VC_Weaker_Classwide_Pre
    | VC_Stronger_Classwide_Post
+   | VC_Weaker_Pre_Access
+   | VC_Stronger_Post_Access
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
    | VC_Inconsistent_Post
@@ -105,6 +107,8 @@ let is_warning_reason r =
    | VC_Stronger_Post
    | VC_Weaker_Classwide_Pre
    | VC_Stronger_Classwide_Post
+   | VC_Weaker_Pre_Access
+   | VC_Stronger_Post_Access
      -> false
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
@@ -200,6 +204,8 @@ let reason_from_string s =
    | "VC_STRONGER_POST"             -> VC_Stronger_Post
    | "VC_WEAKER_CLASSWIDE_PRE"      -> VC_Weaker_Classwide_Pre
    | "VC_STRONGER_CLASSWIDE_POST"   -> VC_Stronger_Classwide_Post
+   | "VC_WEAKER_PRE_ACCESS"         -> VC_Weaker_Pre_Access
+   | "VC_STRONGER_POST_ACCESS"      -> VC_Stronger_Post_Access
    (* VC_Warning_Kind - warnings *)
    | "VC_INCONSISTENT_PRE"          -> VC_Inconsistent_Pre
    | "VC_INCONSISTENT_POST"         -> VC_Inconsistent_Post
@@ -261,6 +267,8 @@ let reason_to_ada reason =
    | VC_Stronger_Post             -> "VC_STRONGER_POST"
    | VC_Weaker_Classwide_Pre      -> "VC_WEAKER_CLASSWIDE_PRE"
    | VC_Stronger_Classwide_Post   -> "VC_STRONGER_CLASSWIDE_POST"
+   | VC_Weaker_Pre_Access         -> "VC_WEAKER_PRE_ACCESS"
+   | VC_Stronger_Post_Access      -> "VC_STRONGER_POST_ACCESS"
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre          -> "VC_INCONSISTENT_PRE"
    | VC_Inconsistent_Post         -> "VC_INCONSISTENT_POST"
@@ -317,6 +325,8 @@ let reason_to_string reason =
    | VC_Stronger_Post             -> "stronger_post"
    | VC_Weaker_Classwide_Pre      -> "weaker_classwide_pre"
    | VC_Stronger_Classwide_Post   -> "stronger_classwide_post"
+   | VC_Weaker_Pre_Access         -> "weaker_pre_access"
+   | VC_Stronger_Post_Access      -> "stronger_post_access"
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre          -> "inconsistent_pre"
    | VC_Inconsistent_Post         -> "inconsistent_post"

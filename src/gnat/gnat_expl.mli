@@ -53,6 +53,8 @@ type reason =
    | VC_Stronger_Post
    | VC_Weaker_Classwide_Pre
    | VC_Stronger_Classwide_Post
+   | VC_Weaker_Pre_Access
+   | VC_Stronger_Post_Access
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
    | VC_Inconsistent_Post
