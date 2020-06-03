@@ -135,6 +135,13 @@ module Functions
     ()
 end
 
+module Strings
+  use string.OCaml
+  let test1 () =
+    let s = "hello" in
+    concat s " world"
+end
+
 module PolyRefContracts
   use int.Int
   use ref.Ref
@@ -162,16 +169,71 @@ module PolyRefContracts
     f2_aux myref 1 2 (* POST fails *)
 end
 
-module Record
+module RecordMut
+  use int.Int
+
+  type t = { mutable f: int -> int }
+
+  let test () =
+    let x = { f= fun (x:int) -> x+1 } in
+    assert { x.f 1 = 2 };
+    let f' = x.f in
+    x.f <- (fun x -> if x = 0 then 42 else f' x);
+    (* previous x.f is in now the closure of x.f *)
+    assert { x.f 0 = 42 };
+    assert { x.f 1 = 2 }
+end
+
+module RecordMutGhost
   use int.Int
 
   type t = { mutable f: int -> int; ghost n: int }
 
-  let f0 () =
+  let test () =
     let x = { f= (fun (x:int) -> x); n= 2 } in
     assert { x.n = 2 };
-    x.f <- (let g = x.f in (fun (z: int) -> if z = 3 then 13 else g z));
+    assert { x.f 3 = 3 };
+    let g = x.f in 
+    x.f <- (fun (z: int) -> if z = 3 then 42 else g z);
+    assert { x.f 3 = 42 };
     1 (* + x.n *) + x.f 3
+end
+
+module RecordPoly
+  use int.Int
+  type t1 'a = { mutable x: 'a }
+
+  let test1 () =
+    let r = {x= 1} in
+    assert { r.x = 1 };
+    r.x <- 100;
+    assert { r.x = 100 }
+
+  type t2 'a = { mutable f: int -> 'a }
+  let test2 () =
+    let r = { f= fun (_: int) -> True } in
+    assert { r.f 0 = True };
+    assert { r.f 1 = True };
+    r.f <- (let f = r.f in (fun (j: int) -> if j = 0 then False else f j));
+    assert { r.f 0 = False };
+    assert { r.f 1 = True };
+
+  type t3 'a = { mutable elts: int -> 'a; length: int }
+
+  let update (r: t3 'a) (i: int) (x: 'a) : unit
+    (* requires { 0 < i < r.length } *)
+    (* ensures { forall j. 0 < j < r.length -> j <> i -> r.elts j = old r.elts j } *)
+    (* ensures { r.elts i = x } *)
+  = r.elts <- let f = r.elts in (fun (j: int) -> if j = i then x else f j)
+
+  use bool.Bool
+
+  let test3 () =
+    let r = { length= 5; elts= fun (_:int) -> True } in
+    assert { r.elts 3 = True };
+    update r 3 False;
+    assert { r.elts 3 = False };
+    assert { r.elts 2 = True }
 end
 
 module Arrays
@@ -218,4 +280,24 @@ module ArrayExec
     let a = make 5 1 in
     let x = a[0] in
     assert { x = 1 }
+end
+
+
+module C
+  use int.Int
+
+  type char = < range 0 255 >
+
+  val (<=) (c1 c2: char) : bool
+     ensures { result <-> char'int c1 <= char'int c2 }
+
+  val (-) (c1 c2: char) : char
+     ensures { char'int result = char'int c1 - char'int c2 }
+
+  let uppercase (c:char) =
+     if (97:char) <= c <= (122:char)  then
+        c - 32 else c
+
+  let main () : char =
+    uppercase 97
 end
