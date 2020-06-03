@@ -531,13 +531,12 @@ let print_model_element ~at_loc ~print_attrs ~print_model_value ~me_name_trans f
   | _ ->
       let m_element = {m_element with me_name=fix_loc_kind ~at_loc m_element.me_name} in
       fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]"
-        let cmp_attrs a1 a2 = String.compare a1.attr_string a2.attr_string in
         (me_name_trans m_element.me_name)
         (fun fmt ->
            if print_attrs then
              fprintf fmt ",@ [%a]"
                (Pp.print_list Pp.comma Pretty.print_attr)
-          (List.sort cmp_attrs (Sattr.elements m_element.me_name.men_attrs))
+               (List.sort cmp_attrs (Sattr.elements m_element.me_name.men_attrs)))
         print_model_value m_element.me_value
 
 let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
