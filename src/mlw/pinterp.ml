@@ -122,7 +122,7 @@ let rec term_of_value mt v : ty Mtv.t * term =
         let mt, t = term_of_value mt v in
         mt, Mvs.add vs t mv in
       let mt, mv = Mvs.fold aux cl (mt, Mvs.empty) in
-      let t = Option.get (term_of_expr ~prop:false e) in
+      let t = Opt.get (term_of_expr ~prop:false e) in
       let mt, t = mt, t_ty_subst mt mv t in
       mt, t_lambda [arg] [] t
   | _ -> Format.kasprintf failwith "term_of_value: %a" print_value v
