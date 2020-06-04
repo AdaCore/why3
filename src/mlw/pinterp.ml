@@ -230,7 +230,7 @@ let eval_true _ls _l = value ty_bool (Vbool true)
 let eval_false _ls _l = value ty_bool (Vbool false)
 
 let eval_int_op op ls l =
-  value ty_int
+  value (ty_of_ity ls.rs_cty.cty_result)
     ( match List.map v_desc l with
     | [Vnum i1; Vnum i2] -> (
       try Vnum (op i1 i2) with NotNum | Division_by_zero -> constr ls l )
@@ -241,7 +241,7 @@ let eval_int_uop op ls l =
     match List.map v_desc l with
     | [Vnum i1] -> ( try Vnum (op i1) with NotNum -> constr ls l )
     | _ -> constr ls l in
-  {v_desc; v_ty= ty_int}
+  {v_desc; v_ty=ty_of_ity ls.rs_cty.cty_result}
 
 let eval_int_rel op ls l =
   let v_desc =
@@ -367,20 +367,29 @@ let builtin_float_type _kn _its = ()
 let built_in_modules env =
   let bool_module =
     ["bool"], "Bool", [], ["True", eval_true; "False", eval_false] in
+  let int_ops =
+    [ op_infix "+", eval_int_op BigInt.add;
+      (* defined as x+(-y)
+         op_infix "-", eval_int_op BigInt.sub; *)
+      op_infix "*", eval_int_op BigInt.mul;
+      op_prefix "-", eval_int_uop BigInt.minus;
+      op_infix "=", eval_int_rel BigInt.eq;
+      op_infix "<", eval_int_rel BigInt.lt;
+      op_infix "<=", eval_int_rel BigInt.le;
+      op_infix ">", eval_int_rel BigInt.gt;
+      op_infix ">=", eval_int_rel BigInt.ge ] in
+  let bounded_int_ops =
+    ("of_int", eval_int_uop (fun x -> x)) ::
+    ("to_int", eval_int_uop (fun x -> x)) ::
+    (op_infix "-", eval_int_op BigInt.sub) ::
+    (op_infix "/", eval_int_op BigInt.computer_div) ::
+    (op_infix "%", eval_int_op BigInt.computer_mod) ::
+    int_ops in
   let int_modules =
     [ ( ["int"],
         "Int",
         [],
-        [ op_infix "+", eval_int_op BigInt.add;
-          (* defined as x+(-y)
-             op_infix "-", eval_int_op BigInt.sub; *)
-          op_infix "*", eval_int_op BigInt.mul;
-          op_prefix "-", eval_int_uop BigInt.minus;
-          op_infix "=", eval_int_rel BigInt.eq;
-          op_infix "<", eval_int_rel BigInt.lt;
-          op_infix "<=", eval_int_rel BigInt.le;
-          op_infix ">", eval_int_rel BigInt.gt;
-          op_infix ">=", eval_int_rel BigInt.ge ] );
+        int_ops );
       ( ["int"],
         "MinMax",
         [],
@@ -395,6 +404,16 @@ let built_in_modules env =
         [],
         [ "div", eval_int_op BigInt.euclidean_div;
           "mod", eval_int_op BigInt.euclidean_mod ] ) ] in
+  let int63_module =
+    ( ["mach";"int"],
+      "Int63",
+      [],
+      bounded_int_ops) in
+  let int31_module =
+    ( ["mach";"int"],
+      "Int31",
+      [],
+      bounded_int_ops) in
   let mode_module =
     let pm = Pmodule.read_module env ["ieee_float"] "RoundingMode" in
     let its = Pmodule.ns_find_its pm.Pmodule.mod_export ["mode"] in
@@ -462,7 +481,7 @@ let built_in_modules env =
   (bool_module :: int_modules)
   @ [ real_module; real_square_module; real_trigo_module; real_exp_log;
       mode_module; float_modules 32 ~prec:24 "Float32";
-      float_modules 64 ~prec:53 "Float64" ]
+      float_modules 64 ~prec:53 "Float64"; int63_module; int31_module ]
 
 exception CannotFind of (Env.pathname * string * string)
 
@@ -843,7 +862,7 @@ let rec eval_expr ~rac env (e : expr) : result =
       Normal v
     with Not_found -> assert false (* Irred e ? *) )
   | Econst (Constant.ConstInt c) ->
-      Normal (value ty_int (Vnum (big_int_of_const c)))
+      Normal (value (ty_of_ity e.e_ity) (Vnum (big_int_of_const c)))
   | Econst (Constant.ConstReal r) ->
       (* ConstReal can be float or real *)
       let is_real ity = ity_equal ity ity_real in

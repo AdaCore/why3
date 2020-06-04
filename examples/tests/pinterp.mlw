@@ -1,0 +1,143 @@
+module Int63Test
+
+  use mach.int.Int63
+
+  let t (): int63 = 1
+
+  let t2 () = 2:int63
+
+  let t3 () =
+    let x:int63 = 1 in
+    x
+
+  let t4 () =
+    let x:int63 = 1 in
+    x + 2
+
+  let t5 () =
+    let x:int63 = 1 in
+    x - 2
+
+  let t6 () =
+    let x = 10 in
+    x + 2
+
+  let t7 () =
+    let x:int = 10 in
+    Int.(-) x 2
+
+  let t8 () =
+    let x = 20 in
+    let y = 21 in
+    x < y
+
+  let t9 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y
+
+  let t10 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y - 1
+
+  let t11 () =
+    let x = 20 in
+    let y = 21 in
+    x = y - 1 && x >= y - 1 && y > x
+
+  let t12 () =
+    let x = 42 in
+    x % 2 = 0
+
+  let t13 () =
+    let x = 42 in
+    let y = 24 in
+    let z = x + y / 2 in
+    let w = z * x in
+    let w = w % 10 in
+    let w = -w in
+    w = -8
+
+  let t14 () =
+    let x:int63 = of_int(42:int) in
+    let y:int = to_int x in
+    x + of_int y
+
+  let t15 () = Int.(+) max_int63 min_int63
+
+  (* let t16 () = zero + one + max_int + min_int *)
+
+end
+
+module Int31Test
+
+  use mach.int.Int31
+
+  let t (): int31 = 1
+
+  let t2 () = 2:int31
+
+  let t3 () =
+    let x:int31 = 1 in
+    x
+
+  let t4 () =
+    let x:int31 = 1 in
+    x + 2
+
+  let t5 () =
+    let x:int31 = 1 in
+    x - 2
+
+  let t6 () =
+    let x = 10 in
+    x + 2
+
+  let t7 () =
+    let x:int = 10 in
+    Int.(-) x 2
+
+  let t8 () =
+    let x = 20 in
+    let y = 21 in
+    x < y
+
+  let t9 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y
+
+  let t10 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y - 1
+
+  let t11 () =
+    let x = 20 in
+    let y = 21 in
+    x = y - 1 && x >= y - 1 && y > x
+
+  let t12 () =
+    let x = 42 in
+    x % 2 = 0
+
+  let t13 () =
+    let x = 42 in
+    let y = 24 in
+    let z = x + y / 2 in
+    let w = z * x in
+    let w = w % 10 in
+    let w = -w in
+    w = -8
+
+  let t14 () =
+    let x:int31 = of_int(42:int) in
+    let y:int = to_int x in
+    x + of_int y
+
+  let t15 () = Int.(+) max_int31 min_int31
+
+  (* let t16 () = zero + one + max_int + min_int *)
+
+end
