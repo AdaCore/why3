@@ -295,17 +295,17 @@ let eval_real : type a. a real_arity -> a -> Expr.rsymbol -> value list -> value
   {v_desc; v_ty= ty_real}
 
 let rec default_value_of_type known ity : value =
-  let v_ty = ty_of_ity ity in
+  let ty = ty_of_ity ity in
   match ity.ity_node with
   | Ityvar _ -> assert false
-  | Ityreg r -> default_value_of_types known r.reg_its r.reg_args r.reg_regs
-  | Ityapp (ts, _, _) when its_equal ts its_int -> value v_ty (Vnum BigInt.zero)
+  | Ityreg r -> default_value_of_types known r.reg_its r.reg_args r.reg_regs ty
+  | Ityapp (ts, _, _) when its_equal ts its_int -> value ty (Vnum BigInt.zero)
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
-  | Ityapp (ts, _, _) when its_equal ts its_bool -> value v_ty (Vbool false)
+  | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
   (* | Ityapp(ts,_,_) when is_its_tuple ts -> assert false (* TODO *) *)
-  | Ityapp (ts, l1, l2) -> default_value_of_types known ts l1 l2
+  | Ityapp (ts, l1, l2) -> default_value_of_types known ts l1 l2 ty
 
-and default_value_of_types known ts l1 l2 : value =
+and default_value_of_types known ts l1 l2 ty : value =
   let cs =
     match Pdecl.((find_its_defn known ts).itd_constructors) with
     | cs :: _ -> cs
@@ -314,9 +314,8 @@ and default_value_of_types known ts l1 l2 : value =
   let subst = its_match_regs ts l1 l2 in
   let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
   let tyl = List.map (ity_full_inst subst) ityl in
-  let vl = List.map (default_value_of_type known) tyl in
-  let v_desc = Vconstr (cs, List.map ref vl) in
-  {v_desc; v_ty= ty_of_ity cs.rs_cty.cty_result}
+  let fl = List.map (fun ity -> ref (default_value_of_type known ity)) tyl in
+  value ty (Vconstr (cs, fl))
 
 type result =
   | Normal of value
@@ -1072,13 +1071,9 @@ let eval_global_expr ~rac env km locals e =
   let env' = {known= km; funenv= Mrs.empty; vsenv= Mvs.empty; env} in
   let add_glob _ d acc =
     match d.Pdecl.pd_node with
-    | Pdecl.PDlet (LDvar (pvs, _)) ->
-        (*
-        eprintf "@[<hov 2>[interp] global:@ %s@]@."
-          pvs.pv_vs.vs_name.id_string;
-        *)
-        let ity = pvs.pv_ity in
-        let v = default_value_of_type env'.known ity in
+    | Pdecl.PDlet (LDvar (pvs, _e)) ->
+        (* TODO evaluate _e! *)
+        let v = default_value_of_type env'.known pvs.pv_ity in
         Mvs.add pvs.pv_vs v acc
     | _ -> acc in
   let global_env = Mid.fold add_glob km Mvs.empty in
