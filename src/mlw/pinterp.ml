@@ -729,68 +729,41 @@ let check_terms ctx = List.iter (check_term ctx)
 
 (** Assert a post-condition [t] by binding the result variable to
     the term [vt] representing the result value... type error for
-    polymorphic types
+    polymorphic types *)
 
-    Fatal error in rac.mlw:199 (RecordMutGhost.test): exception Type mismatch between 'a -> int and int -> int *)
-
+(* Substitute result in post-condition term *)
 let check_post0 ctx (vt : term) (mt : ty Mtv.t) (t : term) =
-  try
-    let vs, t = open_post t in
-    let mt = ty_match mt vs.vs_ty (oty_type vt.t_ty) in
-    let vsenv = Mvs.add vs vt ctx.c_vsenv in
-    let pp_vs fmt vs =
-      fprintf fmt "(%a: %a)" Pretty.print_vs vs Pretty.print_ty vs.vs_ty in
-    if Debug.test_flag debug_rac then (
-      eprintf "TY SUBST@." ;
-      eprintf "- @[<hv3>MT:@ %a@]@."
-        (pp_bindings Pretty.print_tv Pretty.print_ty)
-        (Mtv.bindings mt) ;
-      eprintf "- @[<hv3>VSENV:@ %a@]@."
-        (pp_bindings pp_vs Pretty.print_term)
-        (Mvs.bindings vsenv) ;
-      eprintf "- @[<hv2>T:@ %a@]@." Pretty.print_term t ) ;
-    let t = t_ty_subst mt vsenv t in
-    (* let vsenv', t = t_subst_types mt vsenv t in
-       * let vsenv = Mvs.union (fun _ _ t -> Some t) vsenv vsenv' in *)
-    check_term {ctx with c_vsenv= vsenv} t ;
-    mt
-  with e when Debug.test_flag debug_rac ->
-    eprintf "%a@." report_cntr (ctx, "PREPARE POST", t) ;
-    raise e
+  let vs, t = open_post t in
+  let mt = ty_match mt vs.vs_ty (oty_type vt.t_ty) in
+  (* let pp_vs fmt vs =
+    *   fprintf fmt "(%a: %a)" Pretty.print_vs vs Pretty.print_ty vs.vs_ty in
+    * if Debug.test_flag debug_rac then (
+    *   eprintf "TY SUBST@." ;
+    *   eprintf "- @[<hv3>MT:@ %a@]@."
+    *     (pp_bindings Pretty.print_tv Pretty.print_ty)
+    *     (Mtv.bindings mt) ;
+    *   eprintf "- @[<hv3>VSENV:@ %a@]@."
+    *     (pp_bindings pp_vs Pretty.print_term)
+    *     (Mvs.bindings vsenv) ;
+    *   eprintf "- @[<hv2>T:@ %a@]@." Pretty.print_term t ) ; *)
+  let vsenv = Mvs.add vs vt ctx.c_vsenv in
+  let t = t_ty_subst mt vsenv t in
+  check_term ctx t ; mt
 
-(* Check postcondition by applying the postcondition to the result value.
-
-   Fatal error for post-condition of record constructors (t'mk), e.g. rac.mlw:RecordMutGhost.test:193
-   Type mismatch between 'a -> 'b and RecordMut.t  *)
+(* Apply post-condition term to result term *)
 let check_post1 ctx rt mt t =
-  try
-    if Debug.test_flag debug_rac then (
-      eprintf "T_FUNC_APP@." ;
-      eprintf "- T: @[<hv2>%a@]@." Pretty.print_term t ;
-      eprintf "- RT: @[<hv2>%a@]@." Pretty.print_term rt ) ;
-    let t = t_func_app t rt in
-    check_term ctx t ; mt
-  with e when Debug.test_flag debug_rac ->
-    eprintf "%a@." report_cntr (ctx, "PREPARE POST", t) ;
-    raise e
+  let t = t_func_app t rt in
+  check_term ctx t ; mt
 
-(* Check postcondition by applying the postcondition to the result value.c_vsenv
-   Fatal error in RecordMutGhost.test: exception Type mismatch between 'a and int *)
+(* Reconstruct lambda term from post-condition and apply to result term *)
 let check_post2 ctx rt mt t =
-  try
-    let vs, _ = open_post t in
-    let mt = ty_match mt vs.vs_ty (oty_type rt.t_ty) in
-    let t = t_lambda [vs] [] t in
-    let t = t_ty_subst mt Mvs.empty t in
-    check_term ctx t ; mt
-  with e when Debug.test_flag debug_rac ->
-    eprintf "%a@." report_cntr (ctx, "PREPARE POST", t) ;
-    raise e
+  let vs, t = open_post t in
+  let t = t_lambda [vs] [] t in
+  let t = t_func_app t rt in
+  check_term ctx t ; mt
 
-(* Or check postcondition by convert it to (eps fc. forall x. fc @ x = body) @ result
- * as understood by the reduction engine? *)
-let check_post2 _ = assert false
-let check_post = check_post0
+let check_post ctx rt mt t =
+  check_post0 ctx rt mt t
 
 (* evaluate expressions *)
 let rec eval_expr ~rac env (e : expr) : result =
