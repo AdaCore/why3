@@ -304,8 +304,17 @@ test_mlw_printer () {
 
 rac () {
     file=$1
-    func=$2
-    "bin/why3execute$suffix" --rac "$file" "$func" 2>&1
+    mod=$2
+    shift 2
+    echo
+    echo "* $mod"
+    echo -n "$mod:" >&2
+    for func in $@; do
+        echo "** $mod.$func"
+        echo -n " $func" >&2
+        "bin/why3execute$suffix" --rac "$file" "$mod.$func" 2>&1
+    done
+    echo >&2
 }
 
 echo "=== Checking stdlib ==="
@@ -368,35 +377,21 @@ invalid_goals bench/invalid
 echo ""
 
 echo "=== Checking RAC ==="
-mlw_file="examples/tests/rac.mlw"
-out_file="$(dirname "$mlw_file")/$(basename "$mlw_file" .mlw).out"
-oracle_file="$(dirname "$mlw_file")/$(basename "$mlw_file" .mlw).oracle"
+mlw="examples/tests/rac.mlw"
+output="examples/tests/rac.out"
 (
-    echo "  $mlw_file.Local" >&2
-    for func in c0 c1 c2 c_or f2 f3; do
-        rac "$mlw_file" Local."$func"
-    done
-    echo "  $mlw_file.Global" >&2
-    for func in c2; do
-        rac "$mlw_file" Global."$func"
-    done
-    echo "  $mlw_file.Functions" >&2
-    for func in f1 f2 f3 f4 f5a f5b f5c f6 f7 f8 f9; do
-        rac "$mlw_file" Functions."$func"
-    done
-    echo "  $mlw_file.PolyRefContracts" >&2
-    for func in f1 f2a f2b f2c; do
-        rac "$mlw_file" PolyRefContracts."$func"
-    done
-    echo " $mlw_file: records" >&2
-    for func in RecordMut.test RecordMutGhost.test; do
-        rac "$mlw_file" "$func"
-    done
-) > "$out_file"
-if diff -u "$oracle_file" "$out_file"; then
+    rac "$mlw" Local test1 test2 test3 test4 test5
+    rac "$mlw" Global test1 test2
+    rac "$mlw" Functions f1 f2 f3 f4 f5a f5b f6 f8 f9 # TODO f7
+    rac "$mlw" PolyRefContracts f1 f2a f2b f2c
+    rac "$mlw" RecordMut test
+    # TODO rac "$mlw" RecordMutGhost test
+    rac "$mlw" RecordPoly test2 # TODO test1 test3
+) > "$output"
+if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
     echo "RAC: ok"
 else
-    echo "RAC: diff in output $out_file"
+    echo "RAC: diff in output $output"
     exit 1
 fi
 echo ""

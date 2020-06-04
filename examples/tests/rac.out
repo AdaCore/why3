@@ -1,0 +1,126 @@
+
+* Local
+** Local.test1
+Assertion cannot be evaluated at examples/tests/rac.mlw, line 8, characters 13-37
+  Term: forall y:int. y = x -> y = 1
+  Variables: {x -> 1; _ -> ()}
+Execution of Local.test1 : () -> ()
+  Assertion failed at examples/tests/rac.mlw, line 9, characters 13-18
+    Term: x = 0
+    Variables: {x -> 1; _ -> (); _1 -> ()}
+** Local.test2
+Execution of Local.test2 : () -> ()
+  result: ()
+  globals: 
+** Local.test3
+Execution of Local.test3 : () -> ()
+  Assertion failed at examples/tests/rac.mlw, line 20, characters 13-19
+    Term: contents x > 10
+    Variables: {x -> ref'mk 1; _ -> ()}
+** Local.test4
+Execution of Local.test4 : () -> ()
+  result: ()
+  globals: 
+** Local.test5
+Execution of Local.test5 : () -> ()
+  result: ()
+  globals: 
+
+* Global
+** Global.test1
+Execution of Global.test1 : () -> ()
+  result: ()
+  globals: x -> (ref'mk 1);
+           y -> (ref'mk 0)
+** Global.test2
+Execution of Global.test2 : () -> ()
+  Assertion failed at examples/tests/rac.mlw, line 44, characters 13-19
+    Term: contents y = 42
+    Variables: {x -> ref'mk 0; y -> ref'mk 0}
+
+* Functions
+** Functions.f1
+Execution of Functions.f1 : () -> ()
+  Assertion failed at examples/tests/rac.mlw, line 60, characters 13-28
+    Term: fff 0 = ((ggg @ 0) @ 1)
+    Variables: {x -> ref'mk 0; _ -> (); _1 -> ()}
+** Functions.f2
+Execution of Functions.f2 : () -> ()
+  result: ()
+  globals: x -> (ref'mk 0)
+** Functions.f3
+Execution of Functions.f3 : () -> ()
+  Loop invariant preservation failed at examples/tests/rac.mlw, line 69, characters 18-32
+    Term: contents x = 0 || contents x = 1
+    Variables: {x -> ref'mk 2; i -> 1; o -> 5; o1 -> 0}
+** Functions.f4
+Execution of Functions.f4 : () -> ()
+  Loop invariant preservation failed at examples/tests/rac.mlw, line 76, characters 18-24
+    Term: 5 >= contents x
+    Variables: {x -> ref'mk 6}
+** Functions.f5a
+Execution of Functions.f5a : () -> int
+  Precondition of f5_aux failed at examples/tests/rac.mlw, line 87, characters 4-12
+    Defined at examples/tests/rac.mlw, line 82, characters 15-20
+    Term: y > 0
+    Variables: {x -> ref'mk 0; y -> 0; o -> 0}
+** Functions.f5b
+Execution of Functions.f5b : () -> int
+  Postcondition of f5_aux failed at examples/tests/rac.mlw, line 91, characters 4-12
+    Defined at examples/tests/rac.mlw, line 83, characters 14-24
+    Term: 2 = 1
+    Variables: {x -> ref'mk 0; y -> 2; _ -> 1; o -> 2}
+** Functions.f6
+Execution of Functions.f6 : () -> ()
+  Exceptional postcondition of f6_aux failed at examples/tests/rac.mlw, line 101, characters 8-17
+    Defined at examples/tests/rac.mlw, line 96, characters 20-25
+    Term: 42 = contents (ref'mk 1)
+    Variables: {x -> ref'mk 1; _ -> (); o -> ()}
+** Functions.f8
+Execution of Functions.f8 : () -> ()
+  Assertion failed at examples/tests/rac.mlw, line 113, characters 13-18
+    Term: contents r = 1
+    Variables: {x -> ref'mk 0; r -> ref'mk 0}
+** Functions.f9
+Execution of Functions.f9 : () -> ()
+  Precondition of f9_aux failed at examples/tests/rac.mlw, line 124, characters 12-23
+    Defined at examples/tests/rac.mlw, line 116, characters 15-21
+    Term: not contents x = y
+    Variables: {x1 -> ref'mk 0; x -> ref'mk 42; y -> 42; r -> ref'mk 42;
+      _ -> 42; o -> 42}
+
+* PolyRefContracts
+** PolyRefContracts.f1
+Execution of PolyRefContracts.f1 : () -> ()
+  result: ()
+  globals: myref -> (ref'mk 0)
+** PolyRefContracts.f2a
+Execution of PolyRefContracts.f2a : () -> int
+  result: 1
+  globals: myref -> (ref'mk 1)
+** PolyRefContracts.f2b
+Execution of PolyRefContracts.f2b : () -> int
+  Precondition of f2_aux failed at examples/tests/rac.mlw, line 156, characters 4-20
+    Defined at examples/tests/rac.mlw, line 144, characters 15-29
+    Term: not contents argref = argx
+    Variables: {argref -> ref'mk 0; argx -> 0; argy -> 1; myref -> ref'mk 0;
+      o -> 1; o1 -> 0}
+** PolyRefContracts.f2c
+Execution of PolyRefContracts.f2c : () -> int
+  Postcondition of f2_aux failed at examples/tests/rac.mlw, line 159, characters 4-20
+    Defined at examples/tests/rac.mlw, line 146, characters 14-27
+    Term: 1 = 2
+    Variables: {argref -> ref'mk 1; argx -> 1; argy -> 2; myref -> ref'mk 1;
+      o -> 2; o1 -> 1}
+
+* RecordMut
+** RecordMut.test
+Execution of RecordMut.test : () -> ()
+  result: ()
+  globals: 
+
+* RecordPoly
+** RecordPoly.test2
+Execution of RecordPoly.test2 : () -> ()
+  result: ()
+  globals: 
