@@ -602,20 +602,21 @@ let compute_fraction {Number.rv_sig= i; Number.rv_pow2= p2; Number.rv_pow5= p5}
     den := BigInt.mul p5_val !den ;
   !num, !den
 
-let report_cntr fmt (ctx, msg, term) =
+let report_cntr_head fmt (ctx, msg, term) =
   let pp_pos fmt loc =
     let f, l, b, e = Loc.get loc in
     fprintf fmt "%s, line %d, characters %d-%d" f l b e in
-  fprintf fmt "@[<v2>%s %s%t" ctx.c_desc msg (fun fmt ->
-      if Opt.inhabited ctx.c_trigger_loc then
-        fprintf fmt " at %a" pp_pos (Opt.get ctx.c_trigger_loc)) ;
-  if (not (Opt.inhabited ctx.c_trigger_loc)) && not (Opt.inhabited term.t_loc)
-  then
-    fprintf fmt "@," ;
-  if Opt.inhabited ctx.c_trigger_loc && Opt.inhabited term.t_loc then
-    fprintf fmt "@,Defined" ;
-  if Opt.inhabited term.t_loc then
-    fprintf fmt " at %a@," pp_pos (Opt.get term.t_loc) ;
+  fprintf fmt "@[<v2>%s %s" ctx.c_desc msg;
+  ( match ctx.c_trigger_loc, term.t_loc with
+    | Some t1, Some t2 ->
+        fprintf fmt " at %a@,Defined at %a" pp_pos t1 pp_pos t2
+    | Some t, None | None, Some t ->
+        fprintf fmt " at %a" pp_pos t
+    | None, None -> () );
+  fprintf fmt "@]"
+
+let report_cntr fmt (ctx, msg, term) =
+  fprintf fmt "@[<v2>%a@," report_cntr_head (ctx, msg, term);
   fprintf fmt "@[<hov2>Term: %a@]@," Pretty.print_term term ;
   fprintf fmt "@[<hov2>Variables: %a@]"
     (pp_bindings ~delims:Pp.(lbrace, rbrace) Pretty.print_vs Pretty.print_term)
@@ -718,15 +719,12 @@ let check_term ctx t =
   match eval_term ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
   | {t_node= Ttrue} ->
       if Debug.test_flag debug_rac then
-        eprintf "%a@." report_cntr (ctx, "is ok", t)
+        eprintf "%a@." report_cntr_head (ctx, "is ok", t)
   | {t_node= Tfalse} -> raise (Contr (ctx, t))
   | t' ->
       eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t) ;
       if Debug.test_flag debug_rac then
-        eprintf "@[<hv2>RESULT: %a@]@." Pretty.print_term t'
-  | exception e when Debug.test_flag debug_rac ->
-      eprintf "%a@." report_cntr (ctx, "WHILE TRYING", t) ;
-      raise e
+        eprintf "  @[<hv2>Result: %a@]@." Pretty.print_term t'
 
 let check_terms ctx = List.iter (check_term ctx)
 
