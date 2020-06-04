@@ -614,12 +614,15 @@ let report_cntr_head fmt (ctx, msg, term) =
     | None, None -> () );
   fprintf fmt "@]"
 
+let cmp_vs (vs1, _) (vs2, _) =
+  String.compare vs1.vs_name.id_string vs2.vs_name.id_string
+
 let report_cntr fmt (ctx, msg, term) =
   fprintf fmt "@[<v2>%a@," report_cntr_head (ctx, msg, term);
   fprintf fmt "@[<hov2>Term: %a@]@," Pretty.print_term term ;
   fprintf fmt "@[<hov2>Variables: %a@]"
     (pp_bindings ~delims:Pp.(lbrace, rbrace) Pretty.print_vs Pretty.print_term)
-    (Mvs.bindings ctx.c_vsenv) ;
+    (List.sort cmp_vs (Mvs.bindings ctx.c_vsenv)) ;
   fprintf fmt "@]"
 
 let add_known_rule_term id pdecl (known, rule_terms) =
