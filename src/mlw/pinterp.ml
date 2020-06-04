@@ -977,15 +977,11 @@ and exec_match ~rac env t ebl =
   iter ebl
 
 and exec_call ~rac ?loc env rs args ity_result =
-  (* let aux id pd =
-   *   if id.id_string = "ttt" then
-   *     eprintf "@[<v2>TTT: %a@]@." Pdecl.pp_pdecl pd in
-   * Mid.iter aux env.known; *)
   (* TODO variant *)
   let args' = List.map (get_pvs env) args in
   let mt = Mtv.empty in
+  let mt = ty_match_pvs_tys rs.rs_cty.cty_args (List.map v_ty args') mt in
   (* let mt = ty_match mt (ty_of_ity rs.rs_cty.cty_result) (ty_of_ity ity_result) in *)
-  (* let mt = ty_match_pvs_tys rs.rs_cty.cty_args (List.map v_ty args') mt in *)
   let env' = multibind_pvs rs.rs_cty.cty_args args' env in
   if rac then
     check_terms
@@ -1010,7 +1006,7 @@ and exec_call ~rac ?loc env rs args ity_result =
           | Capp (rs', pvl) -> exec_call ~rac env rs' (pvl @ args) ity_result
           | Cpur _ -> assert false (* TODO ? *)
           | Cany ->
-              (* eprintf "Any %a: %a@." pp_ident rs.rs_name pp_rsymbol rs; *)
+              eprintf "FUNCTION ANY: %a@." print_decoded rs.rs_name.id_string;
               raise CannotCompute
           | Cfun body ->
               let pvsl = d.c_cty.cty_args in
@@ -1048,22 +1044,22 @@ and exec_call ~rac ?loc env rs args ity_result =
           eprintf "[interp] cannot find definition of routine %s@."
             rs.rs_name.id_string ;
           raise CannotCompute in
-  (* ( if rac then
-   *     match res with
-   *     | Normal v ->
-   *         let desc = asprintf "Postcondition of %a" print_decoded rs.rs_name.id_string in
-   *         let ctx = cntr_ctx desc ?trigger_loc:loc env' in
-   *         let mt, rt = term_of_value mt v in
-   *         let assrt = check_post ctx rt in
-   *         ignore (List.fold_left assrt mt rs.rs_cty.cty_post)
-   *     | Excep (xs, v) ->
-   *         let desc = asprintf "Exceptional postcondition of %a" print_decoded rs.rs_name.id_string in
-   *         let ctx = cntr_ctx desc ?trigger_loc:loc env' in
-   *         let mt, rt = term_of_value mt v in
-   *         let assrt = check_post ctx rt in
-   *         let xpost = Mxs.find xs rs.rs_cty.cty_xpost in
-   *         ignore (List.fold_left assrt mt xpost)
-   *     | _ -> () ); *)
+  ( if rac then
+      match res with
+      | Normal v ->
+          let desc = asprintf "Postcondition of %a" print_decoded rs.rs_name.id_string in
+          let ctx = cntr_ctx desc ?trigger_loc:loc env' in
+          let mt, rt = term_of_value mt v in
+          let assrt = check_post ctx rt in
+          ignore (List.fold_left assrt mt rs.rs_cty.cty_post)
+      | Excep (xs, v) ->
+          let desc = asprintf "Exceptional postcondition of %a" print_decoded rs.rs_name.id_string in
+          let ctx = cntr_ctx desc ?trigger_loc:loc env' in
+          let mt, rt = term_of_value mt v in
+          let assrt = check_post ctx rt in
+          let xpost = Mxs.find xs rs.rs_cty.cty_xpost in
+          ignore (List.fold_left assrt mt xpost)
+      | _ -> () );
   res
 
 let eval_global_expr ~rac env km locals e =
