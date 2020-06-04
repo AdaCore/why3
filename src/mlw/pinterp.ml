@@ -119,11 +119,12 @@ let rec term_of_value mt v : ty Mtv.t * term =
        * mt, fs_app ls ts v.v_ty *)
   | Vfun (cl, arg, e) ->
       let aux vs v (mt, mv) =
+        let mt = ty_match mt vs.vs_ty v.v_ty in
         let mt, t = term_of_value mt v in
         mt, Mvs.add vs t mv in
       let mt, mv = Mvs.fold aux cl (mt, Mvs.empty) in
       let t = Opt.get (term_of_expr ~prop:false e) in
-      let mt, t = mt, t_ty_subst mt mv t in
+      let t = t_ty_subst mt mv t in
       mt, t_lambda [arg] [] t
   | _ -> Format.kasprintf failwith "term_of_value: %a" print_value v
 
@@ -691,20 +692,20 @@ let add_rule _id t eng =
      *   id.id_string Pretty.print_term t s; *)
     eng
 
-let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env =
+let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env mt =
   let c_known, c_rule_terms =
     Mid.fold add_known_rule_term env.known (Mid.empty, []) in
   let c_known = Mrs.fold add_fun env.funenv c_known in
   let c_rule_terms = Mid.of_list c_rule_terms in
-  let _, vsenv' =
-    Mvs.mapi_fold (fun _ v mt -> term_of_value mt v) env.vsenv Mtv.empty in
+  let mt, vsenv' =
+    Mvs.mapi_fold (fun _ v mt -> term_of_value mt v) env.vsenv mt in
   let c_vsenv = Mvs.union (fun _ _ t -> Some t) vsenv vsenv' in
   { c_env= env.env;
     c_desc= desc;
     c_trigger_loc= trigger_loc;
     c_known;
     c_rule_terms;
-    c_vsenv }
+    c_vsenv }, mt
 
 (** Evaluate a term using the reduction engine.
 
@@ -865,14 +866,14 @@ let rec eval_expr ~rac env (e : expr) : result =
   | Ewhile (cond, inv, _var, e1) -> (
       (* TODO variants *)
       if rac then
-        check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
+        check_terms (fst (cntr_ctx "Loop invariant initialization" env Mtv.empty)) inv ;
       match eval_expr ~rac env cond with
       | Normal {v_desc= Vbool false} -> Normal (value ty_unit Vvoid)
       | Normal {v_desc= Vbool true} -> (
         match eval_expr ~rac env e1 with
         | Normal _ ->
             if rac then
-              check_terms (cntr_ctx "Loop invariant preservation" env) inv ;
+              check_terms (fst (cntr_ctx "Loop invariant preservation" env Mtv.empty)) inv ;
             eval_expr ~rac env e
         | r -> r )
       | Normal t ->
@@ -896,14 +897,14 @@ let rec eval_expr ~rac env (e : expr) : result =
           match eval_expr ~rac env' e1 with
           | Normal _ ->
               if rac then
-                check_terms (cntr_ctx "Loop invariant preservation" env') inv ;
+                check_terms (fst (cntr_ctx "Loop invariant preservation" env' Mtv.empty)) inv ;
               iter (suc i)
           | r -> r
         else
           Normal (value ty_unit Vvoid) in
       ( if rac then
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
-          check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
+          check_terms (fst (cntr_ctx "Loop invariant initialization" env' Mtv.empty)) inv ) ;
       iter a
     with NotNum -> Irred e )
   | Ematch (e0, ebl, el) -> (
@@ -935,7 +936,7 @@ let rec eval_expr ~rac env (e : expr) : result =
         | Expr.Assert -> "Assertion"
         | Expr.Assume -> "Assumption"
         | Expr.Check -> "Check" in
-      if rac then check_term (cntr_ctx descr env) t ;
+      if rac then check_term (fst (cntr_ctx descr env Mtv.empty)) t ;
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
       (* TODO: do not eval ghost if no assertion check *)
@@ -969,7 +970,7 @@ and exec_call ~rac ?loc env rs args ity_result =
   if rac then (
     let desc = asprintf "Precondition of %a" print_decoded rs.rs_name.id_string in
     let pre = List.map (t_ty_subst mt' mv') rs.rs_cty.cty_pre in
-    check_terms (cntr_ctx desc ?trigger_loc:loc env') pre) ;
+    check_terms (fst (cntr_ctx desc ?trigger_loc:loc env' mt)) pre) ;
   let res =
     if rs_equal rs rs_func_app then
       match args' with
@@ -1029,14 +1030,14 @@ and exec_call ~rac ?loc env rs args ity_result =
       match res with
       | Normal v ->
           let desc = asprintf "Postcondition of %a" print_decoded rs.rs_name.id_string in
-          let ctx = cntr_ctx desc ?trigger_loc:loc env' in
+          let ctx, mt = cntr_ctx desc ?trigger_loc:loc env' mt in
           let mt, rt = term_of_value mt v in
           let assrt = check_post ctx rt in
           let post = List.map (t_ty_subst mt' mv') rs.rs_cty.cty_post in
           ignore (List.fold_left assrt mt post)
       | Excep (xs, v) ->
           let desc = asprintf "Exceptional postcondition of %a" print_decoded rs.rs_name.id_string in
-          let ctx = cntr_ctx desc ?trigger_loc:loc env' in
+          let ctx, mt = cntr_ctx desc ?trigger_loc:loc env' mt in
           let mt, rt = term_of_value mt v in
           let assrt = check_post ctx rt in
           let xpost = Mxs.find xs rs.rs_cty.cty_xpost in
