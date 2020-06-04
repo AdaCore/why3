@@ -384,9 +384,8 @@ output="examples/tests/rac.out"
     rac "$mlw" Global test1 test2
     rac "$mlw" Functions f1 f2 f3 f4 f5a f5b f6 f8 f9 # TODO f7
     rac "$mlw" PolyRefContracts f1 f2a f2b f2c
-    rac "$mlw" RecordMut test
-    # TODO rac "$mlw" RecordMutGhost test
-    rac "$mlw" RecordPoly test2 # TODO test1 test3
+    rac "$mlw" RecordMutGhost test
+    rac "$mlw" RecordPoly test1 test2 test3
 ) > "$output"
 if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
     echo "RAC: ok"

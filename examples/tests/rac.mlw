@@ -159,29 +159,10 @@ module PolyRefContracts
     f2_aux myref 1 2 (* POST fails *)
 end
 
-module RecordMut
-  use int.Int
-
-  type t = {mutable f: int -> int}
-
-  let test () =
-    let x = {f= fun (x:int) -> x+1} in
-    assert { x.f 1 = 2 }; (* ok *)
-    let f' = x.f in
-    x.f <- (fun x -> if x = 0 then 42 else f' x);
-    assert { x.f 0 = 42 }; (* ok *)
-    assert { x.f 1 = 2 } (* ok *)
-end
-
 module RecordMutGhost
   use int.Int
 
-  type t = { mutable f: int -> int; ghost n: int }
-
-  let test0 () =
-    let x = { f= (fun (x:int) -> x); n= 2 } in
-    x.f <- (let g = x.f in (fun (z: int) -> if z = 3 then 42 else g z));
-    1 + x.f 3
+  type t = {mutable f: int -> int; ghost n: int}
 
   let test () =
     let x = { f= (fun (x:int) -> x); n= 2 } in
@@ -214,9 +195,9 @@ module RecordPoly
   type t3 'a = { mutable elts: int -> 'a; length: int }
 
   let update (r: t3 'a) (i: int) (x: 'a) : unit
-    (* requires { 0 < i < r.length } *)
-    (* ensures { forall j. 0 < j < r.length -> j <> i -> r.elts j = old r.elts j } *)
-    (* ensures { r.elts i = x } *)
+    requires { 0 < i < r.length }
+    ensures { forall j. 0 < j < r.length -> j <> i -> r.elts j = old r.elts j }
+    ensures { r.elts i = x }
   = r.elts <- let f = r.elts in (fun (j: int) -> if j = i then x else f j)
 
   use bool.Bool
@@ -226,7 +207,8 @@ module RecordPoly
     assert { r.elts 3 = True }; (* ok *)
     update r 3 False;
     assert { r.elts 3 = False }; (* ok *)
-    assert { r.elts 2 = True } (* failure *)
+    assert { r.elts 2 = True }; (* ok *)
+    assert { r.elts 1 = False } (* failure *)
 end
 
 module Arrays
