@@ -821,12 +821,12 @@ let rec eval_expr ~rac env (e : expr) : result =
   | Eexec (ce, cty) -> (
     match ce.c_node with
     | Cpur _ -> assert false (* TODO ? *)
-    | Cfun e ->
+    | Cfun e' ->
         let aux pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
         let cl = Spv.fold aux ce.c_cty.cty_effect.eff_reads Mvs.empty in
         let arg =
           match ce.c_cty.cty_args with [arg] -> arg | _ -> assert false in
-        Normal (value (ty_of_ity e.e_ity) (Vfun (cl, arg.pv_vs, e)))
+        Normal (value (ty_of_ity e.e_ity) (Vfun (cl, arg.pv_vs, e')))
     | Cany -> raise CannotCompute
     | Capp (rs, pvsl) ->
         assert (cty.cty_args = []) ;
