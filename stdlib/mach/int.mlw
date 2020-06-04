@@ -126,6 +126,29 @@ module Unsigned
 
 end
 
+module UByte
+
+  use int.Int
+
+  type ubyte = < range 0 255 >
+
+  let constant min_ubyte : int = 0
+  let constant max_ubyte : int = 255
+  let constant radix : int = max_ubyte + 1
+  function to_int (x: ubyte) : int = ubyte'int x
+
+  clone export Unsigned with
+    type t = ubyte,
+    constant max = ubyte'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = ubyte'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+end
+
 module UnsignedGMP
 
   (** Additional GMP-inspired arithmetic primitives *)
