@@ -386,6 +386,7 @@ output="examples/tests/rac.out"
     rac "$mlw" PolyRefContracts f1 f2a f2b f2c
     rac "$mlw" RecordMutGhost test
     rac "$mlw" RecordPoly test1 test2 test3
+    rac "$mlw" ArrayExec f
 ) > "$output"
 if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
     echo "RAC: ok"

@@ -230,25 +230,22 @@ end
 
 module ArrayExec
 
-  type array = {
-      length : int ;
-      mutable contents : int -> int ;
-    }
+  type array 'a = {length: int; mutable contents: int -> 'a}
 
   use int.Int
 
-  let make (l: int) (v: int) : array
-  = { length= l; contents= fun _ -> v }
+  let make (l: int) (v: 'a) : array 'a
+  = {length= l; contents= fun _ -> v}
 
-  let function map_update (f:int -> int) (x:int) (y:int) =
-    fun (z:int) -> if z=x then y else f z
+  let function map_update (f: int -> 'a) (i: int) (x: 'a) =
+    fun (j: int) -> if j = i then x else f j
 
-  let function ([]) (a: array) (i: int) : int = a.contents i
+  let function ([]) (a: array 'a) (i: int) : 'a = a.contents i
 
-  let function ([<-]) (a: array) (i: int) (v: int): array
+  let function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
     = { length = a.length ; contents = map_update a.contents i v }
 
-  let ([]<-) (a: array) (i: int) (v: int) : unit
+  let ([]<-) (a: array 'a) (i: int) (v: 'a) : unit
     = a.contents <- map_update a.contents i v
 
   let f () =
