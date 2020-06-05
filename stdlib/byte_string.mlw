@@ -1,0 +1,61 @@
+module CString
+
+  use mach.int.Int
+  use mach.int.UByte
+  use export array.Array
+  use array.ArrayEq
+
+  type char = ubyte
+  type cstring = array char
+
+  exception Break
+
+  let (=) (s1 s2: cstring) : bool
+    ensures {result = True <-> array_eq s1 s2}
+  = if s1.length <> s2.length then false else
+      try
+        let ref i = 0 in
+        while i < s1.length do
+          variant   { s1.length - i }
+          invariant { 0 <= i <= s1.length }
+          invariant { forall j. 0 <= j < i -> s1[j] = s2[j] }
+          if s1[i] <> s2[i] then raise Break;
+          i <- i + 1
+        done;
+        true
+      with Break -> false end
+
+  let function concat (s1 s2: cstring) : cstring
+    ensures { result.length = s1.length + s2.length }
+    ensures { forall i. 0 <= i < s1.length -> result[i] = s1[i] }
+    ensures { forall i. s1.length <= i < result.length ->
+                          result[i] = s2[i - s1.length] }
+  = let r = make (s1.length + s2.length) 0 in
+    let ref i = 0 in
+    while i < s1.length do
+      variant   { s1.length - i }
+      invariant { 0 <= i <= s1.length }
+      invariant { forall j. 0 <= j < i -> r[j] = s1[j] }
+      r[i] <- s1[i];
+      i <- i + 1
+    done;
+    while i < s1.length + s2.length do
+      variant   { s1.length + s2.length - i }
+      invariant { s1.length <= i <= s1.length + s2.length }
+      invariant { forall j. 0 <= j < s1.length -> r[j] = s1[j]}
+      invariant { forall j. s1.length <= j < i -> r[j] = s2[j - s1.length] }
+      r[i] <- s2[i - s1.length];
+      i <- i + 1
+    done;
+    r
+
+  (* use string.String
+  use string.Char
+
+  val function of_string (s: string) : cstring
+    ensures { String.length s = Array.length result }
+    ensures { forall i. 0 <= i < String.length s ->
+                Array.([]) result i = code (Char.get s i) }
+  meta coercion function of_string *)
+
+end
