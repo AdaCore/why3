@@ -13,6 +13,8 @@
 
 type value
 
+val v_ty : value -> Ty.ty
+
 val print_value : Format.formatter -> value -> unit
 
 type result =
@@ -33,6 +35,14 @@ type cntr_ctx =
 exception Contr of cntr_ctx * Term.term
 (** Exception [Contr] is raised when a contradiction is observed
     during RAC. *)
+
+type dispatch
+
+val empty_dispatch : dispatch
+
+val add_dispatch : Env.env -> dispatch -> (string * string) * (string * string) -> dispatch
+
+exception Missing_dispatch of Expr.rsymbol
 
 val init_real : int * int * int -> unit
 (** Give a precision on real computation. *)
@@ -55,12 +65,13 @@ val find_global_fundef :
 val eval_global_fundef :
   rac:bool ->
   Env.env ->
+  dispatch ->
   Pdecl.pdecl Ident.Mid.t ->
   (Expr.rsymbol * Expr.cexp) list ->
   Expr.expr ->
   result * value Term.Mvs.t
-(** [eval_global_fundef ~rac env known def] evaluates a function definition and returns an evaluation
-    result and a final variable environment.
+(** [eval_global_fundef ~rac env dispatch known def] evaluates a function definition and
+   returns an evaluation result and a final variable environment.
 
     @raise Contr RAC is enabled and a contradiction was found *)
 

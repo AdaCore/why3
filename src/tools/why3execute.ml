@@ -35,6 +35,8 @@ let opt_parser = ref None
 
 let enable_rac = ref false
 
+let dispatch = ref []
+
 let option_list =
   let open Getopt in
   [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
@@ -44,7 +46,11 @@ let option_list =
     "<emin>,<emax>,<prec> set format used for real computations\n\
      (e.g., -148,128,24 for float32)";
     KLong "rac", Hnd0 (fun () -> enable_rac := true),
-    " enable runtime basic runtime assertion checking"
+    " enable runtime basic runtime assertion checking";
+    KLong "dispatch", Hnd1 (APair ('-', APair ('.', AString, AString),
+      APair ('.', AString, AString)), fun arg -> dispatch := arg :: !dispatch),
+    ("<f.M> <g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\
+      provide an implementation for a module with abstract types or values)");
   ]
 
 let config, _, env =
@@ -52,6 +58,9 @@ let config, _, env =
 
 let () =
   if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
+
+let prepare_dispatch env dispatch : Pinterp.dispatch =
+  List.fold_left (Pinterp.add_dispatch env) Pinterp.empty_dispatch dispatch
 
 let do_input f =
   let format = !opt_parser in
@@ -70,7 +79,8 @@ let do_input f =
       let locals, body = find_global_fundef known rs in
       Opt.iter init_real !prec;
       ( try
-          let res = eval_global_fundef ~rac:!enable_rac env known locals body in
+          let dispatch = prepare_dispatch env !dispatch in
+          let res = eval_global_fundef ~rac:!enable_rac env dispatch known locals body in
           printf "%a@." (report_eval_result ~mod_name ~fun_name body) res;
           exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
         with Contr (ctx, term) ->

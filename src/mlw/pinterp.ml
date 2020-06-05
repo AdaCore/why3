@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Format
+open Wstdlib
 open Term
 open Ident
 open Ty
@@ -130,11 +131,22 @@ let rec term_of_value mt v : ty Mtv.t * term =
 
 and term_of_field mt r = term_of_value mt r.contents
 
+type routine_defn =
+  | Builtin of (rsymbol -> value list -> value)
+  | Function of (rsymbol * cexp) list * cexp
+  | Constructor of Pdecl.its_defn
+  | Projection of Pdecl.its_defn
+
+type dispatch = (Pdecl.known_map * rsymbol) option Mrs.t
+
+let empty_dispatch = Mrs.empty
+
 type env =
   { known: Pdecl.known_map;
     funenv: Expr.cexp Mrs.t;
     vsenv: value Mvs.t;
-    env: Env.env }
+    env: Env.env;
+    dispatch: dispatch }
 
 let add_local_funs locals env =
   { env with
@@ -157,12 +169,18 @@ let multibind_pvs' l tl env mt =
   List.fold_right2 aux l tl (env, mt, Mvs.empty)
 
 let pp_vsvar fmt (vs, t) =
-  (* fprintf fmt "@[<hov 2>%a: %a -> %a@]" Pretty.print_vs vs Pretty.print_ty vs.vs_ty print_value t *)
   fprintf fmt "@[<hov 2>%a -> %a@]" Pretty.print_vs vs print_value t
 
 let print_vsenv fmt s =
   let l = Mvs.bindings s in
   fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi pp_vsvar) l
+
+let pp_vsvar_ty fmt (vs, t) =
+  fprintf fmt "@[<hov 2>(%a: %a) -> (%a: %a)@]" Pretty.print_vs vs Pretty.print_ty vs.vs_ty print_value t Pretty.print_ty t.v_ty
+
+let print_vsenv_ty fmt s =
+  let l = Mvs.bindings s in
+  fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi pp_vsvar_ty) l
 
 (* evaluation of terms *)
 
@@ -543,12 +561,6 @@ let print_logic_result fmt r =
 
 (* find routine definitions *)
 
-type routine_defn =
-  | Builtin of (rsymbol -> value list -> value)
-  | Function of (rsymbol * cexp) list * cexp
-  | Constructor of Pdecl.its_defn
-  | Projection of Pdecl.its_defn
-
 let rec find_def rs = function
   | d :: _ when rs_equal rs d.rec_sym ->
       d.rec_fun (* TODO : put rec_rsym in local env *)
@@ -581,16 +593,56 @@ let find_global_definition kn rs =
   | Pdecl.PDexn _ -> raise Not_found
   | Pdecl.PDpure -> raise Not_found
 
-let find_definition env rs =
-  (* first try if it is a built-in symbol *)
-  try Builtin (Hrs.find builtin_progs rs)
-  with Not_found -> (
-    try
-      (* then try if it is a local function *)
-      Function ([], Mrs.find rs env.funenv)
-    with Not_found ->
-      (* else look for a global function *)
-      find_global_definition env.known rs )
+let add_dispatch env m ((f1, m1), (f2, m2)) =
+  let open Pmodule in
+  let open Expr in
+  let pm2 = read_module env [f2] m2 in
+  let for_rs _ rs1 m =
+    let open Pdecl in
+    let exception Found of pdecl in
+    let find str id pd = if id.id_string = str then raise (Found pd) in
+    let def = match Mid.iter (find rs1.rs_name.id_string) pm2.mod_known with
+      | () -> None
+      | exception Found pd -> match pd.pd_node with
+        | PDlet (LDsym (rs2, _)) -> Some (pm2.mod_known, rs2)
+        | PDlet (LDrec dl) -> (
+            let exception Found of rsymbol in
+            let find rd = if rd.rec_sym.rs_name.id_string = rs1.rs_name.id_string then raise (Found rd.rec_sym) in
+            match List.iter find dl with
+            | () -> None
+            | exception Found rs2 -> Some (pm2.mod_known, rs2) )
+        | _ -> None in
+    Mrs.add rs1 def m in
+  let ns1 = (read_module env [f1] m1).mod_export in
+  let mrs1 = Mstr.map_filter (function RS rs -> Some rs | _ -> None) ns1.ns_ps in
+  Mstr.fold for_rs mrs1 m
+
+exception Missing_dispatch of Expr.rsymbol
+
+let () = Exn_printer.register (fun fmt exn ->
+    match exn with
+    | Missing_dispatch rs -> fprintf fmt "Missing dispatch for %a" print_rs rs
+    | _ -> raise exn)
+
+let dispatch rs dispatch =
+  match Mrs.find rs dispatch with
+  | Some (known, rs') ->
+      Debug.dprintf debug_rac "@[<hov2>Dispatched %a to %a@]@." print_rs rs print_rs rs';
+      rs', known
+  | None -> raise (Missing_dispatch rs)
+
+let find_definition env (rs: rsymbol) =
+  (* first, try to dispatch the symbol *)
+      (* then try if it is a built-in symbol *)
+      match Hrs.find builtin_progs rs with
+      | f -> Builtin f
+      | exception Not_found ->
+          (* then try if it is a local function *)
+          match Mrs.find rs env.funenv with
+          | f -> Function ([], f)
+          | exception Not_found ->
+              (* else look for a global function *)
+              find_global_definition env.known rs
 
 (* Assuming the real is given in pow2 and pow5 *)
 let compute_fraction {Number.rv_sig= i; Number.rv_pow2= p2; Number.rv_pow5= p5}
@@ -810,7 +862,12 @@ let rec eval_expr ~rac env (e : expr) : result =
         let cl = Spv.fold aux ce.c_cty.cty_effect.eff_reads Mvs.empty in
         let arg =
           match ce.c_cty.cty_args with [arg] -> arg | _ -> assert false in
-        Normal (value (ty_of_ity e.e_ity) (Vfun (cl, arg.pv_vs, e')))
+        let aux pv mt =
+          let v = Mvs.find pv.pv_vs env.vsenv in
+          ty_match mt pv.pv_vs.vs_ty v.v_ty in
+        let mt = Spv.fold aux cty.cty_effect.eff_reads Mtv.empty in
+        let ty = ty_inst mt (ty_of_ity e.e_ity) in
+        Normal (value ty (Vfun (cl, arg.pv_vs, e')))
     | Cany -> raise CannotCompute
     | Capp (rs, pvsl) ->
         assert (cty.cty_args = []) ;
@@ -962,12 +1019,17 @@ and exec_match ~rac env t ebl =
   iter ebl
 
 and exec_call ~rac ?loc env rs args ity_result =
-  (* TODO variant *)
+  let rs, env =
+    match dispatch rs env.dispatch with
+    | rs, known -> rs, {env with known}
+    | exception Not_found -> rs, env in
   let args' = List.map (get_pvs env) args in
   let mt = Mtv.empty in
   (* let mt = ty_match mt (ty_of_ity rs.rs_cty.cty_result) (ty_of_ity ity_result) in *)
   let env', mt', mv' = multibind_pvs' rs.rs_cty.cty_args args' env mt in
+  let res_ty = ty_inst mt' (ty_of_ity ity_result) in
   if rac then (
+    (* TODO variant *)
     let desc = asprintf "Precondition of %a" print_decoded rs.rs_name.id_string in
     let pre = List.map (t_ty_subst mt' mv') rs.rs_cty.cty_pre in
     check_terms (fst (cntr_ctx desc ?trigger_loc:loc env' mt)) pre) ;
@@ -981,24 +1043,27 @@ and exec_call ~rac ?loc env rs args ity_result =
           eval_expr ~rac env e
       | _ -> assert false
     else
+      let call env d =
+        match d.c_node with
+        | Capp (rs', pvl) ->
+            exec_call ~rac env rs' (pvl @ args) ity_result
+        | Cpur _ -> assert false (* TODO ? *)
+        | Cany ->
+            eprintf "Cannot compute any function %a (add dispatch?)@." print_decoded rs.rs_name.id_string;
+            raise CannotCompute
+        | Cfun body ->
+            let pvsl = d.c_cty.cty_args in
+            let env' = multibind_pvs pvsl args' env in
+            Debug.dprintf debug "@[Evaluating function body of %s@]@."
+              rs.rs_name.id_string ;
+            let r = eval_expr ~rac env' body in
+            Debug.dprintf debug "@[Return from function %s@ result@ %a@]@."
+              rs.rs_name.id_string print_logic_result r ;
+            r in
       match find_definition env rs with
-      | Function (locals, d) -> (
+      | Function (locals, d) ->
           let env = add_local_funs locals env in
-          match d.c_node with
-          | Capp (rs', pvl) -> exec_call ~rac env rs' (pvl @ args) ity_result
-          | Cpur _ -> assert false (* TODO ? *)
-          | Cany ->
-              eprintf "FUNCTION ANY: %a@." print_decoded rs.rs_name.id_string;
-              raise CannotCompute
-          | Cfun body ->
-              let pvsl = d.c_cty.cty_args in
-              let env' = multibind_pvs pvsl args' env in
-              Debug.dprintf debug "@[Evaluating function body of %s@]@."
-                rs.rs_name.id_string ;
-              let r = eval_expr ~rac env' body in
-              Debug.dprintf debug "@[Return from function %s@ result@ %a@]@."
-                rs.rs_name.id_string print_logic_result r ;
-              r )
+          call env d
       | Builtin f ->
           Debug.dprintf debug "@[Evaluating builtin function %s@]@."
             rs.rs_name.id_string ;
@@ -1011,7 +1076,7 @@ and exec_call ~rac ?loc env rs args ity_result =
             ity_result ;
           (* FIXME : put a ref only on mutable fields *)
           let args' = List.map ref args' in
-          Normal (value (ty_of_ity ity_result) (Vconstr (rs, args')))
+          Normal (value res_ty (Vconstr (rs, args')))
       | Projection _d -> (
         match rs.rs_field, args' with
         | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
@@ -1046,20 +1111,18 @@ and exec_call ~rac ?loc env rs args ity_result =
       | _ -> () );
   res
 
-let eval_global_expr ~rac env km locals e =
+let eval_global_expr ~rac env dispatch km locals e =
   get_builtin_progs env ;
-  let env' = {known= km; funenv= Mrs.empty; vsenv= Mvs.empty; env} in
-  let add_glob _ d acc =
+  let add_glob id d acc =
     match d.Pdecl.pd_node with
     | Pdecl.PDlet (LDvar (pvs, _e)) ->
         (* TODO evaluate _e! *)
-        let v = default_value_of_type env'.known pvs.pv_ity in
+        let v = default_value_of_type km pvs.pv_ity in
         Mvs.add pvs.pv_vs v acc
     | _ -> acc in
   let global_env = Mid.fold add_glob km Mvs.empty in
-  let env' =
-    add_local_funs locals {known= km; funenv= Mrs.empty; vsenv= global_env; env}
-  in
+  let env' = {known= km; funenv= Mrs.empty; vsenv= global_env; env; dispatch} in
+  let env' = add_local_funs locals env' in
   let res = eval_expr ~rac env' e in
   res, global_env
 
@@ -1082,14 +1145,14 @@ let find_global_fundef mod_known rs =
   | Function (locals, {c_node= Cfun body}) -> locals, body
   | _ -> assert false
 
-let eval_global_fundef ~rac env mod_known locals body =
-  try eval_global_expr ~rac env mod_known locals body
+let eval_global_fundef ~rac env dispatch mod_known locals body =
+  try eval_global_expr ~rac env dispatch mod_known locals body
   with CannotFind (l, s, n) ->
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
 let report_eval_result ~mod_name ~fun_name body fmt (res, final_env) =
-  fprintf fmt "@[<v 2>Execution of %s.%s : () -> %a@," mod_name fun_name
+  fprintf fmt "@[<v 2>Execution of %s.%s : () -> @[<h>%a@]@," mod_name fun_name
     print_ity body.e_ity ;
   ( match res with
   | Normal _ ->

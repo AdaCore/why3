@@ -211,20 +211,13 @@ module RecordPoly
     assert { r.elts 1 = False } (* failure *)
 end
 
-module Arrays
-  use array.Array
+module PolyFunc
+  use int.Int
 
-  let f1 () =
-    let a = make 10 0 in
-    let i = a[0] in
-    assert { i = 0 };
-    a[10]
+  let mk v = fun (_: int) -> v
 
-  let f3 () =
-    let a = make 10 0 in
-    assert { length a = 10 };
-    assert { a[0] = 0 }; (* OK *)
-    assert { a[10] = 0 } (* FAILS *)
+  let test0 () =
+      mk 0
 end
 
 
@@ -234,7 +227,18 @@ module ArrayExec
 
   use int.Int
 
+  let test0 () =
+    let a = {length= 5; contents= fun (_: int) -> 0} in
+    a.contents 0, a.contents 1
+
+  let test1 () =
+    let a = {length= 5; contents= fun (_: int) -> 0} in
+    a.contents <- (let f = a.contents in (fun (i: int) -> if i = 0 then 11 else f i));
+    a.contents 0, a.contents 1
+
   let make (l: int) (v: 'a) : array 'a
+    ensures { result.length = l }
+    ensures { forall i. 0 <= i < l -> result.contents i = v }
   = {length= l; contents= fun _ -> v}
 
   let function map_update (f: int -> 'a) (i: int) (x: 'a) =
@@ -248,10 +252,29 @@ module ArrayExec
   let ([]<-) (a: array 'a) (i: int) (v: 'a) : unit
     = a.contents <- map_update a.contents i v
 
-  let f () =
-    let a = make 5 1 in
-    let x = a[0] in
-    assert { x = 1 }
+  let test2 () =
+    let a = make 10 0 in
+    assert { true };
+    a[1] <- 11;
+    a[0], a[1]
+end
+
+module Arrays
+  use array.Array
+
+  let test0 () =
+    let a = make 10 0 in
+    a[1] <- 11;
+    a[0], a[1]
+
+  let test1 () =
+    let a = make 10 0 in
+    assert { length a = 10 };
+    assert { a[0] = 0 }; (* ok *)
+    a[1] <- 11;
+    assert { a[0] = 0 }; (* ok *)
+    assert { a[1] = 11 }; (* ok *)
+    assert { a[2] = 11 } (* failure *)
 end
 
 
