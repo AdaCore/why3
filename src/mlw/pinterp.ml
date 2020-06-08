@@ -100,6 +100,9 @@ let rec print_value fmt v =
 
 and print_field fmt f = print_value fmt (field_get f)
 
+let print_value_ty fmt v =
+  fprintf fmt "(%a: %a)" print_value v Pretty.print_ty v.v_ty
+
 (** Match the types of a list of program variables with a list of types
     and update the type mapping *)
 let ty_match_pvs_tys =
@@ -759,6 +762,14 @@ let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env mt =
     c_rule_terms;
     c_vsenv }, mt
 
+let indent = ref 0
+let pp_indent fmt =
+  let s = String.make (!indent * 2) ' ' in
+  pp_print_string fmt s
+
+let pp_typed pp ty fmt x =
+  fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x)
+
 (** Evaluate a term using the reduction engine.
 
     @param env Why3 environment
@@ -775,6 +786,9 @@ let eval_term env known rule_terms vsenv t =
       compute_def_set= Sls.empty } in
   let eng = Reduction_engine.create params env known in
   let eng = Mid.fold add_rule rule_terms eng in
+  let vsenv = (* TODO better fix typing of the variables in vsenv *)
+    let vars = t_freevars Mvs.empty t in
+    Mvs.filter (fun vs _ -> Mvs.contains vars vs) vsenv in
   Reduction_engine.normalize ~limit:1000 eng vsenv t
 
 (** Evaluate a term and raise an exception [Contr] if the result is false. *)
@@ -796,23 +810,14 @@ let check_terms ctx = List.iter (check_term ctx)
     polymorphic types *)
 
 (* Substitute result in post-condition term *)
-let check_post0 ctx (vt : term) (mt : ty Mtv.t) (t : term) =
+let check_post ctx (vt : term) (mt : ty Mtv.t) (t : term) =
   let vs, t = open_post t in
   let mt = ty_match mt vs.vs_ty (oty_type vt.t_ty) in
-  (* let pp_vs fmt vs =
-    *   fprintf fmt "(%a: %a)" Pretty.print_vs vs Pretty.print_ty vs.vs_ty in
-    * if Debug.test_flag debug_rac then (
-    *   eprintf "TY SUBST@." ;
-    *   eprintf "- @[<hv3>MT:@ %a@]@."
-    *     (pp_bindings Pretty.print_tv Pretty.print_ty)
-    *     (Mtv.bindings mt) ;
-    *   eprintf "- @[<hv3>VSENV:@ %a@]@."
-    *     (pp_bindings pp_vs Pretty.print_term)
-    *     (Mvs.bindings vsenv) ;
-    *   eprintf "- @[<hv2>T:@ %a@]@." Pretty.print_term t ) ; *)
-  let vsenv = Mvs.add vs vt ctx.c_vsenv in
+  (* eprintf "%t@[<hov2>MT: %a@]@." pp_indent (pp_bindings Pretty.print_tv Pretty.print_ty) (Mtv.bindings mt); *)
+  let vsenv = Mvs.singleton vs vt in
   let t = t_ty_subst mt vsenv t in
-  check_term ctx t ; mt
+  check_term ctx t ;
+  mt
 
 (* Apply post-condition term to result term *)
 let check_post1 ctx rt mt t =
@@ -826,12 +831,10 @@ let check_post2 ctx rt mt t =
   let t = t_func_app t rt in
   check_term ctx t ; mt
 
-let check_post ctx rt mt t =
-  check_post0 ctx rt mt t
-
 (* evaluate expressions *)
 let rec eval_expr ~rac env (e : expr) : result =
-  match e.e_node with
+  incr indent;
+  let res = match e.e_node with
   | Evar pvs -> (
     try
       let v = get_pvs env pvs in
@@ -895,11 +898,13 @@ let rec eval_expr ~rac env (e : expr) : result =
     match ld with
     | LDvar (pvs, e1) -> (
       match eval_expr ~rac env e1 with
-      | Normal v -> eval_expr ~rac (bind_pvs pvs v env) e2
+      | Normal v ->
+        let env = bind_pvs pvs v env in
+        eval_expr ~rac env e2
       | r -> r )
     | LDsym (rs, ce) ->
-        let env' = {env with funenv= Mrs.add rs ce env.funenv} in
-        eval_expr ~rac env' e2
+        let env = {env with funenv= Mrs.add rs ce env.funenv} in
+        eval_expr ~rac env e2
     | LDrec l ->
         let env' =
           { env with
@@ -1003,7 +1008,9 @@ let rec eval_expr ~rac env (e : expr) : result =
       eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
         (if Debug.test_flag debug then print_expr (* p_expr *) else print_expr)
         e ;
-      Irred e
+      Irred e in
+  decr indent;
+  res
 
 and exec_match ~rac env t ebl =
   let rec iter ebl =

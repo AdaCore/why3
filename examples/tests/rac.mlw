@@ -218,6 +218,20 @@ module PolyFunc
 
   let test0 () =
       mk 0
+
+  type t 'a = {mutable f: int -> 'a}
+
+  let function map_update (f: int -> 'a) (i: int) (x: 'a) =
+    fun (j: int) -> if j = i then x else f j
+
+  let ([]<-) (x: t 'a) (i: int) (v: 'a) : unit =
+    x.f <- map_update x.f i v
+
+  let test1 () =
+    let x = {f= fun _ -> 0} in
+    (* x.f <- map_update x.f 0 111; *)
+    x[0] <- 111;
+    x.f 0, x.f 1
 end
 
 
@@ -254,8 +268,7 @@ module ArrayExec
 
   let test2 () =
     let a = make 10 0 in
-    assert { true };
-    a[1] <- 11;
+    a[0] <- 10;
     a[0], a[1]
 end
 

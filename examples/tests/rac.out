@@ -74,7 +74,7 @@ Execution of Functions.f5b : () -> int
 Execution of Functions.f6 : () -> ()
   Exceptional postcondition of f6_aux failed at examples/tests/rac.mlw, line 101, characters 8-17
     Defined at examples/tests/rac.mlw, line 96, characters 20-25
-    Term: 42 = contents (ref'mk 1)
+    Term: 42 = contents x
     Variables: {_ -> (); o -> (); x -> ref'mk 1}
 ** Functions.f8
 Execution of Functions.f8 : () -> ()
@@ -109,7 +109,7 @@ Execution of PolyRefContracts.f2b : () -> int
 Execution of PolyRefContracts.f2c : () -> int
   Postcondition of f2_aux failed at examples/tests/rac.mlw, line 159, characters 4-20
     Defined at examples/tests/rac.mlw, line 146, characters 14-27
-    Term: 1 = 2
+    Term: 1 = argy
     Variables: {argref -> ref'mk 1; argx -> 1; argy -> 2; myref -> ref'mk 1;
       o -> 2; o1 -> 1}
 
@@ -132,39 +132,49 @@ Execution of RecordPoly.test2 : () -> ()
 Postcondition of update cannot be evaluated at examples/tests/rac.mlw, line 208, characters 4-20
   Defined at examples/tests/rac.mlw, line 199, characters 14-77
   Term: forall j:int.
-         0 < j /\
-         j
-         < length
-           (t3'mk
-            (fun (j1:int) ->
-              if j1 = 3 then False else (fun (_:int) -> True) @ j1)
-            5) ->
-         not j = 3 ->
-         (elts
-          (t3'mk
-           (fun (j1:int) ->
-             if j1 = 3 then False else (fun (_:int) -> True) @ j1)
-           5)
-          @ j)
-         = (elts r @ j)
+         0 < j /\ j < length r -> not j = i -> (elts r @ j) = (elts r1 @ j)
   Variables: {_ -> (); i -> 3; o -> False; o1 -> 3;
-    r1 -> t3'mk
-          (fun (j:int) -> if j = 3 then False else (fun (_1:int) -> True) @ j)
-          5;
     r2 -> t3'mk
           (fun (j:int) -> if j = 3 then False else (fun (_1:int) -> True) @ j)
-          5; x -> False}
+          5;
+    r -> t3'mk
+         (fun (j:int) -> if j = 3 then False else (fun (_1:int) -> True) @ j)
+         5; x -> False}
 Execution of RecordPoly.test3 : () -> ()
   Assertion failed at examples/tests/rac.mlw, line 211, characters 13-29
-    Term: (elts r1 @ 1) = False
+    Term: (elts r2 @ 1) = False
     Variables: {_ -> (); _1 -> (); _2 -> (); _3 -> ();
-      r1 -> t3'mk
+      r2 -> t3'mk
             (fun (j:int) ->
               if j = 3 then False else (fun (_4:int) -> True) @ j)
             5}
 
+* PolyFunc
+** PolyFunc.test0
+Execution of PolyFunc.test0 : () -> int -> int
+  result: <fun>
+  globals: 
+** PolyFunc.test1
+Execution of PolyFunc.test1 : () -> (int, int)
+  result: (111, 0)
+  globals: 
+
 * ArrayExec
-** ArrayExec.f
-Execution of ArrayExec.f : () -> ()
-  result: ()
+** ArrayExec.test0
+Execution of ArrayExec.test0 : () -> (int, int)
+  result: (0, 0)
+  globals: 
+** ArrayExec.test1
+Execution of ArrayExec.test1 : () -> (int, int)
+  result: (11, 0)
+  globals: 
+** ArrayExec.test2
+Execution of ArrayExec.test2 : () -> (int, int)
+  result: (10, 0)
+  globals: 
+
+* Arrays
+** Arrays.test0
+Execution of Arrays.test0 : () -> (int, int)
+  result: (0, 11)
   globals: 
