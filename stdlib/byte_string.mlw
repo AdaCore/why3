@@ -1,11 +1,11 @@
 module CString
 
   use mach.int.Int
-  use mach.int.UByte
+  use mach.int.Byte
   use export array.Array
   use array.ArrayEq
 
-  type char = ubyte
+  type char = byte
   type cstring = array char
 
   exception Break

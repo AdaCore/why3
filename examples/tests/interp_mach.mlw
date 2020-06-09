@@ -2,7 +2,7 @@ module Int63Test
 
   use mach.int.Int63
 
-  let t (): int63 = 1
+  let t1 (): int63 = 1
 
   let t2 () = 2:int63
 
@@ -74,7 +74,7 @@ module Int31Test
 
   use mach.int.Int31
 
-  let t (): int31 = 1
+  let t1 (): int31 = 1
 
   let t2 () = 2:int31
 
@@ -142,24 +142,24 @@ module Int31Test
 
 end
 
-module UByteTest
+module ByteTest
 
-  use mach.int.UByte
+  use mach.int.Byte
 
-  let t (): ubyte = 1
+  let t1 (): byte = 1
 
-  let t2 () = 2:ubyte
+  let t2 () = 2:byte
 
   let t3 () =
-    let x:ubyte = 1 in
+    let x:byte = 1 in
     x
 
   let t4 () =
-    let x:ubyte = 1 in
+    let x:byte = 1 in
     x + 2
 
   let t5 () =
-    let x:ubyte = 1 in
+    let x:byte = 1 in
     x - 2
 
   let t6 () =
@@ -203,12 +203,22 @@ module UByteTest
     w = 8
 
   let t14 () =
-    let x:ubyte = of_int(42:int) in
+    let x:byte = of_int(42:int) in
     let y:int = to_int x in
     x + of_int y
 
-  let t15 () = Int.(+) max_ubyte min_ubyte
+  let t15 () = Int.(+) max_byte min_byte
 
   (* let t16 () = zero + one + max_int + min_int *)
+
+end
+
+module TestArrays
+
+  use array.Array
+
+  let t1 () = empty ()
+
+  let t2 () = make 10 1
 
 end

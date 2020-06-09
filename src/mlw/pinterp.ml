@@ -406,7 +406,7 @@ let built_in_modules env =
           "mod", eval_int_op BigInt.euclidean_mod ] ) ] in
   let int63_module = (["mach";"int"],"Int63",[],bounded_int_ops) in
   let int31_module = (["mach";"int"],"Int31",[],bounded_int_ops) in
-  let ubyte_module  = (["mach";"int"],"UByte",[],bounded_int_ops) in
+  let byte_module  = (["mach";"int"],"Byte",[],bounded_int_ops) in
   let mode_module =
     let pm = Pmodule.read_module env ["ieee_float"] "RoundingMode" in
     let its = Pmodule.ns_find_its pm.Pmodule.mod_export ["mode"] in
@@ -475,7 +475,7 @@ let built_in_modules env =
   @ [ real_module; real_square_module; real_trigo_module; real_exp_log;
       mode_module; float_modules 32 ~prec:24 "Float32";
       float_modules 64 ~prec:53 "Float64"; int63_module;
-      int31_module; ubyte_module ]
+      int31_module; byte_module ]
 
 exception CannotFind of (Env.pathname * string * string)
 

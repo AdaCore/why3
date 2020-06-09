@@ -126,23 +126,23 @@ module Unsigned
 
 end
 
-module UByte
+module Byte
 
   use int.Int
 
-  type ubyte = < range 0 255 >
+  type byte = < range 0 255 >
 
-  let constant min_ubyte : int = 0
-  let constant max_ubyte : int = 255
-  let constant radix : int = max_ubyte + 1
-  function to_int (x: ubyte) : int = ubyte'int x
+  let constant min_byte : int = 0
+  let constant max_byte : int = 255
+  let constant radix : int = max_byte + 1
+  function to_int (x: byte) : int = byte'int x
 
   clone export Unsigned with
-    type t = ubyte,
-    constant max = ubyte'maxInt,
+    type t = byte,
+    constant max = byte'maxInt,
     constant radix = radix,
     goal radix_def,
-    function to_int = ubyte'int,
+    function to_int = byte'int,
     lemma zero_unsigned_is_zero,
     lemma to_int_in_bounds,
     lemma extensionality
