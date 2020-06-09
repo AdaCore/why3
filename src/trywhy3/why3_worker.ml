@@ -325,7 +325,7 @@ let why3_execute modules =
              let locals, body = find_global_fundef m.Pmodule.mod_known rs in
              let result =
                try
-                 let res = eval_global_fundef ~rac:false env m.Pmodule.mod_known locals body in
+                 let res = eval_global_fundef ~rac:false env Pinterp.empty_dispatch m.Pmodule.mod_known locals body in
                  asprintf "%a@." (report_eval_result ~mod_name ~fun_name body) res
                with Contr (ctx, term) ->
                  asprintf "%a@." (report_cntr ~mod_name ~fun_name body) (ctx, term) in
