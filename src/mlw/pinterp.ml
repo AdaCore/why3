@@ -32,6 +32,11 @@ let pp_bindings ?(sep = Pp.semi) ?(delims = Pp.(lbrace, rbrace)) pp_key pp_value
 let pp_typed pp ty fmt x =
   fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x)
 
+let indent = ref 0
+let pp_indent fmt =
+  let s = String.make (!indent * 2) ' ' in
+  pp_print_string fmt s
+
 (* environment *)
 
 open Ity
@@ -173,8 +178,6 @@ let add_dispatch env dispatch ((f1, m1), (f2, m2)) =
   let open Expr in
   let ns1 = (read_module env [f1] m1).mod_export in
   let pm2 = read_module env [f2] m2 in
-  (* eprintf "@[<v2>%a@]@." pp_ns (m1, ns1);
-   * eprintf "@[<v2>%a@]@." pp_ns (m2, pm2.mod_export); *)
   let disp_rs =
     let for_rs _ rs1 disp_rs =
       if List.mem rs1.rs_name.id_string ["Tuple0"; "True"; "False"] then
@@ -712,22 +715,22 @@ let report_cntr fmt (ctx, msg, term) =
 let add_known_rule_term id pd (known, rule_terms) =
   match pd.Pdecl.pd_pure with
   | [] -> known, rule_terms
-  | [decl] -> Mid.add id decl known, rule_terms
+  | [decl] ->
+      Mid.add id decl known, rule_terms
   | Decl.[({d_node= Dparam _} as decl); {d_node= Dprop (Paxiom, _, t)}] ->
       (* let function: function + axiom *)
-      Mid.add id decl known, (id, t) :: rule_terms
-  | Decl.
-      [({d_node= Dlogic [(ls, _def)]} as decl); {d_node= Dprop (Paxiom, pr, t)}]
+      Mid.add id decl known, Mid.add id t rule_terms
+  | Decl.[({d_node= Dlogic [(ls, _def)]} as decl); {d_node= Dprop (Paxiom, pr, t)}]
     ->
       (* let (rec) predicate:
          predicate + axiom *)
-      Mid.add ls.ls_name decl known, (pr.Decl.pr_name, t) :: rule_terms
+      Mid.add ls.ls_name decl known, Mid.add pr.Decl.pr_name t rule_terms
   | Decl.
       [ {d_node= Dparam _}; {d_node= Dprop (Paxiom, pr, t)};
         {d_node= Dprop (Paxiom, _, _)} ] ->
       (* let (rec) function:
          function f args : ty + axiom f'def : t + axiom f'spec : t *)
-      known, (pr.Decl.pr_name, t) :: rule_terms
+      known, Mid.add pr.Decl.pr_name t rule_terms
   | Decl.{d_node= Dtype _} :: _ ->
       (* - type declaration
          - field function declarations (Dparam)
@@ -758,20 +761,10 @@ let add_fun rs cexp known =
     Mid.add rs.rs_name decl known
   with Exit -> known
 
-let add_rule _id t eng =
-  try Reduction_engine.add_rule t eng
-  with Reduction_engine.NotARewriteRule _s ->
-    (* TODO Try to evaluate terms of the form `<t> -> if <t> then <t> else <t>` during
-       normalization. *)
-    (* Format.eprintf "@[<v2>Could not add rule for the axiomatization of %s:@ %a@ because %s.@]@."
-     *   id.id_string Pretty.print_term t s; *)
-    eng
-
 let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env mt =
   let c_known, c_rule_terms =
-    Mid.fold add_known_rule_term env.known (Mid.empty, []) in
+    Mid.fold add_known_rule_term env.known (Mid.empty, Mid.empty) in
   let c_known = Mrs.fold add_fun env.funenv c_known in
-  let c_rule_terms = Mid.of_list c_rule_terms in
   let mt, vsenv' =
     Mvs.mapi_fold (fun _ v mt -> term_of_value mt v) env.vsenv mt in
   let c_vsenv = Mvs.union (fun _ _ t -> Some t) vsenv vsenv' in
@@ -782,10 +775,14 @@ let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env mt =
     c_rule_terms;
     c_vsenv }, mt
 
-let indent = ref 0
-let pp_indent fmt =
-  let s = String.make (!indent * 2) ' ' in
-  pp_print_string fmt s
+let add_rule _id t eng =
+  try Reduction_engine.add_rule t eng
+  with Reduction_engine.NotARewriteRule _s ->
+    (* TODO Try to evaluate terms of the form `<t> -> if <t> then <t> else <t>` during
+       normalization. *)
+    (* Format.eprintf "@[<v2>Could not add rule for the axiomatization of %s:@ %a@ because %s.@]@."
+     *   id.id_string Pretty.print_term t s; *)
+    eng
 
 (** Evaluate a term using the reduction engine.
 
@@ -819,6 +816,9 @@ let check_term ctx t =
       eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t) ;
       if Debug.test_flag debug_rac then
         eprintf "  @[<hv2>Result: %a@]@." Pretty.print_term t'
+  | exception e when Debug.test_flag debug_rac ->
+      eprintf "%a@." report_cntr (ctx, "WHEN TRYING", t) ;
+      raise e
 
 let check_terms ctx = List.iter (check_term ctx)
 
