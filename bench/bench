@@ -313,7 +313,7 @@ rac () {
     shift 2
     echo
     echo "* $mod"
-    echo -n "$mod:" >&2
+    echo -n "  $mod:" >&2
     for func in $@; do
         echo "** $mod.$func"
         echo -n " $func" >&2
@@ -407,7 +407,7 @@ output="examples/tests/rac.out"
     rac "$mlw" RecordMutGhost test
     rac "$mlw" RecordPoly test1 test2 test3
     rac "$mlw" PolyFunc test0 test1
-    rac "$mlw" ArrayExec test0 test1 test2
+    rac "$mlw" ArrayExec test0 test1 test2 test3
     (RACARGS=( -L examples/tests --dispatch=array.Array-rac.ArrayExec )
      rac "$mlw" Arrays test0) # TODO test1
 ) > "$output"

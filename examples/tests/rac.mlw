@@ -267,8 +267,17 @@ module ArrayExec
   let test2 () =
     let a = make 10 0 in
     a[0] <- 10;
-    assert { a[0]' = 10 };
     a[0], a[1]
+
+  let test3 () =
+    let a = make 10 0 in
+    assert { length a = 10 };
+    assert { a[0]' = 0 }; (* ok *)
+    a[1] <- 11;
+    assert { a[0]' = 0 }; (* ok *)
+    assert { a[1]' = 11 }; (* ok *)
+    assert { a[2]' = 11 }; (* failure *)
+    ()
 
   clone export array.Array with
     type array = array,

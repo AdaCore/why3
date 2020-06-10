@@ -172,6 +172,13 @@ Execution of ArrayExec.test1 : () -> (int, int)
 Execution of ArrayExec.test2 : () -> (int, int)
   result: (10, 0)
   globals: 
+** ArrayExec.test3
+Execution of ArrayExec.test3 : () -> ()
+  Assertion failed at examples/tests/rac.mlw, line 279, characters 13-23
+    Term: a[2]' = 11
+    Variables: {_ -> (); _1 -> (); _2 -> (); _3 -> (); _4 -> ();
+      a -> array'mk 10
+           (fun (j:int) -> if j = 1 then 11 else (fun (_5:int) -> 0) @ j)}
 
 * Arrays
 ** Arrays.test0
