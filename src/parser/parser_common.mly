@@ -252,13 +252,13 @@
 
 (* symbols *)
 
-%token AND ARROW
+%token AND ARROW DASHARROW
 %token AMP BAR
 %token COLON COMMA
 %token DOT DOTDOT EQUAL LT GT LTGT MINUS
-%token LEFTPAR LEFTSQ
+%token LEFTPAR LEFTSQ LEFTSQBAR
 %token LARROW LRARROW OR
-%token RIGHTPAR RIGHTSQ
+%token RIGHTPAR RIGHTSQ BARRIGHTSQ
 %token UNDERSCORE
 
 %token EOF
@@ -817,14 +817,31 @@ term_arg: mk_term(term_arg_) { $1 }
 term_dot: mk_term(term_dot_) { $1 }
 
 term_arg_:
-| qualid                    { Tident $1 }
-| AMP qualid                { Tasref $2 }
-| numeral                   { Tconst $1 }
-| STRING                    { Tconst (Constant.ConstStr $1) }
-| TRUE                      { Ttrue }
-| FALSE                     { Tfalse }
-| o = oppref ; a = term_arg { Tidapp (Qident o, [a]) }
-| term_sub_                 { $1 }
+| qualid                       { Tident $1 }
+| AMP qualid                   { Tasref $2 }
+| numeral                      { Tconst $1 }
+| STRING                       { Tconst (Constant.ConstStr $1) }
+| TRUE                         { Ttrue }
+| FALSE                        { Tfalse }
+| o = oppref ; a = term_arg    { Tidapp (Qident o, [a]) }
+| term_sub_                    { $1 }
+| LEFTSQBAR fun_lit BARRIGHTSQ { Tfunlit (fst $2,snd $2) }
+
+fun_lit:
+| (* epsilon *)                               { [], None }
+| fun_lit_arrow                               { $1 }
+| semicolon_list1(term)
+    { let mk_index_pair i t =
+        let const = Constant.int_const (BigInt.of_int (i+1)) in
+        let tconst = {term_desc = Tconst const; term_loc  = t.term_loc} in
+        tconst, t in
+      List.mapi mk_index_pair $1, None }
+
+fun_lit_arrow:
+| UNDERSCORE DASHARROW term                   { [], Some $3 }
+| term DASHARROW term                         { [$1, $3], None }
+| term DASHARROW term SEMICOLON fun_lit_arrow
+    { ($1, $3) :: fst $5, snd $5 }
 
 term_dot_:
 | lqualid                   { Tident $1 }

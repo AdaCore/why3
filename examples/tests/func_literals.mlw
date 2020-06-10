@@ -1,0 +1,41 @@
+
+(* let test () = any int -> int ensures { result 2 = 2 } *)
+
+constant a1 : int -> int = [||]
+constant a2 : int -> int = [|1|]
+constant a3 : int -> int = [|1;2|]
+constant a4 : int -> int = [|1;2;3;4;5;6;7|]
+
+constant b1 : int -> int = [|0 --> 1|]
+constant b2 : int -> int = [|0 --> 1; 1 --> 2|]
+constant b3 : int -> int = [|5 --> 50; 1 --> 10|]
+constant b4 : int -> int = [|0 --> 1; 1 --> 2; 2 --> 3; 3 --> 4|]
+
+constant c1 : int -> int = [|_ --> 1|]
+constant c2 : int -> int = [|0 --> 1; _ --> 2|]
+constant c3 : int -> int = [|5 --> 50; _ --> 10|]
+constant c4 : int -> int = [|0 --> 1; 1 --> 2; 2 --> 3; _ --> 4|]
+
+use int.Int
+function z (x: int) : int = x + x
+
+function d1 (x: int) : int -> int = [||]
+function d2 (x: int) : int -> int = [|1; x|]
+function d3 (x: int) : int -> int = [|1; x; x + 1|]
+function d4 (x: int) : int -> int = [|1; x; x + 1; z x |]
+function d5 (x: int) : int -> int = d4 (x+1)
+
+function e1 (x: int) : int -> int = [|0 --> 1; 1 --> x|]
+function e2 (x: int) : int -> int = [|0 --> 1; 1 --> x; 2 --> x + 1|]
+function e3 (x: int) : int -> int = [|5 --> 1; 1 --> x; 10 --> x + 1; _ --> z x |]
+function e4 (x: int) : int -> int = e4 (x+1)
+
+(*
+let w (x: int) = x + x
+
+let f1 (x: int) = [||]
+let f2 (x: int) = [|1; x|]
+let f3 (x: int) = [|1; x; x + 1|]
+let f4 (x: int) = [|1; x; x + 1; w x |]
+let f5 (x: int) = f4 (x+1)
+*)

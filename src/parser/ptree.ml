@@ -104,6 +104,7 @@ and term_desc =
   | Tcase of term * (pattern * term) list
   | Tcast of term * pty
   | Ttuple of term list
+  | Tfunlit of (term * term) list * term option
   | Trecord of (qualid * term) list
   | Tupdate of term * (qualid * term) list
   | Tscope of qualid * term

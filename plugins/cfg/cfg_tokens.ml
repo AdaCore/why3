@@ -68,6 +68,7 @@ type token =
   | LET
   | LEMMA
   | LEFTSQ
+  | LEFTSQBAR
   | LEFTPAR
   | LEFTBRC
   | LARROW
@@ -102,6 +103,7 @@ type token =
   | DONE
   | DO
   | DIVERGES
+  | DASHARROW
   | CORE_UIDENT of (string)
   | CORE_LIDENT of (string)
   | CONTINUE
@@ -115,6 +117,7 @@ type token =
   | BREAK
   | BEGIN
   | BARBAR
+  | BARRIGHTSQ
   | BAR
   | AXIOM
   | ATTRIBUTE of (string)

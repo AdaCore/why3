@@ -400,6 +400,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       DTconst (c, dty_real)
   | Ptree.Tconst (Constant.ConstStr _ as c) ->
       DTconst (c, dty_str)
+  | Ptree.Tfunlit (tl, d) -> assert false
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm ns km crcmap gvars at denv e1 in
@@ -884,7 +885,7 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tidapp _ | Ptree.Tconst _ | Ptree.Tinfix _ | Ptree.Tinnfix _
   | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tcase _ | Ptree.Tif _
   | Ptree.Ttrue | Ptree.Tfalse | Ptree.Tnot _ | Ptree.Tbinop _ | Ptree.Tbinnop _
-  | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ ->
+  | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ | Ptree.Tfunlit _ ->
       Loc.errorm ~loc "unsupported effect expression")
 
 let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
