@@ -48,3 +48,6 @@ val type_term_in_namespace :
 
 val type_fmla_in_namespace :
   Theory.namespace -> Decl.known_map -> Coercion.t -> Ptree.term -> Term.term
+
+val type_expr_in_muc :
+  Pmodule.pmodule_uc -> ?denv:Dexpr.denv -> Ptree.expr -> Expr.expr

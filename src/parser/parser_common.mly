@@ -1017,7 +1017,7 @@ assign_expr:
         | _, _ -> Eassign (down [$1] [$3]) in
       { expr_desc = d; expr_loc = loc } }
 
-expr:
+%public expr:
 | single_expr %prec below_COMMA   { $1 }
 | single_expr COMMA expr_list1
     { mk_expr (Etuple ($1::$3)) $startpos $endpos }

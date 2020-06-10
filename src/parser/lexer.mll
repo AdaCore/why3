@@ -313,6 +313,9 @@ rule token = parse
   let parse_term lb =
     build_parsing_function Parser.Incremental.term_eof lb
 
+  let parse_expr lb =
+    build_parsing_function Parser.Incremental.expr_eof lb
+
   let parse_decl lb = build_parsing_function Parser.Incremental.decl_eof lb
 
   let parse_term_list lb = build_parsing_function Parser.Incremental.term_comma_list_eof lb

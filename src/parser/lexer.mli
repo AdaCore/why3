@@ -11,6 +11,8 @@
 
 val parse_term : Lexing.lexbuf -> Ptree.term
 
+val parse_expr : Lexing.lexbuf -> Ptree.expr
+
 val parse_decl : Lexing.lexbuf -> Ptree.decl
 
 val parse_term_list: Lexing.lexbuf -> Ptree.term list
