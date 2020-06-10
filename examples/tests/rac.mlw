@@ -236,40 +236,42 @@ end
 
 
 module ArrayExec
-
-  type array 'a = {length: int; mutable contents: int -> 'a}
-
   use int.Int
 
-  let test0 () =
-    let a = {length= 5; contents= fun (_: int) -> 0} in
-    a.contents 0, a.contents 1
+  type array 'a = {length: int; mutable elts: int -> 'a}
 
-  let test1 () =
-    let a = {length= 5; contents= fun (_: int) -> 0} in
-    a.contents <- (let f = a.contents in (fun (i: int) -> if i = 0 then 11 else f i));
-    a.contents 0, a.contents 1
-
-  let make (l: int) (v: 'a) : array 'a
-    ensures { result.length = l }
-    ensures { forall i. 0 <= i < l -> result.contents i = v }
-  = {length= l; contents= fun _ -> v}
+  let function make (n: int) (v: 'a) : array 'a
+    ensures { result.length = n }
+    ensures { forall i. 0 <= i < n -> result.elts i = v }
+  = {length= n; elts= fun _ -> v}
 
   let function map_update (f: int -> 'a) (i: int) (x: 'a) =
     fun (j: int) -> if j = i then x else f j
 
-  let function ([]) (a: array 'a) (i: int) : 'a = a.contents i
-
-  let function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
-    = { length = a.length ; contents = map_update a.contents i v }
+  let ([]) (a: array 'a) (i: int) : 'a = a.elts i
 
   let ([]<-) (a: array 'a) (i: int) (v: 'a) : unit
-    = a.contents <- map_update a.contents i v
+    = a.elts <- map_update a.elts i v
+
+  let test0 () =
+    let a = {length= 5; elts= fun (_: int) -> 0} in
+    a.elts 0, a.elts 1
+
+  let test1 () =
+    let a = {length= 5; elts= fun (_: int) -> 0} in
+    a.elts <- (let f = a.elts in (fun (i: int) -> if i = 0 then 11 else f i));
+    a.elts 0, a.elts 1
 
   let test2 () =
     let a = make 10 0 in
     a[0] <- 10;
     a[0], a[1]
+
+  clone export array.Array with
+    type array = array,
+    val make = make,
+    val ([]) = ([]),
+    val ([]<-) = ([]<-)
 end
 
 module Arrays
@@ -277,7 +279,7 @@ module Arrays
 
   let test0 () =
     let a = make 10 0 in
-    a[1] <- 11;
+    a[0] <- 10;
     a[0], a[1]
 
   let test1 () =
@@ -287,9 +289,9 @@ module Arrays
     a[1] <- 11;
     assert { a[0] = 0 }; (* ok *)
     assert { a[1] = 11 }; (* ok *)
-    assert { a[2] = 11 } (* failure *)
+    assert { a[2] = 11 }; (* failure *)
+    ()
 end
-
 
 module C
   use int.Int

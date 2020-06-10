@@ -42,7 +42,7 @@ val empty_dispatch : dispatch
 
 val add_dispatch : Env.env -> dispatch -> (string * string) * (string * string) -> dispatch
 
-exception Missing_dispatch of Expr.rsymbol
+exception Missing_dispatch of string
 
 val init_real : int * int * int -> unit
 (** Give a precision on real computation. *)

@@ -75,7 +75,9 @@ let do_input f =
   let do_exec (mod_name, fun_name) =
     try
       let open Pinterp in
+      (* eprintf "Find global symbol %s.%s...@." mod_name fun_name; *)
       let {Pmodule.mod_known= known}, rs = find_global_symbol mm ~mod_name ~fun_name in
+      (* eprintf "Find Global fundef %a...@." Expr.print_rs rs; *)
       let locals, body = find_global_fundef known rs in
       Opt.iter init_real !prec;
       ( try
@@ -86,7 +88,7 @@ let do_input f =
         with Contr (ctx, term) ->
           printf "%a@." (report_cntr ~mod_name ~fun_name body) (ctx, term) ;
           exit 1 )
-    with Not_found ->
+    with Not_found when not (Debug.test_flag Debug.stack_trace) ->
       exit 1 in
   Queue.iter do_exec opt_exec
 

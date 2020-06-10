@@ -29,6 +29,9 @@ let pp_bindings ?(sep = Pp.semi) ?(delims = Pp.(lbrace, rbrace)) pp_key pp_value
     (Pp.print_list sep pp_binding)
     l (snd delims) ()
 
+let pp_typed pp ty fmt x =
+  fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x)
+
 (* environment *)
 
 open Ity
@@ -140,9 +143,102 @@ type routine_defn =
   | Constructor of Pdecl.its_defn
   | Projection of Pdecl.its_defn
 
-type dispatch = (Pdecl.known_map * rsymbol) option Mrs.t
+(* DISPATCH *)
 
-let empty_dispatch = Mrs.empty
+type dispatch = {
+  disp_rs: (Pdecl.known_map * rsymbol) option Mrs.t;
+  disp_ty: tysymbol option Mts.t;
+}
+
+let empty_dispatch = {disp_rs= Mrs.empty; disp_ty= Mts.empty}
+
+let pp_rs_ty fmt rs =
+  fprintf fmt "(%a: %a -> %a)" print_rs rs Pp.(print_list arrow (pp_typed print_pv (fun pv -> pv.pv_vs.vs_ty))) rs.rs_cty.cty_args Pretty.print_ty (ty_of_ity rs.rs_cty.cty_result)
+
+let pp_ns fmt (name, ns) =
+  let open Pmodule in
+  fprintf fmt "@[<v2>Module content of %s@," name;
+  fprintf fmt "@[<hov2>TS: %a@]@," Pp.(print_list comma pp_print_string) (Mstr.keys ns.ns_ts);
+  let pp_prog_symbol fmt = function
+    | PV pv -> fprintf fmt "PV:%a:%a" print_pv pv Pretty.print_ty pv.pv_vs.vs_ty
+    | RS rs -> fprintf fmt "RS:%a" pp_rs_ty rs
+    | OO _ -> fprintf fmt "OO" in
+  fprintf fmt "@[<hov2>PS: %a@]@," Pp.(print_list comma (fun fmt (_, ps) -> pp_prog_symbol fmt ps)) (Mstr.bindings ns.ns_ps);
+  fprintf fmt "@[<hov2>XS: %a@]@," Pp.(print_list comma pp_print_string) (Mstr.keys ns.ns_xs);
+  fprintf fmt "@[<hov2>NS: %a@]" Pp.(print_list comma pp_print_string) (Mstr.keys ns.ns_ns);
+  fprintf fmt "@]"
+
+let add_dispatch env dispatch ((f1, m1), (f2, m2)) =
+  let open Pmodule in
+  let open Expr in
+  let ns1 = (read_module env [f1] m1).mod_export in
+  let pm2 = read_module env [f2] m2 in
+  (* eprintf "@[<v2>%a@]@." pp_ns (m1, ns1);
+   * eprintf "@[<v2>%a@]@." pp_ns (m2, pm2.mod_export); *)
+  let disp_rs =
+    let for_rs _ rs1 disp_rs =
+      if List.mem rs1.rs_name.id_string ["Tuple0"; "True"; "False"] then
+        (* TODO Why are there in every module?? *)
+        disp_rs
+      else
+        let open Pdecl in
+        let exception Found of rsymbol in
+        let find str2 ps =
+          if str2 = rs1.rs_name.id_string then
+            match ps with
+            | RS rs2 -> raise (Found rs2)
+            | _ -> () in
+        let def = match Mstr.iter find pm2.mod_export.ns_ps with
+          | exception Found rs2 -> Some (pm2.mod_known, rs2)
+          | () -> None in
+        Mrs.add rs1 def disp_rs in
+    let mrs1 = Mstr.map_filter (function RS rs -> Some rs | _ -> None) ns1.ns_ps in
+    Mstr.fold for_rs mrs1 dispatch.disp_rs in
+  let disp_ty =
+    let for_ity _ {its_ts= ts1} disp_ty =
+      let exception Found of tysymbol in
+      let find str2 {its_ts= ts2} =
+        if str2 = ts1.ts_name.id_string then
+          raise (Found ts2) in
+      let def = match Mstr.iter find pm2.mod_export.ns_ts with
+        | exception Found ts2 -> Some ts2
+        | () -> None in
+      Mts.add ts1 def disp_ty in
+    Mstr.fold for_ity ns1.ns_ts dispatch.disp_ty in
+  (* eprintf "@[<hov2>DISP TY: %a@]@." (pp_bindings Pretty.print_ts (Pp.print_option_or_default "NONE" Pretty.print_ts)) (Mts.bindings disp_ty); *)
+  {disp_rs; disp_ty}
+
+exception Missing_dispatch of string
+
+let () = Exn_printer.register (fun fmt exn ->
+    match exn with
+    | Missing_dispatch str -> fprintf fmt "Missing dispatch for %s" str
+    | _ -> raise exn)
+
+let rs_dispatch dispatch rs =
+  match Mrs.find rs dispatch with
+  | Some (known, rs') ->
+      let pp_rs fmt rs =
+        fprintf fmt "%a:%a -> %a" print_rs rs
+          Pp.(print_list arrow (pp_typed print_pv (fun pv -> pv.pv_vs.vs_ty))) rs.rs_cty.cty_args
+          Pretty.print_ty (ty_of_ity rs.rs_cty.cty_result) in
+      Debug.dprintf debug_rac "@[<hv2>Dispatched @[<h>%a@] to @[<h>%a@]@]@."
+        pp_rs rs pp_rs rs';
+      rs', known
+  | None -> raise (Missing_dispatch (asprintf "rsymbol %a" print_rs rs))
+
+let rec ty_dispatch dispatch ty =
+  match ty.ty_node with
+  | Tyvar tv -> ty
+  | Tyapp (ts, tys) ->
+      match Mts.find ts dispatch with
+      | Some ts' ->
+          Debug.dprintf debug_rac "@[<hv2>Dispatched type @[<h>%a@] to @[<h>%a@]@]@."
+            Pretty.print_ts ts Pretty.print_ts ts';
+          ty_app ts' (List.map (ty_dispatch dispatch) tys)
+      | None -> raise (Missing_dispatch (asprintf "tvsymbol %a" Pretty.print_ts ts))
+
+(* ENV *)
 
 type env =
   { known: Pdecl.known_map;
@@ -164,10 +260,13 @@ let multibind_pvs l tl env =
   try List.fold_right2 bind_pvs l tl env
   with Invalid_argument _ -> assert false
 
-let multibind_pvs' l tl env mt =
+let multibind_pvs' dispatch l tl env mt =
   let aux pv v (env, mt, mv) =
     let vs = create_vsymbol (id_clone pv.pv_vs.vs_name) v.v_ty in
-    let mt = ty_match mt pv.pv_vs.vs_ty v.v_ty in
+    let ty =
+      let ty = pv.pv_vs.vs_ty in
+      try ty_dispatch dispatch ty with Not_found -> ty in
+    let mt = ty_match mt ty v.v_ty in
     bind_vs vs v env, mt, Mvs.add pv.pv_vs (t_var vs) mv in
   List.fold_right2 aux l tl (env, mt, Mvs.empty)
 
@@ -190,6 +289,8 @@ let print_vsenv_ty fmt s =
 exception NoMatch
 exception Undetermined
 exception CannotCompute
+
+(* CONTRADICTION *)
 
 type cntr_ctx =
   { c_desc: string;
@@ -510,61 +611,6 @@ let get_pvs env pvs =
       assert false in
   t
 
-(* explicit printing of expr *)
-
-(*
-
-let p_pvs fmt pvs =
-  fprintf fmt "@[{ pv_vs =@ %a;@ pv_ity =@ %a;@ pv_ghost =@ %B }@]"
-    Pretty.print_vs pvs.pv_vs Ppretty.print_ity pvs.pv_ity
-    pvs.pv_ghost
-
-let p_ps fmt ps =
-  fprintf fmt "@[{ ps_name =@ %s;@ ... }@]"
-    ps.ps_name.id_string
-
-let p_pls fmt pls =
-  fprintf fmt "@[{ pl_ls =@ %s;@ ... }@]"
-    pls.pl_ls.ls_name.id_string
-
-let p_letsym fmt lsym =
-  match lsym with
-    | LetV pvs -> fprintf fmt "@[LetV(%a)@]" p_pvs pvs
-    | LetA _ -> fprintf fmt "@[LetA(_)@]"
-
-let rec p_let fmt ld =
-  fprintf fmt "@[{ let_sym =@ %a;@ let_expr =@ %a }@]"
-    p_letsym ld.let_sym p_expr ld.let_expr
-
-and p_expr fmt e =
-  match e.e_node with
-    | Elogic t ->
-      fprintf fmt "@[Elogic{type=%a}(%a)@]"
-        Ppretty.print_vty e.e_vty
-        Pretty.print_term t
-    | Evalue pvs -> fprintf fmt "@[Evalue(%a)@]" p_pvs pvs
-    | Earrow ps -> fprintf fmt "@[Earrow(%a)@]" p_ps ps
-    | Eapp (e1, pvs, _) ->
-      fprintf fmt "@[Eapp(%a,@ %a,@ <spec>)@]" p_expr e1 p_pvs pvs
-    | Elet(ldefn,e1) ->
-      fprintf fmt "@[Elet(%a,@ %a)@]" p_let ldefn p_expr e1
-    | Erec (_, _) -> fprintf fmt "@[Erec(_,@ _,@ _)@]"
-    | Eif (_, _, _) -> fprintf fmt "@[Eif(_,@ _,@ _)@]"
-    | Ematch (_, _) -> fprintf fmt "@[Ematch(_,@ _)@]"
-    | Eassign (pls, e1, reg, pvs) ->
-      fprintf fmt "@[Eassign(%a,@ %a,@ %a,@ %a)@]"
-        p_pls pls p_expr e1 Ppretty.print_reg reg p_pvs pvs
-    | Eghost _ -> fprintf fmt "@[Eghost(_)@]"
-    | Eany _ -> fprintf fmt "@[Eany(_)@]"
-    | Eloop (_, _, _) -> fprintf fmt "@[Eloop(_,@ _,@ _)@]"
-    | Efor (_, _, _, _) -> fprintf fmt "@[Efor(_,@ _,@ _,@ _)@]"
-    | Eraise (_, _) -> fprintf fmt "@[Eraise(_,@ _)@]"
-    | Eabstr (_, _) -> fprintf fmt "@[Eabstr(_,@ _)@]"
-    | Eassert (_, _) -> fprintf fmt "@[Eassert(_,@ _)@]"
-    | Eabsurd -> fprintf fmt "@[Eabsurd@]"
-
-*)
-
 let print_logic_result fmt r =
   match r with
   | Normal v -> fprintf fmt "@[%a@]" print_value v
@@ -609,56 +655,17 @@ let find_global_definition kn rs =
   | Pdecl.PDexn _ -> raise Not_found
   | Pdecl.PDpure -> raise Not_found
 
-let add_dispatch env m ((f1, m1), (f2, m2)) =
-  let open Pmodule in
-  let open Expr in
-  let pm2 = read_module env [f2] m2 in
-  let for_rs _ rs1 m =
-    let open Pdecl in
-    let exception Found of pdecl in
-    let find str id pd = if id.id_string = str then raise (Found pd) in
-    let def = match Mid.iter (find rs1.rs_name.id_string) pm2.mod_known with
-      | () -> None
-      | exception Found pd -> match pd.pd_node with
-        | PDlet (LDsym (rs2, _)) -> Some (pm2.mod_known, rs2)
-        | PDlet (LDrec dl) -> (
-            let exception Found of rsymbol in
-            let find rd = if rd.rec_sym.rs_name.id_string = rs1.rs_name.id_string then raise (Found rd.rec_sym) in
-            match List.iter find dl with
-            | () -> None
-            | exception Found rs2 -> Some (pm2.mod_known, rs2) )
-        | _ -> None in
-    Mrs.add rs1 def m in
-  let ns1 = (read_module env [f1] m1).mod_export in
-  let mrs1 = Mstr.map_filter (function RS rs -> Some rs | _ -> None) ns1.ns_ps in
-  Mstr.fold for_rs mrs1 m
-
-exception Missing_dispatch of Expr.rsymbol
-
-let () = Exn_printer.register (fun fmt exn ->
-    match exn with
-    | Missing_dispatch rs -> fprintf fmt "Missing dispatch for %a" print_rs rs
-    | _ -> raise exn)
-
-let dispatch rs dispatch =
-  match Mrs.find rs dispatch with
-  | Some (known, rs') ->
-      Debug.dprintf debug_rac "@[<hov2>Dispatched %a to %a@]@." print_rs rs print_rs rs';
-      rs', known
-  | None -> raise (Missing_dispatch rs)
-
 let find_definition env (rs: rsymbol) =
-  (* first, try to dispatch the symbol *)
-      (* then try if it is a built-in symbol *)
-      match Hrs.find builtin_progs rs with
-      | f -> Builtin f
+  (* then try if it is a built-in symbol *)
+  match Hrs.find builtin_progs rs with
+  | f -> Builtin f
+  | exception Not_found ->
+      (* then try if it is a local function *)
+      match Mrs.find rs env.funenv with
+      | f -> Function ([], f)
       | exception Not_found ->
-          (* then try if it is a local function *)
-          match Mrs.find rs env.funenv with
-          | f -> Function ([], f)
-          | exception Not_found ->
-              (* else look for a global function *)
-              find_global_definition env.known rs
+          (* else look for a global function *)
+          find_global_definition env.known rs
 
 (* Assuming the real is given in pow2 and pow5 *)
 let compute_fraction {Number.rv_sig= i; Number.rv_pow2= p2; Number.rv_pow5= p5}
@@ -779,9 +786,6 @@ let indent = ref 0
 let pp_indent fmt =
   let s = String.make (!indent * 2) ' ' in
   pp_print_string fmt s
-
-let pp_typed pp ty fmt x =
-  fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x)
 
 (** Evaluate a term using the reduction engine.
 
@@ -1039,14 +1043,15 @@ and exec_match ~rac env t ebl =
   iter ebl
 
 and exec_call ~rac ?loc env rs args ity_result =
+  (* eprintf "EXEC CALL %a@." print_rs rs; *)
   let rs, env =
-    match dispatch rs env.dispatch with
+    match rs_dispatch env.dispatch.disp_rs rs with
     | rs, known -> rs, {env with known}
     | exception Not_found -> rs, env in
   let args' = List.map (get_pvs env) args in
   let mt = Mtv.empty in
   (* let mt = ty_match mt (ty_of_ity rs.rs_cty.cty_result) (ty_of_ity ity_result) in *)
-  let env', mt', mv' = multibind_pvs' rs.rs_cty.cty_args args' env mt in
+  let env', mt', mv' = multibind_pvs' env.dispatch.disp_ty rs.rs_cty.cty_args args' env mt in
   let res_ty = ty_inst mt' (ty_of_ity ity_result) in
   if rac then (
     (* TODO variant *)
