@@ -250,6 +250,8 @@ module ArrayExec
 
   let ([]) (a: array 'a) (i: int) : 'a = a.elts i
 
+  function ([]') (a: array 'a) (i: int) : 'a = a.elts i
+
   let ([]<-) (a: array 'a) (i: int) (v: 'a) : unit
     = a.elts <- map_update a.elts i v
 
@@ -265,6 +267,7 @@ module ArrayExec
   let test2 () =
     let a = make 10 0 in
     a[0] <- 10;
+    assert { a[0]' = 10 };
     a[0], a[1]
 
   clone export array.Array with

@@ -169,7 +169,7 @@ replay () {
 
 execute () {
     pgm="bin/why3execute$suffix"
-    echo -n "  $@... "
+    echo -n "  ${@: -2} ${@: -1}... "
     if "$pgm" "$@" > /dev/null; then
         echo "ok"
     else

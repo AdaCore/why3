@@ -709,19 +709,19 @@ let report_cntr fmt (ctx, msg, term) =
     (List.sort cmp_vs (Mvs.bindings ctx.c_vsenv)) ;
   fprintf fmt "@]"
 
-let add_known_rule_term id pdecl (known, rule_terms) =
-  match pdecl.Pdecl.pd_pure with
+let add_known_rule_term id pd (known, rule_terms) =
+  match pd.Pdecl.pd_pure with
   | [] -> known, rule_terms
   | [decl] -> Mid.add id decl known, rule_terms
   | Decl.[({d_node= Dparam _} as decl); {d_node= Dprop (Paxiom, _, t)}] ->
       (* let function: function + axiom *)
       Mid.add id decl known, (id, t) :: rule_terms
   | Decl.
-      [({d_node= Dlogic [(_ls, _def)]} as decl); {d_node= Dprop (Paxiom, pr, t)}]
+      [({d_node= Dlogic [(ls, _def)]} as decl); {d_node= Dprop (Paxiom, pr, t)}]
     ->
       (* let (rec) predicate:
          predicate + axiom *)
-      Mid.add pr.Decl.pr_name decl known, (pr.Decl.pr_name, t) :: rule_terms
+      Mid.add ls.ls_name decl known, (pr.Decl.pr_name, t) :: rule_terms
   | Decl.
       [ {d_node= Dparam _}; {d_node= Dprop (Paxiom, pr, t)};
         {d_node= Dprop (Paxiom, _, _)} ] ->
@@ -737,7 +737,7 @@ let add_known_rule_term id pdecl (known, rule_terms) =
       Format.eprintf "@[<hv2>Cannot process pure declarations for %s:@ %a@]@."
         id.id_string
         (Pp.print_list Pp.space Pretty.print_decl)
-        pdecl.Pdecl.pd_pure ;
+        pd.Pdecl.pd_pure ;
       failwith "Cannot process pure declarations"
 
 let add_fun rs cexp known =
