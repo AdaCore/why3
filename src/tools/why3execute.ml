@@ -59,8 +59,8 @@ let config, _, env =
 let () =
   if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
 
-let prepare_dispatch env dispatch : Pinterp.dispatch =
-  List.fold_left (Pinterp.add_dispatch env) Pinterp.empty_dispatch dispatch
+let prepare_dispatch env disp_ctx =
+  List.fold_right (Pinterp.add_dispatch env) disp_ctx Pinterp.empty_dispatch
 
 let do_input f =
   let format = !opt_parser in
