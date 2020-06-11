@@ -99,6 +99,8 @@ val set_plugins : main -> string list -> main
 val add_plugin : main -> string -> main
 val load_plugins : main -> unit
 
+val load_default_config_if_needed : config -> config
+
 (** {2 Provers} *)
 
 (** {3 Prover's identifier} *)

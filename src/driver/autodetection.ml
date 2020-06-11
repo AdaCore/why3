@@ -634,14 +634,23 @@ let provers_from_detected_provers config =
         detected.exec_name
         (Some detected.version))
     (get_detected_provers config);
-  let detected = run_auto_detection' env config in
   let manually_added = get_provers config in
+  let detected = run_auto_detection' env (set_provers config Mprover.empty) in
   let detected =
-    Mprover.map (fun c -> if Mprover.mem c.prover manually_added
-                    then c else
-                    {  c with detected_at_startup = true }) detected
+    Mprover.map_filter
+      (fun c -> if Mprover.mem c.prover manually_added
+        then None else
+          Some {  c with detected_at_startup = true }) detected
   in
-  generate_builtin_config (env,detected) config
+  let provers =
+    Mprover.merge (fun _ manual auto ->
+        match manual, auto with
+        | (Some _) as c, _ -> c
+        | None, Some c -> Some {  c with detected_at_startup = true }
+        | None, None -> assert false)
+      manually_added detected
+  in
+  generate_builtin_config (env,provers) config
 
 let () = Whyconf.provers_from_detected_provers :=
     provers_from_detected_provers

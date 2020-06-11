@@ -955,6 +955,7 @@ let provers_from_detected_provers =
 
 let add_builtin_provers config = !provers_from_detected_provers config
 
+let load_default_config_if_needed config = if config.main.load_default_config then add_builtin_provers config else config
 
 module Args = struct
   let opt_config = ref None
@@ -1010,7 +1011,7 @@ module Args = struct
     Debug.Args.set_flags_selected ();
     if Debug.Args.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
-    let config = if config.main.load_default_config then add_builtin_provers config else config in
+    let config = load_default_config_if_needed config in
     config, base_config, Env.create_env lp
 
   let exit_with_usage ?(exit_code=1) ?(extra_help=Format.pp_print_newline) options usage =
