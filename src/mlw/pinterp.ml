@@ -14,6 +14,10 @@ open Wstdlib
 open Term
 open Ident
 open Ty
+open Ity
+open Expr
+open Big_real
+open Mlmpfr_wrapper
 
 let debug =
   Debug.register_info_flag "trace_exec"
@@ -21,10 +25,10 @@ let debug =
 
 let debug_rac = Debug.register_info_flag "rac" ~desc:"trace evaluation for RAC"
 
-let pp_bindings ?(sep = Pp.semi) ?(delims = Pp.(lbrace, rbrace)) pp_key pp_value
+let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace)) pp_key pp_value
     fmt l =
   let pp_binding fmt (k, v) =
-    fprintf fmt "@[<h>%a ->@ %a@]" pp_key k pp_value v in
+    fprintf fmt "@[<h>%a%a%a@]" pp_key k pair_sep () pp_value v in
   fprintf fmt "%a%a%a" (fst delims) ()
     (Pp.print_list sep pp_binding)
     l (snd delims) ()
@@ -32,19 +36,95 @@ let pp_bindings ?(sep = Pp.semi) ?(delims = Pp.(lbrace, rbrace)) pp_key pp_value
 let pp_typed pp ty fmt x =
   fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x)
 
-let indent = ref 0
-let pp_indent fmt =
-  let s = String.make (!indent * 2) ' ' in
-  pp_print_string fmt s
 
-(* environment *)
+(* EXCEPTIONS *)
 
-open Ity
-open Expr
-open Big_real
-open Mlmpfr_wrapper
+exception NoMatch
+exception Undetermined
+exception CannotCompute
+exception NotNum
+exception CannotFind of (Env.pathname * string * string)
+exception Missing_dispatch of string
 
-(* module Nummap = Map.Make(BigInt) *)
+(* DISPATCH *)
+
+type dispatch_ctx = {
+  disp_rs: (Pdecl.known_map * rsymbol) option Mrs.t; (* Map source symbols to target symbols *)
+  disp_ty: tysymbol option Mts.t; (* Map source type symbols to target type symbols *)
+}
+
+let empty_dispatch = {disp_rs= Mrs.empty; disp_ty= Mts.empty}
+
+let add_dispatch env ~source:pm1 ~target:pm2 disp_ctx =
+  let open Pmodule in
+  let add_rs_rev_ls disp_ctx =
+    let for_rs _ rs1 disp_ctx =
+      if List.mem rs1.rs_name.id_string ["Tuple0"; "True"; "False"] then
+        (* TODO Why are they in every module? *)
+        disp_ctx
+      else
+        let exception Found of rsymbol in
+        let find str2 ps =
+          if str2 = rs1.rs_name.id_string then
+            match ps with
+            | RS rs2 -> raise (Found rs2)
+            | _ -> () in
+        let def = match Mstr.iter find pm2.mod_export.ns_ps with
+          | exception Found rs2 -> Some (pm2.mod_known, rs2)
+          | () -> None in
+        let disp_rs = Mrs.add rs1 def disp_ctx.disp_rs in
+        {disp_ctx with disp_rs} in
+    let print_ps fmt = function
+      | PV pv -> fprintf fmt "PV %a" print_pv pv
+      | RS rs -> fprintf fmt "PV %a" print_rs rs
+      | OO _ -> fprintf fmt "OO" in
+    let get_rs = function RS rs -> Some rs | ps -> eprintf "IGNORE %a@." print_ps ps; None in
+    let mrs1 = Mstr.map_filter get_rs pm1.mod_export.ns_ps in
+    Mstr.fold for_rs mrs1 disp_ctx in
+  let add_ty disp_ctx =
+    let for_ity _ {its_ts= ts1} disp_ctx =
+      let exception Found of tysymbol in
+      let find str2 {its_ts= ts2} =
+        if str2 = ts1.ts_name.id_string then
+          raise (Found ts2) in
+      let def = match Mstr.iter find pm2.mod_export.ns_ts with
+        | exception Found ts2 ->
+            Some ts2
+        | () -> None in
+      let disp_ty = Mts.add ts1 def disp_ctx.disp_ty in
+      {disp_ctx with disp_ty} in
+    Mstr.fold for_ity pm1.mod_export.ns_ts disp_ctx in
+  add_ty (add_rs_rev_ls disp_ctx)
+
+let () = Exn_printer.register (fun fmt exn ->
+    match exn with
+    | Missing_dispatch str -> fprintf fmt "Missing dispatch for %s" str
+    | _ -> raise exn)
+
+let rs_dispatch disp_rs rs =
+  match Mrs.find rs disp_rs with
+  | Some (known, rs') ->
+      let pp_rs fmt rs =
+        fprintf fmt "%a:%a -> %a" print_rs rs
+          Pp.(print_list arrow (pp_typed print_pv (fun pv -> pv.pv_vs.vs_ty))) rs.rs_cty.cty_args
+          Pretty.print_ty (ty_of_ity rs.rs_cty.cty_result) in
+      Debug.dprintf debug_rac "@[<hv2>Dispatched @[<h>%a@] to @[<h>%a@]@]@."
+        pp_rs rs pp_rs rs';
+      rs', known
+  | None -> raise (Missing_dispatch (asprintf "rsymbol %a" print_rs rs))
+
+let rec ty_dispatch disp_ty ty =
+  match ty.ty_node with
+  | Tyvar _ -> ty
+  | Tyapp (ts, tys) ->
+      match Mts.find ts disp_ty with
+      | Some ts' ->
+          Debug.dprintf debug_rac "@[<hv2>Dispatched type @[<h>%a@] to @[<h>%a@]@]@."
+            Pretty.print_ts ts Pretty.print_ts ts';
+          ty_app ts' (List.map (ty_dispatch disp_ty) tys)
+      | None -> raise (Missing_dispatch (asprintf "tvsymbol %a" Pretty.print_ts ts))
+
+(* VALUES *)
 
 type float_mode = mpfr_rnd_t
 type big_float = mpfr_float
@@ -108,13 +188,6 @@ let rec print_value fmt v =
 
 and print_field fmt f = print_value fmt (field_get f)
 
-let print_value_ty fmt v =
-  fprintf fmt "(%a: %a)" print_value v Pretty.print_ty v.v_ty
-
-(** Match the types of a list of program variables with a list of types
-    and update the type mapping *)
-let ty_match_pvs_tys =
-  List.fold_right2 (fun pv ty mt -> ty_match mt pv.pv_vs.vs_ty ty)
 
 let rec term_of_value mt v : ty Mtv.t * term =
   match v.v_desc with
@@ -125,10 +198,6 @@ let rec term_of_value mt v : ty Mtv.t * term =
   | Vconstr (rs, fs) ->
       let mt, fs = Lists.map_fold_left term_of_field mt fs in
       mt, t_app_infer (ls_of_rs rs) fs
-      (* let ls = ls_of_rs rs in
-       * let mt = ty_match mt (Opt.get ls.ls_value) v.v_ty in
-       * let mt, ts = Lists.map_fold_left term_of_field mt fs in
-       * mt, fs_app ls ts v.v_ty *)
   | Vfun (cl, arg, e) ->
       let aux vs v (mt, mv) =
         let mt = ty_match mt vs.vs_ty v.v_ty in
@@ -142,104 +211,21 @@ let rec term_of_value mt v : ty Mtv.t * term =
 
 and term_of_field mt r = term_of_value mt r.contents
 
-type routine_defn =
-  | Builtin of (rsymbol -> value list -> value)
-  | Function of (rsymbol * cexp) list * cexp
-  | Constructor of Pdecl.its_defn
-  | Projection of Pdecl.its_defn
+(* RESULT *)
 
-(* DISPATCH *)
+type result =
+  | Normal of value
+  | Excep of xsymbol * value
+  | Irred of expr
+  | Fun of rsymbol * pvsymbol list * int
 
-type dispatch = {
-  disp_rs: (Pdecl.known_map * rsymbol) option Mrs.t;
-  disp_ty: tysymbol option Mts.t;
-}
-
-let empty_dispatch = {disp_rs= Mrs.empty; disp_ty= Mts.empty}
-
-let pp_rs_ty fmt rs =
-  fprintf fmt "(%a: %a -> %a)" print_rs rs Pp.(print_list arrow (pp_typed print_pv (fun pv -> pv.pv_vs.vs_ty))) rs.rs_cty.cty_args Pretty.print_ty (ty_of_ity rs.rs_cty.cty_result)
-
-let pp_ns fmt (name, ns) =
-  let open Pmodule in
-  fprintf fmt "@[<v2>Module content of %s@," name;
-  fprintf fmt "@[<hov2>TS: %a@]@," Pp.(print_list comma pp_print_string) (Mstr.keys ns.ns_ts);
-  let pp_prog_symbol fmt = function
-    | PV pv -> fprintf fmt "PV:%a:%a" print_pv pv Pretty.print_ty pv.pv_vs.vs_ty
-    | RS rs -> fprintf fmt "RS:%a" pp_rs_ty rs
-    | OO _ -> fprintf fmt "OO" in
-  fprintf fmt "@[<hov2>PS: %a@]@," Pp.(print_list comma (fun fmt (_, ps) -> pp_prog_symbol fmt ps)) (Mstr.bindings ns.ns_ps);
-  fprintf fmt "@[<hov2>XS: %a@]@," Pp.(print_list comma pp_print_string) (Mstr.keys ns.ns_xs);
-  fprintf fmt "@[<hov2>NS: %a@]" Pp.(print_list comma pp_print_string) (Mstr.keys ns.ns_ns);
-  fprintf fmt "@]"
-
-let add_dispatch env dispatch ((f1, m1), (f2, m2)) =
-  let open Pmodule in
-  let open Expr in
-  let ns1 = (read_module env [f1] m1).mod_export in
-  let pm2 = read_module env [f2] m2 in
-  let disp_rs =
-    let for_rs _ rs1 disp_rs =
-      if List.mem rs1.rs_name.id_string ["Tuple0"; "True"; "False"] then
-        (* TODO Why are there in every module?? *)
-        disp_rs
-      else
-        let open Pdecl in
-        let exception Found of rsymbol in
-        let find str2 ps =
-          if str2 = rs1.rs_name.id_string then
-            match ps with
-            | RS rs2 -> raise (Found rs2)
-            | _ -> () in
-        let def = match Mstr.iter find pm2.mod_export.ns_ps with
-          | exception Found rs2 -> Some (pm2.mod_known, rs2)
-          | () -> None in
-        Mrs.add rs1 def disp_rs in
-    let mrs1 = Mstr.map_filter (function RS rs -> Some rs | _ -> None) ns1.ns_ps in
-    Mstr.fold for_rs mrs1 dispatch.disp_rs in
-  let disp_ty =
-    let for_ity _ {its_ts= ts1} disp_ty =
-      let exception Found of tysymbol in
-      let find str2 {its_ts= ts2} =
-        if str2 = ts1.ts_name.id_string then
-          raise (Found ts2) in
-      let def = match Mstr.iter find pm2.mod_export.ns_ts with
-        | exception Found ts2 -> Some ts2
-        | () -> None in
-      Mts.add ts1 def disp_ty in
-    Mstr.fold for_ity ns1.ns_ts dispatch.disp_ty in
-  (* eprintf "@[<hov2>DISP TY: %a@]@." (pp_bindings Pretty.print_ts (Pp.print_option_or_default "NONE" Pretty.print_ts)) (Mts.bindings disp_ty); *)
-  {disp_rs; disp_ty}
-
-exception Missing_dispatch of string
-
-let () = Exn_printer.register (fun fmt exn ->
-    match exn with
-    | Missing_dispatch str -> fprintf fmt "Missing dispatch for %s" str
-    | _ -> raise exn)
-
-let rs_dispatch dispatch rs =
-  match Mrs.find rs dispatch with
-  | Some (known, rs') ->
-      let pp_rs fmt rs =
-        fprintf fmt "%a:%a -> %a" print_rs rs
-          Pp.(print_list arrow (pp_typed print_pv (fun pv -> pv.pv_vs.vs_ty))) rs.rs_cty.cty_args
-          Pretty.print_ty (ty_of_ity rs.rs_cty.cty_result) in
-      Debug.dprintf debug_rac "@[<hv2>Dispatched @[<h>%a@] to @[<h>%a@]@]@."
-        pp_rs rs pp_rs rs';
-      rs', known
-  | None -> raise (Missing_dispatch (asprintf "rsymbol %a" print_rs rs))
-
-let rec ty_dispatch dispatch ty =
-  match ty.ty_node with
-  | Tyvar tv -> ty
-  | Tyapp (ts, tys) ->
-      match Mts.find ts dispatch with
-      | Some ts' ->
-          Debug.dprintf debug_rac "@[<hv2>Dispatched type @[<h>%a@] to @[<h>%a@]@]@."
-            Pretty.print_ts ts Pretty.print_ts ts';
-          ty_app ts' (List.map (ty_dispatch dispatch) tys)
-      | None -> raise (Missing_dispatch (asprintf "tvsymbol %a" Pretty.print_ts ts))
+let print_logic_result fmt r =
+  match r with
+  | Normal v -> fprintf fmt "@[%a@]" print_value v
+  | Excep (x, v) ->
+      fprintf fmt "@[exception %s(@[%a@])@]" x.xs_name.id_string print_value v
+  | Irred e -> fprintf fmt "@[Cannot execute expression@ @[%a@]@]" print_expr e
+  | Fun _ -> fprintf fmt "@[Result is a function@]"
 
 (* ENV *)
 
@@ -248,13 +234,11 @@ type env =
     funenv: Expr.cexp Mrs.t;
     vsenv: value Mvs.t;
     env: Env.env;
-    dispatch: dispatch }
+    disp_ctx: dispatch_ctx }
 
 let add_local_funs locals env =
-  { env with
-    funenv=
-      List.fold_left (fun acc (rs, ce) -> Mrs.add rs ce acc) env.funenv locals
-  }
+  let funenv = List.fold_left (fun acc (rs, ce) -> Mrs.add rs ce acc) env.funenv locals in
+  {env with funenv}
 
 let bind_vs vs v env = {env with vsenv= Mvs.add vs v env.vsenv}
 let bind_pvs pv v_t env = bind_vs pv.pv_vs v_t env
@@ -263,70 +247,22 @@ let multibind_pvs l tl env =
   try List.fold_right2 bind_pvs l tl env
   with Invalid_argument _ -> assert false
 
-let multibind_pvs' dispatch l tl env mt =
+let multibind_pvs' ty_disp l tl env mt =
   let aux pv v (env, mt, mv) =
     let vs = create_vsymbol (id_clone pv.pv_vs.vs_name) v.v_ty in
     let ty =
       let ty = pv.pv_vs.vs_ty in
-      try ty_dispatch dispatch ty with Not_found -> ty in
+      try ty_dispatch ty_disp ty with Not_found -> ty in
     let mt = ty_match mt ty v.v_ty in
     bind_vs vs v env, mt, Mvs.add pv.pv_vs (t_var vs) mv in
   List.fold_right2 aux l tl (env, mt, Mvs.empty)
 
-let pp_vsvar fmt (vs, t) =
-  fprintf fmt "@[<hov 2>%a -> %a@]" Pretty.print_vs vs print_value t
+let print_vsenv_ty fmt m =
+  let pp_vs = pp_typed Pretty.print_vs (fun vs -> vs.vs_ty) in
+  let pp_value = pp_typed print_value (fun v -> v.v_ty) in
+  fprintf fmt "@[<v 0>%a@]" (pp_bindings pp_vs pp_value) (Mvs.bindings m)
 
-let print_vsenv fmt s =
-  let l = Mvs.bindings s in
-  fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi pp_vsvar) l
-
-let pp_vsvar_ty fmt (vs, t) =
-  fprintf fmt "@[<hov 2>(%a: %a) -> (%a: %a)@]" Pretty.print_vs vs Pretty.print_ty vs.vs_ty print_value t Pretty.print_ty t.v_ty
-
-let print_vsenv_ty fmt s =
-  let l = Mvs.bindings s in
-  fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi pp_vsvar_ty) l
-
-(* evaluation of terms *)
-
-exception NoMatch
-exception Undetermined
-exception CannotCompute
-
-(* CONTRADICTION *)
-
-type cntr_ctx =
-  { c_desc: string;
-    c_trigger_loc: Loc.position option;
-    c_env: Env.env;
-    c_known: Decl.known_map;
-    c_rule_terms: term Mid.t;
-    c_vsenv: term Mvs.t }
-
-exception Contr of cntr_ctx * term
-
-let rec matching env (v : value) p =
-  match p.pat_node with
-  | Pwild -> env
-  | Pvar vs -> bind_vs vs v env
-  | Por (p1, p2) -> (
-    try matching env v p1 with NoMatch -> matching env v p2 )
-  | Pas (p, vs) -> matching (bind_vs vs v env) v p
-  | Papp (ls, pl) -> (
-    match v.v_desc with
-    | Vconstr ({rs_logic= RLls ls2}, tl) ->
-        if ls_equal ls ls2 then
-          List.fold_left2 matching env (List.map field_get tl) pl
-        else if ls2.ls_constr > 0 then
-          raise NoMatch
-        else
-          raise Undetermined
-    | Vbool b ->
-        let ls2 = if b then fs_bool_true else fs_bool_false in
-        if ls_equal ls ls2 then env else raise NoMatch
-    | _ -> raise Undetermined )
-
-exception NotNum
+(* BUILTINS *)
 
 let big_int_of_const i = i.Number.il_int
 let big_int_of_value v = match v.v_desc with Vnum i -> i | _ -> raise NotNum
@@ -370,8 +306,6 @@ type 'a float_arity =
         float_arity (* ternary op *)
   | Mode_rel : (big_float -> big_float -> bool) float_arity (* binary predicates *)
   | Mode_rel1 : (big_float -> bool) float_arity
-
-(* Unary predicate *)
 
 let use_float_format (float_format : int) =
   match float_format with
@@ -428,38 +362,7 @@ let eval_real : type a. a real_arity -> a -> Expr.rsymbol -> value list -> value
     | _ -> assert false in
   {v_desc; v_ty= ty_real}
 
-let rec default_value_of_type known ity : value =
-  let ty = ty_of_ity ity in
-  match ity.ity_node with
-  | Ityvar _ -> assert false
-  | Ityreg r -> default_value_of_types known r.reg_its r.reg_args r.reg_regs ty
-  | Ityapp (ts, _, _) when its_equal ts its_int -> value ty (Vnum BigInt.zero)
-  | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
-  | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
-  (* | Ityapp(ts,_,_) when is_its_tuple ts -> assert false (* TODO *) *)
-  | Ityapp (ts, l1, l2) -> default_value_of_types known ts l1 l2 ty
-
-and default_value_of_types known ts l1 l2 ty : value =
-  let cs =
-    match Pdecl.((find_its_defn known ts).itd_constructors) with
-    | cs :: _ -> cs
-    | [] -> assert false
-    | exception Not_found -> assert false in
-  let subst = its_match_regs ts l1 l2 in
-  let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
-  let tyl = List.map (ity_full_inst subst) ityl in
-  let fl = List.map (fun ity -> ref (default_value_of_type known ity)) tyl in
-  value ty (Vconstr (cs, fl))
-
-type result =
-  | Normal of value
-  | Excep of xsymbol * value
-  | Irred of expr
-  | Fun of rsymbol * pvsymbol list * int
-
 let builtin_progs = Hrs.create 17
-
-(* let builtin_array_type _kn _its = () *)
 
 let builtin_mode _kn _its = ()
 let builtin_float_type _kn _its = ()
@@ -581,8 +484,6 @@ let built_in_modules env =
       float_modules 64 ~prec:53 "Float64"; int63_module;
       int31_module; byte_module ]
 
-exception CannotFind of (Env.pathname * string * string)
-
 let add_builtin_mo env (l, n, t, d) =
   let mo = Pmodule.read_module env l n in
   let exp = mo.Pmodule.mod_export in
@@ -614,17 +515,38 @@ let get_pvs env pvs =
       assert false in
   t
 
-let print_logic_result fmt r =
-  match r with
-  | Normal v -> fprintf fmt "@[%a@]" print_value v
-  | Excep (x, v) ->
-      fprintf fmt "@[exception %s(@[%a@])@]" x.xs_name.id_string print_value v
-  | Irred e -> fprintf fmt "@[Cannot execute expression@ @[%a@]@]" print_expr e
-  | Fun _ -> fprintf fmt "@[Result is a function@]"
+(* DEFAULTS *)
 
-(* evaluation of WhyML expressions *)
+let rec default_value_of_type known ity : value =
+  let ty = ty_of_ity ity in
+  match ity.ity_node with
+  | Ityvar _ -> assert false
+  | Ityreg r -> default_value_of_types known r.reg_its r.reg_args r.reg_regs ty
+  | Ityapp (ts, _, _) when its_equal ts its_int -> value ty (Vnum BigInt.zero)
+  | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
+  | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
+  (* | Ityapp(ts,_,_) when is_its_tuple ts -> assert false (* TODO *) *)
+  | Ityapp (ts, l1, l2) -> default_value_of_types known ts l1 l2 ty
 
-(* find routine definitions *)
+and default_value_of_types known ts l1 l2 ty : value =
+  let cs =
+    match Pdecl.((find_its_defn known ts).itd_constructors) with
+    | cs :: _ -> cs
+    | [] -> assert false
+    | exception Not_found -> assert false in
+  let subst = its_match_regs ts l1 l2 in
+  let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
+  let tyl = List.map (ity_full_inst subst) ityl in
+  let fl = List.map (fun ity -> ref (default_value_of_type known ity)) tyl in
+  value ty (Vconstr (cs, fl))
+
+(* ROUTINE DEFINITIONS *)
+
+type routine_defn =
+  | Builtin of (rsymbol -> value list -> value)
+  | Function of (rsymbol * cexp) list * cexp
+  | Constructor of Pdecl.its_defn
+  | Projection of Pdecl.its_defn
 
 let rec find_def rs = function
   | d :: _ when rs_equal rs d.rec_sym ->
@@ -670,23 +592,17 @@ let find_definition env (rs: rsymbol) =
           (* else look for a global function *)
           find_global_definition env.known rs
 
-(* Assuming the real is given in pow2 and pow5 *)
-let compute_fraction {Number.rv_sig= i; Number.rv_pow2= p2; Number.rv_pow5= p5}
-    =
-  let p2_val = BigInt.pow_int_pos_bigint 2 (BigInt.abs p2) in
-  let p5_val = BigInt.pow_int_pos_bigint 5 (BigInt.abs p5) in
-  let num = ref BigInt.one in
-  let den = ref BigInt.one in
-  num := BigInt.mul i !num ;
-  if BigInt.ge p2 BigInt.zero then
-    num := BigInt.mul p2_val !num
-  else
-    den := BigInt.mul p2_val !den ;
-  if BigInt.ge p5 BigInt.zero then
-    num := BigInt.mul p5_val !num
-  else
-    den := BigInt.mul p5_val !den ;
-  !num, !den
+(* CONTRADICTION CONTEXT *)
+
+type cntr_ctx =
+  { c_desc: string;
+    c_trigger_loc: Loc.position option;
+    c_env: Env.env;
+    c_known: Decl.known_map;
+    c_rule_terms: term Mid.t;
+    c_vsenv: term Mvs.t }
+
+exception Contr of cntr_ctx * term
 
 let report_cntr_head fmt (ctx, msg, term) =
   let pp_pos fmt loc =
@@ -704,11 +620,15 @@ let report_cntr_head fmt (ctx, msg, term) =
 let cmp_vs (vs1, _) (vs2, _) =
   String.compare vs1.vs_name.id_string vs2.vs_name.id_string
 
+let pp_vsenv pp_value fmt =
+  let delims = Pp.(nothing, nothing) and sep = Pp.comma in
+  fprintf fmt "%a" (pp_bindings ~delims ~sep Pretty.print_vs pp_value)
+
 let report_cntr fmt (ctx, msg, term) =
   fprintf fmt "@[<v2>%a@," report_cntr_head (ctx, msg, term);
   fprintf fmt "@[<hov2>Term: %a@]@," Pretty.print_term term ;
   fprintf fmt "@[<hov2>Variables: %a@]"
-    (pp_bindings ~delims:Pp.(lbrace, rbrace) Pretty.print_vs Pretty.print_term)
+    (pp_vsenv Pretty.print_term)
     (List.sort cmp_vs (Mvs.bindings ctx.c_vsenv)) ;
   fprintf fmt "@]"
 
@@ -775,16 +695,19 @@ let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env mt =
     c_rule_terms;
     c_vsenv }, mt
 
-let add_rule _id t eng =
-  try Reduction_engine.add_rule t eng
-  with Reduction_engine.NotARewriteRule _s ->
+(* TERM EVALUATION *)
+
+let try_add_rule _id t eng =
+  let open Reduction_engine in
+  try add_rule t eng
+  with NotARewriteRule _s ->
     (* TODO Try to evaluate terms of the form `<t> -> if <t> then <t> else <t>` during
        normalization. *)
     (* Format.eprintf "@[<v2>Could not add rule for the axiomatization of %s:@ %a@ because %s.@]@."
      *   id.id_string Pretty.print_term t s; *)
     eng
 
-(** Evaluate a term using the reduction engine.
+(** Reduce a term using the reduction engine.
 
     @param env Why3 environment
     @param known Global definitions from the interpreted module
@@ -793,21 +716,35 @@ let add_rule _id t eng =
     @param t Term to be evaluated
     @return A reduction of term [t]
   *)
-let eval_term env known rule_terms vsenv t =
+let reduce_term env known rule_terms vsenv t =
+  let open Reduction_engine in
   let params =
-    { Reduction_engine.compute_builtin= true;
+    { compute_builtin= true;
       compute_defs= true;
       compute_def_set= Sls.empty } in
-  let eng = Reduction_engine.create params env known in
-  let eng = Mid.fold add_rule rule_terms eng in
+  let eng = create params env known in
+  let eng = Mid.fold try_add_rule rule_terms eng in
   let vsenv = (* TODO better fix typing of the variables in vsenv *)
     let vars = t_freevars Mvs.empty t in
     Mvs.filter (fun vs _ -> Mvs.contains vars vs) vsenv in
-  Reduction_engine.normalize ~limit:1000 eng vsenv t
+  (* (\* Cannot substite abstract with concrete types (only type variables) *\)
+   * let mt, mv, vsenv =
+   *   let aux vs t (mt, mv, vsenv) =
+   *     let ty = Opt.get t.t_ty in
+   *     let vs' = create_vsymbol (id_clone vs.vs_name) ty in
+   *     (\* eprintf "TY MATCH @[<h>%a@] @[%a@]@." Pretty.print_ty vs.vs_ty Pretty.print_ty ty; *\)
+   *     let (\* mt, *\) ty0 = (\* ty_dispatch dispatch mt *\) vs.vs_ty in
+   *     let mt = ty_match mt ty0 ty in
+   *     let mv = Mvs.add vs (t_var vs') mv in
+   *     let vsenv = Mvs.add vs' t vsenv in
+   *     mt, mv, vsenv in
+   *   Mvs.fold aux vsenv (Mtv.empty, Mvs.empty, Mvs.empty) in
+   * let t = t_ty_subst mt mv t in *)
+  normalize ~limit:1000 eng vsenv t
 
 (** Evaluate a term and raise an exception [Contr] if the result is false. *)
 let check_term ctx t =
-  match eval_term ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
+  match reduce_term ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
   | {t_node= Ttrue} ->
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "is ok", t)
@@ -823,35 +760,58 @@ let check_term ctx t =
 let check_terms ctx = List.iter (check_term ctx)
 
 (** Assert a post-condition [t] by binding the result variable to
-    the term [vt] representing the result value... type error for
-    polymorphic types *)
-
-(* Substitute result in post-condition term *)
+    the term [vt] representing the result value. *)
 let check_post ctx (vt : term) (mt : ty Mtv.t) (t : term) =
   let vs, t = open_post t in
   let mt = ty_match mt vs.vs_ty (oty_type vt.t_ty) in
-  (* eprintf "%t@[<hov2>MT: %a@]@." pp_indent (pp_bindings Pretty.print_tv Pretty.print_ty) (Mtv.bindings mt); *)
   let vsenv = Mvs.singleton vs vt in
   let t = t_ty_subst mt vsenv t in
   check_term ctx t ;
   mt
 
-(* Apply post-condition term to result term *)
-let check_post1 ctx rt mt t =
-  let t = t_func_app t rt in
-  check_term ctx t ; mt
+(* EXPRESSION EVALUATION *)
 
-(* Reconstruct lambda term from post-condition and apply to result term *)
-let check_post2 ctx rt mt t =
-  let vs, t = open_post t in
-  let t = t_lambda [vs] [] t in
-  let t = t_func_app t rt in
-  check_term ctx t ; mt
+(* Assuming the real is given in pow2 and pow5 *)
+let compute_fraction {Number.rv_sig= i; Number.rv_pow2= p2; Number.rv_pow5= p5}
+  =
+  let p2_val = BigInt.pow_int_pos_bigint 2 (BigInt.abs p2) in
+  let p5_val = BigInt.pow_int_pos_bigint 5 (BigInt.abs p5) in
+  let num = ref BigInt.one in
+  let den = ref BigInt.one in
+  num := BigInt.mul i !num ;
+  if BigInt.ge p2 BigInt.zero then
+    num := BigInt.mul p2_val !num
+  else
+    den := BigInt.mul p2_val !den ;
+  if BigInt.ge p5 BigInt.zero then
+    num := BigInt.mul p5_val !num
+  else
+    den := BigInt.mul p5_val !den ;
+  !num, !den
 
-(* evaluate expressions *)
+let rec matching env (v : value) p =
+  match p.pat_node with
+  | Pwild -> env
+  | Pvar vs -> bind_vs vs v env
+  | Por (p1, p2) -> (
+      try matching env v p1 with NoMatch -> matching env v p2 )
+  | Pas (p, vs) -> matching (bind_vs vs v env) v p
+  | Papp (ls, pl) -> (
+      match v.v_desc with
+      | Vconstr ({rs_logic= RLls ls2}, tl) ->
+          if ls_equal ls ls2 then
+            List.fold_left2 matching env (List.map field_get tl) pl
+          else if ls2.ls_constr > 0 then
+            raise NoMatch
+          else
+            raise Undetermined
+      | Vbool b ->
+          let ls2 = if b then fs_bool_true else fs_bool_false in
+          if ls_equal ls ls2 then env else raise NoMatch
+      | _ -> raise Undetermined )
+
 let rec eval_expr ~rac env (e : expr) : result =
-  incr indent;
-  let res = match e.e_node with
+  match e.e_node with
   | Evar pvs -> (
     try
       let v = get_pvs env pvs in
@@ -1023,11 +983,8 @@ let rec eval_expr ~rac env (e : expr) : result =
   | Epure _ -> Normal (value ty_unit Vvoid) (* TODO *)
   | Eabsurd ->
       eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
-        (if Debug.test_flag debug then print_expr (* p_expr *) else print_expr)
-        e ;
-      Irred e in
-  decr indent;
-  res
+        print_expr e ;
+      Irred e
 
 and exec_match ~rac env t ebl =
   let rec iter ebl =
@@ -1043,15 +1000,13 @@ and exec_match ~rac env t ebl =
   iter ebl
 
 and exec_call ~rac ?loc env rs args ity_result =
-  (* eprintf "EXEC CALL %a@." print_rs rs; *)
   let rs, env =
-    match rs_dispatch env.dispatch.disp_rs rs with
+    match rs_dispatch env.disp_ctx.disp_rs rs with
     | rs, known -> rs, {env with known}
     | exception Not_found -> rs, env in
   let args' = List.map (get_pvs env) args in
   let mt = Mtv.empty in
-  (* let mt = ty_match mt (ty_of_ity rs.rs_cty.cty_result) (ty_of_ity ity_result) in *)
-  let env', mt', mv' = multibind_pvs' env.dispatch.disp_ty rs.rs_cty.cty_args args' env mt in
+  let env', mt', mv' = multibind_pvs' env.disp_ctx.disp_ty rs.rs_cty.cty_args args' env mt in
   let res_ty = ty_inst mt' (ty_of_ity ity_result) in
   if rac then (
     (* TODO variant *)
@@ -1092,7 +1047,7 @@ and exec_call ~rac ?loc env rs args ity_result =
       | Builtin f ->
           Debug.dprintf debug "@[Evaluating builtin function %s@]@."
             rs.rs_name.id_string ;
-          let r = Normal (f rs (* env ity_result *) args') in
+          let r = Normal (f rs args') in
           Debug.dprintf debug "@[Return from builtin function %s result %a@]@."
             rs.rs_name.id_string print_logic_result r ;
           r
@@ -1136,9 +1091,13 @@ and exec_call ~rac ?loc env rs args ity_result =
       | _ -> () );
   res
 
-let eval_global_expr ~rac env dispatch km locals e =
+(* GLOBAL EVALUATION *)
+
+let init_real (emin, emax, prec) = Big_real.init emin emax prec
+
+let eval_global_expr ~rac env disp_ctx km locals e =
   get_builtin_progs env ;
-  let add_glob id d acc =
+  let add_glob _id d acc =
     match d.Pdecl.pd_node with
     | Pdecl.PDlet (LDvar (pvs, _e)) ->
         (* TODO evaluate _e! *)
@@ -1146,12 +1105,10 @@ let eval_global_expr ~rac env dispatch km locals e =
         Mvs.add pvs.pv_vs v acc
     | _ -> acc in
   let global_env = Mid.fold add_glob km Mvs.empty in
-  let env' = {known= km; funenv= Mrs.empty; vsenv= global_env; env; dispatch} in
+  let env' = {known= km; funenv= Mrs.empty; vsenv= global_env; env; disp_ctx} in
   let env' = add_local_funs locals env' in
   let res = eval_expr ~rac env' e in
   res, global_env
-
-let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 let find_global_symbol mm ~mod_name ~fun_name =
   match Wstdlib.Mstr.find mod_name mm with
@@ -1170,8 +1127,8 @@ let find_global_fundef mod_known rs =
   | Function (locals, {c_node= Cfun body}) -> locals, body
   | _ -> assert false
 
-let eval_global_fundef ~rac env dispatch mod_known locals body =
-  try eval_global_expr ~rac env dispatch mod_known locals body
+let eval_global_fundef ~rac env disp_ctx mod_known locals body =
+  try eval_global_expr ~rac env disp_ctx mod_known locals body
   with CannotFind (l, s, n) ->
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
@@ -1182,13 +1139,13 @@ let report_eval_result ~mod_name ~fun_name body fmt (res, final_env) =
   ( match res with
   | Normal _ ->
       fprintf fmt "@[<hov2>result:@ %a@]@,@[<hov2>globals:@ %a@]"
-        print_logic_result res print_vsenv final_env
+        print_logic_result res (pp_vsenv print_value) (Mvs.bindings final_env)
   | Excep _ ->
       fprintf fmt "@[<hov2>exceptional result:@ %a@]@,@[<hov2>globals:@ %a@]"
-        print_logic_result res print_vsenv final_env
+        print_logic_result res (pp_vsenv print_value) (Mvs.bindings final_env)
   | Irred _ | Fun _ ->
       fprintf fmt "@[<hov2>Execution error: %a@]@," print_logic_result res ;
-      fprintf fmt "@[globals:@ %a@]" print_vsenv final_env ) ;
+      fprintf fmt "@[globals:@ %a@]" (pp_vsenv print_value) (Mvs.bindings final_env) ) ;
   fprintf fmt "@]"
 
 let report_cntr ~mod_name ~fun_name body fmt (ctx, term) =
