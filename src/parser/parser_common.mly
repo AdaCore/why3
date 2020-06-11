@@ -832,7 +832,7 @@ fun_lit:
 | fun_lit_arrow                               { $1 }
 | semicolon_list1(term)
     { let mk_index_pair i t =
-        let const = Constant.int_const (BigInt.of_int (i+1)) in
+        let const = Constant.int_const (BigInt.of_int i) in
         let tconst = {term_desc = Tconst const; term_loc  = t.term_loc} in
         tconst, t in
       List.mapi mk_index_pair $1, None }
