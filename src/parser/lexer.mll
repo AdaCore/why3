@@ -210,8 +210,6 @@ rule token = parse
       { SEMICOLON }
   | "->"
       { ARROW }
-  | "-->"
-      { DASHARROW }
   | "->'"
       { Lexlib.backjump lexbuf 1; ARROW }
   | "<-"
@@ -242,6 +240,8 @@ rule token = parse
       { LTGT }
   | "="
       { EQUAL }
+  | "=>"
+      { EQUALARROW }
   | "-"
       { MINUS }
   | "["

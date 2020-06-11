@@ -252,7 +252,7 @@
 
 (* symbols *)
 
-%token AND ARROW DASHARROW
+%token AND ARROW EQUALARROW
 %token AMP BAR
 %token COLON COMMA
 %token DOT DOTDOT EQUAL LT GT LTGT MINUS
@@ -838,9 +838,9 @@ fun_lit:
       List.mapi mk_index_pair $1, None }
 
 fun_lit_arrow:
-| UNDERSCORE DASHARROW term                   { [], Some $3 }
-| term DASHARROW term                         { [$1, $3], None }
-| term DASHARROW term SEMICOLON fun_lit_arrow
+| UNDERSCORE EQUALARROW term                   { [], Some $3 }
+| term EQUALARROW term                         { [$1, $3], None }
+| term EQUALARROW term SEMICOLON fun_lit_arrow
     { ($1, $3) :: fst $5, snd $5 }
 
 term_dot_:

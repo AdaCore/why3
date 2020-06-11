@@ -146,11 +146,11 @@ let pp_const fmt c =
 
 let pp_funlit pp fmt (tl,d) =
   let pp_lit fmt (t1,t2) =
-    fprintf fmt "%a --> %a" pp.closed t1 pp.closed t2 in
+    fprintf fmt "%a => %a" pp.closed t1 pp.closed t2 in
   let pp_xs = pp_print_list ~pp_sep:(pp_sep ";@ ") pp_lit in
   fprintf fmt "@[<hv 1>[|%a%a|]@]"
     pp_xs tl
-    (pp_opt ~prefix:(if tl <> [] then "; _ --> " else "_ --> ") pp.closed) d
+    (pp_opt ~prefix:(if tl <> [] then "; _ => " else "_ => ") pp.closed) d
 
 let pp_ident fmt id =
   pp_qualid fmt id

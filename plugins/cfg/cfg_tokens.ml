@@ -91,6 +91,7 @@ type token =
   | EXPORT
   | EXISTS
   | EXCEPTION
+  | EQUALARROW
   | EQUAL
   | EPSILON
   | EOF
@@ -103,7 +104,6 @@ type token =
   | DONE
   | DO
   | DIVERGES
-  | DASHARROW
   | CORE_UIDENT of (string)
   | CORE_LIDENT of (string)
   | CONTINUE
