@@ -117,12 +117,14 @@ let rec ty_dispatch disp_ty ty =
   match ty.ty_node with
   | Tyvar _ -> ty
   | Tyapp (ts, tys) ->
-      match Mts.find ts disp_ty with
-      | Some ts' ->
-          Debug.dprintf debug_rac "@[<hv2>Dispatched type @[<h>%a@] to @[<h>%a@]@]@."
-            Pretty.print_ts ts Pretty.print_ts ts';
-          ty_app ts' (List.map (ty_dispatch disp_ty) tys)
-      | None -> raise (Missing_dispatch (asprintf "tvsymbol %a" Pretty.print_ts ts))
+      try
+        match Mts.find ts disp_ty with
+        | Some ts' ->
+            Debug.dprintf debug_rac "@[<hv2>Dispatched type @[<h>%a@] to @[<h>%a@]@]@."
+              Pretty.print_ts ts Pretty.print_ts ts';
+            ty_app ts' (List.map (ty_dispatch disp_ty) tys)
+        | None -> raise (Missing_dispatch (asprintf "tvsymbol %a" Pretty.print_ts ts))
+      with Not_found -> ty
 
 (* VALUES *)
 
@@ -247,15 +249,19 @@ let multibind_pvs l tl env =
   try List.fold_right2 bind_pvs l tl env
   with Invalid_argument _ -> assert false
 
-let multibind_pvs' ty_disp l tl env mt =
+(** [multibind_pvs' ty_disp pvs vs (env, mt, mv)] binds values [vs] to variables [pvs],
+    updating the type mapping [mt] by the bindings. Values are possibly
+    dispatching values by [ty_disp], adding entries from original variables to
+    new variables with dispatched types in [mv]. *)
+let multibind_pvs' ty_disp pvs vs (env, mt, mv) =
   let aux pv v (env, mt, mv) =
     let vs = create_vsymbol (id_clone pv.pv_vs.vs_name) v.v_ty in
-    let ty =
-      let ty = pv.pv_vs.vs_ty in
-      try ty_dispatch ty_disp ty with Not_found -> ty in
+    let ty = ty_dispatch ty_disp pv.pv_vs.vs_ty in
+    let env = bind_vs vs v env in
     let mt = ty_match mt ty v.v_ty in
-    bind_vs vs v env, mt, Mvs.add pv.pv_vs (t_var vs) mv in
-  List.fold_right2 aux l tl (env, mt, Mvs.empty)
+    let mv = Mvs.add pv.pv_vs (t_var vs) mv in
+    env, mt, mv in
+  List.fold_right2 aux pvs vs (env, mt, mv)
 
 let print_vsenv_ty fmt m =
   let pp_vs = pp_typed Pretty.print_vs (fun vs -> vs.vs_ty) in
@@ -759,16 +765,6 @@ let check_term ctx t =
 
 let check_terms ctx = List.iter (check_term ctx)
 
-(** Assert a post-condition [t] by binding the result variable to
-    the term [vt] representing the result value. *)
-let check_post ctx (vt : term) (mt : ty Mtv.t) (t : term) =
-  let vs, t = open_post t in
-  let mt = ty_match mt vs.vs_ty (oty_type vt.t_ty) in
-  let vsenv = Mvs.singleton vs vt in
-  let t = t_ty_subst mt vsenv t in
-  check_term ctx t ;
-  mt
-
 (* EXPRESSION EVALUATION *)
 
 (* Assuming the real is given in pow2 and pow5 *)
@@ -1005,14 +1001,14 @@ and exec_call ~rac ?loc env rs args ity_result =
     | rs, known -> rs, {env with known}
     | exception Not_found -> rs, env in
   let args' = List.map (get_pvs env) args in
-  let mt = Mtv.empty in
-  let env', mt', mv' = multibind_pvs' env.disp_ctx.disp_ty rs.rs_cty.cty_args args' env mt in
-  let res_ty = ty_inst mt' (ty_of_ity ity_result) in
+  let env', mt, mv = multibind_pvs' env.disp_ctx.disp_ty rs.rs_cty.cty_args args' (env, Mtv.empty, Mvs.empty) in
+  let res_ty = ty_inst mt (ty_of_ity ity_result) in
+  let desc str = asprintf "%s of %a" str print_decoded rs.rs_name.id_string in
   if rac then (
     (* TODO variant *)
-    let desc = asprintf "Precondition of %a" print_decoded rs.rs_name.id_string in
-    let pre = List.map (t_ty_subst mt' mv') rs.rs_cty.cty_pre in
-    check_terms (fst (cntr_ctx desc ?trigger_loc:loc env' mt)) pre) ;
+    let pre = (* Substitute paramaters in preconditions *)
+      List.map (t_ty_subst mt mv) rs.rs_cty.cty_pre in
+    check_terms (fst (cntr_ctx (desc "Precondition") ?trigger_loc:loc env' Mtv.empty)) pre );
   let res =
     if rs_equal rs rs_func_app then
       match args' with
@@ -1072,22 +1068,28 @@ and exec_call ~rac ?loc env rs args ity_result =
             rs.rs_name.id_string ;
           raise CannotCompute in
   ( if rac then
+      (* Check a post-condition [t] by binding the result variable to
+         the term [vt] representing the result value. *)
+      let check_post ctx (vt : term) (mt : ty Mtv.t) (t : term) =
+        let vs, t = open_post t in
+        let mt = ty_match mt vs.vs_ty (oty_type vt.t_ty) in
+        let vsenv = Mvs.singleton vs vt in
+        let t = t_ty_subst mt vsenv t in
+        check_term ctx t in
+      (* Checking shared between normal and exceptional post-conditions *)
+      let check_posts desc v posts =
+        let ctx, mt = cntr_ctx desc ?trigger_loc:loc env' mt in
+        let mt, vt = term_of_value mt v in
+        let post = (* Substitute parameters in postconditions *)
+          List.map (t_ty_subst mt mv) posts in
+        List.iter (check_post ctx vt mt) post in
       match res with
       | Normal v ->
-          let desc = asprintf "Postcondition of %a" print_decoded rs.rs_name.id_string in
-          let ctx, mt = cntr_ctx desc ?trigger_loc:loc env' mt in
-          let mt, rt = term_of_value mt v in
-          let assrt = check_post ctx rt in
-          let post = List.map (t_ty_subst mt' mv') rs.rs_cty.cty_post in
-          ignore (List.fold_left assrt mt post)
+          let desc = desc "Postcondition" in
+          check_posts desc v rs.rs_cty.cty_post
       | Excep (xs, v) ->
-          let desc = asprintf "Exceptional postcondition of %a" print_decoded rs.rs_name.id_string in
-          let ctx, mt = cntr_ctx desc ?trigger_loc:loc env' mt in
-          let mt, rt = term_of_value mt v in
-          let assrt = check_post ctx rt in
-          let xpost = Mxs.find xs rs.rs_cty.cty_xpost in
-          let xpost = List.map (t_ty_subst mt' mv') xpost in
-          ignore (List.fold_left assrt mt xpost)
+          let desc = desc "Exceptional postcondition" in
+          check_posts desc v (Mxs.find xs rs.rs_cty.cty_xpost)
       | _ -> () );
   res
 
