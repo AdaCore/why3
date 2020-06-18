@@ -29,9 +29,6 @@ module Occurs
   use string.OCaml
   use Spec
 
-  val (=) (x y: char) : bool
-    ensures { result <-> x = y }
-
   let occurs (pat text: string) (p: int63) : bool
     requires { 0 <= p <= length text - length pat }
     ensures  { result <-> matches pat text p }
@@ -40,7 +37,7 @@ module Occurs
     for i = 0 to m - 1 do
       invariant { substring text p i == substring pat 0 i }
       assert { p + i <= n };
-      if text[p + i] <> pat[i] then return false
+      if not (eq_char text[p + i] pat[i]) then return false
     done;
     true
 
