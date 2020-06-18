@@ -1135,7 +1135,7 @@ let eval_global_fundef ~rac env disp_ctx mod_known locals body =
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
-let report_eval_result ~mod_name ~fun_name body fmt (res, final_env) =
+let report_eval_result ?(mod_name="") ?(fun_name="") body fmt (res, final_env) =
   fprintf fmt "@[<v 2>Execution of %s.%s : () -> @[<h>%a@]@," mod_name fun_name
     print_ity body.e_ity ;
   ( match res with
@@ -1150,6 +1150,6 @@ let report_eval_result ~mod_name ~fun_name body fmt (res, final_env) =
       fprintf fmt "@[globals:@ %a@]" (pp_vsenv print_value) (Mvs.bindings final_env) ) ;
   fprintf fmt "@]"
 
-let report_cntr ~mod_name ~fun_name body fmt (ctx, term) =
+let report_cntr ?(mod_name="") ?(fun_name="") body fmt (ctx, term) =
   fprintf fmt "@[<v 2>Execution of %s.%s : () -> %a@,%a@]" mod_name fun_name
     print_ity body.e_ity report_cntr (ctx, "failed", term)

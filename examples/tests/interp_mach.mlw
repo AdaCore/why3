@@ -222,3 +222,22 @@ module TestArrays
   let t2 () = make 10 1
 
 end
+
+module TestArgs
+
+  use export int.Int
+  use export ref.Ref
+
+  let t1 x = x + 1
+
+  let c = ref 1
+
+  let t2 () = !c + 1
+
+  let t3 () = c := 52
+
+  let t4 () = c := !c + 1
+
+  let t5 x = c := !c + x
+
+end

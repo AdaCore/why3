@@ -91,8 +91,8 @@ val eval_global_fundef :
     @raise Contr RAC is enabled and a contradiction was found *)
 
 val report_eval_result :
-  mod_name:string ->
-  fun_name:string ->
+  ?mod_name:string ->
+  ?fun_name:string ->
   Expr.expr ->
   Format.formatter ->
   result * value Term.Mvs.t ->
@@ -100,8 +100,8 @@ val report_eval_result :
 (** Report an evaluation result *)
 
 val report_cntr :
-  mod_name:string ->
-  fun_name:string ->
+  ?mod_name:string ->
+  ?fun_name:string ->
   Expr.expr ->
   Format.formatter ->
   cntr_ctx * Term.term ->

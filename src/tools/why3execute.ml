@@ -18,15 +18,15 @@ let usage_msg = sprintf
   (Filename.basename Sys.argv.(0))
 
 let opt_file = ref None
-let opt_exec = Queue.create ()
+let opt_exec = ref ""
 
 let add_opt x =
-  if !opt_file = None then opt_file := Some x else
-  match Strings.split '.' x with
-  | [m;i] -> Queue.push (m,i) opt_exec
-  | _ ->
-    Format.eprintf "extra arguments must be of the form 'module.ident'@.";
-    exit 1
+  if !opt_file = None then opt_file := Some x else opt_exec := x
+  (* match Strings.split '.' x with
+   * | [m;i] -> Queue.push (m,i) opt_exec
+   * | _ ->
+   *   Format.eprintf "extra arguments must be of the form 'module.ident'@.";
+   *   exit 1 *)
 
 (* Used for real numbers approximation *)
 let prec = ref None
@@ -76,25 +76,47 @@ let do_input f =
           Env.read_file Pmodule.mlw_language ?format env file in
         mlw_files
   in
-  let do_exec (mod_name, fun_name) =
-    try
-      let open Pinterp in
-      (* eprintf "Find global symbol %s.%s...@." mod_name fun_name; *)
-      let {Pmodule.mod_known= known}, rs = find_global_symbol mm ~mod_name ~fun_name in
-      (* eprintf "Find Global fundef %a...@." Expr.print_rs rs; *)
-      let locals, body = find_global_fundef known rs in
-      Opt.iter init_real !prec;
-      ( try
-          let dispatch = prepare_dispatch env !dispatch in
-          let res = eval_global_fundef ~rac:!enable_rac env dispatch known locals body in
-          printf "%a@." (report_eval_result ~mod_name ~fun_name body) res;
-          exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
-        with Contr (ctx, term) ->
-          printf "%a@." (report_cntr ~mod_name ~fun_name body) (ctx, term) ;
-          exit 1 )
-    with Not_found when not (Debug.test_flag Debug.stack_trace) ->
-      exit 1 in
-  Queue.iter do_exec opt_exec
+  let muc = Pmodule.create_module env (Ident.id_fresh "") in
+  let add_module muc s m =
+    let muc = Pmodule.open_scope muc s in
+    let muc = Pmodule.use_export muc m in
+    Pmodule.close_scope muc false in
+  let muc = Why3.Wstdlib.Mstr.fold_left add_module muc mm in
+  let prog_parsed = Lexer.parse_expr (Lexing.from_string !opt_exec) in
+  let expr = Typing.type_expr_in_muc muc prog_parsed in
+  Format.eprintf "%a@." Expr.print_expr expr;
+
+  let known = muc.muc_known in
+  let open Pinterp in
+  try
+    let dispatch = prepare_dispatch env !dispatch in
+    let res = eval_global_fundef ~rac:!enable_rac env dispatch known [] expr in
+    printf "%a@." (report_eval_result expr) res;
+    exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
+  with Contr (ctx, term) ->
+    printf "%a@." (report_cntr expr) (ctx, term) ;
+    exit 1
+
+
+  (* let do_exec (mod_name, fun_name) =
+   *   try
+   *     let open Pinterp in
+   *     (\* eprintf "Find global symbol %s.%s...@." mod_name fun_name; *\)
+   *     let {Pmodule.mod_known= known}, rs = find_global_symbol mm ~mod_name ~fun_name in
+   *     (\* eprintf "Find Global fundef %a...@." Expr.print_rs rs; *\)
+   *     let locals, body = find_global_fundef known rs in
+   *     Opt.iter init_real !prec;
+   *     ( try
+   *         let dispatch = prepare_dispatch env !dispatch in
+   *         let res = eval_global_fundef ~rac:!enable_rac env dispatch known locals body in
+   *         printf "%a@." (report_eval_result ~mod_name ~fun_name body) res;
+   *         exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
+   *       with Contr (ctx, term) ->
+   *         printf "%a@." (report_cntr ~mod_name ~fun_name body) (ctx, term) ;
+   *         exit 1 )
+   *   with Not_found when not (Debug.test_flag Debug.stack_trace) ->
+   *     exit 1 in
+   * Queue.iter do_exec opt_exec *)
 
 let () =
   try
