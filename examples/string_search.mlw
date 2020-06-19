@@ -163,6 +163,8 @@ module BadShiftTable
     = assert { (substring text j m)[i + m - j] = c } in
     ()
 
+  lemma length_nonneg: forall s. length s >= 0
+
   let search (bst: bad_shift_table) (text: string) : int63
     requires { length bst.pat <= length text }
     ensures  { -1 <= result <= length text - length bst.pat }

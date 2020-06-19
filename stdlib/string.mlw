@@ -86,6 +86,8 @@ module String
   function length string : int
   (** `length s` is the length of the string `s`. *)
 
+  (* axiom length_nonneg: forall s. length s >= 0 *)
+
   axiom length_empty: length "" = 0
 
   axiom length_concat: forall s1 s2.
