@@ -225,8 +225,8 @@ end
 
 module TestArgs
 
-  use export int.Int
-  use export ref.Ref
+  use int.Int
+  use ref.Ref
 
   let t1 x = x + 1
 
@@ -240,4 +240,53 @@ module TestArgs
 
   let t5 x = c := !c + x
 
+  type t 'a = { f1: 'a; f2: int}
+
+  let t6 () = {f1 = ""; f2 = 2}
+
+  let t7 s x = {f1 = s; f2 = x}
+
+  let t8 s = {f1 = s; f2 = !c}
+
+  let t9 (t: t 'a): 'a = t.f1
+
+  let t10 t = t.f2
+
+  let t = ref {f1 = 1; f2 = 2}
+
 end
+
+
+(*
+
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t1 1"
+why3 execute examples/tests/execute-tests.mlw "t1 1" --use-modules="use TestArgs"
+
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t2 ()"
+why3 execute examples/tests/execute-tests.mlw "let _ = TestArgs.c := 42 in TestArgs.t2 ()" --use-modules="use ref.Ref"
+why3 execute examples/tests/execute-tests.mlw "let _ = c := 42 in t2 ()" --use-modules="use ref.Ref; use TestArgs"
+
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t3 ()"
+
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t4 ()"
+
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t5 42"
+
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t6 ()"
+
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t7 \"hello\" 42"
+
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t8 \"hello\""
+
+# for some reason it doesn't work if we don't specify the type of 1
+why3 execute examples/tests/execute-tests.mlw "t9 {f1=1:int;f2=42}" --use-modules="use TestArgs"
+
+why3 execute examples/tests/execute-tests.mlw "t9 {f1=\"hello\";f2=42}" --use-modules="use TestArgs"
+
+why3 execute examples/tests/execute-tests.mlw "t10 {f1=\"hello\";f2=42}" --use-modules="use TestArgs"
+
+why3 execute examples/tests/execute-tests.mlw "t10 ! t" --use-modules="use TestArgs; use ref.Ref"
+
+why3 execute examples/tests/execute-tests.mlw "let _ = t := {! t with f1 = 42} in t10 ! t" --use-modules="use TestArgs; use ref.Ref"
+
+*)
