@@ -83,10 +83,11 @@ let string_list_of_qualid q =
     | Qident id -> id.id_str :: acc in
   sloq [] q
 
-let find_module env q =
+let find_module env file q =
   let open Ptree in
   match q with
-    | Qident {id_str = nm} -> read_module env [] nm
+    | Qident {id_str = nm} ->
+        (try Wstdlib.Mstr.find nm file with Not_found -> read_module env [] nm)
     | Qdot (p, {id_str = nm}) -> read_module env (string_list_of_qualid p) nm
 
 let do_input f =
@@ -116,14 +117,14 @@ let do_input f =
     Loc.set_file "command line argument --use-modules" lb;
     let decl = Lexer.parse_mlw_file lb in
     match decl with
-    | Decls [Duseexport use] -> use_export muc (find_module env use)
+    | Decls [Duseexport use] -> use_export muc (find_module env mm use)
     | Decls [Duseimport (_loc,import,uses)] ->
        let qualid_last = function Qident x | Qdot (_, x) -> x in
        let use_as q = function Some x -> x | None -> qualid_last q in
        let add_import muc (m, q) =
          let import = import || q = None in
          let muc = open_scope muc (use_as m q).id_str in
-         let m = find_module env m in
+         let m = find_module env mm m in
          let muc = use_export muc m in
          close_scope muc ~import in
        List.fold_left add_import muc uses
