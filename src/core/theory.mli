@@ -256,7 +256,7 @@ type bad_instance =
   | BadI_ls_arity of lsymbol (* lsymbol arity mismatch *)
   | BadI_ls_rs of lsymbol (* "val function" -> "function" *)
   | BadI_rs_arity of ident (* incompatible rsymbol arity *)
-  | BadI_rs_type of ident (* rsymbol type mismatch *)
+  | BadI_rs_type of ident * exn (* rsymbol type mismatch *)
   | BadI_rs_kind of ident (* incompatible rsymbol kind *)
   | BadI_rs_ghost of ident (* incompatible ghost status *)
   | BadI_rs_mask of ident (* incompatible result mask *)
