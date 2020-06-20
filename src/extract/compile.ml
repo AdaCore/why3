@@ -555,7 +555,9 @@ module Translate = struct
           let pjl = filter_ghost_params p drecord_fields pjl in
           begin match pjl with
             | [] ->
-                ML.mk_its_defn id args is_private (Some (ML.Dalias ML.tunit))
+                let ty_def = if is_private then None
+                  else Some (ML.Dalias (ML.tunit)) in
+                ML.mk_its_defn id args is_private ty_def
             | [_, _, ty_pj] when is_optimizable_record_itd itd ->
                 ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj))
             | pjl ->
