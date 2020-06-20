@@ -525,7 +525,9 @@ let rec clone_ity cl ity = match ity.ity_node with
   | Ityapp (s, tl, rl) ->
       let tl' = List.map (clone_ity cl) tl in
       begin match Mts.find_opt s.its_ts cl.ts_table with
-      | Some s' -> ity_app_pure s' tl' (clone_regs cl s tl rl s')
+      | Some s' -> ity_app_pure s' tl' (* pure to pure *)
+                     (if List.for_all (fun r -> r.ity_pure) rl
+                        then [] else clone_regs cl s tl rl s')
       | None -> (* creative indentation *)
       begin match Mts.find_opt s.its_ts cl.ty_table with
       | Some ity -> ity_full_inst (its_match_regs s tl' []) ity
