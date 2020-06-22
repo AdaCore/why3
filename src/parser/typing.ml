@@ -407,9 +407,9 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
           let dt_true = Dterm.dterm crcmap DTtrue in
           let dt = DTeps (id_fresh "_", dty_fresh (), dt_true) in
           Dterm.dterm crcmap dt in
-     let v_id, dty = id_fresh "x" ~loc, dty_fresh () in
+     let v_id, dty = id_fresh "_x" ~loc, dty_fresh () in
      let vs_eq_dt ?loc dt =
-       let dt_v = Dterm.dterm crcmap (DTvar (v_id.pre_name,dty)) in
+       let dt_v = Dterm.dterm crcmap ?loc (DTvar (v_id.pre_name,dty)) in
        Dterm.dterm crcmap ?loc (DTapp (ps_equ, [dt_v; dt])) in
      let add_term (t1,t2) ({dt_loc} as dt) =
        let dt1 = dterm ns km crcmap gvars at denv t1 in
