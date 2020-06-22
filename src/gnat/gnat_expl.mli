@@ -42,6 +42,7 @@ type reason =
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
    | VC_Loop_Variant
+   | VC_Subprogram_Variant
    | VC_Assert
    | VC_Raise
    | VC_Inline_Check

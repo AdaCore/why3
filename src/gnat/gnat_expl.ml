@@ -38,6 +38,7 @@ type reason =
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
    | VC_Loop_Variant
+   | VC_Subprogram_Variant
    | VC_Assert
    | VC_Raise
    | VC_Inline_Check
@@ -96,6 +97,7 @@ let is_warning_reason r =
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
    | VC_Loop_Variant
+   | VC_Subprogram_Variant
    | VC_Assert
    | VC_Raise
    | VC_Inline_Check
@@ -193,6 +195,7 @@ let reason_from_string s =
    | "VC_LOOP_INVARIANT_INIT"       -> VC_Loop_Invariant_Init
    | "VC_LOOP_INVARIANT_PRESERV"    -> VC_Loop_Invariant_Preserv
    | "VC_LOOP_VARIANT"              -> VC_Loop_Variant
+   | "VC_SUBPROGRAM_VARIANT"        -> VC_Subprogram_Variant
    | "VC_ASSERT"                    -> VC_Assert
    | "VC_RAISE"                     -> VC_Raise
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
@@ -256,6 +259,7 @@ let reason_to_ada reason =
    | VC_Loop_Invariant_Init       -> "VC_LOOP_INVARIANT_INIT"
    | VC_Loop_Invariant_Preserv    -> "VC_LOOP_INVARIANT_PRESERV"
    | VC_Loop_Variant              -> "VC_LOOP_VARIANT"
+   | VC_Subprogram_Variant        -> "VC_SUBPROGRAM_VARIANT"
    | VC_Assert                    -> "VC_ASSERT"
    | VC_Raise                     -> "VC_RAISE"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
@@ -314,6 +318,7 @@ let reason_to_string reason =
    | VC_Loop_Invariant_Init       -> "loop_invariant_init"
    | VC_Loop_Invariant_Preserv    -> "loop_invariant_preserv"
    | VC_Loop_Variant              -> "loop_variant"
+   | VC_Subprogram_Variant        -> "subprogram_variant"
    | VC_Assert                    -> "assert"
    | VC_Raise                     -> "raise"
    | VC_Inline_Check              -> "inline_check"
