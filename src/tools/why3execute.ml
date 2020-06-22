@@ -138,7 +138,6 @@ let do_input f =
   Loc.set_file "expression to execute" lb;
   let prog_parsed = Lexer.parse_expr lb in
   let expr = Typing.type_expr_in_muc muc prog_parsed in
-  Format.eprintf "%a@." Expr.print_expr expr;
   let known = muc.muc_known in
 
   (* execute expression *)

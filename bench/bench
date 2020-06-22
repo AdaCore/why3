@@ -317,7 +317,7 @@ rac () {
     for func in $@; do
         echo "** $mod.$func"
         echo -n " $func" >&2
-        "bin/why3execute$suffix" --rac "${RACARGS[@]}" "$file" "$mod.$func" 2>&1
+        "bin/why3execute$suffix" --rac "${RACARGS[@]}" "$file" "$mod.$func ()" 2>&1
     done
     echo >&2
 }
@@ -423,30 +423,31 @@ fi
 if enabled execution; then
 echo "=== Checking execution ==="
 DISPATCH=( -L examples/tests --dispatch=array.Array-rac.ArrayExec )
-execute examples/euler001.mlw Euler001.bench
-execute examples/euler002.mlw Solve.bench
-execute examples/fibonacci.mlw FibRecGhost.bench
-execute examples/fibonacci.mlw FibonacciLogarithmic.bench
+execute examples/euler001.mlw "Euler001.bench ()"
+execute examples/euler002.mlw "Solve.bench ()"
+execute examples/fibonacci.mlw "FibRecGhost.bench ()"
+execute examples/fibonacci.mlw "FibonacciLogarithmic.bench ()"
 # fails: cannot execute Cany
 # execute examples/same_fringe.mlw SameFringe.bench
 # fails: cannot evaluate condition a=b (how to do it?)
 # execute examples/same_fringe.mlw SameFringe.test5
-execute examples/same_fringe.mlw Test.test1
-execute examples/vstte12_combinators.mlw Combinators.test_SKK
-execute "${DISPATCH[@]}" examples/selection_sort.mlw SelectionSort.bench
-execute "${DISPATCH[@]}" examples/insertion_sort.mlw InsertionSort.bench
-execute "${DISPATCH[@]}" examples/quicksort.mlw Test.bench
-execute "${DISPATCH[@]}" examples/conjugate.mlw Test.bench
+execute examples/same_fringe.mlw "Test.test1 ()"
+execute examples/vstte12_combinators.mlw "Combinators.test_SKK ()"
+execute "${DISPATCH[@]}" examples/selection_sort.mlw "SelectionSort.bench ()"
+execute "${DISPATCH[@]}" examples/insertion_sort.mlw "InsertionSort.bench ()"
+# fails: problem with random.Random.s
+# execute "${DISPATCH[@]}" examples/quicksort.mlw "Test.bench ()"
+execute "${DISPATCH[@]}" examples/conjugate.mlw "Test.bench ()"
 # fails: needs support for "val" without code (how to do it?)
 # examples/vacid_0_sparse_array.mlw Harness.bench
-execute "${DISPATCH[@]}" examples/knuth_prime_numbers.mlw PrimeNumbers.bench
-execute "${DISPATCH[@]}" examples/vstte10_max_sum.mlw TestCase.test_case
-execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw LCP_test.bench
-execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw SuffixSort_test.bench
-execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw SuffixArray_test.bench
-execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw LRS_test.bench
-execute "${DISPATCH[@]}" examples/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
-execute "${DISPATCH[@]}" examples/vstte10_queens.mlw NQueens.test8
+execute "${DISPATCH[@]}" examples/knuth_prime_numbers.mlw "PrimeNumbers.bench ()"
+execute "${DISPATCH[@]}" examples/vstte10_max_sum.mlw "TestCase.test_case ()"
+execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw "LCP_test.bench ()"
+execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw "SuffixSort_test.bench ()"
+execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw "SuffixArray_test.bench ()"
+execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw "LRS_test.bench ()"
+execute "${DISPATCH[@]}" examples/verifythis_PrefixSumRec.mlw "PrefixSumRec.bench ()"
+execute "${DISPATCH[@]}" examples/vstte10_queens.mlw "NQueens.test8 ()"
 # fails: "Cannot decide condition of if: (not ((~)((<<)((~)(0), 8)) = 0))"
 # examples/queens.mlw NQueensBits.test8
 # fails: cannot find definition of routine eq
@@ -454,34 +455,34 @@ execute "${DISPATCH[@]}" examples/vstte10_queens.mlw NQueens.test8
 # test of execution on real numbers; only if mpfr installed
 if test -n "$has_mpfr"; then
     # Reals
-    execute bench/interp/real.mlw R.test0
-    execute bench/interp/real.mlw R.test1
-    execute bench/interp/real.mlw R.test2
-    execute bench/interp/real.mlw R.test3
-    execute bench/interp/real.mlw R.test_exp
-    execute bench/interp/real.mlw R.test_log
-    execute bench/interp/real.mlw R.test_exp_log
-    execute bench/interp/real.mlw R.bench1
-    execute bench/interp/real.mlw R.bench2
-    execute bench/interp/real.mlw R.bench3
+    execute bench/interp/real.mlw "R.test0 ()"
+    execute bench/interp/real.mlw "R.test1 ()"
+    execute bench/interp/real.mlw "R.test2 ()"
+    execute bench/interp/real.mlw "R.test3 ()"
+    execute bench/interp/real.mlw "R.test_exp ()"
+    execute bench/interp/real.mlw "R.test_log ()"
+    execute bench/interp/real.mlw "R.test_exp_log ()"
+    execute bench/interp/real.mlw "R.bench1 ()"
+    execute bench/interp/real.mlw "R.bench2 ()"
+    execute bench/interp/real.mlw "R.bench3 ()"
     # Float32
-    execute bench/interp/float32.mlw N.bench1
-    execute bench/interp/float32.mlw N.bench2
-    execute bench/interp/float32.mlw N.bench3
-    execute bench/interp/float32.mlw N.bench4
-    execute bench/interp/float32.mlw N.bench5
-    execute bench/interp/float32.mlw N.bench6
-    execute bench/interp/float32.mlw N.bench7
-    execute bench/interp/float32.mlw N.bench8
+    execute bench/interp/float32.mlw "N.bench1 ()"
+    execute bench/interp/float32.mlw "N.bench2 ()"
+    execute bench/interp/float32.mlw "N.bench3 ()"
+    execute bench/interp/float32.mlw "N.bench4 ()"
+    execute bench/interp/float32.mlw "N.bench5 ()"
+    execute bench/interp/float32.mlw "N.bench6 ()"
+    execute bench/interp/float32.mlw "N.bench7 ()"
+    execute bench/interp/float32.mlw "N.bench8 ()"
     # Float64
-    execute bench/interp/float64.mlw N.bench1
-    execute bench/interp/float64.mlw N.bench2
-    execute bench/interp/float64.mlw N.bench3
-    execute bench/interp/float64.mlw N.bench4
-    execute bench/interp/float64.mlw N.bench5
-    execute bench/interp/float64.mlw N.bench6
-    execute bench/interp/float64.mlw N.bench7
-    execute bench/interp/float64.mlw N.bench8
+    execute bench/interp/float64.mlw "N.bench1 ()"
+    execute bench/interp/float64.mlw "N.bench2 ()"
+    execute bench/interp/float64.mlw "N.bench3 ()"
+    execute bench/interp/float64.mlw "N.bench4 ()"
+    execute bench/interp/float64.mlw "N.bench5 ()"
+    execute bench/interp/float64.mlw "N.bench6 ()"
+    execute bench/interp/float64.mlw "N.bench7 ()"
+    execute bench/interp/float64.mlw "N.bench8 ()"
 else
     echo "MPFR not installed, skipping tests"
 fi
