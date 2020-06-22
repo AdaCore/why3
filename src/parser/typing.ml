@@ -400,7 +400,24 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       DTconst (c, dty_real)
   | Ptree.Tconst (Constant.ConstStr _ as c) ->
       DTconst (c, dty_str)
-  | Ptree.Tfunlit (tl, d) -> assert false
+  | Ptree.Tfunlit (tl, default) ->
+     let default = match default with
+       | Some t -> dterm ns km crcmap gvars at denv t
+       | None ->
+          let dt_true = Dterm.dterm crcmap DTtrue in
+          let dt = DTeps (id_fresh "_", dty_fresh (), dt_true) in
+          Dterm.dterm crcmap dt in
+     let v_id, dty = id_fresh "x" ~loc, dty_fresh () in
+     let vs_eq_dt ?loc dt =
+       let dt_v = Dterm.dterm crcmap (DTvar (v_id.pre_name,dty)) in
+       Dterm.dterm crcmap ?loc (DTapp (ps_equ, [dt_v; dt])) in
+     let add_term (t1,t2) ({dt_loc} as dt) =
+       let dt1 = dterm ns km crcmap gvars at denv t1 in
+       let dt2 = dterm ns km crcmap gvars at denv t2 in
+       let dt = DTif (vs_eq_dt ?loc:dt1.dt_loc dt1, dt2,dt) in
+       Dterm.dterm crcmap dt in
+     let dt = List.fold_right add_term tl default in
+     DTquant (DTlambda,[Some v_id,dty,Some loc],[],dt)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm ns km crcmap gvars at denv e1 in

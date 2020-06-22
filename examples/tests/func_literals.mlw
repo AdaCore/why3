@@ -28,7 +28,7 @@ function d5 (x: int) : int -> int = d4 (x+1)
 function e1 (x: int) : int -> int = [|0 => 1; 1 => x|]
 function e2 (x: int) : int -> int = [|0 => 1; 1 => x; 2 => x + 1|]
 function e3 (x: int) : int -> int = [|5 => 1; 1 => x; 10 => x + 1; _ => z x |]
-function e4 (x: int) : int -> int = e4 (x+1)
+function e4 (x: int) : int -> int = e3 (x+1)
 
 (*
 let w (x: int) = x + x
