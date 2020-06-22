@@ -19,7 +19,7 @@ constant c4 : int -> int = [|0 => 1; 1 => 2; 2 => 3; _ => 4|]
 use int.Int
 function z (x: int) : int = x + x
 
-function d1 (x: int) : int -> int = [||]
+function d1 (_: int) : int -> int = [||]
 function d2 (x: int) : int -> int = [|1; x|]
 function d3 (x: int) : int -> int = [|1; x; x + 1|]
 function d4 (x: int) : int -> int = [|1; x; x + 1; z x |]
@@ -29,6 +29,21 @@ function e1 (x: int) : int -> int = [|0 => 1; 1 => x|]
 function e2 (x: int) : int -> int = [|0 => 1; 1 => x; 2 => x + 1|]
 function e3 (x: int) : int -> int = [|5 => 1; 1 => x; 10 => x + 1; _ => z x |]
 function e4 (x: int) : int -> int = e3 (x+1)
+
+goal g1:
+  let a = [| 0 => 1 |] in
+  let b = [| 1 => 2 |] in
+  a 2 = b 2
+
+goal g2:
+  let a = [| 0 => 1; 1 => 2 |] in
+  let b = [| 0 => 1; 1 => -2 |] in
+  a 0 = b 0 &&
+  a 1 = - (b 1) &&
+  a 2 = b 3
+
+goal g3:
+  [|1|] = [|1|]
 
 (*
 let w (x: int) = x + x
