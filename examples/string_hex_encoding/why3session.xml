@@ -3,7 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.7" alternative="strings" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="string_hex_encoding.mlw"/>
 <theory name="Top" proved="true">
@@ -30,134 +31,124 @@
  <goal name="encode&#39;vc" expl="VC for encode" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="encode&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.21" steps="559"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="encode&#39;vc.1" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="encode&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="20"/></proof>
   </goal>
   <goal name="encode&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="20"/></proof>
   </goal>
   <goal name="encode&#39;vc.4" expl="division by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.00" steps="26"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="encode&#39;vc.5" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="106"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="108"/></proof>
   </goal>
   <goal name="encode&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="101"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="103"/></proof>
   </goal>
   <goal name="encode&#39;vc.7" expl="division by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="encode&#39;vc.8" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="143"/></proof>
-  </goal>
-  <goal name="encode&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="137"/></proof>
-  </goal>
-  <goal name="encode&#39;vc.10" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="36"/></proof>
-  </goal>
-  <goal name="encode&#39;vc.11" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
-  </goal>
-  <goal name="encode&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
-  </goal>
-  <goal name="encode&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="40"/></proof>
-  </goal>
-  <goal name="encode&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="2.64" steps="3875"/></proof>
-  </goal>
-  <goal name="encode&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="4.34" steps="9086"/></proof>
-  </goal>
-  <goal name="encode&#39;vc.16" expl="postcondition" proved="true">
   <transf name="unfold" proved="true" arg1="encoding">
-   <goal name="encode&#39;vc.16.0" expl="VC for encode" proved="true">
+   <goal name="encode&#39;vc.8.0" expl="integer overflow" proved="true">
    <transf name="split_vc" proved="true" >
-    <goal name="encode&#39;vc.16.0.0" expl="VC for encode" proved="true">
-    <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
-    </goal>
-    <goal name="encode&#39;vc.16.0.1" expl="VC for encode" proved="true">
-    <transf name="instantiate" proved="true" arg1="LoopInvariant1" arg2="i">
-     <goal name="encode&#39;vc.16.0.1.0" expl="VC for encode" proved="true">
-     <proof prover="0"><result status="valid" time="0.24" steps="557"/></proof>
-     </goal>
-    </transf>
-    </goal>
-    <goal name="encode&#39;vc.16.0.2" expl="VC for encode" proved="true">
-    <proof prover="0"><result status="valid" time="0.04" steps="96"/></proof>
+    <goal name="encode&#39;vc.8.0.0" expl="integer overflow" proved="true">
+    <proof prover="0"><result status="valid" time="0.04" steps="146"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
+  </goal>
+  <goal name="encode&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="139"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.10" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="38"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.11" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="38"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="38"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="42"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="3.40" steps="4419"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.15" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.77" steps="952933"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.16" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.24" steps="28856"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="decode&#39;vc" expl="VC for decode" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="decode&#39;vc.0" expl="division by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
   <goal name="decode&#39;vc.1" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="57"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="57"/></proof>
   </goal>
   <goal name="decode&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="22"/></proof>
   </goal>
   <goal name="decode&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.06" steps="7843"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="22"/></proof>
   </goal>
   <goal name="decode&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="25"/></proof>
   </goal>
   <goal name="decode&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="27"/></proof>
   </goal>
   <goal name="decode&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="118"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="120"/></proof>
   </goal>
   <goal name="decode&#39;vc.7" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="34"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
   <goal name="decode&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.12" steps="146"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="148"/></proof>
   </goal>
   <goal name="decode&#39;vc.9" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.13" steps="163"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="165"/></proof>
   </goal>
   <goal name="decode&#39;vc.10" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.15" steps="195"/></proof>
+  <proof prover="0"><result status="valid" time="0.20" steps="198"/></proof>
   </goal>
   <goal name="decode&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.22" steps="453"/></proof>
+  <proof prover="0"><result status="valid" time="0.25" steps="409"/></proof>
   </goal>
   <goal name="decode&#39;vc.12" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="44"/></proof>
-  </goal>
-  <goal name="decode&#39;vc.13" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="44"/></proof>
-  </goal>
-  <goal name="decode&#39;vc.14" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="46"/></proof>
   </goal>
+  <goal name="decode&#39;vc.13" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="46"/></proof>
+  </goal>
+  <goal name="decode&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="48"/></proof>
+  </goal>
   <goal name="decode&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="48"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="50"/></proof>
   </goal>
   <goal name="decode&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="51"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="53"/></proof>
   </goal>
   <goal name="decode&#39;vc.17" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.89" steps="956"/></proof>
+  <proof prover="0"><result status="valid" time="0.66" steps="951"/></proof>
   </goal>
   <goal name="decode&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.12" steps="183"/></proof>
+  <proof prover="0"><result status="valid" time="0.15" steps="185"/></proof>
   </goal>
  </transf>
  </goal>
