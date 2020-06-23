@@ -371,10 +371,10 @@ The extension of syntax is described by the following rules.
     vardecl: "var" `ident`* ":" `type` ";" | "ghost" "var" `ident`* ":" `type` ";"
     block: `instruction` (";" `instruction`)*
     labelblock: `ident` "{" `block` "}"
-    instruction: `expression`
+    instruction: `expr`
     : | "goto" `ident`
     : | "invariant" `ident` "{" `term` "}"
-    : | "switch" "(" `expression` ")" `switch_case`* "end"
+    : | "switch" "(" `expr` ")" `switch_case`* "end"
     switch_case: "|" `pattern` "->" `block`
 
 
