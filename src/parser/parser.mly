@@ -34,7 +34,7 @@ term_eof:
 | term EOF { $1 }
 
 expr_eof:
-| expr EOF { $1 }
+| seq_expr EOF { $1 }
 
 decl_eof:
 | pure_decl EOF { $1 }
