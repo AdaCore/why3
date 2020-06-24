@@ -3,205 +3,174 @@
 ** Local.test1
 Assertion cannot be evaluated at examples/tests/rac.mlw, line 8, characters 13-37
   Term: forall y:int. y = x -> y = 1
-  Variables: _ -> (), _1 -> (), myref -> ref'mk 0, o -> (), x -> 1,
-    x1 -> ref'mk 0, x2 -> ref'mk 0, y -> ref'mk 0
+  Variables: _ -> (), _1 -> (), o -> (), x -> 1
 Execution of . : () -> ()
   Assertion failed at examples/tests/rac.mlw, line 9, characters 13-18
     Term: x = 0
-    Variables: _ -> (), _1 -> (), _2 -> (), myref -> ref'mk 0, o -> (),
-      x -> 1, x1 -> ref'mk 0, x2 -> ref'mk 0, y -> ref'mk 0
+    Variables: _ -> (), _1 -> (), _2 -> (), o -> (), x -> 1
 ** Local.test2
 Execution of . : () -> ()
   result: ()
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 ** Local.test3
 Execution of . : () -> ()
   Assertion failed at examples/tests/rac.mlw, line 20, characters 13-19
     Term: contents x > 10
-    Variables: _ -> (), _1 -> (), myref -> ref'mk 0, o -> (), x -> ref'mk 1,
-      x1 -> ref'mk 0, x2 -> ref'mk 0, y -> ref'mk 0
+    Variables: _ -> (), _1 -> (), o -> (), x -> ref'mk 1
 ** Local.test4
 Execution of . : () -> ()
   result: ()
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 ** Local.test5
 Execution of . : () -> ()
   result: ()
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 
 * Global
 ** Global.test1
 Execution of . : () -> ()
   result: ()
-  globals: x -> (ref'mk 1), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: x -> (ref'mk 1), y -> (ref'mk 0)
 ** Global.test2
 Execution of . : () -> ()
   Assertion failed at examples/tests/rac.mlw, line 44, characters 13-19
     Term: contents y = 42
-    Variables: _ -> (), myref -> ref'mk 0, o -> (), x -> ref'mk 0,
-      x1 -> ref'mk 0, y -> ref'mk 0
+    Variables: _ -> (), o -> (), x -> ref'mk 0, y -> ref'mk 0
 
 * Functions
 ** Functions.f1
 Execution of . : () -> ()
   Assertion failed at examples/tests/rac.mlw, line 60, characters 13-28
     Term: fff 0 = ((ggg @ 0) @ 1)
-    Variables: _ -> (), _1 -> (), _2 -> (), myref -> ref'mk 0, o -> (),
-      x -> ref'mk 0, x1 -> ref'mk 0, y -> ref'mk 0
+    Variables: _ -> (), _1 -> (), _2 -> (), o -> (), x -> ref'mk 0
 ** Functions.f2
 Execution of . : () -> ()
   result: ()
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: x -> (ref'mk 0)
 ** Functions.f3
 Execution of . : () -> ()
   Loop invariant preservation failed at examples/tests/rac.mlw, line 69, characters 18-32
     Term: contents x = 0 || contents x = 1
-    Variables: _ -> (), i -> 1, myref -> ref'mk 0, o -> 5, o1 -> 0, o2 -> (),
-      x1 -> ref'mk 0, x -> ref'mk 2, y -> ref'mk 0
+    Variables: _ -> (), i -> 1, o -> 5, o1 -> 0, o2 -> (), x -> ref'mk 2
 ** Functions.f4
 Execution of . : () -> ()
   Loop invariant preservation failed at examples/tests/rac.mlw, line 76, characters 18-24
     Term: 5 >= contents x
-    Variables: _ -> (), myref -> ref'mk 0, o -> (), x1 -> ref'mk 0,
-      x -> ref'mk 6, y -> ref'mk 0
+    Variables: _ -> (), o -> (), x -> ref'mk 6
 ** Functions.f5a
 Execution of . : () -> int
   Precondition of f5_aux failed at examples/tests/rac.mlw, line 87, characters 4-12
     Defined at examples/tests/rac.mlw, line 82, characters 15-20
     Term: y > 0
-    Variables: _ -> (), myref -> ref'mk 0, o -> 0, o1 -> (), x -> ref'mk 0,
-      x1 -> ref'mk 0, y1 -> ref'mk 0, y -> 0
+    Variables: _ -> (), o -> 0, o1 -> (), x -> ref'mk 0, y -> 0
 ** Functions.f5b
 Execution of . : () -> int
   Postcondition of f5_aux failed at examples/tests/rac.mlw, line 91, characters 4-12
     Defined at examples/tests/rac.mlw, line 83, characters 14-24
     Term: 2 = 1
-    Variables: _ -> (), _1 -> 1, myref -> ref'mk 0, o -> 2, o1 -> (),
-      x -> ref'mk 0, x1 -> ref'mk 0, y -> ref'mk 0, y1 -> 2
+    Variables: _ -> (), _1 -> 1, o -> 2, o1 -> (), x -> ref'mk 0, y -> 2
 ** Functions.f6
 Execution of . : () -> ()
   Exceptional postcondition of f6_aux failed at examples/tests/rac.mlw, line 101, characters 8-17
     Defined at examples/tests/rac.mlw, line 96, characters 20-25
     Term: 42 = contents x
-    Variables: _ -> (), _1 -> (), myref -> ref'mk 0, o -> (), o1 -> (),
-      x1 -> ref'mk 0, x -> ref'mk 1, y -> ref'mk 0
+    Variables: _ -> (), _1 -> (), o -> (), o1 -> (), x -> ref'mk 1
 ** Functions.f8
 Execution of . : () -> ()
   Assertion failed at examples/tests/rac.mlw, line 113, characters 13-18
     Term: contents r = 1
-    Variables: _ -> (), myref -> ref'mk 0, o -> (), r -> ref'mk 0,
-      x -> ref'mk 0, x1 -> ref'mk 0, y -> ref'mk 0
+    Variables: _ -> (), o -> (), r -> ref'mk 0, x -> ref'mk 0
 ** Functions.f9
 Execution of . : () -> ()
   Precondition of f9_aux failed at examples/tests/rac.mlw, line 124, characters 12-23
     Defined at examples/tests/rac.mlw, line 116, characters 15-21
     Term: not contents x = y
-    Variables: _ -> (), _1 -> 42, myref -> ref'mk 0, o -> 42, o1 -> (),
-      r -> ref'mk 42, x1 -> ref'mk 0, x2 -> ref'mk 0, x -> ref'mk 42,
-      y1 -> ref'mk 0, y -> 42
+    Variables: _ -> (), _1 -> 42, o -> 42, o1 -> (), r -> ref'mk 42,
+      x1 -> ref'mk 0, x -> ref'mk 42, y -> 42
 
 * PolyRefContracts
 ** PolyRefContracts.f1
 Execution of . : () -> ()
   result: ()
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: myref -> (ref'mk 0)
 ** PolyRefContracts.f2a
 Execution of . : () -> int
   result: 1
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 1)
+  globals: myref -> (ref'mk 1)
 ** PolyRefContracts.f2b
 Execution of . : () -> int
   Precondition of f2_aux failed at examples/tests/rac.mlw, line 156, characters 4-20
     Defined at examples/tests/rac.mlw, line 144, characters 15-29
     Term: not contents argref = argx
     Variables: _ -> (), argref -> ref'mk 0, argx -> 0, argy -> 1,
-      myref -> ref'mk 0, o -> 1, o1 -> 0, o2 -> (), x -> ref'mk 0,
-      x1 -> ref'mk 0, y -> ref'mk 0
+      myref -> ref'mk 0, o -> 1, o1 -> 0, o2 -> ()
 ** PolyRefContracts.f2c
 Execution of . : () -> int
   Postcondition of f2_aux failed at examples/tests/rac.mlw, line 159, characters 4-20
     Defined at examples/tests/rac.mlw, line 146, characters 14-27
     Term: 1 = argy
     Variables: _ -> (), argref -> ref'mk 1, argx -> 1, argy -> 2,
-      myref -> ref'mk 1, o -> 2, o1 -> 1, o2 -> (), x -> ref'mk 0,
-      x1 -> ref'mk 0, y -> ref'mk 0
+      myref -> ref'mk 1, o -> 2, o1 -> 1, o2 -> ()
 
 * RecordMutGhost
 ** RecordMutGhost.test
 Execution of . : () -> int
   result: 43
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 
 * RecordPoly
 ** RecordPoly.test1
 Execution of . : () -> ()
   result: ()
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 ** RecordPoly.test2
 Execution of . : () -> ()
   result: ()
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 ** RecordPoly.test3
 Postcondition of update cannot be evaluated at examples/tests/rac.mlw, line 208, characters 4-20
   Defined at examples/tests/rac.mlw, line 199, characters 14-77
   Term: forall j:int.
          0 < j /\ j < length r -> not j = i -> (elts r @ j) = (elts r1 @ j)
-  Variables: _ -> (), _1 -> (), i -> 3, myref -> ref'mk 0, o -> False,
-    o1 -> 3, o2 -> (),
+  Variables: _ -> (), _1 -> (), i -> 3, o -> False, o1 -> 3, o2 -> (),
     r2 -> t3'mk
           (fun (j:int) -> if j = 3 then False else (fun (_2:int) -> True) @ j)
           5,
     r -> t3'mk
          (fun (j:int) -> if j = 3 then False else (fun (_2:int) -> True) @ j)
-         5, x -> ref'mk 0, x1 -> ref'mk 0, x2 -> False, y -> ref'mk 0
+         5, x -> False
 Execution of . : () -> ()
   Assertion failed at examples/tests/rac.mlw, line 211, characters 13-29
     Term: (elts r2 @ 1) = False
-    Variables: _ -> (), _1 -> (), _2 -> (), _3 -> (), _4 -> (),
-      myref -> ref'mk 0, o2 -> (),
+    Variables: _ -> (), _1 -> (), _2 -> (), _3 -> (), _4 -> (), o2 -> (),
       r2 -> t3'mk
             (fun (j:int) ->
               if j = 3 then False else (fun (_5:int) -> True) @ j)
-            5, x -> ref'mk 0, x1 -> ref'mk 0, y -> ref'mk 0
+            5
 
 * PolyFunc
 ** PolyFunc.test0
 Execution of . : () -> int -> int
   result: <fun>
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 ** PolyFunc.test1
 Execution of . : () -> (int, int)
   result: (111, 0)
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 
 * ArrayExec
 ** ArrayExec.test0
 Execution of . : () -> (int, int)
   result: (0, 0)
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 ** ArrayExec.test1
 Execution of . : () -> (int, int)
   result: (11, 0)
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 ** ArrayExec.test2
 Execution of . : () -> (int, int)
   result: (10, 0)
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 
 ** ArrayExec.test3
 Execution of . : () -> ()
   Assertion failed at examples/tests/rac.mlw, line 279, characters 13-23
@@ -209,12 +178,10 @@ Execution of . : () -> ()
     Variables: _ -> (), _1 -> (), _2 -> (), _3 -> (), _4 -> (), _5 -> (),
       a -> array'mk 10
            (fun (j:int) -> if j = 1 then 11 else (fun (_6:int) -> 0) @ j),
-      myref -> ref'mk 0, o -> (), x -> ref'mk 0, x1 -> ref'mk 0,
-      y -> ref'mk 0
+      o -> ()
 
 * Arrays
 ** Arrays.test0
 Execution of . : () -> (int, int)
   result: (10, 0)
-  globals: x -> (ref'mk 0), y -> (ref'mk 0), x1 -> (ref'mk 0),
-    myref -> (ref'mk 0)
+  globals: 

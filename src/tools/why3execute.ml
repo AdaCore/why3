@@ -54,10 +54,9 @@ let option_list =
       APair ('.', AString, AString)), fun arg -> dispatch := arg :: !dispatch),
     ("<f.M> <g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\
       provide an implementation for a module with abstract types or values)");
-    KLong "use-modules",
-    Hnd1 (AString, fun l -> use_modules := String.split_on_char ';' l),
-    "<use_declaration> use modules to type given expressions separated by ';'";
-
+    KLong "use",
+    Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
+    "<qualified module> use module in the execution";
   ]
 
 let config, _, env =
@@ -73,22 +72,13 @@ let prepare_dispatch env l =
   List.fold_right (fun (source, target) -> Pinterp.add_dispatch env ~source ~target)
     (List.map aux l) Pinterp.empty_dispatch
 
-(* TODO: Functions string_list_of_qualid, find_module and the add_use
-   inside do_input are replicated from typing.ml. Can be removed if
-   the function Typing.add_decl is exported. *)
-let string_list_of_qualid q =
-  let open Ptree in
-  let rec sloq acc = function
-    | Qdot (p, id) -> sloq (id.id_str :: acc) p
-    | Qident id -> id.id_str :: acc in
-  sloq [] q
-
 let find_module env file q =
   let open Ptree in
-  match q with
-    | Qident {id_str = nm} ->
-        (try Wstdlib.Mstr.find nm file with Not_found -> read_module env [] nm)
-    | Qdot (p, {id_str = nm}) -> read_module env (string_list_of_qualid p) nm
+  match List.rev q with
+  | [] -> assert false
+  | [nm] ->
+     (try Wstdlib.Mstr.find nm file with Not_found -> read_module env [] nm)
+  | nm :: p -> read_module env (List.rev p) nm
 
 let do_input f =
   let format = !opt_parser in
@@ -102,36 +92,16 @@ let do_input f =
   in
   let muc = create_module env (Ident.id_fresh "") in
 
-  (* add all modules declared in the file to the muc *)
-  let add_module muc s m =
-    let muc = open_scope muc s in
-    let muc = use_export muc m in
-    close_scope muc ~import:false in
-
-  (* parse use declarations provided in the command line and add them
-     to the muc *)
-  let muc = Wstdlib.Mstr.fold_left add_module muc mm in
-  let add_use muc d =
+  (* add modules passed in the --use argument to the muc *)
+  let add_module muc m =
     let open Ptree in
-    let lb = Lexing.from_string d in
-    Loc.set_file "command line argument --use-modules" lb;
-    let decl = Lexer.parse_mlw_file lb in
-    match decl with
-    | Decls [Duseexport use] -> use_export muc (find_module env mm use)
-    | Decls [Duseimport (_loc,import,uses)] ->
-       let qualid_last = function Qident x | Qdot (_, x) -> x in
-       let use_as q = function Some x -> x | None -> qualid_last q in
-       let add_import muc (m, q) =
-         let import = import || q = None in
-         let muc = open_scope muc (use_as m q).id_str in
-         let m = find_module env mm m in
-         let muc = use_export muc m in
-         close_scope muc ~import in
-       List.fold_left add_import muc uses
-    | _ -> eprintf "only use declarations supported in command line \
-                    option '--use-modules'@.";
-           exit 1 in
-  let muc = List.fold_left add_use muc !use_modules in
+    let qualid = String.split_on_char '.' m in
+    let qualid_last = List.hd (List.rev qualid) in
+    let muc = open_scope muc qualid_last in
+    let m = find_module env mm qualid in
+    let muc = use_export muc m in
+    close_scope muc ~import:true in
+  let muc = List.fold_left add_module muc (List.rev !use_modules) in
 
   (* parse and type check command line expression *)
   let lb = Lexing.from_string !opt_exec in

@@ -252,41 +252,41 @@ module TestArgs
 
   let t10 t = t.f2
 
-  let t = ref {f1 = 1; f2 = 2}
+  let t11 = ref {f1 = 1; f2 = 2}
+
+  let t12 () = t9 {f1=1;f2=42}
 
 end
 
-
 (*
 
-why3 execute examples/tests/execute-tests.mlw "TestArgs.t1 1"
-why3 execute examples/tests/execute-tests.mlw "t1 1" --use-modules="use TestArgs"
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t1 1" --use=TestArgs
+why3 execute examples/tests/execute-tests.mlw "t1 1" --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "TestArgs.t2 ()"
-why3 execute examples/tests/execute-tests.mlw "let _ = TestArgs.c := 42 in TestArgs.t2 ()" --use-modules="use ref.Ref"
-why3 execute examples/tests/execute-tests.mlw "let _ = c := 42 in t2 ()" --use-modules="use ref.Ref; use TestArgs"
+why3 execute examples/tests/execute-tests.mlw "t2 ()" --use=TestArgs
+why3 execute examples/tests/execute-tests.mlw "c := 42; t2 ()" --use=ref.Ref --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "TestArgs.t3 ()"
+why3 execute examples/tests/execute-tests.mlw "t3 ()" --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "TestArgs.t4 ()"
+why3 execute examples/tests/execute-tests.mlw "t4 ()" --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "TestArgs.t5 42"
+why3 execute examples/tests/execute-tests.mlw "t5 42" --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "TestArgs.t6 ()"
+why3 execute examples/tests/execute-tests.mlw "t6 ()" --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "TestArgs.t7 \"hello\" 42"
+why3 execute examples/tests/execute-tests.mlw "t7 \"hello\" 42" --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "TestArgs.t8 \"hello\""
+why3 execute examples/tests/execute-tests.mlw 't8 "hello"' --use=TestArgs
 
 # for some reason it doesn't work if we don't specify the type of 1
-why3 execute examples/tests/execute-tests.mlw "t9 {f1=1:int;f2=42}" --use-modules="use TestArgs"
+why3 execute examples/tests/execute-tests.mlw "t9 {f1=1;f2=42}" --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "t9 {f1=\"hello\";f2=42}" --use-modules="use TestArgs"
+why3 execute examples/tests/execute-tests.mlw 't9 {f1="hello";f2=42}' --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "t10 {f1=\"hello\";f2=42}" --use-modules="use TestArgs"
+why3 execute examples/tests/execute-tests.mlw 't10 {f1="hello";f2=42}' --use=TestArgs
 
-why3 execute examples/tests/execute-tests.mlw "t10 ! t" --use-modules="use TestArgs; use ref.Ref"
+why3 execute examples/tests/execute-tests.mlw 't10 !t11' --use=TestArgs --use=ref.Ref
 
-why3 execute examples/tests/execute-tests.mlw "let _ = t := {! t with f1 = 42} in t10 ! t" --use-modules="use TestArgs; use ref.Ref"
+why3 execute examples/tests/execute-tests.mlw 't11 := {!t11 with f1 = 42}; t10 !t11' --use=TestArgs --use=ref.Ref
 
 *)

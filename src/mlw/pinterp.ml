@@ -538,7 +538,10 @@ and default_value_of_types known ts l1 l2 ty : value =
   let cs =
     match Pdecl.((find_its_defn known ts).itd_constructors) with
     | cs :: _ -> cs
-    | [] -> assert false
+    | [] ->
+       eprintf "Cannot compute instances of private type %a (add \
+                dispatch?)@." print_its ts;
+       raise CannotCompute
     | exception Not_found -> assert false in
   let subst = its_match_regs ts l1 l2 in
   let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
