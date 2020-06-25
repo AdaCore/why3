@@ -5,7 +5,7 @@ module Local
   let test1 () =
     let x = 1 in
     assert { x >= 0 }; (* ok *)
-    assert { forall y. y = x -> y = 1 }; (* cannot evaluate *)
+    assert { forall y. y = 1 -> x = y }; (* cannot evaluate *)
     assert { x = 0 } (* failure *)
 
   predicate p (_: unit) = false
@@ -25,14 +25,6 @@ module Local
   let test5 () =
     let x = True in
     assert { x = True }
-
-  type r = { mutable value: int }
-
-  let test6 () =
-    let x = {value= 0} in
-    let y = x in
-    y.value <- 100;
-    x.value, y.value
 end
 
 module Global
@@ -49,123 +41,168 @@ module Global
   let ref y = 42
 
   let test2 () =
-    assert { y = 42 }; (* ok *)
-    ()
+    assert { y = 42 } (* ok, TODO *)
 end
 
 module Functions
 
   use int.Int
 
-  let function fff (x: int): int = x+100
+  let function f1_aux (x: int): int = x+100
 
   let ref x = 0
 
-  let f1 () =
-    let function ggg (x: int) (_: int) : int = x+200 in
-    assert { 101 = fff 1 }; (* ok *)
-    assert { 200 = ggg 0 1 }; (* ok *)
-    assert { fff 0 = ggg 0 1 } (* failure *)
+  let test1 () =
+    let function f1_aux' (x: int) (_: int) : int = x+200 in
+    assert { 101 = f1_aux 1 }; (* ok *)
+    assert { 200 = f1_aux' 0 1 }; (* ok *)
+    assert { f1_aux 0 = f1_aux' 0 1 } (* failure *)
 
-  let f2 () requires { x = 0 } =
+ let test2 () =
+    let function f1_aux (x: int) (_: int) : int = x+200 in
+    assert { f1_aux 0 0 = 200 } (* ok *)
+
+  let test3_aux (y: int) : int
+    requires { y > 0 }
+    ensures { result = 1 }
+  = y
+
+  let test3a () =
+    test3_aux 0 (* failure in precondition *)
+
+  let test3b () =
+    let _ = test3_aux 1 in (* ok *)
+    test3_aux 2 (* failure in postcondition *)
+
+  exception E int
+
+  let test4_aux () : unit
+    raises { E j -> j = x }
+  = x <- 1;
+    raise (E 42)
+
+  let test4 () =
+    try test4_aux () (* failure in exceptional postcondition *)
+    with E _ -> () end
+
+  let test5_aux (d: int)
+    ensures { x = old x + 1 }
+  = x <- x + d
+
+  let test5 () =
+    test5_aux 1; (* ok *)
+    test5_aux 2 (* failure in postcondition *)
+
+  let test6_aux (ref x: 'a) (y: 'a)
+    requires { x <> y }
+    ensures { result = y }
+  = x <- y;
+    x
+
+  let test6 () =
+    let ref r = 1 in (* pres, posts of ref ok *)
+    let _ = test6_aux r 42 in (* ok *)
+    let _ = test6_aux r 42 in (* failure in precondition *)
+    ()
+end
+
+module Loops
+  use int.Int
+
+  val ref x : int
+
+  let test1 () requires { x = 0 } =
     for i = 1 to 10 do
       invariant { 0 < i <= 10 } (* ok *)
     done
 
-  let f3 () requires { x = 0 } =
+  let test2 () requires { x = 0 } =
     for i = 0 to 5 do
       invariant { x = 0 || x = 1 } (* failure when i = 1, x = 2 *)
       x <- x + 1
     done
 
-  let f4 ()  =
+  let test3 ()  =
     while x < 10 do
       variant { 10 - x }
       invariant { 5 >= x } (* failure when x = 6 *) 
       x <- x + 1
     done;
     assert { x = 100 }
-
-  let f5_aux (y: int) : int
-    requires { y > 0 }
-    ensures { result = 1 }
-  = y
-
-  let f5a () =
-    f5_aux 0 (* failure in precondition of f5_aux *)
-
-  let f5b () =
-    let _ = f5_aux 1 in (* ok *)
-    f5_aux 2 (* failure in postcondition of f5_aux *)
-
-  exception E int
-
-  let f6_aux () : unit
-    raises { E j -> j = x }
-  = x <- 1;
-    raise (E 42)
-
-  let f6 () =
-    try f6_aux () (* failure in exceptional postcondition of f6_aux *)
-    with E _ -> () end
-
-  let f7_aux (d: int)
-    ensures { x = old x + 1 }
-  = x <- x + d
-
-  let f7 () =
-    f7_aux 1; (* ok *)
-    f7_aux 2 (* failure in postcondition in f7_aux *)
-
-  let f8 () =
-    let ref r = 0 in
-    assert { r = 1 } (* failure *)
-
-  let f9_aux (ref x: 'a) (y: 'a)
-    requires { x <> y }
-    ensures { result = y }
-  = x <- y;
-    x
-
-  let f9 () =
-    let ref r = 1 in
-    let _ = f9_aux r 42 in (* ok *)
-    let _ = f9_aux r 42 in (* failure in precondition *)
-    ()
 end
 
+module Aliasing
+  use int.Int
+
+  type r = { mutable value: int }
+
+  let test1 () = (* aliasing *)
+    let x = {value= 0} in
+    let y = x in
+    y.value <- 100;
+    assert { (x.value, y.value) = (100, 100) };
+    x.value, y.value
+
+  let test2_aux (b: bool) = (* aliasing *)
+    let x = {value= 0} in
+    let y = x in
+    (if b then
+      y.value <- 100
+    else
+      x.value <- 111);
+    assert { y.value >= 100 };
+    x.value, y.value
+
+  let test2 () =
+    let x, y = test2_aux True in
+    assert { (x, y) = (100, 100) };
+    let x, y = test2_aux False in
+    assert { (x, y) = (111, 111) }
+end
+
+(* TODO *)
+module Labels
+  use int.Int
+
+  type r = { mutable value: int }
+
+  let test1 () =
+    let x = {value= 0} in
+    label X1 in
+    x.value <- x.value + 1;
+    label X2 in
+    x.value <- x.value + 1;
+    assert { x.value at X1 = 0 }; (* ok *)
+    assert { x.value at X2 = 1 }; (* ok *)
+    assert { x.value = 2 } (* ok *)
+end
+
+(* TODO *)
+module Chars
+  use int.Int
+
+  type char = < range 0 255 >
+
+  val (<=) (c1 c2: char) : bool
+     ensures { result <-> char'int c1 <= char'int c2 }
+
+  val (-) (c1 c2: char) : char
+     ensures { char'int result = char'int c1 - char'int c2 }
+
+  let uppercase (c:char) =
+     if (97:char) <= c <= (122:char)  then
+        c - 32 else c
+
+  let test1 () : char =
+    uppercase 97
+end
+
+(* TODO *)
 module Strings
   use string.OCaml
   let test1 () =
     let s = "hello" in
     concat s " world"
-end
-
-module PolyRefContracts
-  use int.Int
-  use ref.Ref
-
-  let f1 () =
-    let myref = ref 0 in
-    myref := !myref + 1
-
-  let f2_aux (ref argref: 'a) (argx argy: 'a)
-    requires { argref <> argx }
-    ensures { result = argx }
-    ensures { result = argy }
-  = argref <- argx;
-    argref
-
-  let ref myref = 0
-
-  let f2a () =
-    f2_aux myref 1 1 (* OK *)
-
-  let f2b () =
-    f2_aux myref 0 1 (* PRE fails *)
-
-  let f2c () =
-    f2_aux myref 1 2 (* POST fails *)
 end
 
 module RecordMutGhost
@@ -180,6 +217,51 @@ module RecordMutGhost
     x.f <- (let g = x.f in (fun (z: int) -> if z = 3 then 42 else g z));
     assert { x.f 3 = 42 }; (* ok *)
     1 (* + x.n *) + x.f 3
+end
+
+module PolyContext
+
+  let poly (x: 'a) : 'a = x
+
+  (* Call polymorphic function from context with statically concrete types *)
+  let test1 () =
+    let x = 42 in
+    poly x
+
+  (* Call polymorphic function from context with statically polymorphic types *)
+  let poly' (x: 'a) : 'a =
+    poly x (* ← *)
+
+  let test2 () =
+    let x = 42 in
+    poly' x
+end
+
+module PolyRefContracts
+  use int.Int
+  use ref.Ref
+
+  let test1 () = (* check contracts in ref *)
+    let r = ref 0 in
+    r := !r + 1
+
+  let test2_aux (ref argref: 'a) (argx argy: 'a)
+    requires { argref <> argx }
+    ensures { result = argx }
+    ensures { result = argy }
+  = argref <- argx;
+    argref
+
+  let ref myref = 0
+
+  let test2a () =
+    test2_aux myref 1 1 (* OK *)
+
+  let test2b () =
+    test2_aux myref 0 1 (* PRE fails *)
+
+  let test2c () =
+    test2_aux myref 1 2 (* POST fails *)
 end
 
 module RecordPoly
@@ -214,7 +296,7 @@ module RecordPoly
   let test3 () =
     let r = { length= 5; elts= fun (_:int) -> True } in
     assert { r.elts 3 = True }; (* ok *)
-    update r 3 False;
+    update r 3 False; (* post condition cannot be evaluated *)
     assert { r.elts 3 = False }; (* ok *)
     assert { r.elts 2 = True }; (* ok *)
     assert { r.elts 1 = False } (* failure *)
@@ -225,7 +307,7 @@ module PolyFunc
 
   let mk v = fun (_: int) -> v
 
-  let test0 () =
+  let test1 () =
       mk 0
 
   type t 'a = {mutable f: int -> 'a}
@@ -236,18 +318,19 @@ module PolyFunc
   let ([]<-) (x: t 'a) (i: int) (v: 'a) : unit =
     x.f <- map_update x.f i v
 
-  let test1 () =
+  let test2 () =
     let x = {f= fun _ -> 0} in
     (* x.f <- map_update x.f 0 111; *)
     x[0] <- 111;
     x.f 0, x.f 1
 end
 
-
 module ArrayExec
   use int.Int
 
   type array 'a = {length: int; mutable elts: int -> 'a}
+
+  let empty () : array 'a = {length= 0; elts= fun _ -> any 'a}
 
   let function make (n: int) (v: 'a) : array 'a
     ensures { result.length = n }
@@ -264,21 +347,21 @@ module ArrayExec
   let ([]<-) (a: array 'a) (i: int) (v: 'a) : unit
     = a.elts <- map_update a.elts i v
 
-  let test0 () =
+  let test1 () =
     let a = {length= 5; elts= fun (_: int) -> 0} in
     a.elts 0, a.elts 1
 
-  let test1 () =
+  let test2 () =
     let a = {length= 5; elts= fun (_: int) -> 0} in
     a.elts <- (let f = a.elts in (fun (i: int) -> if i = 0 then 11 else f i));
     a.elts 0, a.elts 1
 
-  let test2 () =
+  let test3 () =
     let a = make 10 0 in
     a[0] <- 10;
     a[0], a[1]
 
-  let test3 () =
+  let test4 () =
     let a = make 10 0 in
     assert { length a = 10 };
     let x = a[0] in
@@ -295,10 +378,12 @@ module ArrayExec
   clone export array.Array with
     type array = array,
     val make = make,
+    val empty = empty,
     val ([]) = ([]),
     val ([]<-) = ([]<-)
 end
 
+(* TODO dispatch array.Array/rac.ArrayExec by module substitution *)
 module Arrays
   use array.Array
 
@@ -316,23 +401,4 @@ module Arrays
     assert { a[1] = 11 }; (* ok *)
     assert { a[2] = 11 }; (* failure *)
     ()
-end
-
-module C
-  use int.Int
-
-  type char = < range 0 255 >
-
-  val (<=) (c1 c2: char) : bool
-     ensures { result <-> char'int c1 <= char'int c2 }
-
-  val (-) (c1 c2: char) : char
-     ensures { char'int result = char'int c1 - char'int c2 }
-
-  let uppercase (c:char) =
-     if (97:char) <= c <= (122:char)  then
-        c - 32 else c
-
-  let main () : char =
-    uppercase 97
 end

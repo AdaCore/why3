@@ -169,7 +169,7 @@ replay () {
 
 execute () {
     pgm="bin/why3execute$suffix"
-    echo -n "  ${@: -2} ${@: -1}... "
+    echo -n "  ${@:1}... "
     if "$pgm" "$@" > /dev/null; then
         echo "ok"
     else
@@ -400,16 +400,22 @@ echo "=== Checking RAC ==="
 mlw="examples/tests/rac.mlw"
 output="examples/tests/rac.out"
 (
-    rac "$mlw" Local test1 test2 test3 test4 test5 test6
-    rac "$mlw" Global test1 test2
-    rac "$mlw" Functions f1 f2 f3 f4 f5a f5b f6 f7 f8 f9
-    rac "$mlw" PolyRefContracts f1 f2a f2b f2c
+    rac "$mlw" Local test1 test2 test3 test4 test5
+    rac "$mlw" Global test1 # TODO test2
+    rac "$mlw" Functions test1 test2 test3a test3b test4 test5 test6
+    rac "$mlw" Loops test1 test2 test3
+    rac "$mlw" Aliasing test1 test2
+    # rac "$mlw" Labels test1  # TODO
+    # rac "$mlw" Chars test1  # TODO
+    # rac "$mlw" Strings test1  # TODO
     rac "$mlw" RecordMutGhost test
+    rac "$mlw" PolyContext test1 test2
+    rac "$mlw" PolyRefContracts test1 test2a test2b test2c
     rac "$mlw" RecordPoly test1 test2 test3
-    rac "$mlw" PolyFunc test0 test1
-    rac "$mlw" ArrayExec test0 test1 test2 test3
-    (RACARGS=( -L examples/tests --dispatch=array.Array-rac.ArrayExec )
-     rac "$mlw" Arrays test0) # TODO test1
+    rac "$mlw" PolyFunc test1 test2
+    rac "$mlw" ArrayExec test1 test2 test3 test4
+    # (RACARGS=( -L examples/tests --dispatch=array.Array/rac.ArrayExec )
+    #  rac "$mlw" Arrays test0 test1)
 ) > "$output"
 if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
     echo "RAC: ok"
@@ -422,7 +428,7 @@ fi
 
 if enabled execution; then
 echo "=== Checking execution ==="
-DISPATCH=( -L examples/tests --dispatch=array.Array-rac.ArrayExec )
+DISPATCH=( -L examples/tests --dispatch=array.Array/rac.ArrayExec )
 execute examples/euler001.mlw "bench ()" --use=Euler001
 execute examples/euler002.mlw "bench ()" --use=Solve
 execute examples/fibonacci.mlw "bench ()" --use=FibRecGhost
