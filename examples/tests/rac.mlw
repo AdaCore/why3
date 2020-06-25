@@ -109,12 +109,13 @@ module Functions
     try f6_aux () (* failure in exceptional postcondition of f6_aux *)
     with E _ -> () end
 
-  let f7_aux ()
-    ensures { x = old x }
-  = x <- x + 1
+  let f7_aux (d: int)
+    ensures { x = old x + 1 }
+  = x <- x + d
 
   let f7 () =
-    f7_aux () (* TODO failure in postcondition in f7_aux *)
+    f7_aux 1; (* ok *)
+    f7_aux 2 (* failure in postcondition in f7_aux *)
 
   let f8 () =
     let ref r = 0 in

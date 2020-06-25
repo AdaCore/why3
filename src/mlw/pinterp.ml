@@ -146,6 +146,14 @@ and value_desc =
 
 and field = value ref
 
+let rec freeze v = match v.v_desc with
+  | Vconstr (rs, fs) ->
+      let fs = List.map freeze_field fs in
+      {v with v_desc= Vconstr (rs, fs)}
+  | _ -> v
+
+and freeze_field r = ref (freeze !r)
+
 let value ty desc = {v_desc= desc; v_ty= ty}
 let v_desc v = v.v_desc
 let v_ty v = v.v_ty
@@ -1009,6 +1017,12 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
   let arg_vs = List.map (get_pvs env) arg_pvs in
   let env', mt, mv = multibind_pvs' env.disp_ctx.disp_ty rs.rs_cty.cty_args arg_vs (env, Mtv.empty, Mvs.empty) in
   let res_ty = ty_inst mt (ty_of_ity ity_result) in
+  let oldies = (* cty_oldies: {old_v -> v} *)
+    let aux old_pv pv oldies =
+      try Mvs.add old_pv.pv_vs (freeze (Mvs.find pv.pv_vs env.vsenv)) oldies
+      with Not_found ->
+        oldies in
+    Mpv.fold aux rs.rs_cty.cty_oldies Mvs.empty in
   let desc str = asprintf "%s of %a" str print_decoded rs.rs_name.id_string in
   if rac then (
     (* TODO variant *)
@@ -1085,6 +1099,7 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
         check_term ctx t in
       (* Checking shared between normal and exceptional post-conditions *)
       let check_posts desc v posts =
+        let env' = {env' with vsenv= Mvs.union (fun _ _ v -> Some v) env'.vsenv oldies} in
         let ctx = cntr_ctx desc ?trigger_loc:loc env' in
         let vt = term_of_value v in
         let post = (* Substitute parameters in postconditions *)
