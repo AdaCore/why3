@@ -25,6 +25,14 @@ module Local
   let test5 () =
     let x = True in
     assert { x = True }
+
+  type r = { mutable value: int }
+
+  let test6 () =
+    let x = {value= 0} in
+    let y = x in
+    y.value <- 100;
+    x.value, y.value
 end
 
 module Global
@@ -272,11 +280,15 @@ module ArrayExec
   let test3 () =
     let a = make 10 0 in
     assert { length a = 10 };
-    assert { a[0]' = 0 }; (* ok *)
+    let x = a[0] in
+    assert { x = 0 }; (* ok *)
     a[1] <- 11;
-    assert { a[0]' = 0 }; (* ok *)
-    assert { a[1]' = 11 }; (* ok *)
-    assert { a[2]' = 11 }; (* failure *)
+    let x = a[0] in
+    assert { x = 0 }; (* ok *)
+    let x = a[1] in
+    assert { x = 11 }; (* ok *)
+    let x = a[2] in
+    assert { x = 11 }; (* failure *)
     ()
 
   clone export array.Array with
