@@ -50,13 +50,12 @@ let option_list =
      (e.g., -148,128,24 for float32)";
     KLong "rac", Hnd0 (fun () -> enable_rac := true),
     " enable runtime basic runtime assertion checking";
-    KLong "dispatch", Hnd1 (APair ('-', APair ('.', AString, AString),
+    KLong "dispatch", Hnd1 (APair ('/', APair ('.', AString, AString),
       APair ('.', AString, AString)), fun arg -> dispatch := arg :: !dispatch),
-    ("<f.M> <g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\
+    ("<f.M>/<g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\
       provide an implementation for a module with abstract types or values)");
-    KLong "use",
-    Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
-    "<qualified module> use module in the execution";
+    KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
+    "<qualified_module> use module in the execution";
   ]
 
 let config, _, env =
