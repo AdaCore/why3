@@ -1115,36 +1115,17 @@ let eval_global_expr ~rac env disp_ctx km locals e =
   let res = eval_expr ~rac env' e in
   res, global_env
 
-let find_global_symbol mm ~mod_name ~fun_name =
-  match Wstdlib.Mstr.find mod_name mm with
-  | m -> (
-    match Pmodule.ns_find_rs m.Pmodule.mod_export [fun_name] with
-    | rs -> m, rs
-    | exception (Not_found as e) ->
-        eprintf "Function %S not found in module %S" fun_name mod_name ;
-        raise e )
-  | exception (Not_found as e) ->
-      eprintf "Module %S not found" mod_name ;
-      raise e
-
-let find_global_fundef mod_known rs =
-  match find_global_definition mod_known rs with
-  | Function (locals, {c_node= Cfun body}) -> locals, body
-  | _ -> assert false
-
 let eval_global_fundef ~rac env disp_ctx mod_known locals body =
   try eval_global_expr ~rac env disp_ctx mod_known locals body
   with CannotFind (l, s, n) ->
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
-let report_eval_result ?(mod_name="") ?(fun_name="") body fmt (res, final_env) =
-  fprintf fmt "@[<v 2>Execution of %s.%s : () -> @[<h>%a@]@," mod_name fun_name
-    print_ity body.e_ity ;
+let report_eval_result body fmt (res, final_env) =
   ( match res with
   | Normal _ ->
-      fprintf fmt "@[<hov2>result:@ %a@]@,@[<hov2>globals:@ %a@]"
-        print_logic_result res (pp_vsenv print_value) (Mvs.bindings final_env)
+      fprintf fmt "@[<hov2>result:@ %a@ =@ %a@]@,@[<hov2>globals:@ %a@]"
+        print_ity body.e_ity print_logic_result res (pp_vsenv print_value) (Mvs.bindings final_env)
   | Excep _ ->
       fprintf fmt "@[<hov2>exceptional result:@ %a@]@,@[<hov2>globals:@ %a@]"
         print_logic_result res (pp_vsenv print_value) (Mvs.bindings final_env)
@@ -1153,6 +1134,5 @@ let report_eval_result ?(mod_name="") ?(fun_name="") body fmt (res, final_env) =
       fprintf fmt "@[globals:@ %a@]" (pp_vsenv print_value) (Mvs.bindings final_env) ) ;
   fprintf fmt "@]"
 
-let report_cntr ?(mod_name="") ?(fun_name="") body fmt (ctx, term) =
-  fprintf fmt "@[<v 2>Execution of %s.%s : () -> %a@,%a@]" mod_name fun_name
-    print_ity body.e_ity report_cntr (ctx, "failed", term)
+let report_cntr _body fmt (ctx, term) =
+  fprintf fmt "@[%a@]" report_cntr (ctx, "failed", term)

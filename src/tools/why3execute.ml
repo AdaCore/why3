@@ -73,7 +73,6 @@ let prepare_dispatch env l =
     (List.map aux l) Pinterp.empty_dispatch
 
 let find_module env file q =
-  let open Ptree in
   match List.rev q with
   | [] -> assert false
   | [nm] ->
@@ -94,7 +93,6 @@ let do_input f =
 
   (* add modules passed in the --use argument to the muc *)
   let add_module muc m =
-    let open Ptree in
     let qualid = String.split_on_char '.' m in
     let qualid_last = List.hd (List.rev qualid) in
     let muc = open_scope muc qualid_last in
@@ -105,7 +103,7 @@ let do_input f =
 
   (* parse and type check command line expression *)
   let lb = Lexing.from_string !opt_exec in
-  Loc.set_file "expression to execute" lb;
+  Loc.set_file "command line expression to execute" lb;
   let prog_parsed = Lexer.parse_expr lb in
   let expr = Typing.type_expr_in_muc muc prog_parsed in
   let known = muc.muc_known in

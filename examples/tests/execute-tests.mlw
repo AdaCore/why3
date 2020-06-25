@@ -229,64 +229,88 @@ module TestArgs
   use ref.Ref
 
   let t1 x = x + 1
+(*
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t1 1" --use=TestArgs
+why3 execute examples/tests/execute-tests.mlw "t1 1" --use=TestArgs
+*)
 
   let c = ref 1
 
   let t2 () = !c + 1
+(*
+why3 execute examples/tests/execute-tests.mlw "t2 ()" --use=TestArgs
+why3 execute examples/tests/execute-tests.mlw "c := 42; t2 ()" --use=ref.Ref --use=TestArgs
+*)
 
   let t3 () = c := 52
+(*
+why3 execute examples/tests/execute-tests.mlw "t3 ()" --use=TestArgs
+*)
 
   let t4 () = c := !c + 1
+(*
+why3 execute examples/tests/execute-tests.mlw "t4 ()" --use=TestArgs
+*)
 
   let t5 x = c := !c + x
+(*
+why3 execute examples/tests/execute-tests.mlw "t5 42" --use=TestArgs
+*)
 
   type t 'a = { f1: 'a; f2: int}
 
   let t6 () = {f1 = ""; f2 = 2}
+(*
+why3 execute examples/tests/execute-tests.mlw "t6 ()" --use=TestArgs
+*)
 
   let t7 s x = {f1 = s; f2 = x}
+(*
+why3 execute examples/tests/execute-tests.mlw "t7 \"hello\" 42" --use=TestArgs
+*)
 
   let t8 s = {f1 = s; f2 = !c}
+(*
+why3 execute examples/tests/execute-tests.mlw 't8 "hello"' --use=TestArgs
+*)
 
   let t9 (t: t 'a): 'a = t.f1
+(*
+why3 execute examples/tests/execute-tests.mlw "t9 {f1=1;f2=42}" --use=TestArgs
+why3 execute examples/tests/execute-tests.mlw 't9 {f1="hello";f2=42}' --use=TestArgs
+*)
 
   let t10 t = t.f2
+(*
+why3 execute examples/tests/execute-tests.mlw 't10 !t11' --use=TestArgs --use=ref.Ref
+why3 execute examples/tests/execute-tests.mlw 't10 {f1="hello";f2=42}' --use=TestArgs
+*)
 
   let t11 = ref {f1 = 1; f2 = 2}
+(*
+why3 execute examples/tests/execute-tests.mlw 't11 := {!t11 with f1 = 42}; t10 !t11' --use=TestArgs --use=ref.Ref
+*)
 
   let t12 () = t9 {f1=1;f2=42}
+(*
+why3 execute examples/tests/execute-tests.mlw 't12 ()' --use=TestArgs
+*)
 
 end
 
+module ShouldFail
+  use random.Random
+  (*
+why3 execute examples/tests/execute-tests.mlw "()" --use=ShouldFail
+  *)
+end
+
+module TestRac
+  use int.Int
+
+  let f (x: int) = assert {x > 0}
 (*
-
-why3 execute examples/tests/execute-tests.mlw "TestArgs.t1 1" --use=TestArgs
-why3 execute examples/tests/execute-tests.mlw "t1 1" --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw "t2 ()" --use=TestArgs
-why3 execute examples/tests/execute-tests.mlw "c := 42; t2 ()" --use=ref.Ref --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw "t3 ()" --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw "t4 ()" --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw "t5 42" --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw "t6 ()" --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw "t7 \"hello\" 42" --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw 't8 "hello"' --use=TestArgs
-
-# for some reason it doesn't work if we don't specify the type of 1
-why3 execute examples/tests/execute-tests.mlw "t9 {f1=1;f2=42}" --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw 't9 {f1="hello";f2=42}' --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw 't10 {f1="hello";f2=42}' --use=TestArgs
-
-why3 execute examples/tests/execute-tests.mlw 't10 !t11' --use=TestArgs --use=ref.Ref
-
-why3 execute examples/tests/execute-tests.mlw 't11 := {!t11 with f1 = 42}; t10 !t11' --use=TestArgs --use=ref.Ref
-
+why3 execute examples/tests/execute-tests.mlw "f 1" --use=TestRac
+why3 execute examples/tests/execute-tests.mlw "f 0" --use=TestRac
 *)
+end
