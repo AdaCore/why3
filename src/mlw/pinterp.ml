@@ -191,7 +191,7 @@ let rec print_value fmt v =
 and print_field fmt f = print_value fmt (field_get f)
 
 
-let rec term_of_value mt v : ty Mtv.t * term =
+let rec term_of_value' mt v : ty Mtv.t * term =
   match v.v_desc with
   | Vnum i -> mt, t_const (Constant.int_const i) v.v_ty
   | Vstring s -> mt, t_const (Constant.ConstStr s) ty_str
@@ -203,15 +203,20 @@ let rec term_of_value mt v : ty Mtv.t * term =
   | Vfun (cl, arg, e) ->
       let aux vs v (mt, mv) =
         let mt = ty_match mt vs.vs_ty v.v_ty in
-        let mt, t = term_of_value mt v in
+        let mt, t = term_of_value' mt v in
         mt, Mvs.add vs t mv in
       let mt, mv = Mvs.fold aux cl (mt, Mvs.empty) in
       let t = Opt.get (term_of_expr ~prop:false e) in
       let t = t_ty_subst mt mv t in
       mt, t_lambda [arg] [] t
+      (* let mv = Mvs.map term_of_value cl in
+       * let t = t_ty_subst Mtv.empty mv t in
+       * t_lambda [arg] [] t *)
   | _ -> Format.kasprintf failwith "term_of_value: %a" print_value v
 
-and term_of_field mt r = term_of_value mt r.contents
+and term_of_field mt r = term_of_value' mt r.contents
+
+let term_of_value t = snd (term_of_value' Mtv.empty t)
 
 (* RESULT *)
 
@@ -239,15 +244,15 @@ type env =
     disp_ctx: dispatch_ctx }
 
 let add_local_funs locals env =
-  let funenv = List.fold_left (fun acc (rs, ce) -> Mrs.add rs ce acc) env.funenv locals in
+  let add acc (rs, ce) = Mrs.add rs ce acc in
+  let funenv = List.fold_left add env.funenv locals in
   {env with funenv}
 
 let bind_vs vs v env = {env with vsenv= Mvs.add vs v env.vsenv}
 let bind_pvs pv v_t env = bind_vs pv.pv_vs v_t env
 
 let multibind_pvs l tl env =
-  try List.fold_right2 bind_pvs l tl env
-  with Invalid_argument _ -> assert false
+  List.fold_right2 bind_pvs l tl env
 
 (** [multibind_pvs' ty_disp pvs vs (env, mt, mv)] binds values [vs] to variables [pvs],
     updating the type mapping [mt] by the bindings. Values are possibly
@@ -541,8 +546,7 @@ and default_value_of_types known ts l1 l2 ty : value =
     | [] ->
        eprintf "Cannot compute instances of private type %a (add \
                 dispatch?)@." print_its ts;
-       raise CannotCompute
-    | exception Not_found -> assert false in
+       raise CannotCompute in
   let subst = its_match_regs ts l1 l2 in
   let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
   let tyl = List.map (ity_full_inst subst) ityl in
@@ -690,19 +694,18 @@ let add_fun rs cexp known =
     Mid.add rs.rs_name decl known
   with Exit -> known
 
-let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env mt =
+let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env =
   let c_known, c_rule_terms =
     Mid.fold add_known_rule_term env.known (Mid.empty, Mid.empty) in
   let c_known = Mrs.fold add_fun env.funenv c_known in
-  let mt, vsenv' =
-    Mvs.mapi_fold (fun _ v mt -> term_of_value mt v) env.vsenv mt in
+  let vsenv' = Mvs.map term_of_value env.vsenv in
   let c_vsenv = Mvs.union (fun _ _ t -> Some t) vsenv vsenv' in
   { c_env= env.env;
     c_desc= desc;
     c_trigger_loc= trigger_loc;
     c_known;
     c_rule_terms;
-    c_vsenv }, mt
+    c_vsenv }
 
 (* TERM EVALUATION *)
 
@@ -904,14 +907,14 @@ let rec eval_expr ~rac env (e : expr) : result =
   | Ewhile (cond, inv, _var, e1) -> (
       (* TODO variants *)
       if rac then
-        check_terms (fst (cntr_ctx "Loop invariant initialization" env Mtv.empty)) inv ;
+        check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
       match eval_expr ~rac env cond with
       | Normal {v_desc= Vbool false} -> Normal (value ty_unit Vvoid)
       | Normal {v_desc= Vbool true} -> (
         match eval_expr ~rac env e1 with
         | Normal _ ->
             if rac then
-              check_terms (fst (cntr_ctx "Loop invariant preservation" env Mtv.empty)) inv ;
+              check_terms (cntr_ctx "Loop invariant preservation" env) inv ;
             eval_expr ~rac env e
         | r -> r )
       | Normal t ->
@@ -935,14 +938,14 @@ let rec eval_expr ~rac env (e : expr) : result =
           match eval_expr ~rac env' e1 with
           | Normal _ ->
               if rac then
-                check_terms (fst (cntr_ctx "Loop invariant preservation" env' Mtv.empty)) inv ;
+                check_terms (cntr_ctx "Loop invariant preservation" env') inv ;
               iter (suc i)
           | r -> r
         else
           Normal (value ty_unit Vvoid) in
       ( if rac then
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
-          check_terms (fst (cntr_ctx "Loop invariant initialization" env' Mtv.empty)) inv ) ;
+          check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
       iter a
     with NotNum -> Irred e )
   | Ematch (e0, ebl, el) -> (
@@ -974,7 +977,7 @@ let rec eval_expr ~rac env (e : expr) : result =
         | Expr.Assert -> "Assertion"
         | Expr.Assume -> "Assumption"
         | Expr.Check -> "Check" in
-      if rac then check_term (fst (cntr_ctx descr env Mtv.empty)) t ;
+      if rac then check_term (cntr_ctx descr env) t ;
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
       (* TODO: do not eval ghost if no assertion check *)
@@ -998,23 +1001,24 @@ and exec_match ~rac env t ebl =
       with NoMatch -> iter rem ) in
   iter ebl
 
-and exec_call ~rac ?loc env rs args ity_result =
+and exec_call ~rac ?loc env rs arg_pvs ity_result =
   let rs, env =
     match rs_dispatch env.disp_ctx.disp_rs rs with
     | rs, known -> rs, {env with known}
     | exception Not_found -> rs, env in
-  let args' = List.map (get_pvs env) args in
-  let env', mt, mv = multibind_pvs' env.disp_ctx.disp_ty rs.rs_cty.cty_args args' (env, Mtv.empty, Mvs.empty) in
+  let arg_vs = List.map (get_pvs env) arg_pvs in
+  let env', mt, mv = multibind_pvs' env.disp_ctx.disp_ty rs.rs_cty.cty_args arg_vs (env, Mtv.empty, Mvs.empty) in
   let res_ty = ty_inst mt (ty_of_ity ity_result) in
   let desc str = asprintf "%s of %a" str print_decoded rs.rs_name.id_string in
   if rac then (
     (* TODO variant *)
+    let ctx = cntr_ctx (desc "Precondition") ?trigger_loc:loc env' in
     let pre = (* Substitute paramaters in preconditions *)
       List.map (t_ty_subst mt mv) rs.rs_cty.cty_pre in
-    check_terms (fst (cntr_ctx (desc "Precondition") ?trigger_loc:loc env' Mtv.empty)) pre );
+    check_terms ctx pre );
   let res =
     if rs_equal rs rs_func_app then
-      match args' with
+      match arg_vs with
       | [{v_desc= Vfun (cl, arg, e)}; value] ->
           let env =
             {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv cl} in
@@ -1025,14 +1029,14 @@ and exec_call ~rac ?loc env rs args ity_result =
       let call env d =
         match d.c_node with
         | Capp (rs', pvl) ->
-            exec_call ~rac env rs' (pvl @ args) ity_result
+            exec_call ~rac env rs' (pvl @ arg_pvs) ity_result
         | Cpur _ -> assert false (* TODO ? *)
         | Cany ->
             eprintf "Cannot compute any function %a (add dispatch?)@." print_decoded rs.rs_name.id_string;
             raise CannotCompute
         | Cfun body ->
             let pvsl = d.c_cty.cty_args in
-            let env' = multibind_pvs pvsl args' env in
+            let env' = multibind_pvs pvsl arg_vs env in
             Debug.dprintf debug "@[Evaluating function body of %s@]@."
               rs.rs_name.id_string ;
             let r = eval_expr ~rac env' body in
@@ -1046,7 +1050,7 @@ and exec_call ~rac ?loc env rs args ity_result =
       | Builtin f ->
           Debug.dprintf debug "@[Evaluating builtin function %s@]@."
             rs.rs_name.id_string ;
-          let r = Normal (f rs args') in
+          let r = Normal (f rs arg_vs) in
           Debug.dprintf debug "@[Return from builtin function %s result %a@]@."
             rs.rs_name.id_string print_logic_result r ;
           r
@@ -1054,10 +1058,10 @@ and exec_call ~rac ?loc env rs args ity_result =
           Debug.dprintf debug "[interp] create record with type %a@." print_ity
             ity_result ;
           (* FIXME : put a ref only on mutable fields *)
-          let args' = List.map ref args' in
+          let args' = List.map ref arg_vs in
           Normal (value res_ty (Vconstr (rs, args')))
       | Projection _d -> (
-        match rs.rs_field, args' with
+        match rs.rs_field, arg_vs with
         | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
             let rec aux constr_args args =
               match constr_args, args with
@@ -1081,18 +1085,16 @@ and exec_call ~rac ?loc env rs args ity_result =
         check_term ctx t in
       (* Checking shared between normal and exceptional post-conditions *)
       let check_posts desc v posts =
-        let ctx, mt = cntr_ctx desc ?trigger_loc:loc env' mt in
-        let mt, vt = term_of_value mt v in
+        let ctx = cntr_ctx desc ?trigger_loc:loc env' in
+        let vt = term_of_value v in
         let post = (* Substitute parameters in postconditions *)
           List.map (t_ty_subst mt mv) posts in
         List.iter (check_post ctx vt mt) post in
       match res with
       | Normal v ->
-          let desc = desc "Postcondition" in
-          check_posts desc v rs.rs_cty.cty_post
+          check_posts (desc "Postcondition") v rs.rs_cty.cty_post
       | Excep (xs, v) ->
-          let desc = desc "Exceptional postcondition" in
-          check_posts desc v (Mxs.find xs rs.rs_cty.cty_xpost)
+          check_posts (desc "Exceptional postcondition") v (Mxs.find xs rs.rs_cty.cty_xpost)
       | _ -> () );
   res
 
