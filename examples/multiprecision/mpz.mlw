@@ -223,7 +223,7 @@ val release_writer (x: mpz_ptr) (p:ptr limb) : unit
   requires { mpz.readers[x] = -1 }
   requires { min p = 0 }
   requires { max p = plength p }
-  requires { writable p } (* maybe not needed? *)
+  requires { mpz.abs_value_of[x] = value p mpz.abs_size[x] }
   writes   { mpz.readers }
   writes   { p } (* invalidates p and its aliases *)
   ensures  { mpz.readers[x] = 0 }
