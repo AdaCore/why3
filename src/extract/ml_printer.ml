@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,7 +22,6 @@ open Printer
 open Pp
 open Theory
 open Pmodule
-open Compile
 
 open Mltree
 
@@ -49,6 +48,20 @@ let create_info pargs fname ~flat ({mod_theory = th} as m) = {
   info_flat         = flat;
   info_current_ph   = [];
 }
+
+let clean_name fname =
+  (* TODO: replace with Filename.remove_extension
+   * after migration to OCaml 4.04+ *)
+  let remove_extension s =
+    try Filename.chop_extension s with Invalid_argument _ -> s in
+  let f = Filename.basename fname in (remove_extension f)
+
+let module_name ?fname path t =
+  let fname = match fname, path with
+    | None, "why3"::_ -> "why3"
+    | None, _   -> String.concat "__" path
+    | Some f, _ -> clean_name f in
+  fname ^ "__" ^ t
 
 let add_current_path info s =
   { info with info_current_ph = s :: info.info_current_ph }
@@ -198,6 +211,9 @@ module MLPrinter (K: sig val keywords: string list end) = struct
     | Ttuple tl ->
         fprintf fmt (protect_on paren "@[%a@]")
           (print_list star (print_ty ~paren:true info)) tl
+    | Tarrow (t1, t2) ->
+       fprintf fmt (protect_on paren "%a -> %a")
+         (print_ty ~paren info) t1 (print_ty ~paren info) t2
     | Tapp (ts, tl) ->
         match query_syntax info.info_syn ts with
         | Some s ->

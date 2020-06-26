@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -75,7 +75,7 @@
   let type_array s e =
     let array = Qdot (Qident (mk_id "Array" s e), mk_id "array" s e) in
     PTtyapp (array, [type_int s e])
-                   
+
 %}
 
 %token <string> INCLUDE
@@ -432,7 +432,7 @@ quant:
 binder:
 | id=ident                { id, type_int   $startpos $endpos }
 | id=ident LEFTSQ RIGHTSQ { id, type_array $startpos $endpos }
-    
+
 term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:

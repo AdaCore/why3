@@ -1,0 +1,296 @@
+module Zget_str
+
+use int.Int
+use int.EuclideanDivision
+use int.Power
+use mach.int.Int32
+use mach.int.UInt32
+use mach.int.Int32GMP
+use ref.Ref
+use mach.c.C
+use mach.c.UChar
+use lemmas.Lemmas
+use import mach.int.UInt64GMP as Limb
+use types.Types
+use int.Abs
+use util.Util
+use mpz.Z
+use mpz.Zutil
+use string.Char
+use mach.c.String
+use array.Array
+use map.Map
+use base_info.BaseInfo
+use stringlemmas.String_lemmas
+use stringlemmas.Conversions
+use stringlemmas.String_value
+use get_str.Get_str
+
+function effective (b:int) : int
+  = if (abs b < 2) then 10 else abs b
+
+let lemma pow_mon_strict (b x y:int)
+  requires { 0 < b }
+  requires { 0 <= x /\ 0 <= y }
+  requires { 0 <= power b x < power b y }
+  ensures  { x < y }
+= ()
+
+let lemma pow_mon (b x y:int)
+  requires { 1 < b }
+  requires { 0 <= x /\ 0 <= y }
+  requires { 0 <= power b x <= power b y }
+  ensures  { x <= y }
+=
+  if power b x = power b y
+  then assert { x <= y
+                by y < x ->
+                   power b (x - y) >= b
+                so power b y * 1 < power b y * power b (x - y)
+                   = power b x }
+  else pow_mon_strict b x y
+
+let wmpz_get_str (sp: ptr char) (ghost sz:int32)
+                 (base:int32) (u: mpz_ptr) : ptr char
+  requires { valid sp sz }
+  requires { writable sp }
+  requires { 2 <= sz }
+  requires { mpz.abs_value_of[u] < power (effective base) (sz-2) }
+  requires { mpz.readers[u] = 0 }
+  requires { 64 * mpz.abs_size[u] + 7 <= max_int32 }
+  requires { -36 <= base <= 62 }
+  ensures { result = sp }
+  ensures { valid_string sp }
+  ensures { string_in_base (effective base) (pelts sp) (offset sp) }
+  ensures { forall x. mpz_unchanged x mpz (old mpz) }
+  ensures { value_text (effective base) (pelts sp) (offset sp)
+            = value_of u mpz }
+
+=
+  label Start in
+  let ghost ob = base in
+  let digits = begin ensures { base < 0 -> result = numupstring }
+                     ensures { 0 <= base <= 36 -> result = numlowstring }
+                     ensures { 36 < base -> result = numuplowstring }
+                     ensures { effective base <= String.length result }
+    if base > 36
+    then "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    else if base >= 0
+    then "0123456789abcdefghijklmnopqrstuvwxyz"
+    else "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ" end in
+  let ref base = base in
+  begin ensures { base = effective ob }
+    if base <= 0 then base <- - base;
+    if base <= 1 then base <- 10;
+  end;
+  let un = abs_size_of u in
+  if un = 0
+  then begin
+    C.set_ofs sp 0 zero_num;
+    C.set_ofs sp 1 zero_char;
+    assert { strlen (pelts sp) (offset sp) = 1 };
+    assert { value_text base (pelts sp) (offset sp) = 0
+             by zero_num <> minus_char
+             so value_text base (pelts sp) (offset sp)
+                = abs_value_sub_text base (pelts sp) (offset sp) (offset sp + 1)
+                = text_to_num ob zero_num
+                = 0 };
+    return sp
+  end;
+  let ref i : int32 = 0 in
+  let ref sn : int32 = 0 in
+  if size_of u < 0
+  then begin
+    C.set_ofs sp 0 minus_char;
+    i <- i+1
+  end;
+  let bits = wmpn_base_power_of_two_p (Limb.of_int32 base) in
+  let up = get_read_ptr u in
+  assert { valid sp sz };
+  label Open in
+  let usp, ghost mem = open_from_charptr sp in
+  assert { valid usp sz };
+  let ghost ousp = pure { usp } in
+  let uspi = C.incr usp i in
+  if (bits <> 0)
+  then begin
+    value_tail up (un-1);
+    let ghost um = C.get_ofs up (un - 1) in
+    let ghost sb = wmpn_limb_size_in_base_2 um in
+    let ghost ub = 64 * (un - 1) + (Limb.to_int32 sb) in
+    assert { power 2 (ub - 1) <= value up un < power 2 ub
+             by value up un < power radix (un - 1) + power radix (un - 1) * um
+             = power radix (un - 1) * (1 + um)
+             = power 2 (64 * (un - 1)) * (1 + um)
+             <= power 2 (64 * (un - 1)) * power 2 sb
+             = power 2 (64 * (un - 1) + sb)
+             so value up un >= power radix (un - 1) * um
+                >= power 2 (64 * (un - 1)) * um
+                >= power 2 (64 * (un - 1)) * power 2 (sb - 1)
+                = power 2 (64 * (un - 1) + sb - 1) };
+    assert { power 2 ub <= power base (sz - 2)
+             by base = power 2 bits
+             so power 2 (ub - 1) <= value up un < power 2 (bits * (sz - 2))
+             so ub - 1 < bits * (sz - 2)
+             so ub <= bits * (sz - 2) };
+    assert { div (ub + bits - 1) bits < sz - 1
+             by power 2 ub <= power base (sz - 2)
+                  = power (power 2 bits) (sz - 2)
+                  = power 2 (bits * (sz - 2))
+               so ub <= bits * (sz - 2)
+               so ub + bits - 1 < bits * (sz - 1)
+               so let d = div (ub + bits - 1) bits in
+                  ub + bits - 1 >= bits * d
+               so bits * d < bits * (sz - 1)
+               so d < sz - 1 };
+    let g = wmpn_get_str_bits uspi bits up un ub in
+    assert { i = 1 -> (pelts uspi)[offset sp] = UChar.of_char minus_char
+             by offset sp = offset sp at Open
+             so (pelts uspi)[offset sp]
+             = (pelts ousp)[offset sp]
+             = UChar.of_char ((pelts sp)[offset sp] at Open) };
+    sn <- i + UInt32.to_int32 g;
+    assert { sn <= sz - 1
+             by g <= div (ub + bits - 1) bits <= sz - 2
+             so sn <= g + i <= sz - 1 };
+    assert { svalue_sub (power 2 bits) (pelts usp)
+                      (offset sp + i) (offset sp + sn)
+             = mpz.abs_value_of[u]
+             by svalue (power 2 bits) uspi g = mpz.abs_value_of[u]
+             so svalue (power 2 bits) uspi g
+                = svalue_sub (power 2 bits) (pelts uspi)
+                             (offset uspi) (offset uspi + g)
+                = svalue_sub (power 2 bits) (pelts usp)
+                             (offset usp + i) (offset usp + sn)};
+  end else begin
+    let info = wmpn_get_base_info (Limb.of_int32 base) in
+    let tp = salloc (UInt32.of_int32 un) in
+    wmpn_copyd_sep tp up un;
+    assert { value tp un = mpz.abs_value_of[u] };
+    let g = wmpn_get_str_other uspi (sz - i) base info tp un in
+    sn <- i + UInt32.to_int32 g;
+    assert { i = 1 -> (pelts uspi)[offset sp] = UChar.of_char minus_char
+             by offset sp = offset sp at Open
+             so (pelts uspi)[offset sp]
+             = (pelts ousp)[offset sp]
+             = UChar.of_char ((pelts sp)[offset sp] at Open) };
+    assert { svalue_sub base (pelts usp) (offset sp + i) (offset sp + sn)
+             = mpz.abs_value_of[u]
+             by svalue base uspi g = mpz.abs_value_of[u]
+             so svalue base uspi g
+                = svalue_sub base (pelts uspi) (offset uspi) (offset uspi + g)
+                = svalue_sub base (pelts usp) (offset usp + i)
+                                              (offset usp + sn) };
+  end;
+  assert { svalue_sub base (pelts usp)
+                      (offset sp + i) (offset sp + sn)
+           = mpz.abs_value_of[u] };
+  assert bs { forall j. i <= j < sn
+              -> 0 <= (pelts usp)[offset sp + j] < base
+              by in_base base (pelts uspi) (offset uspi) (offset usp + sn)
+              so (pelts usp)[j] = (pelts uspi)[j]
+              so offset uspi <= offset sp + j < offset usp + sn};
+  let ghost ousp = pure { usp } in
+  close_from_charptr sp usp mem;
+  assert tc { forall i. 0 <= i < plength sp -> (pelts sp)[i]
+                        = to_char (pelts ousp)[i] };
+  label Conv in
+  assert { 0 <= i <= sn <= plength sp
+           by sn <= sz - 1
+              so valid (sp at Start) sz
+              so plength sp = plength ousp = plength (sp at Start) >= sz };
+  assert { i = 1 -> (pelts sp)[offset sp] = minus_char
+           by offset sp < offset sp + i
+           so (pelts sp)[offset sp] = to_char (pelts ousp)[offset sp]
+              = to_char (of_char minus_char)
+           so 0 <= code minus_char < 127 };
+  for j = i to sn - 1 do
+    invariant { i <= j <= sn }
+    invariant { forall k. offset sp + j <= offset sp + k < offset sp + sn ->
+                (pelts sp)[offset sp + k] = (pelts sp at Conv)[offset sp + k] }
+    invariant { 0 <= ob <= 36 ->
+                to_lowercase_text (pelts ousp) (pelts sp)
+                                  (offset sp) (offset sp + j) }
+    invariant { 36 < ob ->
+                to_bothcase_text (pelts ousp) (pelts sp)
+                                  (offset sp) (offset sp + j) }
+    invariant { ob < 0 ->
+                to_uppercase_text (pelts ousp) (pelts sp)
+                                  (offset sp) (offset sp + j) }
+    invariant { abs_value_sub_text base (pelts sp)
+                                        (offset sp + i) (offset sp + j)
+                = svalue_sub base (pelts ousp) (offset ousp + i)
+                                               (offset ousp + j) }
+    invariant { forall k. offset sp <= k < offset sp + j
+                -> code (pelts sp)[k] <> 0 }
+    invariant { text_in_base base (pelts sp) (offset sp + i) (offset sp + j) }
+    invariant { i = 1 -> (pelts sp)[offset sp] = minus_char }
+    invariant { i = 0 -> j > i -> (pelts sp)[offset sp] <> minus_char }
+    label L in
+    let ghost osp = pure { sp } in
+    let cj = UChar.of_char (C.get_ofs sp j) in
+    assert { cj = (pelts ousp)[offset sp + j] /\ 0 <= cj < base
+             by (pelts sp)[offset sp + j]
+                = (pelts sp at Conv)[offset sp + j]
+                = UChar.to_char (pelts ousp)[offset sp + j]
+             so let tc = UChar.to_char (pelts ousp)[offset sp + j] in
+                0 <= (pelts ousp)[offset sp + j] < base < 127
+             so code tc = (pelts ousp)[offset sp + j]
+             so UChar.of_char tc = code tc = (pelts ousp)[offset sp + j]
+             so cj
+                = UChar.of_char (UChar.to_char (pelts ousp)[offset sp + j])
+                = (pelts ousp)[offset sp + j] };
+    assert { 0 <= cj < base <= String.length digits };
+    let dc = String.get digits (UChar.to_int32 cj) in
+    assert { dc <> minus_char };
+    assert { text_to_num base dc = cj
+             by text_to_num ob dc = cj
+             so if abs ob < 2
+                then text_to_num ob dc
+                     = text_to_num_onecase dc
+                     = text_to_num base dc
+                else if -36 <= ob <= 36
+                     then text_to_num ob dc
+                     = text_to_num_onecase dc
+                     = text_to_num base dc
+                else ob = base };
+    C.set_ofs sp j dc;
+    assert { forall k. offset sp + (j + 1) <= offset sp + k < offset sp + sn ->
+             (pelts sp)[offset sp + k] = (pelts sp)[offset sp + k] at Conv
+             by (pelts sp)[offset sp + k] = (pelts sp)[offset sp + k] at L
+                = (pelts sp)[offset sp + k] at Conv };
+    abs_value_sub_text_frame (int32'int base) (pelts sp) (pelts osp)
+                 (offset sp + int32'int i) (offset sp + int32'int j);
+    assert { abs_value_sub_text base (pelts sp)
+                                        (offset sp + i) (offset sp + (j + 1))
+                = svalue_sub base (pelts ousp) (offset ousp + i)
+                                               (offset ousp + (j + 1)) };
+  done;
+  let ghost osp = pure { sp } in
+  C.set_ofs sp sn zero_char;
+  abs_value_sub_text_frame (int32'int base) (pelts sp) (pelts osp)
+               (offset sp + int32'int i) (offset sp + int32'int sn);
+  assert { strlen (pelts sp) (offset sp) = sn };
+  assert { strlen (pelts sp) (offset sp + i) = sn - i };
+  assert { text_in_base (effective ob) (pelts sp) (offset sp + i)
+           (offset sp + strlen (pelts sp) (offset sp))
+           by base = effective ob
+           so offset sp + strlen (pelts sp) (offset sp) = offset sp + sn
+           so text_in_base base (pelts osp) (offset sp + i) (offset sp + sn)
+           so text_in_base base (pelts sp) (offset sp + i) (offset sp + sn) };
+  assert { value_text base (pelts sp) (offset sp) = value_of u mpz
+           by abs_value_text base (pelts sp) (offset sp + i)
+              = mpz.abs_value_of[u]
+           so if i = 1
+              then
+                value_text base (pelts sp) (offset sp) = - mpz.abs_value_of[u]
+                so mpz.sgn[u] = -1
+              else
+                value_text base (pelts sp) (offset sp)
+                = abs_value_text base (pelts sp) (offset sp)
+                = mpz.abs_value_of[u]
+                so mpz.sgn[u] = 1 };
+  release_reader u up;
+  return sp
+
+end

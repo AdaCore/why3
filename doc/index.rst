@@ -36,6 +36,7 @@ project (ANR-15-CE25-0001), and the `VOCaL`_ ANR project
    install
    manpages
    syntaxref
+   vcgen
    input_formats
    exec
    itp

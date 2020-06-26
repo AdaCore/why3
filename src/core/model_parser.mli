@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -81,9 +81,14 @@ type model_element_kind =
   (* Result of a function call (if the counter-example is for postcondition)  *)
 | Old
   (* Old value of function argument (if the counter-example is for postcondition) *)
+| At of string
+(* Value at label *)
 | Error_message
   (* The model element represents error message, not source-code element.
      The error message is saved in the name of the model element.*)
+| Loop_before
+| Loop_previous_iteration
+| Loop_current_iteration
 | Other
 
 (** Information about the name of the model element *)
@@ -112,9 +117,6 @@ val create_model_element :
   name      : string ->
   value     : model_value ->
   attrs     : Ident.Sattr.t ->
-  ?location : Loc.position ->
-  ?term     : Term.term ->
-  unit ->
   model_element
 (** Creates a counter-example model element.
     @param name : the name of the source-code element
@@ -159,9 +161,7 @@ val print_model_human :
   model ->
   print_attrs:bool ->
   unit
-(** Same as print_model but is intended to be human readable.
-
-*)
+(** Same as print_model but is intended to be human readable.*)
 
 val print_model_json :
   ?me_name_trans:(model_element_name -> string) ->
@@ -284,20 +284,7 @@ type model_parser =  string -> Printer.printer_mapping -> model
     and builds model data structure.
 *)
 
-type raw_model_parser =
-  Ident.ident Wstdlib.Mstr.t -> Ident.ident Wstdlib.Mstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
-    string list -> Ident.Sattr.t Wstdlib.Mstr.t -> string -> model_element list
-(** Parses the input string into model elements.
-    [raw_model_parser: proj->record_map->noarg_cons->s->mel]
-    [proj]: is the list of projections
-    [list_field]: is the list of field function definition
-    [record_map]: is a map associating the name of printed projections to the
-      fields (couple of printed field and model_trace name).
-    [noarg_cons]: List of constructors with no arguments (collected to avoid
-      confusion between variable and constructors)
-    [s]: model
-    [mel]: collected model
- *)
+type raw_model_parser = Printer.printer_mapping -> string -> model_element list
 
 val register_remove_field:
   (Ident.Sattr.t * model_value -> Ident.Sattr.t * model_value) -> unit

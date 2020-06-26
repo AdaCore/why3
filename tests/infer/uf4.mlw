@@ -1,0 +1,19 @@
+
+
+module Uf1
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
+
+	let b(x:int): int
+	requires { x >= 3 }
+	ensures { result = x * x } =
+		let a = make x 0 in
+		let i = ref 0 in
+		while (!i  < length a) do
+		variant { length a - !i }
+		incr i;
+		a[!i-1] <- !i * !i ;
+		done; a[!i-1]
+end

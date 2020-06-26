@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -967,49 +967,46 @@ let provers_from_detected_provers =
 
 let add_builtin_provers config = !provers_from_detected_provers config
 
+let load_default_config_if_needed config =
+  if config.main.load_default_config then add_builtin_provers config else config
 
 module Args = struct
   let opt_config = ref None
   let opt_extra = ref []
   let opt_loadpath = ref []
-  let opt_help = ref false
   let opt_stdlib = ref true
   let opt_load_default_plugins = ref true
 
-  let common_options_head = [
-    "-C", Arg.String (fun s -> opt_config := Some s),
-        "<file> read configuration from <file>";
-    "--config", Arg.String (fun s -> opt_config := Some s),
-        " same as -C";
-    "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-        "<file> read additional configuration from <file>";
-    "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-        "<dir> add <dir> to the library search path";
-    "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-        " same as -L";
-    "--no-stdlib", Arg.Clear opt_stdlib,
-    " do not add the standard library to the loadpath";
-    "--no-load-default-plugins", Arg.Clear opt_load_default_plugins,
-    " do not load the plugins from the standard path";
-    Debug.Args.desc_debug;
-    Debug.Args.desc_debug_all;
-    Debug.Args.desc_debug_list; ]
+  let common_options =
+    let open Getopt in
+    [ Key ('C', "config"), Hnd1 (AString, fun s -> opt_config := Some s),
+      "<file> read configuration from <file>";
+      KLong "extra-config", Hnd1 (AString, fun s -> opt_extra := !opt_extra @ [s]),
+      "<file> read additional configuration from <file>";
+      Key ('L', "library"), Hnd1 (AString, fun s -> opt_loadpath := s :: !opt_loadpath),
+      "<dir> add <dir> to the library search path";
+      KLong "no-stdlib", Hnd0 (fun () -> opt_stdlib := false),
+      " do not add the standard library to the loadpath";
+      KLong "no-load-default-plugins", Hnd0 (fun () -> opt_load_default_plugins := false),
+      " do not load the plugins from the standard path";
+      Debug.Args.desc_debug;
+      Debug.Args.desc_debug_all;
+      Debug.Args.desc_debug_list;
+    ]
 
-  let common_options_tail = [
-    "-h", Arg.Set opt_help, " print this list of options";
-    "-help", Arg.Set opt_help, "";
-    "--help", Arg.Set opt_help, " same as -h"; ]
+  let do_usage options header footer =
+    Printf.printf "%s\n%s" header (Getopt.format options);
+    if footer <> "" then Printf.printf "\n%s" footer;
+    Printf.printf "%!"
 
-  let align_options options =
-    Arg.align (common_options_head @ options @ common_options_tail)
+  let all_options options header footer =
+    let options = common_options @ options in
+    let open Getopt in
+    (Key ('h', "help"), Hnd0 (fun () -> do_usage options header footer; exit 0),
+     " display this help and exit") ::
+      options
 
-  let initialize ?(extra_help=Format.pp_print_newline) options default usage =
-    let options = align_options options in
-    Arg.parse options default usage;
-    if !opt_help then begin
-      Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
-      exit 0
-    end;
+  let complete_initialization () =
     Debug.Args.set_flags_selected ~silent:true ();
     let base_config = read_config !opt_config in
     let config = { base_config with conf_file = "" } in
@@ -1022,16 +1019,19 @@ module Args = struct
     Debug.Args.set_flags_selected ();
     if Debug.Args.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
-    let config = if config.main.load_default_config then add_builtin_provers config else config in
+    let config = load_default_config_if_needed config in
     config, base_config, Env.create_env lp
 
-  let exit_with_usage ?(exit_code=1) ?(extra_help=Format.pp_print_newline) options usage =
-    let options = align_options options in
-    Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
+  let initialize ?(extra_help="") options default usage =
+    let options = all_options options usage extra_help in
+    Getopt.parse_all options default Sys.argv;
+    complete_initialization ()
+
+  let exit_with_usage ?(exit_code=1) ?(extra_help="") options usage =
+    let options = common_options @ options in
+    do_usage options usage extra_help;
     exit exit_code
 end
-
-
 
 (** Loading drivers with relative names *)
 

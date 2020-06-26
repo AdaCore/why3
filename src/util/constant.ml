@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Mysexplib.Std [@@warning "-33"]
 open Number
 
 (** Construction *)
@@ -17,6 +18,7 @@ type constant =
   | ConstInt  of int_constant
   | ConstReal of real_constant
   | ConstStr  of string
+[@@deriving sexp_of]
 
 let compare_const c1 c2 =
   match c1, c2 with
@@ -48,6 +50,7 @@ let default_escape c = match c with
   | '\n' -> "\\n"
   | '\r' -> "\\r"
   | '\t' -> "\\t"
+  | '\b' -> "\\b"
   | '\"'  -> "\\\""
   | '\032' .. '\126' -> Format.sprintf "%c" c
   | '\000' .. '\031'

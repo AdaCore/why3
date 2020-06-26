@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -561,14 +561,12 @@ and convert_z3_array (t: term) : array =
 and convert_record lf l =
   List.map (fun (f, v) -> f, convert_to_model_value lf v) l
 
-let convert_to_model_element ~set_str list_field name (t: term) =
-  let value = convert_to_model_value list_field t in
+let convert_to_model_element pm name (t: term) =
+  let value = convert_to_model_value pm.Printer.list_fields t in
   let attrs =
-    match Mstr.find name set_str with
-    | exception Not_found -> Ident.Sattr.empty
-    | attrs -> attrs
-  in
-  Model_parser.create_model_element ~name ~value ~attrs ()
+    try Mstr.find name pm.Printer.set_str
+    with Not_found -> Ident.Sattr.empty in
+  Model_parser.create_model_element ~name ~value ~attrs
 
 let default_apply_to_record (list_records: (string list) Mstr.t)
     (noarg_constructors: string list) (t: term) =
@@ -704,17 +702,13 @@ and convert_tarray_to_array a =
   | TConst t -> Const (convert_tterm_to_term t)
   | TStore (a, t1, t2) -> Store (convert_tarray_to_array a, convert_tterm_to_term t1, convert_tterm_to_term t2)
 
-let create_list (projections_list: Ident.ident Mstr.t)
-    (field_list: Ident.ident Mstr.t)
-    (list_records: ((string * string) list) Mstr.t)
-    (noarg_constructors: string list) (set_str: Ident.Sattr.t Mstr.t)
-    (table: definition Mstr.t) =
+let create_list pm (table: definition Mstr.t) =
 
   (* Convert list_records to take replace fields with model_trace when
      necessary. *)
   let list_records =
     Mstr.fold (fun key l acc ->
-      Mstr.add key (List.map (fun (a, b) -> if b = "" then a else b) l) acc) list_records Mstr.empty
+        Mstr.add key (List.map (fun (a, b) -> if b = "" then a else b) l) acc) pm.Printer.list_records Mstr.empty
   in
 
   (* Convert Apply that were actually recorded as record to Record. Also replace
@@ -722,7 +716,7 @@ let create_list (projections_list: Ident.ident Mstr.t)
   let table =
     Mstr.fold (fun key value acc ->
       let value =
-        definition_apply_to_record list_records noarg_constructors value
+        definition_apply_to_record list_records pm.Printer.noarg_constructors value
       in
       Mstr.add key value acc) table Mstr.empty
   in
@@ -752,7 +746,7 @@ let create_list (projections_list: Ident.ident Mstr.t)
   (* First recover values stored in projections that were registered *)
   let table =
     Mstr.fold (fun key value acc ->
-      if Mstr.mem key projections_list || Mstr.mem key field_list then
+        if Mstr.mem key pm.Printer.list_projections || Mstr.mem key pm.Printer.list_fields then
         add_vars_to_table acc key value
       else
         acc)
@@ -771,19 +765,14 @@ let create_list (projections_list: Ident.ident Mstr.t)
   Debug.dprintf debug_cntex "Variable values were propagated@.";
   print_table table;
 
-  let table: term Mstr.t =
-    Mstr.fold (fun k e acc ->
-        Mstr.add k (convert_tree_to_term e) acc) table Mstr.empty
-  in
-
   (* Then converts all variables to raw_model_element *)
   Mstr.fold
-    (fun key value list_acc ->
-      try (convert_to_model_element ~set_str field_list key value :: list_acc)
+    (fun name term list_acc ->
+      try (convert_to_model_element pm name term :: list_acc)
       with Not_value when not (Debug.test_flag debug_cntex &&
                                Debug.test_flag Debug.stack_trace) ->
-        Debug.dprintf debug_cntex "Element creation failed: %s@." key;
+        Debug.dprintf debug_cntex "Element creation failed: %s@." name;
         list_acc
       | e -> raise e)
-    table
+    (Mstr.map convert_tree_to_term table)
     []

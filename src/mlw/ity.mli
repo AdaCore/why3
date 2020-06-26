@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,6 +22,7 @@ type itysymbol = private {
   its_mutable : bool;           (** mutable type *)
   its_fragile : bool;           (** breakable invariant *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
+  its_ofields : pvsymbol list;  (** non-mutable fields *)
   its_regions : region list;    (** shareable components *)
   its_arg_flg : its_flag list;  (** flags for type args *)
   its_reg_flg : its_flag list;  (** flags for regions *)
@@ -232,6 +233,8 @@ val reg_r_reachable : region -> region -> bool
 val ity_r_stale : Sreg.t -> Sreg.t -> ity -> bool
 val reg_r_stale : Sreg.t -> Sreg.t -> region -> bool
 
+val ity_frz_regs : Sreg.t -> ity -> Sreg.t
+
 (** {2 Built-in types} *)
 
 val ts_unit : tysymbol (** the same as [Ty.ts_tuple 0] *)
@@ -296,10 +299,17 @@ val pvs_of_vss : Spv.t -> 'a Mvs.t -> Spv.t
 
 (** {2 Exception symbols} *)
 
+(** A mask is a generalized ghost information allowing to handle
+   tuples where some components can be ghost and others are not.
+
+   They are used for expressions, including results of programs, and
+   for exceptions *)
+
 type mask =
-  | MaskVisible
-  | MaskTuple of mask list
-  | MaskGhost
+  | MaskVisible            (** fully non-ghost *)
+  | MaskTuple of mask list (** decomposed ghst status for tuples *)
+  | MaskGhost              (** fully ghost *)
+[@@deriving sexp_of]
 
 val mask_ghost : mask -> bool
 
@@ -398,6 +408,7 @@ val eff_ghostify_weak : bool -> effect -> effect     (* only if has no effect *)
 
 val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
 val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
+val eff_fusion    : effect -> effect -> effect  (* drop invalidated writes *)
 
 val mask_adjust : effect -> ity -> mask -> mask
 
@@ -526,6 +537,7 @@ val forget_cty : cty -> unit      (* forget arguments and oldies *)
 
 val print_its : Format.formatter -> itysymbol -> unit (* type symbol *)
 val print_reg : Format.formatter -> region -> unit    (* region *)
+val print_reg_name : Format.formatter -> region -> unit    (* region name *)
 val print_ity : Format.formatter -> ity -> unit       (* individual type *)
 val print_ity_full : Format.formatter -> ity -> unit  (* type with regions *)
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,12 +17,10 @@ type action = RenameFile of string * string
 let actions = ref ([] : action list)
 
 let spec_update =
-  let from_file = ref "" in
-  ("-rename-file",
-   Arg.(Tuple [Set_string from_file;
-               String (fun s -> actions := RenameFile(!from_file,s) :: !actions)]),
-       "<oldname> <newname> rename file") ::
-  common_options
+  let open Getopt in
+  [ KLong "rename-file", Hnd1 (APair (':', AString, AString),
+      fun (src, dst) -> actions := RenameFile (src, dst) :: !actions),
+    "<old>:<new> rename file" ]
 
 let do_action ~env ~session action =
   ignore(env);
@@ -38,11 +36,10 @@ let do_action ~env ~session action =
      Sys.rename src dst
 
 let run_update () =
-  let env,_config,should_exit1 = read_env_spec () in
-  if should_exit1 then exit 1;
+  let _,_,env = Whyconf.Args.complete_initialization () in
   iter_files
     (fun fname ->
-     let session, _ = read_session fname in
+     let session = read_session fname in
      List.iter (do_action ~env ~session) !actions;
      Session_itp.save_session session)
 

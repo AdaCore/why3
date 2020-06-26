@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -470,6 +470,8 @@ let add_symbol_pr uc pr = add_symbol add_pr pr.pr_name pr uc
 let create_decl d = mk_tdecl (Decl d)
 
 let print_id fmt id = Ident.print_decoded fmt id.id_string
+let print_vs fmt vs = print_id fmt vs.vs_name
+let print_tv fmt tv = Format.pp_print_char fmt '\''; print_id fmt tv.tv_name
 
 let warn_dubious_axiom uc k _ syms =
   match k with
@@ -658,14 +660,43 @@ let cl_clone_pr cl pr =
 
 (* initialize the clone structure *)
 
-type badinstance_error =
+type bad_instance =
   | BadI of ident
-  | BadI_type_proj of ident * string
-  | BadI_ghost_proj of ident * string
-  | BadI_not_found of ident * string
+  | BadI_ty_vars of tysymbol (* type variable mismatch *)
+  | BadI_ty_ner of tysymbol (* non-empty record -> ty *)
+  | BadI_ty_impure of tysymbol (* impure type -> ty *)
+  | BadI_ty_arity of tysymbol (* tysymbol arity mismatch *)
+  | BadI_ty_rec of tysymbol (* instance with a rectype *)
+  | BadI_ty_mut_lhs of tysymbol (* incompatible mutability *)
+  | BadI_ty_mut_rhs of tysymbol (* incompatible mutability *)
+  | BadI_ty_alias of tysymbol (* added aliased fields *)
+  | BadI_field of tysymbol * vsymbol (* field not found *)
+  | BadI_field_type of tysymbol * vsymbol (* incompatible field type *)
+  | BadI_field_ghost of tysymbol * vsymbol (* incompatible ghost status *)
+  | BadI_field_mut of tysymbol * vsymbol (* incompatible mutability *)
+  | BadI_field_inv of tysymbol * vsymbol (* strengthened invariant *)
+  | BadI_ls_type of lsymbol (* lsymbol type mismatch *)
+  | BadI_ls_kind of lsymbol (* function/predicate mismatch *)
+  | BadI_ls_arity of lsymbol (* lsymbol arity mismatch *)
+  | BadI_ls_rs of lsymbol (* "val function" -> "function" *)
+  | BadI_rs_arity of ident (* incompatible rsymbol arity *)
+  | BadI_rs_type of ident * exn (* rsymbol type mismatch *)
+  | BadI_rs_kind of ident (* incompatible rsymbol kind *)
+  | BadI_rs_ghost of ident (* incompatible ghost status *)
+  | BadI_rs_mask of ident (* incompatible result mask *)
+  | BadI_rs_reads of ident * Svs.t (* incompatible dependencies *)
+  | BadI_rs_writes of ident * Svs.t (* incompatible write effect *)
+  | BadI_rs_taints of ident * Svs.t (* incompatible ghost writes *)
+  | BadI_rs_covers of ident * Svs.t (* incompatible written regions *)
+  | BadI_rs_resets of ident * Svs.t (* incompatible reset regions *)
+  | BadI_rs_raises of ident * Sid.t (* incompatible exception set *)
+  | BadI_rs_spoils of ident * Stv.t (* incompatible spoiled tyvars *)
+  | BadI_rs_oneway of ident (* incompatible partiality status *)
+  | BadI_xs_type of ident (* xsymbol type mismatch *)
+  | BadI_xs_mask of ident (* incompatible exception mask *)
 
 exception NonLocal of ident
-exception BadInstance of badinstance_error
+exception BadInstance of bad_instance
 
 let cl_init_ty cl ({ts_name = id} as ts) ty =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
@@ -993,25 +1024,141 @@ let print_meta_arg_type fmt = function
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
-  | NonLocal id ->
-      Format.fprintf fmt "Non-local symbol: %a" print_id id
-  | CannotInstantiate id ->
-      Format.fprintf fmt "Cannot instantiate a defined symbol %a" print_id id
-  | BadInstance (BadI id) ->
-      Format.fprintf fmt "Illegal instantiation for symbol %a" print_id id
-  | BadInstance (BadI_type_proj (id, pr_name)) ->
-      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
-                          projection types for %s are not compatible"
-        print_id id pr_name
-  | BadInstance (BadI_ghost_proj (id, pr_name)) ->
-      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
-                          projection %s cannot be ghost if the \
-                          cloned projection is not"
-        print_id id pr_name
-  | BadInstance (BadI_not_found (id, pj_str)) ->
-      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
-                          projection %s cannot be found in instance type"
-        print_id id pj_str
+  | NonLocal id -> Format.fprintf fmt
+      "Non-local symbol: %a" print_id id
+  | CannotInstantiate id -> Format.fprintf fmt
+      "Cannot instantiate a defined symbol %a" print_id id
+  | BadInstance (BadI id) -> Format.fprintf fmt
+      "Illegal instantiation for symbol %a" print_id id
+  | BadInstance (BadI_ty_vars ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+          extra type variables in the type expression"
+        print_id ts.ts_name
+  | BadInstance (BadI_ty_ner ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+          record types cannot be instantiated with type expressions"
+        print_id ts.ts_name
+  | BadInstance (BadI_ty_impure ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+          both %a and the refining type expression must be pure"
+        print_id ts.ts_name print_id ts.ts_name
+  | BadInstance (BadI_ty_arity ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\narity mismatch"
+        print_id ts.ts_name
+  | BadInstance (BadI_ty_rec ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        the refining type must be a non-recursive record"
+        print_id ts.ts_name
+  | BadInstance (BadI_ty_mut_lhs ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        the refinining type must be mutable"
+        print_id ts.ts_name
+  | BadInstance (BadI_ty_mut_rhs ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        the refinining type must be immutable"
+        print_id ts.ts_name
+  | BadInstance (BadI_ty_alias ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        the added fields are aliased with the original fields"
+        print_id ts.ts_name
+  | BadInstance (BadI_field (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        field %a not found in the refinining type"
+        print_id ts.ts_name print_id vs.vs_name
+  | BadInstance (BadI_field_type (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        incompatible types for field %a"
+        print_id ts.ts_name print_id vs.vs_name
+  | BadInstance (BadI_field_ghost (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        incompatible ghost status for field %a"
+        print_id ts.ts_name print_id vs.vs_name
+  | BadInstance (BadI_field_mut (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        incompatible mutability status for field %a"
+        print_id ts.ts_name print_id vs.vs_name
+  | BadInstance (BadI_field_inv (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        field %a must not appear in the refined invariant"
+        print_id ts.ts_name print_id vs.vs_name
+  | BadInstance (BadI_ls_type ls) -> Format.fprintf fmt
+      "Illegal instantiation for %s %a:@\ntype mismatch"
+        (if ls.ls_value = None then "predicate" else "function")
+        print_id ls.ls_name
+  | BadInstance (BadI_ls_kind ls) -> Format.fprintf fmt
+      "Illegal instantiation for %s %a:@\n%s expected"
+        (if ls.ls_value = None then "predicate" else "function")
+        print_id ls.ls_name
+        (if ls.ls_value = None then "predicate" else "function")
+  | BadInstance (BadI_ls_arity ls) -> Format.fprintf fmt
+      "Illegal instantiation for %s %a:@\narity mismatch"
+        (if ls.ls_value = None then "predicate" else "function")
+        print_id ls.ls_name
+  | BadInstance (BadI_ls_rs ls) -> Format.fprintf fmt
+      "Cannot instantiate %s %a:@\nprogram function %a \
+        must be refined instead"
+        (if ls.ls_value = None then "predicate" else "function")
+        print_id ls.ls_name print_id ls.ls_name
+  | BadInstance (BadI_rs_arity id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        arity mismatch"
+        print_id id
+  | BadInstance (BadI_rs_type (id,exn)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        %a"
+        print_id id Exn_printer.exn_printer exn
+  | BadInstance (BadI_rs_kind id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        incompatible kind"
+        print_id id
+  | BadInstance (BadI_rs_ghost id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        incompatible ghost status"
+        print_id id
+  | BadInstance (BadI_rs_mask id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        incompatible mask"
+        print_id id
+  | BadInstance (BadI_rs_reads (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced external dependencies: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_writes (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced write effects in variables: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_taints (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced ghost write effects in variables: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_covers (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced region modifications in variables: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_resets (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced region resets in variables: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_raises (id,sid)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced raised exceptions: %a"
+        print_id id (Pp.print_list Pp.space print_id) (Sid.elements sid)
+  | BadInstance (BadI_rs_spoils (id,stv)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        restricted type variables: %a"
+        print_id id (Pp.print_list Pp.space print_tv) (Stv.elements stv)
+  | BadInstance (BadI_rs_oneway id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        incompatible termination status"
+        print_id id
+  | BadInstance (BadI_xs_type id) -> Format.fprintf fmt
+      "Illegal instantiation for exception %a:@\n\
+        type mismatch"
+        print_id id
+  | BadInstance (BadI_xs_mask id) -> Format.fprintf fmt
+      "Illegal instantiation for exception %a:@\n\
+        incompatible mask"
+        print_id id
   | CloseTheory ->
       Format.fprintf fmt "Cannot close theory: some namespaces are still open"
   | NoOpenedNamespace ->

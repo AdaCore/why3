@@ -18,7 +18,9 @@ module Intf
 
   val find (uf: t) (x: int) : int
     requires { 0 <= x < uf.size }
+    writes   { uf }
     ensures  { result = uf.repr x }
+    ensures  { uf.repr = old uf.repr }
 
   predicate same (repr: int -> int) (x y: int) =
     repr x = repr y

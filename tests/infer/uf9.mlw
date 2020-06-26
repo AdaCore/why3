@@ -1,0 +1,21 @@
+
+
+module Uf1
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
+
+	let b(_:int): int
+	ensures { result = 0 } =
+		let a = make 12 3 in
+		let k = ref 0 in
+		while (!k < 11 && !k >= 0)
+		do
+		variant { 12 - !k }
+		a[!k] <- 0;
+		incr k;
+		done;
+
+		a[!k-1]
+end

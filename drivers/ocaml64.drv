@@ -159,17 +159,31 @@ module queue.Queue
 end
 
 module set.SetAppInt
-  prelude "module SetAppInt = Set.Make(Z)"
+  prelude export "module SetAppInt = Set.Make(Z)\n"
+  prelude export
+  "let interval l r =\
+   \n  let rec aux acc l r =\
+   \n    if Z.leq r l then acc\
+   \n    else aux (SetAppInt.add l acc) (Z.add l Z.one) r\
+   \n  in aux SetAppInt.empty l r\n"
+
   syntax type set      "SetAppInt.t"
+  syntax val  (==)     "SetAppInt.equal %1 %2" prec 4 3 3
+  syntax val  subset   "SetAppInt.subset %1 %2" prec 4 3 3
   syntax val  empty    "%1; SetAppInt.empty" prec 17 16
   syntax val  is_empty "SetAppInt.is_empty %1" prec 4 3
   syntax val  add      "SetAppInt.add %1 %2" prec 4 3 3
   syntax val  mem      "SetAppInt.mem %1 %2" prec 4 3 3
   syntax val  remove   "SetAppInt.remove %1 %2" prec 4 3 3
+  syntax val  union    "SetAppInt.union %1 %2" prec 4 3 3
+  syntax val  inter    "SetAppInt.inter %1 %2" prec 4 3 3
+  syntax val  diff     "SetAppInt.diff %1 %2" prec 4 3 3
+  syntax val  choose   "SetAppInt.choose %1" prec 4 3
+  syntax val  disjoint "SetAppInt.disjoint %1 %2" prec 4 3 3
   syntax val  cardinal "Z.of_int (SetAppInt.cardinal %1)" prec 4 3
   syntax val  min_elt  "SetAppInt.min_elt %1" prec 4 3
   syntax val  max_elt  "SetAppInt.max_elt %1" prec 4 3
-  (* TODO interval *)
+  syntax val  interval "interval %1 %2" prec 4 3 3
 end
 
 module set.SetImpInt
@@ -316,14 +330,7 @@ module mach.int.Random63
 end
 
 module mach.int.State63
-  (* the most appropriate way to do this would be to have
-     something similar to [remove] from smt drivers:
-     remove val create *)
-  syntax val create       "REMOVE"
-  syntax val init         "REMOVE"
-  syntax val self_init    "REMOVE"
-  syntax val random_bool  "REMOVE"
-  syntax val random_int63 "REMOVE"
+  remove module
 end
 
 module mach.peano.Peano
@@ -508,12 +515,12 @@ end
 module ocaml.Exceptions
   syntax exception Exit             "Pervasives.Exit"
   syntax exception Not_found        "Not_found"
+  syntax exception Invalid_argument "Invalid_argument"
 end
 
 module ocaml.Pervasives
   syntax exception AssertFailure    "REMOVE"
   syntax val       ocaml_assert     "assert"
-  syntax exception Invalid_argument "Invalid_argument"
   syntax val       succ             "succ"
   syntax val       pred             "pred"
 end

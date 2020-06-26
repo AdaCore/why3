@@ -100,22 +100,22 @@ run () {
     else
         f="${file_path}_$1_SP"
         oracle_file="$2/oracles/$3_$1_SP.oracle"
-        wp_sp=" --debug vc_sp"
+        wp_sp=" --debug=vc_sp"
         echo "Strongest Postcondition" > "$f.out"
         printf "Strongest Postcondition  ${file_path} ($1)... "
     fi
-    $dir/../bin/why3prove.opt --json --debug print_model_attrs${wp_sp} -P "$1,counterexamples" --timelimit 1 -a split_vc "${file_path}.mlw" | \
+    if [ "$3" = "strings" ] && [ "$1" = "CVC4,1.7" ] ; then
+        prover="$1,strings+counterexamples"
+    else
+        prover="$1,counterexamples"
+    fi
+    $dir/../bin/why3prove.opt --json --debug=print_model_attrs${wp_sp} -P $prover --timelimit=1 -a split_vc "${file_path}.mlw" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
         sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
         # This ad hoc sed removes diff between Timeout and Unknown (unknown)
         # when running from platform with different speed.
         sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/' | \
-        # ad hoc sed to remove the directory of the stdlib that can be found
-        # inside labels attribute [@at:'Old:loc:/home/.../stdlib/array.mlw
-        # TODO temporary as this comes from incorrect locations generated in
-        # a[i] <- x like terms.
-        sed -r 's/\:loc\:.*\]/\:loc\:location\]/' | \
         # Remove steps informations
         sed -r 's/Unknown \(sat\).*$/Unknown \(sat\)/' | \
         sed -r 's/Valid \(.*$/Valid/' >> "$f.out"

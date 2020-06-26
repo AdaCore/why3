@@ -1,0 +1,48 @@
+
+module BreakContinue
+
+  use int.Int
+  use int.ComputerDivision
+
+  (* translation of
+
+     x, i <- 0, 0;
+     while true do
+       if x > 20 then break;
+       i <- i + 1;
+       if i mod 2 = 0 then continue;
+       x <- x + i
+     done;
+     x
+
+  *)
+
+  let cfg example () : int
+    ensures { result = 25 }
+  = var x: int;
+    var i: int;
+    {
+      x <- 0;
+      i <- 0;
+      goto Loop
+    }
+    Loop {
+      invariant I1 { 0 <= i <= 9 };
+      invariant I2 { 4 * x = if mod i 2 = 0 then i * i else (i + 1) * (i + 1) };
+      switch (x > 20)
+      | True  -> goto Break
+      | False -> goto L1
+      end
+    }
+    L1 {
+      i <- i + 1;
+      switch (mod i 2 = 0)
+      | True  -> goto Loop (* continue *)
+      | False -> x <- x + i; goto Loop
+      end
+    }
+    Break {
+      x
+    }
+
+end

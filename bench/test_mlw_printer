@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+import sys
+import sexpdata
+from subprocess import Popen, PIPE
+
+# Read a whyml file as a s-exp
+def read(filename):
+    p = Popen(["bin/why3pp", "--output=sexp", filename], stdout=PIPE, encoding='utf8')
+    return sexpdata.loads(''.join(p.stdout.readlines()))
+
+# Pretty-print a whyml file and read the result as a s-exp
+def print_and_read(filename):
+    p = Popen(["bin/why3pp", "--output=mlw", filename], stdout=PIPE, encoding='utf8')
+    p1 = Popen(["bin/why3pp", "--output=sexp", "-"], stdin=p.stdout, stdout=PIPE, encoding='utf8')
+    return sexpdata.loads(''.join(p1.stdout.readlines()))
+
+class NotEqual(Exception):
+    def __init__(self, path, sexp0, sexp1):
+        self.path = path
+        self.sexp0 = sexp0
+        self.sexp1 = sexp1
+
+def is_location(sexp):
+    return (type(sexp) == list and
+            [type(x) for x in sexp] == [str, int, int, int])
+
+def assert_equal(path, sexp0, sexp1):
+    if is_location(sexp0) and is_location(sexp1):
+        return # Don't bother with locations
+    elif sexp1 == sexpdata.Symbol("__todo__"):
+        return # And accept todos
+    elif type(sexp0) == list and type(sexp1) == list:
+        for i, (s0, s1) in enumerate(zip(sexp0, sexp1)):
+            return assert_equal(path+[i], s0, s1)
+        if len(sexp0) > len(sexp1):
+            raise NotEqual(path+[len(sexp1)], sexp0[len(sexp1)], None)
+        if len(sexp1) > len(sexp0):
+            raise NotEqual(path+[len(sexp0)], None, sexp1[len(sexp0)])
+    elif sexp0 == sexp1:
+        return
+    else:
+        raise NotEqual(path, sexp0, sexp1)
+
+def trace(path, sexp, sexp1):
+    if path == []:
+        return [sexpdata.Symbol("EXPECTED"), sexp,
+                sexpdata.Symbol("FOUND"), sexp1]
+    elif type(sexp) == list:
+        return [trace(path[1:], sexp[i], sexp1)
+                if i == path[0] else sexp[i]
+                for i, x in enumerate(sexp)]
+    return sexp
+
+def test(filename):
+    sexp0 = read(filename)
+    try:
+        sexp1 = print_and_read(filename)
+        assert_equal([], sexp0, sexp1)
+        print("OK:", filename)
+        return True
+    except AssertionError:
+        print("CANT REPARSE:", filename)
+        return False
+    except NotEqual as e:
+        print("FAILED:", filename)
+        # sexpdata.dump(trace(e.path, sexp0, e.sexp1), sys.stdout)
+        return False
+
+def main():
+    res = all(test(f) for f in sys.argv[1:])
+    exit(0 if res else 1)
+
+if __name__ == "__main__":
+    main()

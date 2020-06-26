@@ -59,15 +59,15 @@ needed.
 The commands accept a common subset of command-line options. In
 particular, option :option:`--help` displays the usage and options.
 
-.. option:: -L <dir>, --library <dir>
+.. option:: -L <dir>, --library=<dir>
 
    Add ``<dir>`` in the load path, to search for theories.
 
-.. option:: -C <file>, --config <file>
+.. option:: -C <file>, --config=<file>
 
    Read the configuration from the given file. See :numref:`sec.whyconffile`.
 
-.. option:: --extra-config <file>
+.. option:: --extra-config=<file>
 
    Read additional configuration from the given file.
 
@@ -93,15 +93,17 @@ particular, option :option:`--help` displays the usage and options.
 
 .. option:: --list-metas
 
-   List known metas.
+   List known metas. See also :numref:`sec.meta` for a description of
+   some of those metas.
 
 .. option:: --debug-all
 
    Set all debug flags (except flags that change the behavior).
 
-.. option:: --debug <flag>
+.. option:: --debug=<flag>,...
 
-   Set a specific debug flag.
+   Set some specific debug flags. See also :numref:`sec.debug` for
+   a description of some of those flags.
 
 .. option:: --help
 
@@ -164,7 +166,7 @@ Options
    Imply both :option:`--detect-provers` and :option:`--detect-plugins`.
    Also reset the loadpath.
 
-.. option:: --add-prover <id> <shortcut> <file>
+.. option:: --add-prover=<id>,<shortcut>,<file>
 
    Check the executable program ``<file>`` against the provers of family
    ``<id>``, and register it as ``<shortcut>``.
@@ -174,7 +176,7 @@ Options
 
    ::
 
-      why3 config --add-prover alt-ergo new-ae /home/me/bin/alt-ergo-trunk
+      why3 config --add-prover=alt-ergo,new-ae,/home/me/bin/alt-ergo-trunk
 
 .. option:: --list-prover-families
 
@@ -259,35 +261,35 @@ Invalid
 Options
 ~~~~~~~
 
-.. option:: -F <format>, --format <format>
+.. option:: -F <format>, --format=<format>
 
    Select the given input format.
 
-.. option:: -T <theory>, --theory <theory>
+.. option:: -T <theory>, --theory=<theory>
 
    Focus on the given theory. If the argument is not qualified, the
    theory is searched in the input file.
 
-.. option:: -G <goal>, --goal <goal>
+.. option:: -G <goal>, --goal=<goal>
 
    Focus on the given goal. The goal is searched in the theory given
    by :option:`--theory`, if any. Otherwise, it is searched in the
    toplevel namespace of the input file.
 
-.. option:: -a <transform>, --apply-transform <transform>
+.. option:: -a <transform>, --apply-transform=<transform>
 
    Apply the given transformation to the goals.
 
-.. option:: -P <prover>, --prover <prover>
+.. option:: -P <prover>, --prover=<prover>
 
    Execute the given prover on the goals.
 
-.. option:: -D <driver>, --driver <driver>
+.. option:: -D <driver>, --driver=<driver>
 
    Output the tasks obtained by applying the given driver to the goals.
    This option conflicts with :option:`--prover`.
 
-.. option:: --extra-expl-prefix <s>
+.. option:: --extra-expl-prefix=<s>
 
    Specify *s* as an additional prefix for labels that denotes VC
    explanations. The option can be used several times to specify
@@ -318,7 +320,7 @@ detailed in introduction to this chapter, plus the specific option
 already described for the :why3:tool:`prove` command in
 :numref:`sec.proveoptions`.
 
-.. .. option:: --extra-expl-prefix <s>
+.. .. option:: --extra-expl-prefix=<s>
 
 At least one anonymous argument must be specified on the command line.
 More precisely, the first anonymous argument must be the directory of
@@ -740,11 +742,8 @@ displayed in the *Counterexample* tab of the bottom right window, this time inte
 with the code, as shown in :numref:`fig.ce_example0_p2`.
 
 
-.. %%Generation of the screenshots:
-.. %%Those commands follow the style of starting.tex. To execute them one needs to
-.. %%do make update-doc-png.
-.. %EXECUTE bin/why3 ide -C doc/why3ide-doc.conf --batch "down;down;type cvc4;wait 2;down;snap -crop 1024x600+0+0 doc/images/ce_example0_p1.png" doc/cedoc.mlw
-.. %EXECUTE bin/why3 ide -C doc/why3ide-doc.conf --batch "down;down;type cvc4;wait 2;down;type get-ce;wait 2;down;faketype get-ce;snap -crop 1024x600+0+0 doc/images/ce_example0_p2.png" doc/cedoc.mlw
+.. %EXECUTE bin/why3 ide --batch="down;down;type cvc4;wait 2;down;snap -crop 1024x600+0+0 doc/images/ce_example0_p1.png" doc/cedoc.mlw
+.. %EXECUTE bin/why3 ide --batch="down;down;type cvc4;wait 2;down;type get-ce;wait 2;down;faketype get-ce;snap -crop 1024x600+0+0 doc/images/ce_example0_p2.png" doc/cedoc.mlw
 
 .. _fig.ce_example0_p1:
 
@@ -909,11 +908,11 @@ Options are:
    Replay the proofs only if the session contains obsolete proof
    attempts.
 
-.. option:: --smoke-detector {none|top|deep}
+.. option:: --smoke-detector[=none|top|deep]
 
-   Try to detect if the context is self-contradicting.
+   Try to detect if the context is self-contradicting (default: top).
 
-.. option:: --prover <prover>
+.. option:: --prover=<prover>
 
    Restrict the replay to the selected provers only.
 
@@ -1114,24 +1113,24 @@ tabular environment in LaTeX, one tabular for each theory, one per file.
 
 The specific options are
 
-.. option:: -style <n>
+.. option:: --style=<n>
 
-   set output style (1 or 2, default 1) Option ``-style 2`` produces
+   Set output style (1 or 2, default 1). Option ``--style=2`` produces
    an alternate version of LaTeX output, with a different layout of the
    tables.
 
 .. option:: -o <dir>
 
-   indicate where to produce LaTeX files (default: the session
+   Indicate where to produce LaTeX files (default: the session
    directory).
 
-.. option:: -longtable
+.. option:: --longtable
 
-   use the ‘longtable’ environment instead of ‘tabular’.
+   Use the ``longtable`` environment instead of ``tabular``.
 
 .. option :: -e <elem>
 
-   produce a table for the given element, which is either a file, a
+   Produce a table for the given element, which is either a file, a
    theory or a root goal. The element must be specified using its path
    in dot notation, e.g., ``file.theory.goal``. The file produced is named
    accordingly, e.g., :file:`file.theory.goal.tex`. This option can be given
@@ -1225,10 +1224,10 @@ HTML tags such as ``<ul>`` and ``<li>``.
 
 Specific options for this command are as follows.
 
-.. option:: --style <style>
+.. option:: --style=[simpletree|table]
 
-   Set the style to use, among ``simpletree`` and ``table``; defaults
-   to ``table``.
+   Set the style to use, among ``simpletree`` and ``table`` (default:
+   ``table``).
 
 .. option:: -o <dir>
 
@@ -1243,7 +1242,7 @@ Specific options for this command are as follows.
    directory all the needed external files. It is incompatible with stdout
    output.
 
-.. option:: --add_pp <suffix> <cmd> <out_suffix>
+.. option:: --add_pp=<suffix>,<cmd>,<out_suffix>
 
    Set a specific pretty-printer for files with the given suffix.
    Produced files use *<out_suffix>* as suffix. *<cmd>* must
@@ -1253,7 +1252,7 @@ Specific options for this command are as follows.
 .. option:: --coqdoc
 
    use the :program:`coqdoc` command to display Coq proof scripts. This is
-   equivalent to ``--add_pp .v coqdoc --no-index --html -o %o %i .html``
+   equivalent to ``--add_pp=.v,coqdoc --no-index --html -o %o %i,.html``
 
 .. why3:tool:: session update
 
@@ -1265,7 +1264,7 @@ Command ``update``
 The :program:`why3 session update` command permits to modify the session
 contents, depending on the following specific options.
 
-.. option:: -rename-file <src> <dst>
+.. option:: --rename-file=<src>:<dst>
 
    rename the file *<src>* to *<dst>* in the session. The file *<src>*
    itself is also renamed to *<dst>* in your filesystem.
@@ -1299,7 +1298,7 @@ identifier use to its definition.
 Options
 ~~~~~~~
 
-.. option:: -o <dir>, --output <dir>
+.. option:: -o <dir>, --output=<dir>
 
    Define the directory where to output the HTML files.
 
@@ -1312,11 +1311,11 @@ Options
 
    Prevent the generation of an index file.
 
-.. option:: --title <title>
+.. option:: --title=<title>
 
    Set title of the index page.
 
-.. option:: --stdlib-url <url>
+.. option:: --stdlib-url=<url>
 
    Set a URL for files found in load path, so that links to
    definitions can be added.
@@ -1349,20 +1348,29 @@ The ``pp`` Command
 
 .. program:: why3 pp
 
-This tool pretty-prints Why3 declarations. Currenty it can be used to
-print WhyML inductive definitions to LaTeX (using the ``mathpartir``
-package), and to format WhyML source code.
+This tool pretty-prints Why3 declarations into various forms. The kind of output is
+specified using the ``--output`` option.
 
 ::
 
-    why3 pp [--output=latex|mlw] [--kind=inductive] [--prefix <prefix>] \
-      <filename> <file>[.<Module>].<ind_type> ...
+    why3 pp [--output=mlw|sexp|latex|dep] [--kind=inductive] [--prefix=<prefix>] \
+      <filename> <file>[[.<Module>].<ind_type>] ...
 
 .. option:: --output=<output>
 
-   Set the output format. Currently, only pretty printing to LaTeX is
-   supported using ``--output=latex``, and formatting of WhyML source
-   code using ``--output=mlw``.
+   Set the output format, among the following:
+
+   - ``mlw``: reformat WhyML source code.
+
+   - ``sexp``: print the abstract syntax tree of a WhyML file (data-type from API module
+     ``Ptree``) as a S-expression (enabled only when package ``ppx_sexp_conv`` is
+     available at configuration time of Why3).
+
+   - ``latex``: currently can be used to print WhyML inductive definitions
+     to LaTeX, using the ``mathpartir`` package.
+
+   - ``dep``: display module dependencies, under the form of a digraph
+     using the ``dot`` syntax from the `GraphViz <https://www.graphviz.org/>`_ visualisation software.
 
 .. option:: --kind=<kind>
 
@@ -1372,7 +1380,8 @@ package), and to format WhyML source code.
 
 .. option:: --prefix=<prefix>
 
-   Set the prefix for LaTeX commands to *<prefix>*. The default is ``WHY``.
+   Set the prefix for LaTeX commands when using ``--output=latex`` to *<prefix>*. The
+   default is ``WHY``.
 
 For the LaTeX output, the typesetting of variables, record fields, and
 functions can be configured by LaTeX commands. Dummy definitions of these
@@ -1389,7 +1398,25 @@ The ``execute`` Command
 .. program:: why3 execute
 
 Why3 can symbolically execute programs written using the WhyML language
-(extension :file:`.mlw`). See also :numref:`sec.execute`.
+(extension :file:`.mlw`).
+
+::
+
+   why3 execute [options] file module.ident
+
+The first argument is the file where to read the code to execute. The
+second argument is a qualified identifier which denote a program
+function from that file. The latter function must have only `()` as
+argument.
+
+There are no specific options apart from the options common to all
+Why3 commands.
+
+Upon completion of the execution, the value of the result is displayed
+on the standard input. Additionally, values of the global mutable
+variables modified by that function are displayed too.
+
+See more details and examples of use in :numref:`sec.execute`.
 
 .. why3:tool:: extract
 .. _sec.why3extract:
@@ -1433,7 +1460,7 @@ symbol, in order to state where to look for file :file:`f.mlw`.
    Output extracted code to the given file (for :option:`--flat`) or
    directory (for :option:`--modular`).
 
-.. option:: -D <driver>, --driver <driver>
+.. option:: -D <driver>, --driver=<driver>
 
    Use the given driver.
 

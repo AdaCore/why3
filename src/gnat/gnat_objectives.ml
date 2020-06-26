@@ -278,12 +278,12 @@ let init_cont () =
   let session_dir = Gnat_config.session_dir in
   (* Shape version is only used for pairing of goals in session_itp.ml
      (nothing else). *)
-  let is_new_session, (session, shape_version) =
+  let is_new_session, session =
     if not Gnat_config.force && Sys.file_exists session_dir then
       false, Session_itp.load_session session_dir
     else begin
       if not (Sys.file_exists session_dir) then Unix.mkdir session_dir 0o700;
-      true, (Session_itp.empty_session ~shape_version:None session_dir, None)
+      true, Session_itp.empty_session session_dir
     end
   in
   let c = Controller_itp.create_controller Gnat_config.config Gnat_config.env session in
@@ -329,7 +329,7 @@ let init_cont () =
          ());
       try
         let (_ : bool), (_ : bool) =
-          Controller_itp.reload_files c ~shape_version in
+          Controller_itp.reload_files c in
         c
       with
       | Controller_itp.Errors_list l ->

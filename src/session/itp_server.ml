@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -658,14 +658,14 @@ end
 
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
-  let reload_files cont ~shape_version =
+  let reload_files cont =
     let hard_reload = true in
     (* On reload, we empty the legacy printer (which is used to print
        parsing/typing errors. This avoids odd numbering of ident. *)
     Pretty.forget_all ();
     capture_parse_or_type_errors
       (fun c ->
-        try let (_,_) = reload_files ~hard_reload ~shape_version c in [] with
+        try let (_,_) = reload_files ~hard_reload c in [] with
         | Errors_list le -> le) cont
 
   let add_file cont ?format fname =
@@ -1083,7 +1083,7 @@ end
 
   let init_server ?(send_source=true) config env f =
     Debug.dprintf debug "loading session %s@." f;
-    let ses,shape_version = Session_itp.load_session f in
+    let ses = Session_itp.load_session f in
     Debug.dprintf debug "creating controller@.";
     let c = create_controller config env ses in
     let shortcuts =
@@ -1123,7 +1123,7 @@ end
                      };
     Debug.dprintf debug "reloading source files@.";
     let d = get_server_data () in
-    let x = reload_files d.cont ~shape_version in
+    let x = reload_files d.cont in
     reset_and_send_the_whole_tree ();
     (* After initial sending, we don't check anymore that there is a need to
            focus on a specific node. *)
@@ -1419,9 +1419,7 @@ end
     let _old_focus = !focused_node in
     focused_node := Unfocused;
     clear_tables ();
-    let l = reload_files d.cont
-                         ~shape_version:(Some Termcode.current_shape_version)
-    in
+    let l = reload_files d.cont in
     match l with
     | [] ->
         (* TODO: try to restore the previous focus : focused_node := old_focus; *)
@@ -1474,8 +1472,11 @@ end
     | Some (APa panid) ->
       let pan = Session_itp.get_proof_attempt_node session panid in
       let filter_prover =
+        let altern =
+          if pan.prover.Whyconf.prover_altern = "" then "counterexamples"
+          else pan.prover.Whyconf.prover_altern ^ "+" ^ "counterexamples" in
         Whyconf.mk_filter_prover ~version:pan.prover.Whyconf.prover_version
-          ~altern:"counterexamples" pan.prover.Whyconf.prover_name
+            ~altern pan.prover.Whyconf.prover_name
       in
       begin match Whyconf.filter_one_prover config filter_prover with
       | config_prover ->

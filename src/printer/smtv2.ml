@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -53,24 +53,26 @@ let ident_printer () =
       "declare-funs"; "declare-preds"; "define";
       "simplify";
 
-     (* operators, including theory symbols *)
+      (* operators, including theory symbols *)
+      "="; "=>";
+      "+"; "-"; "*"; "^" ;
+      "<"; "<="; ">"; ">=";
       "ite";
       "and"; "distinct"; "is_int"; "not"; "or"; "select";
       "store"; "to_int"; "to_real"; "xor";
-
-      "div"; "mod"; "rem";
+      "/"; "div"; "mod"; "rem";
 
       "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
-      "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
+      "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor"; "bvxnor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
       "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
       "rotate_right"; "bvredor"; "bvredand";
+      "bv2nat";
 
-      "^"; "exp"; "sin"; "cos"; "tan";
-      "csc"; "sec"; "cot";
+      "^";
+      "sqrt"; "sin"; "cos"; "tan"; "asin"; "acos"; "atan"; "pi";
+      "exp"; "csc"; "sec"; "cot";
       "arcsin"; "arccos"; "arctan"; "arccsc"; "arcsec"; "arccot";
-      "sqrt";
-      "asin"; "acos"; "atan"; "pi";
 
      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
@@ -92,16 +94,19 @@ let ident_printer () =
       "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
 
      (* the new proposed string theory *)
-      "String";
+      "String"; "str.<"; "str.<=";
       "str.++"; "str.len"; "str.substr"; "str.contains"; "str.at";
-      "str.indexof"; "str.replace";
-      "str.prefixof"; "str.suffixof";
+      "str.indexof"; "str.prefixof"; "str.suffixof"; "int.to.str";
+      "str.to.int"; "u16.to.str"; "str.to.u16"; "u32.to.str"; "str.to.u32";
+      "str.in.re"; "str.to.re";
+      "str.replace"; "str.tolower"; "str.toupper"; "str.rev";
+      "str.from_code"; "str.is_digit"; "str.from_int"; "str.to_int";
+      "str.in_re"; "str.to_code"; "str.replace_all";
+      "int.to.str"; "str.to.int"; "str.code"; "str.replaceall";
       "str.from-int"; "str.to-int"; "str.in-re"; "str.to-re";
-      "int.to.str"; "str.to.int"; "str.in.re"; "str.to.re";
       "re.++"; "re.union"; "re.inter";
       "re.*"; "re.+"; "re.opt"; "re.range"; "re.loop";
-      "str.code"; "str.<"; "str.<=";
-      "u16.to.str"; "str.to.u16"; "u32.to.str"; "str.to.u32";
+      "re.comp"; "re.diff";
 
      (* separation logic theory *)
       "sep"; "pto"; "wand"; "emp";
@@ -128,7 +133,16 @@ let ident_printer () =
 
      (* Counterexamples specific keywords *)
       "lambda"; "LAMBDA"; "model";
-      ]
+
+      (* various stuff from
+         "sed -n -e 's/^.*addOperator.*\"\([^\"]*\)\".*/\1/p' src/parser/smt2/smt2.cpp"
+
+       *)
+
+      "inst-closure"; "dt.size"; "sep"; "pto"; "wand"; "emp";
+      "fmf.card"; "fmf.card.val";
+
+    ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
@@ -584,7 +598,7 @@ let print_incremental_axiom info fmt =
     l;
   add_check_sat info fmt
 
-let print_prop_decl vc_loc args info fmt k pr f = match k with
+let print_prop_decl vc_loc vc_attrs args info fmt k pr f = match k with
   | Paxiom ->
       if info.info_incremental then
         info.incr_list <- (pr, f) :: info.incr_list
@@ -610,6 +624,7 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
                                 vc_term_loc = vc_loc;
+                                vc_term_attrs = vc_attrs;
                                 queried_terms = model_list;
                                 list_projections = info.list_projs;
                                 list_fields = info.list_field_def;
@@ -683,7 +698,7 @@ let print_sort_decl info fmt (ts,_) =
     (print_ident info) ts.ts_name
     (List.length ts.ts_args)
 
-let print_decl vc_loc args info fmt d =
+let print_decl vc_loc vc_attrs args info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
@@ -707,7 +722,7 @@ let print_decl vc_loc args info fmt d =
       "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl vc_loc args info fmt k pr f
+      print_prop_decl vc_loc vc_attrs args info fmt k pr f
 
 let set_produce_models fmt info =
   if info.info_cntexample then
@@ -746,6 +761,7 @@ let print_task version args ?old:_ fmt task =
     not (Theory.Stdecl.is_empty m.Task.tds_set)
   in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
+  let vc_attrs = (Task.task_goal_fmla task).t_attrs in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {
     info_syn = Discriminate.get_syntax_map task;
@@ -782,7 +798,7 @@ let print_task version args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc args info fmt d
+            begin try print_decl vc_loc vc_attrs args info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

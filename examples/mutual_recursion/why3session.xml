@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="mutual_recursion.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="f1&#39;vc" expl="VC for f1" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+ </goal>
+ <goal name="f2&#39;vc" expl="VC for f2" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="f&#39;vc" expl="VC for f" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="f&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="f&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="f&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="f&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  </goal>
+  <goal name="f&#39;vc.4" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="f&#39;vc.4.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+   </goal>
+   <goal name="f&#39;vc.4.1" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="f&#39;vc.4.1.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+    </goal>
+    <goal name="f&#39;vc.4.1.1" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.00" steps="19"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="f&#39;vc.4.2" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="m&#39;vc" expl="VC for m" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="m&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="m&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="m&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  </goal>
+  <goal name="m&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="m&#39;vc.4" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="m&#39;vc.4.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="m&#39;vc.4.0.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+    </goal>
+    <goal name="m&#39;vc.4.0.1" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="m&#39;vc.4.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+   </goal>
+   <goal name="m&#39;vc.4.2" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

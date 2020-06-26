@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -615,7 +615,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
       with Not_found ->
         Debug.dprintf debug_interp "var %a not found@." print_pv pv;
            raise CannotReduce)
-  | Eapp (rs, le) -> begin
+  | Eapp (rs, le, _) -> begin
       Debug.dprintf debug_interp "Eapp %a@." Expr.print_rs rs;
       let eval_call info vl e rs =
         Debug.dprintf debug_interp "eval params@.";
@@ -702,9 +702,12 @@ let rec interp_expr info (e:Mltree.expr) : value =
      end
   | Eassign l ->
      List.iter
-       (fun (pvs, rs, e) ->
+       (fun (epv, _, rs, e) ->
          let fld = fd_of_rs rs in
          let value = interp_expr info e in
+         let pvs = match epv.e_node with
+           | Evar pv -> pv
+           | _ -> assert false in
          match get pvs info with
          | Vconstr(c, args) ->
             let rec aux cargs args =
@@ -735,7 +738,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
         interp_expr info e
      | Vbool false -> Vvoid
      | _ -> assert false end
-  | Efor (x, pv1, dir, pv2, e) ->
+  | Efor (x, _, pv1, dir, pv2, e) ->
      Debug.dprintf debug_interp "for@.";
      begin match (get pv1 info, get pv2 info) with
      | (Vbigint i1, Vbigint i2) ->

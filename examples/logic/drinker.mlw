@@ -1,0 +1,11 @@
+
+type t
+
+constant a : t
+
+predicate b t
+
+goal drinkers_paradox: exists i:t. b i -> forall j:t. b j
+
+predicate c int
+

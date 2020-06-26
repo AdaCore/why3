@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1512,8 +1512,10 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
             Loc.errorm ~loc:(qloc q) "program constant expected"
         | RS _, PV _ ->
             Loc.errorm ~loc:(qloc q) "program function expected"
-        | OO _, _ | _, OO _ ->
+        | _, OO _ ->
             Loc.errorm ~loc:(qloc q) "ambiguous notation"
+        | OO _, _  ->
+            assert false (* should never happen *)
         end
     | CSxsym (p,q) ->
         let xs1 = find_xsymbol_ns m.mod_export p in

@@ -1,0 +1,10 @@
+use int.Int
+
+type t = A | B int | C | D
+
+let g[@infer](x:t): int
+= match x with
+	| A -> 1
+  | B x -> x
+  | _ -> 3
+	end

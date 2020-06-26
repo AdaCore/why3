@@ -1,0 +1,94 @@
+(* A generalization: the midpoint is computed by some abstract function.
+   The only requirement is that it lies between l and u. *)
+
+module BinarySearchAnyMidPoint
+
+  use int.Int
+  use ref.Ref
+  use array.Array
+
+  exception Break int (* raised to exit the loop *)
+  exception Not_found (* raised to signal a search failure *)
+
+  val midpoint (l:int) (u:int) : int
+    requires { l <= u } ensures { l <= result <= u }
+
+  let binary_search[@infer](a :array int) (v : int)
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    ensures  { 0 <= result < length a /\ a[result] = v }
+    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+  = try
+      let l = ref 0 in
+	  l := 0;
+      let u = ref (length a - 1) in
+      while !l <= !u do
+        invariant { !u < length a }
+        invariant {
+          forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
+        variant { !u - !l }
+        let m = midpoint !l !u in
+        if a[m] < v then
+          l := m + 1
+        else if a[m] > v then
+          u := m - 1
+        else
+          raise (Break m)
+      done;
+      raise Not_found
+    with Break i ->
+      i
+    end
+
+  let binary_search2[@infer:oct](a :array int) (v : int)
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    ensures  { 0 <= result < length a /\ a[result] = v }
+    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+  = try
+      let l = ref 0 in
+	  l := 0;
+      let u = ref (length a - 1) in
+      while !l <= !u do
+        invariant { !u < length a }
+        invariant {
+          forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
+        variant { !u - !l }
+        let m = midpoint !l !u in
+        if a[m] < v then
+          l := m + 1
+        else if a[m] > v then
+          u := m - 1
+        else
+          raise (Break m)
+      done;
+      raise Not_found
+    with Break i ->
+      i
+    end
+
+  let binary_search3[@infer:box](a :array int) (v : int)
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    ensures  { 0 <= result < length a /\ a[result] = v }
+    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+  = try
+      let l = ref 0 in
+	  l := 0;
+      let u = ref (length a - 1) in
+      while !l <= !u do
+        invariant { !u < length a }
+        invariant {
+          forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
+        variant { !u - !l }
+        let m = midpoint !l !u in
+        if a[m] < v then
+          l := m + 1
+        else if a[m] > v then
+          u := m - 1
+        else
+          raise (Break m)
+      done;
+      raise Not_found
+    with Break i ->
+      i
+    end
+
+end

@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  #
+#  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -25,7 +25,7 @@
 # See the GNU Library General Public License version 2 for more details
 # (enclosed in the file LGPL).
 
-AC_INIT([Why3], [1.2.1+git])
+AC_INIT([Why3], [1.3.1+git])
 
 # verbosemake
 
@@ -75,6 +75,11 @@ AC_ARG_ENABLE(zip,
     AS_HELP_STRING([--disable-zip], [do not use LZ compression to store session files]),,
     enable_zip=yes)
 
+# infer
+
+AC_ARG_ENABLE(infer,
+    AS_HELP_STRING([--enable-infer], [use apron and fixpoint to infer loop invariants]),,
+    enable_infer=no)
 # js_of_ocaml
 
 AC_ARG_ENABLE(js_of_ocaml,
@@ -86,6 +91,12 @@ AC_ARG_ENABLE(js_of_ocaml,
 AC_ARG_ENABLE(re,
     AS_HELP_STRING([--disable-re], [use Str instead of Re for regular expressions]),,
     enable_re=yes)
+
+# pp_sexp
+
+AC_ARG_ENABLE(pp-sexp,
+    AS_HELP_STRING([--disable-pp-sexp], [disable S-expression output for why3pp (requires findlib and ppx_sexp_conv)]),,
+    enable_pp_sexp=yes)
 
 # IDE
 
@@ -469,6 +480,35 @@ else
    BIGINTINCLUDE="$NUMINCLUDE"
 fi
 
+# checking for apron and fixpoint
+if test "$enable_infer" = yes; then
+   if test "$enable_ocamlfind" = yes; then
+      # gmp is a dependency of apron
+      INFERINCLUDE=$($OCAMLFIND query apron camllib)
+   fi
+   if test -n "$INFERINCLUDE"; then
+      echo "ocamlfind found apron, camllib in $INFERINCLUDE"
+      INFERINCLUDE=$($OCAMLFIND query fixpoint)
+      if test -n "$INFERINCLUDE"; then
+         echo "ocamlfind found fixpoint in $INFERINCLUDE"
+         INFERINCLUDE="$($OCAMLFIND query -separator ' ' -i-format apron fixpoint camllib gmp)"
+         INFERLIB="apron fixpoint"
+         INFERPKG="apron fixpoint apron.boxMPQ apron.octMPQ apron.polkaMPQ"
+      else
+         enable_infer=no
+         AC_MSG_WARN([Lib fixpoint not found, infer will not be built.])
+         reason_infer=" (fixpoint not found)"
+      fi
+   else
+      enable_infer=no
+      reason_infer=" (apron or camllib not found)"
+      AC_MSG_WARN([Lib apron or camllib not found, infer will not be built.])
+   fi
+else
+  reason_infer=" (disabled by default)"
+fi
+
+
 # checking for camlzip
 if test "$enable_zip" = yes; then
    DIR=
@@ -698,10 +738,6 @@ else
    LABLGTKINCLUDE=
 fi
 
-dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
-
-dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
-
 # checking for ocamlgraph
 # temporarily disabled until #453 is fixed
 if test "$enable_hypothesis_selection" = yes; then
@@ -822,6 +858,34 @@ if test "$enable_statmemprof" = yes; then
       fi
       STATMEMPROFPKG=statmemprof-emacs
    fi
+fi
+
+# ppx_sexp_conv (only with ocamlfind)
+SEXPLIBPPX=""
+SEXPLIB=""
+if test "$enable_pp_sexp" = yes; then
+    if test "$enable_ocamlfind" != yes; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires ocamlfind)"
+    elif test "$enable_ppx" != yes; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires ppx)"
+    elif ! $OCAMLFIND query ppx_sexp_conv > /dev/null; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires ppx_sexp_conv)"
+    elif ! $OCAMLFIND query sexplib > /dev/null; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires sexplib)"
+    elif ! $OCAMLFIND query ppx_deriving > /dev/null; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires ppx_deriving)"
+    else
+        SEXPLIBPPX="ppx_sexp_conv"
+        SEXPLIB="sexplib sexplib.num"
+        reason_no_pp_sexp=""
+    fi
+else
+    reason_no_pp_sexp=" (disabled)"
 fi
 
 # Coq
@@ -1027,10 +1091,6 @@ if test "$enable_frama_c" = yes; then
    FRAMAC_INCLUDE="-I $FRAMAC_LIBDIR"
 fi
 
-#Viewer for ps and pdf
-dnl AC_CHECK_PROGS(PSVIEWER,gv evince)
-dnl AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
-
 VERSION=$PACKAGE_VERSION
 
 # substitutions to perform
@@ -1051,10 +1111,7 @@ AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)
 AC_SUBST(OCAMLLIB)
 AC_SUBST(OCAMLINSTALLLIB)
-dnl AC_SUBST(OCAMLV)
-dnl AC_SUBST(FORPACK)
 AC_SUBST(OCAMLGRAPHLIB)
-dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(MENHIR)
 
 AC_SUBST(enable_ocamlfind)
@@ -1078,6 +1135,9 @@ AC_SUBST(JSOFOCAMLPKG)
 AC_SUBST(META_OCAMLGRAPH)
 
 AC_SUBST(enable_ppx)
+AC_SUBST(enable_pp_sexp)
+AC_SUBST(SEXPLIB)
+AC_SUBST(SEXPLIBPPX)
 
 AC_SUBST(NUMINCLUDE)
 AC_SUBST(MLMPFRINCLUDE)
@@ -1089,6 +1149,11 @@ AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)
 AC_SUBST(BIGINTLIB)
 AC_SUBST(BIGINTPKG)
+
+AC_SUBST(enable_infer)
+AC_SUBST(INFERINCLUDE)
+AC_SUBST(INFERLIB)
+AC_SUBST(INFERPKG)
 
 AC_SUBST(enable_zip)
 AC_SUBST(ZIPINCLUDE)
@@ -1148,9 +1213,6 @@ AC_SUBST(WHY3INCLUDE)
 
 AC_SUBST(enable_relocation)
 
-dnl AC_SUBST(PSVIEWER)
-dnl AC_SUBST(PDFVIEWER)
-
 # Finally create the Makefile from Makefile.in
 AC_CONFIG_FILES(Makefile)
 AC_CONFIG_FILES(src/config.sh)
@@ -1186,6 +1248,7 @@ echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
 echo "    Memory profiling        : $enable_statmemprof$reason_statmemprof"
 echo "    PPX                     : $enable_ppx$reason_ppx"
+echo "    why3pp S-expr output    : $enable_pp_sexp$reason_no_pp_sexp"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
 echo "    Re support              : $enable_re$reason_re"
@@ -1196,6 +1259,7 @@ echo "    Web IDE                 : $enable_web_ide$reason_web_ide"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
+echo "    Invariant inference(exp): $enable_infer$reason_infer"
 echo "    Frama-C support         : $enable_frama_c$reason_frama_c"
 if test "$enable_frama_c" = yes ; then
    echo "        Version             : $FRAMAC_VERSION"

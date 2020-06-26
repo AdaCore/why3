@@ -501,7 +501,10 @@ directly build the typed declaration. The first choice use concepts
 similar to the WhyML language but errors in the generation are harder to
 debug since they are lost inside the typing phase, the second choice use
 more internal notions but it is easier to pinpoint the functions wrongly
-used.
+used. :numref:`sec.build_untyped` and :numref:`sec.build_untyped_attr`
+follow choice one and :numref:`sec.build_typed` choice two.
+
+.. _sec.build_untyped:
 
 Untyped syntax tree
 ~~~~~~~~~~~~~~~~~~~
@@ -510,8 +513,10 @@ The examples of this section are available in the file
 :file:`examples/use_api/mlw_tree.ml` of the distribution.
 
 The first step is to build an environment as already illustrated in
-:numref:`sec.api.callingprovers`, and open the OCaml module ``Ptree`` (“parse tree”)
-which contains most of the OCaml functions we need in this section.
+:numref:`sec.api.callingprovers`, and open the OCaml module ``Ptree``
+(“parse tree”) which contains most of the OCaml functions we need in
+this section, and is documented `here
+<http://why3.lri.fr/api/Ptree.html>`_.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
@@ -594,21 +599,110 @@ The corresponding OCaml code is as follows.
 
 Having declared all the programs we wanted to write, we can now close
 the module and the file, and get as a result the set of modules of our
-file, under the form of a map of module names to modules.
+file.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
    :start-after: BEGIN{getmodules}
    :end-before: END{getmodules}
 
-We can then construct the proofs tasks for our module, and then try to
-call the Alt-Ergo prover. The rest of that code is using OCaml functions
-that were already introduced before.
+Module ``Mlw_printer`` provides functions to print elements of ``Ptree``
+in concrete whyml syntax.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{mlwprinter}
+   :end-before: END{mlwprinter}
+
+The typing of the modules is carried out by function
+``Typing.type_mlw_file``, which produces a mapping of module names to
+typed modules.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{typemodules}
+   :end-before: END{typemodules}
+
+Typing errors are reported by exceptions ``Located of position * exn``
+from module ``Loc``. However, the positions in our declarations, which
+are provided by the exception, cannot be used to identify the position
+in the (printed) program, because the locations do not correspond to any
+concrete syntax.
+
+Alternatively, we can give every ``Ptree`` element in our declarations
+above a unique location (for example using the function
+``Mlw_printer.next_pos``). When a located error is encountered, the
+function ``Mlw_printer.with_marker`` can then be used to instruct
+``Mlw_printer`` to insert the error as a comment just before the
+syntactic element with the given location.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{typemoduleserror}
+   :end-before: END{typemoduleserror}
+
+Finally, we can then construct the proofs tasks for our typed module,
+and then try to call the Alt-Ergo prover. The rest of that code is using
+OCaml functions that were already introduced before.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
    :start-after: BEGIN{checkingvcs}
    :end-before: END{checkingvcs}
+
+.. _sec.build_untyped_attr:
+
+Use attributes to infer loop invariants
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this section we build a module containing a let declaration with a
+while loop and an attribute that triggers the inference of loop
+invariants during VC generation. For more information about the
+inference of loop invariants refer to :numref:`sec.installinferloop`
+and :numref:`sec.runwithinferloop`. The examples shown below are
+available in the file :file:`examples/use_api/mlw_tree1.ml`.
+
+We build an environment and define the some helper functions exactly
+as in :numref:`sec.build_untyped`. Additionally we create two other
+helper functions as follows:
+
+.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+   :language: ocaml
+   :start-after: BEGIN{helper2}
+   :end-before: END{helper2}
+
+Our goal is now to build a program equivalent to the following. Note
+that the let declaration contains an attribute ``[@infer]`` which will
+trigger the inference of loop invariants during VC generation (make
+sure that the why3 library was compiled with support for `infer-loop`,
+see :numref:`sec.installinferloop` for more information).
+
+.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+   :language: ocaml
+   :start-after: BEGIN{source1}
+   :end-before: END{source1}
+
+The OCaml code that builds such a module is shown below.
+
+.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+   :language: ocaml
+   :start-after: BEGIN{code1}
+   :end-before: END{code1}
+
+The debugging flags mentioned in :numref:`sec.runwithinferloop` can be
+enabled using the API as follows (the line(s) corresponding to the
+desired flag(s) should be uncommented).
+
+.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+   :language: ocaml
+   :start-after: BEGIN{flags}
+   :end-before: END{flags}
+
+Finally the code for closing the modules, printing it to the standard
+output, typing it, and so on is exactly the same as in the previous
+section, thus we omit it in here.
+
+.. _sec.build_typed:
 
 Typed declaration
 ~~~~~~~~~~~~~~~~~
@@ -633,8 +727,6 @@ functions from the logical part of the modules
    :language: ocaml
    :start-after: BEGIN{code2_import}
    :end-before: END{code2_import}
-
-\lstinputlisting{generated/mlw_expr__code2_import.ml}
 
 We want now to build a program equivalent to the following code in
 concrete Why3 syntax.
@@ -684,7 +776,7 @@ Attributes and locations on identifiers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For variables to be used for counterexamples they need to contain an
-attribute called ``model_trace`` and a location. The ``model_trace`` attribute
+attribute called :why3:attribute:`model_trace` and a location. This attribute
 states the name the user wants the variable to be named in the output of
 the counterexamples pass. Usually, people put a reference to their
 program AST node in this attribute; this helps them to parse and display
@@ -698,7 +790,7 @@ subsequent tasks:
 
     x := !y + 1
 
-This means that the ident generated for :math:`x` will hold both a
+This means that the ident generated for ``x`` will hold both a
 ``model_trace`` and a location.
 
 The example becomes the following:
@@ -716,7 +808,7 @@ Attributes in formulas
 
 Now that variables are tagged, we can define formulas. To define a goal
 formula for counterexamples, we need to tag it with the
-``vc:annotation`` attribute. This attribute is automatically added when
+:why3:attribute:`[@vc:annotation]` attribute. This attribute is automatically added when
 using the VC generation of Why3, but on a user-built task, this needs to
 be added. We also need to add a location for this goal. The following is
 obtained for the simple formula linking ``A`` and ``B``:
@@ -728,7 +820,7 @@ obtained for the simple formula linking ``A`` and ``B``:
 
 Note: the transformations used for counterexamples will create new
 variables for each variable occurring inside the formula tagged by
-``vc:annotation``. These variables are duplicates located at the VC
+:why3:attribute:`vc:annotation`. These variables are duplicates located at the VC
 line. They allow giving all counterexample values located at that VC
 line.
 

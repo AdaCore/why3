@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Compile
 open Format
 open Ident
 open Pp
@@ -96,15 +95,6 @@ module Print = struct
 
   let pv_name pv = pv.pv_vs.vs_name
   let print_pv info fmt pv = print_lident info fmt (pv_name pv)
-
-  (* FIXME put these in Compile*)
-  let is_true e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_true
-    | _ -> false
-
-  let is_false e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_false
-    | _ -> false
 
   let is_mapped_to_int info ity =
     match ity.ity_node with
@@ -238,8 +228,8 @@ module Print = struct
     | Econst (Constant.ConstInt c) ->
         let n = c.Number.il_int in
         let n = BigInt.to_string n in
-        let id = match e.e_ity with
-          | I { ity_node = Ityapp ({its_ts = ts},_,_) } -> ts.ts_name
+        let id = match e.e_mlty with
+          | Tapp (tname, _) -> tname
           | _ -> assert false in
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
@@ -255,13 +245,11 @@ module Print = struct
         forget_let_defn let_def
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
-    | Eapp (rs, []) when rs_equal rs rs_true ->
+    | Eapp (rs, [], false) when rs_equal rs rs_true ->
         fprintf fmt "true"
-    | Eapp (rs, []) when rs_equal rs rs_false ->
+    | Eapp (rs, [], false) when rs_equal rs rs_false ->
         fprintf fmt "false"
-    | Eapp (rs, [])  -> (* avoids parenthesis around values *)
-        fprintf fmt "%a" (print_apply info rs) []
-    | Eapp (rs, pvl) ->
+    | Eapp (rs, pvl, _) ->
        fprintf fmt (protect_on paren "%a")
                (print_apply info rs) pvl
     | Ematch (e1, [p, e2], []) ->
@@ -281,10 +269,10 @@ module Print = struct
           (print_expr info) e (print_list_next newline (print_branch info)) bl
           (print_list_next newline (print_xbranch true info)) xl
     | Eassign al ->
-        let assign fmt (rho, rs, e) =
+        let assign fmt (e1, _, rs, e2) =
           fprintf fmt "@[<hov 2>%a.%a <-@ %a@]"
-            (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
-            (print_expr info) e in
+            (print_expr info) e1 (print_lident info) rs.rs_name
+            (print_expr info) e2 in
         begin match al with
           | [] -> assert false | [a] -> assign fmt a
           | al -> fprintf fmt "@[(%a)]" (print_list semi assign) al end
@@ -320,7 +308,7 @@ module Print = struct
           (print_expr info) e1 (print_expr info) e2
     | Eraise (xs, e_opt) ->
         print_raise ~paren info xs fmt e_opt
-    | Efor (pv1, pv2, dir, pv3, e) ->
+    | Efor (pv1, _ty, pv2, dir, pv3, e) ->
         if is_mapped_to_int info pv1.pv_ity then
           fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
             (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)
@@ -485,8 +473,15 @@ let cml_printer = Pdriver.{
     desc = "printer for CakeML code";
     implem_printer = {
         filename_generator = fg_cml;
-        decl_printer = print_decl;
-        prelude_printer = dummy_prelude_printer;
+        decl_printer = print_decl ~flat:false;
+        prelude_printer = default_prelude_printer;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
+      };
+    flat_printer = {
+        filename_generator = fg_cml;
+        decl_printer = print_decl ~flat:true;
+        prelude_printer = default_prelude_printer;
         header_printer = dummy_border_printer;
         footer_printer = dummy_border_printer;
       };
@@ -504,8 +499,15 @@ let sml_printer = Pdriver.{
     desc = "printer for SML code";
     implem_printer = {
         filename_generator = fg_sml;
-        decl_printer = print_decl;
-        prelude_printer = dummy_prelude_printer;
+        decl_printer = print_decl ~flat:false;
+        prelude_printer = default_prelude_printer;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
+      };
+    flat_printer = {
+        filename_generator = fg_sml;
+        decl_printer = print_decl ~flat:true;
+        prelude_printer = default_prelude_printer;
         header_printer = dummy_border_printer;
         footer_printer = dummy_border_printer;
       };

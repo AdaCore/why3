@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,21 +9,66 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 Pretty printing of Why3 parse trees as Why3 source code} *)
+(** {1 Pretty printing of Why3 parse trees as WhyML source code} *)
 
-val pp_pattern : Format.formatter -> Ptree.pattern -> unit
+(** {2 Printers} *)
 
-val pp_expr : Format.formatter -> Ptree.expr -> unit
+type 'a printers = { marked: 'a Pp.pp; closed: 'a Pp.pp }
+(** The [marked] printer potentially adds the marker, the [closed] printer adds
+    parentheses to the potentially marked node *)
 
-val pp_term : Format.formatter -> Ptree.term -> unit
+val pp_pattern : Ptree.pattern printers
+(** Printer for patterns *)
 
-val pp_pty : Format.formatter -> Ptree.pty -> unit
+val pp_expr : Ptree.expr printers
+(** Printer for expressions *)
 
-val pp_decl : Format.formatter -> Ptree.decl -> unit
+val pp_term : Ptree.term printers
+(** Printer for terms *)
 
-val pp_mlw_file : Format.formatter -> Ptree.mlw_file -> unit
-(** [pp_mlw_file fmt t] outputs the parse tree [t] in formatter [fmt] *)
+val pp_pty : Ptree.pty printers
+(** Printer for types *)
 
-(*/*)
+val pp_decl : Ptree.decl Pp.pp
+(** Printer for declarations *)
 
-val set_marker : Loc.position -> unit
+val pp_mlw_file : Ptree.mlw_file Pp.pp
+(** Printer for mlw files *)
+
+(** {2 Markers}
+
+    When [Ptree] elements are generated (instead of being parsed from a
+    whyml file), locations of typing errors are useless, because they do not
+    correspond to any concrete syntax.
+
+    Alternatively, we can give every [Ptree] element a unique location,
+    for example using the function {!val:Mlw_printer.next_pos}. When a
+    located error is encountered, the function {!val:with_marker} can
+    then be used to instruct the mlw-printer to insert a message as a
+    comment just before an expression, term, or pattern with the given
+    location.
+
+    For example, this can be used to indicate and show a typing error in
+    the printed mlw-file:
+
+    {[
+      try
+        let mm = Typing.type_mlw_file env path filename mlw_file in
+        (* ... well typed mlw_file ... *)
+      with Loc.Located (loc, e) -> (* A located exception [e] *)
+        let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
+        Format.fprintf fmt "%a@."
+          (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
+          mlw_file
+    ]}
+*)
+
+val next_pos : unit -> Loc.position
+(** Generate a unique location. *)
+
+val with_marker : ?msg:string -> Loc.position -> 'a Pp.pp -> 'a Pp.pp
+(** Inform a printer to include the message (default: ["XXX"]) as a comment
+   before the expression, term, or pattern with the given location.
+
+    NOTE: This is currently implemented by a global reference and is
+    therefore unsafe in threaded programs. *)

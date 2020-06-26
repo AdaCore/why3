@@ -110,6 +110,8 @@ module MapApp
 
   type key
 
+  (* we enforce type `key` to have a decidable equality
+     by requiring the following function *)
   val eq (x y: key) : bool
     ensures { result <-> x = y }
 

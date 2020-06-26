@@ -1,0 +1,82 @@
+(* Two Way Sort
+
+   The following program sorts an array of Boolean values, with False<True.
+
+   Questions:
+
+   1. Prove safety i.e. the absence of array access out of bounds.
+
+   2. Prove termination.
+
+   3. Prove that array a is sorted after execution of function two_way_sort
+      (using the predicate sorted that is provided).
+
+   4. Show that after execution the array contents is a permutation of its
+      initial contents. Use the library predicate "permut_all" to do so
+      (the corresponding module ArrayPermut is already imported).
+
+      Within a postcondition, you can refer to the contents of array a
+      at the beginning of the function with notation (old a).
+      Within a loop invariant, you can refer to it with notation (at a 'Init).
+
+*)
+
+module TwoWaySort
+
+  use int.Int
+  use bool.Bool
+  use ref.Refint
+  use array.Array
+  use array.ArraySwap
+  use array.ArrayPermut
+
+  predicate (<<) (x y: bool) = x = False \/ y = True
+
+  predicate sorted (a: array bool) =
+    forall i1 i2: int. 0 <= i1 <= i2 < a.length -> a[i1] << a[i2]
+
+  let two_way_sort[@infer](a: array bool) : unit
+  requires { length a >= 0 }
+    writes { a }
+    ensures { sorted a }
+  =
+    let i = ref 0 in
+    let j = ref (length a - 1) in
+    while !i < !j do
+	variant { !j - !i }
+      invariant { forall k:int. 0 <= k < !i -> not a[k] }
+      invariant { forall k:int. !j < k < length a -> a[k] }
+      if not a[!i] then
+         i := !i + 1
+      else if a[!j] then
+        j := !j - 1
+      else begin
+        swap a !i !j;
+        i := !i + 1;
+        j := !j - 1
+      end
+    done
+
+  let two_way_sort3[@infer:box](a: array bool) : unit
+  requires { length a >= 0 }
+    writes { a }
+    ensures { sorted a }
+  =
+    let i = ref 0 in
+    let j = ref (length a - 1) in
+    while !i < !j do
+	variant { !j - !i }
+      invariant { forall k:int. 0 <= k < !i -> not a[k] }
+      invariant { forall k:int. !j < k < length a -> a[k] }
+      if not a[!i] then
+         i := !i + 1
+      else if a[!j] then
+        j := !j - 1
+      else begin
+        swap a !i !j;
+        i := !i + 1;
+        j := !j - 1
+      end
+    done
+
+end

@@ -1,0 +1,33 @@
+module If1
+
+	use int.Int
+	use ref.Ref
+
+	let b(x:int) : int
+	ensures { result = 18 }
+	=
+		let i = ref 0 in
+		let j = ref 0 in
+		while !i < 10 do
+			variant { 10 - !i  }
+			if !i < !j then
+				i := !i + 1
+			else
+				j := !j + 1
+		done;
+		!j
+
+	let c(x:int) : int
+	ensures { result = 18 }
+	=
+		let i = ref 0 in
+		let j = ref 0 in
+		while !i < 10 do
+			variant { 10 - !i  }
+			if !i <= !j then
+				i := !i + 1
+			else
+				j := !j + 1
+		done;
+		!j
+end

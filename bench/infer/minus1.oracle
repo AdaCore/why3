@@ -1,0 +1,93 @@
+### Debug: inferred invariants ###
+((((1 = 1 /\ 18 = 18) /\ 0 = 0) /\ 0 < contents i) /\ contents i <= 10) /\
+20 = ((2 * contents i) + contents j)
+###
+### Debug: inferred invariants ###
+((((((((((((contents i1 <= 1 /\ (contents i1 + 17) <= contents j1) /\
+           19 <= (contents i1 + contents j1)) /\
+          18 <= contents j1) /\
+         1 = contents i1) /\
+        18 = contents j1 \/
+        ((((((4 <= contents i1 /\ contents i1 <= 4) /\
+             (contents i1 + 8) <= contents j1) /\
+            16 <= (contents i1 + contents j1)) /\
+           12 <= contents j1) /\
+          (contents i1 + contents j1) <= 16) /\
+         contents j1 <= (8 + contents i1)) /\
+        contents j1 <= 12 \/
+        ((((((7 <= contents i1 /\ contents i1 <= 7) /\
+             contents i1 <= (1 + contents j1)) /\
+            13 <= (contents i1 + contents j1)) /\
+           6 <= contents j1) /\
+          (contents i1 + contents j1) <= 13) /\
+         contents j1 < contents i1) /\
+        contents j1 <= 6 \/
+        ((10 <= contents i1 /\ (contents i1 + contents j1) <= 10) /\
+         (contents j1 + 10) <= contents i1) /\
+        contents j1 <= 0 \/
+        ((((((6 <= contents i1 /\ contents i1 <= 6) /\
+             (contents i1 + 2) <= contents j1) /\
+            14 <= (contents i1 + contents j1)) /\
+           8 <= contents j1) /\
+          (contents i1 + contents j1) <= 14) /\
+         contents j1 <= (2 + contents i1)) /\
+        contents j1 <= 8 \/
+        ((((((2 <= contents i1 /\ contents i1 <= 2) /\
+             (contents i1 + 14) <= contents j1) /\
+            18 <= (contents i1 + contents j1)) /\
+           16 <= contents j1) /\
+          (contents i1 + contents j1) <= 18) /\
+         contents j1 <= (14 + contents i1)) /\
+        contents j1 <= 16 \/
+        ((((((3 <= contents i1 /\ contents i1 <= 3) /\
+             (contents i1 + 11) <= contents j1) /\
+            17 <= (contents i1 + contents j1)) /\
+           14 <= contents j1) /\
+          (contents i1 + contents j1) <= 17) /\
+         contents j1 <= (11 + contents i1)) /\
+        contents j1 <= 14 \/
+        ((((((5 <= contents i1 /\ contents i1 <= 5) /\
+             (contents i1 + 5) <= contents j1) /\
+            15 <= (contents i1 + contents j1)) /\
+           10 <= contents j1) /\
+          (contents i1 + contents j1) <= 15) /\
+         contents j1 <= (5 + contents i1)) /\
+        contents j1 <= 10 \/
+        ((((((8 <= contents i1 /\ contents i1 <= 8) /\
+             contents i1 <= (4 + contents j1)) /\
+            12 <= (contents i1 + contents j1)) /\
+           4 <= contents j1) /\
+          (contents i1 + contents j1) <= 12) /\
+         (contents j1 + 4) <= contents i1) /\
+        contents j1 <= 4 \/
+        ((((((9 <= contents i1 /\ contents i1 <= 9) /\
+             contents i1 <= (7 + contents j1)) /\
+            11 <= (contents i1 + contents j1)) /\
+           2 <= contents j1) /\
+          (contents i1 + contents j1) <= 11) /\
+         (contents j1 + 7) <= contents i1) /\
+        contents j1 <= 2) /\
+       contents j1 <= 18) /\
+      contents j1 <= (17 + contents i1)) /\
+     (contents i1 + contents j1) <= 19) /\
+    0 <= contents j1) /\
+   10 <= (contents i1 + contents j1)) /\
+  contents i1 <= (10 + contents j1)) /\
+ contents i1 <= 10) /\
+0 < contents i1
+###
+### Debug: inferred invariants ###
+((((((((((1 = contents i2 /\ 18 = contents j2) /\ 1 = contents i2) /\
+        1 = contents i2) /\
+       18 = contents j2) /\
+      18 = contents j2 \/
+      (((2 = contents i2 /\ 16 = contents j2) /\ 16 = contents j2) /\
+       2 = contents i2) /\
+      2 = contents i2 \/ (3 <= contents i2 /\ contents j2 <= 14) /\ 2 = 2) /\
+     1 = 1) /\
+    18 = 18) /\
+   0 = 0) /\
+  contents j2 <= 18) /\
+ contents i2 <= 10) /\
+0 < contents i2
+###

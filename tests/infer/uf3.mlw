@@ -1,0 +1,18 @@
+
+module Uf1
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
+
+	let b(x:int): int
+	requires { x >= 1 }
+	ensures { result = 42+x-1 } =
+		let a = make x 0 in
+		let i = ref 0 in
+		while (!i < length a) do
+		variant { length a - !i }
+		a[!i] <- !i + 42;
+		incr i;
+		done; a[!i-1]
+end

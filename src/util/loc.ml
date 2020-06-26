@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,6 +13,7 @@
 type lexing_loc = Lexing.position * Lexing.position
 *)
 
+open Mysexplib.Std [@@warning "-33"]
 open Lexing
 
 let current_offset = ref 0
@@ -43,6 +44,7 @@ let report_line fmt l = fprintf fmt "%s:%d:" l.pos_fname l.pos_lnum
 *)
 
 type position = string * int * int * int
+[@@deriving sexp_of]
 
 let user_position fname lnum cnum1 cnum2 = (fname,lnum,cnum1,cnum2)
 

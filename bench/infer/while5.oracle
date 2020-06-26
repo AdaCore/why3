@@ -1,0 +1,14 @@
+### Debug: inferred invariants ###
+(((0 = contents i /\ contents i = 0 \/
+   (6 = contents i /\ 6 = contents i) /\ 6 = contents i \/
+   12 = contents i /\ 6 = 6) /\
+  0 = 0) /\
+ 0 <= contents i) /\
+contents i <= 12
+###
+### Debug: inferred invariants ###
+((contents i1 <= 0 /\ contents i1 = 0 \/
+  6 <= contents i1 /\ contents i1 <= 6 \/ 12 <= contents i1) /\
+ contents i1 <= 12) /\
+0 <= contents i1
+###

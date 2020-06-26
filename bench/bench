@@ -104,9 +104,9 @@ drivers () {
         if [[ $f == drivers/cakeml.drv ]]; then continue; fi
 	printf "  $f... "
 	# running Why
-	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f - > /dev/null; then
+	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f - > /dev/null; then
 	    echo "why FAILED"
-            echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f -
+            echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f -
 	    exit 1
 	fi
 	echo "ok"
@@ -296,6 +296,12 @@ list_stuff () {
     fi
 }
 
+test_mlw_printer () {
+    python3 -m sexpdata || return
+    bench/test_mlw_printer bench/valid/*.mlw
+    bench/test_mlw_printer bench/typing/good/*.mlw
+}
+
 echo "=== Checking stdlib ==="
 goods stdlib
 goods stdlib/mach
@@ -321,7 +327,7 @@ goods bench/typing/x-good --parse-only
 bads bench/typing/x-good --type-only
 goods bench/programs/good
 goods bench/ce
-goods src/trywhy3/examples "--debug ignore_missing_diverges"
+goods src/trywhy3/examples "--debug=ignore_missing_diverges"
 goods examples/bts
 goods examples/tests
 goods examples/tests-provers
@@ -337,7 +343,7 @@ goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_201
 goods examples/double_wp "-L examples/double_wp"
 goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
-goods examples/prover "-L examples/prover --debug ignore_unused_vars"
+goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
 goods examples/in_progress
 plugins tests/python --type-only py
 plugins tests/microc --type-only c
@@ -452,7 +458,7 @@ replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_20
 replay examples/double_wp "-L examples/double_wp --merging-only"
 #replay examples/in_progress/ring_decision "-L examples/in_progress/ring_decision --merging-only"
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
-replay examples/prover "-L examples/prover --merging-only --debug ignore_unused_vars"
+replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_vars"
 #replay examples/in_progress --merging-only
 echo ""
 
@@ -467,3 +473,6 @@ echo ""
 
 echo "=== Checking realizations ==="
 exec bench/check_realizations.sh
+
+echo "=== Checking mlw_printer ==="
+test_mlw_printer

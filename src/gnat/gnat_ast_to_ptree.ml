@@ -1356,10 +1356,13 @@ let read_channel env path filename c =
   let mlw_file = mlw_file gnat_file.theory_declarations in
   (* Defer printing of mlw file until after the typing, to set the marker of located
      exceptions *)
-  let print_mlw_file () =
+  let print_mlw_file ?mark () =
+    let pp =
+      match mark with
+      | Some (msg, pos) -> Mlw_printer.(with_marker ~msg pos pp_mlw_file)
+      | None -> Mlw_printer.pp_mlw_file in
     let out = open_out (filename^".mlw") in
-    Format.fprintf (Format.formatter_of_out_channel out) "%a@."
-      Mlw_printer.pp_mlw_file mlw_file;
+    Format.fprintf (Format.formatter_of_out_channel out) "%a@." pp mlw_file;
     close_out out in
   match Typing.type_mlw_file env path filename mlw_file with
   | res ->
@@ -1369,13 +1372,12 @@ let read_channel env path filename c =
   | exception Loc.Located (pos, e) ->
       (* The positions in the generated ptree are useless - we set the marker for
          printing the mlw file and report that. *)
-      Mlw_printer.set_marker pos;
-      print_mlw_file ();
+      let msg = Format.asprintf " ERROR %a: @?" Exn_printer.exn_printer e in
+      print_mlw_file ~mark:(msg, pos) ();
       raise (Located_by_marker (Filename.basename filename^".mlw", e))
   | exception e ->
       print_mlw_file ();
       raise e
-
 
 let gnat_json_format = "gnat-json"
 
@@ -1398,6 +1400,6 @@ let () =
        | Located_by_marker (filename, e) ->
            (* Located errors (i.e. typing errors) are reported with an hint on the marker, which
               is inserted into the mlw file by the mlw-printer. *)
-           Format.fprintf fmt "File %s, marked by (*XXX*)(...):@\n%a"
+           Format.fprintf fmt "File %s, marked by (* ERROR: *)(...):@\n%a"
              filename Exn_printer.exn_printer e
        | _ -> raise exn)

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,6 +12,8 @@
 (** Explanations *)
 
 val arg_extra_expl_prefix : string * Arg.spec * string
+
+val opt_extra_expl_prefix : Getopt.opt
 
 val goal_expl_task:
   root:bool -> Task.task -> Ident.ident * string * Task.task
@@ -26,13 +28,7 @@ val search_attrs :
 
 (** Shapes *)
 
-(*
-val reset_dict : unit -> unit
- *)
-
-val current_shape_version : int
-
-(* Backward compatible but not used in shape version equal or above SV7 *)
+(* Backward compatible but not used in recent shape version *)
 type shape
 
 (* This shape representation is not just a classic "summary" of a task as
@@ -40,7 +36,7 @@ type shape
    session (see Gshape.gshape for these global field) and associated to a
    unique index. The [bound_shape] is just the list of integers corresponding to
    the shapes of declarations.
-   These shape are used from version SV7 and above. *)
+   These shape are used from recent shape version *)
 type bound_shape
 
 val empty_bound_shape: bound_shape
@@ -50,14 +46,25 @@ type shape_v =
   | Old_shape of shape
   | Bound_shape of bound_shape
 
-val shape_of_string: version:int -> string -> shape_v
-val string_of_shape: shape_v -> string
+type sum_shape_version
 
-val t_shape_task: version:int -> expl:string -> Task.task -> shape
-(** returns the shape of a given task. Raise [Assert_failure] for version >= 8 *)
+exception InvalidShape
+
+val string_to_sum_shape_version : string -> sum_shape_version
+(** raise [InvalidShape] if argument is not denoting a valid shape version *)
+
+val pp_sum_shape_version : Format.formatter -> sum_shape_version -> unit
 
 (* True if a shape version represented as bound_shape false if it is shape *)
-val is_bound_shape_version: int -> bool
+val is_bound_sum_shape_version: sum_shape_version -> bool
+
+val current_sum_shape_version : sum_shape_version
+
+val shape_of_string: version:sum_shape_version -> string -> shape_v
+val string_of_shape: shape_v -> string
+
+val t_shape_task: version:sum_shape_version -> expl:string -> Task.task -> shape
+(** returns the shape of a given task. returns [empty_shape] for unrecognized versions *)
 
 (* This modules handles the session part of the new [bound_shape]. A [gshape]
    is now included in the session *)
@@ -79,7 +86,7 @@ module Gshape : sig
   val goal_and_expl_shapes  : gshape -> bound_shape -> shape
 
   val t_bound_shape_task:
-    gshape -> version:int -> expl:string -> Task.task -> bound_shape
+    gshape -> version:sum_shape_version -> expl:string -> Task.task -> bound_shape
 
   val empty_bshape: bound_shape
 end
@@ -95,7 +102,7 @@ val dumb_checksum: checksum
 
 val buffer_checksum : Buffer.t -> checksum
 
-val task_checksum : ?version:int -> Task.task -> checksum
+val task_checksum : ?version:sum_shape_version -> Task.task -> checksum
 
 (** Pairing algorithm *)
 

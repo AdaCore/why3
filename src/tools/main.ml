@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -14,10 +14,6 @@ open Why3
 open Whyconf
 open Theory
 
-let usage_msg = sprintf
-  "Usage: %s [options] <command> [options]"
-  (Filename.basename Sys.argv.(0))
-
 let opt_list_transforms = ref false
 let opt_list_printers = ref false
 let opt_list_provers = ref false
@@ -25,37 +21,37 @@ let opt_list_formats = ref false
 let opt_list_metas = ref false
 let opt_list_attrs = ref false
 
-let option_list = [
-  "--list-transforms", Arg.Set opt_list_transforms,
-      " list known transformations";
-  "--list-printers", Arg.Set opt_list_printers,
-      " list known printers";
-  "--list-provers", Arg.Set opt_list_provers,
-      " list known provers";
-  "--list-formats", Arg.Set opt_list_formats,
-      " list known input formats";
-  "--list-metas", Arg.Set opt_list_metas,
-      " list known metas";
-  "--list-attributes", Arg.Set opt_list_attrs, "list used attributes";
-  "--print-libdir",
-      Arg.Unit (fun _ -> printf "%s@." Config.libdir; exit 0),
-      " print location of binary components (plugins, etc)";
-  "--print-datadir",
-      Arg.Unit (fun _ -> printf "%s@." Config.datadir; exit 0),
-      " print location of non-binary data (theories, modules, etc)";
-  "--version",
-      Arg.Unit (fun _ -> printf "Why3 platform, version %s@."
-        Config.version; exit 0),
-      " print version information";
-]
+let option_list =
+  let open Getopt in
+  Args.common_options @
+  [ KLong "list-transforms", Hnd0 (fun () -> opt_list_transforms := true),
+    " list known transformations";
+    KLong "list-printers", Hnd0 (fun () -> opt_list_printers := true),
+    " list known printers";
+    KLong "list-provers", Hnd0 (fun () -> opt_list_provers := true),
+    " list known provers";
+    KLong "list-formats", Hnd0 (fun () -> opt_list_formats := true),
+    " list known input formats";
+    KLong "list-metas", Hnd0 (fun () -> opt_list_metas := true),
+    " list known metas";
+    KLong "list-attributes", Hnd0 (fun () -> opt_list_attrs := true),
+    " list used attributes";
+    KLong "print-libdir", Hnd0 (fun () -> printf "%s@." Config.libdir; exit 0),
+    " print location of binary components (plugins, etc)";
+    KLong "print-datadir", Hnd0 (fun _ -> printf "%s@." Config.datadir; exit 0),
+    " print location of non-binary data (modules, etc)";
+    KLong "version",
+    Hnd0 (fun _ -> printf "Why3 platform, version %s@." Config.version; exit 0),
+    " print version information";
+  ]
 
 let command_path = match Config.localdir with
   | Some p -> Filename.concat p "bin"
   | None -> Filename.concat Config.libdir "commands"
 
 let extra_help fmt commands =
-  fprintf fmt "@\nAvailable commands:@.";
-  List.iter (fun (v,_) -> fprintf fmt "  %s@." v) commands
+  fprintf fmt "Available commands:@\n";
+  List.iter (fun (v,_) -> fprintf fmt "  %s@\n" v) commands
 
 let available_commands () =
   let commands = Sys.readdir command_path in
@@ -70,20 +66,35 @@ let available_commands () =
     else acc) [] commands in
   List.rev commands
 
-let command sscmd =
-  let sscmd,args =
-    let cur = !Arg.current in
+let do_usage () =
+  Format.printf
+    "@[Usage: %s [options] <command> [options]@\n\
+     Execute the given subcommand.@\n\
+     @\n%s@\n%a@]@?"
+    (Filename.basename Sys.argv.(0))
+    (Getopt.format option_list)
+    extra_help (available_commands ());
+  exit 0
+
+let option_list =
+  let open Getopt in
+  (Key ('h', "help"), Hnd0 do_usage,
+   " display this help and exit") ::
+  option_list
+
+let command cur =
+  let sscmd, args =
+    let nargs = Array.length Sys.argv in
+    let sscmd = Sys.argv.(cur) in
+    let cur = cur + 1 in
     if sscmd = "help" then begin
-      if cur + 1 >= Array.length Sys.argv then begin
-        let extra_help fmt () = extra_help fmt (available_commands ()) in
-        Args.exit_with_usage ~exit_code:0 ~extra_help option_list usage_msg
-      end;
-      let sscmd = Sys.argv.(cur + 1) in
+      if cur = nargs then do_usage ();
+      let sscmd = Sys.argv.(cur) in
       sscmd, ["--help"]
     end else begin
       let args = ref [] in
-      for i = 1 to Array.length Sys.argv - 1 do
-        if i <> cur then args := Sys.argv.(i) :: !args;
+      for i = 1 to nargs - 1 do
+        if i <> cur - 1 then args := Sys.argv.(i) :: !args;
       done;
       sscmd, List.rev !args
     end in
@@ -97,7 +108,7 @@ let command sscmd =
       let scmd =
         try List.assoc sscmd commands
         with Not_found ->
-          eprintf "'%s' is not a Why3 command.@\n%a"
+          eprintf "'%s' is not a Why3 command.@\n@\n%a"
             sscmd extra_help commands;
           exit 1 in
       Filename.concat command_path scmd
@@ -109,8 +120,9 @@ let command sscmd =
   Unix.execv cmd args
 
 let () = try
-  let extra_help fmt () = extra_help fmt (available_commands ()) in
-  let config,_,_ = Args.initialize ~extra_help option_list command usage_msg in
+  let i = Getopt.parse_many option_list Sys.argv 1 in
+  if i < Array.length Sys.argv then command i;
+  let config,_,_ = Args.complete_initialization () in
 
   (* listings *)
 
@@ -181,8 +193,9 @@ let () = try
   end;
   if !opt_list then exit 0;
 
-  printf "@[%s%a@]" usage_msg extra_help ()
+  do_usage ();
 
-  with e when not (Debug.test_flag Debug.stack_trace) ->
+  with
+  | e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

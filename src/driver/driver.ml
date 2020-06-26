@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -145,7 +145,7 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
   in
   (* th_uc is the theory built with the uses forced by the driver *)
   let add_local th th_uc = function
-    | Rprelude s ->
+    | Rprelude (s, _transitive) ->
         let l = Mid.find_def [] th.th_name !thprelude in
         thprelude := Mid.add th.th_name (s::l) !thprelude;
         th_uc

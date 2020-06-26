@@ -1,0 +1,173 @@
+
+module Test
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
+
+	let b(x:int): unit
+	=
+		let a = make x 1 in
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { a[1] = 43 }
+		()
+		done; ()
+
+
+
+	let c(x:int): unit
+	requires { x >= 2 }
+	=
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int.  k <> 0) }
+		()
+		done; ()
+
+	let dd(x:int): unit
+	requires { x >= 2 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		while (true) do
+		variant { 0 }
+		invariant { forall k: int. k <> 0 }
+		()
+		done; ()
+
+
+	let d(x:int): unit
+	requires { x >= 2 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { a[1] = 42 /\ a[0] = 0 /\ (forall k: int. (k = 0 -> a[k] = 18)) }
+		()
+		done; ()
+
+	let e(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { a[1] = 42 /\ a[0] = 0 /\ (forall k: int. k = 2 -> a[k] = 2) }
+		()
+		done; ()
+
+	let ee(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		while (true) do
+		variant { 0 }
+		invariant {(forall k: int. k = 0 -> a[k] = 1) }
+		()
+		done; ()
+
+
+	let f(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> (a[k] = 10))) }
+		a[0] <- 10;
+		()
+		done; ()
+
+	let g(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		a[0] <- 10;
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> (a[k] = 1))) }
+		()
+		done; ()
+
+	let cond(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		if x >= 5 then
+			a[0] <- 7
+		else
+			a[0] <- 9;
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> (a[k] = 1 \/ a[0] = 7))) }
+		()
+		done; ()
+
+	let cond2(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		if x >= 5 then
+			a[0] <- 7
+		else
+			a[0] <- 9;
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> (a[k] = 1 \/ a[0] = 9))) }
+		()
+		done; ()
+
+	let h(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> (a[k] = 1))) }
+		a[0] <- 10;
+		()
+		done; ()
+
+	let cond3(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		if x >= 5 then
+			a[0] <- 7;
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> ( a[0] = 7))) }
+		()
+		done; ()
+
+	let cond4(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		if x >= 5 then
+			a[0] <- 7;
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> ( a[0] = 1))) }
+		()
+		done; ()
+
+	let fe(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (true) do
+		variant { 0 }
+		invariant { 0 <= !k < 2 }
+		a[0] <- !k + 1;
+		incr k;
+		done; ()
+end

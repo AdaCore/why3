@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -403,31 +403,35 @@ let kind = ref None
 
 let set_kind = function
   | "inductive" -> kind := Some Inductive
-  | str -> ksprintf invalid_arg "kind: %s" str
+  | _ -> assert false
 
-type output = Latex | Mlw | Ast | Dep
+type output = Latex | Mlw | Sexp | Dep
 
-let output = ref None
+let output = ref Mlw
 
 let set_output = function
-  | "latex" -> output := Some Latex
-  | "mlw" -> output := Some Mlw
-  | "ast" -> output := Some Ast
-  | "dep" -> output := Some Dep
-  | str -> ksprintf invalid_arg "output: --%s--" str
+  | "latex" -> output := Latex
+  | "mlw" -> output := Mlw
+  | "sexp" -> output := Sexp
+  | "dep" -> output := Dep
+  | _ -> assert false
 
 let prefix = ref "WHY"
 
-let usage =
-  "Pretty print Why3 declarations (currently only inductive types in LaTeX using mathpartir).\n\
-   why3 pp [--output=latex|mlw|ast] [--kind=inductive] [--prefix <prefix>] <filename> [<Module>.]<type> ..."
+let usage_msg = sprintf
+  "Usage: %s [options] [--output=latex|mlw|sexp|dep] [--kind=inductive] [--prefix=<prefix>] <filename> [<Module>.]<type> ...\n"
+  (Filename.basename Sys.argv.(0))
 
-let options = [
-  "--output", Arg.String set_output,                "<output> Output format";
-  "--kind",   Arg.String set_kind,                  "<category> Syntactic category to be printed (--kind=inductive only possible value for --output=latex)";
-  "--prefix", Arg.String ((:=) prefix),             "<prefix> Prefix for LaTeX commands (default for output latex: WHY)";
-  "-",        Arg.Unit (fun () -> filename := Some "-"), " Read from stdin";
-]
+let spec =
+  let open Why3.Getopt in
+  [ KLong "output", Hnd1 (ASymbol ["latex"; "mlw"; "sexp"; "dep"], set_output),
+    "<output> select output format (default: \"mlw\")";
+    KLong "kind", Hnd1 (ASymbol ["inductive"], set_kind),
+    "<category> select syntactic category to be printed (only\n\
+     \"inductive\" for --output=latex)";
+    KLong "prefix", Hnd1 (AString, (:=) prefix),
+    "<prefix> set prefix for LaTeX macros (default: \"WHY\")";
+  ]
 
 let parse_mlw_file filename =
   let c = if filename = "-" then stdin else open_in filename in
@@ -479,29 +483,29 @@ let deps_file fmt header filename f =
   end;
   if header then fprintf fmt "}@."
 
+
+let _, _, _ =
+  Whyconf.Args.initialize spec add_filename_then_path usage_msg
+
 let () =
-  Arg.parse options add_filename_then_path usage;
-  try
     match !filename with
     | Some filename ->
         let mlw_file = parse_mlw_file filename in
         (match !output, !kind, Queue.length paths with
-         | Some Latex, Some Inductive, _ ->
+         | Latex, Some Inductive, _ ->
              let paths = List.rev (Queue.fold (fun l x -> x :: l) [] paths) in
              let module Conf = struct let prefix = !prefix let flatten_applies = true let comment_macros = true end in
              let module M = LatexInd(Conf) in
              M.main std_formatter mlw_file paths
-         | Some Mlw, None, 0 ->
+         | Mlw, None, 0 ->
             Mlw_printer.pp_mlw_file std_formatter mlw_file
-         | Some Dep, None, _ ->
+         | Dep, None, _ ->
             let f = Filename.(chop_extension (basename filename)) in
             deps_file std_formatter true f mlw_file
-         (* | Some Ast, None, 0 ->
-          *     Ptree.pp_mlw_file std_formatter mlw_file *)
+         | Sexp, None, 0 ->
+             Why3pp_sexp.why3pp_sexp mlw_file
          | _, _, _ ->
-             failwith "command line arguments"
+             Getopt.handle_exn Sys.argv "invalid arguments"
         )
-    | None -> invalid_arg "no filename given"
-  with Invalid_argument msg ->
-    eprintf "Error: %s@." msg;
-    exit 1
+    | None ->
+        Getopt.handle_exn Sys.argv "missing filename"

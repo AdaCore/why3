@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,7 +11,6 @@
 
 (** Printer for extracted OCaml code *)
 
-open Compile
 open Format
 open Ident
 open Pp
@@ -165,7 +164,7 @@ module Print = struct
       let p, t, q =
         try Pmodule.restore_path id with Not_found -> Theory.restore_path id in
       let fname = if p = [] then info.info_fname else None in
-      let m = Strings.capitalize (module_name ?fname p t) in
+      let m = Strings.capitalize (Ml_printer.module_name ?fname p t) in
       fprintf fmt "%s.%a" m (print_path ~sanitizer) (q, id)
     with
     | Not_found ->
@@ -227,6 +226,10 @@ module Print = struct
     | Ttuple tl ->
         fprintf fmt (protect_on paren "@[%a@]")
           (print_list star (print_ty ~use_quote ~paren:true info)) tl
+    | Tarrow (t1, t2) ->
+        fprintf fmt (protect_on paren "%a -> %a")
+          (print_ty ~use_quote ~paren info) t1
+          (print_ty ~use_quote ~paren info) t2
     | Tapp (ts, tl) ->
         match query_syntax info.info_syn ts with
         | Some s when complex_syntax s ->
@@ -270,12 +273,14 @@ module Print = struct
     else fprintf fmt "(%a:@ %a)" (print_lident info) id
       (print_ty ~use_quote:false ~paren:false info) ty
 
-  let print_vsty_opt_fun info fmt id = function
+  let print_vsty_opt_fun info fmt id ty = match ty with
     | Tapp (id_ty, [arg]) ->
         assert (query_syntax info.info_syn id_ty = Some "%1 option");
         fprintf fmt "?%s:%a" id.id_string
           (print_ty ~use_quote:false ~paren:false info) arg
-    | _ -> invalid_arg "print_vsty_opt_fun" (*FIXME : better error message *)
+    | _ ->
+       Loc.errorm "invalid optional argument of type %a"
+         (print_ty ~use_quote:false ~paren:false info) ty
 
   let print_vsty_named_fun info fmt id ty =
     fprintf fmt "%s:%a" id.id_string
@@ -355,15 +360,6 @@ module Print = struct
   let pv_name pv = pv.pv_vs.vs_name
   let print_pv info fmt pv = print_lident info fmt (pv_name pv)
 
-  (* FIXME put these in Compile*)
-  let is_true e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_true
-    | _ -> false
-
-  let is_false e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_false
-    | _ -> false
-
   let is_field rs =
       match rs.rs_field with
       | None   -> false
@@ -400,7 +396,7 @@ module Print = struct
     | expr :: exprl, pv :: pvl ->
         if is_optional ~attrs:(pv_name pv).id_attrs then
           begin match expr.e_node with
-            | Eapp (rs, _)
+            | Eapp (rs, _, false)
               when query_syntax info.info_syn rs.rs_name = Some "None" -> ()
             | _ -> fprintf fmt "?%s:%a" (pv_name pv).id_string
                      (print_expr info 1) expr end
@@ -543,8 +539,8 @@ module Print = struct
     | Econst (Constant.ConstInt c) ->
         let n = c.Number.il_int in
         let n = BigInt.to_string n in
-        let id = match e.e_ity with
-          | I { ity_node = Ityapp ({its_ts = ts},_,_) } -> ts.ts_name
+        let id = match e.e_mlty with
+          | Tapp (tname, _) -> tname
           | _ -> assert false in
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
@@ -562,15 +558,14 @@ module Print = struct
         forget_let_defn let_def
     | Eabsurd ->
         fprintf fmt (protect_on (opr && prec < 4) "assert false (* absurd *)")
-    | Eapp (rs, []) when rs_equal rs rs_true ->
+    | Eapp (rs, [], _) when rs_equal rs rs_true ->
         fprintf fmt "true"
-    | Eapp (rs, []) when rs_equal rs rs_false ->
+    | Eapp (rs, [], _) when rs_equal rs rs_false ->
         fprintf fmt "false"
-    | Eapp (rs, [])  -> (* avoids parenthesis around values *)
-        print_apply info prec rs fmt []
-    | Eapp (rs, [e]) when query_syntax info.info_syn rs.rs_name = Some "%1" ->
+    | Eapp (rs, [e], _)
+         when query_syntax info.info_syn rs.rs_name = Some "%1" ->
         print_expr ~boxed ~opr ~be info prec fmt e
-    | Eapp (rs, pvl) ->
+    | Eapp (rs, pvl, _) ->
         print_apply info prec rs fmt pvl
     | Ematch (e1, [p, e2], []) ->
         fprintf fmt (protect_on (opr && prec < 18) "let %a =@ %a in@ %a")
@@ -584,24 +579,25 @@ module Print = struct
           (print_expr info 18) e
           (print_list newline (print_branch info)) pl
     | Eassign al ->
-        let assign fmt (rho, rs, e) =
+        let assign fmt (e1, _, rs, e2) =
           if rs_equal rs rs_ref_proj
           then fprintf fmt "@[<hv 2>%a :=@ %a@]"
-                 (print_lident info) (pv_name rho) (print_expr info 15) e
+                 (print_expr info 14) e1 (print_expr info 15) e2
           else if is_field rs
           then fprintf fmt "@[<hv 2>%a.%a <-@ %a@]"
-                 (print_lident info) (pv_name rho) (print_record_proj info) rs
-                (print_expr info 15) e
+                 (print_expr info 14) e1 (print_record_proj info) rs
+                (print_expr info 15) e2
           else
             match query_syntax info.info_syn rs.rs_name with
             | Some s ->
                fprintf fmt "@[<hv 2>%a <-@ %a@]"
-                (syntax_arguments s (print_lident info)) [pv_name rho]
-                (print_expr info 15) e
+                (syntax_arguments s (print_expr info 14)) [e1]
+                (print_expr info 15) e2
             | None ->
                fprintf fmt "@[<hv 2>%a.%a <-@ %a@]"
-                 (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
-                 (print_expr info 15) e in
+                 (print_expr info 14) e1
+                 (print_lident info) rs.rs_name
+                 (print_expr info 15) e2 in
         begin match al with
         | [] -> assert false | [a] -> assign fmt a
         | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
@@ -649,7 +645,7 @@ module Print = struct
           (print_expr info 18) e1 (print_expr ~opr:false info 18) e2
     | Eraise (xs, e_opt) ->
         print_raise ~paren:(prec < 4) info xs fmt e_opt
-    | Efor (pv1, pv2, dir, pv3, e) ->
+    | Efor (pv1, _, pv2, dir, pv3, e) ->
         if is_mapped_to_int info pv1.pv_ity then begin
           fprintf fmt "@[<hv 2>for %a = %a %a %a do@ @[%a@]@ done@]"
             (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)
@@ -848,7 +844,7 @@ let print_decl =
       info_current_mo   = Some m;
       info_th_known_map = th.th_known;
       info_mo_known_map = m.mod_known;
-      info_fname        = Opt.map Compile.clean_name fname;
+      info_fname        = Opt.map Ml_printer.clean_name fname;
       info_flat         = flat;
       info_prec         = pargs.Pdriver.prec;
       info_current_ph   = [];
@@ -859,14 +855,21 @@ let print_decl =
 let ng suffix ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in
   let path     = m.mod_theory.th_path in
-  (module_name ?fname path mod_name) ^ suffix
+  (Ml_printer.module_name ?fname path mod_name) ^ suffix
 
 let ocaml_printer = Pdriver.{
     desc = "printer for Ocaml code";
     implem_printer = {
         filename_generator = ng ".ml";
-        decl_printer = print_decl;
-        prelude_printer = dummy_prelude_printer;
+        decl_printer = print_decl ~flat:false;
+        prelude_printer = default_prelude_printer;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
+      };
+    flat_printer = {
+        filename_generator = ng ".ml";
+        decl_printer = print_decl ~flat:true;
+        prelude_printer = default_prelude_printer;
         header_printer = dummy_border_printer;
         footer_printer = dummy_border_printer;
       };

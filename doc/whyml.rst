@@ -709,7 +709,7 @@ As long as ``s`` is not empty and its head is not zero, it increments
 
 .. code-block:: whyml
 
-      let search_loop (l: list int) : int =
+      let search_loop (l: list int) : int
         ensures { ... same postcondition as in search_list ... }
       = let i = ref 0 in
         let s = ref l in

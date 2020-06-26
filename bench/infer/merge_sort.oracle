@@ -1,0 +1,30 @@
+### Debug: inferred invariants ###
+((1 = 1 /\ 0 <= lo) /\ contents i <= length a) /\ lo < contents i
+###
+### Debug: inferred invariants ###
+((1 = 1 /\ 0 < contents i1) /\ 0 < length a1) /\ 0 <= lo1
+###
+### Debug: inferred invariants ###
+((((0 = contents lo2 /\ 2 <= contents first_run) /\ contents lo2 = 0 \/
+   ((contents first_run = contents lo2 /\ 2 <= contents first_run) /\ 2 <= n) /\
+   contents lo2 = contents first_run \/
+   (((((((n = length tmp /\ n = length a3) /\ 0 = contents lo2) /\
+        0 = contents first_run) /\
+       2 <= n) /\
+      contents first_run = 0) /\
+     contents lo2 = 0) /\
+    length a3 = n) /\
+   length tmp = n \/
+   ((contents first_run + 2) <= contents lo2 /\ 2 <= contents first_run) /\
+   (contents first_run + 2) <= n) /\
+  0 = 0) /\
+ 0 <= contents first_run) /\
+0 <= contents lo2
+((2 <= contents first_run \/
+  (((((n = length tmp /\ n = length a3) /\ 0 = contents first_run) /\ 2 <= n) /\
+    contents first_run = 0) /\
+   length a3 = n) /\
+  length tmp = n) /\
+ 0 = 0) /\
+0 <= contents first_run
+###

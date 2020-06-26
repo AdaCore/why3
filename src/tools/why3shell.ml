@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -381,14 +381,15 @@ let files = Queue.create ()
 
 let quiet = ref false
 
-let set_quiet () = quiet := true
-
 let spec =
-  ["--quiet", Arg.Unit set_quiet, "Remove all printing to stdout"]
+  let open Getopt in
+  [KLong "quiet", Hnd0 (fun () -> quiet := true),
+   " remove all printing to stdout"]
 
 (* --help *)
-let usage_str = sprintf
-  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]"
+let usage_str = Format.sprintf
+  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]\n\
+   Launch a command-line interface for Why3.\n"
   (Filename.basename Sys.argv.(0))
 
 (* Parse files *)

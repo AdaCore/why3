@@ -3,9 +3,8 @@
 
 printer "cakeml"
 
-theory BuiltIn
+module BuiltIn
   syntax type int "int"
-  syntax predicate  (=)   "%1 = %2"
 end
 
 module HighOrd
@@ -13,44 +12,44 @@ module HighOrd
   syntax val  ( @ )  "%1 %2"
 end
 
-theory option.Option
+module option.Option
   syntax type     option "%1 option"
-  syntax function None   "NONE"
-  syntax function Some   "SOME %1"
+  syntax val None   "NONE"
+  syntax val Some   "SOME %1"
 end
 
-theory Bool
+module Bool
   syntax type     bool  "bool"
-  syntax function True  "true"
-  syntax function False "false"
+  syntax val True  "true"
+  syntax val False "false"
 end
 
-theory bool.Ite
-  syntax function ite "(if %1 then %2 else %3)"
+module bool.Ite
+  syntax val ite "(if %1 then %2 else %3)"
 end
 
-theory bool.Bool
-  syntax function andb  "%1 andalso %2"
-  syntax function orb   "%1 orelse %2"
-  syntax function xorb  "%1 <> %2"
-  syntax function notb  "not %1"
-  syntax function implb "not %1 orelse %2"
+module bool.Bool
+  syntax val andb  "%1 andalso %2"
+  syntax val orb   "%1 orelse %2"
+  syntax val xorb  "%1 <> %2"
+  syntax val notb  "not %1"
+  syntax val implb "not %1 orelse %2"
 end
 
-theory list.List
+module list.List
   syntax type     list "%1 list"
-  syntax function Nil  "[]"
-  syntax function Cons "%1 :: %2"
-  syntax predicate is_nil "%1 = []"
+  syntax val Nil  "[]"
+  syntax val Cons "%1 :: %2"
+  syntax val is_nil "%1 = []"
 end
 
-theory list.Length
-  syntax function length "List.length %1"
+module list.Length
+  syntax val length "List.length %1"
 end
 
 module Ref
   syntax type     ref      "%1 ref"
-  syntax function contents "!%1"
+  syntax val contents "!%1"
   syntax val      ref      "ref %1"
 end
 
@@ -68,19 +67,19 @@ module ref.Refint
 end
 
 module int.Int
-  syntax constant zero "0"
-  syntax constant one  "1"
+  syntax val zero "0"
+  syntax val one  "1"
 
-  syntax predicate (<)   "%1 < %2"
-  syntax predicate (<=)  "%1 <= %2"
-  syntax predicate (>)   "%1 > %2"
-  syntax predicate (>=)  "%1 >= %2"
+  syntax val (<)   "%1 < %2"
+  syntax val (<=)  "%1 <= %2"
+  syntax val (>)   "%1 > %2"
+  syntax val (>=)  "%1 >= %2"
   syntax val       (=)   "%1 = %2"
 
-  syntax function  (+)   "%1 + %2"
-  syntax function  (-)   "%1 - %2"
-  syntax function  ( * ) "%1 * %2"
-  syntax function  (-_)  "~%1"
+  syntax val  (+)   "%1 + %2"
+  syntax val  (-)   "%1 - %2"
+  syntax val  ( * ) "%1 * %2"
+  syntax val  (-_)  "~%1"
 end
 
 module int.EuclideanDivision

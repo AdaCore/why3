@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,14 +16,17 @@ open Format
 exception InvalidConstantLiteral of int * string
 
 type int_value = BigInt.t
+[@@deriving sexp_of]
 
 type int_literal_kind =
   ILitUnk | ILitDec | ILitHex | ILitOct | ILitBin
+[@@deriving sexp_of]
 
 type int_constant = {
   il_kind : int_literal_kind;
   il_int  : int_value;
 }
+[@@deriving sexp_of]
 
 type real_value = private {
   rv_sig  : BigInt.t;
@@ -33,11 +36,13 @@ type real_value = private {
 
 type real_literal_kind =
   RLitUnk | RLitDec of int | RLitHex of int
+[@@deriving sexp_of]
 
 type real_constant = {
   rl_kind : real_literal_kind;
   rl_real : real_value
 }
+[@@deriving sexp_of]
 
 val neg_int : int_constant -> int_constant
 val abs_int : int_constant -> int_constant
@@ -121,6 +126,7 @@ type int_range = {
   ir_lower : BigInt.t;
   ir_upper : BigInt.t;
 }
+[@@deriving sexp_of]
 
 val create_range : BigInt.t -> BigInt.t -> int_range
 
@@ -137,6 +143,7 @@ type float_format = {
   fp_exponent_digits    : int;
   fp_significand_digits : int; (* counting the hidden bit *)
 }
+[@@deriving sexp_of]
 
 exception NonRepresentableFloat of real_constant
 

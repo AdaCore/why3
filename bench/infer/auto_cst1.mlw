@@ -1,0 +1,65 @@
+module Test
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
+
+	let b[@infer](_:int): unit
+	=
+	 let y = 10 in
+	 while (true) do
+		variant { 0 }
+		invariant { y = 10 }
+	()
+		done; ()
+
+	let b2[@infer:oct](_:int): unit
+	=
+	 let y = 10 in
+	 while (true) do
+		variant { 0 }
+		invariant { y = 10 }
+	()
+		done; ()
+
+	let b3[@infer:box](_:int): unit
+	=
+	 let y = 10 in
+	 while (true) do
+		variant { 0 }
+		invariant { y = 10 }
+	()
+		done; ()
+
+	let c[@infer](_:int): unit
+	=
+	 let y = 10 in
+	 let k = 42 in
+	 while (true) do
+		variant { 0 }
+		invariant { y = 10 /\ k = 42 }
+	()
+		done; ()
+
+	let c2[@infer:oct](_:int): unit
+	=
+	 let y = 10 in
+	 let k = 42 in
+	 while (true) do
+		variant { 0 }
+		invariant { y = 10 /\ k = 42 }
+	()
+		done; ()
+
+	let c3[@infer:box](_:int): unit
+	=
+	 let y = 10 in
+	 let k = 42 in
+	 while (true) do
+		variant { 0 }
+		invariant { y = 10 /\ k = 42 }
+	()
+		done; ()
+
+
+end

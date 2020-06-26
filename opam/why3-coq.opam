@@ -36,11 +36,11 @@ build: [
 install: [make "install-coq"]
 
 depends: [
+  "conf-autoconf" {build & dev}
+  "coq" {>= "8.6" & < "8.12~"}
   "ocaml" {>= "4.05.0"}
   "ocamlfind" {build}
-  "conf-autoconf" {dev}
   "why3" {= version}
-  "coq" {>= "8.6" & < "8.12~"}
 ]
 
 depopts: [

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -303,6 +303,7 @@ let create_prsymbol n = { pr_name = id_register n }
 type ind_decl = lsymbol * (prsymbol * term) list
 
 type ind_sign = Ind | Coind
+[@@deriving sexp_of]
 
 type ind_list = ind_sign * ind_decl list
 
@@ -312,6 +313,7 @@ type prop_kind =
   | Plemma    (* prove, use as a premise *)
   | Paxiom    (* do not prove, use as a premise *)
   | Pgoal     (* prove, do not use as a premise *)
+[@@deriving sexp_of]
 
 type prop_decl = prop_kind * prsymbol * term
 

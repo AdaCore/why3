@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -100,6 +100,8 @@ val pluginsdir : main -> string
 val set_plugins : main -> string list -> main
 val add_plugin : main -> string -> main
 val load_plugins : main -> unit
+
+val load_default_config_if_needed : config -> config
 
 (** {2 Provers} *)
 
@@ -286,19 +288,23 @@ val set_family  : config -> string -> Rc.family  -> config
 
 module Args : sig
 
+  val all_options : Getopt.opt list -> string -> string -> Getopt.opt list
+
   val initialize :
-    ?extra_help : (Format.formatter -> unit -> unit) ->
-    (string * Arg.spec * string) list ->
+    ?extra_help:string ->
+    Getopt.opt list ->
     (string -> unit) -> string ->
     config * config * Env.env
 
+  val complete_initialization : unit -> config * config * Env.env
+
   val exit_with_usage :
-    ?exit_code : int ->
-    ?extra_help : (Format.formatter -> unit -> unit) ->
-    (string * Arg.spec * string) list -> string -> 'a
+    ?exit_code:int -> ?extra_help:string ->
+    Getopt.opt list -> string -> 'a
+
+  val common_options : Getopt.opt list
 
 end
-
 
 (** Loading drivers with relative names *)
 

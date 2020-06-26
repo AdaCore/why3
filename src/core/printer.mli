@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -31,8 +31,10 @@ exception BadSyntaxKind of char
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type prelude_export_map = prelude Mid.t
 type interface = string list
 type interface_map = interface Mid.t
+type interface_export_map = interface Mid.t
 type blacklist = string list
 
 (* Makes it possible to estabilish traceability from names
@@ -40,6 +42,7 @@ in the output of the printer to elements of AST in its input. *)
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
+  vc_term_attrs : Sattr.t;
   (* The position of the term that triggers the VC *)
   queried_terms : Term.term Mstr.t;
   (* The list of terms that were queried for the counter-example

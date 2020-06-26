@@ -12,11 +12,8 @@
             type="text/javascript" charset="utf-8"></script>
 
     <script type="text/javascript">
-      var load_embedded_files = false;
       var editor_theme = "ace/theme/chrome";
-      var editor_mode = "ace/mode/why3";
       var task_viewer_mode = "ace/mode/why3";
-      var library_index = "examples/index.txt";
     </script>
     <script defer="defer" type="text/javascript"
             src="trywhy3.js"></script>
@@ -52,7 +49,17 @@
 	<div class="why3-separator" style="width:2em;"></div>
 
 	<div class="why3-button-group">
-	  <span id="why3-example-label" class="fas fa-spin fa-refresh why3-icon"></span>
+	  <span id="why3-format-label" class="fas fa-spin fa-spinner why3-icon"></span>
+	  <select  id="why3-select-format"
+		   title="Choose an input format">
+	    <option disabled="disabled" selected="selected">&nbsp;</option>
+	  </select>
+	</div>
+
+	<div class="why3-separator" style="width:2em;"></div>
+
+	<div class="why3-button-group">
+	  <span id="why3-example-label" class="fas fa-spin fa-spinner why3-icon"></span>
 	  <select  id="why3-select-example"
 		   title="Choose a predefined example">
 	    <option disabled="disabled" selected="selected">&nbsp;</option>
@@ -63,10 +70,10 @@
 
 	<div class="why3-button-group">
           <button id="why3-button-compile" class="why3-button" title="Verify">
-	    <span class="fas fa-cogs"></span>
+	    <span class="fas fa-check"></span>
 	  </button>
 	  <button id="why3-button-execute" class="why3-button" title="Execute">
-	    <span class="fas fa-arrow-circle-right"></span>
+	    <span class="fas fa-cogs"></span>
 	  </button>
 	  <button id="why3-button-stop" class="why3-button" title="Interrupt">
 	    <span class="fas fa-ban"></span>
@@ -167,7 +174,7 @@
 	  <p>TryWhy3 is a Javascript based version of
 	    the <a href="http://why3.lri.fr/" target="_blank">Why3
 	    Verification Platform</a></p>
-	  <p>© 2010-2018,   Inria - CNRS - Paris-Sud University<br/>
+	  <p>© 2010-2020,   Inria - CNRS - Paris-Sud University<br/>
 	    This software is distributed under the terms of the GNU Lesser
 	    General Public License version 2.1, with the special exception
 	    on linking described in the

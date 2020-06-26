@@ -19,12 +19,12 @@ do
             make bench
             ;;
         ide)
-            WHY3CONFIG="" xvfb-run bin/why3 ide --batch "" examples/logic/einstein.why
+            WHY3CONFIG="" xvfb-run bin/why3 ide --batch="" examples/logic/einstein.why
             bin/why3config --detect
             bench/ide-bench
             ;;
         web_ide)
-            make web_ide src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js
+            make web_ide src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js
             ;;
         doc)
             #make doc # disabled during Sphinx migration

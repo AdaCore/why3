@@ -1,0 +1,13 @@
+module Record2
+
+	use int.Int
+	use ref.Ref
+
+	type d = { mutable c: int; e: int; mutable f: bool; }
+
+	let a (x:int) : int =
+		let j = ref 5 in
+		let i = ref 3 in
+		let k = { c = 1; e = 2; f = false } in
+		k.e
+end

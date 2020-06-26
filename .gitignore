@@ -46,6 +46,7 @@ why3.conf
 /why3regtests.out
 /src/jessie/.merlin
 /_build
+/public
 
 # /bench/
 /bench/programs/good/booleans/
@@ -203,6 +204,7 @@ pvsbin/
 /src/util/json_parser.ml
 /src/util/json_parser.conflicts
 /src/util/mlmpfr_wrapper.ml
+/src/util/mysexplib.ml
 /src/util/ppx_debug_optim
 
 # /src/session
@@ -212,6 +214,7 @@ pvsbin/
 
 # /src/tools
 /src/tools/why3wc.ml
+/src/tools/why3pp_sexp.ml
 /src/tools/build
 
 # /src/ide
@@ -240,6 +243,12 @@ pvsbin/
 /plugins/microc/test/
 /plugins/microc/mc_parser.conflicts
 
+# /plugins/cfg/
+/plugins/cfg/cfg_lexer.ml
+/plugins/cfg/cfg_parser.ml
+/plugins/cfg/cfg_parser.mli
+/plugins/cfg/cfg_parser.conflicts
+
 # /drivers
 /drivers/coq-realizations.aux
 /drivers/pvs-realizations.aux
@@ -258,6 +267,7 @@ pvsbin/
 /tests/microc/*/why3shapes.gz
 
 # /examples/
+/examples/use_api/results
 /examples/in_progress/course/
 /examples/in_progress/wcet_hull/
 /examples/in_progress/binary_search2/
@@ -284,8 +294,6 @@ pvsbin/
 /examples/*/*.tex
 /examples/*/*/*.tex
 /examples/*/*/*/*.tex
-/examples/use_api/runstrat/makejob.opt
-/examples/use_api/runstrat/runstrat.opt
 /examples/vstte10_max_sum/vstte10_max_sum.ml
 /examples/euler001/euler001.ml
 /examples/sudoku/sudoku.ml

@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
@@ -8,7 +9,7 @@
 
 #if defined(TEST_GMP) || defined(TEST_WHY3) || defined(TEST_MINIGMP)
 #define BENCH
-#if !(defined(TEST_ADD) || defined(TEST_MUL) || defined(TEST_TOOMB) || defined(TEST_TOOMM) || defined(TEST_TOOMU) || defined(TEST_DIV) || defined(TEST_SQRT1) || defined(TEST_SQRTREM) || defined(TEST_POWM) || defined(TEST_ZADD) || defined(TEST_ZSUB) || defined(TEST_ZMUL) || defined(TEST_MILLERRABIN))
+#if !(defined(TEST_ADD) || defined(TEST_MUL) || defined(TEST_TOOMB) || defined(TEST_TOOMM) || defined(TEST_TOOMU) || defined(TEST_DIV) || defined(TEST_SQRT1) || defined(TEST_SQRTREM) || defined(TEST_POWM) || defined(TEST_ZADD) || defined(TEST_ZSUB) || defined(TEST_ZMUL) || defined(TEST_ZDIV) || defined (TEST_ZGETSET) || defined(TEST_MILLERRABIN))
 #error "missing TEST_foo macro definition"
 #endif //no TEST_OP
 #else //no TEST_LIB
@@ -32,6 +33,7 @@
 #define TEST_ZSUB
 #define TEST_ZMUL
 #define TEST_ZDIV
+#define TEST_ZGETSET
 #ifndef COMPARE_MINI
 #define TEST_MILLERRABIN
 #endif
@@ -102,8 +104,8 @@ void compare_mpz (mpz_ptr u, mpz_ptr v, mpz_ptr w, mpz_ptr refw) {
       printf ("ERROR, an = %d, bn = %d\n", (int) an, (int) bn);
       printf ("a: "); mpn_dump (PTR(u), an);
       printf ("b: "); mpn_dump (PTR(v), bn);
-      printf ("r:   "); mpn_dump (PTR(w), SIZ(w));
-      printf ("ref: "); mpn_dump (PTR(refw), SIZ(refw));
+      printf ("r:   "); mpn_dump (PTR(w), abs (SIZ(w)));
+      printf ("ref: "); mpn_dump (PTR(refw), abs (SIZ(refw)));
       abort();
     }
 }
@@ -330,9 +332,10 @@ void mr_candidate (mpz_t c, int len) {
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr, ep, rep, mp, tp;
   mp_size_t max_n, max_add, max_mul, max_toom, max_div, max_sqrt, max_powm,
-    an, bn, rn, cn;
+    max_getset, an, bn, rn, cn;
   mpz_t q, r, u, v, w, refzq, refzr, refw, cp;
-  int nb, nb_iter;
+  int nb, nb_iter, base;
+  char * sp, * refsp;
   double elapsed;
   mpz_init(cp);
   mpz_init(u);
@@ -370,6 +373,8 @@ int main () {
   max_div = 20;
   max_sqrt = 95;
   max_powm = 50;
+  max_getset = 50;
+
   ap = TMP_ALLOC_LIMBS (max_n + 1);
   bp = TMP_ALLOC_LIMBS (max_n + 1);
   /* nap = TMP_ALLOC_LIMBS (max_n + 1); */
@@ -383,6 +388,8 @@ int main () {
   tp = TMP_ALLOC_LIMBS(2 * max_n);
   ep = TMP_ALLOC_LIMBS(max_n + 1);
   mp = TMP_ALLOC_LIMBS(max_n + 1);
+  sp = malloc (max_getset * 64);
+  refsp = malloc (max_getset * 64);
 
 #ifdef TEST_ADD
 #ifdef BENCH
@@ -1293,7 +1300,62 @@ int main () {
   printf ("Miller-Rabin ok\n");
 #endif
 #endif
+#ifdef TEST_ZGETSET
+  elapsed = 0;
+  for (len = 1; len < max_getset; len=(int)ceil(len * 1.1)){
+    for (base = -36; base <= 62; base++) {
+      if (-2 < base && base < 2)
+        continue;
+      init_mpz_1(u,len);
+#ifdef BENCH
+      gettimeofday(&begin, NULL);
+#endif
+      wmpz_get_str(sp, base, u);
+      mpz_get_str(refsp, base, u);
+#ifdef COMPARE
+      if (strcmp(sp, refsp)) {
+        printf ("ERROR in wmpz_get_str, len = %d, base = %d :\n", len, base);
+        mpn_dump (PTR(u), len);
+        printf ("sp %s refsp %s\n", sp, refsp);
+        abort ();
+      }
+#endif
+      c = wmpz_set_str(w, refsp, abs (base));
+      refc = mpz_set_str(refw, refsp, abs (base));
+#ifdef COMPARE
+      if (c != refc) {
+        printf ("ERROR in wmpz_set_str, c = %ld refc = %ld : \n", c, refc);
+        printf ("base %d, sp %s, refsp %s, strlen %lu\n",
+                base, sp, refsp, strlen(refsp));
+        printf ("w:   "); mpn_dump (PTR(w), abs SIZ(w));
+        printf ("refw: "); mpn_dump (PTR(refw), abs SIZ(refw));
+        abort();
+      }
+      if (mpz_cmp(w, refw))
+        {
+          printf ("ERROR, an = %d\n", SIZ(u));
+          printf ("a: "); mpn_dump (PTR(u), len);
+          printf ("r:   "); mpn_dump (PTR(w), abs SIZ(w));
+          printf ("ref: "); mpn_dump (PTR(refw), abs SIZ(refw));
+          abort();
+        }
+#endif
+#ifdef BENCH
+      gettimeofday(&end, NULL);
+      elapsed +=
+        (end.tv_sec - begin.tv_sec) * 1000000.0
+        + (end.tv_usec - begin.tv_usec);
+#endif
+    }
+  }
+#ifdef BENCH
+  printf ("%d   %g\n", len, elapsed);
+#endif
+#ifdef COMPARE
+  printf ("mpz get/set_str ok\n");
+#endif
+#endif
   //TMP_FREE;
   //tests_end ();
-  return 0;
-}
+    return 0;
+  }

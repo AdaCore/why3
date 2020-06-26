@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -193,7 +193,7 @@ and bool env ({Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } as e) =
       | Mc_ast.Bge  -> Eidapp (infix ~loc ">=", [e1; e2])
       | _ -> assert false)
   | Mc_ast.Eunop (Mc_ast.Unot, e) ->
-    mk_expr ~loc (Eidapp (Qident (mk_id ~loc "not"), [bool env e]))
+    mk_expr ~loc (Enot (bool env e))
   | _ ->
      let e = Eidapp (infix ~loc "=", [expr env e; constant ~loc 0]) in
      mk_expr ~loc (Enot (mk_expr ~loc e))

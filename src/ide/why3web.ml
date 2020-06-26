@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -129,21 +129,16 @@ let files : string Queue.t = Queue.create ()
 
 let opt_parser = ref None
 
-let spec = [
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-(*
-  "-f",
-   Arg.String (fun s -> input_files := s :: !input_files),
-   "<file> add file to the project (ignored if it is already there)";
-*)
-  Termcode.arg_extra_expl_prefix
-]
+let spec =
+  let open Getopt in
+  [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
+    "<format> select input format (default: \"why\")";
+    Termcode.opt_extra_expl_prefix;
+  ]
 
 let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]..."
+  "Usage: %s [options] [<file.why>|<project directory>]...\n\
+   Launch a web server that provides a graphical interface for Why3.\n"
   (Filename.basename Sys.argv.(0))
 
 

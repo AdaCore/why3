@@ -230,18 +230,185 @@ module C
 
 end
 
-module Char
+module String [@W:non_conservative_extension:N]
 
-  type char = < range -128 127 >
+  use int.Int
+  use mach.int.Int32
+  use string.String
+  use string.Char
+
+  meta coercion function code
+
+  val code (c:char) : int32
+    ensures { result = code c }
+
+  val (=) (c1 c2:char) : bool
+    ensures { result <-> c1 = c2 }
+
+  val get (s:string) (i:int32) : char
+    requires { 0 <= i <= length s }
+    ensures  { 0 <= i < length s -> result = (get s i) }
+    ensures  { i = length s -> result = chr 0 }
+
+  val constant zero_char : char
+    ensures { code result = 0 }
+
+  val constant zero_num : char
+    ensures { result = get "0" 0 }
+
+  val constant nine_num : char
+    ensures { result = get "9" 0 }
+
+  val constant minus_char : char
+    ensures { result = Char.get "-" 0 }
+
+  val constant small_a : char
+    ensures { result = Char.get "a" 0 }
+
+  val constant small_z : char
+    ensures { result = Char.get "z" 0 }
+
+  val constant big_a : char
+    ensures { result = Char.get "A" 0 }
+
+  val constant big_z : char
+    ensures { result = Char.get "Z" 0 }
+
+  constant digitstring : string = "0123456789"
+  constant lowstring : string = "abcdefghijklmnopqrstuvwxyz"
+  constant upstring : string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+  axiom numcodes:
+        forall i. 0 <= i < 10 ->
+               code (get digitstring i) = code (get "0" 0) + i
+
+  axiom lowcodes:
+        forall i. 0 <= i < 26 ->
+               code (get lowstring i)
+               = code (get "a" 0) + i
+
+  axiom upcodes:
+        forall i. 0 <= i < 26 ->
+               code (get upstring i)
+               = code (get "A" 0) + i
+
+  axiom code_0: code (get "0" 0) = 48
+  axiom code_a: code (get "a" 0) = 97
+  axiom code_A: code (get "A" 0) = 65
+  axiom code_minus : code minus_char = 45
+
+  use C
+  use map.Map
+
+  function strlen (s:map int char) (ofs:int) : int
+
+  axiom strlen_def:
+    forall s ofs i. 0 <= i
+    -> (forall j. 0 <= j < i -> code s[ofs + j] <> 0)
+    -> code s[ofs + i] = 0
+    -> strlen s ofs = i
+
+  axiom strlen_invalid:
+    forall s ofs. (forall i. 0 <= i -> code s[ofs + i] <> 0) -> strlen s ofs < 0
+
+  predicate valid_string (p: ptr char)
+    = strlen (pelts p) (offset p) >= 0
+      /\ valid p (1 + strlen (pelts p) (offset p))
+
+  use mach.int.UInt32
+
+  val length (s: string) : uint32
+    ensures { result = String.length s }
+
+  val strlen (p: ptr char) : uint32
+    requires { valid_string p }
+    ensures  { result = strlen (pelts p) (offset p) }
+
+end
+
+module StrlenLemmas
+
+  use int.Int
+  use string.Char
+  use map.Map
+  use String
+
+  let rec lemma strlen_before_null (s: map int char) (ofs i:int)
+    requires { 0 <= i < strlen s ofs }
+    ensures { s[ofs + i] <> 0 }
+    variant { i }
+  =
+    for j = 0 to i-1 do
+      invariant { forall k. 0 <= k < j -> s[ofs + k] <> 0 }
+      strlen_before_null s ofs j
+    done;
+    assert { forall j. 0 <= j < i -> s[ofs + j] <> 0 }
+
+  let lemma strlen_at_null (s: map int char) (ofs:int)
+    requires { 0 <= strlen s ofs }
+    ensures  { s[ofs + strlen s ofs] = 0 }
+  =
+    let rec lemma aux (i:int)
+      requires { strlen s ofs <= i }
+      requires { s[ofs + i] = 0 }
+      ensures  { s[ofs + strlen s ofs] = 0 }
+      variant  { i }
+    =
+      if pure { strlen s ofs } = i then ()
+      else begin
+        let j = any int ensures { 0 <= result < i /\ s[ofs + result] = 0 } in
+        aux j
+      end in
+    (* Why3 checks that this exists *)
+    let i = any int ensures { 0 <= result /\ s[ofs + result] = 0 } in
+    if i < pure { strlen s ofs } then begin
+      strlen_before_null s ofs i;
+      absurd
+    end else aux i
+
+  lemma strlen_not_0: forall s ofs i. 0 <= i < strlen s ofs
+                                      -> s[ofs + i] <> 0
+                                      -> i < strlen s ofs
+
+  lemma strlen_0: forall s ofs i.
+                      0 <= i < strlen s ofs
+                      -> s[ofs + i] = 0
+                      -> i = strlen s ofs
+
+  let lemma strlen_sup (s: map int char) (ofs i:int)
+    requires { 0 <= i }
+    requires { s[ofs + i] = 0 }
+    ensures  { 0 <= strlen s ofs <= i }
+  =
+    if pure { strlen s ofs } > i
+    then begin
+      strlen_before_null s ofs i;
+      absurd
+    end;
+    for j = 0 to (i-1) do
+      invariant { forall k. 0 <= k < j -> s[ofs + k] <> 0 }
+      if s[ofs + j] = zero_char
+      then begin
+        assert { 0 <= strlen s ofs = j <= i };
+        return
+      end
+    done;
+    assert { strlen s ofs = i }
+
+end
+
+module SChar
+
+  type schar = < range -128 127 >
   let constant min_char : int = -128
   let constant max_char : int = 127
-  function to_int (x:char) : int = char'int x
+  function to_int (x:schar) : int = schar'int x
 
   clone export mach.int.Bounded_int with
-    type t = char,
-    constant min = char'minInt,
-    constant max = char'maxInt,
-    function to_int = char'int,
+    type t = schar,
+    constant min = schar'minInt,
+    constant max = schar'maxInt,
+    function to_int = schar'int,
     lemma to_int_in_bounds,
     lemma extensionality
 
@@ -275,5 +442,58 @@ module UChar
 
   val to_uint64 (x:uchar) : uint64
     ensures  { to_int result = x }
+
+  use mach.int.Int32
+
+  val of_int32 (x:int32) : uchar
+    requires { 0 <= x <= 255 }
+    ensures  { result = to_int x }
+
+  val to_int32 (x:uchar) : int32
+    ensures  { to_int result = x }
+
+  use string.Char
+  use map.Map
+
+  (* char can be signed or unsigned *)
+  val function of_char (x:char) : uchar
+    ensures { 0 <= code x <= 127 -> result = code x }
+
+  val function to_char (x:uchar) : char
+    ensures { 0 <= x <= 127 -> code result = x }
+
+
+  (* cast to and from char* *)
+
+  use C
+
+  type cast_mem = abstract { mi: int; ma: int; z: zone; l: int;
+                             mutable ok: bool }
+
+  val open_from_charptr (x: ptr char) : (nx: ptr uchar, ghost mem: cast_mem)
+    requires { writable x }
+    writes   { x }
+    ensures  { min nx = old min x = mem.mi }
+    ensures  { max nx = old max x = mem.ma }
+    ensures  { old zone x = mem.z }
+    ensures  { plength nx = old plength x = mem.l }
+    ensures  { mem.ok }
+    ensures  { nx.offset = old x.offset }
+    ensures  { forall i. 0 <= i < old plength x
+               -> (pelts nx)[i] = of_char (old pelts x)[i] }
+    ensures  { writable nx }
+
+  val close_from_charptr (x:ptr char) (nx:ptr uchar) (ghost mem:cast_mem) : unit
+    requires { mem.ok }
+    requires { mem.z = x.zone }
+    requires { mem.mi = nx.min }
+    requires { mem.ma = nx.max }
+    requires { x.offset = nx.offset }
+    requires { plength nx = mem.l }
+    writes   { x, nx, mem.ok }
+    ensures  { x.min = mem.mi /\ x.max = mem.ma }
+    ensures  { forall i. 0 <= i < plength x
+               -> (pelts x)[i] = to_char (old pelts nx)[i] }
+    ensures  { plength x = old plength nx }
 
 end

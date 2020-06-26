@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,9 +12,7 @@
 open Why3
 open Whyconf
 
-val verbose: Debug.flag
-
-type spec_list = (Arg.key * Arg.spec * Arg.doc) list
+type spec_list = Getopt.opt list
 
 type cmd =
     {
@@ -30,24 +28,9 @@ type cmd =
 val iter_files : (string -> unit) -> unit
 val anon_fun : Arg.anon_fun
 
-(** {2 Spec for version, debug} *)
-(* val simple_spec : spec_list *)
-
-(*
-val read_simple_spec : unit -> bool
-(** return if we must exit *)
-*)
-
-(** {2 Spec for configuration, loadpath} *)
-val common_options : spec_list
-
-val read_env_spec : unit -> Env.env * Whyconf.config * bool
-(** read_simple_spec also *)
-
-val read_session : string -> Session_itp.session * int option
-(** [read_session s] reads the session file [s] and returns a pair
-[(ses,shape_version)] where [ses] is the session structure (without
-any tasks) and [shape_version] indicates the shapes version, if any *)
+val read_session : string -> Session_itp.session
+(** [read_session s] reads the session file [s] and returns a session structure (without
+any tasks)  *)
 
 val read_update_session :
   allow_obsolete:bool -> Env.env ->
@@ -80,7 +63,6 @@ val session_iter_proof_attempt_by_filter :
 
 (* quite ad-hoc *)
 type filter_three = | FT_Yes | FT_No | FT_All
-val set_filter_verified_goal : filter_three -> unit
 
 (** force obsolete *)
 val opt_force_obsolete : bool ref

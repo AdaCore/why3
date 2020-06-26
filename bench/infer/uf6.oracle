@@ -1,0 +1,36 @@
+### Debug: inferred invariants ###
+(((((_2 = 5 /\ ll _1 = 0) /\ 0 = 0) /\ 0 <= contents k) /\ contents k <= 3) /\
+ 0 = ll _1) /\
+5 = _2
+###
+### Debug: inferred invariants ###
+((((((((((((((((((_6 = 5 /\ ll _5 = 0) /\ contents k1 <= 3) /\
+                (contents k1 + 2) <= _6) /\
+               (_6 + contents k1) <= 8) /\
+              contents k1 <= (3 + ll _5)) /\
+             (ll _5 + contents k1) <= 3) /\
+            0 <= contents k1) /\
+           5 <= (_6 + contents k1)) /\
+          _6 <= (5 + contents k1)) /\
+         0 <= (ll _5 + contents k1)) /\
+        ll _5 <= contents k1) /\
+       _6 <= 5) /\
+      _6 <= (5 + ll _5)) /\
+     (ll _5 + _6) <= 5) /\
+    5 <= _6) /\
+   5 <= (ll _5 + _6)) /\
+  (ll _5 + 5) <= _6) /\
+ ll _5 <= 0) /\
+0 <= ll _5
+###
+### Debug: inferred invariants ###
+(((((((0 = contents k2 /\ contents k2 = 0 \/
+       2 = contents k2 \/ 1 = contents k2 \/ 3 = contents k2) /\
+      _10 = 5) /\
+     ll _9 = 0) /\
+    0 = 0) /\
+   contents k2 <= 3) /\
+  0 <= contents k2) /\
+ 5 = _10) /\
+0 = ll _9
+###

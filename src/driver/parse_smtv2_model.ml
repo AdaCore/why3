@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -57,9 +57,13 @@ let do_parsing model =
        l;
      Wstdlib.Mstr.empty
 
-let do_parsing list_proj list_fields list_records noarg_constructors set_str model =
-  let m = do_parsing model in
-  Collect_data_model.create_list list_proj list_fields list_records noarg_constructors set_str m
+let get_model_string input =
+  (*    let r = Re.Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
+        ignore (Re.Str.search_forward r input 0);
+        let match_end = Re.Str.match_end () in*)
+  let nr = Re.Str.regexp "^)+" in
+  let res = Re.Str.search_backward nr input (String.length input) in
+  String.sub input 0 (res + String.length (Re.Str.matched_string input))
 
 (* Parses the model returned by CVC4, Z3 or Alt-ergo.
    Returns the list of pairs term - value *)
@@ -67,18 +71,12 @@ let do_parsing list_proj list_fields list_records noarg_constructors set_str mod
    match on "I don't know". But we also need to begin
    parsing on a fresh new line ".*" ensures it *)
 let parse : raw_model_parser =
-  fun list_proj list_fields list_records noarg_constructors set_str input ->
-  try
-(*    let r = Re.Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
-    ignore (Re.Str.search_forward r input 0);
-    let match_end = Re.Str.match_end () in*)
-    let nr = Re.Str.regexp "^)+" in
-    let res = Re.Str.search_backward nr input (String.length input) in
-    let model_string = String.sub input 0 (res + String.length (Re.Str.matched_string input)) in
-    do_parsing list_proj list_fields list_records noarg_constructors set_str model_string
-  with
-  | Not_found -> []
-
+  fun pm input ->
+    try
+      let model_string = get_model_string input in
+      let model = do_parsing model_string in
+      Collect_data_model.create_list pm model
+    with Not_found -> []
 
 let () = register_model_parser "smtv2" parse
   ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."

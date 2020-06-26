@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,7 +16,8 @@ open Why3
 let () = Debug.set_flag Dterm.debug_ignore_unused_var
 
 let usage_msg = sprintf
-  "Usage: %s [options] -D <driver> -o <dir> -T <theory> ..."
+  "Usage: %s [options] -D <driver> -o <dir> -T <theory> ...\n\
+   Output realization skeletons for the given theories or update them.\n"
   (Filename.basename Sys.argv.(0))
 
 let opt_queue = Queue.create ()
@@ -44,23 +45,17 @@ let opt_parser = ref None
 let opt_output = ref None
 let opt_driver = ref []
 
-let option_list = [
-  "-T", Arg.String add_opt_theory,
-      "<theory> select <theory> in the input file or in the library";
-  "--theory", Arg.String add_opt_theory,
-      " same as -T";
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-  "-D", Arg.String (fun s -> opt_driver := s::!opt_driver),
-      "<file> specify a realization driver";
-  "--driver", Arg.String (fun s -> opt_driver := s::!opt_driver),
-      " same as -D";
-  "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir> write the realizations in <dir>";
-  "--output", Arg.String (fun s -> opt_output := Some s),
-      " same as -o" ]
+let option_list =
+  let open Getopt in
+  [ Key ('T', "theory"), Hnd1 (AString, add_opt_theory),
+    "<theory> select <theory> in the input file or in the library";
+    Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
+    "<format> select input format (default: \"why\")";
+    Key ('D', "driver"), Hnd1 (AString, fun s -> opt_driver := s::!opt_driver),
+    "<file> specify a realization driver";
+    Key ('o', "output"), Hnd1 (AString, fun s -> opt_output := Some s),
+    "<dir> write the realizations to <dir>";
+  ]
 
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg

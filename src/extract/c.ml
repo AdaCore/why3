@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -66,7 +66,7 @@ module C = struct
   (* template, type and type arguments of result, typed arguments, precedence level *)
 
   and constant =
-    | Cint of string
+    | Cint of string * Number.int_constant
     | Cfloat of string
     | Cchar of string
     | Cstring of string
@@ -88,6 +88,7 @@ module C = struct
     | Dinclude of ident * include_kind
     | Dproto of ident * proto
     | Ddecl of names
+    | Dextern of ty * ident
     | Dstruct of struct_def
     | Dstruct_decl of string
     | Dtypedef of ty * ident
@@ -104,12 +105,15 @@ module C = struct
     | Sseq (s1,s2) -> is_nop s1 && is_nop s2
     | _ -> false
 
+  let is_one ic = BigInt.eq ic.Number.il_int BigInt.one
+  let is_zero ic = BigInt.eq ic.Number.il_int BigInt.zero
+
   let is_true = function
-    | Sexpr(Econst(Cint "1")) -> true
+    | Sexpr(Econst(Cint (_,ic))) -> is_one ic
     | _ -> false
 
   let is_false = function
-    | Sexpr(Econst(Cint "0")) -> true
+    | Sexpr(Econst(Cint (_,ic))) -> is_zero ic
     | _ -> false
 
   let rec one_stmt = function
@@ -217,7 +221,7 @@ module C = struct
     | Dinclude (i,k) -> Dinclude (i,k), true
     | Dstruct _ -> raise (Unsupported "struct declaration inside function")
     | Dfun _ -> raise (Unsupported "nested function")
-    | Dtypedef _ | Dproto _ | Dstruct_decl _ -> assert false
+    | Dextern _ | Dtypedef _ | Dproto _ | Dstruct_decl _ -> assert false
 
   and propagate_in_block id v (dl, s) =
     let dl, b = List.fold_left
@@ -451,6 +455,38 @@ module C = struct
     | Bassign -> true
     | _ -> false
 
+  let e_map fe (e:expr) =
+    match e with
+    | Enothing -> Enothing
+    | Eunop (u,e) -> Eunop (u, fe e)
+    | Ebinop (b, e1, e2) -> Ebinop (b, fe e1, fe e2)
+    | Equestion (c, t, e) -> Equestion (fe c, fe t, fe e)
+    | Ecast (t,e) -> Ecast(t, fe e)
+    | Ecall (f,args) -> Ecall (fe f, List.map fe args)
+    | Econst c -> Econst c
+    | Evar v -> Evar v
+    | Elikely e -> Elikely (fe e)
+    | Eunlikely e -> Eunlikely (fe e)
+    | Esize_expr e -> Esize_expr (fe e)
+    | Esize_type t -> Esize_type t
+    | Eindex (a,i) -> Eindex (fe a, fe i)
+    | Edot (e,f) -> Edot (fe e, f)
+    | Earrow (e, f) -> Earrow (fe e, f)
+    | Esyntaxrename (s,args) -> Esyntaxrename (s, List.map fe args)
+    | Esyntax (s,rt,ta,args,pl) ->
+       Esyntax (s, rt, ta, List.map (fun (e, t) -> (fe e, t)) args, pl)
+
+  let s_map fd fs fe (s:stmt) = match s with
+    | Snop -> Snop
+    | Sexpr e -> Sexpr (fe e)
+    | Sblock (d,s) -> Sblock (List.map fd d, fs s)
+    | Sseq (s1,s2) -> Sseq (fs s1, fs s2)
+    | Sif (ce,ts,es) -> Sif (fe ce, fs ts, fs es)
+    | Swhile (c,b) -> Swhile (fe c, fs b)
+    | Sfor (e1,e2,e3,b) -> Sfor (fe e1, fe e2, fe e3, fs b)
+    | Sbreak -> Sbreak
+    | Sreturn e -> Sreturn (fe e)
+
   (** Integer type bounds *)
   open BigInt
   let min32 = minus (pow_int_pos 2 31)
@@ -497,16 +533,28 @@ module Print = struct
 
   let sanitizer = sanitizer char_to_lalpha char_to_alnumus
   let sanitizer s = Strings.lowercase (sanitizer s)
-  let local_printer = create_ident_printer c_keywords ~sanitizer
-  let global_printer = create_ident_printer c_keywords ~sanitizer
+  let local_printer = ref None
+  let global_printer = ref None
+  let printers_initialized = ref false
+
+  let init_printers blacklist =
+    if not !printers_initialized
+    then begin
+      let bl = c_keywords@blacklist in
+      local_printer := Some (create_ident_printer bl ~sanitizer);
+      global_printer := Some (create_ident_printer bl ~sanitizer);
+      printers_initialized := true
+      end
 
   let c_static_inline = create_attribute "extraction:c_static_inline"
   (* prints the c inline keyword *)
 
-  let print_local_ident fmt id = fprintf fmt "%s" (id_unique local_printer id)
-  let print_global_ident fmt id = fprintf fmt "%s" (id_unique global_printer id)
+  let print_local_ident fmt id =
+    pp_print_string fmt (id_unique (Opt.get !local_printer) id)
+  let print_global_ident fmt id =
+    pp_print_string fmt (id_unique (Opt.get !global_printer) id)
 
-  let clear_local_printer () = Ident.forget_all local_printer
+  let clear_local_printer () = Ident.forget_all (Opt.get !local_printer)
 
   let space_nolinebreak fmt () = fprintf fmt " "
 
@@ -521,6 +569,10 @@ module Print = struct
       | t -> (acc, t)
     in
   aux 0 ty
+
+  let char_escape c = match c with
+    | '\'' -> "\\'"
+    | _ -> Constant.default_escape c
 
   let rec print_ty ?(paren=false) fmt = function
     | Tvoid -> fprintf fmt "void"
@@ -646,8 +698,9 @@ module Print = struct
         gen_syntax_arguments_prec fmt s pr pl
 
   and print_const  fmt = function
-    | Cint s | Cfloat s | Cchar s | Cstring s -> fprintf fmt "%s" s
-
+    | Cint (s,_) | Cfloat s -> pp_print_string fmt s
+    | Cchar s -> fprintf fmt "'%s'" Constant.(escape char_escape s)
+    | Cstring s -> fprintf fmt "\"%s\"" Constant.(escape default_escape s)
   let print_id_init ?(size=None) ~stars fmt ie =
     (if stars > 0
     then fprintf fmt "%s " (String.make stars '*')
@@ -697,14 +750,14 @@ module Print = struct
     | Sreturn Enothing -> fprintf fmt "return;"
     | Sreturn e -> fprintf fmt "return %a;" print_expr_no_paren e
 
-  and print_def fmt def =
+  and print_def ~global fmt def =
     let print_inline fmt id =
       if Sattr.mem c_static_inline id.id_attrs
       then fprintf fmt "static inline "
       else fprintf fmt "" in
-    try match def with
+    match def with
       | Dfun (id,(rt,args),body) ->
-         let s = sprintf "@[@[<hv 2>%a%a %a(@[%a@]) {@\n@[%a@]@]\n}\n@]"
+          fprintf fmt "@[@\n@[<hv 2>%a%a %a(@[%a@]) {@\n@[%a@]@]\n}@]"
                    print_inline id
                    (print_ty ~paren:false) rt
                    print_global_ident id
@@ -712,50 +765,63 @@ module Print = struct
                       (print_pair_delim nothing space_nolinebreak nothing
                          (print_ty ~paren:false) print_local_ident))
                    args
-                   print_body body in
-         (* print into string first to print nothing in case of exception *)
-         fprintf fmt "%s" s
+                   print_body body
       | Dproto (id, (rt, args)) ->
-         let s = sprintf "%a %a(@[%a@]);@;"
+          fprintf fmt "@\n%a %a(@[%a@]);"
                    (print_ty ~paren:false) rt
                    print_global_ident id
                    (print_list comma
                       (print_pair_delim nothing space_nolinebreak nothing
                          (print_ty ~paren:false) print_local_ident))
-                   args in
-         fprintf fmt "%s" s
+                   args
       | Ddecl (Tarray(ty, e), lie) ->
-         let s = sprintf "%a @[<hov>%a@];"
+          fprintf fmt "%a @[<hov>%a@];"
                    (print_ty ~paren:false) ty
                    (print_list comma (print_id_init ~stars:0 ~size:(Some e)))
-                   lie in
-         fprintf fmt "%s" s
+                   lie
       | Ddecl (ty, lie) ->
-         let nb, ty = extract_stars ty in
-         assert (nb=0);
-         let s = sprintf "%a @[<hov>%a@];"
+          if global then pp_force_newline fmt ();
+          let nb, ty = extract_stars ty in
+          assert (nb = 0);
+          fprintf fmt "%a @[<hov>%a@];"
                    (print_ty ~paren:false) ty
                    (print_list comma (print_id_init ~stars:nb ~size:None))
-                   lie in
-         fprintf fmt "%s" s
+                   lie
+      | Dextern (ty, id) ->
+          fprintf fmt "@\nextern %a %a;" (print_ty ~paren:false) ty print_local_ident id
       | Dstruct (s, lf) ->
-         let s = sprintf "struct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@\n@]"
-                   s
-                   (print_list newline
-                      (fun fmt (s,ty) -> fprintf fmt "%a %s;"
-                                           (print_ty ~paren:false) ty s))
-                   lf in
-         fprintf fmt "%s" s
+          fprintf fmt "@\nstruct %s {@\n%a};" s
+            (print_list_suf newline
+               (fun fmt (s,ty) -> fprintf fmt "  %a %s;"
+                                    (print_ty ~paren:false) ty s))
+            lf
       | Dstruct_decl s ->
          fprintf fmt "struct %s;@;" s
       | Dinclude (id, Sys) ->
-         fprintf fmt "#include <%s.h>@;"  (sanitizer id.id_string)
+         fprintf fmt "#include <%s.h>"  (sanitizer id.id_string)
       | Dinclude (id, Proj) ->
-         fprintf fmt "#include \"%s.h\"@;" (sanitizer id.id_string)
+         fprintf fmt "#include \"%s.h\"" (sanitizer id.id_string)
       | Dtypedef (ty,id) ->
-         let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
-                   (print_ty ~paren:false) ty print_global_ident id in
-         fprintf fmt "%s" s
+          fprintf fmt "@[<hov>typedef@ %a@;%a;@]"
+            (print_ty ~paren:false) ty print_global_ident id
+
+  and print_body fmt (def, s) =
+    if def = []
+    then print_stmt ~braces:true fmt s
+    else
+      print_pair_delim nothing newline nothing
+        (print_list newline (print_def ~global:false))
+        (print_stmt ~braces:true)
+        fmt (def,s)
+
+  let print_global_def fmt def =
+    try
+      clear_local_printer ();
+      let buf = Buffer.create 1024 in
+      let f = formatter_of_buffer buf in
+      print_def ~global:true f def;
+      pp_print_flush f ();
+      pp_print_string fmt (Buffer.contents buf)
     with
       Unprinted s ->
        if Debug.test_noflag debug_c_no_error_msgs
@@ -763,19 +829,6 @@ module Print = struct
          Format.eprintf
            "Could not print declaration of %s. Unsupported: %s@."
            !current_decl_name s
-
-  and print_body fmt (def, s) =
-    if def = []
-    then print_stmt ~braces:true fmt s
-    else
-      print_pair_delim nothing newline nothing
-        (print_list newline print_def)
-        (print_stmt ~braces:true)
-        fmt (def,s)
-
-  let print_global_def fmt def =
-    clear_local_printer ();
-    print_def fmt def
 
   let print_file fmt info ast =
     Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
@@ -798,6 +851,7 @@ module MLToC = struct
 
   let structs : struct_def Hid.t = Hid.create 16
   let aliases : C.ty Hid.t = Hid.create 16
+  let globals : unit Hid.t = Hid.create 16
 
   let array = create_attribute "extraction:array"
   let array_mk = create_attribute "extraction:array_make"
@@ -805,41 +859,6 @@ module MLToC = struct
   let unlikely = create_attribute "extraction:unlikely"
 
   let decl_attribute = create_attribute "extraction:c_declaration"
-
-  let rec ty_of_ty info ty =
-    (*FIXME try to use only ML tys*)
-    match ty.ty_node with
-    | Tyvar v ->
-      begin match query_syntax info.syntax v.tv_name
-        with
-        | Some s -> C.Tsyntax (s, [])
-        | None -> C.Tnamed (v.tv_name)
-      end
-    | Tyapp (ts, [t]) when Sattr.mem array ts.ts_name.id_attrs ->
-       Tarray (ty_of_ty info t, Enothing)
-    | Tyapp (id, [t]) when ts_equal id Pmodule.ts_ref ->
-        Tmutable (ty_of_ty info t)
-    | Tyapp (ts, tl) ->
-       begin match query_syntax info.syntax ts.ts_name
-        with
-        | Some s -> C.Tsyntax (s, List.map (ty_of_ty info) tl)
-        | None ->
-           if is_ts_tuple ts
-           then begin
-             match tl with
-             | [] -> C.Tvoid
-             | [t] -> ty_of_ty info t
-             | _ -> Tnosyntax
-             end
-           else if tl = []
-           then if Hid.mem aliases ts.ts_name
-                then Hid.find aliases ts.ts_name
-                else
-                  try Tstruct (Hid.find structs ts.ts_name)
-                  with Not_found -> Tnosyntax
-           else Tnosyntax
-       end
-
   let rec ty_of_mlty info = function
     | Tvar { tv_name = id } ->
       begin match query_syntax info.syntax id
@@ -866,40 +885,26 @@ module MLToC = struct
     | Ttuple [] -> C.Tvoid
     | Ttuple [t] -> ty_of_mlty info t
     | Ttuple _ -> raise (Unsupported "tuple parameters")
+    | Tarrow _ -> raise (Unsupported "arrow type")
 
-  let struct_of_rs info rs : struct_def =
-    let rity = rs.rs_cty.cty_result in
-    let rty = ty_of_ity rity in
+  let struct_of_rs info mlty rs : struct_def =
     let s = match query_syntax info.syntax rs.rs_name with
       | Some s -> s
       | None -> rs.rs_name.id_string in
     let name = Pp.sprintf "__%s_result" s in
-    match rty.ty_node, rs.rs_cty.cty_mask with
-    | Tyapp (ts, lt), MaskVisible ->
-       assert (is_ts_tuple ts);
-       let rec fields fr tys = match tys with
+    let fields =
+      match mlty with
+      | Ttuple lt ->
+         let rec fields fr tys = match tys with
          | [] -> []
-         | ty::l -> (field fr, ty_of_ty info ty)::(fields (fr+1) l) in
-       let fields = fields 0 lt in
-       (name, fields)
-    | Tyapp (ts, lt), MaskTuple ml ->
-       assert (is_ts_tuple ts);
-       assert (List.length lt = List.length ml);
-       let rec fields fr tys masks =
-         match tys, masks with
-         | [], [] -> []
-         | [], _ | _, [] -> assert false
-         | _, MaskTuple _::_ ->
-            raise (Unsupported "nested tuple function result")
-         | _::l, MaskGhost::ml ->
-            fields fr l ml
-         | ty::l, MaskVisible::ml ->
-            (field fr, ty_of_ty info ty)::(fields (fr+1) l ml) in
-       let fields = fields 0 lt ml in
-       (name, fields)
-    | _ -> assert false
+         | ty::l -> (field fr, ty_of_mlty info ty)::(fields (fr+1) l) in
+         fields 0 lt
+      | _ -> assert false
+    in
+    (name, fields)
 
-  let struct_of_rs info = Wrs.memoize 17 (fun rs -> struct_of_rs info rs)
+  let struct_of_rs info mlty =
+    Wrs.memoize 17 (fun rs -> struct_of_rs info mlty rs)
 
   let ity_of_expr e = match e.e_ity with
     | I i -> i
@@ -939,17 +944,9 @@ module MLToC = struct
                       (* is this struct boxed or passed by value? *)
                     }
 
-  let is_true e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_true
-    | _ -> false
-
-  let is_false e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_false
-    | _ -> false
-
   let is_unit = function
-    | I i -> ity_equal i Ity.ity_unit
-    | C _ -> false
+    | Ttuple [] -> true
+    | _ -> false
 
   let handle_likely attrs (e:C.expr) =
     let lkl = Sattr.mem likely attrs in
@@ -962,6 +959,9 @@ module MLToC = struct
     | Elikely e -> Eunlikely e
     | Eunlikely e -> Elikely e
     | e -> e
+
+  let lit_one = Number.(int_literal ILitDec ~neg:false "1")
+  let lit_zero = Number.(int_literal ILitDec ~neg:false "0")
 
   (* /!\ Do not use if e may have type unit and not be Enothing *)
   let expr_or_return env e =
@@ -987,7 +987,7 @@ module MLToC = struct
       [ C.Ddecl (cty, [id, C.Enothing]) ],
       C.Sseq (C.Sblock initblock, C.Sblock (expr info env e)) in
     let do_for (eb: pvsymbol) (ee: Mltree.expr option)
-          (sb: pvsymbol) (se: Mltree.expr option)  i dir body =
+          (sb: pvsymbol) (se: Mltree.expr option) i imlty dir body =
       let open Number in
       match i.pv_vs.vs_ty.ty_node with
       | Tyapp ({ ts_def = Range { ir_lower = lb; ir_upper = ub }},_) ->
@@ -1005,7 +1005,7 @@ module MLToC = struct
               false
            | _, _ -> false, false
          in
-         let ty = ty_of_ty info i.pv_vs.vs_ty in
+         let ty = ty_of_mlty info imlty in
          let di = C.Ddecl(ty, [i.pv_vs.vs_name, Enothing]) in
          let ei = C.Evar (i.pv_vs.vs_name) in
          let env_f = { env with computes_return_value = false } in
@@ -1076,18 +1076,21 @@ module MLToC = struct
                                 C.Sblock (aux t)))
        in
        aux l
-    | Eapp (rs, []) when rs_equal rs rs_true ->
+    | Eapp (_, _, true) -> raise (Unsupported "partial application")
+    | Eapp (rs, [], false) when rs_equal rs rs_true ->
        Debug.dprintf debug_c_extraction "true@.";
-       ([],expr_or_return env (C.Econst (Cint "1")))
-    | Eapp (rs, []) when rs_equal rs rs_false ->
+       ([],expr_or_return env (C.Econst (Cint ("1",lit_one))))
+    | Eapp (rs, [], false) when rs_equal rs rs_false ->
        Debug.dprintf debug_c_extraction "false@.";
-       ([],expr_or_return env (C.Econst (Cint "0")))
+       ([],expr_or_return env (C.Econst (Cint ("0", lit_zero))))
     | Mltree.Evar pv ->
        let id = pv_name pv in
        let e = C.Evar id in
        ([], expr_or_return env e)
-    | Mltree.Econst (Constant.ConstStr _ | Constant.ConstReal _) ->
-       raise (Unsupported "string or real constant")
+    | Mltree.Econst (Constant.ConstStr s) ->
+       C.([], expr_or_return env (Econst (Cstring s)))
+    | Mltree.Econst (Constant.ConstReal _) ->
+       raise (Unsupported "real constant")
     | Mltree.Econst (Constant.ConstInt ic) ->
        let open Number in
        let print fmt ic =
@@ -1103,29 +1106,32 @@ module MLToC = struct
           | ILitOct -> Format.fprintf fmt "0%a" (print_in_base 8 None) n
           | ILitDec | ILitUnk ->
              (* default to base 10 *)
-             Format.fprintf fmt "%a" (print_in_base 10 None) n in
+             print_in_base 10 None fmt n in
        let s =
-         let i = ity_of_expr e in
-         let ts = match (ty_of_ity i) with
-           | { ty_node = Tyapp (ts, []) } -> ts
-             | _ -> assert false in
-         begin match query_syntax info.literal ts.ts_name with
+         let tname = match e.e_mlty with
+           | Tapp (id, _) -> id
+           | _ -> assert false in
+         begin match query_syntax info.literal tname with
          | Some st ->
             Format.asprintf "%a" (syntax_range_literal ~cb:(Some print) st) ic
          | _ ->
-            let s = ts.ts_name.id_string in
+            let s = tname.id_string in
             raise (Unsupported ("unspecified number format for type "^s)) end
        in
-       let e = C.(Econst (Cint s)) in
+       let e = C.(Econst (Cint (s, ic))) in
        ([], expr_or_return env e)
-    | Eapp (rs, _) when Sattr.mem decl_attribute rs.rs_name.id_attrs ->
+    | Eapp (rs, [], _) when Hid.mem globals rs.rs_name ->
+       Debug.dprintf debug_c_extraction "global variable %s@."
+         rs.rs_name.id_string;
+       [], expr_or_return env (Evar rs.rs_name)
+    | Eapp (rs, _, _) when Sattr.mem decl_attribute rs.rs_name.id_attrs ->
        raise (Unsupported "local variable declaration call outside let-in")
-    | Eapp (rs, [e]) when rs_equal rs Pmodule.rs_ref ->
+    | Eapp (rs, [e], _) when rs_equal rs Pmodule.rs_ref ->
        Debug.dprintf debug_c_extraction "ref constructor@.";
        let env_f = { env with computes_return_value = false } in
        let arg = simplify_expr (expr info env_f e) in
        ([], expr_or_return env arg)
-    | Eapp (rs, el)
+    | Eapp (rs, el, _)
          when is_struct_constructor info rs
               && query_syntax info.syntax rs.rs_name = None ->
        Debug.dprintf debug_c_extraction "constructor %s@." rs.rs_name.id_string;
@@ -1134,9 +1140,7 @@ module MLToC = struct
            (fun e ->
              assert (not e.e_effect.eff_ghost);
              (not (Sattr.mem dummy_expr_attr e.e_attrs)) &&
-             match e.e_ity with
-             | I i when ity_equal i Ity.ity_unit -> false
-             | _ -> true)
+             (not (is_unit e.e_mlty)))
            el in
        let env_f = { env with computes_return_value = false } in
        let args = List.map (fun e -> simplify_expr (expr info env_f e)) args in
@@ -1150,9 +1154,9 @@ module MLToC = struct
            (fun acc (f, _ty) arg -> Sseq (acc,assign_expr f arg))
            Snop sfields args in
        (defs, Sseq (inits, expr_or_return env st))
-    | Eapp (rs, el) ->
+    | Eapp (rs, el, _) ->
        Debug.dprintf debug_c_extraction "call to %s@." rs.rs_name.id_string;
-       let args = List.filter (fun e -> not (is_unit e.e_ity)) el
+       let args = List.filter (fun e -> not (is_unit e.e_mlty)) el
        in (*FIXME still needed with masks? *)
        let env_f = { env with computes_return_value = false } in
        if is_rs_tuple rs
@@ -1165,7 +1169,7 @@ module MLToC = struct
             let e_struct = C.Evar id_struct in
             let d_struct =
               C.(Ddecl(Tstruct
-                         (struct_of_rs info env.current_function),
+                         (struct_of_rs info e.e_mlty env.current_function),
                        [id_struct, Enothing])) in
             let assign i (d,s) =
               C.Sblock (d,assignify C.(Edot (e_struct, field i)) s) in
@@ -1182,7 +1186,7 @@ module MLToC = struct
            let prelude, unboxed_params =
              Lists.map_fold_left
                (fun ((accd, accs) as acc) e ->
-                 let pty = ty_of_ty info (ty_of_ity (ity_of_expr e)) in
+                 let pty = ty_of_mlty info e.e_mlty in
                  let d, s = expr info env_f e in
                  try
                    acc,
@@ -1214,15 +1218,14 @@ module MLToC = struct
               let p = Mid.find rs.rs_name info.prec in
               if complex s
               then
-                let rty = ty_of_ity (ity_of_expr e) in
-                let rtyargs = match rty.ty_node with
-                  | Tyvar _ -> [||]
-                  | Tyapp (_,args) ->
-                     Array.of_list
-                       (List.map (ty_of_ty info)
-                          args)
+                let mlty = e.e_mlty in
+                let args = match mlty with
+                  | Tvar _ -> [||]
+                  | Tapp (_, args) | Ttuple args->
+                     Array.of_list (List.map (ty_of_mlty info) args)
+                  | _ -> assert false
                 in
-                C.Esyntax(s,ty_of_ty info rty, rtyargs, params, p)
+                C.Esyntax(s,ty_of_mlty info mlty, args, params, p)
               else
                 if args=[]
                 then C.(Esyntax(s, Tnosyntax, [||], [], p)) (*constant*)
@@ -1249,12 +1252,9 @@ module MLToC = struct
          let s =
            if env.computes_return_value
            then
-             begin match e.e_ity with
-             | I ity when ity_equal ity Ity.ity_unit ->
-                Sseq(Sexpr e', Sreturn Enothing)
-             | I _ -> Sreturn e'
-             | _ -> assert false
-             end
+             if is_unit e.e_mlty
+             then Sseq(Sexpr e', Sreturn Enothing)
+             else Sreturn e'
            else Sexpr e' in
          if is_nop prstmt
          then prdefs, s
@@ -1266,7 +1266,7 @@ module MLToC = struct
        begin match simplify_cond (cd, cs) with
        | [], C.Sexpr c ->
           let c = handle_likely cond.e_attrs c in
-          if is_false th && is_true el
+          if Mltree.is_false th && Mltree.is_true el
           then C.([], expr_or_return env (Eunop(Unot, c)))
           else [], C.Sif(c,C.Sblock t, C.Sblock e)
        | cdef, cs ->
@@ -1297,7 +1297,7 @@ module MLToC = struct
         | C.Snop, e -> cd, C.(Swhile(handle_likely c.e_attrs e, C.Sblock b))
         | s,e ->
            let brc = reverse_likely (handle_likely c.e_attrs (Eunop(Unot,e))) in
-           cd, C.(Swhile(Econst (Cint "1"),
+           cd, C.(Swhile(Econst (Cint ("1", lit_one)),
                          Sseq(s,
                               Sseq(Sif(brc, Sbreak, Snop),
                                    C.Sblock b))))
@@ -1311,13 +1311,13 @@ module MLToC = struct
           let id = xs.xs_name in
           match pvsl, r.e_node with
           | [], (Eblock []) when is_while ->
-             assert (is_unit r.e_ity);
+             assert (is_unit r.e_mlty);
              (Sid.add id bs, rs)
           | [pv], Mltree.Evar pv'
              when pv_equal pv pv' && env.computes_return_value ->
              (bs, Sid.add id rs)
           | [], Mltree.Eblock [] when env.computes_return_value ->
-             assert (is_unit r.e_ity);
+             assert (is_unit r.e_mlty);
              (bs, Sid.add id rs)
           | _ -> raise (Unsupported "non break/return exception in try"))
         (Sid.empty, env.returns) xl
@@ -1344,29 +1344,26 @@ module MLToC = struct
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
     | Elet (Lvar(eb, ee),
             { e_node = Elet(Lvar (sb, se),
-                 { e_node = Efor (i, sb', dir, eb', body) })})
+                 { e_node = Efor (i, ty, sb', dir, eb', body) })})
          when pv_equal sb sb' && pv_equal eb eb' ->
        Debug.dprintf debug_c_extraction "LETLETFOR@.";
-       do_for eb (Some ee) sb (Some se) i dir body
-    | Elet (Lvar (eb, ee), { e_node = Efor (i, sb, dir, eb', body) })
+       do_for eb (Some ee) sb (Some se) i ty dir body
+    | Elet (Lvar (eb, ee), { e_node = Efor (i, ty, sb, dir, eb', body) })
          when pv_equal eb eb' ->
        Debug.dprintf debug_c_extraction "ENDLETFOR@.";
-       do_for eb (Some ee) sb None i dir body
-    | Elet (Lvar (sb, se), { e_node = Efor (i, sb', dir, eb, body) })
+       do_for eb (Some ee) sb None i ty dir body
+    | Elet (Lvar (sb, se), { e_node = Efor (i, ty, sb', dir, eb, body) })
          when pv_equal sb sb' ->
        Debug.dprintf debug_c_extraction "STARTLETFOR@.";
-       do_for eb None sb (Some se) i dir body
-    | Efor (i, sb, dir, eb, body) ->
+       do_for eb None sb (Some se) i ty dir body
+    | Efor (i, ty, sb, dir, eb, body) ->
        Debug.dprintf debug_c_extraction "FOR@.";
-       do_for eb None sb None i dir body
-    | Ematch (({e_node = Eapp(_rs,_)} as e1), [Pwild, e2], []) ->
-       let ne = { e with e_node = Eblock [e1; e2] } in
-       expr info env ne
-    | Ematch (e1, [Pvar v, e2], []) ->
-       let ity = ity_of_expr e1 in
-       let cty = ty_of_ty info (ty_of_ity ity) in
-       do_let v.vs_name ity cty e1 e2
-    | Ematch (({e_node = Eapp(rs,_)} as e1), [Ptuple rets,e2], [])
+       do_for eb None sb None i ty dir body
+    | Ematch (({e_node = Eapp(_rs,_, _)} as _e1), [Pwild, _e2], []) ->
+       assert false (* simplified at Compile *)
+    | Ematch (_e1, [Pvar _v, _e2], []) ->
+       assert false (* simplified at Compile *)
+    | Ematch (({e_node = Eapp(rs,_, _)} as e1), [Ptuple rets,e2], [])
          when List.for_all
                 (function | Pwild (*ghost*) | Pvar _ -> true |_-> false)
                 rets
@@ -1375,17 +1372,20 @@ module MLToC = struct
        | _ ->
         let id_struct = id_register (id_fresh "struct_res") in
         let e_struct = C.Evar id_struct in
-        let d_struct = C.Ddecl(C.Tstruct (struct_of_rs info rs),
+        let d_struct = C.Ddecl(C.Tstruct (struct_of_rs info e1.e_mlty rs),
                                [id_struct, C.Enothing]) in
         let defs =
-          List.fold_right
-            (fun p acc ->
-              match p with
-              | Pvar vs -> C.Ddecl(ty_of_ty info vs.vs_ty,
-                                   [vs.vs_name, C.Enothing])::acc
-              | Pwild -> acc
-              | _ -> assert false )
-            rets [d_struct] in
+          match e1.e_mlty with
+          | Ttuple lt ->
+             List.fold_right2
+               (fun p ty acc ->
+                 match p with
+                 | Pvar vs -> C.Ddecl(ty_of_mlty info ty,
+                                      [vs.vs_name, C.Enothing])::acc
+                 | Pwild -> acc
+                 | _ -> assert false )
+               rets lt [d_struct]
+          | _ -> assert false in
         let d,s = expr info {env with computes_return_value = false} e1 in
         let s = assignify e_struct s in
         let assign vs i =
@@ -1401,12 +1401,13 @@ module MLToC = struct
         d@defs, C.(Sseq(Sseq(s,assigns), Sblock b)) end
     | Ematch _ -> raise (Unsupported "pattern matching")
     | Eabsurd -> assert false
-    | Eassign ([pv, ({rs_field = Some _} as rs), e2]) ->
-       let id = pv_name pv in
+    | Eassign ([e1, pvmlty, ({rs_field = Some _} as rs), e2]) ->
        let boxed =
-         match pv.pv_ity.ity_node with
+         match (ity_of_expr e1).ity_node with
          | Ityreg r ->  Hreg.mem env.boxed r
          | _ -> false in
+       let ce1 = simplify_expr
+                   (expr info { env with computes_return_value = false } e1) in
        let t =
          match query_syntax info.syntax rs.rs_name with
          | Some s ->
@@ -1416,53 +1417,54 @@ module MLToC = struct
                   (Re.Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0
               with Not_found -> raise (Unsupported "assign field format")  in
             let st = if boxed
-                     then C.(Eunop(Ustar, Evar id))
-                     else C.Evar id in
-            let params = [ st, ty_of_ty info (ty_of_ity pv.pv_ity) ] in
-            let rty = ty_of_ity rs.rs_cty.cty_result in
-            let rtyargs = match rty.ty_node with
-              | Tyvar _ -> [||]
-              | Tyapp (_,args) ->
-                 Array.of_list (List.map (ty_of_ty info) args)
+                     then C.(Eunop(Ustar, ce1))
+                     else ce1 in
+            let params = [ st, ty_of_mlty info pvmlty ] in
+            let args = match pvmlty with
+              | Tvar _ -> [||]
+              | Tapp (_,args) | Ttuple args ->
+                 Array.of_list (List.map (ty_of_mlty info) args)
+              | _ -> assert false
             in
             let p = Mid.find rs.rs_name info.prec in
-            C.Esyntax(s,ty_of_ty info rty, rtyargs, params,p)
+            C.Esyntax(s,ty_of_mlty info pvmlty, args, params,p)
          | None ->
-             let ty = ty_of_ty info (ty_of_ity pv.pv_ity) in
+             let ty = ty_of_mlty info pvmlty in
              match ty with
              | Tmutable _ ->
-                 if boxed then Eunop (Ustar, Evar id) else Evar id
+                 if boxed then Eunop (Ustar, ce1) else ce1
              | _ ->
                  if boxed
-                 then Earrow (Evar id, rs.rs_name.id_string)
-                 else Edot (Evar id, rs.rs_name.id_string) in
+                 then Earrow (ce1, rs.rs_name.id_string)
+                 else Edot (ce1, rs.rs_name.id_string) in
        let d,v = expr info { env with computes_return_value = false } e2 in
        d, C.(Sexpr(Ebinop(Bassign, t, simplify_expr ([],v))))
     | Eassign _ -> raise (Unsupported "assign")
     | Eexn (_,_,e) -> expr info env e
     | Eignore e ->
+       Debug.dprintf debug_c_extraction "Eignore@.";
        [],
        C.Sseq(C.Sblock(expr info {env with computes_return_value = false} e),
               if env.computes_return_value
               then C.Sreturn(Enothing)
               else C.Snop)
     | Efun _ -> raise (Unsupported "higher order")
-    | Elet (Lvar (v, { e_node = Eapp (rs, al) }), e)
+    | Elet (Lvar (v, ({ e_node = Eapp (rs, al, _) } as ev)), e)
          when Sattr.mem decl_attribute rs.rs_name.id_attrs
               && query_syntax info.syntax rs.rs_name <> None
-              && List.for_all (fun e -> is_unit e.e_ity) al
+              && List.for_all (fun e -> is_unit e.e_mlty) al
       ->
        Debug.dprintf debug_c_extraction "variable declaration call@.";
        if var_escapes_from_expr env v e
        then raise (Unsupported "local variable escaping function");
-       let t = ty_of_ty info (ty_of_ity v.pv_ity) in
+       let t = ty_of_mlty info ev.e_mlty in
        let scall = Opt.get (query_syntax info.syntax rs.rs_name) in
        let p = Mid.find rs.rs_name info.prec in
        let ecall = C.(Esyntax(scall, Tnosyntax, [||], [], p)) in
        let d = C.Ddecl (t, [pv_name v, ecall]) in
        let d', s = expr info env e in
        d::d', s
-    | Elet (Lvar (a, { e_node = Eapp (rs, [n; v]) }), e)
+    | Elet (Lvar (a, { e_node = Eapp (rs, [n; v], _) }), e)
          when Sattr.mem array_mk rs.rs_name.id_attrs ->
        (* let a = Array.make n v in e*)
        Debug.dprintf debug_c_extraction "call to an array constructor@.";
@@ -1473,7 +1475,7 @@ module MLToC = struct
        let n = get_const_expr n in
        let avar = pv_name a in
        let sizes = Mid.add avar n env.array_sizes in
-       let v_ty = ty_of_ty info (ty_of_ity (ity_of_expr v)) in
+       let v_ty = ty_of_mlty info v.e_mlty in
        let loop_i = id_register (id_fresh "i") in
        let d = C.([Ddecl (Tarray (v_ty, n), [avar, Enothing]);
                    Ddecl (Tsyntax ("int", []), [loop_i, Enothing])]) in
@@ -1481,7 +1483,8 @@ module MLToC = struct
        let dv, sv = expr info env_f v in
        let eai = C.Eindex(Evar avar, i) in
        let assign_e = assignify eai sv in
-       let init_loop = C.(Sfor(Ebinop(Bassign, i, Econst (Cint "0")),
+       let init_loop = C.(Sfor(Ebinop(Bassign, i,
+                                      Econst (Cint ("0", lit_zero))),
                                Ebinop(Blt, i, n),
                                Eunop(Upreincr, i),
                                assign_e)) in
@@ -1492,14 +1495,14 @@ module MLToC = struct
        begin match ld with
        | Lvar (pv,le) -> (* not a block *)
           let ity = pv.pv_ity in
-          let cty = ty_of_ty info (ty_of_ity ity) in
+          let cty = ty_of_mlty info le.e_mlty in
           do_let pv.pv_vs.vs_name ity cty le e
        | Lsym _ -> raise (Unsupported "LDsym")
        | Lrec _ -> raise (Unsupported "LDrec") (* TODO for rec at least*)
        | Lany _ -> raise (Unsupported "Lany")
        end
 
-  let translate_decl (info:info) (d:decl) ~header : C.definition list =
+  let translate_decl (info:info) (d:decl) ~flat ~header : C.definition list =
     current_decl_name := "";
     let translate_fun rs mlty vl e =
       current_decl_name := rs.rs_name.id_string;
@@ -1552,18 +1555,27 @@ module MLToC = struct
                   acc && arity_zero ity.ity_node) true ity)
         in
         (* FIXME is it necessary to have arity 0 in regions ?*)
-        let rtype = try ty_of_mlty info mlty
-                    with Unsupported _ -> (*FIXME*)
-                      ty_of_ty info (ty_of_ity rity) in
-        let rtype,sdecls =
-          if rtype=C.Tnosyntax && is_simple_tuple rity
-          then
-            let st = struct_of_rs info rs in
-            C.Tstruct st, [C.Dstruct st]
-          else rtype, [] in
+        let rtype, sdecls =
+          try ty_of_mlty info mlty, []
+          with Unsupported _ when is_simple_tuple rity ->
+            let st = struct_of_rs info mlty rs in
+            C.Tstruct st, [C.Dstruct st] in
+        (* struct definition goes only in the header *)
+        let rm_struct_def = function
+          | C.Dstruct (s,_) ->
+             Debug.dprintf debug_c_extraction "removing def of %s@." s;
+             C.Dstruct_decl s
+          | d -> d in
+        let sdecls =
+          if not (header || flat)
+          then List.map rm_struct_def sdecls
+          else sdecls in
         if has_array rtype then raise (Unsupported "array return");
         if header
-        then sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
+        then
+          if Hid.mem globals rs.rs_name
+          then sdecls@[C.Dextern (rtype, rs.rs_name)]
+          else sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
         else
           let env = { computes_return_value = true;
                       in_unguarded_loop = false;
@@ -1579,7 +1591,13 @@ module MLToC = struct
           let d = C.group_defs_by_type d in
           let s = C.elim_nop s in
           let s = C.elim_empty_blocks s in
-          sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
+          match s with
+          | Sreturn r when rs.rs_cty.cty_args = [] ->
+             Debug.dprintf debug_c_extraction
+               "declaring global %s@." rs.rs_name.id_string;
+             Hid.add globals rs.rs_name ();
+             sdecls@[C.Ddecl (rtype, [rs.rs_name, r])]
+          | _ -> sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
     try
       begin match d with
       | Dlet (Lsym(rs, _, mlty, vl, e)) ->
@@ -1610,7 +1628,11 @@ module MLToC = struct
                     pjl in
                 let fields =
                   List.map
-                    (fun (_, id, ty) -> (id.id_string, ty_of_mlty info ty))
+                    (fun (_, id, ty) ->
+                      let cty = ty_of_mlty info ty in
+                      match cty with
+                      | Tstruct _ -> raise (Unsupported "nested structs")
+                      | _ -> (id.id_string, cty))
                     pjl in
                 (*if List.exists
                      (fun (_,t) -> match t with Tarray _ -> true | _ -> false)
@@ -1618,7 +1640,9 @@ module MLToC = struct
                 then raise (Unsupported "array in struct");*)
                 let sd = id.id_string, fields in
                 Hid.replace structs id sd;
-                [C.Dstruct sd]
+                if header || flat
+                then [C.Dstruct sd]
+                else [C.Dstruct_decl id.id_string]
              | Some Ddata _ -> raise (Unsupported "Ddata@.")
              | Some (Drange _) | Some (Dfloat _) ->
                 raise (Unsupported "Drange/Dfloat@.")
@@ -1648,17 +1672,53 @@ module MLToC = struct
            !current_decl_name s;
        []
 
-  let translate_decl (info:info) (d:Mltree.decl) ~header : C.definition list =
+  let translate_decl (info:info) (d:Mltree.decl) ~header ~flat
+      : C.definition list =
     let decide_print id =
       (not (header && (Sattr.mem Print.c_static_inline id.id_attrs)))
       && query_syntax info.syntax id = None in
     let names = Mltree.get_decl_name d in
     match List.filter decide_print names with
     | [] -> []
-    | _ -> translate_decl info d ~header
+    | _ -> translate_decl info d ~header ~flat
 
 end
 
+module Transform = struct
+
+open C
+
+(* Common simplifications *)
+let rec expr e =
+  let e = e_map expr e in
+  match e with
+  | Equestion (c, Econst (Cint (_, ic1)), Econst (Cint (_, ic0)))
+       when is_one ic1 && is_zero ic0 -> c                       (* c ? 1 : 0 *)
+  | Equestion (c, Econst (Cint (_, ic0)), Econst (Cint (_, ic1)))
+       when is_one ic1 && is_zero ic0 -> Eunop (Unot, c)         (* c ? 0 : 1 *)
+  | Eunop (Unot, Ebinop(Beq, e1, e2)) -> Ebinop (Bne, e1, e2) (* ! (e1 == e2) *)
+  | Edot (Eunop (Ustar, e1), s) -> Earrow (e1, s)
+  | _ -> e
+
+and stmt s =
+  let s = s_map def stmt expr s in
+  match s with
+  | Sif (Eunop (Unot, Ebinop (Beq, c, Econst (Cint(_, ic0)))), t, e)
+  | Sif (Ebinop (Bne, c, Econst (Cint (_, ic0))), t, e)
+       when is_zero ic0 -> Sif (c, t, e)                         (* if c != 0 *)
+  | _ -> s
+
+and def (d:definition) = match d with
+  | C.Dfun (id,p,(dl, s)) ->  Dfun (id, p, (List.map def dl, stmt s))
+  | C.Ddecl (ty, dl) -> C.Ddecl (ty, List.map (fun (id, e) -> id, expr e) dl)
+  | C.Dextern _
+  | C.Dproto (_,_) | C.Dstruct _
+  | C.Dstruct_decl _ | C.Dtypedef (_,_)
+  | C.Dinclude (_,_) -> d
+
+let defs dl = List.map def dl
+
+end
 
 let name_gen suffix ?fname m =
   let n = m.Pmodule.mod_theory.Theory.th_name.Ident.id_string in
@@ -1668,15 +1728,15 @@ let name_gen suffix ?fname m =
     | Some f -> f ^ "__" ^ n ^ suffix in
   Strings.lowercase r
 
-let header_border_printer header _args ?old:_ ?fname ~flat:_ fmt m =
+let header_border_printer header _args ?old:_ ?fname fmt m =
   let n = Strings.uppercase (name_gen "_H_INCLUDED" ?fname m) in
   if header then
     Format.fprintf fmt "#ifndef %s@\n@." n
   else
-    Format.fprintf fmt "#define %s@\n#endif // %s@." n n
+    Format.fprintf fmt "@\n#define %s@\n#endif // %s@." n n
 
 let print_header_decl args fmt d =
-  let cds = MLToC.translate_decl args d ~header:true in
+  let cds = MLToC.translate_decl args d ~header:true ~flat:false in
   List.iter (Format.fprintf fmt "%a@." Print.print_global_def) cds
 
 let mk_info (args:Pdriver.printer_args) m = {
@@ -1692,64 +1752,78 @@ let mk_info (args:Pdriver.printer_args) m = {
 
 let print_header_decl =
   let memo = Hashtbl.create 16 in
-  fun args ?old ?fname ~flat m fmt d ->
+  fun args ?old ?fname m fmt d ->
   ignore old;
   ignore fname;
-  ignore flat;
   if not (Hashtbl.mem memo d)
   then begin
     Hashtbl.add memo d ();
     let info = mk_info args m in
     print_header_decl info fmt d end
 
-let print_prelude args ?old ?fname ~flat deps fmt pm =
+let print_prelude ~header args ?old ?fname ~flat ~deps
+      ~global_prelude ~prelude fmt pm =
   ignore old;
-  ignore fname;
   ignore flat;
-  ignore pm;
-  ignore args;
-  let add_include id =
+  ignore fname;
+  Print.init_printers args.Pdriver.blacklist;
+  let add_include m =
+    let id = m.Pmodule.mod_theory.Theory.th_name in
     Format.fprintf fmt "%a@." Print.print_global_def C.(Dinclude (id,Proj)) in
-  List.iter
-    (fun m ->
-      let id = m.Pmodule.mod_theory.Theory.th_name in
-      add_include id)
-    (List.rev deps)
+  (* system includes *)
+  Printer.print_prelude fmt global_prelude;
+  (* dependencies *)
+  if header
+  then
+    List.iter add_include (List.rev deps)
+  else
+    (* C files include only their own header *)
+    add_include pm;
+  (* module and exported prelude *)
+  Printer.print_prelude fmt prelude
 
-let print_decl args fmt d =
-  let cds = MLToC.translate_decl args d ~header:false in
+let print_decl args fmt d ~flat =
+  let cds = MLToC.translate_decl args d ~header:false ~flat in
+  let cds = Transform.defs cds in
   let print_def d =
     Format.fprintf fmt "%a@." Print.print_global_def d in
   List.iter print_def cds
 
-let print_decl =
+let print_decl ~flat =
   let memo = Hashtbl.create 16 in
-  fun args ?old ?fname ~flat m fmt d ->
+  fun args ?old ?fname m fmt d ->
   ignore old;
   ignore fname;
-  ignore flat;
   ignore m;
+  Print.init_printers args.Pdriver.blacklist;
   if not (Hashtbl.mem memo d)
   then begin
       Hashtbl.add memo d ();
       let info = mk_info args m in
-    print_decl info fmt d end
+    print_decl info fmt d ~flat end
 
 let c_printer = Pdriver.{
     desc = "printer for C code";
     implem_printer = {
         filename_generator = name_gen ".c";
-        decl_printer = print_decl;
-        prelude_printer = print_prelude;
+        decl_printer = print_decl ~flat:false;
+        prelude_printer = print_prelude ~flat:false ~header:false;
         header_printer = dummy_border_printer;
         footer_printer = dummy_border_printer;
       };
     interf_printer = Some {
         filename_generator = name_gen ".h";
         decl_printer = print_header_decl;
-        prelude_printer = print_prelude;
+        prelude_printer = print_prelude ~flat:false ~header:true;
         header_printer = header_border_printer true;
         footer_printer = header_border_printer false;
+      };
+    flat_printer = {
+        filename_generator = name_gen ".c";
+        decl_printer = print_decl ~flat:true;
+        prelude_printer = print_prelude ~flat:true ~header:false;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
       };
   }
 

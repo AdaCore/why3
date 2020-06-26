@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name="../../../../stdlib/mach/"/><path name="c.mlw"/>
+<theory name="C" proved="true">
+ <goal name="get_ofs&#39;vc" expl="VC for get_ofs" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="28"/></proof>
+ </goal>
+ <goal name="set_ofs&#39;vc" expl="VC for set_ofs" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="103"/></proof>
+ </goal>
+ <goal name="valid_itv_to_shift&#39;vc" expl="VC for valid_itv_to_shift" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
+ </goal>
+ <goal name="salloc&#39;vc" expl="VC for salloc" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+ </goal>
+ <goal name="sfree&#39;vc" expl="VC for sfree" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+</theory>
+<theory name="StrlenLemmas" proved="true">
+ <goal name="strlen_before_null&#39;vc" expl="VC for strlen_before_null" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="strlen_before_null&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="31"/></proof>
+  </goal>
+  <goal name="strlen_before_null&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="33"/></proof>
+  </goal>
+  <goal name="strlen_before_null&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="33"/></proof>
+  </goal>
+  <goal name="strlen_before_null&#39;vc.3" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="41"/></proof>
+  </goal>
+  <goal name="strlen_before_null&#39;vc.4" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="35"/></proof>
+  </goal>
+  <goal name="strlen_before_null&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="129"/></proof>
+  </goal>
+  <goal name="strlen_before_null&#39;vc.6" expl="out of loop bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="strlen_at_null&#39;vc" expl="VC for strlen_at_null" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="strlen_at_null&#39;vc.0" expl="witness existence" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="103"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="38"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="40"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.5" expl="witness existence" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="83"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="32"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.7" expl="unreachable point" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="32"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="32"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="33"/></proof>
+  </goal>
+  <goal name="strlen_at_null&#39;vc.10" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="strlen_not_0" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="30"/></proof>
+ </goal>
+ <goal name="strlen_0" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="32"/></proof>
+ </goal>
+ <goal name="strlen_sup&#39;vc" expl="VC for strlen_sup" proved="true">
+ <proof prover="2"><result status="valid" time="0.06" steps="390"/></proof>
+ </goal>
+</theory>
+<theory name="SChar">
+ <goal name="to_int_in_bounds">
+ </goal>
+ <goal name="extensionality">
+ </goal>
+</theory>
+<theory name="UChar">
+ <goal name="to_int_in_bounds">
+ </goal>
+ <goal name="extensionality">
+ </goal>
+ <goal name="zero_unsigned_is_zero">
+ </goal>
+ <goal name="radix_def" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

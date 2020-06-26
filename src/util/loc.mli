@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -24,6 +24,7 @@ val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
 (** {2 locations in files} *)
 
 type position
+[@@deriving sexp_of]
 
 val extract : Lexing.position * Lexing.position -> position
 val join : position -> position -> position

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -14,10 +14,7 @@ open Why3
 module S = Session_itp
 module C = Whyconf
 
-let verbose = Debug.register_info_flag "verbose"
-    ~desc:"Increase verbosity."
-
-type spec_list = (Arg.key * Arg.spec * Arg.doc) list
+type spec_list = Getopt.opt list
 
 type cmd =
     {
@@ -31,46 +28,6 @@ let files = Queue.create ()
 let iter_files f = Queue.iter f files
 let anon_fun (f:string) = Queue.add f files
 
-let read_simple_spec () =
-  Debug.Args.set_flags_selected ();
-  Debug.Args.option_list ()
-
-let opt_config = ref None
-let opt_loadpath = ref []
-let opt_extra = ref []
-
-let common_options = [
-  "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> read configuration from <file>";
-  "--config", Arg.String (fun s -> opt_config := Some s),
-      "<file> same as -C";
-  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-      "<file> read additional configuration from <file>";
-  "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> add <dir> to the library search path";
-  "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> same as -L";
-  Debug.Args.desc_shortcut "verbose" "--verbose" "increase verbosity";
-  Debug.Args.desc_debug_list;
-  Debug.Args.desc_debug_all;
-  Debug.Args.desc_debug;
-]
-
-(* dead code
-let env_spec = common_options
-*)
-
-let read_env_spec () =
-  (* Configuration *)
-  let config = Whyconf.read_config !opt_config in
-  let config = List.fold_left Whyconf.merge_config config !opt_extra in
-  let main = Whyconf.get_main config in
-  Whyconf.load_plugins main;
-  let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
-    @ List.rev !opt_loadpath in
-  let env = Env.create_env loadpath in
-  env,config,read_simple_spec ()
-
 let read_session fname =
   let q = Queue.create () in
   Queue.push fname q;
@@ -78,7 +35,7 @@ let read_session fname =
   S.load_session project_dir
 
 let read_update_session ~allow_obsolete env config fname =
-  let session,shape_version = read_session fname in
+  let session = read_session fname in
 (*
   let ctxt = S.mk_update_context
     ~allow_obsolete_goals:allow_obsolete
@@ -90,7 +47,7 @@ let read_update_session ~allow_obsolete env config fname =
   let cont = Controller_itp.create_controller config env session in
   let found_obs, some_merge_miss =
     try
-      Controller_itp.reload_files cont ~shape_version
+      Controller_itp.reload_files cont
     with
     | Controller_itp.Errors_list l ->
         List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;
@@ -129,54 +86,49 @@ type filter_three = | FT_Yes | FT_No | FT_All
 
 let opt_filter_archived = ref FT_No
 let opt_filter_obsolete = ref FT_All
-let opt_filter_verified_goal = ref FT_All
 let opt_filter_verified = ref FT_All
 
 let add_filter_three r = function
-  | "no" -> r := FT_No
-  | "yes" -> r := FT_Yes
-  | "all" -> r := FT_All
+  | Some "no" -> r := FT_No
+  | Some "yes" | None -> r := FT_Yes
+  | Some "all" -> r := FT_All
   | _ -> assert false
 
-let opt_three r = Arg.Symbol (["yes";"no";"all"], add_filter_three r)
+let opt_three r =
+  let open Getopt in
+  HndOpt (ASymbol ["yes";"no";"all"], add_filter_three r)
 
 let opt_status = ref []
 
+let status_filter x =
+  let open Call_provers in
+  match x with
+  | "valid" -> Valid
+  | "invalid" -> Invalid
+  | "highfailure" -> HighFailure
+  | _ -> assert false
+
 let filter_spec =
-  ["--filter-prover", Arg.String add_filter_prover,
-   " [name,version[,alternative]|id] \
-the proof containing this prover are selected";
-   "--filter-obsolete", opt_three opt_filter_obsolete,
-   " no: only non-obsolete, yes: only obsolete (default all)";
-   "--filter-archived", opt_three opt_filter_archived,
-   " no: only unarchived, yes: only archived (default no)";
-   "--filter-verified-goal", opt_three opt_filter_verified_goal,
-   " no: only parent goal not verified, yes: only verified (default all)";
-   "--filter-verified", opt_three opt_filter_verified,
-   " no: only not verified, yes: only verified (default all)";
-   "--filter-highfailure",
-   Arg.Unit (fun () -> opt_status := Call_provers.HighFailure::!opt_status),
-   " filter the call that fail in an unexpeted way";
-   "--filter-valid",
-   Arg.Unit (fun () -> opt_status := Call_provers.Valid::!opt_status),
-   " filter the valid goals (can be obsolete)";
-   "--filter-invalid",
-   Arg.Unit (fun () -> opt_status := Call_provers.Invalid::!opt_status),
-   " filter the invalid goals";
-   "--filter-unknown",
-   Arg.String (fun s -> opt_status := Call_provers.Unknown s::!opt_status),
-   " filter when the prover reports it can't determine if the task is valid";
-   "--filter-failure",
-   Arg.String (fun s -> opt_status := Call_provers.Failure s::!opt_status),
-   " filter when the prover reports a failure";
-]
+  let open Getopt in
+  [ KLong "filter-prover", Hnd1 (AString, add_filter_prover),
+    "[<name>,<version>[,<alternative>]|<id>] select proof attempts containing this prover";
+    KLong "filter-obsolete", opt_three opt_filter_obsolete,
+    "[yes|no] select only (non-)obsolete goals";
+    KLong "filter-archived", opt_three opt_filter_archived,
+    "[yes|all] select only archived goals";
+    KLong "filter-verified", opt_three opt_filter_verified,
+    "[yes|no] select only (non-)verified goals";
+    KLong "filter-status",
+    Hnd1 (AList (',', ASymbol ["valid"; "invalid"; "highfailure"]),
+          fun l -> opt_status := List.map status_filter l),
+    "[valid|invalid|highfailure] select proofs attempts with the given status";
+  ]
 
 type filters =
     { provers : C.Sprover.t; (* if empty : every provers *)
       obsolete : filter_three;
       archived : filter_three;
       verified : filter_three;
-      verified_goal : filter_three;
       status : Call_provers.prover_answer list; (* if empty : any answer *)
     }
 
@@ -208,7 +160,6 @@ let read_filter_spec whyconf : filters * bool =
    obsolete = !opt_filter_obsolete;
    archived = !opt_filter_archived;
    verified = !opt_filter_verified;
-   verified_goal = !opt_filter_verified_goal;
    status = !opt_status;
   },!should_exit
 
@@ -231,13 +182,9 @@ let iter_proof_attempt_by_filter ses iter filters f =
 (*
   let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
  *)
-  (* verified_goal *)
-  let f = three_value f filters.verified_goal
-    (fun a -> S.pn_proved ses a.S.parent) in
   (* verified *)
   let f = three_value f filters.verified
-    (fun p -> match p.S.proof_state with Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
-                                      true | _ -> false) in
+    (fun a -> S.pn_proved ses a.S.parent) in
   (* status *)
   let f = if filters.status = [] then f else
       (fun a -> match a.S.proof_state with
@@ -259,13 +206,12 @@ let session_iter_proof_attempt_by_filter s filters f =
     filters f s
 
 
-let set_filter_verified_goal t = opt_filter_verified_goal := t
-
 let opt_force_obsolete = ref false
 
 let force_obsolete_spec =
-  ["-F", Arg.Set opt_force_obsolete,
-   " transform obsolete session"]
+  let open Getopt in
+  [ KShort 'F', Hnd0 (fun () -> opt_force_obsolete := true),
+    " transform obsolete session" ]
 
 
 

@@ -1,0 +1,24 @@
+### Debug: inferred invariants ###
+y = 10 /\ 10 = y
+###
+### Debug: inferred invariants ###
+(y1 = 10 /\ y1 <= 10) /\ 10 <= y1
+###
+### Debug: inferred invariants ###
+y2 = 10 /\ 10 = y2
+###
+### Debug: inferred invariants ###
+((y3 = 10 /\ k = 42) /\ 10 = y3) /\ 42 = k
+###
+### Debug: inferred invariants ###
+((((((((y4 = 10 /\ k1 = 42) /\ k1 <= 42) /\ k1 <= (32 + y4)) /\
+     (y4 + k1) <= 52) /\
+    42 <= k1) /\
+   52 <= (y4 + k1)) /\
+  (y4 + 32) <= k1) /\
+ y4 <= 10) /\
+10 <= y4
+###
+### Debug: inferred invariants ###
+((y5 = 10 /\ k2 = 42) /\ 42 = k2) /\ 10 = y5
+###

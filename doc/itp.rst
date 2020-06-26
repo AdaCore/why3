@@ -66,7 +66,7 @@ Using realizations inside proofs
 If a theory has been realized, the Why3 printer for the corresponding
 prover will no longer output declarations for that theory but instead
 simply put a directive to load the realization. In order to tell the
-printer that a given theory is realized, one has to add a meta
+printer that a given theory is realized, one has to add a :why3:meta:`realized_theory` meta
 declaration in the corresponding theory section of the driver.
 
 ::
@@ -90,7 +90,7 @@ use, it does not scale well when the realizations are to be shipped to
 other users. Instead, one should create two additional files: a
 configuration file that indicates how to modify paths, provers, and
 editors, and a driver file that contains only the needed
-``meta "realized_theory"`` declarations. The configuration file should
+:why3:meta:`realized_theory` meta declarations. The configuration file should
 be as follows.
 
 ::

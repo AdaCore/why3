@@ -29,9 +29,6 @@ module Occurs
   use string.OCaml
   use Spec
 
-  val (=) (x y: char) : bool
-    ensures { result <-> x = y }
-
   let occurs (pat text: string) (p: int63) : bool
     requires { 0 <= p <= length text - length pat }
     ensures  { result <-> matches pat text p }
@@ -40,7 +37,7 @@ module Occurs
     for i = 0 to m - 1 do
       invariant { substring text p i == substring pat 0 i }
       assert { p + i <= n };
-      if text[p + i] <> pat[i] then return false
+      if not (eq_char text[p + i] pat[i]) then return false
     done;
     true
 
@@ -90,7 +87,6 @@ module Naive
 
 end
 
-(*
 module BadShiftTable
 
   use int.Int
@@ -109,7 +105,8 @@ module BadShiftTable
    -----+-----+---+--------+---+----------------
         | ... | C | ..!C.. |
         +-----+---+--------+
-          0     i            m
+          0                  m
+                <----sht c--->
   *)
   type bad_shift_table = {
     pat: string;
@@ -128,14 +125,45 @@ module BadShiftTable
     for i = 0 to m - 1 do
       invariant { forall j c. 0 <= j < i -> c = pat[j] -> M.mem c sht }
       invariant { forall c. M.mem c sht -> 1 <= sht c <= m + 1 }
-      invariant { forall c. M.mem c sht -> forall j. 1 <= j < sht c + i - m ->
-                  pat[i - j] <> c }
+      invariant { forall c. M.mem c sht -> forall j. m - sht c < j < i ->
+                  pat[j] <> c }
       M.add pat[i] (m - i) sht;
     done;
     { pat = pat; sht = sht }
 
+  let lemma shift (bst: bad_shift_table) (text: string) (i: int63)
+    requires { 0 <= i <= length text - length bst.pat }
+    requires { M.mem text[i + length bst.pat] bst.sht }
+    ensures  { forall j. i < j < i + M.find text[i + length bst.pat] bst.sht ->
+               j <= length text - length bst.pat ->
+               substring text j (length bst.pat) <> bst.pat }
+  = let m = String.length bst.pat in
+    let c = Char.get text (to_int i + m) in
+    let lemma aux (j: int)
+      requires { i < j < i + M.find c bst.sht }
+      requires { j <= length text - m }
+      ensures  { substring text j m <> bst.pat }
+    = assert { (substring text j m)[i + m - j] = c };
+      assert { bst.pat[m - (j - i)] <> c } in
+    ()
+
+  let lemma no_shift (bst: bad_shift_table) (text: string) (i: int63)
+    requires { 0 <= i < length text - length bst.pat }
+    requires { not (M.mem text[i + length bst.pat] bst.sht) }
+    ensures  { forall j. i < j <= i + length bst.pat ->
+               j <= length text - length bst.pat ->
+               substring text j (length bst.pat) <> bst.pat }
+  = let m = String.length bst.pat in
+    let c = Char.get text (to_int i + m) in
+    assert { forall j. 0 <= j < m -> bst.pat[j] <> c };
+    let lemma aux (j: int)
+      requires { i < j <= i + m }
+      requires { j <= length text - m }
+      ensures  { substring text j m <> bst.pat }
+    = assert { (substring text j m)[i + m - j] = c } in
+    ()
+
   let search (bst: bad_shift_table) (text: string) : int63
-    (* requires { length pat < max_int } *)
     requires { length bst.pat <= length text }
     ensures  { -1 <= result <= length text - length bst.pat }
     ensures  { if result = -1 then
@@ -148,14 +176,16 @@ module BadShiftTable
     let ref i = 0 in
     while i <= n - m do
       invariant { 0 <= i <= n }
-      invariant { forall j. 0 <= j < i -> substring text j m <> pat }
+      invariant { forall j. 0 <= j < i -> j <= n - m ->
+                  substring text j m <> pat }
       variant   { n - m - i }
       if occurs pat text i then return i;
       if i = n - m then break;
       let c = text[i + m] in
-      i <- i + if M.mem c bst.sht then M.find c bst.sht else m + 1
+      i <- i + if M.mem c bst.sht then (shift    bst text i; M.find c bst.sht)
+                                  else (no_shift bst text i; m + 1)
     done;
    -1
 
 end
-*)
+

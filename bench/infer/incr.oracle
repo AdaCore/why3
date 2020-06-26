@@ -1,0 +1,11 @@
+### Debug: inferred invariants ###
+((0 = contents i /\ contents i = 0 \/ 0 < contents i /\ contents i <= x) /\
+ 0 = 0) /\
+0 <= contents i
+###
+### Debug: inferred invariants ###
+((0 = contents i1 /\ contents i1 = 0 \/
+  0 < x1 /\ 1 = contents i1 \/ 2 <= x1 /\ 2 <= contents i1) /\
+ 0 = 0) /\
+0 <= contents i1
+###

@@ -267,3 +267,57 @@ Outside the GUI, the prover upgrades are handled as follows. The
 stored in the configuration. The :why3:tool:`session` command performs move or
 copy operations on proof attempts in a fine-grained way, using filters,
 as detailed in :numref:`sec.why3session`.
+
+.. _sec.installinferloop:
+
+Inference of Loop Invariants
+----------------------------
+
+This section shows how to install *infer-loop*, an utility based on
+*abstract interpretation* to infer loop invariants
+:cite:`baudin17`. This is still work in progress and many features are
+still very limited.
+
+The ``infer-loop`` utility has the following OCaml dependencies.
+
+-  ``apron``: can be installed using ``opam``.
+
+-  ``camllib``: can be installed using ``opam``.
+
+-  ``fixpoint``: follow instructions below.
+
+The ``apron`` and ``camllib`` libraries can be installed using
+``opam``. The ``fixpoint`` library is not available in ``opam``, but
+it can be easily compiled and installed using the source code. The
+following commands are just an example of how the library can be
+compiled and installed, and can be performed in any directory.
+
+::
+
+    svn co svn://scm.gforge.inria.fr/svnroot/bjeannet/pkg/fixpoint
+    cd fixpoint/trunk/
+    cp Makefile.config.model Makefile.config
+    # if required make modifications to Makefile.config
+    make all     # compiles
+    make install # uses ocamlfind to install the library
+
+By default the *infer-loop* mechanism is not compiled and integrated
+with Why3. So, once the dependencies above are installed, the
+configuration script of Why3 should enable the compilation of the
+``infer-loop`` utility. This can be done by passing to the Why3
+configure script the ``--enable-infer`` flag, as follows:
+
+::
+
+    ./configure --enable-infer
+    # ...
+    # Components
+    # ...
+    #    Invariant inference(exp): yes
+    # ...
+
+The line ``Invariant inference(exp)`` indicates whether the
+dependencies are correctly installed and whether the flag mentioned
+above was selected. After the compilation, the loop inference
+mechanism should be available. See :numref:`sec.runwithinferloop` for
+more details.

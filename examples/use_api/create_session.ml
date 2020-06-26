@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -27,7 +27,8 @@ open Why3
 (* access to the Why configuration *)
 
 (* reads the config file *)
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
@@ -54,16 +55,7 @@ let provers =
     []
 
 (* create an empty session in the current directory *)
-let session = Session_itp.empty_session ~shape_version:None "."
-(*
-let env_session,_,_ =
-  let dummy_session : unit Session.session = Session.create_session "." in
-  let ctxt = Session.mk_update_context
-    ~allow_obsolete_goals:true
-    dummy_keygen
-  in
-  Session.update_session ~ctxt dummy_session env config
- *)
+let session = Session_itp.empty_session "."
 
 (* creates a controller on top of this session *)
 let controller = Controller_itp.create_controller config env session
@@ -83,7 +75,7 @@ let file : Session_itp.file =
 
 (* explore the theories in that file *)
 let theories = Session_itp.file_theories file
-let () = eprintf "%d theories found@." (List.length theories)
+let () = printf "%d theories found in session@." (List.length theories)
 
 (* save the session on disk. *)
 let () = Session_itp.save_session session
@@ -92,7 +84,7 @@ let () = Session_itp.save_session session
 (* add proof attempts for each goals in the theories *)
 let add_proofs_attempts g =
   List.iter
-    (fun (p,d) ->
+    (fun (p,_driver) ->
       let _pa : Session_itp.proofAttemptID =
         Session_itp.graft_proof_attempt
           ~limit:{Call_provers.empty_limit with

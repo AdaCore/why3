@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -14,7 +14,8 @@ open Why3
 open Wstdlib
 
 let usage_msg = sprintf
-  "Usage: %s [options] file module.ident..."
+  "Usage: %s [options] <file> <module>.<ident>...\n\
+   Run the interpreter on the given module symbols.\n"
   (Filename.basename Sys.argv.(0))
 
 let opt_file = ref None
@@ -39,17 +40,13 @@ let precision () =
 let opt_parser = ref None
 
 let option_list =
-  let real_spec = [Arg.Set_int real_emin; Arg.Set_int real_emax;
-                   Arg.Set_int real_prec] in
-  [
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-  "--real", Arg.Tuple real_spec,
-      " Takes 3 integers for the precision used in real computations \
-       [emin emax prec]. Example value for the precision of float32:\
-       -148 128 24";
+  let open Getopt in
+  [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
+    "<format> select input format (default: \"why\")";
+    KLong "real", Hnd1 (APair (',', AInt, APair (',', AInt, AInt)),
+      fun (i1, (i2, i3)) -> real_emin := i1; real_emax := i2; real_prec := i3),
+    "<emin>,<emax>,<prec> set format used for real computations\n\
+     (e.g., -148,128,24 for float32)"
   ]
 
 let config, _, env =

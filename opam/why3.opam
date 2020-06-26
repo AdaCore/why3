@@ -40,9 +40,9 @@ install: [
 ]
 
 depends: [
+  "conf-autoconf" {build & dev}
   "ocaml" {>= "4.05.0"}
   "ocamlfind" {build}
-  "conf-autoconf" {dev}
   "menhir" {>= "20151112"}
   "num"
 ]
@@ -52,6 +52,8 @@ depopts: [
   "camlzip"
   "ocamlgraph"
   "re"
+  "sexplib" {ppx_sexp_conv:installed}
+  "ppx_sexp_conv" {build}
 ]
 
 conflicts: [

@@ -7,6 +7,8 @@
     (see below: copy the dtd on the web)
   - `make trywhy3`
   - run `make detect-unused` and remove unused files
+  - run `make update-doc-png` and check if some pictures need to be updated
+  - check `lib/why3/META.in`
 
 * change version number `VERSION=1.3 RELEASE=1.3.0`
   - update the first line of `configure.in` using `$RELEASE`
@@ -16,10 +18,11 @@
 
 * check/update authors and copyright
   - update the content of the About dialog in `src/ide/gconfig.ml`
-    around lines 600-650
+    around lines 630-670
   - update the `copyright` field in `doc/conf.py` around line 50
   - update `doc/foreword.rst`
-  - check headers, run `make headers` if needed
+  - update `src/trywhy3/trywhy3.html`
+  - check headers, modify `misc/header.txt` and run `make headers` if needed
 
 * generate documentation
   - `make doc`
@@ -45,15 +48,15 @@
 * upload the documentation on the web page
   ```
   DEST=/users/www-perso/projets/why3
+  rm -rf $DEST/doc-$VERSION $DEST/stdlib-$VERSION $DEST/api-$VERSION
   cp share/why3session.dtd $DEST/
   cp doc/latex/manual.pdf $DEST/download/manual-$VERSION.pdf
-  ln -s -n -f download/manual-$VERSION.pdf $DEST/manual.pdf
-  rm -rf $DEST/doc-$VERSION $DEST/stdlib-$VERSION $DEST/api-$VERSION
   cp -r doc/html $DEST/doc-$VERSION
-  ln -s -n -f doc-$VERSION $DEST/doc
   cp -r doc/stdlibdoc $DEST/stdlib-$VERSION
-  ln -s -n -f stdlib-$VERSION $DEST/stdlib
   cp -r doc/apidoc $DEST/api-$VERSION
+  ln -s -n -f download/manual-$VERSION.pdf $DEST/manual.pdf
+  ln -s -n -f doc-$VERSION $DEST/doc
+  ln -s -n -f stdlib-$VERSION $DEST/stdlib
   ln -s -n -f api-$VERSION $DEST/api
   ```
 

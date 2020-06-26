@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -42,29 +42,25 @@ let set_opt_pp_in,set_opt_pp_cmd,set_opt_pp_out =
   (fun s -> opt_pp := (!suf,(!cmd,s))::!opt_pp)
 
 let spec =
-  ("-o",
-   Arg.Set_string output_dir,
-   "<path> output directory ('-' for stdout)") ::
-  ("--context", Arg.Set opt_context,
-   " add context around the generated HTML code") ::
-  ("--style", Arg.Symbol (["simpletree";"table"], set_opt_style),
-   " style to use, defaults to '" ^ default_style ^ "'."
-) ::
-  ("--add_pp", Arg.Tuple
-    [Arg.String set_opt_pp_in;
-     Arg.String set_opt_pp_cmd;
-     Arg.String set_opt_pp_out],
-  "<suffix> <cmd> <out_suffix> declare a pretty-printer for edited proofs") ::
-  ("--coqdoc",
-   Arg.Unit (fun ()->
-    opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
-  " use coqdoc to print Coq proofs") ::
-  common_options
+  let open Getopt in
+  [ KShort 'o', Hnd1 (AString, fun s -> output_dir := s),
+    "<dir> set output directory ('-' for stdout)";
+    KLong "context", Hnd0 (fun () -> opt_context := true),
+    " add context around the generated HTML code";
+    KLong "style", Hnd1 (ASymbol ["simpletree"; "table"], set_opt_style),
+    "[simpletree|table] style to use (default: '" ^ default_style ^ "')";
+    KLong "add_pp", Hnd1 (APair (',', AString, APair (',', AString, AString)),
+      fun (suf, (cmd, out)) -> opt_pp := (suf, (cmd, out)) :: !opt_pp),
+    "<suffix>,<cmd>,<out_suffix> declare a pretty-printer for edited\nproofs";
+    KLong "coqdoc", Hnd0
+      (fun () -> opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
+    " use coqdoc to print Coq proofs";
+  ]
 
 open Session_itp
 
 let run_file print_session fname =
-  let ses,_ = read_session fname in
+  let ses = read_session fname in
   let project_dir = get_dir ses in
   let output_dir =
     if !output_dir = "" then project_dir else !output_dir
@@ -287,8 +283,7 @@ end
 
 
 let run () =
-  let _,_,should_exit1 = read_env_spec () in
-  if should_exit1 then exit 1;
+  let _,_,_ = Whyconf.Args.complete_initialization () in
   match !opt_style with
     | Table -> iter_files (run_file Table.print_session)
     | SimpleTree -> iter_files (run_file Simple.print_session)

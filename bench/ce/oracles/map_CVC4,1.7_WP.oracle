@@ -1,15 +1,15 @@
 Weakest Precondition
-bench/ce/map.mlw M test_map'vc: Unknown (sat)
+bench/ce/map.mlw M test_map'vc: Timeout or Unknown
 Counter-example model:
 File map.mlw:
   Line 7:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
     "value" : {"type" : "Integer" , "val" : "3" } },
     {"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }
   Line 8:
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
     "val" : "0" } , "value" : {"type" : "Integer" , "val" : "3" } },
@@ -17,7 +17,7 @@ File map.mlw:
     "value" : {"type" : "Integer" , "val" : "3" } },
     {"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }
   Line 10:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
     "value" : {"type" : "Integer" , "val" : "3" } },
@@ -29,17 +29,17 @@ bench/ce/map.mlw M test_map_multidim1'vc: Unknown (sat)
 Counter-example model:
 File map.mlw:
   Line 13:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"others" : {"type" : "Array" ,
     "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }] } }
   Line 14:
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Array" ,
     "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }] } }
   Line 16:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
     "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
@@ -48,11 +48,11 @@ File map.mlw:
     {"others" : {"type" : "Array" ,
     "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }] } }
 
-bench/ce/map.mlw M test_map_multidim2'vc: Unknown (sat)
+bench/ce/map.mlw M test_map_multidim2'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
   Line 18:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
     "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
@@ -64,7 +64,7 @@ File ref.mlw:
     "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }] } }
 File map.mlw:
   Line 18:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
     "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
@@ -75,7 +75,7 @@ File map.mlw:
     {"others" : {"type" : "Array" ,
     "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }] } }
   Line 19:
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
     "val" : "0" } , "value" : {"type" : "Array" ,
@@ -89,7 +89,7 @@ File map.mlw:
     {"others" : {"type" : "Array" ,
     "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }] } }
   Line 23:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
     "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
@@ -102,17 +102,17 @@ File map.mlw:
     {"others" : {"type" : "Array" ,
     "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }] } }
 
-bench/ce/map.mlw M proj_map_test1'vc: Unknown (sat)
+bench/ce/map.mlw M proj_map_test1'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
   Line 18:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
     "value" : {"type" : "Integer" , "val" : "3" } },
     {"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }
   Line 20:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
     "value" : {"type" : "Integer" , "val" : "3" } },
@@ -121,13 +121,13 @@ File ref.mlw:
     {"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }
 File map.mlw:
   Line 25:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
     "value" : {"type" : "Integer" , "val" : "3" } },
     {"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }
   Line 26:
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
     "val" : "0" } , "value" : {"type" : "Integer" , "val" : "3" } },
@@ -135,7 +135,7 @@ File map.mlw:
     "value" : {"type" : "Integer" , "val" : "3" } },
     {"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }
   Line 28:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
     "value" : {"type" : "Integer" , "val" : "3" } },
@@ -143,17 +143,17 @@ File map.mlw:
     "value" : {"type" : "Integer" , "val" : "3" } },
     {"others" : {"type" : "Integer" , "val" : "0" } }] } }] } }
 
-bench/ce/map.mlw M proj_map_test2'vc: Unknown (sat)
+bench/ce/map.mlw M proj_map_test2'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
   Line 18:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
     "value" : {"type" : "Boolean" , "val" : true } },
     {"others" : {"type" : "Boolean" , "val" : false } }] } }] } }
   Line 20:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
     "value" : {"type" : "Boolean" , "val" : true } },
@@ -162,13 +162,13 @@ File ref.mlw:
     {"others" : {"type" : "Boolean" , "val" : false } }] } }] } }
 File map.mlw:
   Line 30:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
     "value" : {"type" : "Boolean" , "val" : true } },
     {"others" : {"type" : "Boolean" , "val" : false } }] } }] } }
   Line 31:
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
     "val" : "0" } , "value" : {"type" : "Boolean" , "val" : true } },
@@ -176,7 +176,7 @@ File map.mlw:
     "value" : {"type" : "Boolean" , "val" : true } },
     {"others" : {"type" : "Boolean" , "val" : false } }] } }] } }
   Line 33:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
     "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
     "value" : {"type" : "Boolean" , "val" : true } },

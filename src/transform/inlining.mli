@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -75,3 +75,9 @@ val addps : env -> Term.lsymbol -> Term.vsymbol list -> Term.term -> env
 val replacet : env -> Term.term -> Term.term
 val replacep : env -> Term.term -> Term.term
 *)
+
+open Term
+
+val t_replace_all : (vsymbol list * term) Mls.t -> term -> term
+(* [t_replace_all env t] replaces in [t] all occurrences of function
+   applicatios given in [env] *)

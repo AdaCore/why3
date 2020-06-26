@@ -1,0 +1,38 @@
+module Aliasing1
+
+	use int.Int
+	use ref.Ref
+
+	let b[@infer](_:int) : int
+	  ensures { result = 10 }
+	=
+		let i = ref 0 in
+		let j = i in
+		while !i < 10 do
+			variant { 10 - !i  }
+			i := !i + 1;
+		done;
+		!j
+
+	let c[@infer:oct](_:int) : int
+	  ensures { result = 10 }
+	=
+		let i = ref 0 in
+		let j = i in
+		while !i < 10 do
+			variant { 10 - !i  }
+			i := !i + 1;
+		done;
+		!j
+
+	let d[@infer:box](_:int) : int
+	  ensures { result = 10 }
+	=
+		let i = ref 0 in
+		let j = i in
+		while !i < 10 do
+			variant { 10 - !i  }
+			i := !i + 1;
+		done;
+		!j
+end
