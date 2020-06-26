@@ -19,7 +19,7 @@ module Alias
     /\ min p1 = min p2 /\ max p1 = max p2 /\ zone p1 = zone p2
 
 
-  val open_sep (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
+  val open_sep (r x:ptr limb) (ghost sx:int32) (y:ptr limb) (ghost sy:int32) :
                (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid r sx /\ valid x sx /\ valid y sy }
     requires { writable r }
@@ -47,7 +47,7 @@ module Alias
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
 
-  val close_sep (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+  val close_sep (r x:ptr limb) (ghost sx:int32) (y:ptr limb) (ghost sy:int32)
                 (nr nx ny:ptr limb) (ghost m:mem) : unit
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
@@ -78,7 +78,7 @@ module Alias
     writes { nr, nx, ny, nr.data, nx.data, ny.data,
              r.data, r.max, x.data, x.max, y.data, y.max, m.ok }
 
-  val open_rx (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
+  val open_rx (x:ptr limb) (ghost sx:int32) (y:ptr limb) (ghost sy:int32) :
                (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid x sx /\ valid y sy }
     requires { 0 <= sy <= sx }
@@ -104,7 +104,7 @@ module Alias
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
 
-  val close_rx (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+  val close_rx (x:ptr limb) (ghost sx:int32) (y:ptr limb) (ghost sy:int32)
                 (nr nx ny:ptr limb) (ghost m:mem) : unit
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
@@ -131,7 +131,7 @@ module Alias
     writes { nr, nx, ny, nr.data, nx.data, ny.data,
              x.data, x.max, y.data, y.max, m.ok }
 
-  val open_shift_sep (r x:ptr limb) (sz:int32) :
+  val open_shift_sep (r x:ptr limb) (ghost sz:int32) :
                      (nr:ptr limb, nx:ptr limb, ghost m:mem)
     requires { valid r sz /\ valid x sz }
     requires { 0 <= sz }
@@ -153,7 +153,7 @@ module Alias
     writes   { r, x }
     alias    { nr.data with nx.data }
 
-  val close_shift_sep (r x:ptr limb) (sz:int32) (nr nx:ptr limb) (ghost m:mem)
+  val close_shift_sep (r x:ptr limb) (ghost sz:int32) (nr nx:ptr limb) (ghost m:mem)
                       : unit
     alias    { nr.data with nx.data }
     requires { writable r /\ writable nr }

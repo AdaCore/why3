@@ -84,7 +84,7 @@ module ptralias.Alias
     \n};\
     \n\
     \nstatic inline struct __open_sep_result\
-    \nopen_sep (uint64_t *r, uint64_t *x, int32_t sx, uint64_t *y, int32_t sy)\
+    \nopen_sep (uint64_t *r, uint64_t *x, uint64_t *y)\
     \n{\
     \n  struct __open_sep_result result;\
     \n  result.__field_0 = r;\
@@ -94,7 +94,7 @@ module ptralias.Alias
     \n}\
     \n\
     \nstatic inline struct __open_rx_result\
-    \nopen_rx (uint64_t *x, int32_t sx, uint64_t *y, int32_t sy)\
+    \nopen_rx (uint64_t *x, uint64_t *y)\
     \n{\
     \n  struct __open_rx_result result;\
     \n  result.__field_0 = x;\
@@ -104,7 +104,7 @@ module ptralias.Alias
     \n}\
     \n\
     \nstatic inline struct __open_shift_sep_result\
-    \nopen_shift_sep (uint64_t *r, uint64_t *x, int32_t sz)\
+    \nopen_shift_sep (uint64_t *r, uint64_t *x)\
     \n{\
     \n  struct __open_shift_sep_result result;\
     \n  result.__field_0 = r;\
@@ -116,9 +116,9 @@ module ptralias.Alias
   syntax val open_sep "open_sep"
   syntax val open_rx "open_rx"
   syntax val open_shift_sep "open_shift_sep"
-  syntax val close_sep "IGNORE3(%1,%2,%4)" prec 1 15 15 15
-  syntax val close_rx "IGNORE3(%1,%2,%4)" prec 1 15 15 15
-  syntax val close_shift_sep "IGNORE2(%1,%2)" prec 1 15 15
+  syntax val close_sep "IGNORE3(%1, %2, %3)" prec 1 15 15 15
+  syntax val close_rx "IGNORE2(%1, %2)" prec 1 15 15
+  syntax val close_shift_sep "IGNORE2(%1, %2)" prec 1 15 15
 
 end
 
