@@ -196,7 +196,7 @@ module Add
      done;
      c
 
-  let add_n (*[@extraction:inline]*) (r x y:ptr limb) (sz:int32) : limb
+  let add_n [@extraction:inline] (r x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid r sz /\ valid x sz /\ valid y sz }
     requires { writable r }
@@ -238,7 +238,7 @@ module Add
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_n_rx (*[@extraction:inline]*) (x y:ptr limb) (sz:int32) : limb
+  let add_n_rx [@extraction:inline] (x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid x sz /\ valid y sz }
     requires { writable x }
@@ -269,8 +269,7 @@ module Add
                           (int32'int sz);
     res
 
-  let add (*[@extraction:inline]*) (r x:ptr limb) (sx:int32)
-                                      (y:ptr limb) (sy:int32) : limb
+  let add [@extraction:inline] (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid r sx /\ valid x sx /\ valid y sy }
     requires { writable r }
@@ -312,8 +311,7 @@ module Add
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_rx (*[@extraction:inline]*) (x:ptr limb) (sx:int32)
-                                  (y:ptr limb) (sy:int32) : limb
+  let add_rx [@extraction:inline] (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sy }
     requires { writable x }
@@ -345,8 +343,7 @@ module Add
                           (offset y) (offset oy) (int32'int sy);
     res
 
-  let add_ry (*[@extraction:inline]*) (x:ptr limb) (sx:int32)
-                                  (y:ptr limb) (sy:int32) : limb
+  let add_ry [@extraction:inline] (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sx }
     requires { writable y }
@@ -383,7 +380,7 @@ module Add
                           (offset x) (offset x) (int32'int sx);
     res
 
-  let add_n_rxy (*[@extraction:inline]*) (x:ptr limb) (sx:int32) : limb
+  let add_n_rxy [@extraction:inline] (x:ptr limb) (sx:int32) : limb
     requires { 0 <= sx }
     requires { writable x }
     requires { valid x sx }
