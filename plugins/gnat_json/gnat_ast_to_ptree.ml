@@ -5,6 +5,8 @@ open Ptree_constructors
 
 let debug = Debug.register_info_flag "gnat_ast" ~desc:"Output@ mlw@ file"
 
+let () = Debug.set_flag debug
+
 [@@@warning "-42"]
 
 exception Conversion_error of {node_id: int; message: string}

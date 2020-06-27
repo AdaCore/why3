@@ -188,8 +188,8 @@ let ada_ext_printer task =
 (* Registration of ada_terms plugin *)
 
 let () =
-  Env.register_format Pmodule.mlw_language ada_format ["adb"]
-    Lexer.read_channel ~desc:"WhyML@ for@ Ada"
+  Env.register_format ~desc:"WhyML@ for@ Ada"
+    Pmodule.mlw_language ada_format ["adb"] Lexer.read_channel
 
 let register_ada_terms format =
   Itp_server.add_registered_lang format ada_ext_printer;
@@ -198,5 +198,4 @@ let register_ada_terms format =
     ~parse_term ~parse_term_list ~parse_list_ident ~parse_qualid ~parse_list_qualid
 
 let () =
-  List.iter register_ada_terms
-    [ada_format; Lexer.whyml_format; Gnat_ast_to_ptree.gnat_json_format]
+  List.iter register_ada_terms [ada_format; Lexer.whyml_format]
