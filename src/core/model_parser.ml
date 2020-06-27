@@ -378,9 +378,10 @@ let split_model_trace_name mt_name =
   (* Mt_name is of the form "name[@kind[@*]]". Return (name, kind) *)
   let splitted = Strings.bounded_split '@' mt_name 3 in
   match splitted with
-  | [first] -> (first, "")
-  | first :: second :: _ -> (first, second)
-  | [] -> (mt_name, "")
+  | [] -> mt_name, Other
+  | [name] -> name, Other
+  | name :: "result" :: _ -> name, Result
+  | name :: _ :: _ -> name, Other
 
 let create_model_element ~name ~value ~attrs =
   let name, kind = split_model_trace_name name in
@@ -644,26 +645,23 @@ let print_model_element_json me_name_to_str fmt me =
   let print_value fmt = fprintf fmt "%a" print_model_value_sanit me.me_value in
   let print_kind fmt =
     (* We compute kinds using the attributes and locations *)
-    let me_kind = compute_kind me in
-    match me_kind with
+    match compute_kind me with
     | Result -> fprintf fmt "%a" Json_base.string "result"
-    | At l -> fprintf fmt "at %s" l
+    | At l -> fprintf fmt "@%s" l
     | Old -> fprintf fmt "%a" Json_base.string "old"
     | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
     | Other -> fprintf fmt "%a" Json_base.string "other"
-    | Loop_before -> fprintf fmt "%a" Json_base.string "before-loop"
+    | Loop_before -> fprintf fmt "%a" Json_base.string "before_loop"
     | Loop_previous_iteration ->
-        fprintf fmt "%a" Json_base.string "previous-iteration"
+        fprintf fmt "%a" Json_base.string "previous_iteration"
     | Loop_current_iteration ->
-        fprintf fmt "%a" Json_base.string "current-iteration" in
+        fprintf fmt "%a" Json_base.string "current_iteration" in
   let print_name fmt = Json_base.string fmt (me_name_to_str me.me_name) in
   let print_json_attrs fmt = print_attrs_json me.me_name fmt in
   let print_value_or_kind_or_name fmt printer = printer fmt in
-  Json_base.map_bindings
-    (fun s -> s)
-    print_value_or_kind_or_name fmt
-    [ ("name", print_name); ("attrs", print_json_attrs); ("value", print_value)
-    ; ("kind", print_kind) ]
+  Json_base.map_bindings (fun s -> s) print_value_or_kind_or_name fmt
+    [ ("name", print_name); ("attrs", print_json_attrs);
+      ("value", print_value) ; ("kind", print_kind) ]
 
 let print_model_elements_json me_name_to_str fmt model_elements =
   Json_base.list (print_model_element_json me_name_to_str) fmt model_elements
@@ -744,9 +742,7 @@ let fix_kind at_loc vc_attrs me =
     | None -> (
         match Opt.map (while_loop_kind vc_attrs) me.me_location with
         | Some (Some k) -> k
-        | _ ->
-            let _, type_s = split_model_trace_name me.me_name.men_name in
-            if type_s = "result" then Result else me.me_name.men_kind) in
+        | _ -> me.me_name.men_kind) in
   {me with me_name={me.me_name with men_kind}}
 
 let add_to_model ?vc_term_attrs model_element model =
