@@ -196,6 +196,10 @@ val print_model_json :
       - "kind": kind of counterexample element:
         - "result": Result of a function call (if the counter-example is for postcondition)
         - "old": Old value of function argument (if the counter-example is for postcondition)
+        - "@X": Value at label X
+        - "before_loop": Value before entering the loop
+        - "previous_iteration": Value in the previous loop iteration
+        - "current_iteration": Value in the current loop iteration
         - "error_message": The model element represents error message, not source-code element.
             The error message is saved in the name of the model element
         - "other"
