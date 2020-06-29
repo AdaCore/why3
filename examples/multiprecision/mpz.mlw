@@ -233,23 +233,19 @@ type mpz_mem = abstract { ptr: mpz_ptr; mutable ok: bool }
 
 val wmpz_struct_to_ptr (x:mpz_struct)
     : (res:mpz_ptr, ghost memo:mpz_mem)
-  writes  { mpz }
   ensures { res = x.addr }
   ensures { memo.ptr = res }
   ensures { memo.ok }
-  ensures { mpz.alloc[res] = 0 }
-  ensures { mpz.abs_size[res] = 0 }
-  ensures { mpz.readers[res] = old mpz.readers[res] }
-  ensures { forall y. y <> x.addr -> mpz_unchanged y mpz (old mpz) }
 
 val wmpz_tmp_decl [@extraction:c_declaration] () : mpz_struct
   writes  { mpz }
-  ensures { old mpz.readers[result.addr] = -2 }
+  ensures { old mpz.readers[result.addr] = -2 } (*result is fresh*)
   ensures { forall x. x <> result.addr -> mpz_unchanged x mpz (old mpz) }
   ensures { mpz.readers[result.addr] = 0 }
-            (*result is fresh*)
+  ensures { mpz.alloc[result.addr] = 0 }
+  ensures { mpz.abs_size[result.addr] = 0 }
 
-val wmpz_tmp_clear (x:mpz_ptr) (memo: mpz_mem) : unit
+val ghost wmpz_tmp_clear (x:mpz_ptr) (memo: mpz_mem) : unit
   requires { memo.ok }
   requires { x = memo.ptr }
   requires { -1 <= mpz.readers[x] <= 0 }
