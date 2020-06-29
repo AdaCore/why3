@@ -218,6 +218,30 @@
       | _ -> Loc.errorm ?loc "illegal kind qualifier" in
     unfold false d pat
 
+  (* TODO: fix locations and assert false *)
+  let mk_fun_lit (el,default) =
+     let default = match default with
+       | Some e -> e
+       | None -> if el = [] then assert false else snd (List.hd el)  in
+     let id_var = {id_str = "_x";id_ats = [];id_loc=Loc.dummy_position} in
+
+     let add_expr (e1,e2) e =
+       let var = {expr_desc = Eident (Qident id_var);
+                  expr_loc = Loc.dummy_position} in
+       let eq_id = {id_str = Ident.op_equ;id_ats = [];id_loc=Loc.dummy_position} in
+       let v_eq_e1 = Einfix (var,eq_id,e1) in
+       let v_eq_e1 = {expr_desc = v_eq_e1; expr_loc = Loc.dummy_position} in
+       {expr_desc = Eif (v_eq_e1,e2,e); expr_loc = Loc.dummy_position}
+     in
+
+     let ifte = List.fold_right add_expr el default in
+     let binder = (Loc.dummy_position, Some id_var, false, None) in
+     let pattern = {pat_desc = Ptree.Pvar id_var; pat_loc = Loc.dummy_position }in
+     let spec = { sp_pre = []; sp_post = []; sp_xpost = []; sp_reads = [];
+                  sp_writes = []; sp_alias = []; sp_variant = [];
+                  sp_checkrw = false; sp_diverge = false; sp_partial = false } in
+     Ptree.Efun ([binder], None, pattern, Ity.MaskVisible, spec, ifte)
+
 %}
 
 (* Tokens *)
@@ -817,31 +841,15 @@ term_arg: mk_term(term_arg_) { $1 }
 term_dot: mk_term(term_dot_) { $1 }
 
 term_arg_:
-| qualid                       { Tident $1 }
-| AMP qualid                   { Tasref $2 }
-| numeral                      { Tconst $1 }
-| STRING                       { Tconst (Constant.ConstStr $1) }
-| TRUE                         { Ttrue }
-| FALSE                        { Tfalse }
-| o = oppref ; a = term_arg    { Tidapp (Qident o, [a]) }
-| term_sub_                    { $1 }
-| LEFTSQBAR fun_lit BARRIGHTSQ { Tfunlit (fst $2,snd $2) }
-
-fun_lit:
-| (* epsilon *)                               { [], None }
-| fun_lit_arrow                               { $1 }
-| semicolon_list1(term)
-    { let mk_index_pair i t =
-        let const = Constant.int_const (BigInt.of_int i) in
-        let tconst = {term_desc = Tconst const; term_loc  = t.term_loc} in
-        tconst, t in
-      List.mapi mk_index_pair $1, None }
-
-fun_lit_arrow:
-| UNDERSCORE EQUALARROW term                   { [], Some $3 }
-| term EQUALARROW term                         { [$1, $3], None }
-| term EQUALARROW term SEMICOLON fun_lit_arrow
-    { ($1, $3) :: fst $5, snd $5 }
+| qualid                            { Tident $1 }
+| AMP qualid                        { Tasref $2 }
+| numeral                           { Tconst $1 }
+| STRING                            { Tconst (Constant.ConstStr $1) }
+| TRUE                              { Ttrue }
+| FALSE                             { Tfalse }
+| o = oppref ; a = term_arg         { Tidapp (Qident o, [a]) }
+| term_sub_                         { $1 }
+| LEFTSQBAR term_fun_lit BARRIGHTSQ { Tfunlit (fst $2,snd $2) }
 
 term_dot_:
 | lqualid                   { Tident $1 }
@@ -870,6 +878,16 @@ term_sub_:
     { Tidapp (rcut_op $5 $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ DOTDOT term rightsq
     { Tidapp (lcut_op $5 $startpos($2) $endpos($2), [$1;$4]) }
+
+term_fun_lit:
+| (* epsilon *)                     { [], None }
+| mapping_list_with_default(term)   { $1 }
+| semicolon_list1(term)
+    { let mk_index_pair i t =
+        let const = Constant.int_const (BigInt.of_int i) in
+        let tconst = {term_desc = Tconst const; term_loc  = t.term_loc} in
+        tconst, t in
+      List.mapi mk_index_pair $1, None }
 
 field_list1(X):
 | fl = semicolon_list1(separated_pair(lqualid, EQUAL, X)) { fl }
@@ -1218,6 +1236,17 @@ expr_arg_:
 | FALSE                     { Efalse }
 | o = oppref ; a = expr_arg { Eidapp (Qident o, [a]) }
 | expr_sub_                 { $1 }
+| LEFTSQBAR expr_fun_lit BARRIGHTSQ { mk_fun_lit $2 }
+
+expr_fun_lit:
+| (* epsilon *)                     { [], None }
+| mapping_list_with_default(expr)   { $1 }
+| semicolon_list1(expr)
+    { let mk_index_pair i e =
+        let const = Constant.int_const (BigInt.of_int i) in
+        let econst = {expr_desc = Econst const; expr_loc  = e.expr_loc} in
+        econst, e in
+      List.mapi mk_index_pair $1, None }
 
 expr_dot_:
 | lqualid                   { Eident $1 }
@@ -1643,3 +1672,9 @@ comma_list0(X):
 | x = X ; SEMICOLON ; xl = semicolon_list1(X) { x :: xl }
 
 located(X): X { $1, $startpos, $endpos }
+
+mapping_list_with_default(X):
+| UNDERSCORE EQUALARROW X option(SEMICOLON) { [], Some $3 }
+| X EQUALARROW X option(SEMICOLON)          { [$1, $3], None }
+| X EQUALARROW X SEMICOLON mapping_list_with_default(X)
+    { let l,d = $5 in ($1, $3) :: l, d }
