@@ -14,8 +14,8 @@ open Why3
 open Pmodule
 
 let usage_msg = sprintf
-  "Usage: %s [options] <file> <module>.<ident>...\n\
-   Run the interpreter on the given module symbols.\n"
+  "Usage: %s [options] <file> <expr>\n\
+   Execute the expression in the given file (and --use the necessary modules).\n"
   (Filename.basename Sys.argv.(0))
 
 let opt_file = ref None
