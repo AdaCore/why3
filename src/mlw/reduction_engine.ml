@@ -823,11 +823,13 @@ and reduce_eval eng st t ~orig sigma rem =
   | Tvar v ->
     begin
       match Ident.Mid.find v.vs_name eng.known_map with
-      | Decl.{d_node = Dlogic [(_ls, ls_defn)]} ->
+      | Decl.{d_node = Dlogic dl} ->
         incr rec_step_limit ;
+        let _, ls_defn = List.find (fun (ls, _) -> String.equal ls.ls_name.Ident.id_string v.vs_name.Ident.id_string) dl in
         let vs, t = Decl.open_ls_defn ls_defn in
         let aux vs t =
-          (* ε fc. λ vs. fc @ vs = t *)
+          (* Create ε fc. λ vs. fc @ vs = t to make the value from
+             known_map compatible to reduce_func_app *)
           let ty = Opt.get t.t_ty in
           let app_ty = Ty.ty_func vs.vs_ty ty in
           let fc = create_vsymbol (Ident.id_fresh "fc") app_ty in
