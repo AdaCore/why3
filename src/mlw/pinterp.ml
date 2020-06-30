@@ -629,7 +629,7 @@ let report_cntr_head fmt (ctx, msg, term) =
   let pp_pos fmt loc =
     let f, l, b, e = Loc.get loc in
     fprintf fmt "%s, line %d, characters %d-%d" f l b e in
-  fprintf fmt "@[<v2>%s %s" ctx.c_desc msg;
+  fprintf fmt "@[<v>%s %s" ctx.c_desc msg;
   ( match ctx.c_trigger_loc, term.t_loc with
     | Some t1, Some t2 ->
         fprintf fmt " at %a@,Defined at %a" pp_pos t1 pp_pos t2
@@ -646,7 +646,7 @@ let pp_vsenv pp_value fmt =
   fprintf fmt "%a" (pp_bindings ~delims ~sep Pretty.print_vs pp_value)
 
 let report_cntr fmt (ctx, msg, term) =
-  fprintf fmt "@[<v2>%a@," report_cntr_head (ctx, msg, term);
+  fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
   fprintf fmt "@[<hov2>Term: %a@]@," Pretty.print_term term ;
   fprintf fmt "@[<hov2>Variables: %a@]"
     (pp_vsenv Pretty.print_term)
@@ -772,7 +772,7 @@ let check_term ctx t =
   | t' ->
       eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t) ;
       if Debug.test_flag debug_rac then
-        eprintf "  @[<hv2>Result: %a@]@." Pretty.print_term t'
+        eprintf "@[<hv2>Result: %a@]@." Pretty.print_term t'
   | exception e when Debug.test_flag debug_rac ->
       eprintf "%a@." report_cntr (ctx, "WHEN TRYING", t) ;
       raise e
