@@ -641,9 +641,10 @@ let report_cntr_head fmt (ctx, msg, term) =
 let cmp_vs (vs1, _) (vs2, _) =
   String.compare vs1.vs_name.id_string vs2.vs_name.id_string
 
-let pp_vsenv pp_value fmt =
+let pp_vsenv pp_value fmt bs =
   let delims = Pp.(nothing, nothing) and sep = Pp.comma in
-  fprintf fmt "%a" (pp_bindings ~delims ~sep Pretty.print_vs pp_value)
+  let bs = List.filter (fun (vs, _) -> not (Sattr.mem Ident.proxy_attr vs.vs_name.id_attrs)) bs in
+  fprintf fmt "%a" (pp_bindings ~delims ~sep Pretty.print_vs pp_value) bs
 
 let report_cntr fmt (ctx, msg, term) =
   fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
