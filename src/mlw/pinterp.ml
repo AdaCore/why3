@@ -734,7 +734,7 @@ let try_add_rule _id t eng =
     @param t Term to be evaluated
     @return A reduction of term [t]
   *)
-let reduce_term env known rule_terms vsenv t =
+let reduce_term ?(mt = Mtv.empty) ?(mv = Mvs.empty) env known rule_terms vsenv t =
   let open Reduction_engine in
   let params =
     { compute_builtin= true;
@@ -742,27 +742,21 @@ let reduce_term env known rule_terms vsenv t =
       compute_def_set= Sls.empty } in
   let eng = create params env known in
   let eng = Mid.fold try_add_rule rule_terms eng in
-  let vsenv = (* TODO better fix typing of the variables in vsenv *)
-    let vars = t_freevars Mvs.empty t in
-    Mvs.filter (fun vs _ -> Mvs.contains vars vs) vsenv in
-  (* (\* Cannot substite abstract with concrete types (only type variables) *\)
-   * let mt, mv, vsenv =
-   *   let aux vs t (mt, mv, vsenv) =
-   *     let ty = Opt.get t.t_ty in
-   *     let vs' = create_vsymbol (id_clone vs.vs_name) ty in
-   *     (\* eprintf "TY MATCH @[<h>%a@] @[%a@]@." Pretty.print_ty vs.vs_ty Pretty.print_ty ty; *\)
-   *     let (\* mt, *\) ty0 = (\* ty_dispatch dispatch mt *\) vs.vs_ty in
-   *     let mt = ty_match mt ty0 ty in
-   *     let mv = Mvs.add vs (t_var vs') mv in
-   *     let vsenv = Mvs.add vs' t vsenv in
-   *     mt, mv, vsenv in
-   *   Mvs.fold aux vsenv (Mtv.empty, Mvs.empty, Mvs.empty) in
-   * let t = t_ty_subst mt mv t in *)
+  let vsenv, mt, mv =
+    let aux vs t (vsenv, mt, mv) =
+      let ty = Opt.get t.t_ty in
+      let vs' = create_vsymbol (id_clone vs.vs_name) ty in
+      let vsenv = Mvs.add vs' t vsenv in
+      let mt = ty_match mt vs.vs_ty ty in
+      let mv = Mvs.add vs (t_var vs') mv in
+      vsenv, mt, mv in
+    Mvs.fold aux vsenv (Mvs.empty, mt, mv) in
+  let t = t_ty_subst mt mv t in
   normalize ~limit:1000 eng vsenv t
 
 (** Evaluate a term and raise an exception [Contr] if the result is false. *)
-let check_term ctx t =
-  match reduce_term ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
+let check_term ?mt ?mv ctx t =
+  match reduce_term ?mt ?mv ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
   | {t_node= Ttrue} ->
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "is ok", t)
@@ -1086,20 +1080,18 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
   ( if rac then
       (* Check a post-condition [t] by binding the result variable to
          the term [vt] representing the result value. *)
-      let check_post ctx (vt : term) (mt : ty Mtv.t) (t : term) =
+      let check_post ctx vt t =
         let vs, t = open_post t in
-        let mt = ty_match mt vs.vs_ty (oty_type vt.t_ty) in
-        let vsenv = Mvs.singleton vs vt in
-        let t = t_ty_subst mt vsenv t in
-        check_term ctx t in
-      (* Checking shared between normal and exceptional post-conditions *)
+        let mt = ty_match Mtv.empty vs.vs_ty (oty_type vt.t_ty) in
+        let ctx = {ctx with c_vsenv= Mvs.add vs vt ctx.c_vsenv} in
+        check_term ~mt ctx t in
       let check_posts desc v posts =
         let env' = {env' with vsenv= Mvs.union (fun _ _ v -> Some v) env'.vsenv oldies} in
         let ctx = cntr_ctx desc ?trigger_loc:loc env' in
         let vt = term_of_value v in
-        let post = (* Substitute parameters in postconditions *)
+        let posts = (* Substitute parameters in postconditions *)
           List.map (t_ty_subst mt mv) posts in
-        List.iter (check_post ctx vt mt) post in
+        List.iter (check_post ctx vt) posts in
       match res with
       | Normal v ->
           check_posts (desc "Postcondition") v rs.rs_cty.cty_post
