@@ -47,7 +47,6 @@ type dispatch_ctx
 val empty_dispatch : dispatch_ctx
 
 val add_dispatch :
-  Env.env ->
   source:Pmodule.pmodule ->
   target:Pmodule.pmodule ->
   dispatch_ctx ->

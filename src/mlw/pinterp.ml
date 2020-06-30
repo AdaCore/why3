@@ -55,7 +55,7 @@ type dispatch_ctx = {
 
 let empty_dispatch = {disp_rs= Mrs.empty; disp_ty= Mts.empty}
 
-let add_dispatch env ~source:pm1 ~target:pm2 disp_ctx =
+let add_dispatch ~source:pm1 ~target:pm2 disp_ctx =
   let open Pmodule in
   let add_rs_rev_ls disp_ctx =
     let for_rs _ rs1 disp_ctx =
@@ -618,8 +618,8 @@ let find_definition env (rs: rsymbol) =
 type cntr_ctx =
   { c_desc: string;
     c_trigger_loc: Loc.position option;
-    c_env: Env.env;
-    c_known: Decl.known_map;
+    c_env: Env.env; (* to get builtins in Reduction_engine.create *)
+    c_known: Decl.known_map; (* becomes Reduction_engine.engine.known_map *)
     c_rule_terms: term Mid.t;
     c_vsenv: term Mvs.t }
 
@@ -685,18 +685,15 @@ let add_known_rule_term id pd (known, rule_terms) =
         pd.Pdecl.pd_pure ;
       failwith "Cannot process pure declarations"
 
-let add_fun rs cexp known =
+let add_fun_to_known rs cexp known =
   try
     let t =
       match cexp.c_node with
       | Cfun e -> Opt.get_exn Exit (term_of_expr ~prop:false e)
       | _ -> raise Exit in
-    let ls =
-      let preid = id_clone rs.rs_name in
-      let ty_args =
-        List.map (fun pv -> Ity.ty_of_ity pv.pv_ity) rs.rs_cty.cty_args in
-      let ty_res = Ity.ty_of_ity rs.rs_cty.cty_result in
-      Term.create_lsymbol preid ty_args (Some ty_res) in
+    let ty_args = List.map (fun pv -> Ity.ty_of_ity pv.pv_ity) rs.rs_cty.cty_args in
+    let ty_res = Ity.ty_of_ity rs.rs_cty.cty_result in
+    let ls = Term.create_lsymbol (id_clone rs.rs_name) ty_args (Some ty_res) in
     let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
     let ldecl = Decl.make_ls_defn ls vs_args t in
     let decl = Decl.create_logic_decl [ldecl] in
@@ -704,17 +701,17 @@ let add_fun rs cexp known =
   with Exit -> known
 
 let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env =
-  let c_known, c_rule_terms =
+  let known, rule_terms =
     Mid.fold add_known_rule_term env.known (Mid.empty, Mid.empty) in
-  let c_known = Mrs.fold add_fun env.funenv c_known in
-  let vsenv' = Mvs.map term_of_value env.vsenv in
-  let c_vsenv = Mvs.union (fun _ _ t -> Some t) vsenv vsenv' in
+  let known = Mrs.fold add_fun_to_known env.funenv known in
+  let vsenv = Mvs.union (fun _ _ t -> Some t)
+      vsenv (Mvs.map term_of_value env.vsenv) in
   { c_env= env.env;
     c_desc= desc;
     c_trigger_loc= trigger_loc;
-    c_known;
-    c_rule_terms;
-    c_vsenv }
+    c_known= known;
+    c_rule_terms= rule_terms;
+    c_vsenv= vsenv }
 
 (* TERM EVALUATION *)
 
@@ -834,8 +831,7 @@ let rec eval_expr ~rac env (e : expr) : result =
       Normal (value (ty_of_ity e.e_ity) (Vnum (big_int_of_const c)))
   | Econst (Constant.ConstReal r) ->
       (* ConstReal can be float or real *)
-      let is_real ity = ity_equal ity ity_real in
-      if is_real e.e_ity then
+      if ity_equal e.e_ity ity_real then
         let p, q = compute_fraction r.Number.rl_real in
         let sp, sq = BigInt.to_string p, BigInt.to_string q in
         try Normal (value ty_real (Vreal (real_from_fraction sp sq)))
@@ -1041,27 +1037,25 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
           eval_expr ~rac env e
       | _ -> assert false
     else
-      let call env d =
-        match d.c_node with
-        | Capp (rs', pvl) ->
-            exec_call ~rac env rs' (pvl @ arg_pvs) ity_result
-        | Cpur _ -> assert false (* TODO ? *)
-        | Cany ->
-            eprintf "Cannot compute any function %a (add dispatch?)@." print_decoded rs.rs_name.id_string;
-            raise CannotCompute
-        | Cfun body ->
-            let pvsl = d.c_cty.cty_args in
-            let env' = multibind_pvs pvsl arg_vs env in
-            Debug.dprintf debug "@[Evaluating function body of %s@]@."
-              rs.rs_name.id_string ;
-            let r = eval_expr ~rac env' body in
-            Debug.dprintf debug "@[Return from function %s@ result@ %a@]@."
-              rs.rs_name.id_string print_logic_result r ;
-            r in
       match find_definition env rs with
       | LocalFunction (locals, ce) -> (
           let env = add_local_funs locals env in
-          call env d
+          match ce.c_node with
+            | Capp (rs', pvl) ->
+                exec_call ~rac env rs' (pvl @ arg_pvs) ity_result
+            | Cfun body ->
+                let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
+                Debug.dprintf debug "@[Evaluating function body of %s@]@."
+                  rs.rs_name.id_string ;
+                let r = eval_expr ~rac env' body in
+                Debug.dprintf debug "@[Return from function %s@ result@ %a@]@."
+                  rs.rs_name.id_string print_logic_result r ;
+                r
+            | Cany ->
+                eprintf "Cannot compute any function %a (add dispatch?)@."
+                  print_decoded rs.rs_name.id_string;
+                raise CannotCompute
+            | Cpur _ -> assert false (* TODO ? *) )
       | Builtin f ->
           Debug.dprintf debug "@[Evaluating builtin function %s@]@."
             rs.rs_name.id_string ;

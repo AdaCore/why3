@@ -68,7 +68,7 @@ let prepare_dispatch env l =
   let aux ((p1, m1), (p2, m2)) =
     read_module env [p1] m1,
     read_module env [p2] m2 in
-  List.fold_right (fun (source, target) -> Pinterp.add_dispatch env ~source ~target)
+  List.fold_right (fun (source, target) -> Pinterp.add_dispatch ~source ~target)
     (List.map aux l) Pinterp.empty_dispatch
 
 let find_module env file q =
