@@ -565,7 +565,7 @@ and default_value_of_types known ts l1 l2 ty : value =
 
 type routine_defn =
   | Builtin of (rsymbol -> value list -> value)
-  | Function of (rsymbol * cexp) list * cexp
+  | LocalFunction of (rsymbol * cexp) list * cexp
   | Constructor of Pdecl.its_defn
   | Projection of Pdecl.its_defn
 
@@ -594,10 +594,10 @@ let find_global_definition kn rs =
   match (Mid.find rs.rs_name kn).Pdecl.pd_node with
   | Pdecl.PDtype dl -> find_constr_or_proj dl rs
   | Pdecl.PDlet (LDvar _) -> raise Not_found
-  | Pdecl.PDlet (LDsym (_, ce)) -> Function ([], ce)
+  | Pdecl.PDlet (LDsym (_, ce)) -> LocalFunction ([], ce)
   | Pdecl.PDlet (LDrec dl) ->
       let locs = List.map (fun d -> d.rec_rsym, d.rec_fun) dl in
-      Function (locs, find_def rs dl)
+      LocalFunction (locs, find_def rs dl)
   | Pdecl.PDexn _ -> raise Not_found
   | Pdecl.PDpure -> raise Not_found
 
@@ -608,7 +608,7 @@ let find_definition env (rs: rsymbol) =
   | exception Not_found ->
       (* then try if it is a local function *)
       match Mrs.find rs env.funenv with
-      | f -> Function ([], f)
+      | f -> LocalFunction ([], f)
       | exception Not_found ->
           (* else look for a global function *)
           find_global_definition env.known rs
@@ -1058,7 +1058,7 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
               rs.rs_name.id_string print_logic_result r ;
             r in
       match find_definition env rs with
-      | Function (locals, d) ->
+      | LocalFunction (locals, ce) -> (
           let env = add_local_funs locals env in
           call env d
       | Builtin f ->
