@@ -453,6 +453,18 @@ module ArrayInt63
     ensures  { result.length = a.length }
     ensures  { forall i. 0 <= i < result.length -> result[i] = a[i] }
 
+  let sub (a: array63) (ofs: int63) (len: int63) : array63
+    requires { 0 <= ofs /\ 0 <= len /\ ofs + len <= length a }
+    ensures  { length result = len }
+    ensures  { forall i. 0 <= i < len -> result[i] = a[ofs + i] }
+  =
+    let b = make len 0 in
+    for i = 0 to len - 1 do
+      invariant { forall k. 0 <= k < i -> b[k] = a[ofs+k] }
+      b[i] <- a[ofs + i];
+    done;
+    b
+
   use seq.Exchange
 
   let swap (a:array63) (i j:int63) : unit
@@ -462,5 +474,17 @@ module ArrayInt63
   = let v = a[i] in
     a[i] <- a[j];
     a[j] <- v
+
+  let init (n: int63) (f: int63 -> int63) : array63
+    requires { [@expl:array creation size] n >= 0 }
+    ensures  { forall i: int63. 0 <= i < n -> result[i] = f i }
+    ensures  { length result = n }
+  =
+    let a = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { forall k: int63. 0 <= k < i -> a[k] = f k }
+      a[i] <- f i
+    done;
+    a
 
 end
