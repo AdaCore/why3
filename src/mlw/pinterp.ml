@@ -846,8 +846,10 @@ let rec eval_expr ~rac env (e : expr) : result =
         let ty = ty_inst mt (ty_of_ity e.e_ity) in
         Normal (value ty (Vfun (cl, arg.pv_vs, e')))
     | Cany -> raise CannotCompute
+    | Capp _ when cty.cty_args <> [] ->
+        eprintf "Cannot compute partial function application";
+        raise CannotCompute
     | Capp (rs, pvsl) ->
-        assert (cty.cty_args = []) ;
         assert (ce.c_cty.cty_args = []) ;
         exec_call ~rac ?loc:e.e_loc env rs pvsl e.e_ity )
   | Eassign l ->
