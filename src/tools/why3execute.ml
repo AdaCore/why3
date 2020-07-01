@@ -64,6 +64,11 @@ let config, _, env =
 let () =
   if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
 
+let () =
+  if !enable_rac && !dispatch <> [] then (
+    Format.eprintf "RAC and dispatch currently not supported at the same time";
+    exit 1 )
+
 let prepare_dispatch env l =
   let aux ((p1, m1), (p2, m2)) =
     read_module env [p1] m1,
