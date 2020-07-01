@@ -625,6 +625,9 @@ type cntr_ctx =
 
 exception Contr of cntr_ctx * term
 
+let cntr_desc str id =
+  asprintf "%s of %a" str print_decoded id.id_string
+
 let report_cntr_head fmt (ctx, msg, term) =
   let pp_pos fmt loc =
     let f, l, b, e = Loc.get loc in
@@ -638,20 +641,20 @@ let report_cntr_head fmt (ctx, msg, term) =
     | None, None -> () );
   fprintf fmt "@]"
 
-let cmp_vs (vs1, _) (vs2, _) =
-  String.compare vs1.vs_name.id_string vs2.vs_name.id_string
 
-let pp_vsenv pp_value fmt bs =
+let pp_vsenv pp_value fmt =
   let delims = Pp.(nothing, nothing) and sep = Pp.comma in
-  let bs = List.filter (fun (vs, _) -> not (Sattr.mem Ident.proxy_attr vs.vs_name.id_attrs)) bs in
-  fprintf fmt "%a" (pp_bindings ~delims ~sep Pretty.print_vs pp_value) bs
+  fprintf fmt "%a" (pp_bindings ~delims ~sep Pretty.print_vs pp_value)
 
 let report_cntr fmt (ctx, msg, term) =
+  let cmp_vs (vs1, _) (vs2, _) =
+    String.compare vs1.vs_name.id_string vs2.vs_name.id_string in
+  let mvs = t_freevars Mvs.empty term in
   fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
   fprintf fmt "@[<hov2>Term: %a@]@," Pretty.print_term term ;
   fprintf fmt "@[<hov2>Variables: %a@]"
     (pp_vsenv Pretty.print_term)
-    (List.sort cmp_vs (Mvs.bindings ctx.c_vsenv)) ;
+    (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_vsenv)));
   fprintf fmt "@]"
 
 let add_known_rule_term id pd (known, rule_terms) =
@@ -1128,11 +1131,15 @@ let eval_global_fundef ~rac env disp_ctx mod_known locals body =
 let report_eval_result body fmt (res, final_env) =
   ( match res with
   | Normal _ ->
-      fprintf fmt "@[<hov2>result:@ %a@ =@ %a@]@,@[<hov2>globals:@ %a@]"
-        print_ity body.e_ity print_logic_result res (pp_vsenv print_value) (Mvs.bindings final_env)
+      fprintf fmt "@[<hov2>result:@ %a@ =@ %a@]@,"
+        print_ity body.e_ity print_logic_result res;
+      fprintf fmt "@[<hov2>globals:@ %a@]"
+        (pp_vsenv print_value) (Mvs.bindings final_env)
   | Excep _ ->
-      fprintf fmt "@[<hov2>exceptional result:@ %a@]@,@[<hov2>globals:@ %a@]"
-        print_logic_result res (pp_vsenv print_value) (Mvs.bindings final_env)
+      fprintf fmt "@[<hov2>exceptional result:@ %a@]@,"
+        print_logic_result res;
+      fprintf fmt "@[<hov2>globals:@ %a@]"
+        (pp_vsenv print_value) (Mvs.bindings final_env)
   | Irred _ | Fun _ ->
       fprintf fmt "@[<hov2>Execution error: %a@]@," print_logic_result res ;
       fprintf fmt "@[globals:@ %a@]" (pp_vsenv print_value) (Mvs.bindings final_env) ) ;
