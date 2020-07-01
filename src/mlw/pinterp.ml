@@ -258,28 +258,8 @@ let add_local_funs locals env =
 
 let bind_vs vs v env = {env with vsenv= Mvs.add vs v env.vsenv}
 let bind_pvs pv v_t env = bind_vs pv.pv_vs v_t env
+let multibind_pvs l tl env = List.fold_right2 bind_pvs l tl env
 
-let multibind_pvs l tl env =
-  List.fold_right2 bind_pvs l tl env
-
-(** [multibind_pvs' ty_disp pvs vs (env, mt, mv)] binds values [vs] to variables [pvs],
-    updating the type mapping [mt] by the bindings. Values are possibly
-    dispatching values by [ty_disp], adding entries from original variables to
-    new variables with dispatched types in [mv]. *)
-let multibind_pvs' ty_disp pvs vs (env, mt, mv) =
-  let aux pv v (env, mt, mv) =
-    let vs = create_vsymbol (id_clone pv.pv_vs.vs_name) v.v_ty in
-    let ty = ty_dispatch ty_disp pv.pv_vs.vs_ty in
-    let env = bind_vs vs v env in
-    let mt = ty_match mt ty v.v_ty in
-    let mv = Mvs.add pv.pv_vs (t_var vs) mv in
-    env, mt, mv in
-  List.fold_right2 aux pvs vs (env, mt, mv)
-
-let print_vsenv_ty fmt m =
-  let pp_vs = pp_typed Pretty.print_vs (fun vs -> vs.vs_ty) in
-  let pp_value = pp_typed print_value (fun v -> v.v_ty) in
-  fprintf fmt "@[<v 0>%a@]" (pp_bindings pp_vs pp_value) (Mvs.bindings m)
 
 (* BUILTINS *)
 
@@ -728,6 +708,14 @@ let try_add_rule _id t eng =
      *   id.id_string Pretty.print_term t s; *)
     eng
 
+let fix_vsenv_value vs t (vsenv, mt, mv) =
+  let ty = Opt.get t.t_ty in
+  let vs' = create_vsymbol (id_clone vs.vs_name) ty in
+  let vsenv = Mvs.add vs' t vsenv in
+  let mt = ty_match mt vs.vs_ty ty in
+  let mv = Mvs.add vs (t_var vs') mv in
+  vsenv, mt, mv
+
 (** Reduce a term using the reduction engine.
 
     @param env Why3 environment
@@ -745,21 +733,13 @@ let reduce_term ?(mt = Mtv.empty) ?(mv = Mvs.empty) env known rule_terms vsenv t
       compute_def_set= Sls.empty } in
   let eng = create params env known in
   let eng = Mid.fold try_add_rule rule_terms eng in
-  let vsenv, mt, mv =
-    let aux vs t (vsenv, mt, mv) =
-      let ty = Opt.get t.t_ty in
-      let vs' = create_vsymbol (id_clone vs.vs_name) ty in
-      let vsenv = Mvs.add vs' t vsenv in
-      let mt = ty_match mt vs.vs_ty ty in
-      let mv = Mvs.add vs (t_var vs') mv in
-      vsenv, mt, mv in
-    Mvs.fold aux vsenv (Mvs.empty, mt, mv) in
+  let vsenv, mt, mv = Mvs.fold fix_vsenv_value vsenv (Mvs.empty, mt, mv) in
   let t = t_ty_subst mt mv t in
   normalize ~limit:1000 eng vsenv t
 
 (** Evaluate a term and raise an exception [Contr] if the result is false. *)
-let check_term ?mt ?mv ctx t =
-  match reduce_term ?mt ?mv ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
+let check_term ctx t =
+  match reduce_term ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
   | {t_node= Ttrue} ->
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "is ok", t)
@@ -773,6 +753,19 @@ let check_term ?mt ?mv ctx t =
       raise e
 
 let check_terms ctx = List.iter (check_term ctx)
+
+(* Check a post-condition [t] by binding the result variable to
+   the term [vt] representing the result value. *)
+let check_post ctx vt t =
+  let vs, t = open_post t in
+  let ctx = {ctx with c_vsenv= Mvs.add vs vt ctx.c_vsenv} in
+  check_term ctx t
+
+let check_posts desc trigger_loc env oldies v posts =
+  let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
+  let ctx = cntr_ctx desc ?trigger_loc env in
+  let vt = term_of_value v in
+  List.iter (check_post ctx vt) posts
 
 (* EXPRESSION EVALUATION *)
 
@@ -1009,21 +1002,15 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
     | rs, known -> rs, {env with known}
     | exception Not_found -> rs, env in
   let arg_vs = List.map (get_pvs env) arg_pvs in
-  let env', mt, mv = multibind_pvs' env.disp_ctx.disp_ty rs.rs_cty.cty_args arg_vs (env, Mtv.empty, Mvs.empty) in
-  let res_ty = ty_inst mt (ty_of_ity ity_result) in
+  let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let oldies = (* cty_oldies: {old_v -> v} *)
     let aux old_pv pv oldies =
-      try Mvs.add old_pv.pv_vs (freeze (Mvs.find pv.pv_vs env.vsenv)) oldies
-      with Not_found ->
-        oldies in
+      Mvs.add old_pv.pv_vs (freeze (Mvs.find pv.pv_vs env.vsenv)) oldies in
     Mpv.fold aux rs.rs_cty.cty_oldies Mvs.empty in
-  let desc str = asprintf "%s of %a" str print_decoded rs.rs_name.id_string in
   if rac then (
     (* TODO variant *)
-    let ctx = cntr_ctx (desc "Precondition") ?trigger_loc:loc env' in
-    let pre = (* Substitute paramaters in preconditions *)
-      List.map (t_ty_subst mt mv) rs.rs_cty.cty_pre in
-    check_terms ctx pre );
+    let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
+    check_terms ctx rs.rs_cty.cty_pre );
   let res =
     if rs_equal rs rs_func_app then
       match arg_vs with
@@ -1061,11 +1048,15 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
             rs.rs_name.id_string print_logic_result r ;
           r
       | Constructor _ ->
-          Debug.dprintf debug "[interp] create record with type %a@." print_ity
-            ity_result ;
-          (* FIXME : put a ref only on mutable fields *)
-          let args' = List.map ref arg_vs in
-          Normal (value res_ty (Vconstr (rs, args')))
+          Debug.dprintf debug "[interp] create record with type %a@."
+            print_ity ity_result;
+          let match_pv_v mt pv v =
+            let ty = ty_dispatch env.disp_ctx.disp_ty pv.pv_vs.vs_ty in
+            ty_match mt ty v.v_ty in
+          let mt = List.fold_left2 match_pv_v Mtv.empty rs.rs_cty.cty_args arg_vs in
+          let ty = ty_inst mt (ty_of_ity ity_result) in
+          let fs = List.map mk_field arg_vs in
+          Normal (value ty (Vconstr (rs, fs)))
       | Projection _d -> (
         match rs.rs_field, arg_vs with
         | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
@@ -1081,25 +1072,14 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
             rs.rs_name.id_string ;
           raise CannotCompute in
   ( if rac then
-      (* Check a post-condition [t] by binding the result variable to
-         the term [vt] representing the result value. *)
-      let check_post ctx vt t =
-        let vs, t = open_post t in
-        let mt = ty_match Mtv.empty vs.vs_ty (oty_type vt.t_ty) in
-        let ctx = {ctx with c_vsenv= Mvs.add vs vt ctx.c_vsenv} in
-        check_term ~mt ctx t in
-      let check_posts desc v posts =
-        let env' = {env' with vsenv= Mvs.union (fun _ _ v -> Some v) env'.vsenv oldies} in
-        let ctx = cntr_ctx desc ?trigger_loc:loc env' in
-        let vt = term_of_value v in
-        let posts = (* Substitute parameters in postconditions *)
-          List.map (t_ty_subst mt mv) posts in
-        List.iter (check_post ctx vt) posts in
       match res with
       | Normal v ->
-          check_posts (desc "Postcondition") v rs.rs_cty.cty_post
+          let desc = cntr_desc "Postcondition" rs.rs_name in
+          check_posts desc loc env oldies v rs.rs_cty.cty_post
       | Excep (xs, v) ->
-          check_posts (desc "Exceptional postcondition") v (Mxs.find xs rs.rs_cty.cty_xpost)
+          let desc = cntr_desc "Exceptional postcondition" rs.rs_name in
+          let posts = Mxs.find xs rs.rs_cty.cty_xpost in
+          check_posts desc loc env oldies v posts
       | _ -> () );
   res
 
