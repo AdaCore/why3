@@ -36,7 +36,6 @@ let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, r
 let pp_typed pp ty fmt x =
   fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x)
 
-
 (* EXCEPTIONS *)
 
 exception NoMatch
@@ -144,7 +143,12 @@ and value_desc =
   | Vvoid
   | Vfun of value Mvs.t (* closure *) * vsymbol * expr
 
-and field = value ref
+and field = Field of value ref
+
+let mk_field v = Field (ref v)
+let field_get (Field r) = r.contents
+
+let constr rs vl = Vconstr (rs, List.map mk_field vl)
 
 let rec freeze v = match v.v_desc with
   | Vconstr (rs, fs) ->
@@ -152,13 +156,11 @@ let rec freeze v = match v.v_desc with
       {v with v_desc= Vconstr (rs, fs)}
   | _ -> v
 
-and freeze_field r = ref (freeze !r)
+and freeze_field f = mk_field (field_get f)
 
 let value ty desc = {v_desc= desc; v_ty= ty}
 let v_desc v = v.v_desc
 let v_ty v = v.v_ty
-let field_get (f : field) = f.contents
-let constr rs vl = Vconstr (rs, List.map ref vl)
 
 let mode_to_string m =
   match m with
@@ -222,7 +224,7 @@ let rec term_of_value' mt v : ty Mtv.t * term =
        * t_lambda [arg] [] t *)
   | _ -> Format.kasprintf failwith "term_of_value: %a" print_value v
 
-and term_of_field mt r = term_of_value' mt r.contents
+and term_of_field mt f = term_of_value' mt (field_get f)
 
 let term_of_value t = snd (term_of_value' Mtv.empty t)
 
@@ -538,7 +540,7 @@ and default_value_of_types known ts l1 l2 ty : value =
   let subst = its_match_regs ts l1 l2 in
   let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
   let tyl = List.map (ity_full_inst subst) ityl in
-  let fl = List.map (fun ity -> ref (default_value_of_type known ity)) tyl in
+  let fl = List.map (fun ity -> mk_field (default_value_of_type known ity)) tyl in
   value ty (Vconstr (cs, fl))
 
 (* ROUTINE DEFINITIONS *)
@@ -861,9 +863,9 @@ let rec eval_expr ~rac env (e : expr) : result =
             | _ -> assert false in
           let rec aux constr_args args =
             match constr_args, args with
-            | pv :: pvl, v :: vl ->
+            | pv :: pvl, Field r :: vl ->
                 if pv_equal pv (fd_of_rs rs) then
-                  v := get_pvs env value
+                  r := get_pvs env value
                 else
                   aux pvl vl
             | _ -> raise CannotCompute in
