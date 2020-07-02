@@ -186,7 +186,7 @@ module Sub
      done;
      b
 
-  let sub_n (*[@extraction:inline]*) (r x y:ptr limb) (sz:int32) : limb
+  let sub_n [@extraction:inline] (r x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid r sz /\ valid x sz /\ valid y sz }
     requires { writable r }
@@ -228,7 +228,7 @@ module Sub
                 = (pelts oy)[offset y + j] };
     res
 
-  let sub_n_rx (*[@extraction:inline]*) (x y:ptr limb) (sz:int32) : limb
+  let sub_n_rx [@extraction:inline] (x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid x sz /\ valid y sz }
     requires { writable x }
@@ -259,7 +259,7 @@ module Sub
                           (int32'int sz);
     res
 
-  let sub_n_ry (*[@extraction:inline]*) (x y:ptr limb) (sz:int32) : limb
+  let sub_n_ry [@extraction:inline] (x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid x sz /\ valid y sz }
     requires { writable y }
@@ -290,8 +290,7 @@ module Sub
                           (offset x) (offset x) (int32'int sz);
     res
 
-  let sub (*[@extraction:inline]*) (r x:ptr limb) (sx:int32)
-                                      (y:ptr limb) (sy:int32) : limb
+  let sub [@extraction:inline] (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid r sx /\ valid x sx /\ valid y sy }
     requires { writable r }
@@ -333,8 +332,7 @@ module Sub
                 = (pelts oy)[offset y + j] };
     res
 
-  let sub_rx (*[@extraction:inline]*) (x:ptr limb) (sx:int32)
-                                  (y:ptr limb) (sy:int32) : limb
+  let sub_rx [@extraction:inline] (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sy }
     requires { writable x }
@@ -366,8 +364,7 @@ module Sub
                           (offset y) (offset oy) (int32'int sy);
     res
 
-  let sub_ry (*[@extraction:inline]*) (x:ptr limb) (sx:int32)
-                                  (y:ptr limb) (sy:int32) : limb
+  let sub_ry [@extraction:inline] (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sx }
     requires { writable y }
