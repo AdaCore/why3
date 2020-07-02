@@ -444,6 +444,11 @@ module ArrayInt63
     writes   { a }
     ensures  { a.elts = (old a.elts)[i <- to_int v] }
 
+  val ghost set (a: array63) (i: int63) (v: int63) : array63
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    ensures  { result.length = a.length }
+    ensures  { result.elts = a.elts[i <- to_int v] }
+
   val make (n: int63) (v: int63) : array63
     requires { [@expl:array creation size] n >= 0 }
     ensures  { forall i. 0 <= i < n -> result[i] = to_int v }
