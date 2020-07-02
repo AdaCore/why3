@@ -227,6 +227,67 @@ let output_task drv fname _tname th task dir =
 
 let unproved = ref false
 
+let loc_starts_le loc1 loc2 =
+  loc1 <> Loc.dummy_position && loc2 <> Loc.dummy_position &&
+  let f1, l1, b1, _ = Loc.get loc1 in
+  let f2, l2, b2, _ = Loc.get loc2 in
+  f1 = f2 && l1 <= l2 && l1 <= l2 && b1 <= b2
+
+let loc_ends_le loc1 loc2 =
+  loc1 <> Loc.dummy_position && loc2 <> Loc.dummy_position &&
+  let f1, l1, _, e1 = Loc.get loc1 in
+  let f2, l2, _, e2 = Loc.get loc2 in
+  f1 = f2 && l1 <= l2 && l1 <= l2 && e1 <= e2
+
+let loc_contains loc1 loc2 =
+  (* [    [  ]loc2   ]loc1 *)
+  loc_starts_le loc1 loc2 && loc_ends_le loc2 loc1
+
+let find_rs pm loc =
+  let exception Found of Expr.rsymbol in
+  let open Expr in
+  let open Pdecl in
+  let loc_of_exp e = Opt.get_def Loc.dummy_position e.e_loc in
+  let loc_of_cexp ce = match ce.c_node with Cfun e -> loc_of_exp e | _ -> Loc.dummy_position in
+  let find_pd_rec_defn rd =
+    if loc_contains (loc_of_cexp rd.rec_fun) loc then
+      raise (Found rd.rec_sym) in
+  let find_pd_pdecl pd =
+    match pd.pd_node with
+    | PDlet (LDvar (_, e)) when
+        loc_contains (loc_of_exp e) loc ->
+        failwith "find_pd: location in variable declaration :/"
+    | PDlet (LDsym (rs, ce)) when
+        loc_contains (loc_of_cexp ce) loc ->
+        raise (Found rs)
+    | PDlet (LDrec rds) ->
+        List.iter find_pd_rec_defn rds
+    | _ -> () in
+  let rec find_pd_mod_unit =
+    let open Pmodule in
+    function
+    | Uuse _ | Uclone _ | Umeta _ -> ()
+    | Uscope (_, us) -> List.iter find_pd_mod_unit us
+    | Udecl pd -> find_pd_pdecl pd in
+  try List.iter find_pd_mod_unit pm.Pmodule.mod_units; None
+  with Found rs -> Some rs
+
+let maybe_model_rs pm loc model rs =
+  try
+    ignore (Pinterp.eval_rs env pm.Pmodule.mod_known loc model rs);
+    eprintf "maybe_model: term with loc not encountered, was ok, or could not evaluated";
+    None
+  with Pinterp.Contr _ -> Some true
+
+let maybe_model pm m =
+  eprintf "@[<hv2>ATTRS: %a@]@." Pp.(print_list comma Pretty.print_attr)
+    (Ident.Sattr.elements (Model_parser.get_model_term_attrs m));
+  let (>>=) o k = match o with None -> None | Some x -> k x in
+  Opt.get_def true
+    (Model_parser.get_model_term_loc m >>= fun loc ->
+     find_rs pm loc >>=
+     maybe_model_rs pm loc m)
+
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
     { Call_provers.empty_limit with
@@ -237,6 +298,10 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
         let call =
           Driver.prove_task ~command ~limit drv task in
         let res = Call_provers.wait_on_call call in
+        let pr_model =
+          let model = res.Call_provers.pr_model in
+          if maybe_model (Pmodule.restore_module th) model then model else Model_parser.default_model in
+        let res = {res with Call_provers.pr_model} in
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
           (Call_provers.print_prover_result ~json_model:!opt_json) res;

@@ -499,6 +499,9 @@ let get_model_elements m =
   List.concat
     (List.concat (List.map Mint.values (Mstr.values m.model_files)))
 
+let get_model_term_loc m = m.vc_term_loc
+let get_model_term_attrs m = m.vc_term_attrs
+
 type model_parser = string -> printer_mapping -> model
 type raw_model_parser = printer_mapping -> string -> model_element list
 

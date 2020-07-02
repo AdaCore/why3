@@ -739,14 +739,27 @@ let reduce_term ?(mt = Mtv.empty) ?(mv = Mvs.empty) env known rule_terms vsenv t
   let t = t_ty_subst mt mv t in
   normalize ~limit:1000 eng vsenv t
 
+type rac = RacAll | RacOnly of Loc.position * Model_parser.model | RacNone
+
+let do_rac rac ?trigger_loc ~loc = match rac with
+  | RacAll -> true
+  | RacOnly (loc', _) ->
+      (* TODO check both trigger_loc and loc *)
+      let loc = if Opt.inhabited trigger_loc then trigger_loc else loc in
+      Opt.equal Loc.equal (Some loc') loc
+  | RacNone -> false
+
 (** Evaluate a term and raise an exception [Contr] if the result is false. *)
 let check_term ctx t =
   match reduce_term ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
   | {t_node= Ttrue} ->
+      (* TODO raise NoContradiction if [rac_only rac t] and model is valid in current context *)
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "is ok", t)
-  | {t_node= Tfalse} -> raise (Contr (ctx, t))
+  | {t_node= Tfalse} ->
+      raise (Contr (ctx, t))
   | t' ->
+      (* TODO raise CannotEvaluate if [rac_only rac t] and model is valid in current context *)
       eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t) ;
       if Debug.test_flag debug_rac then
         eprintf "@[<hv2>Result: %a@]@." Pretty.print_term t'
@@ -754,20 +767,23 @@ let check_term ctx t =
       eprintf "%a@." report_cntr (ctx, "WHEN TRYING", t) ;
       raise e
 
-let check_terms ctx = List.iter (check_term ctx)
+let check_terms ?trigger_loc rac ctx =
+  List.iter (fun t ->
+      if do_rac rac ?trigger_loc ~loc:t.t_loc then
+        check_term ctx t)
 
 (* Check a post-condition [t] by binding the result variable to
    the term [vt] representing the result value. *)
-let check_post ctx vt t =
-  let vs, t = open_post t in
+let check_post ctx vt post =
+  let vs, t = open_post post in
   let ctx = {ctx with c_vsenv= Mvs.add vs vt ctx.c_vsenv} in
   check_term ctx t
 
-let check_posts desc trigger_loc env oldies v posts =
+let check_posts rac desc trigger_loc env oldies v posts =
   let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
   let ctx = cntr_ctx desc ?trigger_loc env in
   let vt = term_of_value v in
-  List.iter (check_post ctx vt) posts
+  List.iter (fun t -> if do_rac rac trigger_loc then check_post ctx vt t) posts
 
 (* EXPRESSION EVALUATION *)
 
@@ -905,15 +921,15 @@ let rec eval_expr ~rac env (e : expr) : result =
     | r -> r )
   | Ewhile (cond, inv, _var, e1) -> (
       (* TODO variants *)
-      if rac then
-        check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
+      if rac <> RacNone then
+        check_terms rac (cntr_ctx "Loop invariant initialization" env) inv ;
       match eval_expr ~rac env cond with
       | Normal {v_desc= Vbool false} -> Normal (value ty_unit Vvoid)
       | Normal {v_desc= Vbool true} -> (
         match eval_expr ~rac env e1 with
         | Normal _ ->
-            if rac then
-              check_terms (cntr_ctx "Loop invariant preservation" env) inv ;
+            if rac <> RacNone then
+              check_terms rac (cntr_ctx "Loop invariant preservation" env) inv ;
             eval_expr ~rac env e
         | r -> r )
       | Normal t ->
@@ -936,15 +952,15 @@ let rec eval_expr ~rac env (e : expr) : result =
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum i)) env in
           match eval_expr ~rac env' e1 with
           | Normal _ ->
-              if rac then
-                check_terms (cntr_ctx "Loop invariant preservation" env') inv ;
+              if rac <> RacNone then
+                check_terms rac (cntr_ctx "Loop invariant preservation" env') inv ;
               iter (suc i)
           | r -> r
         else
           Normal (value ty_unit Vvoid) in
-      ( if rac then
+      ( if rac <> RacNone then
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
-          check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
+          check_terms rac (cntr_ctx "Loop invariant initialization" env') inv ) ;
       iter a
     with NotNum -> Irred e )
   | Ematch (e0, ebl, el) -> (
@@ -976,7 +992,7 @@ let rec eval_expr ~rac env (e : expr) : result =
         | Expr.Assert -> "Assertion"
         | Expr.Assume -> "Assumption"
         | Expr.Check -> "Check" in
-      if rac then check_term (cntr_ctx descr env) t ;
+      if do_rac rac t.t_loc then check_term (cntr_ctx descr env) t ;
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
       (* TODO: do not eval ghost if no assertion check *)
@@ -1006,15 +1022,17 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
     | rs, known -> rs, {env with known}
     | exception Not_found -> rs, env in
   let arg_vs = List.map (get_pvs env) arg_pvs in
+  Debug.dprintf debug_rac "Exec call %a %a@."
+    print_rs rs Pp.(print_list space print_value) arg_vs;
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let oldies = (* cty_oldies: {old_v -> v} *)
     let aux old_pv pv oldies =
       Mvs.add old_pv.pv_vs (freeze (Mvs.find pv.pv_vs env.vsenv)) oldies in
     Mpv.fold aux rs.rs_cty.cty_oldies Mvs.empty in
-  if rac then (
+  if rac <> RacNone then (
     (* TODO variant *)
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
-    check_terms ctx rs.rs_cty.cty_pre );
+    check_terms ?trigger_loc:loc rac ctx rs.rs_cty.cty_pre );
   let res =
     if rs_equal rs rs_func_app then
       match arg_vs with
@@ -1075,15 +1093,15 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
           eprintf "[interp] cannot find definition of routine %s@."
             rs.rs_name.id_string ;
           raise CannotCompute in
-  ( if rac then
+  ( if rac <> RacNone then
       match res with
       | Normal v ->
           let desc = cntr_desc "Postcondition" rs.rs_name in
-          check_posts desc loc env oldies v rs.rs_cty.cty_post
+          check_posts rac desc loc env oldies v rs.rs_cty.cty_post
       | Excep (xs, v) ->
           let desc = cntr_desc "Exceptional postcondition" rs.rs_name in
           let posts = Mxs.find xs rs.rs_cty.cty_xpost in
-          check_posts desc loc env oldies v posts
+          check_posts rac desc loc env oldies v posts
       | _ -> () );
   res
 
@@ -1091,26 +1109,39 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
-let eval_global_expr ~rac env disp_ctx km locals e =
-  get_builtin_progs env ;
+let make_global_env known =
   let add_glob _id d acc =
     match d.Pdecl.pd_node with
     | Pdecl.PDlet (LDvar (pvs, _e)) ->
         (* TODO evaluate _e! *)
-        let v = default_value_of_type km pvs.pv_ity in
+        let v = default_value_of_type known pvs.pv_ity in
         Mvs.add pvs.pv_vs v acc
     | _ -> acc in
-  let global_env = Mid.fold add_glob km Mvs.empty in
-  let env' = {known= km; funenv= Mrs.empty; vsenv= global_env; env; disp_ctx} in
-  let env' = add_local_funs locals env' in
-  let res = eval_expr ~rac env' e in
+  Mid.fold add_glob known Mvs.empty
+
+
+let eval_global_expr ~rac env disp_ctx known locals e =
+  get_builtin_progs env ;
+  let global_env = make_global_env known in
+  let env = add_local_funs locals
+      {known; funenv= Mrs.empty; vsenv= global_env; env; disp_ctx} in
+  let res = eval_expr ~rac env e in
   res, global_env
 
 let eval_global_fundef ~rac env disp_ctx mod_known locals body =
+  let rac = if rac then RacAll else RacNone in
   try eval_global_expr ~rac env disp_ctx mod_known locals body
   with CannotFind (l, s, n) ->
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
+
+let eval_rs env known loc model (rs: rsymbol) =
+  let rac = RacOnly (loc, model) in
+  let arg_vs = List.map (fun pv -> default_value_of_type known pv.pv_ity) rs.rs_cty.cty_args in
+  let global_env = make_global_env known in
+  let env = {known; funenv= Mrs.empty; vsenv= global_env; env; disp_ctx= empty_dispatch} in
+  let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
+  exec_call ~rac env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
 
 let report_eval_result body fmt (res, final_env) =
   ( match res with

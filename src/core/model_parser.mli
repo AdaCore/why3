@@ -137,7 +137,9 @@ val default_model : model
 
 (** {2 Querying the model} *)
 
-val get_model_elements: model -> model_element list
+val get_model_elements : model -> model_element list
+val get_model_term_loc : model -> Loc.position option
+val get_model_term_attrs : model -> Ident.Sattr.t
 
 val print_model :
   ?me_name_trans:(model_element_name -> string) ->

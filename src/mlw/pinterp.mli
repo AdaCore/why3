@@ -74,6 +74,8 @@ val eval_global_fundef :
 
     @raise Contr RAC is enabled and a contradiction was found *)
 
+val eval_rs : Env.env -> Pdecl.known_map -> Loc.position -> Model_parser.model -> Expr.Mrs.key -> result
+
 val report_eval_result :
   Expr.expr ->
   Format.formatter ->
