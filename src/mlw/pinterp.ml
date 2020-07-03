@@ -1109,16 +1109,39 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
-let make_global_env known =
+let import_model_value = let open Model_parser in function
+    | String s ->
+        value ty_str (Vstring s)
+    | Integer s ->
+        value ty_int (Vnum (BigInt.of_string s))
+    | Decimal _ | Fraction _ | Float _ | Boolean _ | Array _
+    | Record _ | Proj _ | Bitvector _ | Apply _ | Unparsed _ as v ->
+        eprintf "import_model_value %a@." print_model_value v;
+        failwith "import_model_value"
+
+let get_model_value model name loc =
+  let open Model_parser in
+  let aux me =
+    me.me_name.men_name = name &&
+    Opt.equal Loc.equal me.me_location (Some loc) in
+  Opt.map (fun me -> me.me_value)
+    (List.find_opt aux (Model_parser.get_model_elements model))
+
+let model_value pv model =
+  Opt.bind pv.pv_vs.vs_name.id_loc
+    (get_model_value model pv.pv_vs.vs_name.id_string)
+
+let make_global_env ?model known =
   let add_glob _id d acc =
     match d.Pdecl.pd_node with
-    | Pdecl.PDlet (LDvar (pvs, _e)) ->
+    | Pdecl.PDlet (LDvar (pv, _e)) ->
         (* TODO evaluate _e! *)
-        let v = default_value_of_type known pvs.pv_ity in
-        Mvs.add pvs.pv_vs v acc
+        let v = match Opt.bind model (model_value pv) with
+          | Some v -> import_model_value v
+          | None -> default_value_of_type known pv.pv_ity in
+        Mvs.add pv.pv_vs v acc
     | _ -> acc in
   Mid.fold add_glob known Mvs.empty
-
 
 let eval_global_expr ~rac env disp_ctx known locals e =
   get_builtin_progs env ;
@@ -1137,8 +1160,11 @@ let eval_global_fundef ~rac env disp_ctx mod_known locals body =
 
 let eval_rs env known loc model (rs: rsymbol) =
   let rac = RacOnly (loc, model) in
-  let arg_vs = List.map (fun pv -> default_value_of_type known pv.pv_ity) rs.rs_cty.cty_args in
-  let global_env = make_global_env known in
+  let get_value pv =
+    let mv = Opt.get (model_value pv model) in
+    import_model_value mv in
+  let arg_vs = List.map get_value rs.rs_cty.cty_args in
+  let global_env = make_global_env ~model known in
   let env = {known; funenv= Mrs.empty; vsenv= global_env; env; disp_ctx= empty_dispatch} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   exec_call ~rac env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
