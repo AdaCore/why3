@@ -134,3 +134,39 @@ let with_location f lb =
     try f lb with
     | Located _ as e -> raise e
     | e -> raise (Located (loc lb, e))
+
+let get_line_lengths f =
+  let lengths = ref [] in
+  let ch = open_in f in
+  ( try
+      while true do
+        let line = input_line ch in
+        lengths := String.length line :: !lengths;
+      done
+    with End_of_file -> () );
+  close_in ch;
+  Array.of_list (List.rev !lengths)
+
+let get_line_lengths =
+  let module Str = struct include String let hash = Hashtbl.hash end in
+  let module Hstr = Hashtbl.Make (Str) in
+  let cache = Hstr.create 5 in
+  fun f ->
+    try Hstr.find cache f
+    with Not_found ->
+      let l = get_line_lengths f in
+      Hstr.add cache f l;
+      l
+
+let get_multiline (f, bl, bc, ec) =
+  if Sys.file_exists f then
+    let ls = get_line_lengths f in
+    let el, ec = ref bl, ref ec in
+    assert (!el > 0); (* lines are 1-indexed *)
+    while !el < Array.length ls && !ec > ls.(!el-1) do
+      ec := !ec - ls.(!el-1) - 1; (* newlines are counted in multi-line locs *)
+      incr el
+    done;
+    f, (bl, bc), (!el, !ec)
+  else
+    f, (bl, bc), (bl, ec)

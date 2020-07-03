@@ -74,3 +74,11 @@ exception Message of string
 val errorm: ?loc:position -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 val with_location: (Lexing.lexbuf -> 'a) -> (Lexing.lexbuf -> 'a)
+
+(** Returns [filename, (bline, bcol), (eline, ecol)] of a position.
+
+    Currently, this function re-reads the file to determine the line and column of the end
+    of multiline positions. Subsequent calls for positions in the same file will not require
+    re-reading the file. If the file does not exist, the last pair in the returned value is
+    composed of [bline] and [bcol + position length] (similar to [get]). *)
+val get_multiline : position -> string * (int * int) * (int * int)

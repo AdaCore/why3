@@ -240,8 +240,12 @@ let loc_ends_le loc1 loc2 =
   f1 = f2 && l1 <= l2 && l1 <= l2 && e1 <= e2
 
 let loc_contains loc1 loc2 =
-  (* [    [  ]loc2   ]loc1 *)
-  loc_starts_le loc1 loc2 && loc_ends_le loc2 loc1
+  (* [loc1:   [loc2:   ]    ] *)
+  let f1, (bl1, bc1), (el1, ec1) = Loc.get_multiline loc1 in
+  let f2, (bl2, bc2), (el2, ec2) = Loc.get_multiline loc2 in
+  String.equal f1 f2 &&
+  (bl1 < bl2 || (bl1 = bl2 && bc1 <= bc2)) &&
+  (el1 > el2 || (el1 = el2 && ec1 >= ec2))
 
 let find_rs pm loc =
   let exception Found of Expr.rsymbol in
