@@ -282,11 +282,11 @@ let maybe_model_rs pm loc model rs =
 let maybe_model pm m =
   eprintf "@[<hv2>ATTRS: %a@]@." Pp.(print_list comma Pretty.print_attr)
     (Ident.Sattr.elements (Model_parser.get_model_term_attrs m));
-  let (>>=) o k = match o with None -> None | Some x -> k x in
+  let (>>=) = Opt.bind in
   Opt.get_def true
     (Model_parser.get_model_term_loc m >>= fun loc ->
-     find_rs pm loc >>=
-     maybe_model_rs pm loc m)
+     find_rs pm loc >>= fun rs ->
+     maybe_model_rs pm loc m rs)
 
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
