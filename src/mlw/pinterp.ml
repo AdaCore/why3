@@ -200,7 +200,6 @@ let rec print_value fmt v =
 
 and print_field fmt f = print_value fmt (field_get f)
 
-
 let rec term_of_value' mt v : ty Mtv.t * term =
   match v.v_desc with
   | Vnum i -> mt, t_const (Constant.int_const i) v.v_ty
@@ -741,11 +740,9 @@ let reduce_term ?(mt = Mtv.empty) ?(mv = Mvs.empty) env known rule_terms vsenv t
 
 type rac = RacAll | RacOnly of Loc.position * Model_parser.model | RacNone
 
-let do_rac rac ?trigger_loc ~loc = match rac with
+let do_rac loc = function
   | RacAll -> true
   | RacOnly (loc', _) ->
-      (* TODO check both trigger_loc and loc *)
-      let loc = if Opt.inhabited trigger_loc then trigger_loc else loc in
       Opt.equal Loc.equal (Some loc') loc
   | RacNone -> false
 
@@ -767,9 +764,10 @@ let check_term ctx t =
       eprintf "%a@." report_cntr (ctx, "WHEN TRYING", t) ;
       raise e
 
-let check_terms ?trigger_loc rac ctx =
+let check_terms ?loc rac ctx =
   List.iter (fun t ->
-      if do_rac rac ?trigger_loc ~loc:t.t_loc then
+      let loc = if Opt.inhabited loc then loc else t.t_loc in
+      if do_rac loc rac then
         check_term ctx t)
 
 (* Check a post-condition [t] by binding the result variable to
@@ -779,11 +777,11 @@ let check_post ctx vt post =
   let ctx = {ctx with c_vsenv= Mvs.add vs vt ctx.c_vsenv} in
   check_term ctx t
 
-let check_posts rac desc trigger_loc env oldies v posts =
+let check_posts rac desc loc env oldies v posts =
   let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
-  let ctx = cntr_ctx desc ?trigger_loc env in
+  let ctx = cntr_ctx desc ?trigger_loc:loc env in
   let vt = term_of_value v in
-  List.iter (fun t -> if do_rac rac trigger_loc then check_post ctx vt t) posts
+  List.iter (fun t -> if do_rac loc rac then check_post ctx vt t) posts
 
 (* EXPRESSION EVALUATION *)
 
@@ -992,7 +990,7 @@ let rec eval_expr ~rac env (e : expr) : result =
         | Expr.Assert -> "Assertion"
         | Expr.Assume -> "Assumption"
         | Expr.Check -> "Check" in
-      if do_rac rac t.t_loc then check_term (cntr_ctx descr env) t ;
+      if do_rac t.t_loc rac then check_term (cntr_ctx descr env) t ;
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
       (* TODO: do not eval ghost if no assertion check *)
@@ -1025,14 +1023,14 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
   Debug.dprintf debug_rac "Exec call %a %a@."
     print_rs rs Pp.(print_list space print_value) arg_vs;
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
-  let oldies = (* cty_oldies: {old_v -> v} *)
+  let oldies =
     let aux old_pv pv oldies =
       Mvs.add old_pv.pv_vs (freeze (Mvs.find pv.pv_vs env.vsenv)) oldies in
     Mpv.fold aux rs.rs_cty.cty_oldies Mvs.empty in
   if rac <> RacNone then (
     (* TODO variant *)
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
-    check_terms ?trigger_loc:loc rac ctx rs.rs_cty.cty_pre );
+    check_terms ?loc rac ctx rs.rs_cty.cty_pre );
   let res =
     if rs_equal rs rs_func_app then
       match arg_vs with
