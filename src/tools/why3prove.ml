@@ -227,18 +227,6 @@ let output_task drv fname _tname th task dir =
 
 let unproved = ref false
 
-let loc_starts_le loc1 loc2 =
-  loc1 <> Loc.dummy_position && loc2 <> Loc.dummy_position &&
-  let f1, l1, b1, _ = Loc.get loc1 in
-  let f2, l2, b2, _ = Loc.get loc2 in
-  f1 = f2 && l1 <= l2 && l1 <= l2 && b1 <= b2
-
-let loc_ends_le loc1 loc2 =
-  loc1 <> Loc.dummy_position && loc2 <> Loc.dummy_position &&
-  let f1, l1, _, e1 = Loc.get loc1 in
-  let f2, l2, _, e2 = Loc.get loc2 in
-  f1 = f2 && l1 <= l2 && l1 <= l2 && e1 <= e2
-
 let loc_contains loc1 loc2 =
   (* [loc1:   [loc2:   ]    ] *)
   let f1, (bl1, bc1), (el1, ec1) = Loc.get_multiline loc1 in
@@ -261,9 +249,8 @@ let find_rs pm loc =
     | PDlet (LDvar (_, e)) when
         loc_contains (loc_of_exp e) loc ->
         failwith "find_pd: location in variable declaration :/"
-    | PDlet (LDsym (rs, ce)) when
-        loc_contains (loc_of_cexp ce) loc ->
-        raise (Found rs)
+    | PDlet (LDsym (rs, ce)) when loc_contains (loc_of_cexp ce) loc ->
+          raise (Found rs)
     | PDlet (LDrec rds) ->
         List.iter find_pd_rec_defn rds
     | _ -> () in
@@ -284,8 +271,6 @@ let maybe_model_rs pm loc model rs =
   with Pinterp.Contr _ -> Some true
 
 let maybe_model pm m =
-  eprintf "@[<hv2>ATTRS: %a@]@." Pp.(print_list comma Pretty.print_attr)
-    (Ident.Sattr.elements (Model_parser.get_model_term_attrs m));
   let (>>=) = Opt.bind in
   Opt.get_def true
     (Model_parser.get_model_term_loc m >>= fun loc ->
