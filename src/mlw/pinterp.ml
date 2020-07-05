@@ -1156,10 +1156,12 @@ let eval_global_fundef ~rac env disp_ctx mod_known locals body =
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
+exception MissingModelValue of pvsymbol
+
 let eval_rs env known loc model (rs: rsymbol) =
   let rac = RacOnly (loc, model) in
   let get_value pv =
-    let mv = Opt.get (model_value pv model) in
+    let mv = Opt.get_exn (MissingModelValue pv) (model_value pv model) in
     import_model_value mv in
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   let global_env = make_global_env ~model known in

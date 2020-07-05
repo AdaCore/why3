@@ -264,11 +264,15 @@ let find_rs pm loc =
   with Found rs -> Some rs
 
 let maybe_model_rs pm loc model rs =
+  let open Pinterp in
   try
-    ignore (Pinterp.eval_rs env pm.Pmodule.mod_known loc model rs);
+    ignore (eval_rs env pm.Pmodule.mod_known loc model rs);
     eprintf "maybe_model: term with loc not encountered, was ok, or could not evaluated";
     None
-  with Pinterp.Contr _ -> Some true
+  with
+  | Contr _ -> Some true
+  | MissingModelValue _ ->
+      None
 
 let maybe_model pm m =
   let (>>=) = Opt.bind in
@@ -289,7 +293,8 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
         let res = Call_provers.wait_on_call call in
         let pr_model =
           let model = res.Call_provers.pr_model in
-          if maybe_model (Pmodule.restore_module th) model then model else Model_parser.default_model in
+          if maybe_model (Pmodule.restore_module th) model
+          then model else Model_parser.default_model in
         let res = {res with Call_provers.pr_model} in
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
