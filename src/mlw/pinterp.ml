@@ -1114,6 +1114,9 @@ let rec import_model_value known ity = let open Model_parser in function
     | String s ->
         assert (ty_equal (ty_of_ity ity) ty_str);
         value ty_str (Vstring s)
+    | Boolean b ->
+        assert (ity_equal ity ity_bool);
+        value ty_bool (Vbool b)
     | Record r ->
         let def, subst =
           match ity.ity_node with
@@ -1133,7 +1136,7 @@ let rec import_model_value known ity = let open Model_parser in function
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
     | Proj _ (* One *)
     | Apply _ (* Constructor *)
-    | Decimal _ | Fraction _ | Float _ | Boolean _ | Array _
+    | Decimal _ | Fraction _ | Float _ | Array _
     | Bitvector _ | Unparsed _ as v ->
         eprintf "import_model_value %a@." print_model_value v;
         failwith "import_model_value"
