@@ -273,6 +273,9 @@ let maybe_model_rs pm loc model rs =
   | Contr _ -> Some true
   | MissingModelValue _ ->
       None
+  | Failure msg -> (* TODO Remove when term_of_value' works for types with invariants *)
+      eprintf "Failure: %s@." msg;
+      None
 
 let maybe_model pm m =
   let (>>=) = Opt.bind in

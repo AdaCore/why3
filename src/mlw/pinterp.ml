@@ -208,7 +208,11 @@ let rec term_of_value' mt v : ty Mtv.t * term =
   | Vvoid -> mt, t_tuple []
   | Vconstr (rs, fs) ->
       let mt, fs = Lists.map_fold_left term_of_field mt fs in
-      mt, t_app_infer (ls_of_rs rs) fs
+      if rs_kind rs = RKfunc then
+        mt, t_app_infer (ls_of_rs rs) fs
+      else
+        (* TODO The constructor is not exposed for records with type invariants *)
+        kasprintf failwith "term_of_value': No constructor lsymbol for %a" print_rs rs
   | Vfun (cl, arg, e) ->
       let aux vs v (mt, mv) =
         let mt = ty_match mt vs.vs_ty v.v_ty in
@@ -1138,8 +1142,7 @@ let rec import_model_value known ity = let open Model_parser in function
     | Apply _ (* Constructor *)
     | Decimal _ | Fraction _ | Float _ | Array _
     | Bitvector _ | Unparsed _ as v ->
-        eprintf "import_model_value %a@." print_model_value v;
-        failwith "import_model_value"
+        kasprintf failwith "import_model_value (not implemented): %a" print_model_value v
 
 let get_model_value model name loc =
   let open Model_parser in
