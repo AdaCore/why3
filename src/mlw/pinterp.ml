@@ -1107,13 +1107,34 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
-let import_model_value = let open Model_parser in function
-    | String s ->
-        value ty_str (Vstring s)
+let rec import_model_value known ity = let open Model_parser in function
     | Integer s ->
+        assert (ty_equal (ty_of_ity ity) ty_int);
         value ty_int (Vnum (BigInt.of_string s))
+    | String s ->
+        assert (ty_equal (ty_of_ity ity) ty_str);
+        value ty_str (Vstring s)
+    | Record r ->
+        let def, subst =
+          match ity.ity_node with
+          | Ityapp (ts, l1, l2) | Ityreg {reg_its= ts; reg_args= l1; reg_regs= l2} ->
+              Pdecl.find_its_defn known ts,
+              its_match_regs ts l1 l2
+          | _ -> assert false in
+        let rs = match def.Pdecl.itd_constructors with [c] -> c | _ -> assert false in
+        let aux rs =
+          let name =
+            try Ident.get_model_element_name ~attrs:rs.rs_name.id_attrs
+            with Not_found -> rs.rs_name.id_string in
+          let ity = ity_full_inst subst (fd_of_rs rs).pv_ity in
+          name, ity in
+        let arg_itys = List.map aux def.Pdecl.itd_fields in
+        let fs = List.map (fun (f, mv) -> import_model_value known (List.assoc f arg_itys) mv) r in
+        value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
+    | Proj _ (* One *)
+    | Apply _ (* Constructor *)
     | Decimal _ | Fraction _ | Float _ | Boolean _ | Array _
-    | Record _ | Proj _ | Bitvector _ | Apply _ | Unparsed _ as v ->
+    | Bitvector _ | Unparsed _ as v ->
         eprintf "import_model_value %a@." print_model_value v;
         failwith "import_model_value"
 
@@ -1135,7 +1156,7 @@ let make_global_env ?model known =
     | Pdecl.PDlet (LDvar (pv, _e)) ->
         (* TODO evaluate _e! *)
         let v = match Opt.bind model (model_value pv) with
-          | Some v -> import_model_value v
+          | Some v -> import_model_value known pv.pv_ity  v
           | None -> default_value_of_type known pv.pv_ity in
         Mvs.add pv.pv_vs v acc
     | _ -> acc in
@@ -1162,7 +1183,7 @@ let eval_rs env known loc model (rs: rsymbol) =
   let rac = RacOnly (loc, model) in
   let get_value pv =
     let mv = Opt.get_exn (MissingModelValue pv) (model_value pv model) in
-    import_model_value mv in
+    import_model_value known pv.pv_ity mv in
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   let global_env = make_global_env ~model known in
   let env = {known; funenv= Mrs.empty; vsenv= global_env; env; disp_ctx= empty_dispatch} in
