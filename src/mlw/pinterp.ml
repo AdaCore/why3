@@ -1111,7 +1111,15 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
-let rec import_model_value known ity = let open Model_parser in function
+let rec import_model_value known ity =
+  let open Model_parser in
+  let get_def_subst ity =
+    match ity.ity_node with
+    | Ityapp (ts, l1, l2) | Ityreg {reg_its= ts; reg_args= l1; reg_regs= l2} ->
+        Pdecl.find_its_defn known ts,
+        its_match_regs ts l1 l2
+    | _ -> assert false in
+  function
     | Integer s ->
         assert (ty_equal (ty_of_ity ity) ty_int);
         value ty_int (Vnum (BigInt.of_string s))
@@ -1122,24 +1130,26 @@ let rec import_model_value known ity = let open Model_parser in function
         assert (ity_equal ity ity_bool);
         value ty_bool (Vbool b)
     | Record r ->
-        let def, subst =
-          match ity.ity_node with
-          | Ityapp (ts, l1, l2) | Ityreg {reg_its= ts; reg_args= l1; reg_regs= l2} ->
-              Pdecl.find_its_defn known ts,
-              its_match_regs ts l1 l2
-          | _ -> assert false in
+        let def, subst = get_def_subst ity in
         let rs = match def.Pdecl.itd_constructors with [c] -> c | _ -> assert false in
-        let aux rs =
+        let assoc_ity rs =
           let name =
             try Ident.get_model_element_name ~attrs:rs.rs_name.id_attrs
             with Not_found -> rs.rs_name.id_string in
           let ity = ity_full_inst subst (fd_of_rs rs).pv_ity in
           name, ity in
-        let arg_itys = List.map aux def.Pdecl.itd_fields in
-        let fs = List.map (fun (f, mv) -> import_model_value known (List.assoc f arg_itys) mv) r in
+        let arg_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
+        let fs = List.map (fun (f, mv) -> import_model_value known (Mstr.find f arg_itys) mv) r in
+        let ity = ity_full_inst subst ity in
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
-    | Proj _ (* One *)
-    | Apply _ (* Constructor *)
+    | Apply (s, mvs) ->
+        let def, subst = get_def_subst ity in
+        let matching_name rs = String.equal rs.rs_name.id_string s in
+        let rs = List.find matching_name def.Pdecl.itd_constructors in
+        let import field_pv = import_model_value known (ity_full_inst subst field_pv.pv_ity) in
+        let fs = List.map2 import rs.rs_cty.cty_args mvs in
+        value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
+    | Proj _
     | Decimal _ | Fraction _ | Float _ | Array _
     | Bitvector _ | Unparsed _ as v ->
         kasprintf failwith "import_model_value (not implemented): %a" print_model_value v
