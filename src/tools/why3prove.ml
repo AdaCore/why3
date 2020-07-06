@@ -295,6 +295,8 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
           Driver.prove_task ~command ~limit drv task in
         let res = Call_provers.wait_on_call call in
         let pr_model =
+          (* TODO Move to Call_provers.analyse_results.analyse [Answer _; Model _; ...]
+             and proceed to next model if necessary *)
           let model = res.Call_provers.pr_model in
           if maybe_model (Pmodule.restore_module th) model
           then model else Model_parser.default_model in
