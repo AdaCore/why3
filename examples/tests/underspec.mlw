@@ -1,0 +1,38 @@
+module LoopInvariant
+
+  use int.Int
+
+  (* use array.Array *)
+  (* let h () = *)
+  (*   let a = Array.make 10 0 in *)
+  (*   for i = 0 to 9 do *)
+  (*     invariant { forall j. 0 <= j < i -> a[j] = 1 } *)
+  (*     a[i] <- a[i] + 1 *)
+  (*   done *)
+
+  let i () =
+    let ref x1 = 0 in
+    let ref x2 = 0 in
+    for i = 0 to 1 do
+      invariant { i > 0 -> x1 = 1 }
+      if i = 0 then
+        x1 <- x1 + 1
+      else
+        x2 <- x2 + 1
+    done
+end
+
+module PostCondition
+  use int.Int
+  val ref z: int
+
+  let g ()
+    writes { z }
+    ensures { z > old z }
+  = z <- z + 1
+
+  let f () =
+    z <- 0;
+    g ();
+    assert { z = 1 }
+end
