@@ -758,15 +758,15 @@ let do_rac loc = function
 
 (** Evaluate a term and raise an exception [Contr] if the result is false. *)
 let check_term ctx t =
+  (* TODO raise NoContrdiction / CannotEvaluate if [t] corresponds to the goal of the CE
+     and reduces to true / cannot be reduced. *)
   match reduce_term ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
   | {t_node= Ttrue} ->
-      (* TODO raise NoContradiction if [rac_only rac t] and model is valid in current context *)
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "is ok", t)
   | {t_node= Tfalse} ->
       raise (Contr (ctx, t))
   | t' ->
-      (* TODO raise CannotEvaluate if [rac_only rac t] and model is valid in current context *)
       eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t) ;
       if Debug.test_flag debug_rac then
         eprintf "@[<hv2>Result: %a@]@." Pretty.print_term t'
