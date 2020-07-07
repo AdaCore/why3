@@ -189,7 +189,13 @@ let rec print_value fmt v =
   | Vfloat_mode m -> fprintf fmt "%s" (mode_to_string m)
   | Vstring s -> Constant.print_string_def fmt s
   | Vvoid -> fprintf fmt "()"
-  | Vfun _ -> fprintf fmt "@[<v2><fun>@]"
+  | Vfun (mvs, vs, e) ->
+      fprintf fmt "@[<v2>(%tfun %a -> %a)@]"
+        (fun fmt ->
+           if not (Mvs.is_empty mvs) then
+             pp_bindings Pretty.print_vs print_value fmt (Mvs.bindings mvs))
+        Pretty.print_vs vs
+        print_expr e
   | Vconstr (rs, vl) when is_rs_tuple rs ->
       fprintf fmt "@[(%a)@]" (Pp.print_list Pp.comma print_field) vl
   | Vconstr (rs, []) -> fprintf fmt "@[%a@]" print_rs rs
