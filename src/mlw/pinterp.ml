@@ -829,8 +829,8 @@ let rec matching env (v : value) p =
       | _ -> raise Undetermined )
 
 (* Dynamic, polymorphic program equality. Used to construct a function from an "Array"
-   value which corresponds to a function literal à la [key -> value; ...; default] *)
-let rs_dynamic_equality =
+   model value, which corresponds to a function literal à la [key -> value; ...; default]. *)
+let rs_dyn_poly_equ =
   let tv = create_tvsymbol (id_fresh "a") in
   let x_arg = create_pvsymbol (id_fresh "x") (ity_var tv) in
   let y_arg = create_pvsymbol (id_fresh "y") (ity_var tv) in
@@ -1050,7 +1050,7 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
     check_terms ?loc rac ctx rs.rs_cty.cty_pre );
   let res =
-    if rs_equal rs rs_dynamic_equality then
+    if rs_equal rs rs_dyn_poly_equ then
       let arg1, arg2 =
         match arg_vs with
         | [arg1; arg2] -> arg1, arg2
@@ -1143,17 +1143,22 @@ let rec import_model_value known ity =
     | _ -> assert false in
   function
     | Integer s ->
-        assert (ty_equal (ty_of_ity ity) ty_int);
+        assert (ity_equal ity ity_int);
         value ty_int (Vnum (BigInt.of_string s))
     | String s ->
-        assert (ty_equal (ty_of_ity ity) ty_str);
+        assert (ity_equal ity ity_str);
         value ty_str (Vstring s)
     | Boolean b ->
         assert (ity_equal ity ity_bool);
         value ty_bool (Vbool b)
     | Record r ->
         let def, subst = get_def_subst ity in
-        let rs = match def.Pdecl.itd_constructors with [c] -> c | _ -> assert false in
+        if def.Pdecl.itd_its.its_private then (
+          let msg = asprintf "Private value of type %a" print_ity ity in
+          raise (CannotImportModelValue msg) );
+        let rs = match def.Pdecl.itd_constructors with [c] -> c | cs ->
+          eprintf "@[<hv2>---> %a %a@]@." print_ity ity Pp.(print_list space print_rs) cs;
+          assert false in
         let assoc_ity rs =
           let name =
             try Ident.get_model_element_name ~attrs:rs.rs_name.id_attrs
@@ -1166,14 +1171,54 @@ let rec import_model_value known ity =
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
     | Apply (s, mvs) ->
         let def, subst = get_def_subst ity in
+        if def.Pdecl.itd_its.its_private then (
+          let msg = asprintf "Private value of type %a" print_ity ity in
+          raise (CannotImportModelValue msg) );
         let matching_name rs = String.equal rs.rs_name.id_string s in
         let rs = List.find matching_name def.Pdecl.itd_constructors in
         let import field_pv = import_model_value known (ity_full_inst subst field_pv.pv_ity) in
         let fs = List.map2 import rs.rs_cty.cty_args mvs in
+        let ity = ity_full_inst subst ity in
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
-    | Proj _
-    | Decimal _ | Fraction _ | Float _ | Array _
-    | Bitvector _ | Unparsed _ as v ->
+    | Proj (s, mv) ->
+        let def, subst = get_def_subst ity in
+        if def.Pdecl.itd_its.its_private then (
+          let msg = asprintf "Private value of type %a" print_ity ity in
+          raise (CannotImportModelValue msg) );
+        let matching_name rs = String.equal rs.rs_name.id_string s in
+        let rs = List.find matching_name def.Pdecl.itd_constructors in
+        let import_or_default field_pv =
+          let ity = ity_full_inst subst field_pv.pv_ity in
+          if String.equal field_pv.pv_vs.vs_name.id_string s
+          then import_model_value known ity mv
+          else default_value_of_type known ity in
+        let fs = List.map import_or_default rs.rs_cty.cty_args in
+        let ity = ity_full_inst subst ity in
+        value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
+    | Array a ->
+        let def, subst = get_def_subst ity in
+        if its_equal def.Pdecl.itd_its its_func then
+          let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
+            | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
+            | _ -> assert false in
+          let mvs, e0 =
+            let pv = create_pvsymbol (id_fresh "default") value_ity in
+            let v = import_model_value known value_ity a.arr_others in
+            Mvs.singleton pv.pv_vs v, e_var pv in
+          let arg_pv = create_pvsymbol (id_fresh "arg") key_ity in
+          let aux ix (mvs, e) =
+            let key_pv = create_pvsymbol (id_fresh "key") value_ity in
+            let value_pv = create_pvsymbol (id_fresh "value") key_ity in
+            let key_v = import_model_value known key_ity ix.arr_index_key in
+            let value_v = import_model_value known value_ity ix.arr_index_value in
+            let mvs = Mvs.add key_pv.pv_vs key_v (Mvs.add (value_pv.pv_vs) value_v mvs) in
+            let test = e_exec (c_app rs_dyn_poly_equ [arg_pv; key_pv] [] ity_bool) in
+            mvs, e_if test (e_var value_pv) e in
+          let mvs, e = List.fold_right aux a.arr_indices (mvs, e0) in
+          value (ty_of_ity ity) (Vfun (mvs, arg_pv.pv_vs, e))
+        else
+          failwith "import_model_value array"
+    | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
         kasprintf failwith "import_model_value (not implemented): %a" print_model_value v
 
 let get_model_value model name loc =
