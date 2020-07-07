@@ -533,12 +533,14 @@ let print_model_element ~at_loc ~print_attrs ~print_model_value ~me_name_trans f
   | Error_message -> fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
       let m_element = {m_element with me_name=fix_loc_kind ~at_loc m_element.me_name} in
-      fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]"
+      (* fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]" *)
+      fprintf fmt "@[%s%t =@ %a@]"
         (me_name_trans m_element.me_name)
         (fun fmt ->
            if print_attrs then
-             fprintf fmt ",@ [%a]"
-               (Pp.print_list Pp.comma Pretty.print_attr)
+             (* fprintf fmt " %a" *)
+             fprintf fmt ",@ @[<h>[%a]@]"
+               Pp.(print_list comma Pretty.print_attr)
                (List.sort cmp_attrs (Sattr.elements m_element.me_name.men_attrs)))
         print_model_value m_element.me_value
 
