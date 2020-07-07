@@ -1278,7 +1278,7 @@ let eval_rs env known loc model (rs: rsymbol) =
   exec_call ~rac env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
 
 let report_eval_result body fmt (res, final_env) =
-  ( match res with
+  match res with
   | Normal _ ->
       fprintf fmt "@[<hov2>result:@ %a@ =@ %a@]@,"
         print_ity body.e_ity print_logic_result res;
@@ -1291,8 +1291,7 @@ let report_eval_result body fmt (res, final_env) =
         (pp_vsenv print_value) (Mvs.bindings final_env)
   | Irred _ | Fun _ ->
       fprintf fmt "@[<hov2>Execution error: %a@]@," print_logic_result res ;
-      fprintf fmt "@[globals:@ %a@]" (pp_vsenv print_value) (Mvs.bindings final_env) ) ;
-  fprintf fmt "@]"
+      fprintf fmt "@[globals:@ %a@]" (pp_vsenv print_value) (Mvs.bindings final_env)
 
 let report_cntr _body fmt (ctx, term) =
-  fprintf fmt "@[%a@]" report_cntr (ctx, "failed", term)
+  report_cntr fmt (ctx, "failed", term)
