@@ -543,9 +543,8 @@ and default_value_of_types known ts l1 l2 ty : value =
     match Pdecl.((find_its_defn known ts).itd_constructors) with
     | cs :: _ -> cs
     | [] ->
-       eprintf "Cannot compute instances of private type %a (add \
-                dispatch?)@." print_its ts;
-       raise CannotCompute in
+        let priv = if ts.its_private then "private " else "" in
+        raise (Missing_dispatch (asprintf "%stype %a" priv Ity.print_its ts)) in
   let subst = its_match_regs ts l1 l2 in
   let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
   let tyl = List.map (ity_full_inst subst) ityl in
@@ -1086,9 +1085,7 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
                   rs.rs_name.id_string print_logic_result r ;
                 r
             | Cany ->
-                eprintf "Cannot compute any function %a (add dispatch?)@."
-                  print_decoded rs.rs_name.id_string;
-                raise CannotCompute
+                raise (Missing_dispatch (asprintf "any function %a" print_rs rs))
             | Cpur _ -> assert false (* TODO ? *) )
       | Builtin f ->
           Debug.dprintf debug "@[Evaluating builtin function %s@]@."

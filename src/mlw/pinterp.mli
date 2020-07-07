@@ -93,3 +93,7 @@ val report_cntr :
   cntr_ctx * Term.term ->
   unit
 (** Report a contradiction context and term *)
+
+(**/**)
+
+val debug_rac : Debug.flag

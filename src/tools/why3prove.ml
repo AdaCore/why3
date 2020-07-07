@@ -267,17 +267,20 @@ let maybe_model_rs pm loc model rs =
   let open Pinterp in
   try
     ignore (eval_rs env pm.Pmodule.mod_known loc model rs);
-    eprintf "maybe_model: term with loc not encountered, was ok, or could not evaluated";
+    Debug.dprintf debug_rac "maybe_model: term with loc not encountered, was ok, or could not evaluated";
     None
   with
   | Contr _ ->
       eprintf "Model seems good";
       Some true
   | CannotImportModelValue msg ->
-      eprintf "@[<h>Cannot import model value: %s@]@." msg;
+      Debug.dprintf debug_rac "@[<h>Cannot import model value: %s@]@." msg;
       None
-  | Failure msg -> (* TODO Remove when term_of_value' works for types with invariants *)
-      eprintf "Failure: %s@." msg;
+  | Failure msg -> (* TODO Remove when term_of_value' works for types with invariants (no constructors) *)
+      Debug.dprintf debug_rac "Failure: %s@." msg;
+      None
+  | Missing_dispatch msg ->
+      Debug.dprintf debug_rac "Missing dispatch for %s@." msg;
       None
 
 let maybe_model pm m =
