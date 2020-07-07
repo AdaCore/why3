@@ -828,6 +828,20 @@ let rec matching env (v : value) p =
           if ls_equal ls ls2 then env else raise NoMatch
       | _ -> raise Undetermined )
 
+(* Dynamic, polymorphic program equality. Used to construct a function from an "Array"
+   value which corresponds to a function literal à la [key -> value; ...; default] *)
+let rs_dynamic_equality =
+  let tv = create_tvsymbol (id_fresh "a") in
+  let x_arg = create_pvsymbol (id_fresh "x") (ity_var tv) in
+  let y_arg = create_pvsymbol (id_fresh "y") (ity_var tv) in
+  let post =
+    let result = create_vsymbol (id_fresh "res") ty_bool in
+    let t1 = t_equ (t_var result) t_bool_true in
+    let t2 = t_equ (t_var x_arg.pv_vs) (t_var x_arg.pv_vs) in
+    create_post result (t_iff t1 t2) in
+  let cty = create_cty [x_arg; y_arg] [] [post] Mxs.empty Mpv.empty eff_empty ity_bool in
+  create_rsymbol (id_fresh "infix =") cty
+
 let rec eval_expr ~rac env (e : expr) : result =
   match e.e_node with
   | Evar pvs -> (
@@ -1036,7 +1050,13 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
     check_terms ?loc rac ctx rs.rs_cty.cty_pre );
   let res =
-    if rs_equal rs rs_func_app then
+    if rs_equal rs rs_dynamic_equality then
+      let arg1, arg2 =
+        match arg_vs with
+        | [arg1; arg2] -> arg1, arg2
+        | _ -> assert false in
+      Normal (value ty_bool (Vbool (arg1 = arg2)))
+    else if rs_equal rs rs_func_app then
       match arg_vs with
       | [{v_desc= Vfun (cl, arg, e)}; value] ->
           let env =
@@ -1110,6 +1130,8 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
 (* GLOBAL EVALUATION *)
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
+
+exception CannotImportModelValue of string
 
 let rec import_model_value known ity =
   let open Model_parser in
@@ -1193,12 +1215,16 @@ let eval_global_fundef ~rac env disp_ctx mod_known locals body =
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
-exception MissingModelValue of pvsymbol
-
 let eval_rs env known loc model (rs: rsymbol) =
   let rac = RacOnly (loc, model) in
   let get_value pv =
-    let mv = Opt.get_exn (MissingModelValue pv) (model_value pv model) in
+    let mv = match model_value pv model with
+      | Some mv -> mv
+      | None ->
+          Debug.dprintf debug_rac "@[<hv2>MODEL: %a@]@."
+            (Model_parser.print_model_human ?me_name_trans:None ~print_attrs:false) model;
+          let msg = sprintf "Missing model value for %s" pv.pv_vs.vs_name.id_string in
+          raise (CannotImportModelValue msg) in
     import_model_value known pv.pv_ity mv in
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   let global_env = make_global_env ~model known in

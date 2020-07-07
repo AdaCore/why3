@@ -74,8 +74,7 @@ val eval_global_fundef :
 
     @raise Contr RAC is enabled and a contradiction was found *)
 
-(** Raised when a value is missing in the model for [eval_rs]. *)
-exception MissingModelValue of Ity.pvsymbol
+exception CannotImportModelValue of string
 
 val eval_rs : Env.env -> Pdecl.known_map -> Loc.position -> Model_parser.model -> Expr.Mrs.key -> result
 
