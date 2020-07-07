@@ -246,9 +246,9 @@ let find_rs pm loc =
       raise (Found rd.rec_sym) in
   let find_pd_pdecl pd =
     match pd.pd_node with
-    | PDlet (LDvar (_, e)) when
-        loc_contains (loc_of_exp e) loc ->
-        failwith "find_pd: location in variable declaration :/"
+    | PDlet (LDvar (pv, e)) when loc_contains (loc_of_exp e) loc ->
+        (* TODO Deal with VCs in variable declarations *)
+        kasprintf failwith "find_rs: location in variable declaration of %a" Ity.print_pv pv
     | PDlet (LDsym (rs, ce)) when loc_contains (loc_of_cexp ce) loc ->
           raise (Found rs)
     | PDlet (LDrec rds) ->
