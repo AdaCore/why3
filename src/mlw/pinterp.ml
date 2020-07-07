@@ -1170,7 +1170,6 @@ let rec import_model_value known ity =
           name, ity in
         let arg_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
         let fs = List.map (fun (f, mv) -> import_model_value known (Mstr.find f arg_itys) mv) r in
-        let ity = ity_full_inst subst ity in
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
     | Apply (s, mvs) ->
         let def, subst = get_def_subst ity in
@@ -1181,7 +1180,6 @@ let rec import_model_value known ity =
         let rs = List.find matching_name def.Pdecl.itd_constructors in
         let import field_pv = import_model_value known (ity_full_inst subst field_pv.pv_ity) in
         let fs = List.map2 import rs.rs_cty.cty_args mvs in
-        let ity = ity_full_inst subst ity in
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
     | Proj (s, mv) ->
         let def, subst = get_def_subst ity in
@@ -1196,7 +1194,6 @@ let rec import_model_value known ity =
           then import_model_value known ity mv
           else default_value_of_type known ity in
         let fs = List.map import_or_default rs.rs_cty.cty_args in
-        let ity = ity_full_inst subst ity in
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
     | Array a ->
         let def, subst = get_def_subst ity in
