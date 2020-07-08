@@ -267,20 +267,26 @@ let maybe_model_rs pm loc model rs =
   let open Pinterp in
   try
     ignore (eval_rs env pm.Pmodule.mod_known loc model rs);
-    Debug.dprintf debug_rac "maybe_model: term with loc not encountered, was ok, or could not evaluated";
+    printf "RAC does not confirm the counter-example (execution did not fail at all)@.";
     None
   with
-  | Contr _ ->
-      eprintf "Model seems good";
+  | Contr (_, t) when Opt.equal Loc.equal
+        (Model_parser.get_model_term_loc model) t.Term.t_loc ->
+      printf "RAC confirms the counter-example@.";
       Some true
-  | CannotImportModelValue msg ->
-      Debug.dprintf debug_rac "@[<h>Cannot import model value: %s@]@." msg;
+  | Contr (_, t) ->
+      printf "RAC found a contradiction at different location %a@."
+        (Pp.print_option_or_default "NO LOC" Pretty.print_loc) t.Term.t_loc;
       None
-  | Failure msg -> (* TODO Remove when term_of_value' works for types with invariants (no constructors) *)
-      Debug.dprintf debug_rac "Failure: %s@." msg;
+  | CannotImportModelValue msg ->
+      printf "RAC impossible: Cannot import model value: %s@." msg;
       None
   | Missing_dispatch msg ->
-      Debug.dprintf debug_rac "Missing dispatch for %s@." msg;
+      printf "RAC impossible: Missing dispatch for %s@." msg;
+      None
+  | Failure msg ->
+      (* TODO Remove when term_of_value' works for types with invariants (no constructors) *)
+      printf "Failure: %s@." msg;
       None
 
 let maybe_model pm m =
