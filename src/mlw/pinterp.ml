@@ -1324,10 +1324,11 @@ let eval_rs env known loc model (rs: rsymbol) =
       | None ->
           Debug.dprintf debug_rac "@[<hv2>MODEL: %a@]@."
             (Model_parser.print_model_human ?me_name_trans:None ~print_attrs:false) model;
-          let msg = sprintf "Missing model value for %s" pv.pv_vs.vs_name.id_string in
+          let msg = asprintf "Missing model value for %s (%a)" pv.pv_vs.vs_name.id_string (Pp.print_option_or_default "NO LOC" Pretty.print_loc) pv.pv_vs.vs_name.id_loc in
           raise (CannotImportModelValue msg) in
     import_model_value known pv.pv_ity mv in
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
+  get_builtin_progs env ;
   let global_env = make_global_env ~model known in
   let env = {known; funenv= Mrs.empty; vsenv= global_env; env; disp_ctx= empty_dispatch} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
