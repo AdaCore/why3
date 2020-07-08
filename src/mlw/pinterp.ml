@@ -543,8 +543,8 @@ and default_value_of_types known ts l1 l2 ty : value =
     match Pdecl.((find_its_defn known ts).itd_constructors) with
     | cs :: _ -> cs
     | [] ->
-        let priv = if ts.its_private then "private " else "" in
-        raise (Missing_dispatch (asprintf "%stype %a" priv Ity.print_its ts)) in
+        assert ts.its_nonfree;
+        raise (Missing_dispatch (asprintf "non-free type %a" Ity.print_its ts)) in
   let subst = its_match_regs ts l1 l2 in
   let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
   let tyl = List.map (ity_full_inst subst) ityl in
@@ -1156,8 +1156,8 @@ let rec import_model_value known ity =
         value ty_bool (Vbool b)
     | Record r ->
         let def, subst = get_def_subst ity in
-        if def.Pdecl.itd_its.its_private then (
-          let msg = asprintf "Private value of type %a" print_ity ity in
+        if def.Pdecl.itd_its.its_nonfree then (
+          let msg = asprintf "Value of non-free type %a" print_ity ity in
           raise (CannotImportModelValue msg) );
         let rs = match def.Pdecl.itd_constructors with [c] -> c | cs ->
           eprintf "@[<hv2>---> %a %a@]@." print_ity ity Pp.(print_list space print_rs) cs;
@@ -1173,8 +1173,8 @@ let rec import_model_value known ity =
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
     | Apply (s, mvs) ->
         let def, subst = get_def_subst ity in
-        if def.Pdecl.itd_its.its_private then (
-          let msg = asprintf "Private value of type %a" print_ity ity in
+        if def.Pdecl.itd_its.its_nonfree then (
+          let msg = asprintf "Value of non-free type %a" print_ity ity in
           raise (CannotImportModelValue msg) );
         let matching_name rs = String.equal rs.rs_name.id_string s in
         let rs = List.find matching_name def.Pdecl.itd_constructors in
@@ -1183,8 +1183,8 @@ let rec import_model_value known ity =
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
     | Proj (s, mv) ->
         let def, subst = get_def_subst ity in
-        if def.Pdecl.itd_its.its_private then (
-          let msg = asprintf "Private value of type %a" print_ity ity in
+        if def.Pdecl.itd_its.its_nonfree then (
+          let msg = asprintf "Value of non-free type %a" print_ity ity in
           raise (CannotImportModelValue msg) );
         let matching_name rs = String.equal rs.rs_name.id_string s in
         let rs = List.find matching_name def.Pdecl.itd_constructors in
