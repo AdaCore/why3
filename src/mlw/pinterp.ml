@@ -128,39 +128,8 @@ let rec ty_dispatch disp_ty ty =
 (* VALUES *)
 
 type float_mode = mpfr_rnd_t
+
 type big_float = mpfr_float
-
-type value = {v_desc: value_desc; v_ty: ty}
-
-and value_desc =
-  | Vconstr of rsymbol * field list
-  | Vnum of BigInt.t
-  | Vreal of real
-  | Vfloat_mode of float_mode
-  | Vfloat of big_float
-  | Vstring of string
-  | Vbool of bool
-  | Vvoid
-  | Vfun of value Mvs.t (* closure *) * vsymbol * expr
-
-and field = Field of value ref
-
-let mk_field v = Field (ref v)
-let field_get (Field r) = r.contents
-
-let constr rs vl = Vconstr (rs, List.map mk_field vl)
-
-let rec freeze v = match v.v_desc with
-  | Vconstr (rs, fs) ->
-      let fs = List.map freeze_field fs in
-      {v with v_desc= Vconstr (rs, fs)}
-  | _ -> v
-
-and freeze_field f = mk_field (field_get f)
-
-let value ty desc = {v_desc= desc; v_ty= ty}
-let v_desc v = v.v_desc
-let v_ty v = v.v_ty
 
 let mode_to_string m =
   match m with
@@ -170,6 +139,85 @@ let mode_to_string m =
   | Toward_Minus_Infinity -> "RTN"
   | Toward_Zero -> "RTZ"
   | Faithful -> assert false
+
+module rec Value : sig
+  type value = {v_desc: value_desc; v_ty: ty}
+  and value_desc =
+    | Vconstr of rsymbol * field list
+    | Vnum of BigInt.t
+    | Vreal of real
+    | Vfloat_mode of float_mode
+    | Vfloat of big_float
+    | Vstring of string
+    | Vbool of bool
+    | Vvoid
+    | Vfun of value Mvs.t (* closure *) * vsymbol * expr
+    | Vpurefun of ty (* keys *) * value Mv.t * value
+  and field = Field of value ref
+  val compare_values : value -> value -> int
+end = struct
+  type value = {v_desc: value_desc; v_ty: ty}
+  and value_desc =
+    | Vconstr of rsymbol * field list
+    | Vnum of BigInt.t
+    | Vreal of real
+    | Vfloat_mode of float_mode
+    | Vfloat of big_float
+    | Vstring of string
+    | Vbool of bool
+    | Vvoid
+    | Vfun of value Mvs.t (* closure *) * vsymbol * expr
+    | Vpurefun of ty (* keys *) * value Mv.t * value
+  and field = Field of value ref
+  let (<?>) c (cmp,x,y) = if c = 0 then cmp x y else c
+  let rec compare_lists c l1 l2 : int = match l1, l2 with
+    | h1::t1, h2::t2 -> c h1 h2 <?> (compare_lists c, t1, t2)
+    | _ -> List.compare_lengths l1 l2
+  let rec compare_values v1 v2 : int =
+    ty_compare v1.v_ty v2.v_ty <?>
+    (compare_desc, v1.v_desc, v2.v_desc)
+  and compare_desc d1 d2 =
+    match d1, d2 with
+    | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
+        rs_compare rs1 rs2 <?> (compare_lists compare_fields, fs1, fs2)
+    | Vnum i1, Vnum i2 -> BigInt.compare i1 i2
+    | Vreal r1, Vreal r2 -> Big_real.(if eq r1 r2 then 0 else if lt r1 r2 then -1 else 1)
+    | Vfloat_mode m1, Vfloat_mode m2 -> compare m1 m2
+    | Vfloat f1, Vfloat f2 -> Mlmpfr_wrapper.(if equal_p f1 f2 then 0 else if less_p f1 f2 then -1 else 1)
+    | Vstring s1, Vstring s2 -> String.compare s1 s2
+    | Vbool b1, Vbool b2 -> compare b1 b2
+    | Vvoid, Vvoid -> 0
+    | Vfun _, Vfun _ -> failwith "Value.compare: Vfun"
+    | Vpurefun (ty1, mv1, v1), Vpurefun (ty2, mv2, v2) ->
+        ty_compare ty1 ty2 <?> (compare, v1, v2)
+        <?> (Mv.compare compare, mv1, mv2)
+    | _ -> compare d1 d2
+  and compare_fields (Field r1) (Field r2) =
+    compare !r1 !r2
+end
+and Mv : Map.S with type key = Value.value =
+  Map.Make (struct
+    type t = Value.value
+    let compare = Value.compare_values
+  end)
+
+include Value
+
+let value ty desc = {v_desc= desc; v_ty= ty}
+let field v = Field (ref v)
+let constr rs vl = Vconstr (rs, List.map field vl)
+let v_desc v = v.v_desc
+let v_ty v = v.v_ty
+let field_get (Field r) = r.contents
+
+let rec snapshot v = match v.v_desc with
+  | Vconstr (rs, fs) ->
+      let fs = List.map snapshot_field fs in
+      {v with v_desc= Vconstr (rs, fs)}
+  | _ -> v
+
+and snapshot_field f =
+  field (snapshot (field_get f))
 
 let rec print_value fmt v =
   match v.v_desc with
@@ -203,6 +251,9 @@ let rec print_value fmt v =
       fprintf fmt "@[(%a %a)@]" print_rs rs
         (Pp.print_list Pp.space print_field)
         vl
+  | Vpurefun (_, mv, v) ->
+      fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
+        (Mv.bindings mv) print_value v
 
 and print_field fmt f = print_value fmt (field_get f)
 
@@ -228,10 +279,18 @@ let rec term_of_value' mt v : ty Mtv.t * term =
       let t = Opt.get (term_of_expr ~prop:false e) in
       let t = t_ty_subst mt mv t in
       mt, t_lambda [arg] [] t
-      (* let mv = Mvs.map term_of_value cl in
-       * let t = t_ty_subst Mtv.empty mv t in
-       * t_lambda [arg] [] t *)
-  | _ -> Format.kasprintf failwith "term_of_value: %a" print_value v
+  | Vpurefun (ty, mv, v) ->
+      (* use function literal [|mv...; _ -> v|] *)
+      let mt, t = term_of_value' mt v in
+      let arg = create_vsymbol (id_fresh "arg") ty in
+      let aux key value (mt, t) =
+        let mt, key = term_of_value' mt key in
+        let mt, value = term_of_value' mt value in
+        mt, t_if (t_equ (t_var arg) key) value t in
+      let mt, t = Mv.fold aux mv (mt, t) in
+      mt, t_lambda [arg] [] t
+  | Vreal _ | Vfloat _ | Vfloat_mode _ ->
+      Format.kasprintf failwith "term_of_value: %a" print_value v
 
 and term_of_field mt f = term_of_value' mt (field_get f)
 
@@ -548,7 +607,7 @@ and default_value_of_types known ts l1 l2 ty : value =
   let subst = its_match_regs ts l1 l2 in
   let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
   let tyl = List.map (ity_full_inst subst) ityl in
-  let fl = List.map (fun ity -> mk_field (default_value_of_type known ity)) tyl in
+  let fl = List.map (fun ity -> field (default_value_of_type known ity)) tyl in
   value ty (Vconstr (cs, fl))
 
 (* ROUTINE DEFINITIONS *)
@@ -833,20 +892,6 @@ let rec matching env (v : value) p =
           if ls_equal ls ls2 then env else raise NoMatch
       | _ -> raise Undetermined )
 
-(* Dynamic, polymorphic program equality. Used to construct a function from an "Array"
-   model value, which corresponds to a function literal à la [key -> value; ...; default]. *)
-let rs_dyn_poly_equ =
-  let tv = create_tvsymbol (id_fresh "a") in
-  let x_arg = create_pvsymbol (id_fresh "x") (ity_var tv) in
-  let y_arg = create_pvsymbol (id_fresh "y") (ity_var tv) in
-  let post =
-    let result = create_vsymbol (id_fresh "res") ty_bool in
-    let t1 = t_equ (t_var result) t_bool_true in
-    let t2 = t_equ (t_var x_arg.pv_vs) (t_var x_arg.pv_vs) in
-    create_post result (t_iff t1 t2) in
-  let cty = create_cty [x_arg; y_arg] [] [post] Mxs.empty Mpv.empty eff_empty ity_bool in
-  create_rsymbol (id_fresh "infix =") cty
-
 let rec eval_expr ~rac env (e : expr) : result =
   match e.e_node with
   | Evar pvs -> (
@@ -1043,31 +1088,28 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
     | rs, known -> rs, {env with known}
     | exception Not_found -> rs, env in
   let arg_vs = List.map (get_pvs env) arg_pvs in
-  Debug.dprintf debug_rac "Exec call %a %a@."
+  Debug.dprintf debug_rac "@[<h>Exec call %a %a@]@."
     print_rs rs Pp.(print_list space print_value) arg_vs;
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let oldies =
     let aux old_pv pv oldies =
-      Mvs.add old_pv.pv_vs (freeze (Mvs.find pv.pv_vs env.vsenv)) oldies in
+      Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs env.vsenv)) oldies in
     Mpv.fold aux rs.rs_cty.cty_oldies Mvs.empty in
   if rac <> RacNone then (
     (* TODO variant *)
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
     check_terms ?loc rac ctx rs.rs_cty.cty_pre );
   let res =
-    if rs_equal rs rs_dyn_poly_equ then
-      let arg1, arg2 =
-        match arg_vs with
-        | [arg1; arg2] -> arg1, arg2
-        | _ -> assert false in
-      Normal (value ty_bool (Vbool (arg1 = arg2)))
-    else if rs_equal rs rs_func_app then
+    if rs_equal rs rs_func_app then
       match arg_vs with
       | [{v_desc= Vfun (cl, arg, e)}; value] ->
           let env =
             {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv cl} in
           let env = bind_vs arg value env in
           eval_expr ~rac env e
+      | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
+          let v = try Mv.find value bindings with Not_found -> default in
+          Normal v
       | _ -> assert false
     else
       match find_definition env rs with
@@ -1102,7 +1144,7 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
             ty_match mt ty v.v_ty in
           let mt = List.fold_left2 match_pv_v Mtv.empty rs.rs_cty.cty_args arg_vs in
           let ty = ty_inst mt (ty_of_ity ity_result) in
-          let fs = List.map mk_field arg_vs in
+          let fs = List.map field arg_vs in
           Normal (value ty (Vconstr (rs, fs)))
       | Projection _d -> (
         match rs.rs_field, arg_vs with
@@ -1176,7 +1218,7 @@ let rec import_model_value known ity =
           name, ity in
         let arg_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
         let fs = List.map (fun (f, mv) -> import_model_value known (Mstr.find f arg_itys) mv) r in
-        value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
+        value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
     | Apply (s, mvs) ->
         let def, subst = get_def_subst ity in
         check_construction def;
@@ -1184,7 +1226,7 @@ let rec import_model_value known ity =
         let rs = List.find matching_name def.Pdecl.itd_constructors in
         let import field_pv = import_model_value known (ity_full_inst subst field_pv.pv_ity) in
         let fs = List.map2 import rs.rs_cty.cty_args mvs in
-        value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
+        value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
     | Proj (s, mv) ->
         let def, subst = get_def_subst ity in
         check_construction def;
@@ -1196,30 +1238,42 @@ let rec import_model_value known ity =
           then import_model_value known ity mv
           else default_value_of_type known ity in
         let fs = List.map import_or_default rs.rs_cty.cty_args in
-        value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
+        value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
     | Array a ->
         let def, subst = get_def_subst ity in
-        if its_equal def.Pdecl.itd_its its_func then
-          let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
-            | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
-            | _ -> assert false in
-          let mvs, e0 =
-            let pv = create_pvsymbol (id_fresh "default") value_ity in
-            let v = import_model_value known value_ity a.arr_others in
-            Mvs.singleton pv.pv_vs v, e_var pv in
-          let arg_pv = create_pvsymbol (id_fresh "arg") key_ity in
-          let aux ix (mvs, e) =
-            let key_pv = create_pvsymbol (id_fresh "key") value_ity in
-            let value_pv = create_pvsymbol (id_fresh "value") key_ity in
-            let key_v = import_model_value known key_ity ix.arr_index_key in
-            let value_v = import_model_value known value_ity ix.arr_index_value in
-            let mvs = Mvs.add key_pv.pv_vs key_v (Mvs.add (value_pv.pv_vs) value_v mvs) in
-            let test = e_exec (c_app rs_dyn_poly_equ [arg_pv; key_pv] [] ity_bool) in
-            mvs, e_if test (e_var value_pv) e in
-          let mvs, e = List.fold_right aux a.arr_indices (mvs, e0) in
-          value (ty_of_ity ity) (Vfun (mvs, arg_pv.pv_vs, e))
-        else
-          failwith "import_model_value array"
+        assert (its_equal def.Pdecl.itd_its its_func);
+        let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
+          | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
+          | _ -> assert false in
+        let aux mv ix =
+          let key = import_model_value known key_ity ix.arr_index_key in
+          let value = import_model_value known value_ity ix.arr_index_value in
+          Mv.add key value mv in
+        let mv = List.fold_left aux Mv.empty a.arr_indices in
+        let v = import_model_value known value_ity a.arr_others in
+        value (ty_of_ity ity) (Vpurefun (ty_of_ity key_ity, mv, v))
+        (* let def, subst = get_def_subst ity in
+         * if its_equal def.Pdecl.itd_its its_func then
+         *   let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
+         *     | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
+         *     | _ -> assert false in
+         *   let mvs, e0 =
+         *     let pv = create_pvsymbol (id_fresh "default") value_ity in
+         *     let v = import_model_value known value_ity a.arr_others in
+         *     Mvs.singleton pv.pv_vs v, e_var pv in
+         *   let arg_pv = create_pvsymbol (id_fresh "arg") key_ity in
+         *   let aux ix (mvs, e) =
+         *     let key_pv = create_pvsymbol (id_fresh "key") value_ity in
+         *     let value_pv = create_pvsymbol (id_fresh "value") key_ity in
+         *     let key_v = import_model_value known key_ity ix.arr_index_key in
+         *     let value_v = import_model_value known value_ity ix.arr_index_value in
+         *     let mvs = Mvs.add key_pv.pv_vs key_v (Mvs.add (value_pv.pv_vs) value_v mvs) in
+         *     let test = e_exec (c_app rs_dyn_poly_equ [arg_pv; key_pv] [] ity_bool) in
+         *     mvs, e_if test (e_var value_pv) e in
+         *   let mvs, e = List.fold_right aux a.arr_indices (mvs, e0) in
+         *   value (ty_of_ity ity) (Vfun (mvs, arg_pv.pv_vs, e))
+         * else
+         *   failwith "import_model_value array" *)
     | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
         kasprintf failwith "import_model_value (not implemented): %a" print_model_value v
 
