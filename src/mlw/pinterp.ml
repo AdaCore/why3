@@ -1319,14 +1319,13 @@ let eval_global_fundef ~rac env disp_ctx mod_known locals body =
 let eval_rs env known loc model (rs: rsymbol) =
   let rac = RacOnly (loc, model) in
   let get_value pv =
-    let mv = match model_value pv model with
-      | Some mv -> mv
-      | None ->
-          Debug.dprintf debug_rac "@[<hv2>MODEL: %a@]@."
-            (Model_parser.print_model_human ?me_name_trans:None ~print_attrs:false) model;
-          let msg = asprintf "Missing model value for %s (%a)" pv.pv_vs.vs_name.id_string (Pp.print_option_or_default "NO LOC" Pretty.print_loc) pv.pv_vs.vs_name.id_loc in
-          raise (CannotImportModelValue msg) in
-    import_model_value known pv.pv_ity mv in
+    match model_value pv model with
+    | Some mv ->
+        import_model_value known pv.pv_ity mv
+    | None ->
+        Debug.dprintf debug_rac "Missing value for parameter %a; taking default"
+          print_pv pv;
+        default_value_of_type known pv.pv_ity in
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   get_builtin_progs env ;
   let global_env = make_global_env ~model known in
