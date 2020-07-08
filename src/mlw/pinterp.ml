@@ -1144,6 +1144,16 @@ let rec import_model_value known ity =
         Pdecl.find_its_defn known ts,
         its_match_regs ts l1 l2
     | _ -> assert false in
+  let check_construction def =
+    if def.Pdecl.itd_its.its_nonfree then (
+      let msg = asprintf "Value of non-free type %a" print_ity ity in
+      raise (CannotImportModelValue msg) );
+    if is_range_type_def def.Pdecl.itd_its.its_def then (
+      let msg = asprintf "Value of range type %a (TODO)" print_ity ity in
+      raise (CannotImportModelValue msg) );
+    if is_float_type_def def.Pdecl.itd_its.its_def then (
+      let msg = asprintf "Value of float type %a (TODO)" print_ity ity in
+      raise (CannotImportModelValue msg) ) in
   function
     | Integer s ->
         assert (ity_equal ity ity_int);
@@ -1156,12 +1166,8 @@ let rec import_model_value known ity =
         value ty_bool (Vbool b)
     | Record r ->
         let def, subst = get_def_subst ity in
-        if def.Pdecl.itd_its.its_nonfree then (
-          let msg = asprintf "Value of non-free type %a" print_ity ity in
-          raise (CannotImportModelValue msg) );
-        let rs = match def.Pdecl.itd_constructors with [c] -> c | cs ->
-          eprintf "@[<hv2>---> %a %a@]@." print_ity ity Pp.(print_list space print_rs) cs;
-          assert false in
+        check_construction def;
+        let rs = match def.Pdecl.itd_constructors with [c] -> c | _ -> assert false in
         let assoc_ity rs =
           let name =
             try Ident.get_model_element_name ~attrs:rs.rs_name.id_attrs
@@ -1173,9 +1179,7 @@ let rec import_model_value known ity =
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
     | Apply (s, mvs) ->
         let def, subst = get_def_subst ity in
-        if def.Pdecl.itd_its.its_nonfree then (
-          let msg = asprintf "Value of non-free type %a" print_ity ity in
-          raise (CannotImportModelValue msg) );
+        check_construction def;
         let matching_name rs = String.equal rs.rs_name.id_string s in
         let rs = List.find matching_name def.Pdecl.itd_constructors in
         let import field_pv = import_model_value known (ity_full_inst subst field_pv.pv_ity) in
@@ -1183,9 +1187,7 @@ let rec import_model_value known ity =
         value (ty_of_ity ity) (Vconstr (rs, List.map mk_field fs))
     | Proj (s, mv) ->
         let def, subst = get_def_subst ity in
-        if def.Pdecl.itd_its.its_nonfree then (
-          let msg = asprintf "Value of non-free type %a" print_ity ity in
-          raise (CannotImportModelValue msg) );
+        check_construction def;
         let matching_name rs = String.equal rs.rs_name.id_string s in
         let rs = List.find matching_name def.Pdecl.itd_constructors in
         let import_or_default field_pv =
