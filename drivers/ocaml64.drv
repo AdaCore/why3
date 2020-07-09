@@ -485,10 +485,12 @@ end
 module mach.array.ArrayInt63
   syntax type array63 "(int array)"
   syntax val  make   "Array.make"
+  syntax val  init   "Array.init"
   syntax val  ([])   "%1.(%2)" prec 2 1 18
   syntax val  ([]<-) "%1.(%2) <- %3" prec 15 1 18 15
   syntax val  length "Array.length %1" prec 4 3
   syntax val  copy   "Array.copy"
+  syntax val  sub    "Array.sub"
 end
 
 module mach.matrix.Matrix63
@@ -515,12 +517,12 @@ end
 module ocaml.Exceptions
   syntax exception Exit             "Pervasives.Exit"
   syntax exception Not_found        "Not_found"
+  syntax exception Invalid_argument "Invalid_argument"
 end
 
 module ocaml.Pervasives
   syntax exception AssertFailure    "REMOVE"
   syntax val       ocaml_assert     "assert"
-  syntax exception Invalid_argument "Invalid_argument"
   syntax val       succ             "succ"
   syntax val       pred             "pred"
 end

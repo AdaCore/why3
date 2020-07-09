@@ -6,8 +6,9 @@ module MaxArray
   use array.Array
 
   let cfg compute_max (a:array int) : (max: int, ghost ind:int)
-    requires { a.length > 0 }
-    ensures { forall i. 0 <= i < a.length -> a[ind] >= a[i] }
+    requires { length a > 0 }
+    ensures  { 0 <= ind < length a }
+    ensures  { forall i. 0 <= i < length a -> a[ind] >= a[i] }
   =
   (* simulation of the C code: (from ACSL Manual, section 2.4.2 Loop invariants)
 
@@ -24,35 +25,34 @@ module MaxArray
     return m;
 
   *)
-
-  var i m:int;
-  ghost var ind:int;
+  var i m: int;
+  ghost var ind: int;
   {
-  i <- 0;
-  goto L
+    i <- 0;
+    goto L
   }
   L {
     m <- a[i];
     ind <- i;
     goto L1
-    }
+  }
   L1 {
-    invariant i_bounds   { 0 <= i < a.length };
-    invariant ind_bounds { 0 <= ind < a.length };
+    invariant i_bounds   { 0 <= i < length a };
+    invariant ind_bounds { 0 <= ind < length a };
     invariant m_and_ind  { m = a[ind] };
     invariant m_is_max   { forall j. 0 <= j <= i -> m >= a[j] };
                            (* (yes, j <= i, not j < i !) *)
-    i <- i+1;
-    switch (i < a.length)
-    | True -> goto L2
-    | False -> (m,ind)
+    i <- i + 1;
+    switch (i < length a)
+    | True  -> goto L2
+    | False -> (m, ind)
     end
-    }
+  }
   L2 {
     switch (a[i] > m)
-    | True -> goto L
+    | True  -> goto L
     | False -> goto L1
     end
-    }
+  }
 
 end

@@ -525,7 +525,9 @@ let rec clone_ity cl ity = match ity.ity_node with
   | Ityapp (s, tl, rl) ->
       let tl' = List.map (clone_ity cl) tl in
       begin match Mts.find_opt s.its_ts cl.ts_table with
-      | Some s' -> ity_app_pure s' tl' (clone_regs cl s tl rl s')
+      | Some s' -> ity_app_pure s' tl' (* pure to pure *)
+                     (if List.for_all (fun r -> r.ity_pure) rl
+                        then [] else clone_regs cl s tl rl s')
       | None -> (* creative indentation *)
       begin match Mts.find_opt s.its_ts cl.ty_table with
       | Some ity -> ity_full_inst (its_match_regs s tl' []) ity
@@ -1152,7 +1154,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       if List.length cty.cty_args <> List.length rs'.rs_cty.cty_args then
         raise (BadInstance (BadI_rs_arity rs.rs_name));
       let e = try e_exec (c_app rs' cty.cty_args [] cty.cty_result) with
-        | TypeMismatch _ -> raise (BadInstance (BadI_rs_type rs.rs_name)) in
+        | exn -> raise (BadInstance (BadI_rs_type (rs.rs_name, exn))) in
       let cexp = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
         cty.cty_post cty.cty_xpost cty.cty_oldies e in
       let id = id_derive (rs.rs_name.id_string ^ "'refn") rs.rs_name in

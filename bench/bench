@@ -167,6 +167,29 @@ replay () {
     done
 }
 
+replay_without_shape () {
+    pgm="bin/why3replay$suffix"; test=$1
+    test -d "$test" || exit 1
+    echo -n "Replay $test with shapes... "
+    if "$pgm" "$test" > /dev/null 2>&1; then
+        echo "OK."
+    else
+        echo "Failure!"
+        exit 1
+    fi
+    echo -n "Replay $test without shapes... "
+    noshapes=$(mktemp -d -p $(dirname "$test") "$(basename "$test")-without-shapes.XXXXXXXX")
+    cp "$test/why3session.xml" "$noshapes"
+    if "$pgm" "$noshapes" > /dev/null 2>&1 ; then
+        echo "OK."
+        rm -rf "$noshapes"
+    else
+        echo "Failure!"
+        rm -rf "$noshapes"
+        exit 1
+    fi
+}
+
 execute () {
     pgm="bin/why3execute$suffix"
     echo -n "  ${@:1}... "
@@ -507,6 +530,11 @@ echo ""
 echo "=== Checking extraction to C ==="
 extract_and_test_wmp examples/multiprecision
 echo ""
+fi
+
+if enabled replay-without-shapes; then
+echo "=== Checking replay without shapes ==="
+replay_without_shape examples/replay
 fi
 
 if enabled replay; then

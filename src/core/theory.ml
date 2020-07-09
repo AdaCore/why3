@@ -678,7 +678,7 @@ type bad_instance =
   | BadI_ls_arity of lsymbol (* lsymbol arity mismatch *)
   | BadI_ls_rs of lsymbol (* "val function" -> "function" *)
   | BadI_rs_arity of ident (* incompatible rsymbol arity *)
-  | BadI_rs_type of ident (* rsymbol type mismatch *)
+  | BadI_rs_type of ident * exn (* rsymbol type mismatch *)
   | BadI_rs_kind of ident (* incompatible rsymbol kind *)
   | BadI_rs_ghost of ident (* incompatible ghost status *)
   | BadI_rs_mask of ident (* incompatible result mask *)
@@ -1101,10 +1101,10 @@ let () = Exn_printer.register
       "Illegal instantiation for program function %a:@\n\
         arity mismatch"
         print_id id
-  | BadInstance (BadI_rs_type id) -> Format.fprintf fmt
+  | BadInstance (BadI_rs_type (id,exn)) -> Format.fprintf fmt
       "Illegal instantiation for program function %a:@\n\
-        type mismatch"
-        print_id id
+        %a"
+        print_id id Exn_printer.exn_printer exn
   | BadInstance (BadI_rs_kind id) -> Format.fprintf fmt
       "Illegal instantiation for program function %a:@\n\
         incompatible kind"

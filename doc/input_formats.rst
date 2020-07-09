@@ -296,27 +296,27 @@ MLCFG: Function Bodies on the Style of Control-Flow Graphs
 ----------------------------------------------------------
 
 The MLCFG language is an experimental extension of the regular WhyML
-language, in which the body of program functions can optionally be
-coded using labelled blocks and "goto" statements. MLCFG can be used to
+language, in which the body of program functions can be
+coded using labelled blocks and goto statements. MLCFG can be used to
 encode algorithms which are presented in an unstructured fashion. It
-can be also used as a target for encoding unstructured programming
+can also be used as a target for encoding unstructured programming
 languages in Why3, for example assembly code.
 
 
 Syntax of the MLCFG language
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The MLCFG syntax is an extension of the regular WhyML syntax : every
+The MLCFG syntax is an extension of the regular WhyML syntax: every
 WhyML declaration is allowed, plus an additional declaration of
-program function of the following form, introduced by keywords "let cfg":
+program function of the following form, introduced by keywords ``let cfg``:
 
-| let cfg :math:`f (x_1:t_1) ... (x_n:t_n) : t`
-|   requires { :math:`Pre` }
-|   ensures  { :math:`Post` }
-|   =
-|   var :math:`y_1 : u_1`;
+| ``let cfg`` :math:`f (x_1:t_1) ... (x_n:t_n) : t`
+|   ``requires`` { :math:`Pre` }
+|   ``ensures``  { :math:`Post` }
+|   ``=``
+|   ``var`` :math:`y_1 : u_1`;
 |   :math:`\vdots`
-|   var :math:`y_k : u_k`;
+|   ``var`` :math:`y_k : u_k`;
 |   {
 |     :math:`instructions`
 |   }
@@ -330,37 +330,38 @@ program function of the following form, introduced by keywords "let cfg":
 |     :math:`instructions`
 |   }
 
-It defines a program function `f` as usual, with the same syntax for
-its contract. The difference is the body, which is made by a sequences
-of declaration of mutable variables with their type, an initial block
+It defines a program function `f`, with the usual syntax for
+its contract. The difference is the body, which is made of a sequence
+of declarations of mutable variables with their types, an initial block
 of instructions, and a sequence of other blocks of instructions, each
-block being denoted by a label like :math:`L_1 \ldots L_j` above. The
+block being denoted by a label (:math:`L_1 \ldots L_j` above). The
 instructions are semi-colon separated sequences of either regular
-WhyML expressions of type `unit` (except of course when returning a
-value and the end of sequence), or CFG-specific instructions below:
+WhyML expressions of type ``unit`` (apart from the last one in the
+sequence, when returning a value), or CFG-specific instructions below:
 
-- a `goto` statement: `goto L` where L is one of the label of the
-  other blocks. It naturally instructs to continue execution at the
+- a ``goto`` statement: ``goto L`` where ``L`` is one of the label of the
+  other blocks. It instructs to continue execution at the
   given block.
 
-- a code invariant: `invariant I { t }` where `I` is a name and `t`
-  a predicate. It is similar as an assert expression, telling that `t`
+- a code invariant: ``invariant`` `I` ``{`` `t` ``}`` where `I` is a
+  name and `t`
+  a predicate. It is similar to an assert expression, meaning that `t`
   must hold when execution reaches this statement. Additionally, it
-  acts as a cut in the generation of VC, similarly as a loop
+  acts as a cut in the generation of VC, similarly to a loop
   invariant. See example below.
 
-- a switch statement, of the form
+- a ``switch`` statement, of the form
 
-  | switch (:math:`e`)
-  | | :math:`pat_1` -> :math:`instructions_1`
+  | ``switch`` ``(`` :math:`e` ``)``
+  | ``|`` :math:`pat_1` ``->`` :math:`instructions_1`
   | :math:`\vdots`
-  | | :math:`pat_k` -> :math:`instructions_k`
-  | end
+  | ``|`` :math:`pat_k` ``->`` :math:`instructions_k`
+  | ``end``
 
-  it is similar to a `match ... with ... end` expression, except that
+  It is similar to a ``match ... with ... end`` expression, except that
   the branches may recursively contain CFG instructions.
 
-The extension of syntax is formally described by the following rules.
+The extension of syntax is described by the following rules.
 
 .. productionlist:: CFG
     file: `module`*
@@ -370,11 +371,10 @@ The extension of syntax is formally described by the following rules.
     vardecl: "var" `ident`* ":" `type` ";" | "ghost" "var" `ident`* ":" `type` ";"
     block: `instruction` (";" `instruction`)*
     labelblock: `ident` "{" `block` "}"
-    instruction:
-    | `expression`
-    | "goto" `ident`
-    | "invariant" `ident` "{" `term` "}"
-    | "switch" "(" expression ")" `switch_case`* "end"
+    instruction: `expr`
+    : | "goto" `ident`
+    : | "invariant" `ident` "{" `term` "}"
+    : | "switch" "(" `expr` ")" `switch_case`* "end"
     switch_case: "|" `pattern` "->" `block`
 
 
@@ -409,73 +409,74 @@ an array of integers.
 The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_array`.
 
 .. graphviz:: images/max_array.dot
-   :caption: Control-Flow Graph of "max_array" example
+   :caption: Control-flow graph of "max_array" example.
    :name: fig.cfg.max_array
 
-Here is below a version of this code in the Why3-CFG language, where label "L" corresponds
+Below is a version of this code in the Why3-CFG language, where label
+"L" corresponds
 to node "L", label "L1" to node "invariant", label "L2" to node "do".
 
 .. code-block:: whyml
 
   let cfg max_array (a:array int) : (max: int, ghost ind:int)
-    requires { a.length > 0 }
-    ensures { forall j. 0 <= j < a.length -> a[ind] >= a[j] }
+    requires { length a > 0 }
+    ensures  { 0 <= ind < length a }
+    ensures  { forall j. 0 <= j < length a -> a[ind] >= a[j] }
   =
-  var i m:int;
-  ghost var ind:int;
+  var i m: int;
+  ghost var ind: int;
   {
-  i <- 0;
-  goto L
+    i <- 0;
+    goto L
   }
   L {
     m <- a[i];
     ind <- i;
     goto L1
-    }
+  }
   L1 {
-    invariant i_bounds   { 0 <= i < a.length };
-    invariant ind_bounds { 0 <= ind < a.length };
+    invariant i_bounds   { 0 <= i < length a };
+    invariant ind_bounds { 0 <= ind < length a };
     invariant m_and_ind  { m = a[ind] };
     invariant m_is_max   { forall j. 0 <= j <= i -> m >= a[j] };
-                           (* (yes, j <= i, not j < i !) *)
-    i <- i+1;
-    switch (i < a.length)
-    | True -> goto L2
-    | False -> (m,ind)
+                           (* yes, j <= i, not j < i ! *)
+    i <- i + 1;
+    switch (i < length a)
+    | True  -> goto L2
+    | False -> (m, ind)
     end
-    }
+  }
   L2 {
     switch (a[i] > m)
-    | True -> goto L
+    | True  -> goto L
     | False -> goto L1
     end
-    }
+  }
 
-The consecutive invariants act as one cut in the generation of VCs.
-
-
-
+The consecutive invariants act as a single cut in the generation of VCs.
 
 
 Error messages
 ~~~~~~~~~~~~~~
 
-The translation from the CFG language to the regular WhyML may raise the following errors.
+The translation from the CFG language to regular WhyML code may raise
+the following errors.
 
 - "cycle without invariant": in order to perform the translation, any
   cycle on the control-flow graph must contain at least one
   "invariant" clause. It corresponds to the idea that any loop must
   contain a loop invariant.
 
-- "cycle without invariant (starting from :math:`I`)": some error as
+- "cycle without invariant (starting from :math:`I`)": same error as
   above, except that the cycle was not reachable from the start of the
   function body, but from the other "invariant" clause named
   :math:`I`.
 
-- "label :math:`L` not found for goto": there is a "goto" instruction to a non-existent label.
+- "label :math:`L` not found for goto": there is a goto instruction
+  to a non-existent label.
 
-- "unreachable code after goto": any code occuring after a "goto"
-  statement is unreachable, so is certainly a user mistake.
+- "unreachable code after goto": any code occuring after a goto
+  statement is unreachable and is not allowed.
 
 - "unsupported: trailing code after switch": see limitations below.
 
@@ -483,17 +484,19 @@ The translation from the CFG language to the regular WhyML may raise the followi
 Current Limitations
 ~~~~~~~~~~~~~~~~~~~
 
-- Termination is never checked.
+- There is no way to prove termination.
 
 - New keywords "cfg", "goto", "switch" and "var" cannot be used as
   regular identifiers anymore.
 
-- Trailing code after "switch" is not supported: in principle it
-  should be possible to end a "switch" branch with "()" and transfer
-  the execution to the instructions after the "switch". This is not
+- Trailing code after "switch" is not supported: in principle, it
+  should be possible to have a ``switch`` with type ``unit`` and to transfer
+  the execution to the instructions after the ``switch`` for branches
+  not containing ``goto``. This is not
   yet supported. A workaround is to place the trailing instructions in
-  another block and pose an extra "goto" to this block in all the
-  "switch" branches" that do not end with a "goto" yet.
+  another block and pose an extra ``goto`` to this block in all the
+  branches that do not end with a ``goto``.
 
-- Conditional statements "if e then i1 else i2" are not yet supported, but can be
-  simulated with "switch (e) | True -> i1 | False -> i2 end"
+- Conditional statements ``if e then i1 else i2`` are not yet
+  supported, but can be simulated with ``switch (e) | True -> i1 |
+  False -> i2 end``.

@@ -27,7 +27,8 @@ let () = Debug.set_flag Dterm.debug_ignore_unused_var
 let mk_id ~loc name =
   { id_str = name; id_ats = []; id_loc = loc }
 
-let infix  ~loc s = Qident (mk_id ~loc (Ident.op_infix s))
+let id_infix ~loc s = mk_id ~loc (Ident.op_infix s)
+let infix  ~loc s = Qident (id_infix ~loc s)
 let prefix ~loc s = Qident (mk_id ~loc (Ident.op_prefix s))
 let get_op ~loc   = Qident (mk_id ~loc (Ident.op_get ""))
 let set_op ~loc   = Qident (mk_id ~loc (Ident.op_set ""))
@@ -149,22 +150,22 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
     mk_expr ~loc (match op with
       | Py_ast.Band -> Eand (e1, e2)
       | Py_ast.Bor  -> Eor  (e1, e2)
-      | Py_ast.Badd -> Eidapp (infix ~loc "+", [e1; e2])
-      | Py_ast.Bsub -> Eidapp (infix ~loc "-", [e1; e2])
-      | Py_ast.Bmul -> Eidapp (infix ~loc "*", [e1; e2])
+      | Py_ast.Badd -> Eidapp (infix ~loc "+",  [e1; e2])
+      | Py_ast.Bsub -> Eidapp (infix ~loc "-",  [e1; e2])
+      | Py_ast.Bmul -> Eidapp (infix ~loc "*",  [e1; e2])
       | Py_ast.Bdiv -> Eidapp (infix ~loc "//", [e1; e2])
-      | Py_ast.Bmod -> Eidapp (infix ~loc "%", [e1; e2])
-      | Py_ast.Beq  -> Eidapp (infix ~loc "=", [e1; e2])
-      | Py_ast.Bneq -> Eidapp (infix ~loc "<>", [e1; e2])
-      | Py_ast.Blt  -> Eidapp (infix ~loc "<", [e1; e2])
-      | Py_ast.Ble  -> Eidapp (infix ~loc "<=", [e1; e2])
-      | Py_ast.Bgt  -> Eidapp (infix ~loc ">", [e1; e2])
-      | Py_ast.Bge  -> Eidapp (infix ~loc ">=", [e1; e2])
+      | Py_ast.Bmod -> Eidapp (infix ~loc "%",  [e1; e2])
+      | Py_ast.Beq  -> Einnfix (e1, id_infix ~loc "=",  e2)
+      | Py_ast.Bneq -> Einnfix (e1, id_infix ~loc "<>", e2)
+      | Py_ast.Blt  -> Einnfix (e1, id_infix ~loc "<",  e2)
+      | Py_ast.Ble  -> Einnfix (e1, id_infix ~loc "<=", e2)
+      | Py_ast.Bgt  -> Einnfix (e1, id_infix ~loc ">",  e2)
+      | Py_ast.Bge  -> Einnfix (e1, id_infix ~loc ">=", e2)
     )
   | Py_ast.Eunop (Py_ast.Uneg, e) ->
     mk_expr ~loc (Eidapp (prefix ~loc "-", [expr env e]))
   | Py_ast.Eunop (Py_ast.Unot, e) ->
-    mk_expr ~loc (Eidapp (Qident (mk_id ~loc "not"), [expr env e]))
+    mk_expr ~loc (Enot (expr env e))
   | Py_ast.Ecall ({id_str="print"}, el) ->
     let eval res e =
       mk_expr ~loc (Elet (mk_id ~loc "_", false, Expr.RKnone, expr env e, res)) in
