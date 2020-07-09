@@ -166,7 +166,7 @@ let rec print_value fmt v =
       fprintf fmt "@[<v2>(%tfun %a -> %a)@]"
         (fun fmt ->
            if not (Mvs.is_empty mvs) then
-             pp_bindings Pretty.print_vs print_value fmt (Mvs.bindings mvs))
+             fprintf fmt "%a " (pp_bindings Pretty.print_vs print_value) (Mvs.bindings mvs))
         Pretty.print_vs vs
         print_expr e
   | Vconstr (rs, vl) when is_rs_tuple rs ->

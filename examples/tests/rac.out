@@ -102,13 +102,13 @@ globals: myref -> (ref'mk 0)
 result: int = 1
 globals: myref -> (ref'mk 1)
 ** PolyRefContracts.test2b
-Precondition of test2_aux failed at examples/tests/rac.mlw, line 261, characters 4-23
-Defined at examples/tests/rac.mlw, line 249, characters 15-29
+Precondition of test2_aux failed at examples/tests/rac.mlw, line 259, characters 4-23
+Defined at examples/tests/rac.mlw, line 247, characters 15-29
 Term: not contents argref = argx
 Variables: argref -> ref'mk 0, argx -> 0
 ** PolyRefContracts.test2c
-Postcondition of test2_aux failed at examples/tests/rac.mlw, line 264, characters 4-23
-Defined at examples/tests/rac.mlw, line 251, characters 14-27
+Postcondition of test2_aux failed at examples/tests/rac.mlw, line 262, characters 4-23
+Defined at examples/tests/rac.mlw, line 249, characters 14-27
 Term: result = argy
 Variables: argy -> 2, result -> 1
 
@@ -120,15 +120,15 @@ globals:
 result: () = ()
 globals: 
 ** RecordPoly.test3
-Postcondition of update cannot be evaluated at examples/tests/rac.mlw, line 299, characters 4-20
-Defined at examples/tests/rac.mlw, line 290, characters 14-77
+Postcondition of update cannot be evaluated at examples/tests/rac.mlw, line 297, characters 4-20
+Defined at examples/tests/rac.mlw, line 288, characters 14-77
 Term: forall j:int.
        0 < j /\ j < length r -> not j = i -> (elts r @ j) = (elts r1 @ j)
 Variables: i -> 3,
   r -> t3'mk
        (fun (j:int) -> if j = 3 then False else (fun (_:int) -> True) @ j) 5,
   r1 -> t3'mk (fun (_:int) -> True) 5
-Assertion failed at examples/tests/rac.mlw, line 302, characters 13-29
+Assertion failed at examples/tests/rac.mlw, line 300, characters 13-29
 Term: (elts r2 @ 1) = False
 Variables: r2 -> t3'mk
                  (fun (j:int) ->
@@ -137,7 +137,7 @@ Variables: r2 -> t3'mk
 
 * PolyFunc
 ** PolyFunc.test1
-result: int -> int = <fun>
+result: int -> int = ({v -> 0} fun _ -> v)
 globals: 
 ** PolyFunc.test2
 result: (int, int) = (111, 0)
@@ -154,6 +154,6 @@ globals:
 result: (int, int) = (10, 0)
 globals: 
 ** ArrayExec.test4
-Assertion failed at examples/tests/rac.mlw, line 375, characters 13-19
+Assertion failed at examples/tests/rac.mlw, line 373, characters 13-19
 Term: x = 11
 Variables: x -> 0
