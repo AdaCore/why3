@@ -73,6 +73,7 @@ module rec Value : sig
     | Varray of value array
     | Vfun of value Mvs.t (* closure *) * vsymbol * expr
     | Vpurefun of ty (* keys *) * value Mv.t * value
+    | Vghost of term (* ghost values *)
   and field = Field of value ref
   val compare_values : value -> value -> int
 end = struct
@@ -89,6 +90,7 @@ end = struct
     | Varray of value array
     | Vfun of value Mvs.t (* closure *) * vsymbol * expr
     | Vpurefun of ty (* keys *) * value Mv.t * value
+    | Vghost of term
   and field = Field of value ref
   let (<?>) c (cmp,x,y) = if c = 0 then cmp x y else c
   let rec compare_lists c l1 l2 : int = match l1, l2 with
@@ -112,6 +114,7 @@ end = struct
     | Vpurefun (ty1, mv1, v1), Vpurefun (ty2, mv2, v2) ->
         ty_compare ty1 ty2 <?> (compare, v1, v2)
         <?> (Mv.compare compare, mv1, mv2)
+    | Vghost t1, Vghost t2 -> t_compare t1 t2
     | _ -> compare d1 d2
   and compare_fields (Field r1) (Field r2) =
     compare !r1 !r2
@@ -179,6 +182,8 @@ let rec print_value fmt v =
   | Vpurefun (_, mv, v) ->
       fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
         (Mv.bindings mv) print_value v
+  | Vghost t ->
+      Pretty.print_term fmt t
 
 and print_field fmt f = print_value fmt (field_get f)
 
@@ -230,6 +235,7 @@ let term_of_value env t =
           mt, t_if (t_equ (t_var arg) key) value t in
         let mt, t = Mv.fold aux mv (mt, t) in
         mt, t_lambda [arg] [] t
+    | Vghost t -> mt, t
     | Vreal _ | Vfloat _ | Vfloat_mode _ ->
         Format.kasprintf failwith "term_of_value: %a" print_value v
   and term_of_field mt f = term_of_value' mt (field_get f) in
@@ -1063,7 +1069,7 @@ let rec eval_expr ~rac env (e : expr) : result =
       let t =
         let vsenv = Mvs.map (term_of_value env.env) env.vsenv in
         reduce_term env.env known rule_terms vsenv t in
-      Normal (value_of_term env.vsenv t)
+      Normal (value (Opt.get t.t_ty) (Vghost t))
   | Eabsurd ->
       eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
         print_expr e ;
