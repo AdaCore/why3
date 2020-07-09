@@ -296,6 +296,17 @@ and term_of_field mt f = term_of_value' mt (field_get f)
 
 let term_of_value t = snd (term_of_value' Mtv.empty t)
 
+let rec value_of_term vsenv t : value = match t.t_node with
+  | Tvar vs -> Mvs.find vs vsenv
+  | Tconst (Constant.ConstInt i) ->
+      value ty_int (Vnum (BigInt.of_int (Number.to_small_integer i)))
+  | Tapp (ls, ts) -> (
+      try
+        let fs = List.map (fun t -> field (value_of_term vsenv t)) ts in
+        value (Opt.get t.t_ty) (Vconstr (restore_rs ls, fs))
+      with Not_found -> failwith "value_of_term Tapp: ls not a rs_logic" )
+  | _ -> kasprintf failwith "value_of_term: %a" Pretty.print_term t
+
 (* RESULT *)
 
 type result =
@@ -1063,7 +1074,14 @@ let rec eval_expr ~rac env (e : expr) : result =
   | Eghost e1 ->
       (* TODO: do not eval ghost if no assertion check *)
       eval_expr ~rac env e1
-  | Epure _ -> Normal (value ty_unit Vvoid) (* TODO *)
+  | Epure t ->
+      let known, rule_terms =
+        Mid.fold add_known_rule_term env.known (Mid.empty, Mid.empty) in
+      let known = Mrs.fold add_fun_to_known env.funenv known in
+      let t =
+        let vsenv = Mvs.map term_of_value env.vsenv in
+        reduce_term env.env known rule_terms vsenv t in
+      Normal (value_of_term env.vsenv t)
   | Eabsurd ->
       eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
         print_expr e ;
