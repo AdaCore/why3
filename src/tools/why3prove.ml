@@ -282,8 +282,9 @@ let maybe_model_rs pm loc model rs =
       printf "RAC impossible: Cannot import model value: %s@." msg;
       None
   | Failure msg ->
-      (* TODO Remove when term_of_value' works for types with invariants (no constructors) *)
-      printf "Failure: %s@." msg;
+      (* E.g., cannot create default value for non-free type, cannot construct
+         term for constructor that is not a function *)
+      printf "RAC failure: %s@." msg;
       None
 
 let maybe_model pm m =

@@ -199,9 +199,9 @@ let term_of_value env t =
         let mt, fs = Lists.map_fold_left term_of_field mt fs in
         if rs_kind rs = RKfunc then
           mt, t_app_infer (ls_of_rs rs) fs
-        else
-          (* TODO The constructor is not exposed for records with type invariants *)
-          kasprintf failwith "term_of_value': No constructor lsymbol for %a" print_rs rs
+        else (* TODO Not sure if needed *)
+          kasprintf failwith "Cannot construct term for constructor \
+                              %a that is not a function" print_rs rs
     | Vfun (cl, arg, e) ->
         let aux vs v (mt, mv) =
           let mt = ty_match mt vs.vs_ty v.v_ty in
@@ -602,8 +602,7 @@ and default_value_of_types known ts l1 l2 ty : value =
     | cs :: _ -> cs
     | [] ->
         assert ts.its_nonfree;
-        eprintf "Cannot create default value for non-free type %a" Ity.print_its ts;
-        raise CannotCompute in
+        kasprintf failwith "Cannot create default value for non-free type %a@." Ity.print_its ts in
   let subst = its_match_regs ts l1 l2 in
   let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
   let tyl = List.map (ity_full_inst subst) ityl in
@@ -1325,7 +1324,7 @@ let eval_rs env known loc model (rs: rsymbol) =
     | Some mv ->
         import_model_value known pv.pv_ity mv
     | None ->
-        Debug.dprintf debug_rac "Missing value for parameter %a; taking default"
+        Debug.dprintf debug_rac "Missing value for parameter %a; taking default@."
           print_pv pv;
         default_value_of_type known pv.pv_ity in
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
