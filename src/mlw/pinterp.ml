@@ -25,8 +25,8 @@ let debug =
 
 let debug_rac = Debug.register_info_flag "rac" ~desc:"trace evaluation for RAC"
 
-let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace)) pp_key pp_value
-    fmt l =
+let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
+    pp_key pp_value fmt l =
   let pp_binding fmt (k, v) =
     fprintf fmt "@[<h>%a%a%a@]" pp_key k pair_sep () pp_value v in
   fprintf fmt "%a%a%a" (fst delims) ()
@@ -35,6 +35,7 @@ let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, r
 
 let pp_typed pp ty fmt x =
   fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x)
+[@@warning "-32"]
 
 (* EXCEPTIONS *)
 
