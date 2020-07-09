@@ -168,13 +168,11 @@ module Labels
 
   let test1 () =
     let x = {value= 0} in
-    label X1 in
+    label A in
     x.value <- x.value + 1;
-    label X2 in
+    label B in
     x.value <- x.value + 1;
-    assert { x.value at X1 = 0 }; (* ok *)
-    assert { x.value at X2 = 1 }; (* ok *)
-    assert { x.value = 2 } (* ok *)
+    assert { x.value = x.value at B + 1 = x.value at A + 2 }
 end
 
 (* TODO *)
