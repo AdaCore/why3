@@ -281,9 +281,6 @@ let maybe_model_rs pm loc model rs =
   | CannotImportModelValue msg ->
       printf "RAC impossible: Cannot import model value: %s@." msg;
       None
-  | Missing_dispatch msg ->
-      printf "RAC impossible: Missing dispatch for %s@." msg;
-      None
   | Failure msg ->
       (* TODO Remove when term_of_value' works for types with invariants (no constructors) *)
       printf "Failure: %s@." msg;

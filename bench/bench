@@ -428,7 +428,6 @@ fi
 
 if enabled execution; then
 echo "=== Checking execution ==="
-DISPATCH=( -L examples/tests --dispatch=array.Array/rac.ArrayExec )
 execute examples/euler001.mlw "bench ()" --use=Euler001
 execute examples/euler002.mlw "bench ()" --use=Solve
 execute examples/fibonacci.mlw "bench ()" --use=FibRecGhost
@@ -439,20 +438,20 @@ execute examples/fibonacci.mlw "bench ()" --use=FibonacciLogarithmic
 # execute examples/same_fringe.mlw SameFringe.test5
 execute examples/same_fringe.mlw "test1 ()" --use=Test
 execute examples/vstte12_combinators.mlw "test_SKK ()" --use=Combinators
-execute "${DISPATCH[@]}" examples/selection_sort.mlw "bench ()" --use=SelectionSort
-execute "${DISPATCH[@]}" examples/insertion_sort.mlw "bench ()" --use=InsertionSort
-execute "${DISPATCH[@]}" examples/quicksort.mlw "bench ()" --use=Test
-execute "${DISPATCH[@]}" examples/conjugate.mlw "bench ()" --use=Test
+execute examples/selection_sort.mlw "bench ()" --use=SelectionSort
+execute examples/insertion_sort.mlw "bench ()" --use=InsertionSort
+execute examples/quicksort.mlw "bench ()" --use=Test
+execute examples/conjugate.mlw "bench ()" --use=Test
 # fails: needs support for "val" without code (how to do it?)
 # examples/vacid_0_sparse_array.mlw Harness.bench
-execute "${DISPATCH[@]}" examples/knuth_prime_numbers.mlw "bench ()" --use=PrimeNumbers
-execute "${DISPATCH[@]}" examples/vstte10_max_sum.mlw "test_case ()" --use=TestCase
-execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw "bench ()" --use=LCP_test
-execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw "bench ()" --use=SuffixSort_test
-execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw "bench ()" --use=SuffixArray_test
-execute "${DISPATCH[@]}" examples/verifythis_fm2012_LRS.mlw "bench ()" --use=LRS_test
-execute "${DISPATCH[@]}" examples/verifythis_PrefixSumRec.mlw "bench ()" --use=PrefixSumRec
-execute "${DISPATCH[@]}" examples/vstte10_queens.mlw "test8 ()" --use=NQueens
+execute examples/knuth_prime_numbers.mlw "bench ()" --use=PrimeNumbers
+execute examples/vstte10_max_sum.mlw "test_case ()" --use=TestCase
+execute examples/verifythis_fm2012_LRS.mlw "bench ()" --use=LCP_test
+execute examples/verifythis_fm2012_LRS.mlw "bench ()" --use=SuffixSort_test
+execute examples/verifythis_fm2012_LRS.mlw "bench ()" --use=SuffixArray_test
+execute examples/verifythis_fm2012_LRS.mlw "bench ()" --use=LRS_test
+execute examples/verifythis_PrefixSumRec.mlw "bench ()" --use=PrefixSumRec
+execute examples/vstte10_queens.mlw "test8 ()" --use=NQueens
 # fails: "Cannot decide condition of if: (not ((~)((<<)((~)(0), 8)) = 0))"
 # examples/queens.mlw NQueensBits.test8
 # fails: cannot find definition of routine eq

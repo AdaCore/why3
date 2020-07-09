@@ -43,87 +43,6 @@ exception Undetermined
 exception CannotCompute
 exception NotNum
 exception CannotFind of (Env.pathname * string * string)
-exception Missing_dispatch of string
-
-(* DISPATCH *)
-
-type dispatch_ctx = {
-  disp_rs: (Pdecl.known_map * rsymbol) option Mrs.t; (* Map source symbols to target symbols *)
-  disp_ty: tysymbol option Mts.t; (* Map source type symbols to target type symbols *)
-}
-
-let empty_dispatch = {disp_rs= Mrs.empty; disp_ty= Mts.empty}
-
-let add_dispatch ~source:pm1 ~target:pm2 disp_ctx =
-  let open Pmodule in
-  let add_rs_rev_ls disp_ctx =
-    let for_rs _ rs1 disp_ctx =
-      if List.mem rs1.rs_name.id_string ["Tuple0"; "True"; "False"] then
-        (* TODO Why are they in every module? *)
-        disp_ctx
-      else
-        let exception Found of rsymbol in
-        let find str2 ps =
-          if str2 = rs1.rs_name.id_string then
-            match ps with
-            | RS rs2 -> raise (Found rs2)
-            | _ -> () in
-        let def = match Mstr.iter find pm2.mod_export.ns_ps with
-          | exception Found rs2 -> Some (pm2.mod_known, rs2)
-          | () -> None in
-        let disp_rs = Mrs.add rs1 def disp_ctx.disp_rs in
-        {disp_ctx with disp_rs} in
-    let print_ps fmt = function
-      | PV pv -> fprintf fmt "PV %a" print_pv pv
-      | RS rs -> fprintf fmt "PV %a" print_rs rs
-      | OO _ -> fprintf fmt "OO" in
-    let get_rs = function RS rs -> Some rs | ps -> eprintf "IGNORE %a@." print_ps ps; None in
-    let mrs1 = Mstr.map_filter get_rs pm1.mod_export.ns_ps in
-    Mstr.fold for_rs mrs1 disp_ctx in
-  let add_ty disp_ctx =
-    let for_ity _ {its_ts= ts1} disp_ctx =
-      let exception Found of tysymbol in
-      let find str2 {its_ts= ts2} =
-        if str2 = ts1.ts_name.id_string then
-          raise (Found ts2) in
-      let def = match Mstr.iter find pm2.mod_export.ns_ts with
-        | exception Found ts2 ->
-            Some ts2
-        | () -> None in
-      let disp_ty = Mts.add ts1 def disp_ctx.disp_ty in
-      {disp_ctx with disp_ty} in
-    Mstr.fold for_ity pm1.mod_export.ns_ts disp_ctx in
-  add_ty (add_rs_rev_ls disp_ctx)
-
-let () = Exn_printer.register (fun fmt exn ->
-    match exn with
-    | Missing_dispatch str -> fprintf fmt "Missing dispatch for %s" str
-    | _ -> raise exn)
-
-let rs_dispatch disp_rs rs =
-  match Mrs.find rs disp_rs with
-  | Some (known, rs') ->
-      let pp_rs fmt rs =
-        fprintf fmt "%a:%a -> %a" print_rs rs
-          Pp.(print_list arrow (pp_typed print_pv (fun pv -> pv.pv_vs.vs_ty))) rs.rs_cty.cty_args
-          Pretty.print_ty (ty_of_ity rs.rs_cty.cty_result) in
-      Debug.dprintf debug_rac "@[<hv2>Dispatched @[<h>%a@] to @[<h>%a@]@]@."
-        pp_rs rs pp_rs rs';
-      rs', known
-  | None -> raise (Missing_dispatch (asprintf "rsymbol %a" print_rs rs))
-
-let rec ty_dispatch disp_ty ty =
-  match ty.ty_node with
-  | Tyvar _ -> ty
-  | Tyapp (ts, tys) ->
-      try
-        match Mts.find ts disp_ty with
-        | Some ts' ->
-            Debug.dprintf debug_rac "@[<hv2>Dispatched type @[<h>%a@] to @[<h>%a@]@]@."
-              Pretty.print_ts ts Pretty.print_ts ts';
-            ty_app ts' (List.map (ty_dispatch disp_ty) tys)
-        | None -> raise (Missing_dispatch (asprintf "tvsymbol %a" Pretty.print_ts ts))
-      with Not_found -> ty
 
 (* VALUES *)
 
@@ -329,8 +248,7 @@ type env =
   { known: Pdecl.known_map;
     funenv: Expr.cexp Mrs.t;
     vsenv: value Mvs.t;
-    env: Env.env;
-    disp_ctx: dispatch_ctx }
+    env: Env.env }
 
 let add_local_funs locals env =
   let add acc (rs, ce) = Mrs.add rs ce acc in
@@ -614,7 +532,8 @@ and default_value_of_types known ts l1 l2 ty : value =
     | cs :: _ -> cs
     | [] ->
         assert ts.its_nonfree;
-        raise (Missing_dispatch (asprintf "non-free type %a" Ity.print_its ts)) in
+        eprintf "Cannot create default value for non-free type %a" Ity.print_its ts;
+        raise CannotCompute in
   let subst = its_match_regs ts l1 l2 in
   let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
   let tyl = List.map (ity_full_inst subst) ityl in
@@ -1101,10 +1020,6 @@ and exec_match ~rac env t ebl =
   iter ebl
 
 and exec_call ~rac ?loc env rs arg_pvs ity_result =
-  let rs, env =
-    match rs_dispatch env.disp_ctx.disp_rs rs with
-    | rs, known -> rs, {env with known}
-    | exception Not_found -> rs, env in
   let arg_vs = List.map (get_pvs env) arg_pvs in
   Debug.dprintf debug_rac "@[<h>Exec call %a %a@]@."
     print_rs rs Pp.(print_list space print_value) arg_vs;
@@ -1145,7 +1060,8 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
                   rs.rs_name.id_string print_logic_result r ;
                 r
             | Cany ->
-                raise (Missing_dispatch (asprintf "any function %a" print_rs rs))
+                eprintf "Cannot compute any function %a" print_rs rs;
+                raise CannotCompute
             | Cpur _ -> assert false (* TODO ? *) )
       | Builtin f ->
           Debug.dprintf debug "@[Evaluating builtin function %s@]@."
@@ -1157,10 +1073,8 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
       | Constructor _ ->
           Debug.dprintf debug "[interp] create record with type %a@."
             print_ity ity_result;
-          let match_pv_v mt pv v =
-            let ty = ty_dispatch env.disp_ctx.disp_ty pv.pv_vs.vs_ty in
-            ty_match mt ty v.v_ty in
-          let mt = List.fold_left2 match_pv_v Mtv.empty rs.rs_cty.cty_args arg_vs in
+          let mt = List.fold_left2 ty_match Mtv.empty
+              (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
           let ty = ty_inst mt (ty_of_ity ity_result) in
           let fs = List.map field arg_vs in
           Normal (value ty (Vconstr (rs, fs)))
@@ -1319,17 +1233,17 @@ let make_global_env ?model known =
     | _ -> acc in
   Mid.fold add_glob known Mvs.empty
 
-let eval_global_expr ~rac env disp_ctx known locals e =
+let eval_global_expr ~rac env known locals e =
   get_builtin_progs env ;
   let global_env = make_global_env known in
   let env = add_local_funs locals
-      {known; funenv= Mrs.empty; vsenv= global_env; env; disp_ctx} in
+      {known; funenv= Mrs.empty; vsenv= global_env; env} in
   let res = eval_expr ~rac env e in
   res, global_env
 
-let eval_global_fundef ~rac env disp_ctx mod_known locals body =
+let eval_global_fundef ~rac env mod_known locals body =
   let rac = if rac then RacAll else RacNone in
-  try eval_global_expr ~rac env disp_ctx mod_known locals body
+  try eval_global_expr ~rac env mod_known locals body
   with CannotFind (l, s, n) ->
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
@@ -1347,7 +1261,7 @@ let eval_rs env known loc model (rs: rsymbol) =
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   get_builtin_progs env ;
   let global_env = make_global_env ~model known in
-  let env = {known; funenv= Mrs.empty; vsenv= global_env; env; disp_ctx= empty_dispatch} in
+  let env = {known; funenv= Mrs.empty; vsenv= global_env; env} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   exec_call ~rac env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
 

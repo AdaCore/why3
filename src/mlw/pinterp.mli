@@ -37,26 +37,7 @@ type cntr_ctx =
     during RAC. *)
 exception Contr of cntr_ctx * Term.term
 
-(** {1 Dispatch}
-
-    Dispatch abstract modules, which cannot be executed due to abstract types or
-    val functions, to executable modules. *)
-
-type dispatch_ctx
-
-val empty_dispatch : dispatch_ctx
-
-val add_dispatch :
-  source:Pmodule.pmodule ->
-  target:Pmodule.pmodule ->
-  dispatch_ctx ->
-  dispatch_ctx
-
-(** Raised when the a module is being dispatch but an function or value is not
-    defined in the target module *)
-exception Missing_dispatch of string
-
-(** {1 Evaluation} *)
+(** {1 Global evaluation} *)
 
 val init_real : int * int * int -> unit
 (** Give a precision on real computation. *)
@@ -64,7 +45,6 @@ val init_real : int * int * int -> unit
 val eval_global_fundef :
   rac:bool ->
   Env.env ->
-  dispatch_ctx ->
   Pdecl.pdecl Ident.Mid.t ->
   (Expr.rsymbol * Expr.cexp) list ->
   Expr.expr ->

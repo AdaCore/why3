@@ -36,8 +36,6 @@ let opt_parser = ref None
 
 let enable_rac = ref false
 
-let dispatch = ref []
-
 let use_modules = ref []
 
 let option_list =
@@ -51,7 +49,7 @@ let option_list =
     KLong "rac", Hnd0 (fun () -> enable_rac := true),
     " enable runtime basic runtime assertion checking";
     KLong "dispatch", Hnd1 (APair ('/', APair ('.', AString, AString),
-      APair ('.', AString, AString)), fun arg -> dispatch := arg :: !dispatch),
+    APair ('.', AString, AString)), fun _arg -> eprintf "Dispatch currently not supported"; exit 1),
     ("<f.M>/<g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\
       provide an implementation for a module with abstract types or values)");
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
@@ -63,18 +61,6 @@ let config, _, env =
 
 let () =
   if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
-
-let () =
-  if !enable_rac && !dispatch <> [] then (
-    Format.eprintf "RAC and dispatch currently not supported at the same time";
-    exit 1 )
-
-let prepare_dispatch env l =
-  let aux ((p1, m1), (p2, m2)) =
-    read_module env [p1] m1,
-    read_module env [p2] m2 in
-  List.fold_right (fun (source, target) -> Pinterp.add_dispatch ~source ~target)
-    (List.map aux l) Pinterp.empty_dispatch
 
 let find_module env file q =
   match List.rev q with
@@ -116,8 +102,7 @@ let do_input f =
   let open Pinterp in
   Opt.iter init_real !prec;
   try
-    let dispatch = prepare_dispatch env !dispatch in
-    let res = eval_global_fundef ~rac:!enable_rac env dispatch known [] expr in
+    let res = eval_global_fundef ~rac:!enable_rac env known [] expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
   with Contr (ctx, term) ->

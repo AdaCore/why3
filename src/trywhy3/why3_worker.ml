@@ -325,14 +325,13 @@ let why3_execute modules =
              let e_unit = e_exec (c_app (rs_tuple 0) [] [] (Ity.ity_tuple [])) in
              let (let_defn,pv) = let_var (Ident.id_fresh "o") e_unit in
 
-             let rs = Pmodule.ns_find_rs m.mod_export [mod_name;fun_name] in
-             let e_rs_unit = e_exec (c_app rs [pv] [] rs.rs_cty.cty_result) in
+             let rs = Pmodule.ns_find_rs m.Pmodule.mod_export [mod_name;fun_name] in
+             let e_rs_unit = e_exec (c_app rs [pv] [] rs.rs_cty.Ity.cty_result) in
              let expr = e_let let_defn e_rs_unit in
 
-             let known, dispatch = m.mod_known, Pinterp.empty_dispatch in
              let result =
                try
-                 let res = eval_global_fundef ~rac:false env dispatch known [] expr in
+                 let res = eval_global_fundef ~rac:false env m.Pmodule.mod_known [] expr in
                  asprintf "%a@." (report_eval_result expr) res
                with Contr (ctx, term) ->
                  asprintf "%a@." (report_cntr expr) (ctx, term) in
