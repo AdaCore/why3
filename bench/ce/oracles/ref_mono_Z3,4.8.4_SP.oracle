@@ -86,15 +86,15 @@ File ref_mono.mlw:
     x23,
     [[@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "399" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-1" } }] } }
   Line 38:
     x23, [[@field:0:contents], [@introduced], [@model_trace:x23]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "401" } }] } }
+    "value" : {"type" : "Integer" , "val" : "1" } }] } }
     old x23,
     [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced], [@model_trace:x23]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "399" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-1" } }] } }
     old y,
     [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced], [@model_trace:y]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
@@ -106,12 +106,13 @@ File ref_mono.mlw:
   Line 41:
     x23, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "400" } }] } }
+    "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 42:
     x23, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "401" } }] } }
+    "value" : {"type" : "Integer" , "val" : "1" } }] } }
 
+RAC confirms the counter-example
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File ref_mono.mlw:
@@ -153,6 +154,7 @@ File ref_mono.mlw:
     "value" : {"type" : "Integer" , "val" : "402" } }] } }
 
 bench/ce/ref_mono.mlw M test_loop'vc: Valid
+RAC does not confirm the counter-example (execution did not fail at all)
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File ref_mono.mlw:
