@@ -70,6 +70,7 @@ module rec Value : sig
     | Vstring of string
     | Vbool of bool
     | Vvoid
+    | Varray of value array
     | Vfun of value Mvs.t (* closure *) * vsymbol * expr
     | Vpurefun of ty (* keys *) * value Mv.t * value
   and field = Field of value ref
@@ -85,6 +86,7 @@ end = struct
     | Vstring of string
     | Vbool of bool
     | Vvoid
+    | Varray of value array
     | Vfun of value Mvs.t (* closure *) * vsymbol * expr
     | Vpurefun of ty (* keys *) * value Mv.t * value
   and field = Field of value ref
@@ -170,61 +172,68 @@ let rec print_value fmt v =
       fprintf fmt "@[(%a %a)@]" print_rs rs
         (Pp.print_list Pp.space print_field)
         vl
+  | Varray a ->
+      fprintf fmt "@[[%a]@]"
+        (Pp.print_list Pp.comma print_value)
+        (Array.to_list a)
   | Vpurefun (_, mv, v) ->
       fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
         (Mv.bindings mv) print_value v
 
 and print_field fmt f = print_value fmt (field_get f)
 
-let rec term_of_value' mt v : ty Mtv.t * term =
-  match v.v_desc with
-  | Vnum i -> mt, t_const (Constant.int_const i) v.v_ty
-  | Vstring s -> mt, t_const (Constant.ConstStr s) ty_str
-  | Vbool b -> mt, if b then t_bool_true else t_bool_false
-  | Vvoid -> mt, t_tuple []
-  | Vconstr (rs, fs) ->
-      let mt, fs = Lists.map_fold_left term_of_field mt fs in
-      if rs_kind rs = RKfunc then
-        mt, t_app_infer (ls_of_rs rs) fs
-      else
-        (* TODO The constructor is not exposed for records with type invariants *)
-        kasprintf failwith "term_of_value': No constructor lsymbol for %a" print_rs rs
-  | Vfun (cl, arg, e) ->
-      let aux vs v (mt, mv) =
-        let mt = ty_match mt vs.vs_ty v.v_ty in
+let term_of_value env t =
+  let rec term_of_value' mt v : ty Mtv.t * term =
+    match v.v_desc with
+    | Vnum i -> mt, t_const (Constant.int_const i) v.v_ty
+    | Vstring s -> mt, t_const (Constant.ConstStr s) ty_str
+    | Vbool b -> mt, if b then t_bool_true else t_bool_false
+    | Vvoid -> mt, t_tuple []
+    | Vconstr (rs, fs) ->
+        let mt, fs = Lists.map_fold_left term_of_field mt fs in
+        if rs_kind rs = RKfunc then
+          mt, t_app_infer (ls_of_rs rs) fs
+        else
+          (* TODO The constructor is not exposed for records with type invariants *)
+          kasprintf failwith "term_of_value': No constructor lsymbol for %a" print_rs rs
+    | Vfun (cl, arg, e) ->
+        let aux vs v (mt, mv) =
+          let mt = ty_match mt vs.vs_ty v.v_ty in
+          let mt, t = term_of_value' mt v in
+          mt, Mvs.add vs t mv in
+        let mt, mv = Mvs.fold aux cl (mt, Mvs.empty) in
+        let t = Opt.get (term_of_expr ~prop:false e) in
+        let t = t_ty_subst mt mv t in
+        mt, t_lambda [arg] [] t
+    | Varray a ->
+        let pm = Pmodule.read_module env ["array"] "Array" in
+        let vs = create_vsymbol (id_fresh "a") v.v_ty in
+        let ls_get = Mstr.find (Ident.op_get "") pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
+        let rec aux mt i =
+          if i = Array.length a then
+            mt, t_true
+          else
+            let t_i = t_const (Constant.int_const_of_int i) ty_int in
+            let t1 = t_app_infer ls_get [t_var vs; t_i] in
+            let mt, t2 = term_of_value' mt a.(i) in
+            let mt, t3 = aux mt (succ i) in
+            mt, t_and (t_equ t1 t2) t3 in
+        let mt, t = aux mt 0 in
+        mt, t_eps (t_close_bound vs t)
+    | Vpurefun (ty, mv, v) ->
+        (* use function literal [|mv...; _ -> v|] *)
         let mt, t = term_of_value' mt v in
-        mt, Mvs.add vs t mv in
-      let mt, mv = Mvs.fold aux cl (mt, Mvs.empty) in
-      let t = Opt.get (term_of_expr ~prop:false e) in
-      let t = t_ty_subst mt mv t in
-      mt, t_lambda [arg] [] t
-  | Vpurefun (ty, mv, v) ->
-      (* use function literal [|mv...; _ -> v|] *)
-      let mt, t = term_of_value' mt v in
-      let arg = create_vsymbol (id_fresh "arg") ty in
-      let aux key value (mt, t) =
-        let mt, key = term_of_value' mt key in
-        let mt, value = term_of_value' mt value in
-        mt, t_if (t_equ (t_var arg) key) value t in
-      let mt, t = Mv.fold aux mv (mt, t) in
-      mt, t_lambda [arg] [] t
-  | Vreal _ | Vfloat _ | Vfloat_mode _ ->
-      Format.kasprintf failwith "term_of_value: %a" print_value v
-
-and term_of_field mt f = term_of_value' mt (field_get f)
-
-let term_of_value t = snd (term_of_value' Mtv.empty t)
-
-let rec value_of_term vsenv t : value = match t.t_node with
-  | Tvar vs -> Mvs.find vs vsenv
-  | Tconst (Constant.ConstInt i) ->
-      value ty_int (Vnum (BigInt.of_int (Number.to_small_integer i)))
-  | Tapp (ls, ts) -> (
-      try
-        let fs = List.map (fun t -> field (value_of_term vsenv t)) ts in
-        value (Opt.get t.t_ty) (Vconstr (restore_rs ls, fs))
-      with Not_found -> failwith "value_of_term Tapp: ls not a rs_logic" )
-  | _ -> kasprintf failwith "value_of_term: %a" Pretty.print_term t
+        let arg = create_vsymbol (id_fresh "arg") ty in
+        let aux key value (mt, t) =
+          let mt, key = term_of_value' mt key in
+          let mt, value = term_of_value' mt value in
+          mt, t_if (t_equ (t_var arg) key) value t in
+        let mt, t = Mv.fold aux mv (mt, t) in
+        mt, t_lambda [arg] [] t
+    | Vreal _ | Vfloat _ | Vfloat_mode _ ->
+        Format.kasprintf failwith "term_of_value: %a" print_value v
+  and term_of_field mt f = term_of_value' mt (field_get f) in
+  snd (term_of_value' Mtv.empty t)
 
 (* RESULT *)
 
@@ -258,7 +267,6 @@ let add_local_funs locals env =
 let bind_vs vs v env = {env with vsenv= Mvs.add vs v env.vsenv}
 let bind_pvs pv v_t env = bind_vs pv.pv_vs v_t env
 let multibind_pvs l tl env = List.fold_right2 bind_pvs l tl env
-
 
 (* BUILTINS *)
 
@@ -364,6 +372,50 @@ let builtin_progs = Hrs.create 17
 
 let builtin_mode _kn _its = ()
 let builtin_float_type _kn _its = ()
+let builtin_array_type _kn _its = ()
+
+let exec_array_make ts_array _ args =
+  match args with
+  | [{v_desc= Vnum n};def] -> (
+      try
+        let n = BigInt.to_int n in
+        let ty = ty_app ts_array [def.v_ty] in
+        value ty (Varray (Array.make n def))
+      with _ -> raise CannotCompute )
+  | _ ->
+      raise CannotCompute
+
+let exec_array_empty ts_array _ args =
+  match args with
+  | [{v_desc= Vconstr(_, [])}] ->
+      (* we know by typing that the constructor
+         will be the Tuple0 constructor *)
+      let ty = ty_app ts_array [ty_var (tv_of_string "a")] in
+      value ty (Varray [||])
+  | _ ->
+      raise CannotCompute
+
+let exec_array_get _ args =
+  match args with
+  | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
+      try a.(BigInt.to_int i)
+      with _ -> raise CannotCompute )
+  | _ -> raise CannotCompute
+
+let exec_array_length _ args =
+  match args with
+  | [{v_desc= Varray a}] ->
+      value ty_int (Vnum (BigInt.of_int (Array.length a)))
+  | _ -> raise CannotCompute
+
+let exec_array_set _ args =
+  match args with
+  | [{v_desc= Varray a}; {v_desc= Vnum i}; v] -> (
+      try
+        a.(BigInt.to_int i) <- v;
+        value ty_unit Vvoid
+      with _ -> raise CannotCompute )
+| _ -> assert false
 
 (* Described as a function so that this code is not executed outside of
    why3execute. *)
@@ -412,6 +464,17 @@ let built_in_modules env =
   let int63_module = (["mach";"int"],"Int63",[],bounded_int_ops) in
   let int31_module = (["mach";"int"],"Int31",[],bounded_int_ops) in
   let byte_module  = (["mach";"int"],"Byte",[],bounded_int_ops) in
+  let array_module =
+    let pm = Pmodule.read_module env ["array"] "Array" in
+    let {its_ts= ts_array} = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
+    ["array"],"Array",
+    ["array", builtin_array_type],
+    ["make", exec_array_make ts_array;
+     "empty", exec_array_empty ts_array;
+     Ident.op_get "", exec_array_get ;
+     "length", exec_array_length ;
+     Ident.op_set "", exec_array_set ;
+    ] in
   let mode_module =
     let pm = Pmodule.read_module env ["ieee_float"] "RoundingMode" in
     let its = Pmodule.ns_find_its pm.Pmodule.mod_export ["mode"] in
@@ -480,7 +543,7 @@ let built_in_modules env =
   @ [ real_module; real_square_module; real_trigo_module; real_exp_log;
       mode_module; float_modules 32 ~prec:24 "Float32";
       float_modules 64 ~prec:53 "Float64"; int63_module;
-      int31_module; byte_module ]
+      int31_module; byte_module; array_module ]
 
 let add_builtin_mo env (l, n, t, d) =
   let mo = Pmodule.read_module env l n in
@@ -687,7 +750,7 @@ let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env =
     Mid.fold add_known_rule_term env.known (Mid.empty, Mid.empty) in
   let known = Mrs.fold add_fun_to_known env.funenv known in
   let vsenv = Mvs.union (fun _ _ t -> Some t)
-      vsenv (Mvs.map term_of_value env.vsenv) in
+      vsenv (Mvs.map (term_of_value env.env) env.vsenv) in
   { c_env= env.env;
     c_desc= desc;
     c_trigger_loc= trigger_loc;
@@ -778,7 +841,7 @@ let check_post ctx vt post =
 let check_posts rac desc loc env oldies v posts =
   let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
   let ctx = cntr_ctx desc ?trigger_loc:loc env in
-  let vt = term_of_value v in
+  let vt = term_of_value env.env v in
   List.iter (fun t -> if do_rac loc rac then check_post ctx vt t) posts
 
 (* EXPRESSION EVALUATION *)
@@ -998,7 +1061,7 @@ let rec eval_expr ~rac env (e : expr) : result =
         Mid.fold add_known_rule_term env.known (Mid.empty, Mid.empty) in
       let known = Mrs.fold add_fun_to_known env.funenv known in
       let t =
-        let vsenv = Mvs.map term_of_value env.vsenv in
+        let vsenv = Mvs.map (term_of_value env.env) env.vsenv in
         reduce_term env.env known rule_terms vsenv t in
       Normal (value_of_term env.vsenv t)
   | Eabsurd ->
