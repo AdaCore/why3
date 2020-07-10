@@ -297,9 +297,24 @@ list_stuff () {
 }
 
 test_mlw_printer () {
-    python3 -m sexpdata || return
-    bench/test_mlw_printer bench/valid/*.mlw
-    bench/test_mlw_printer bench/typing/good/*.mlw
+    why3pp="bin/why3pp$suffix"
+    if ! python3 -m sexpdata 2> /dev/null; then
+        echo "Skipping (Python module sexpdata not installed)" >&2
+        return
+    fi
+    if ! "$why3pp" --output=sexp <(echo '') > /dev/null 2>&1; then
+        echo 'Skipping (s-exp output unavailable for why3pp)' >&2
+        return
+    fi
+    find stdlib examples bench -name '*.mlw' \
+         -not -path '*/\.*' \
+         -not -path "bench/parsing/bad/*" \
+         -not -path "bench/programs/bad-to-keep/*" \
+         -not -path "examples/in_progress/*" |
+    sort | \
+    while read filename; do
+        bench/test_mlw_printer "$why3pp" "$filename" || exit 1
+    done
 }
 
 echo "=== Checking stdlib ==="
@@ -472,7 +487,7 @@ list_stuff --list-debug-flags
 echo ""
 
 echo "=== Checking realizations ==="
-exec bench/check_realizations.sh
+bench/check_realizations.sh || exit $?
 
 echo "=== Checking mlw_printer ==="
 test_mlw_printer
