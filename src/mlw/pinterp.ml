@@ -866,6 +866,29 @@ let rec matching env (v : value) p =
           if ls_equal ls ls2 then env else raise NoMatch
       | _ -> raise Undetermined )
 
+let exec_pure env ls pvs =
+  if ls_equal ls ps_equ then
+    (* TODO (?) Add more builtin logical symbols *)
+    let pv1, pv2 = match pvs with [pv1; pv2] -> pv1, pv2 | _ -> assert false in
+    let v1 = Mvs.find pv1.pv_vs env.vsenv and v2 = Mvs.find pv2.pv_vs env.vsenv in
+    Normal (value ty_bool (Vbool (compare_values v1 v2 = 0)))
+  else if ls_equal ls fs_func_app then
+    failwith "Pure function application not yet implemented"
+  else
+    match Decl.find_logic_definition env.th_known ls with
+    | Some defn ->
+        let vs, t = Decl.open_ls_defn defn in
+        let rule_terms = Mid.map_filter rule_term env.th_known in
+        let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
+        let args = List.map (get_pvs env) pvs in
+        let vsenv = List.fold_right2 Mvs.add vs args env.vsenv in
+        let vsenv = Mvs.map (term_of_value env.env) vsenv in
+        let t = reduce_term env.env known rule_terms vsenv t in
+        Normal (value (Opt.get t.t_ty) (Vghost t))
+    | None ->
+        kasprintf failwith "No logic definition for %a"
+          Pretty.print_ls ls
+
 let rec eval_expr ~rac env (e : expr) : result =
   match e.e_node with
   | Evar pvs -> (
@@ -891,10 +914,10 @@ let rec eval_expr ~rac env (e : expr) : result =
   | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
   | Eexec (ce, cty) -> (
     match ce.c_node with
-    | Cpur _ -> assert false (* TODO ? *)
-    | Cfun e' ->
-        let aux pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
-        let cl = Spv.fold aux ce.c_cty.cty_effect.eff_reads Mvs.empty in
+      | Cpur (ls, pvs) -> exec_pure env ls pvs
+      | Cfun e' ->
+        let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
+        let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
         let arg =
           match ce.c_cty.cty_args with [arg] -> arg | _ -> assert false in
         let aux pv mt =
