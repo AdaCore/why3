@@ -215,16 +215,16 @@ let term_of_value env t =
         let pm = Pmodule.read_module env ["array"] "Array" in
         let vs = create_vsymbol (id_fresh "a") v.v_ty in
         let ls_get = Mstr.find (Ident.op_get "") pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
-        let rec aux mt i =
+        let rec loop mt i =
           if i = Array.length a then
             mt, t_true
           else
             let t_i = t_const (Constant.int_const_of_int i) ty_int in
             let t1 = t_app_infer ls_get [t_var vs; t_i] in
             let mt, t2 = term_of_value' mt a.(i) in
-            let mt, t3 = aux mt (succ i) in
+            let mt, t3 = loop mt (succ i) in
             mt, t_and (t_equ t1 t2) t3 in
-        let mt, t = aux mt 0 in
+        let mt, t = loop mt 0 in
         mt, t_eps (t_close_bound vs t)
     | Vpurefun (ty, mv, v) ->
         (* use function literal [|mv...; _ -> v|] *)
@@ -920,10 +920,10 @@ let rec eval_expr ~rac env (e : expr) : result =
         let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
         let arg =
           match ce.c_cty.cty_args with [arg] -> arg | _ -> assert false in
-        let aux pv mt =
+        let match_free pv mt =
           let v = Mvs.find pv.pv_vs env.vsenv in
           ty_match mt pv.pv_vs.vs_ty v.v_ty in
-        let mt = Spv.fold aux cty.cty_effect.eff_reads Mtv.empty in
+        let mt = Spv.fold match_free cty.cty_effect.eff_reads Mtv.empty in
         let ty = ty_inst mt (ty_of_ity e.e_ity) in
         Normal (value ty (Vfun (cl, arg.pv_vs, e')))
     | Cany -> raise CannotCompute
@@ -940,15 +940,15 @@ let rec eval_expr ~rac env (e : expr) : result =
             match (get_pvs env pvs).v_desc with
             | Vconstr (cstr, args) -> cstr, args
             | _ -> assert false in
-          let rec aux constr_args args =
+          let rec search_and_assign constr_args args =
             match constr_args, args with
             | pv :: pvl, Field r :: vl ->
                 if pv_equal pv (fd_of_rs rs) then
                   r := get_pvs env value
                 else
-                  aux pvl vl
+                  search_and_assign pvl vl
             | _ -> raise CannotCompute in
-          aux cstr.rs_cty.cty_args args)
+          search_and_assign cstr.rs_cty.cty_args args)
         l ;
       Normal (value ty_unit Vvoid)
   | Elet (ld, e2) -> (
@@ -1091,9 +1091,9 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
    *   print_rs rs Pp.(print_list space print_value) arg_vs; *)
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let oldies =
-    let aux old_pv pv oldies =
-      Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs env.vsenv)) oldies in
-    Mpv.fold aux rs.rs_cty.cty_oldies Mvs.empty in
+    let snapshot_oldie old_pv pv =
+      Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs env.vsenv)) in
+    Mpv.fold snapshot_oldie rs.rs_cty.cty_oldies Mvs.empty in
   if rac <> RacNone then (
     (* TODO variant *)
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
@@ -1147,12 +1147,14 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
       | Projection _d -> (
         match rs.rs_field, arg_vs with
         | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
-            let rec aux constr_args args =
+            let rec search constr_args args =
               match constr_args, args with
               | pv2 :: pvl, v :: vl ->
-                  if pv_equal pv pv2 then Normal (field_get v) else aux pvl vl
+                  if pv_equal pv pv2 then
+                    Normal (field_get v)
+                  else search pvl vl
               | _ -> raise CannotCompute in
-            aux cstr.rs_cty.cty_args args
+            search cstr.rs_cty.cty_args args
         | _ -> assert false )
       | exception Not_found ->
           eprintf "[interp] cannot find definition of routine %s@."
@@ -1243,11 +1245,11 @@ let rec import_model_value known ity =
         let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
           | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
           | _ -> assert false in
-        let aux mv ix =
+        let add_index mv ix =
           let key = import_model_value known key_ity ix.arr_index_key in
           let value = import_model_value known value_ity ix.arr_index_value in
           Mv.add key value mv in
-        let mv = List.fold_left aux Mv.empty a.arr_indices in
+        let mv = List.fold_left add_index Mv.empty a.arr_indices in
         let v = import_model_value known value_ity a.arr_others in
         value (ty_of_ity ity) (Vpurefun (ty_of_ity key_ity, mv, v))
         (* let def, subst = get_def_subst ity in
