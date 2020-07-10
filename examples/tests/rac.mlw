@@ -400,3 +400,21 @@ module Arrays
     assert { a[2] = 11 }; (* failure *)
     ()
 end
+
+module Ghost
+  type t = {i1: int; ghost i2: int}
+
+  let test1 () : (int, ghost int) =
+    let x = {i1= 123; i2= 456} in
+    assert { x.i1 = 123 /\ x.i2 = 456 };
+    (x.i1, x.i2)
+
+  let ghost f1 (x y : 'a) : bool =
+    if x = y then True else False
+
+  function f2 (x: bool) : bool =
+    not x
+
+  let ghost test2 () =
+    f2 (f1 1 2)
+end
