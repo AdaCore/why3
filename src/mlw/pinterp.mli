@@ -45,7 +45,8 @@ val init_real : int * int * int -> unit
 val eval_global_fundef :
   rac:bool ->
   Env.env ->
-  Pdecl.pdecl Ident.Mid.t ->
+  Pdecl.known_map ->
+  Decl.known_map ->
   (Expr.rsymbol * Expr.cexp) list ->
   Expr.expr ->
   result * value Term.Mvs.t
@@ -56,7 +57,14 @@ val eval_global_fundef :
 
 exception CannotImportModelValue of string
 
-val eval_rs : Env.env -> Pdecl.known_map -> Loc.position -> Model_parser.model -> Expr.Mrs.key -> result
+val eval_rs :
+  Env.env ->
+  Pdecl.known_map ->
+  Decl.known_map ->
+  Loc.position ->
+  Model_parser.model ->
+  Expr.Mrs.key ->
+  result
 
 (** {1 Reporting results} *)
 

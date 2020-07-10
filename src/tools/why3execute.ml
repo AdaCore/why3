@@ -96,13 +96,12 @@ let do_input f =
   Loc.set_file "command line expression to execute" lb;
   let prog_parsed = Lexer.parse_expr lb in
   let expr = Typing.type_expr_in_muc muc prog_parsed in
-  let known = muc.muc_known in
 
   (* execute expression *)
   let open Pinterp in
   Opt.iter init_real !prec;
   try
-    let res = eval_global_fundef ~rac:!enable_rac env known [] expr in
+    let res = eval_global_fundef ~rac:!enable_rac env muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
   with Contr (ctx, term) ->

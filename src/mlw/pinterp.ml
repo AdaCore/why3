@@ -261,7 +261,8 @@ let print_logic_result fmt r =
 (* ENV *)
 
 type env =
-  { known: Pdecl.known_map;
+  { mod_known: Pdecl.known_map;
+    th_known: Decl.known_map;
     funenv: Expr.cexp Mrs.t;
     vsenv: value Mvs.t;
     env: Env.env }
@@ -659,7 +660,7 @@ let find_definition env (rs: rsymbol) =
       | f -> LocalFunction ([], f)
       | exception Not_found ->
           (* else look for a global function *)
-          find_global_definition env.known rs
+          find_global_definition env.mod_known rs
 
 (* CONTRADICTION CONTEXT *)
 
@@ -705,36 +706,11 @@ let report_cntr fmt (ctx, msg, term) =
     (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_vsenv)));
   fprintf fmt "@]"
 
-let add_known_rule_term id pd (known, rule_terms) =
-  match pd.Pdecl.pd_pure with
-  | [] -> known, rule_terms
-  | [decl] ->
-      Mid.add id decl known, rule_terms
-  | Decl.[({d_node= Dparam _} as decl); {d_node= Dprop (Paxiom, _, t)}] ->
-      (* let function: function + axiom *)
-      Mid.add id decl known, Mid.add id t rule_terms
-  | Decl.[({d_node= Dlogic [(ls, _def)]} as decl); {d_node= Dprop (Paxiom, pr, t)}]
-    ->
-      (* let (rec) predicate:
-         predicate + axiom *)
-      Mid.add ls.ls_name decl known, Mid.add pr.Decl.pr_name t rule_terms
-  | Decl.
-      [ {d_node= Dparam _}; {d_node= Dprop (Paxiom, pr, t)};
-        {d_node= Dprop (Paxiom, _, _)} ] ->
-      (* let (rec) function:
-         function f args : ty + axiom f'def : t + axiom f'spec : t *)
-      known, Mid.add pr.Decl.pr_name t rule_terms
-  | Decl.{d_node= Dtype _} :: _ ->
-      (* - type declaration
-         - field function declarations (Dparam)
-         - type invariants (Dprop (Paxiom, _, _)) *)
-      known, rule_terms
-  | _ ->
-      Format.eprintf "@[<hv2>Cannot process pure declarations for %s:@ %a@]@."
-        id.id_string
-        (Pp.print_list Pp.space Pretty.print_decl)
-        pd.Pdecl.pd_pure ;
-      failwith "Cannot process pure declarations"
+let rule_term decl =
+  let open Decl in
+  match decl.d_node with
+  | Dprop (Paxiom, _, t) -> Some t
+  | _ -> None
 
 let add_fun_to_known rs cexp known =
   try
@@ -752,9 +728,8 @@ let add_fun_to_known rs cexp known =
   with Exit -> known
 
 let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env =
-  let known, rule_terms =
-    Mid.fold add_known_rule_term env.known (Mid.empty, Mid.empty) in
-  let known = Mrs.fold add_fun_to_known env.funenv known in
+  let rule_terms = Mid.map_filter rule_term env.th_known in
+  let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
   let vsenv = Mvs.union (fun _ _ t -> Some t)
       vsenv (Mvs.map (term_of_value env.env) env.vsenv) in
   { c_env= env.env;
@@ -1063,10 +1038,9 @@ let rec eval_expr ~rac env (e : expr) : result =
       (* TODO: do not eval ghost if no assertion check *)
       eval_expr ~rac env e1
   | Epure t ->
-      let known, rule_terms =
-        Mid.fold add_known_rule_term env.known (Mid.empty, Mid.empty) in
-      let known = Mrs.fold add_fun_to_known env.funenv known in
       let t =
+        let rule_terms = Mid.map_filter rule_term env.th_known in
+        let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
         let vsenv = Mvs.map (term_of_value env.env) env.vsenv in
         reduce_term env.env known rule_terms vsenv t in
       Normal (value (Opt.get t.t_ty) (Vghost t))
@@ -1090,8 +1064,8 @@ and exec_match ~rac env t ebl =
 
 and exec_call ~rac ?loc env rs arg_pvs ity_result =
   let arg_vs = List.map (get_pvs env) arg_pvs in
-  Debug.dprintf debug_rac "@[<h>Exec call %a %a@]@."
-    print_rs rs Pp.(print_list space print_value) arg_vs;
+  (* Debug.dprintf debug_rac "@[<h>Exec call %a %a@]@."
+   *   print_rs rs Pp.(print_list space print_value) arg_vs; *)
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let oldies =
     let aux old_pv pv oldies =
@@ -1302,35 +1276,35 @@ let make_global_env ?model known =
     | _ -> acc in
   Mid.fold add_glob known Mvs.empty
 
-let eval_global_expr ~rac env known locals e =
+let eval_global_expr ~rac env mod_known th_known locals e =
   get_builtin_progs env ;
-  let global_env = make_global_env known in
+  let global_env = make_global_env mod_known in
   let env = add_local_funs locals
-      {known; funenv= Mrs.empty; vsenv= global_env; env} in
+      {mod_known; th_known; funenv= Mrs.empty; vsenv= global_env; env} in
   let res = eval_expr ~rac env e in
   res, global_env
 
-let eval_global_fundef ~rac env mod_known locals body =
+let eval_global_fundef ~rac env mod_known mod_theory locals body =
   let rac = if rac then RacAll else RacNone in
-  try eval_global_expr ~rac env mod_known locals body
+  try eval_global_expr ~rac env mod_known mod_theory locals body
   with CannotFind (l, s, n) ->
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
-let eval_rs env known loc model (rs: rsymbol) =
+let eval_rs env mod_known th_known loc model (rs: rsymbol) =
   let rac = RacOnly (loc, model) in
   let get_value pv =
     match model_value pv model with
     | Some mv ->
-        import_model_value known pv.pv_ity mv
+        import_model_value mod_known pv.pv_ity mv
     | None ->
         Debug.dprintf debug_rac "Missing value for parameter %a; taking default@."
           print_pv pv;
-        default_value_of_type known pv.pv_ity in
+        default_value_of_type mod_known pv.pv_ity in
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   get_builtin_progs env ;
-  let global_env = make_global_env ~model known in
-  let env = {known; funenv= Mrs.empty; vsenv= global_env; env} in
+  let global_env = make_global_env ~model mod_known in
+  let env = {mod_known; th_known; funenv= Mrs.empty; vsenv= global_env; env} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   exec_call ~rac env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
 

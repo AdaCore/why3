@@ -266,7 +266,7 @@ let find_rs pm loc =
 let maybe_model_rs pm loc model rs =
   let open Pinterp in
   try
-    ignore (eval_rs env pm.Pmodule.mod_known loc model rs);
+    ignore (eval_rs env pm.Pmodule.mod_known pm.Pmodule.mod_theory.th_known loc model rs);
     printf "RAC does not confirm the counter-example (execution did not fail at all)@.";
     None
   with
