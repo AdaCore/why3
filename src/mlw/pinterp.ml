@@ -162,7 +162,18 @@ let rec snapshot v = match v.v_desc with
   | Vconstr (rs, fs) ->
       let fs = List.map snapshot_field fs in
       {v with v_desc= Vconstr (rs, fs)}
-  | _ -> v
+  | Vfun (cl, vs, e) ->
+      let cl = Mvs.map snapshot cl in
+      {v with v_desc= Vfun (cl, vs, e)}
+  | Vpurefun (ty, mv, v) ->
+      let mv = Mv.fold (fun k v -> Mv.add (snapshot k) (snapshot v)) mv Mv.empty in
+      {v with v_desc= Vpurefun (ty, mv, snapshot v)}
+  | Varray a ->
+      let a = Array.map snapshot a in
+      {v with v_desc= Varray a}
+  | Vfloat _ | Vstring _ | Vghost _ | Vbool _
+  | Vreal _ | Vfloat_mode _ | Vvoid | Vnum _ ->
+      v
 
 and snapshot_field f =
   field (snapshot (field_get f))
