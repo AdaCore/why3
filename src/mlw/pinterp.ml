@@ -98,25 +98,48 @@ end = struct
     | h1::t1, h2::t2 -> c h1 h2 <?> (compare_lists c, t1, t2)
     | _ -> List.compare_lengths l1 l2
   let rec compare_values v1 v2 : int =
-    ty_compare v1.v_ty v2.v_ty <?>
-    (compare_desc, v1.v_desc, v2.v_desc)
+    ty_compare v1.v_ty v2.v_ty <?> (compare_desc, v1.v_desc, v2.v_desc)
   and compare_desc d1 d2 =
     match d1, d2 with
     | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
         rs_compare rs1 rs2 <?> (compare_lists compare_fields, fs1, fs2)
-    | Vnum i1, Vnum i2 -> BigInt.compare i1 i2
-    | Vreal r1, Vreal r2 -> Big_real.(if eq r1 r2 then 0 else if lt r1 r2 then -1 else 1)
-    | Vfloat_mode m1, Vfloat_mode m2 -> compare m1 m2
-    | Vfloat f1, Vfloat f2 -> Mlmpfr_wrapper.(if equal_p f1 f2 then 0 else if less_p f1 f2 then -1 else 1)
-    | Vstring s1, Vstring s2 -> String.compare s1 s2
-    | Vbool b1, Vbool b2 -> compare b1 b2
-    | Vvoid, Vvoid -> 0
-    | Vfun _, Vfun _ -> failwith "Value.compare: Vfun"
+    | Vconstr _, _ -> -1 | _, Vconstr _ -> 1
+    | Vnum i1, Vnum i2 ->
+        BigInt.compare i1 i2
+    | Vnum _, _ -> -1 | _, Vnum _ -> 1
+    | Vreal r1, Vreal r2 ->
+        Big_real.(if eq r1 r2 then 0 else if lt r1 r2 then -1 else 1)
+    | Vreal _, _ -> -1 | _, Vreal _ -> 1
+    | Vfloat_mode m1, Vfloat_mode m2 ->
+        compare m1 m2
+    | Vfloat_mode _, _ -> -1 | _, Vfloat_mode _ -> 1
+    | Vfloat f1, Vfloat f2 ->
+        Mlmpfr_wrapper.(if equal_p f1 f2 then 0 else if less_p f1 f2 then -1 else 1)
+    | Vfloat _, _ -> -1 | _, Vfloat _ -> 1
+    | Vstring s1, Vstring s2 ->
+        String.compare s1 s2
+    | Vstring _, _ -> -1 | _, Vstring _ -> 1
+    | Vbool b1, Vbool b2 ->
+        compare b1 b2
+    | Vbool _, _ -> -1 | _, Vbool _ -> 1
+    | Vvoid, Vvoid ->
+        0
+    | Vvoid, _ -> -1 | _, Vvoid -> 1
+    | Vfun _, Vfun _ ->
+        failwith "Value.compare: Vfun"
+    | Vfun _, _ -> -1 | _, Vfun _ -> 1
     | Vpurefun (ty1, mv1, v1), Vpurefun (ty2, mv2, v2) ->
         ty_compare ty1 ty2 <?> (compare, v1, v2)
         <?> (Mv.compare compare, mv1, mv2)
-    | Vghost t1, Vghost t2 -> t_compare t1 t2
-    | _ -> compare d1 d2
+    | Vpurefun _, _ -> -1 | _, Vpurefun _ -> 1
+    | Vghost t1, Vghost t2 ->
+        t_compare t1 t2
+    | Vghost _, _ -> -1 | _, Vghost _ -> 1
+    | Varray a1, Varray a2 ->
+        let rec loop n a1 a2 =
+          if n = 0 then 0
+          else compare a1.(n-1) a2.(n-1) <?> (loop (pred n), a1, a2) in
+        Array.length a2 - Array.length a1 <?> (loop (Array.length a1), a1, a2)
   and compare_fields (Field r1) (Field r2) =
     compare !r1 !r2
 end
