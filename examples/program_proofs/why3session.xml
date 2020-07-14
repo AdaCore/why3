@@ -4,6 +4,8 @@
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.0" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.6" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Eprover" version="2.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -38,7 +40,8 @@
  <proof prover="0"><result status="valid" time="0.06" steps="69"/></proof>
  </goal>
  <goal name="eval_unit" proved="true">
- <proof prover="1"><result status="valid" time="0.11" steps="32744"/></proof>
+ <proof prover="2"><result status="timeout" time="10.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.16" steps="32886"/></proof>
  </goal>
  <goal name="shorten&#39;vc" expl="VC for shorten" proved="true">
  <transf name="split_vc" proved="true" >
@@ -65,23 +68,23 @@
   <proof prover="0"><result status="valid" time="0.02" steps="47"/></proof>
   </goal>
   <goal name="optimize_and_filter&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.26" steps="76270"/></proof>
+  <proof prover="3"><result status="valid" time="0.30" steps="74955"/></proof>
   </goal>
   <goal name="optimize_and_filter&#39;vc.3" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="optimize_and_filter&#39;vc.3.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.06" steps="19803"/></proof>
+   <proof prover="1"><result status="valid" time="0.06" steps="19291"/></proof>
    </goal>
    <goal name="optimize_and_filter&#39;vc.3.1" expl="postcondition" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="optimize_and_filter&#39;vc.3.1.0" expl="postcondition" proved="true">
-    <proof prover="1"><result status="valid" time="0.10" steps="23514"/></proof>
+    <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
     </goal>
     <goal name="optimize_and_filter&#39;vc.3.1.1" expl="postcondition" proved="true">
-    <proof prover="1"><result status="valid" time="0.07" steps="21635"/></proof>
+    <proof prover="1"><result status="valid" time="0.07" steps="21926"/></proof>
     </goal>
     <goal name="optimize_and_filter&#39;vc.3.1.2" expl="postcondition" proved="true">
-    <proof prover="1"><result status="valid" time="0.08" steps="23712"/></proof>
+    <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
     </goal>
    </transf>
    </goal>
