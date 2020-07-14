@@ -3,14 +3,10 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.8.4" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Eprover" version="2.0" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="2.3.2" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="7" name="CVC4" version="1.6" timelimit="10" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<file format="whyml" proved="true">
 <path name=".."/><path name="program_proofs.mlw"/>
 <theory name="Mult" proved="true">
  <goal name="mult&#39;vc" expl="VC for mult" proved="true">
@@ -31,7 +27,7 @@
  <proof prover="0"><result status="valid" time="0.02" steps="135"/></proof>
  </goal>
 </theory>
-<theory name="AST">
+<theory name="AST" proved="true">
  <goal name="MapApp.eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
  </goal>
@@ -41,42 +37,55 @@
  <goal name="eval_list&#39;vc" expl="VC for eval_list" proved="true">
  <proof prover="0"><result status="valid" time="0.06" steps="69"/></proof>
  </goal>
+ <goal name="eval_unit" proved="true">
+ <proof prover="1"><result status="valid" time="0.11" steps="32744"/></proof>
+ </goal>
  <goal name="shorten&#39;vc" expl="VC for shorten" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="shorten&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="48"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="50"/></proof>
   </goal>
   <goal name="shorten&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="shorten&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="optimize&#39;vc" expl="VC for optimize" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="148"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="150"/></proof>
  </goal>
- <goal name="optimize_and_filter&#39;vc" expl="VC for optimize_and_filter">
- <proof prover="0" timelimit="5"><result status="timeout" time="5.00"/></proof>
- <proof prover="1"><result status="timeout" time="5.00" steps="454138"/></proof>
- <proof prover="4" timelimit="5"><result status="timeout" time="5.00" steps="14730624"/></proof>
- <transf name="split_vc" >
+ <goal name="optimize_and_filter&#39;vc" expl="VC for optimize_and_filter" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="optimize_and_filter&#39;vc.0" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="47"/></proof>
   </goal>
   <goal name="optimize_and_filter&#39;vc.1" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="47"/></proof>
   </goal>
-  <goal name="optimize_and_filter&#39;vc.2" expl="postcondition">
-  <proof prover="0" timelimit="10"><result status="timeout" time="10.00"/></proof>
-  <proof prover="1" timelimit="1"><result status="timeout" time="1.00" steps="98612"/></proof>
-  <proof prover="2"><result status="timeout" time="10.00" steps="4802674"/></proof>
-  <proof prover="3"><result status="timeout" time="10.00"/></proof>
-  <proof prover="4"><result status="timeout" time="1.00" steps="2693691"/></proof>
-  <proof prover="5"><result status="timeout" time="10.00"/></proof>
-  <proof prover="6"><result status="timeout" time="10.00"/></proof>
-  <proof prover="7"><result status="unknown" time="0.19" steps="37840"/></proof>
+  <goal name="optimize_and_filter&#39;vc.2" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.26" steps="76270"/></proof>
+  </goal>
+  <goal name="optimize_and_filter&#39;vc.3" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="optimize_and_filter&#39;vc.3.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.06" steps="19803"/></proof>
+   </goal>
+   <goal name="optimize_and_filter&#39;vc.3.1" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="optimize_and_filter&#39;vc.3.1.0" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.10" steps="23514"/></proof>
+    </goal>
+    <goal name="optimize_and_filter&#39;vc.3.1.1" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.07" steps="21635"/></proof>
+    </goal>
+    <goal name="optimize_and_filter&#39;vc.3.1.2" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.08" steps="23712"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>

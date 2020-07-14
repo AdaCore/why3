@@ -96,6 +96,9 @@ module AST
         end
     end
 
+  lemma eval_unit: forall op env l.
+    eval (Node op (Cons (Const (unit op)) l)) env = eval (Node op l) env
+
   (* Instead of lemmas shorten_correct, optimize_correct, etc.
      we give suitable postconditions to the various functions.
 
@@ -130,6 +133,8 @@ module AST
     | Cons e l ->
       let e = optimize e in
       let l = optimize_and_filter l u in
+      assert { forall op env. u = unit op ->
+               eval (Node op (Cons e l)) env = eval (Node op args) env };
       match e with Const n -> if n = u then l else Cons e l | _ -> Cons e l end
     end
 
