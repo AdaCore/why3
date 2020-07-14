@@ -470,9 +470,10 @@ module OCaml
     requires { 0 <= i < length s }
     ensures  { result = get s i }
 
-  let ([]) (s: string) (i: int63) : char = get s i
+  let ([]) (s: string) (i: int63) : char
     requires { 0 <= i < length s }
     ensures  { result = get s i }
+  = get s i
 
   val code (c: char) : int63
     ensures { result = code c }
