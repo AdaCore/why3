@@ -868,8 +868,9 @@ let add_to_model ?vc_term_attrs model model_element =
         | Some vc_term_attrs ->
             fix_kind (filename, line_number) vc_term_attrs model_element
         | None -> model_element in
-      let elements =
-        if found_elements <> [] then elements else model_element :: elements in
+      let elements = model_element :: elements in
+        (* FIXME *)
+        (* if found_elements <> [] then elements else model_element :: elements in *)
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 
