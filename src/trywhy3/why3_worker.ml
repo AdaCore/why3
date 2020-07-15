@@ -331,7 +331,7 @@ let why3_execute modules =
 
              let result =
                try
-                 let res = eval_global_fundef ~rac:false env m.Pmodule.mod_known m.Pmodule.mod_theory.Theory.th_known [] expr in
+                 let res = eval_global_fundef ~rac:false env m.Pmodule.mod_known m.Pmodule.mod_theory.th_known [] expr in
                  asprintf "%a@." (report_eval_result expr) res
                with Contr (ctx, term) ->
                  asprintf "%a@." (report_cntr expr) (ctx, term) in

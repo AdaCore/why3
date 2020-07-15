@@ -731,7 +731,6 @@ let report_cntr_head fmt (ctx, msg, term) =
     | None, None -> () );
   fprintf fmt "@]"
 
-
 let pp_vsenv pp_value fmt =
   let delims = Pp.(nothing, nothing) and sep = Pp.comma in
   fprintf fmt "%a" (pp_bindings ~delims ~sep Pretty.print_vs pp_value)
@@ -959,7 +958,7 @@ let pp_limited ?(n=100) pp fmt x =
 let print_result fmt = function
   | Normal v -> print_value fmt v
   | Excep (xs, v) -> fprintf fmt "EXC %a: %a" print_xs xs print_value v
-  | Fun (rs, pvs, n) -> fprintf fmt "FUN %a" print_rs rs
+  | Fun (rs, _, _) -> fprintf fmt "FUN %a" print_rs rs
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
 
 let rec eval_expr ~rac env e =
