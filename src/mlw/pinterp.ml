@@ -725,7 +725,7 @@ let report_cntr_head fmt (ctx, msg, term) =
   fprintf fmt "@[<v>%s %s" ctx.c_desc msg;
   ( match ctx.c_trigger_loc, term.t_loc with
     | Some t1, Some t2 ->
-        fprintf fmt " at %a@,Defined at %a" pp_pos t1 pp_pos t2
+        fprintf fmt " at %a@,- Defined at %a" pp_pos t1 pp_pos t2
     | Some t, None | None, Some t ->
         fprintf fmt " at %a" pp_pos t
     | None, None -> () );
@@ -740,8 +740,8 @@ let report_cntr fmt (ctx, msg, term) =
     String.compare vs1.vs_name.id_string vs2.vs_name.id_string in
   let mvs = t_freevars Mvs.empty term in
   fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
-  fprintf fmt "@[<hov2>Term: %a@]@," Pretty.print_term term ;
-  fprintf fmt "@[<hov2>Variables: %a@]"
+  fprintf fmt "@[<hov2>- Term: %a@]@," Pretty.print_term term ;
+  fprintf fmt "@[<hov2>- Variables: %a@]"
     (pp_vsenv Pretty.print_term)
     (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_vsenv)));
   fprintf fmt "@]"
@@ -844,7 +844,7 @@ let check_term ctx t =
   | t' ->
       eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t) ;
       if Debug.test_flag debug_rac then
-        eprintf "@[<hv2>Result: %a@]@." Pretty.print_term t'
+        eprintf "@[<hv2>- Result: %a@]@." Pretty.print_term t'
   | exception e when Debug.test_flag debug_rac ->
       eprintf "%a@." report_cntr (ctx, "WHEN TRYING", t) ;
       raise e

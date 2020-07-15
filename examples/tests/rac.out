@@ -2,18 +2,18 @@
 * Local
 ** Local.test1
 Assertion cannot be evaluated at examples/tests/rac.mlw, line 8, characters 13-37
-Term: forall y:int. y = 1 -> x = y
-Variables: x -> 1
+- Term: forall y:int. y = 1 -> x = y
+- Variables: x -> 1
 Assertion failed at examples/tests/rac.mlw, line 9, characters 13-18
-Term: x = 0
-Variables: x -> 1
+- Term: x = 0
+- Variables: x -> 1
 ** Local.test2
 result: () = ()
 globals: 
 ** Local.test3
 Assertion failed at examples/tests/rac.mlw, line 20, characters 13-19
-Term: contents x > 10
-Variables: x -> ref'mk 1
+- Term: contents x > 10
+- Variables: x -> ref'mk 1
 ** Local.test4
 result: () = ()
 globals: 
@@ -29,36 +29,36 @@ globals: x -> (ref'mk 1), y -> (ref'mk 0)
 * Functions
 ** Functions.test1
 Assertion failed at examples/tests/rac.mlw, line 59, characters 13-35
-Term: f1_aux 0 = ((f1_aux' @ 0) @ 1)
-Variables: 
+- Term: f1_aux 0 = ((f1_aux' @ 0) @ 1)
+- Variables: 
 ** Functions.test2
 result: () = ()
 globals: x -> (ref'mk 0)
 ** Functions.test3a
 Precondition of test3_aux failed at examples/tests/rac.mlw, line 71, characters 4-15
-Defined at examples/tests/rac.mlw, line 66, characters 15-20
-Term: y > 0
-Variables: y -> 0
+- Defined at examples/tests/rac.mlw, line 66, characters 15-20
+- Term: y > 0
+- Variables: y -> 0
 ** Functions.test3b
 Postcondition of test3_aux failed at examples/tests/rac.mlw, line 75, characters 4-15
-Defined at examples/tests/rac.mlw, line 67, characters 14-24
-Term: result = 1
-Variables: result -> 2
+- Defined at examples/tests/rac.mlw, line 67, characters 14-24
+- Term: result = 1
+- Variables: result -> 2
 ** Functions.test4
 Exceptional postcondition of test4_aux failed at examples/tests/rac.mlw, line 85, characters 8-20
-Defined at examples/tests/rac.mlw, line 80, characters 20-25
-Term: j = contents x
-Variables: j -> 42, x -> ref'mk 1
+- Defined at examples/tests/rac.mlw, line 80, characters 20-25
+- Term: j = contents x
+- Variables: j -> 42, x -> ref'mk 1
 ** Functions.test5
 Postcondition of test5_aux failed at examples/tests/rac.mlw, line 94, characters 4-15
-Defined at examples/tests/rac.mlw, line 89, characters 14-27
-Term: contents x = (contents x1 + 1)
-Variables: x -> ref'mk 3, x1 -> ref'mk 1
+- Defined at examples/tests/rac.mlw, line 89, characters 14-27
+- Term: contents x = (contents x1 + 1)
+- Variables: x -> ref'mk 3, x1 -> ref'mk 1
 ** Functions.test6
 Precondition of test6_aux failed at examples/tests/rac.mlw, line 105, characters 12-26
-Defined at examples/tests/rac.mlw, line 97, characters 15-21
-Term: not contents x = y
-Variables: x -> ref'mk 42, y -> 42
+- Defined at examples/tests/rac.mlw, line 97, characters 15-21
+- Term: not contents x = y
+- Variables: x -> ref'mk 42, y -> 42
 
 * Loops
 ** Loops.test1
@@ -66,12 +66,12 @@ result: () = ()
 globals: x -> (ref'mk 0)
 ** Loops.test2
 Loop invariant preservation failed at examples/tests/rac.mlw, line 121, characters 18-32
-Term: contents x = 0 || contents x = 1
-Variables: x -> ref'mk 2
+- Term: contents x = 0 || contents x = 1
+- Variables: x -> ref'mk 2
 ** Loops.test3
 Loop invariant preservation failed at examples/tests/rac.mlw, line 128, characters 18-24
-Term: 5 >= contents x
-Variables: x -> ref'mk 6
+- Term: 5 >= contents x
+- Variables: x -> ref'mk 6
 
 * Aliasing
 ** Aliasing.test1
@@ -103,14 +103,14 @@ result: int = 1
 globals: myref -> (ref'mk 1)
 ** PolyRefContracts.test2b
 Precondition of test2_aux failed at examples/tests/rac.mlw, line 259, characters 4-23
-Defined at examples/tests/rac.mlw, line 247, characters 15-29
-Term: not contents argref = argx
-Variables: argref -> ref'mk 0, argx -> 0
+- Defined at examples/tests/rac.mlw, line 247, characters 15-29
+- Term: not contents argref = argx
+- Variables: argref -> ref'mk 0, argx -> 0
 ** PolyRefContracts.test2c
 Postcondition of test2_aux failed at examples/tests/rac.mlw, line 262, characters 4-23
-Defined at examples/tests/rac.mlw, line 249, characters 14-27
-Term: result = argy
-Variables: argy -> 2, result -> 1
+- Defined at examples/tests/rac.mlw, line 249, characters 14-27
+- Term: result = argy
+- Variables: argy -> 2, result -> 1
 
 * RecordPoly
 ** RecordPoly.test1
@@ -121,19 +121,19 @@ result: () = ()
 globals: 
 ** RecordPoly.test3
 Postcondition of update cannot be evaluated at examples/tests/rac.mlw, line 297, characters 4-20
-Defined at examples/tests/rac.mlw, line 288, characters 14-77
-Term: forall j:int.
-       0 < j /\ j < length r -> not j = i -> (elts r @ j) = (elts r1 @ j)
-Variables: i -> 3,
+- Defined at examples/tests/rac.mlw, line 288, characters 14-77
+- Term: forall j:int.
+         0 < j /\ j < length r -> not j = i -> (elts r @ j) = (elts r1 @ j)
+- Variables: i -> 3,
   r -> t3'mk
        (fun (j:int) -> if j = 3 then False else (fun (_:int) -> True) @ j) 5,
   r1 -> t3'mk (fun (_:int) -> True) 5
 Assertion failed at examples/tests/rac.mlw, line 300, characters 13-29
-Term: (elts r2 @ 1) = False
-Variables: r2 -> t3'mk
-                 (fun (j:int) ->
-                   if j = 3 then False else (fun (_:int) -> True) @ j)
-                 5
+- Term: (elts r2 @ 1) = False
+- Variables: r2 -> t3'mk
+                   (fun (j:int) ->
+                     if j = 3 then False else (fun (_:int) -> True) @ j)
+                   5
 
 * PolyFunc
 ** PolyFunc.test1
@@ -155,8 +155,8 @@ result: (int, int) = (10, 0)
 globals: 
 ** ArrayExec.test4
 Assertion failed at examples/tests/rac.mlw, line 373, characters 13-19
-Term: x = 11
-Variables: x -> 0
+- Term: x = 11
+- Variables: x -> 0
 
 * Ghost
 ** Ghost.test1
