@@ -74,7 +74,7 @@ module rec Value : sig
     | Varray of value array
     | Vfun of value Mvs.t (* closure *) * vsymbol * expr
     | Vpurefun of ty (* keys *) * value Mv.t * value
-    | Vghost of term (* ghost values *)
+    | Vterm of term (* ghost values *)
   and field = Field of value ref
   val compare_values : value -> value -> int
 end = struct
@@ -91,7 +91,7 @@ end = struct
     | Varray of value array
     | Vfun of value Mvs.t (* closure *) * vsymbol * expr
     | Vpurefun of ty (* keys *) * value Mv.t * value
-    | Vghost of term
+    | Vterm of term
   and field = Field of value ref
   let (<?>) c (cmp,x,y) = if c = 0 then cmp x y else c
   let rec compare_lists c l1 l2 : int = match l1, l2 with
@@ -132,9 +132,9 @@ end = struct
         ty_compare ty1 ty2 <?> (compare, v1, v2)
         <?> (Mv.compare compare, mv1, mv2)
     | Vpurefun _, _ -> -1 | _, Vpurefun _ -> 1
-    | Vghost t1, Vghost t2 ->
+    | Vterm t1, Vterm t2 ->
         t_compare t1 t2
-    | Vghost _, _ -> -1 | _, Vghost _ -> 1
+    | Vterm _, _ -> -1 | _, Vterm _ -> 1
     | Varray a1, Varray a2 ->
         let rec loop n a1 a2 =
           if n = 0 then 0
@@ -171,7 +171,7 @@ let rec snapshot v = match v.v_desc with
   | Varray a ->
       let a = Array.map snapshot a in
       {v with v_desc= Varray a}
-  | Vfloat _ | Vstring _ | Vghost _ | Vbool _
+  | Vfloat _ | Vstring _ | Vterm _ | Vbool _
   | Vreal _ | Vfloat_mode _ | Vvoid | Vnum _ ->
       v
 
@@ -217,12 +217,12 @@ let rec print_value fmt v =
   | Vpurefun (_, mv, v) ->
       fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
         (Mv.bindings mv) print_value v
-  | Vghost t ->
-      Pretty.print_term fmt t
+  | Vterm t ->
+      fprintf fmt "(term:@ %a)" Pretty.print_term t
 
 and print_field fmt f = print_value fmt (field_get f)
 
-let term_of_value env t =
+let term_of_value env v =
   let rec term_of_value' mt v : ty Mtv.t * term =
     match v.v_desc with
     | Vnum i -> mt, t_const (Constant.int_const i) v.v_ty
@@ -270,11 +270,11 @@ let term_of_value env t =
           mt, t_if (t_equ (t_var arg) key) value t in
         let mt, t = Mv.fold aux mv (mt, t) in
         mt, t_lambda [arg] [] t
-    | Vghost t -> mt, t
+    | Vterm t -> mt, t
     | Vreal _ | Vfloat _ | Vfloat_mode _ ->
         Format.kasprintf failwith "term_of_value: %a" print_value v
   and term_of_field mt f = term_of_value' mt (field_get f) in
-  snd (term_of_value' Mtv.empty t)
+  snd (term_of_value' Mtv.empty v)
 
 (* RESULT *)
 
@@ -918,7 +918,7 @@ let exec_pure env ls pvs =
         let vsenv = List.fold_right2 Mvs.add vs args env.vsenv in
         let vsenv = Mvs.map (term_of_value env.env) vsenv in
         let t = reduce_term env.env known rule_terms vsenv t in
-        Normal (value (Opt.get t.t_ty) (Vghost t))
+        Normal (value (Opt.get_def ty_bool t.t_ty) (Vterm t))
     | None ->
         kasprintf failwith "No logic definition for %a"
           Pretty.print_ls ls
@@ -1100,7 +1100,7 @@ let rec eval_expr ~rac env (e : expr) : result =
         let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
         let vsenv = Mvs.map (term_of_value env.env) env.vsenv in
         reduce_term env.env known rule_terms vsenv t in
-      Normal (value (Opt.get t.t_ty) (Vghost t))
+      Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
       eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
         print_expr e ;
