@@ -793,12 +793,15 @@ let try_add_rule _id t eng =
     eng
 
 let fix_vsenv_value vs t (vsenv, mt, mv) =
-  let ty = Opt.get t.t_ty in
-  let vs' = create_vsymbol (id_clone vs.vs_name) ty in
-  let vsenv = Mvs.add vs' t vsenv in
-  let mt = ty_match mt vs.vs_ty ty in
-  let mv = Mvs.add vs (t_var vs') mv in
-  vsenv, mt, mv
+  match t.t_ty with
+  | None -> (* Don't fix prop-typed terms *)
+      vsenv, mt, mv
+  | Some ty ->
+    let vs' = create_vsymbol (id_clone vs.vs_name) ty in
+    let vsenv = Mvs.add vs' t vsenv in
+    let mt = ty_match mt vs.vs_ty ty in
+    let mv = Mvs.add vs (t_var vs') mv in
+    vsenv, mt, mv
 
 (** Reduce a term using the reduction engine.
 
@@ -939,6 +942,8 @@ let exec_pure env ls pvs =
         let vsenv = List.fold_right2 Mvs.add vs args env.vsenv in
         let vsenv = Mvs.map (term_of_value env.env) vsenv in
         let t = reduce_term env.env known rule_terms vsenv t in
+        (* TODO A variable x binding the result of exec pure are used as (x = True) in
+           subsequent terms, so we map true/false to True/False here. Is this reasonable? *)
         let t = fix_boolean_term t in
         Normal (value (Opt.get_def ty_bool t.t_ty) (Vterm t))
     | None ->
@@ -1051,32 +1056,34 @@ and eval_expr' ~rac env e =
         eval_expr ~rac env' e2 )
   | Eif (e1, e2, e3) -> (
     match eval_expr ~rac env e1 with
-    | Normal t -> (
-      match t.v_desc with
-      | Vbool true -> eval_expr ~rac env e2
-      | Vbool false -> eval_expr ~rac env e3
-      | _ ->
-          eprintf "@[[Exec] Cannot decide condition of if: @[%a@]@]@."
-            print_value t ;
-          Irred e )
+    | Normal v ->
+      if is_true v then
+        eval_expr ~rac env e2
+      else if is_false v then
+        eval_expr ~rac env e3
+      else (
+        eprintf "@[[Exec] Cannot decide condition of if: @[%a@]@]@." print_value v ;
+        Irred e )
     | r -> r )
   | Ewhile (cond, inv, _var, e1) -> (
       (* TODO variants *)
       if rac <> RacNone then
         check_terms rac (cntr_ctx "Loop invariant initialization" env) inv ;
       match eval_expr ~rac env cond with
-      | Normal {v_desc= Vbool false} -> Normal (value ty_unit Vvoid)
-      | Normal {v_desc= Vbool true} -> (
-        match eval_expr ~rac env e1 with
-        | Normal _ ->
-            if rac <> RacNone then
-              check_terms rac (cntr_ctx "Loop invariant preservation" env) inv ;
-            eval_expr ~rac env e
-        | r -> r )
-      | Normal t ->
-          eprintf "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
-            print_value t ;
-          Irred e
+      | Normal v ->
+          if is_true v then (
+            match eval_expr ~rac env e1 with
+            | Normal _ ->
+                if rac <> RacNone then
+                  check_terms rac (cntr_ctx "Loop invariant preservation" env) inv ;
+                eval_expr ~rac env e
+            | r -> r )
+          else if is_false v then
+            Normal (value ty_unit Vvoid)
+          else (
+            eprintf "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
+              print_value v ;
+            Irred e )
       | r -> r )
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) -> (
     try
