@@ -802,19 +802,21 @@ module Save_VCs = struct
            let pr_name = prover.Whyconf.prover_name in
            match pa.Session_itp.proof_obsolete, pa.Session_itp.proof_state with
            | false, Some pr ->
-             Mstr.add pr_name (proof_result_to_json pr) acc
+             Mstr.add pr_name (proof_result_to_json pr_name pr) acc
            | _, _ -> acc)
         (Session_itp.get_proof_attempt_ids session g) s in
     Json_base.Record r
 
-  and proof_result_to_json r =
+  and proof_result_to_json prover r =
     let answer =
       Pp.sprintf "%a"
         Call_provers.print_prover_answer r.Call_provers.pr_answer in
     let s = Mstr.empty in
+    let steps = Gnat_config.back_convert_steps ~prover r.Call_provers.pr_steps
+    in
     let r =
       Mstr.add "time" (Json_base.Float r.Call_provers.pr_time)
-        (Mstr.add "steps" (Json_base.Int r.Call_provers.pr_steps)
+        (Mstr.add "steps" (Json_base.Int steps)
            (Mstr.add "result" (Json_base.String answer) s)) in
     Json_base.Record r
   and transformations_to_json session g =
