@@ -907,6 +907,20 @@ let rec matching env (v : value) p =
           if ls_equal ls ls2 then env else raise NoMatch
       | _ -> raise Undetermined )
 
+let is_true v = match v.v_desc with
+  | Vbool true | Vterm {t_node= Ttrue} -> true
+  | Vterm t when t_equal t t_bool_true -> true
+  | _ -> false
+
+let is_false v = match v.v_desc with
+  | Vbool false | Vterm {t_node= Tfalse} -> true
+  | Vterm t when t_equal t t_bool_false -> true
+  | _ -> false
+
+let fix_boolean_term t =
+  if t_equal t t_true then t_bool_true else
+  if t_equal t t_false then t_bool_false else t
+
 let exec_pure env ls pvs =
   if ls_equal ls ps_equ then
     (* TODO (?) Add more builtin logical symbols *)
@@ -925,12 +939,31 @@ let exec_pure env ls pvs =
         let vsenv = List.fold_right2 Mvs.add vs args env.vsenv in
         let vsenv = Mvs.map (term_of_value env.env) vsenv in
         let t = reduce_term env.env known rule_terms vsenv t in
+        let t = fix_boolean_term t in
         Normal (value (Opt.get_def ty_bool t.t_ty) (Vterm t))
     | None ->
         kasprintf failwith "No logic definition for %a"
           Pretty.print_ls ls
 
-let rec eval_expr ~rac env (e : expr) : result =
+let pp_limited ?(n=100) pp fmt x =
+  let s = asprintf "%a@." pp x in
+  let s = String.map (function '\n' -> ' ' | c -> c) s in
+  let s = String.sub s 0 (Pervasives.min n (String.length s)) in
+  pp_print_string fmt s
+
+let print_result fmt = function
+  | Normal v -> print_value fmt v
+  | Excep (xs, v) -> fprintf fmt "EXC %a: %a" print_xs xs print_value v
+  | Fun (rs, pvs, n) -> fprintf fmt "FUN %a" print_rs rs
+  | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
+
+let rec eval_expr ~rac env e =
+  Debug.dprintf debug "@[<h>%tEVAL EXPR: %a@]@." pp_indent (pp_limited print_expr) e;
+  let res = eval_expr' ~rac env e in
+  Debug.dprintf debug "@[<h>%t -> %a@]@." pp_indent (print_result) res;
+  res
+
+and eval_expr' ~rac env e =
   match e.e_node with
   | Evar pvs -> (
     try
