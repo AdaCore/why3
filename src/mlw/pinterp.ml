@@ -1474,7 +1474,8 @@ let eval_global_fundef ~rac env mod_known mod_theory locals body =
     assert false
 
 let eval_rs env mod_known th_known loc model (rs: rsymbol) =
-  let rac = RacOnly (loc, model) in
+  (* let rac = RacOnly (loc, model) in *)
+  let rac = RacAll in (* FIXME *)
   let get_value pv =
     match model_value pv model with
     | Some mv ->
