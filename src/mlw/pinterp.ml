@@ -19,6 +19,13 @@ open Expr
 open Big_real
 open Mlmpfr_wrapper
 
+let pp_indent fmt =
+  match Printexc.(backtrace_slots (get_callstack 100)) with
+  | None -> ()
+  | Some a ->
+      let s = String.make (2 * (Array.length a - 10)) ' ' in
+      pp_print_string fmt s
+
 let debug =
   Debug.register_info_flag "trace_exec"
     ~desc:"trace execution of code given by --exec or --eval"
@@ -948,8 +955,12 @@ let rec eval_expr ~rac env (e : expr) : result =
   | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
   | Eexec (ce, cty) -> (
     match ce.c_node with
-      | Cpur (ls, pvs) -> exec_pure env ls pvs
+      | Cpur (ls, pvs) ->
+          Debug.dprintf debug "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent Pretty.print_ls ls
+            (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
+          exec_pure env ls pvs
       | Cfun e' ->
+        Debug.dprintf debug "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
         let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
         let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
         let arg =
@@ -1092,9 +1103,11 @@ let rec eval_expr ~rac env (e : expr) : result =
       if do_rac t.t_loc rac then check_term (cntr_ctx descr env) t ;
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
+      Debug.dprintf debug "@[<h>%tEVAL EXPR: GHOST %a@]@." pp_indent print_expr e1;
       (* TODO: do not eval ghost if no assertion check *)
       eval_expr ~rac env e1
   | Epure t ->
+      Debug.dprintf debug "@[<h>%tEVAL EXPR: PURE %a@]@." pp_indent Pretty.print_term t;
       let t =
         let rule_terms = Mid.map_filter rule_term env.th_known in
         let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
@@ -1150,35 +1163,29 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
           let env = add_local_funs locals env in
           match ce.c_node with
             | Capp (rs', pvl) ->
+                Debug.dprintf debug "@[<h>%tEXEC CALL %a: Capp %a]@." pp_indent print_rs rs print_rs rs';
                 exec_call ~rac env rs' (pvl @ arg_pvs) ity_result
             | Cfun body ->
+                Debug.dprintf debug"@[<hv2>%tEXEC CALL %a: FUN %a@]@." pp_indent print_rs rs (pp_limited print_expr) body;
                 let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
-                Debug.dprintf debug "@[Evaluating function body of %s@]@."
-                  rs.rs_name.id_string ;
-                let r = eval_expr ~rac env' body in
-                Debug.dprintf debug "@[Return from function %s@ result@ %a@]@."
-                  rs.rs_name.id_string print_logic_result r ;
-                r
+                eval_expr ~rac env' body
             | Cany ->
+                eprintf "@[<hv2>EXEC CALL %a: ANY@]@." print_rs rs;
                 eprintf "Cannot compute any function %a" print_rs rs;
                 raise CannotCompute
             | Cpur _ -> assert false (* TODO ? *) )
       | Builtin f ->
-          Debug.dprintf debug "@[Evaluating builtin function %s@]@."
-            rs.rs_name.id_string ;
-          let r = Normal (f rs arg_vs) in
-          Debug.dprintf debug "@[Return from builtin function %s result %a@]@."
-            rs.rs_name.id_string print_logic_result r ;
-          r
+          Debug.dprintf debug "@[<hv2>EXEC CALL %a: BUILTIN@]@." print_rs rs;
+          Normal (f rs arg_vs)
       | Constructor _ ->
-          Debug.dprintf debug "[interp] create record with type %a@."
-            print_ity ity_result;
+          Debug.dprintf debug "@[<hv2>EXEC CALL %a: CONSTRUCTOR@]@." print_rs rs;
           let mt = List.fold_left2 ty_match Mtv.empty
               (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
           let ty = ty_inst mt (ty_of_ity ity_result) in
           let fs = List.map field arg_vs in
           Normal (value ty (Vconstr (rs, fs)))
       | Projection _d -> (
+        Debug.dprintf debug "@[<hv2>EXEC CALL %a: PROJECTION@]@." print_rs rs;
         match rs.rs_field, arg_vs with
         | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
             let rec search constr_args args =
