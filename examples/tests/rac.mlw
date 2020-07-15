@@ -402,6 +402,7 @@ module Arrays
 end
 
 module Ghost
+  use int.Int
   type t = {i1: int; ghost i2: int}
 
   let test1 () : (int, ghost int) =
@@ -409,12 +410,35 @@ module Ghost
     assert { x.i1 = 123 /\ x.i2 = 456 };
     (x.i1, x.i2)
 
-  let ghost f1 (x y : 'a) : bool =
-    if x = y then True else False
-
-  function f2 (x: bool) : bool =
-    not x
+  let ghost f1 (x y : int) : int =
+    if x = y then 123 else 456
 
   let ghost test2 () =
-    f2 (f1 1 2)
+    let ghost x = f1 0 1 in
+    x + 1
+end
+
+module Predicates
+  use int.Int
+
+  predicate p1 (n: int) =
+    n = 123
+
+  let test1 () =
+    assert { p1 123 };
+    let ghost x1 = p1 123 in
+    assert { x1 };
+    let ghost x2 = not p1 0 in
+    assert { x2 };
+    let predicate p2 (x: int) = x = 456 in
+    assert { p2 456 }
+
+  let ghost test2 () =
+    let b1 = pure { true } in
+    assert { b1 };
+    let x = if b1 then 0 else 1 in
+    assert { x = 0 };
+    let b2 = p1 123 in
+    assert { b2 };
+    (b1, x, b2)
 end
