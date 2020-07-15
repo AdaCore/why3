@@ -236,6 +236,9 @@ let term_of_value env v =
     | Vstring s -> mt, t_const (Constant.ConstStr s) ty_str
     | Vbool b -> mt, if b then t_bool_true else t_bool_false
     | Vvoid -> mt, t_tuple []
+    | Vterm t -> mt, t
+    | Vreal _ | Vfloat _ | Vfloat_mode _ -> (* TODO *)
+        Format.kasprintf failwith "term_of_value: %a" print_value v
     | Vconstr (rs, fs) ->
         let mt, fs = Lists.map_fold_left term_of_field mt fs in
         if rs_kind rs = RKfunc then
@@ -244,15 +247,18 @@ let term_of_value env v =
           kasprintf failwith "Cannot construct term for constructor \
                               %a that is not a function" print_rs rs
     | Vfun (cl, arg, e) ->
-        let aux vs v (mt, mv) =
+        (* TERM: fun arg -> t *)
+        let t = Opt.get (term_of_expr ~prop:false e) in
+        let bind_cl vs v (mt, mv) =
           let mt = ty_match mt vs.vs_ty v.v_ty in
           let mt, t = term_of_value' mt v in
           mt, Mvs.add vs t mv in
-        let mt, mv = Mvs.fold aux cl (mt, Mvs.empty) in
-        let t = Opt.get (term_of_expr ~prop:false e) in
-        let t = t_ty_subst mt mv t in
+        let t = (* Substitute values from the closure *)
+          let mt, mv = Mvs.fold bind_cl cl (mt, Mvs.empty) in
+          t_ty_subst mt mv t in
         mt, t_lambda [arg] [] t
     | Varray a ->
+        (* TERM: epsilon v. v[0] = a[0] /\ ... /\ v[n-1] = a[n-1] *)
         let pm = Pmodule.read_module env ["array"] "Array" in
         let vs = create_vsymbol (id_fresh "a") v.v_ty in
         let ls_get = Mstr.find (Ident.op_get "") pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
@@ -261,25 +267,22 @@ let term_of_value env v =
             mt, t_true
           else
             let t_i = t_const (Constant.int_const_of_int i) ty_int in
-            let t1 = t_app_infer ls_get [t_var vs; t_i] in
-            let mt, t2 = term_of_value' mt a.(i) in
+            let t1 = t_app_infer ls_get [t_var vs; t_i] in (* v[i] *)
+            let mt, t2 = term_of_value' mt a.(i) in        (* a[i] *)
             let mt, t3 = loop mt (succ i) in
-            mt, t_and (t_equ t1 t2) t3 in
+            mt, t_and (t_equ t1 t2) t3 in    (* v[i] = a[i] /\ ... *)
         let mt, t = loop mt 0 in
         mt, t_eps (t_close_bound vs t)
     | Vpurefun (ty, mv, v) ->
-        (* use function literal [|mv...; _ -> v|] *)
-        let mt, t = term_of_value' mt v in
+        (* TERM: fun arg -> if arg = k0 then v0 else ... else v *)
+        (* TODO Use function literal [|mv...; _ -> v|] when available in Why3 *)
         let arg = create_vsymbol (id_fresh "arg") ty in
-        let aux key value (mt, t) =
-          let mt, key = term_of_value' mt key in
-          let mt, value = term_of_value' mt value in
-          mt, t_if (t_equ (t_var arg) key) value t in
-        let mt, t = Mv.fold aux mv (mt, t) in
+        let mk_case key value (mt, t) =
+          let mt, key = term_of_value' mt key in      (* k_i *)
+          let mt, value = term_of_value' mt value in  (* v_i *)
+          mt, t_if (t_equ (t_var arg) key) value t in (* if arg = k_i then v_i else ... *)
+        let mt, t = Mv.fold mk_case mv (term_of_value' mt v) in
         mt, t_lambda [arg] [] t
-    | Vterm t -> mt, t
-    | Vreal _ | Vfloat _ | Vfloat_mode _ ->
-        Format.kasprintf failwith "term_of_value: %a" print_value v
   and term_of_field mt f = term_of_value' mt (field_get f) in
   snd (term_of_value' Mtv.empty v)
 
