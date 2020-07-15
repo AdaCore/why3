@@ -37,6 +37,12 @@ type cntr_ctx =
     during RAC. *)
 exception Contr of cntr_ctx * Term.term
 
+exception AbstractExEnded of Loc.position option
+(* the abstract execution cannot continue *)
+
+exception InvCeInfraction of Loc.position option
+(* the counter-example model is not consistent with an invariant *)
+
 (** {1 Global evaluation} *)
 
 val init_real : int * int * int -> unit
