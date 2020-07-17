@@ -169,4 +169,11 @@ let get_multiline (f, bl, bc, ec) =
     done;
     f, (bl, bc), (!el, !ec)
   else
-    f, (bl, bc), (bl, ec)
+    failwith "Loc.get_multiline"
+
+let contains loc1 loc2 =
+  let f1, (bl1, bc1), (el1, ec1) = get_multiline loc1 in
+  let f2, (bl2, bc2), (el2, ec2) = get_multiline loc2 in
+  String.equal f1 f2 &&
+  (bl1 < bl2 || (bl1 = bl2 && bc1 <= bc2)) &&
+  (el1 > el2 || (el1 = el2 && ec1 >= ec2))

@@ -208,7 +208,7 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-let analyse_result exit_result res_parser printer_mapping out =
+let analyse_result ?(maybe_ce_model=fun _ -> true) exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
   let list_re = List.map (fun (a, b) -> Re.Str.regexp a, b) list_re in
@@ -261,16 +261,13 @@ let analyse_result exit_result res_parser printer_mapping out =
              in incremental mode gives satisfying results *)
           let use_incremental_choice = false in
           let m =
-            if is_model_empty m then saved_model else
-              match res with
-              | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") ->
+            if is_model_empty m || not (maybe_ce_model m) then saved_model
+            else match res, saved_model with
+              | (StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout")),
+                Some saved_model when use_incremental_choice ->
                   (* we keep the previous model if it was there *)
-                  if use_incremental_choice then
-                    Some (Opt.get_def m saved_model)
-                  else
-                    Some m
-              | _ -> Some m
-          in
+                  Some saved_model
+              | _ -> Some m in
           analyse m (Some res) tl
     | Answer res :: tl ->
         if res = Valid then
@@ -285,7 +282,7 @@ let analyse_result exit_result res_parser printer_mapping out =
 let backup_file f = f ^ ".save"
 
 
-let parse_prover_run res_parser signaled time out exitcode limit ~printer_mapping =
+let parse_prover_run res_parser signaled time out exitcode limit maybe_ce_model ~printer_mapping =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
   (* the following conversion is incorrect (but does not fail) on 32bit, but if
      the incoming exitcode was really outside the bounds of [int], its exact
@@ -297,7 +294,7 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
       if signaled then [Answer HighFailure] else
       try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
       with Not_found -> []
-    in analyse_result exit_result res_parser printer_mapping out
+    in analyse_result ?maybe_ce_model exit_result res_parser printer_mapping out
   in
   let model = match model with Some s -> s | None -> default_model in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
@@ -391,6 +388,7 @@ type save_data = {
   limit      : resource_limit;
   res_parser : prover_result_parser;
   printer_mapping : Printer.printer_mapping;
+  maybe_ce_model : (Model_parser.model -> bool) option;
 }
 
 let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
@@ -421,7 +419,7 @@ let handle_answer answer =
       let ret = exit_code in
       let printer_mapping = save.printer_mapping in
       let ans = parse_prover_run save.res_parser
-          timeout time out ret save.limit ~printer_mapping in
+          timeout time out ret save.limit save.maybe_ce_model ~printer_mapping in
       id, Some ans
   | Started id ->
       id, None
@@ -434,7 +432,7 @@ type prover_call =
   | EditorCall of int
 
 let call_on_file ~command ~limit ~res_parser ~printer_mapping
-                 ?(inplace=false) fin =
+    ?maybe_ce_model ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
     actualcommand ~cleanup:true ~inplace command limit fin in
@@ -443,7 +441,8 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
     inplace    = inplace;
     limit      = limit;
     res_parser = res_parser;
-    printer_mapping = printer_mapping } in
+    printer_mapping = printer_mapping;
+    maybe_ce_model = maybe_ce_model } in
   Hashtbl.add saved_data id save;
   let limit = adapt_limits limit on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
@@ -528,7 +527,7 @@ let rec wait_on_call = function
       editor_result ret
 
 let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
-                   ~gen_new_file ?(inplace=false) buffer =
+    ~gen_new_file ?maybe_ce_model ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
       Filename.open_temp_file "why_" ("_" ^ filename)
@@ -541,7 +540,7 @@ let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
       end
   in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace fin
+  call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace ?maybe_ce_model fin
 
 let call_editor ~command fin =
   let command, use_stdin, _ =

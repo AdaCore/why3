@@ -66,6 +66,24 @@ val eval_rs :
   Expr.Mrs.key ->
   result
 
+val maybe_ce_model_rs :
+  Env.env ->
+  Pmodule.pmodule ->
+  Loc.position ->
+  Model_parser.model ->
+  Expr.rsymbol ->
+  bool option
+(** [maybe_model_rs env pm loc m rs] checks if executing the definition of
+    [rs] (abstractly) using the values from the counter-example model [m]
+    trigger a RAC contradiction at location [loc]. *)
+
+val maybe_ce_model : Env.env -> Pmodule.pmodule -> Model_parser.model -> bool
+(** [maybe_ce_model env pm m] checks if model [m] is valid, i.e. the abstract
+    execution using the model values triggers a RAC contradiction in the
+    corresponding location. The function returns true if the corresponding
+    program definition cannot be identified, or if there is an error during
+    RAC execution *)
+
 (** {1 Reporting results} *)
 
 val report_eval_result :

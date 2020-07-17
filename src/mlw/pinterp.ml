@@ -1416,6 +1416,40 @@ let eval_rs env mod_known th_known loc model (rs: rsymbol) =
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   exec_call ~rac env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
 
+let maybe_ce_model_rs env pm loc model rs =
+  try
+    ignore (eval_rs env pm.Pmodule.mod_known pm.Pmodule.mod_theory.Theory.th_known loc model rs);
+    printf "RAC does not confirm the counter-example (no contradiction during execution)@.";
+    None
+  with
+  | Contr (_, t) when Opt.equal Loc.equal
+        (Model_parser.get_model_term_loc model) t.Term.t_loc ->
+      printf "RAC confirms the counter-example@.";
+      Some true
+  | Contr (_, t) ->
+      printf "RAC found a contradiction at different location %a@."
+        (Pp.print_option_or_default "NO LOC" Pretty.print_loc) t.Term.t_loc;
+      None
+  | CannotImportModelValue msg ->
+      printf "RAC impossible: Cannot import model value: %s@." msg;
+      None
+  | Failure msg ->
+      (* E.g., cannot create default value for non-free type, cannot construct
+         term for constructor that is not a function *)
+      printf "RAC failure: %s@." msg;
+      None
+
+let maybe_ce_model env pm m =
+  try
+    let loc = Opt.get_exn Not_found (Model_parser.get_model_term_loc m) in
+    if let f, _, _, _ = Loc.get loc in Sys.file_exists f then
+      (* TODO deal with VC from variable declarations and type declarations *)
+      let rs = Pmodule.find_rs pm loc in
+      Opt.get_def true (maybe_ce_model_rs env pm loc m rs)
+    else
+      true
+  with Not_found -> true
+
 let report_eval_result body fmt (res, final_env) =
   match res with
   | Normal _ ->

@@ -227,90 +227,17 @@ let output_task drv fname _tname th task dir =
 
 let unproved = ref false
 
-let loc_contains loc1 loc2 =
-  (* [loc1:   [loc2:   ]    ] *)
-  let f1, (bl1, bc1), (el1, ec1) = Loc.get_multiline loc1 in
-  let f2, (bl2, bc2), (el2, ec2) = Loc.get_multiline loc2 in
-  String.equal f1 f2 &&
-  (bl1 < bl2 || (bl1 = bl2 && bc1 <= bc2)) &&
-  (el1 > el2 || (el1 = el2 && ec1 >= ec2))
-
-let find_rs pm loc =
-  let exception Found of Expr.rsymbol in
-  let open Expr in
-  let open Pdecl in
-  let loc_of_exp e = Opt.get_def Loc.dummy_position e.e_loc in
-  let loc_of_cexp ce = match ce.c_node with Cfun e -> loc_of_exp e | _ -> Loc.dummy_position in
-  let find_pd_rec_defn rd =
-    if loc_contains (loc_of_cexp rd.rec_fun) loc then
-      raise (Found rd.rec_sym) in
-  let find_pd_pdecl pd =
-    match pd.pd_node with
-    | PDlet (LDvar (pv, e)) when loc_contains (loc_of_exp e) loc ->
-        (* TODO Deal with VCs in variable declarations *)
-        kasprintf failwith "find_rs: location in variable declaration of %a" Ity.print_pv pv
-    | PDlet (LDsym (rs, ce)) when loc_contains (loc_of_cexp ce) loc ->
-          raise (Found rs)
-    | PDlet (LDrec rds) ->
-        List.iter find_pd_rec_defn rds
-    | _ -> () in
-  let rec find_pd_mod_unit =
-    let open Pmodule in
-    function
-    | Uuse _ | Uclone _ | Umeta _ -> ()
-    | Uscope (_, us) -> List.iter find_pd_mod_unit us
-    | Udecl pd -> find_pd_pdecl pd in
-  try List.iter find_pd_mod_unit pm.Pmodule.mod_units; None
-  with Found rs -> Some rs
-
-let maybe_model_rs pm loc model rs =
-  let open Pinterp in
-  try
-    ignore (eval_rs env pm.Pmodule.mod_known pm.Pmodule.mod_theory.th_known loc model rs);
-    printf "RAC does not confirm the counter-example (execution did not fail at all)@.";
-    None
-  with
-  | Contr (_, t) when Opt.equal Loc.equal
-        (Model_parser.get_model_term_loc model) t.Term.t_loc ->
-      printf "RAC confirms the counter-example@.";
-      Some true
-  | Contr (_, t) ->
-      printf "RAC found a contradiction at different location %a@."
-        (Pp.print_option_or_default "NO LOC" Pretty.print_loc) t.Term.t_loc;
-      None
-  | CannotImportModelValue msg ->
-      printf "RAC impossible: Cannot import model value: %s@." msg;
-      None
-  | Failure msg ->
-      (* E.g., cannot create default value for non-free type, cannot construct
-         term for constructor that is not a function *)
-      printf "RAC failure: %s@." msg;
-      None
-
-let maybe_model pm m =
-  let (>>=) = Opt.bind in
-  Opt.get_def true
-    (Model_parser.get_model_term_loc m >>= fun loc ->
-     find_rs pm loc >>= fun rs ->
-     maybe_model_rs pm loc m rs)
-
-let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
+let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
     { Call_provers.empty_limit with
       Call_provers.limit_time = timelimit;
                    limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
+        let maybe_ce_model = Pinterp.maybe_ce_model env (Pmodule.restore_module th) in
         let call =
-          Driver.prove_task ~command ~limit drv task in
+          Driver.prove_task ~command ~limit ~maybe_ce_model drv task in
         let res = Call_provers.wait_on_call call in
-        let pr_model =
-          (* TODO Move to Call_provers.analyse_results.analyse [Answer _; Model _; ...]
-             and proceed to next model if necessary *)
-          let model = res.Call_provers.pr_model in
-          if maybe_model (Pmodule.restore_module th) model
-          then model else Model_parser.default_model in
-        let res = {res with Call_provers.pr_model} in
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
           (Call_provers.print_prover_result ~json_model:!opt_json) res;
@@ -330,7 +257,7 @@ let do_tasks env drv fname tname th task =
       List.rev_append (Trans.apply tr task) acc) [] tasks)
   in
   let tasks = List.fold_left apply [task] trans in
-  List.iter (do_task drv fname tname th) tasks
+  List.iter (do_task env drv fname tname th) tasks
 
 let do_theory env drv fname tname th glist elist =
   if !opt_print_theory then

@@ -143,6 +143,7 @@ val call_on_buffer :
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
   gen_new_file    : bool ->
+  ?maybe_ce_model  : (Model_parser.model -> bool) ->
   ?inplace        : bool ->
   Buffer.t -> prover_call
 (** Build a prover call on the task already printed in the {!type: Buffer.t} given.
@@ -158,6 +159,8 @@ val call_on_buffer :
     @param inplace : it is used to make a save of the file on which the
     prover was called. It is renamed as %f.save if inplace=true and the command
     [actualcommand] fails
+
+    @param maybe_ce_model : function to validate the model for counter-examples
 
     @param gen_new_file: When set, this generates a new temp file to run the
     prover on. Otherwise it reuses the filename already given.

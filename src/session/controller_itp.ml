@@ -422,10 +422,14 @@ let build_prover_call spa =
     let inplace = config_pr.Whyconf.in_place in
     let interactive = config_pr.Whyconf.interactive in
     try
-      let call =
-        Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
-                        ~limit ~interactive driver task
-      in
+      let rec find_th s id = match get_proof_parent s id with
+        | Theory th -> th
+        | Trans id -> find_th s (get_trans_parent s id) in
+      let th = find_th c.controller_session spa.spa_id in
+      let pm = Pmodule.restore_module (Theory.restore_theory (Session_itp.theory_name th)) in
+      let maybe_ce_model = Pinterp.maybe_ce_model c.controller_env pm in
+      let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
+          ~limit ~interactive ~maybe_ce_model driver task in
       let pa =
         { tp_session  = c.controller_session;
           tp_id       = spa.spa_id;
