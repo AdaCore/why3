@@ -1099,23 +1099,24 @@ let rec eval_expr ~rac ~abs env e =
    instead invariants and function contracts to guide execution. *)
 and eval_expr' ~rac ~abs env ({e_loc} as e) =
   let e_loc = Opt.get_def Loc.dummy_position e_loc in
+  let get_value name ity loc =
+    match get_model_value env.ce_model name loc with
+    | Some v ->
+       let v = import_model_value env.mod_known ity v in
+       Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
+         pp_indent print_value v;
+       v
+    | None -> Debug.dprintf debug "@[<h>%tVALUE not in ce-model@]@." pp_indent;
+       default_value_of_type env.mod_known ity in
   let assign_written_vars env vs _ =
     let pv = restore_pv vs in
     if pv_affected e.e_effect.eff_writes pv then begin
         Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
           pp_indent print_pv pv
           (Pp.print_option Pretty.print_loc) pv.pv_vs.vs_name.id_loc;
-        let value = get_model_value env.ce_model vs.vs_name.id_string e_loc in
-        let v = match value with
-          | Some v ->
-             let v = import_model_value env.mod_known pv.pv_ity v in
-             Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
-               pp_indent print_value v; v
-          | None ->
-             Debug.dprintf debug "@[<h>%tVALUE not in ce-model@]@." pp_indent;
-             default_value_of_type env.mod_known pv.pv_ity in
-        bind_vs vs v env
-      end else env in
+        let value = get_value vs.vs_name.id_string pv.pv_ity e_loc in
+        bind_vs vs value env end
+    else env in
   match e.e_node with
   | Evar pvs -> (
     try
@@ -1222,11 +1223,11 @@ and eval_expr' ~rac ~abs env ({e_loc} as e) =
         assert2 {I};
         if e1 then (e2;assert3 {I}; absurd* ) else ()
 
-        1 - if assert1 fails, then we have a true couterexample
+        1 - if assert1 fails, then we have a real couterexample
             (invariant init doesn't hold)
         2 - if assert2 fails, then we have a false counterexample
             (invariant does not hold at beginning of execution)
-        3 - if assert3 fails, then we have a true counterexample
+        3 - if assert3 fails, then we have a real counterexample
             (invariant does not hold after iteration)
         * stop the interpretation here - raise AbstractExEnded *)
       (* assert1 *)
@@ -1278,6 +1279,79 @@ and eval_expr' ~rac ~abs env ({e_loc} as e) =
               print_value v ;
             Irred e )
       | r -> r end
+  | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) when abs -> begin
+      (* arbitrary execution of an iteartion taken from the counterexample
+
+        for i = e1 to e2 do invariant {I} e done
+        ~>
+        let a = eval_expr e1 in
+        let b = eval_expr e2 in
+        let i = a in assert1 {I};
+        if a <= b then begin
+          assign_written_vars_with_ce;
+          let i = get_model_value i in
+          assert2 { a <= i }; (*?? i <= b + 1 ??*)
+          assert3 { I };
+          if a <= b then begin
+            eval_expr e;
+            let i = i + 1 in assert4 {I};
+            absurd
+          end else ()
+        end else ()
+
+        1 - if assert1 fails, then we have a real counterexample
+            (invariant init doesn't hold)
+        2 - if assert2 fails, then we have a false counterexample
+            (the value assigned to i is not compatible with for loop)
+        3 - if assert3 fails, then we have a false counterexample
+            (invariant does not hold at beginning of execution)
+        4 - if assert4 fails, then we have a real counterexample
+            (invariant does not hold after iteration) *)
+      try
+        let a = big_int_of_value (get_pvs env pvs1) in
+        let b = big_int_of_value (get_pvs env pvs2) in
+        let le, suc = match dir with
+          | To -> BigInt.le, BigInt.succ
+          | DownTo -> BigInt.ge, BigInt.pred in
+        (* assert1 *)
+        if rac <> RacNone then begin
+          let env = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
+          check_terms rac (cntr_ctx "Loop invariant initialization" env) inv end;
+        if le a b then begin
+            let env = Mvs.fold_left assign_written_vars env env.vsenv in
+            let pvs_v = get_value pvs.pv_vs.vs_name.id_string pvs.pv_ity
+                              (Opt.get pvs.pv_vs.vs_name.id_loc) in
+            let env = bind_vs pvs.pv_vs pvs_v env in
+            let pvs_int = match pvs_v.v_desc with
+                Vnum n -> n | _ -> assert false in
+            (* assert2 *)
+            if not (le a pvs_int) then begin
+                printf "ce model does not satisfy loop bounds %a@."
+                  (Pp.print_option Pretty.print_loc) e.e_loc;
+                raise (InvCeInfraction e.e_loc) end;
+            (* assert3 *)
+            (try check_terms rac (cntr_ctx "ce satisfies invariant" env) inv with
+             | Contr (_,t) ->
+                printf "ce model does not satisfy loop invariant %a@."
+                  (Pp.print_option Pretty.print_loc) t.t_loc;
+                raise (InvCeInfraction t.t_loc));
+            if le pvs_int b then begin
+                match eval_expr ~rac ~abs env e1 with
+                | Normal _ ->
+                   let env = bind_vs pvs.pv_vs
+                               (value ty_int (Vnum (suc pvs_int))) env in
+                   (* assert4 *)
+                   if rac <> RacNone then
+                     check_terms rac
+                       (cntr_ctx "Loop invariant preservation" env) inv;
+                   raise (AbstractExEnded e.e_loc)
+                | r -> r
+              end
+            else Normal (value ty_unit Vvoid)
+          end
+        else Normal (value ty_unit Vvoid)
+      with NotNum -> Irred e
+    end
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) -> (
     try
       let a = big_int_of_value (get_pvs env pvs1) in
