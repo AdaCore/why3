@@ -1087,28 +1087,32 @@ let print_result fmt = function
 exception InvCeInfraction of Loc.position option
 exception AbstractExEnded of Loc.position option
 
-let rec eval_expr ~rac env e =
-  Debug.dprintf debug "@[<h>%tEVAL EXPR: %a@]@." pp_indent (pp_limited print_expr) e;
-  let res = eval_expr' ~rac env e in
+let rec eval_expr ~rac ~abs env e =
+  Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
+    (if abs then "Abs. " else "Con. ")
+    (pp_limited print_expr) e;
+  let res = eval_expr' ~rac ~abs env e in
   Debug.dprintf debug "@[<h>%t -> %a@]@." pp_indent (print_result) res;
   res
 
-(* abstractly - do not execute loops and function calls - use instead
-   invariants and function contracts to guide execution. *)
-and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
+(* abs = abstractly - do not execute loops and function calls - use
+   instead invariants and function contracts to guide execution. *)
+and eval_expr' ~rac ~abs env ({e_loc} as e) =
   let e_loc = Opt.get_def Loc.dummy_position e_loc in
-  let assign_written_vars env vs v =
+  let assign_written_vars env vs _ =
     let pv = restore_pv vs in
     if pv_affected e.e_effect.eff_writes pv then begin
-        eprintf "VAR %a is written %a@."
-          print_pv pv (Pp.print_option Pretty.print_loc) pv.pv_vs.vs_name.id_loc;
-        let v = match get_model_value env.ce_model vs.vs_name.id_string e_loc with
+        Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
+          pp_indent print_pv pv
+          (Pp.print_option Pretty.print_loc) pv.pv_vs.vs_name.id_loc;
+        let value = get_model_value env.ce_model vs.vs_name.id_string e_loc in
+        let v = match value with
           | Some v ->
              let v = import_model_value env.mod_known pv.pv_ity v in
-             eprintf "  VALUE from ce-model: %a@." print_value v;
-             v
+             Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
+               pp_indent print_value v; v
           | None ->
-             eprintf "  VALUE not in ce-model@.";
+             Debug.dprintf debug "@[<h>%tVALUE not in ce-model@]@." pp_indent;
              default_value_of_type env.mod_known pv.pv_ity in
         bind_vs vs v env
       end else env in
@@ -1158,7 +1162,7 @@ and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
         raise CannotCompute
     | Capp (rs, pvsl) ->
         assert (ce.c_cty.cty_args = []) ;
-        exec_call ~rac ?loc:e.e_loc env rs pvsl e.e_ity )
+        exec_call ~rac ~abs ?loc:e.e_loc env rs pvsl e.e_ity )
   | Eassign l ->
       List.iter
         (fun (pvs, rs, value) ->
@@ -1180,14 +1184,14 @@ and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
   | Elet (ld, e2) -> (
     match ld with
     | LDvar (pvs, e1) -> (
-      match eval_expr ~rac env e1 with
+      match eval_expr ~rac ~abs env e1 with
       | Normal v ->
         let env = bind_pvs pvs v env in
-        eval_expr ~rac env e2
+        eval_expr ~rac ~abs env e2
       | r -> r )
     | LDsym (rs, ce) ->
         let env = {env with funenv= Mrs.add rs ce env.funenv} in
-        eval_expr ~rac env e2
+        eval_expr ~rac ~abs env e2
     | LDrec l ->
         let env' =
           { env with
@@ -1196,19 +1200,19 @@ and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
                 (fun acc d ->
                   Mrs.add d.rec_sym d.rec_fun (Mrs.add d.rec_rsym d.rec_fun acc))
                 env.funenv l } in
-        eval_expr ~rac env' e2 )
+        eval_expr ~rac ~abs env' e2 )
   | Eif (e1, e2, e3) -> (
-    match eval_expr ~rac env e1 with
+    match eval_expr ~rac ~abs env e1 with
     | Normal v ->
       if is_true v then
-        eval_expr ~rac env e2
+        eval_expr ~rac ~abs env e2
       else if is_false v then
-        eval_expr ~rac env e3
+        eval_expr ~rac ~abs env e3
       else (
         eprintf "@[[Exec] Cannot decide condition of if: @[%a@]@]@." print_value v ;
         Irred e )
     | r -> r )
-  | Ewhile (cond, inv, _var, e1) when abstractly -> begin
+  | Ewhile (cond, inv, _var, e1) when abs -> begin
       (* arbitrary execution of an iteartion taken from the counterexample
 
         while e1 do invariant {I} e2 done
@@ -1235,10 +1239,10 @@ and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
           printf "ce model does not satisfy loop invariant %a@."
             (Pp.print_option Pretty.print_loc) t.t_loc;
           raise (InvCeInfraction t.t_loc));
-      match eval_expr ~rac env cond with
+      match eval_expr ~rac ~abs env cond with
       | Normal v ->
          if is_true v then begin
-             match eval_expr ~rac env e1 with
+             match eval_expr ~rac ~abs env e1 with
              | Normal _ ->
                 if rac <> RacNone then
                   check_terms rac
@@ -1258,14 +1262,14 @@ and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
       (* TODO variants *)
       if rac <> RacNone then
         check_terms rac (cntr_ctx "Loop invariant initialization" env) inv ;
-      match eval_expr ~rac env cond with
+      match eval_expr ~rac ~abs env cond with
       | Normal v ->
           if is_true v then (
-            match eval_expr ~rac env e1 with
+            match eval_expr ~rac ~abs env e1 with
             | Normal _ ->
                 if rac <> RacNone then
                   check_terms rac (cntr_ctx "Loop invariant preservation" env) inv ;
-                eval_expr ~rac env e
+                eval_expr ~rac ~abs env e
             | r -> r )
           else if is_false v then
             Normal (value ty_unit Vvoid)
@@ -1287,7 +1291,7 @@ and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
           (BigInt.to_string i) ;
         if le i b then
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum i)) env in
-          match eval_expr ~rac env' e1 with
+          match eval_expr ~rac ~abs env' e1 with
           | Normal _ ->
               if rac <> RacNone then
                 check_terms rac (cntr_ctx "Loop invariant preservation" env') inv ;
@@ -1301,28 +1305,28 @@ and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
       iter a
     with NotNum -> Irred e )
   | Ematch (e0, ebl, el) -> (
-      let r = eval_expr ~rac env e0 in
+      let r = eval_expr ~rac ~abs env e0 in
       match r with
       | Normal t -> (
           if ebl = [] then
             r
           else
-            try exec_match ~rac env t ebl with Undetermined -> Irred e )
+            try exec_match ~rac ~abs env t ebl with Undetermined -> Irred e )
       | Excep (ex, t) -> (
         match Mxs.find ex el with
         | [], e2 ->
             (* assert (t = Vvoid); *)
-            eval_expr ~rac env e2
+            eval_expr ~rac ~abs env e2
         | [v], e2 ->
             let env' = bind_vs v.pv_vs t env in
-            eval_expr ~rac env' e2
+            eval_expr ~rac ~abs env' e2
         | _ -> assert false (* TODO ? *)
         | exception Not_found -> r )
       | _ -> r )
   | Eraise (xs, e1) -> (
-      let r = eval_expr ~rac env e1 in
+      let r = eval_expr ~rac ~abs env e1 in
       match r with Normal t -> Excep (xs, t) | _ -> r )
-  | Eexn (_, e1) -> eval_expr ~rac env e1
+  | Eexn (_, e1) -> eval_expr ~rac ~abs env e1
   | Eassert (kind, t) ->
       let descr =
         match kind with
@@ -1334,7 +1338,7 @@ and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
   | Eghost e1 ->
       Debug.dprintf debug "@[<h>%tEVAL EXPR: GHOST %a@]@." pp_indent print_expr e1;
       (* TODO: do not eval ghost if no assertion check *)
-      eval_expr ~rac env e1
+      eval_expr ~rac ~abs env e1
   | Epure t ->
       Debug.dprintf debug "@[<h>%tEVAL EXPR: PURE %a@]@." pp_indent Pretty.print_term t;
       let t =
@@ -1348,7 +1352,7 @@ and eval_expr' ?(abstractly=true) ~rac env ({e_loc} as e) =
         print_expr e ;
       Irred e
 
-and exec_match ~rac env t ebl =
+and exec_match ~rac ~abs env t ebl =
   let rec iter ebl =
     match ebl with
     | [] ->
@@ -1357,11 +1361,11 @@ and exec_match ~rac env t ebl =
     | (p, e) :: rem -> (
       try
         let env' = matching env t p.pp_pat in
-        eval_expr ~rac env' e
+        eval_expr ~rac ~abs env' e
       with NoMatch -> iter rem ) in
   iter ebl
 
-and exec_call ~rac ?loc env rs arg_pvs ity_result =
+and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
   let arg_vs = List.map (get_pvs env) arg_pvs in
   (* Debug.dprintf debug_rac "@[<h>Exec call %a %a@]@."
    *   print_rs rs Pp.(print_list space print_value) arg_vs; *)
@@ -1381,7 +1385,7 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
           let env =
             {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv cl} in
           let env = bind_vs arg value env in
-          eval_expr ~rac env e
+          eval_expr ~rac ~abs env e
       | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
           let v = try Mv.find value bindings with Not_found -> default in
           Normal v
@@ -1393,11 +1397,11 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
           match ce.c_node with
             | Capp (rs', pvl) ->
                 Debug.dprintf debug "@[<h>%tEXEC CALL %a: Capp %a]@." pp_indent print_rs rs print_rs rs';
-                exec_call ~rac env rs' (pvl @ arg_pvs) ity_result
+                exec_call ~rac ~abs env rs' (pvl @ arg_pvs) ity_result
             | Cfun body ->
                 Debug.dprintf debug"@[<hv2>%tEXEC CALL %a: FUN %a@]@." pp_indent print_rs rs (pp_limited print_expr) body;
                 let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
-                eval_expr ~rac env' body
+                eval_expr ~rac ~abs env' body
             | Cany ->
                 eprintf "@[<hv2>EXEC CALL %a: ANY@]@." print_rs rs;
                 eprintf "Cannot compute any function %a" print_rs rs;
@@ -1463,7 +1467,7 @@ let eval_global_expr ~rac env mod_known th_known locals e =
   let global_env = make_global_env mod_known in
   let env = add_local_funs locals
       { (default_env env) with mod_known; th_known; vsenv = global_env } in
-  let res = eval_expr ~rac env e in
+  let res = eval_expr ~rac ~abs:false env e in
   res, global_env
 
 let eval_global_fundef ~rac env mod_known mod_theory locals body =
@@ -1473,7 +1477,7 @@ let eval_global_fundef ~rac env mod_known mod_theory locals body =
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
-let eval_rs env mod_known th_known loc model (rs: rsymbol) =
+let eval_rs ~abs env mod_known th_known _loc model (rs: rsymbol) =
   (* let rac = RacOnly (loc, model) in *)
   let rac = RacAll in (* FIXME *)
   let get_value pv =
@@ -1491,30 +1495,61 @@ let eval_rs env mod_known th_known loc model (rs: rsymbol) =
     { (default_env env) with mod_known; th_known; vsenv = global_env;
                              ce_model = model} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
-  exec_call ~rac env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
+  exec_call ~rac ~abs env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
 
 let maybe_ce_model_rs env pm loc model rs =
+  let open Pmodule in
+  let open Theory in
+  begin try
+      ignore (eval_rs ~abs:false env pm.mod_known
+                pm.mod_theory.th_known loc model rs);
+      printf "RAC does not confirm the counter-example (no \
+              contradiction during execution)@."
+    with
+    | Contr (_, t) when Opt.equal Loc.equal
+                          (Model_parser.get_model_term_loc model) t.Term.t_loc ->
+       printf "RAC confirms the counter-example@."
+    | Contr (_, t) ->
+       printf "RAC found a contradiction at different location %a@."
+         (Pp.print_option_or_default "NO LOC" Pretty.print_loc) t.Term.t_loc
+    | CannotImportModelValue msg ->
+       printf "RAC impossible: Cannot import model value: %s@." msg
+    | Failure msg ->
+       (* E.g., cannot create default value for non-free type, cannot construct
+         term for constructor that is not a function *)
+       printf "RAC failure: %s@." msg
+  end;
   try
-    ignore (eval_rs env pm.Pmodule.mod_known pm.Pmodule.mod_theory.Theory.th_known loc model rs);
-    printf "RAC does not confirm the counter-example (no contradiction during execution)@.";
+    ignore (eval_rs ~abs:true env pm.mod_known pm.mod_theory.th_known loc model rs);
+    printf "Abstractly RAC does not confirm the counter-example \
+            (execution did not fail at all)@.";
     None
   with
   | Contr (_, t) when Opt.equal Loc.equal
-        (Model_parser.get_model_term_loc model) t.Term.t_loc ->
-      printf "RAC confirms the counter-example@.";
-      Some true
+                        (Model_parser.get_model_term_loc model) t.Term.t_loc ->
+     printf "Abstractly RAC confirms the counter-example@.";
+     Some true
   | Contr (_, t) ->
-      printf "RAC found a contradiction at different location %a@."
-        (Pp.print_option_or_default "NO LOC" Pretty.print_loc) t.Term.t_loc;
-      None
+     printf "Abstractly RAC found a contradiction at different location %a@."
+       (Pp.print_option_or_default "NO LOC" Pretty.print_loc) t.Term.t_loc;
+     None
   | CannotImportModelValue msg ->
-      printf "RAC impossible: Cannot import model value: %s@." msg;
-      None
+     printf "Abstractly RAC impossible: Cannot import model value: %s@." msg;
+     None
   | Failure msg ->
-      (* E.g., cannot create default value for non-free type, cannot construct
+     (* E.g., cannot create default value for non-free type, cannot construct
          term for constructor that is not a function *)
-      printf "RAC failure: %s@." msg;
-      None
+     printf "Abstractly RAC failure: %s@." msg;
+     None
+  | AbstractExEnded l ->
+     printf "Abstractly RAC cannot continue after %a@."
+       (Pp.print_option Pretty.print_loc) l;
+     None
+  | InvCeInfraction l ->
+     printf "Abstraclty RAC: counter-example model is not consistent \
+             with the invariant %a@."
+       (Pp.print_option Pretty.print_loc) l;
+     None
 
 (** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
     Relies on [get_multiline] and fails under the same conditions. *)

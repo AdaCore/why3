@@ -64,6 +64,7 @@ val eval_global_fundef :
 exception CannotImportModelValue of string
 
 val eval_rs :
+  abs:bool -> (* execute abstractly *)
   Env.env ->
   Pdecl.known_map ->
   Decl.known_map ->
