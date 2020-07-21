@@ -123,10 +123,6 @@ val restore_module : theory -> pmodule
 (** retrieves a module from its underlying theory
     raises [Not_found] if no such module exists *)
 
-val find_rs : pmodule -> Loc.position -> rsymbol
-(** identifies the rsymbol of the definition that contains the given position.
-    Raises [Not_found] if no such definition is found. *)
-
 (** {2 Use and clone} *)
 
 val use_export : pmodule_uc -> pmodule -> pmodule_uc

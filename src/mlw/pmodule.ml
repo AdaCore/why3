@@ -314,29 +314,6 @@ let close_module uc =
   store_module m;
   m
 
-let find_rs pm loc =
-  let loc_of_exp e = Opt.get_def Loc.dummy_position e.e_loc in
-  let loc_of_cexp ce = match ce.c_node with
-    | Cfun e -> loc_of_exp e | _ -> Loc.dummy_position in
-  let exception Found of Expr.rsymbol in
-  let find_pd_rec_defn rd =
-    if Loc.contains (loc_of_cexp rd.rec_fun) loc then
-      raise (Found rd.rec_sym) in
-  let find_pd_pdecl pd =
-    match pd.pd_node with
-    | PDlet (LDsym (rs, ce)) when Loc.contains (loc_of_cexp ce) loc ->
-        raise (Found rs)
-    | PDlet (LDrec rds) ->
-        List.iter find_pd_rec_defn rds
-    | _ -> () in
-  let rec find_pd_mod_unit = function
-    | Uuse _ | Uclone _ | Umeta _ -> ()
-    | Uscope (_, us) -> List.iter find_pd_mod_unit us
-    | Udecl pd -> find_pd_pdecl pd in
-  match List.iter find_pd_mod_unit pm.mod_units with
-  | () -> raise Not_found
-  | exception Found rs -> rs
-
 (*
 let count_regions {muc_known = kn} {pv_ity = ity} mr =
   let add_reg r mr = Mreg.change (fun n -> Some (n <> None)) r mr in

@@ -81,7 +81,3 @@ val get_multiline : position -> string * (int * int) * (int * int)
     Currently, this function re-reads the file to determine the line and column of the end
     of multiline positions. Subsequent calls for positions in the same file will not require
     re-reading the file. The function fails if the file does not exist. *)
-
-val contains : position -> position -> bool
-(** [contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
-    Relies on [get_multiline] and fails under the same conditions. *)

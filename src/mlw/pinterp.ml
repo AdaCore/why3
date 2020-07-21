@@ -1439,12 +1439,48 @@ let maybe_ce_model_rs env pm loc model rs =
       printf "RAC failure: %s@." msg;
       None
 
+(** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
+    Relies on [get_multiline] and fails under the same conditions. *)
+let loc_contains loc1 loc2 =
+  let f1, (bl1, bc1), (el1, ec1) = Loc.get_multiline loc1 in
+  let f2, (bl2, bc2), (el2, ec2) = Loc.get_multiline loc2 in
+  String.equal f1 f2 &&
+  (bl1 < bl2 || (bl1 = bl2 && bc1 <= bc2)) &&
+  (el1 > el2 || (el1 = el2 && ec1 >= ec2))
+
+(** Identifies the rsymbol of the definition that contains the given position. Raises
+    [Not_found] if no such definition is found. **)
+let find_rs pm loc =
+  let open Pmodule in
+  let open Pdecl in
+  let loc_of_exp e = Opt.get_def Loc.dummy_position e.e_loc in
+  let loc_of_cexp ce = match ce.c_node with
+    | Cfun e -> loc_of_exp e | _ -> Loc.dummy_position in
+  let exception Found of Expr.rsymbol in
+  let find_pd_rec_defn rd =
+    if loc_contains (loc_of_cexp rd.rec_fun) loc then
+      raise (Found rd.rec_sym) in
+  let find_pd_pdecl pd =
+    match pd.pd_node with
+    | PDlet (LDsym (rs, ce)) when loc_contains (loc_of_cexp ce) loc ->
+        raise (Found rs)
+    | PDlet (LDrec rds) ->
+        List.iter find_pd_rec_defn rds
+    | _ -> () in
+  let rec find_pd_mod_unit = function
+    | Uuse _ | Uclone _ | Umeta _ -> ()
+    | Uscope (_, us) -> List.iter find_pd_mod_unit us
+    | Udecl pd -> find_pd_pdecl pd in
+  match List.iter find_pd_mod_unit pm.mod_units with
+  | () -> raise Not_found
+  | exception Found rs -> rs
+
 let maybe_ce_model env pm m =
   try
     let loc = Opt.get_exn Not_found (Model_parser.get_model_term_loc m) in
     if let f, _, _, _ = Loc.get loc in Sys.file_exists f then
       (* TODO deal with VC from variable declarations and type declarations *)
-      let rs = Pmodule.find_rs pm loc in
+      let rs = find_rs pm loc in
       Opt.get_def true (maybe_ce_model_rs env pm loc m rs)
     else
       true
