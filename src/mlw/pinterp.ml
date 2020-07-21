@@ -1286,8 +1286,12 @@ let rec import_model_value known ity =
       raise (CannotImportModelValue msg) ) in
   function
     | Integer s ->
-        assert (ity_equal ity ity_int);
-        value ty_int (Vnum (BigInt.of_string s))
+        let is_its_range = function {its_def= Range _} -> true | _ -> false in
+        let is_ity_range ity = match ity.ity_node with
+          | Ityapp (its, _, _) | Ityreg {reg_its= its} -> is_its_range its
+          | _ -> false in
+        assert (ity_equal ity ity_int || is_ity_range ity);
+        value (ty_of_ity ity) (Vnum (BigInt.of_string s))
     | String s ->
         assert (ity_equal ity ity_str);
         value ty_str (Vstring s)
