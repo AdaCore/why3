@@ -636,29 +636,35 @@ let get_pvs env pvs =
 
 (* DEFAULTS *)
 
-let rec default_value_of_type known ity : value =
+(* TODO Remove argument [env] after replacing Varray by model substitution *)
+let rec default_value_of_type env known ity : value =
   let ty = ty_of_ity ity in
   match ity.ity_node with
   | Ityvar _ -> assert false
-  | Ityreg r -> default_value_of_types known r.reg_its r.reg_args r.reg_regs ty
   | Ityapp (ts, _, _) when its_equal ts its_int -> value ty (Vnum BigInt.zero)
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
   | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
   (* | Ityapp(ts,_,_) when is_its_tuple ts -> assert false (* TODO *) *)
-  | Ityapp (ts, l1, l2) -> default_value_of_types known ts l1 l2 ty
-
-and default_value_of_types known ts l1 l2 ty : value =
-  let cs =
-    match Pdecl.((find_its_defn known ts).itd_constructors) with
-    | cs :: _ -> cs
-    | [] ->
-        assert ts.its_nonfree;
-        kasprintf failwith "Cannot create default value for non-free type %a@." Ity.print_its ts in
-  let subst = its_match_regs ts l1 l2 in
-  let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
-  let tyl = List.map (ity_full_inst subst) ityl in
-  let fl = List.map (fun ity -> field (default_value_of_type known ity)) tyl in
-  value ty (Vconstr (cs, fl))
+  | Ityreg {reg_its= its; reg_args= l1; reg_regs= l2}
+  | Ityapp (its, l1, l2) ->
+      let is_array_its env its =
+        let pm = Pmodule.read_module env ["array"] "Array" in
+        let array_its = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
+        its_equal its array_its in
+      if is_array_its env its then
+        value ty (Varray (Array.init 0 (fun _ -> assert false)))
+      else
+      let cs =
+        match Pdecl.((find_its_defn known its).itd_constructors) with
+        | cs :: _ -> cs
+        | [] ->
+            assert its.its_nonfree;
+            kasprintf failwith "Cannot create default value for non-free type %a@." Ity.print_its its in
+      let subst = its_match_regs its l1 l2 in
+      let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
+      let tyl = List.map (ity_full_inst subst) ityl in
+      let fl = List.map (fun ity -> field (default_value_of_type env known ity)) tyl in
+      value ty (Vconstr (cs, fl))
 
 (* ROUTINE DEFINITIONS *)
 
