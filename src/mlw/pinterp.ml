@@ -1441,6 +1441,10 @@ let maybe_ce_model_rs env pm loc model rs =
   | CannotImportModelValue msg ->
       printf "RAC impossible: Cannot import model value: %s@." msg;
       None
+  | CannotCompute ->
+      (* TODO E.g., bad default value for parameter and cannot evaluate pre-condition *)
+      printf "RAC execution got stuck.@.";
+      None
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
          term for constructor that is not a function *)
