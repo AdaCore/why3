@@ -220,7 +220,7 @@ let rec print_value fmt v =
         vl
   | Varray a ->
       fprintf fmt "@[[%a]@]"
-        (Pp.print_list Pp.comma print_value)
+        (Pp.print_list Pp.semi print_value)
         (Array.to_list a)
   | Vpurefun (_, mv, v) ->
       fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
