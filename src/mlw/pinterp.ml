@@ -832,14 +832,6 @@ let reduce_term ?(mt = Mtv.empty) ?(mv = Mvs.empty) env known rule_terms vsenv t
   let t = t_ty_subst mt mv t in
   normalize ~limit:1000 eng vsenv t
 
-type rac = RacAll | RacOnly of Loc.position * Model_parser.model | RacNone
-
-let do_rac loc = function
-  | RacAll -> true
-  | RacOnly (loc', _) ->
-      Opt.equal Loc.equal (Some loc') loc
-  | RacNone -> false
-
 (** Evaluate a term and raise an exception [Contr] if the result is false. *)
 let check_term ctx t =
   (* TODO raise NoContrdiction / CannotEvaluate if [t] corresponds to the goal of the CE
@@ -858,11 +850,8 @@ let check_term ctx t =
       eprintf "%a@." report_cntr (ctx, "WHEN TRYING", t) ;
       raise e
 
-let check_terms ?loc rac ctx =
-  List.iter (fun t ->
-      let loc = if Opt.inhabited loc then loc else t.t_loc in
-      if do_rac loc rac then
-        check_term ctx t)
+let check_terms ?loc ctx =
+  List.iter (check_term ctx)
 
 (* Check a post-condition [t] by binding the result variable to
    the term [vt] representing the result value. *)
@@ -875,7 +864,7 @@ let check_posts rac desc loc env oldies v posts =
   let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
   let ctx = cntr_ctx desc ?trigger_loc:loc env in
   let vt = term_of_value env.env v in
-  List.iter (fun t -> if do_rac loc rac then check_post ctx vt t) posts
+  List.iter (check_post ctx vt) posts
 
 (* EXPRESSION EVALUATION *)
 
@@ -1075,15 +1064,15 @@ and eval_expr' ~rac env e =
     | r -> r )
   | Ewhile (cond, inv, _var, e1) -> (
       (* TODO variants *)
-      if rac <> RacNone then
-        check_terms rac (cntr_ctx "Loop invariant initialization" env) inv ;
+      if rac then
+        check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
       match eval_expr ~rac env cond with
       | Normal v ->
           if is_true v then (
             match eval_expr ~rac env e1 with
             | Normal _ ->
-                if rac <> RacNone then
-                  check_terms rac (cntr_ctx "Loop invariant preservation" env) inv ;
+                if rac then
+                  check_terms (cntr_ctx "Loop invariant preservation" env) inv ;
                 eval_expr ~rac env e
             | r -> r )
           else if is_false v then
@@ -1108,15 +1097,15 @@ and eval_expr' ~rac env e =
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum i)) env in
           match eval_expr ~rac env' e1 with
           | Normal _ ->
-              if rac <> RacNone then
-                check_terms rac (cntr_ctx "Loop invariant preservation" env') inv ;
+              if rac then
+                check_terms (cntr_ctx "Loop invariant preservation" env') inv ;
               iter (suc i)
           | r -> r
         else
           Normal (value ty_unit Vvoid) in
-      ( if rac <> RacNone then
+      ( if rac then
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
-          check_terms rac (cntr_ctx "Loop invariant initialization" env') inv ) ;
+          check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
       iter a
     with NotNum -> Irred e )
   | Ematch (e0, ebl, el) -> (
@@ -1148,7 +1137,7 @@ and eval_expr' ~rac env e =
         | Expr.Assert -> "Assertion"
         | Expr.Assume -> "Assumption"
         | Expr.Check -> "Check" in
-      if do_rac t.t_loc rac then check_term (cntr_ctx descr env) t ;
+      if rac then check_term (cntr_ctx descr env) t ;
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
       Debug.dprintf debug "@[<h>%tEVAL EXPR: GHOST %a@]@." pp_indent print_expr e1;
@@ -1189,10 +1178,10 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
     let snapshot_oldie old_pv pv =
       Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs env.vsenv)) in
     Mpv.fold snapshot_oldie rs.rs_cty.cty_oldies Mvs.empty in
-  if rac <> RacNone then (
+  if rac then (
     (* TODO variant *)
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
-    check_terms ?loc rac ctx rs.rs_cty.cty_pre );
+    check_terms ?loc ctx rs.rs_cty.cty_pre );
   let res =
     if rs_equal rs rs_func_app then
       match arg_vs with
@@ -1249,7 +1238,7 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
           eprintf "[interp] cannot find definition of routine %s@."
             rs.rs_name.id_string ;
           raise CannotCompute in
-  ( if rac <> RacNone then
+  ( if rac then
       match res with
       | Normal v ->
           let desc = cntr_desc "Postcondition" rs.rs_name in
@@ -1399,14 +1388,12 @@ let eval_global_expr ~rac env mod_known th_known locals e =
   res, global_env
 
 let eval_global_fundef ~rac env mod_known mod_theory locals body =
-  let rac = if rac then RacAll else RacNone in
   try eval_global_expr ~rac env mod_known mod_theory locals body
   with CannotFind (l, s, n) ->
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
 let eval_rs env mod_known th_known loc model (rs: rsymbol) =
-  let rac = RacOnly (loc, model) in
   let get_value pv =
     match model_value pv model with
     | Some mv ->
@@ -1421,7 +1408,7 @@ let eval_rs env mod_known th_known loc model (rs: rsymbol) =
   let global_env = make_global_env ~model mod_known in
   let env = {mod_known; th_known; funenv= Mrs.empty; vsenv= global_env; env} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
-  exec_call ~rac env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
+  exec_call ~rac:true env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
 
 let maybe_ce_model_rs env pm loc model rs =
   Debug.dprintf debug_rac "Validating model: %a@." (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) model;
