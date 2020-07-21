@@ -961,7 +961,7 @@ let exec_pure env ls pvs =
 let pp_limited ?(n=100) pp fmt x =
   let s = asprintf "%a@." pp x in
   let s = String.map (function '\n' -> ' ' | c -> c) s in
-  let s = String.sub s 0 (Pervasives.min n (String.length s)) in
+  let s = String.(if length s > n then sub s 0 (Pervasives.min n (length s)) ^ "..." else s) in
   pp_print_string fmt s
 
 let print_result fmt = function
@@ -1182,8 +1182,8 @@ and exec_match ~rac env t ebl =
 
 and exec_call ~rac ?loc env rs arg_pvs ity_result =
   let arg_vs = List.map (get_pvs env) arg_pvs in
-  (* Debug.dprintf debug_rac "@[<h>Exec call %a %a@]@."
-   *   print_rs rs Pp.(print_list space print_value) arg_vs; *)
+  Debug.dprintf debug_rac "@[<h>%tExec call %a %a@]@."
+    pp_indent print_rs rs Pp.(print_list space print_value) arg_vs;
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let oldies =
     let snapshot_oldie old_pv pv =
@@ -1214,26 +1214,26 @@ and exec_call ~rac ?loc env rs arg_pvs ity_result =
                 Debug.dprintf debug "@[<h>%tEXEC CALL %a: Capp %a]@." pp_indent print_rs rs print_rs rs';
                 exec_call ~rac env rs' (pvl @ arg_pvs) ity_result
             | Cfun body ->
-                Debug.dprintf debug"@[<hv2>%tEXEC CALL %a: FUN %a@]@." pp_indent print_rs rs (pp_limited print_expr) body;
+                Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: FUN %a@]@." pp_indent print_rs rs (pp_limited print_expr) body;
                 let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
                 eval_expr ~rac env' body
             | Cany ->
-                eprintf "@[<hv2>EXEC CALL %a: ANY@]@." print_rs rs;
-                eprintf "Cannot compute any function %a" print_rs rs;
+                Debug.dprintf debug  "@[<hv2>%tEXEC CALL %a: ANY@]@." pp_indent print_rs rs;
+                eprintf "Cannot compute any function %a@." print_rs rs;
                 raise CannotCompute
             | Cpur _ -> assert false (* TODO ? *) )
       | Builtin f ->
-          Debug.dprintf debug "@[<hv2>EXEC CALL %a: BUILTIN@]@." print_rs rs;
+          Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
           Normal (f rs arg_vs)
       | Constructor _ ->
-          Debug.dprintf debug "@[<hv2>EXEC CALL %a: CONSTRUCTOR@]@." print_rs rs;
+          Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
           let mt = List.fold_left2 ty_match Mtv.empty
               (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
           let ty = ty_inst mt (ty_of_ity ity_result) in
           let fs = List.map field arg_vs in
           Normal (value ty (Vconstr (rs, fs)))
       | Projection _d -> (
-        Debug.dprintf debug "@[<hv2>EXEC CALL %a: PROJECTION@]@." print_rs rs;
+        Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
         match rs.rs_field, arg_vs with
         | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
             let rec search constr_args args =
@@ -1412,9 +1412,10 @@ let eval_rs env mod_known th_known loc model (rs: rsymbol) =
     | Some mv ->
         import_model_value mod_known pv.pv_ity mv
     | None ->
-        Debug.dprintf debug_rac "Missing value for parameter %a; taking default@."
-          print_pv pv;
-        default_value_of_type mod_known pv.pv_ity in
+        let v = default_value_of_type mod_known pv.pv_ity in
+        Debug.dprintf debug_rac "Missing value for parameter %a, continue with default value %a@."
+          print_pv pv print_value v;
+        v in
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   get_builtin_progs env ;
   let global_env = make_global_env ~model mod_known in
@@ -1423,6 +1424,7 @@ let eval_rs env mod_known th_known loc model (rs: rsymbol) =
   exec_call ~rac env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
 
 let maybe_ce_model_rs env pm loc model rs =
+  Debug.dprintf debug_rac "Validating model: %a@." (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) model;
   try
     ignore (eval_rs env pm.Pmodule.mod_known pm.Pmodule.mod_theory.Theory.th_known loc model rs);
     printf "RAC does not confirm the counter-example (no contradiction during execution)@.";
