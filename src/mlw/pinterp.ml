@@ -259,21 +259,26 @@ let term_of_value env v =
           t_ty_subst mt mv t in
         mt, t_lambda [arg] [] t
     | Varray a ->
-        (* TERM: epsilon v. v[0] = a[0] /\ ... /\ v[n-1] = a[n-1] *)
+        (* TERM: [make a.length (eps v. true)][0 <- a[0]]...[n-1 <- a[n-1]] *)
         let pm = Pmodule.read_module env ["array"] "Array" in
-        let vs = create_vsymbol (id_fresh "a") v.v_ty in
-        let ls_get = Mstr.find (Ident.op_get "") pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
-        let rec loop mt i =
-          if i = Array.length a then
-            mt, t_true
+        let ls_make = Mstr.find "make" pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
+        let ls_update = Mstr.find (Ident.op_update "") pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
+        let rec loop (mt, t) ix =
+          if ix = Array.length a then mt, t
           else
-            let t_i = t_const (Constant.int_const_of_int i) ty_int in
-            let t1 = t_app_infer ls_get [t_var vs; t_i] in (* v[i] *)
-            let mt, t2 = term_of_value' mt a.(i) in        (* a[i] *)
-            let mt, t3 = loop mt (succ i) in
-            mt, t_and (t_equ t1 t2) t3 in    (* v[i] = a[i] /\ ... *)
-        let mt, t = loop mt 0 in
-        mt, t_eps (t_close_bound vs t)
+            let t_ix = t_const (Constant.int_const_of_int ix) ty_int in
+            let mt, t_a_ix = term_of_value' mt a.(ix) in
+            let t = t_app_infer ls_update [t; t_ix; t_a_ix] in
+            loop (mt, t) (succ ix) in
+        let t_n = t_const (Constant.int_const_of_int (Array.length a)) ty_int in
+        let t_v =
+          let val_ty = match v.v_ty.ty_node with
+            | Tyapp (_, [ty]) -> ty
+            | _ -> assert false in
+          let vs = create_vsymbol (Ident.id_fresh "v") val_ty in
+          t_eps (t_close_bound vs t_true) in
+        let t_make = t_app_infer ls_make [t_n; t_v] in
+        loop (mt, t_make) 0
     | Vpurefun (ty, mv, v) ->
         (* TERM: fun arg -> if arg = k0 then v0 else ... else v *)
         (* TODO Use function literal [|mv...; _ -> v|] when available in Why3 *)
