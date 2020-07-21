@@ -779,8 +779,8 @@ let add_fun_to_known rs cexp known =
 let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env =
   let rule_terms = Mid.map_filter rule_term env.th_known in
   let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
-  let vsenv = Mvs.union (fun _ _ t -> Some t)
-      vsenv (Mvs.map (term_of_value env.env) env.vsenv) in
+  let env_vsenv = Mvs.map (term_of_value env.env) env.vsenv in
+  let vsenv = Mvs.union (fun _ _ t -> Some t) vsenv env_vsenv in
   { c_env= env.env;
     c_desc= desc;
     c_trigger_loc= trigger_loc;
