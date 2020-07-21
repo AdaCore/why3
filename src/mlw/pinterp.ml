@@ -23,7 +23,8 @@ let pp_indent fmt =
   match Printexc.(backtrace_slots (get_callstack 100)) with
   | None -> ()
   | Some a ->
-      let s = String.make (2 * (Array.length a - 10)) ' ' in
+      let n = Pervasives.max 0 (Array.length a - 25) in
+      let s = String.make (2 * n) ' ' in
       pp_print_string fmt s
 
 let debug =
