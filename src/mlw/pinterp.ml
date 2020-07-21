@@ -654,8 +654,12 @@ let rec default_value_of_type env known ity : value =
       if is_array_its env its then
         value ty (Varray (Array.init 0 (fun _ -> assert false)))
       else
+      let itd = Pdecl.find_its_defn known its in
+      match itd.Pdecl.itd_its.its_def with
+      | Range r -> value ty (Vnum r.Number.ir_lower)
+      | _ ->
       let cs =
-        match Pdecl.((find_its_defn known its).itd_constructors) with
+        match itd.Pdecl.itd_constructors with
         | cs :: _ -> cs
         | [] ->
             assert its.its_nonfree;
