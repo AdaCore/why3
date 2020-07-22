@@ -1,0 +1,28 @@
+
+use int.Int
+use ref.Ref
+let f () =
+  let ref x1 = 0 in
+  let ref x2 = 0 in
+  for i = 0 to 1 do
+    invariant { i > 0 -> x1 = 1 }
+    if i = 0 then
+      x1 <- x1 + 1
+    else
+      x2 <- x2 + 1
+  done
+
+(*
+make -j 4; why3 prove my_examples/ce-rac/for.mlw -P cvc4-ce
+make -j 4; why3 execute my_examples/ce-rac/for.mlw --use=Top --rac "f ()"
+*)
+
+(*
+counterexamle: x1 = -1 at the beggining of the loop
+It is a true counterexample because the underspecification (weak loop invariant);
+If the program is interpreted (w. rac) from the initial state, it does not fail,
+because it doesn't reach an iteration where x1 = -2.
+If the particular iteration given by the counterexample is interpreted, then the
+invariant will fail, and we can conclude that the program is underspecified.
+*)
+
