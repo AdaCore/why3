@@ -235,7 +235,7 @@ let rec print_value fmt v =
 
 and print_field fmt f = print_value fmt (field_get f)
 
-let term_of_value env v =
+let rec term_of_value env v =
   let rec term_of_value' mt v : ty Mtv.t * term =
     match v.v_desc with
     | Vnum i -> mt, t_const (Constant.int_const i) v.v_ty
@@ -254,10 +254,19 @@ let term_of_value env v =
                               %a that is not a function" print_rs rs
     | Vfun (cl, arg, e) ->
         (* TERM: fun arg -> t *)
+        let ty_arg = match v.v_ty.ty_node with
+          | Tyapp (ts, [ty_arg; _]) ->
+              assert (ts_equal ts ts_func); ty_arg
+          | _ -> assert false in
         let t = Opt.get (term_of_expr ~prop:false e) in
+        let mt, arg, t = if ty_closed arg.vs_ty then mt, arg, t
+          else (* Substitute types from value in term *)
+            let mt = ty_match mt arg.vs_ty ty_arg in
+            let arg' = create_vsymbol (id_clone arg.vs_name) ty_arg in
+            mt, arg', t_ty_subst mt (Mvs.singleton arg (t_var arg')) t in
         let bind_cl vs v (mt, mv) =
           let mt = ty_match mt vs.vs_ty v.v_ty in
-          let mt, t = term_of_value' mt v in
+          let t = term_of_value env v in
           mt, Mvs.add vs t mv in
         let t = (* Substitute values from the closure *)
           let mt, mv = Mvs.fold bind_cl cl (mt, Mvs.empty) in
