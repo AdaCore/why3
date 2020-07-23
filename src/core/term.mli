@@ -397,6 +397,8 @@ val t_pred_app_beta : term -> term -> term
 val t_func_app_beta_l : term -> term list -> term
 val t_pred_app_beta_l : term -> term list -> term
 
+val fs_any_function : lsymbol
+
 (** {2 Term library} *)
 
 (** One-level (non-recursive) term traversal *)

@@ -293,6 +293,9 @@ val ld_func_app : let_defn
 val e_func_app : expr -> expr -> expr
 val e_func_app_l : expr -> expr list -> expr
 
+val rs_any_function : rsymbol
+val ld_any_function : let_defn
+
 (** {2 Pretty-printing} *)
 
 val forget_rs  : rsymbol -> unit (* flush id_unique for a program symbol *)

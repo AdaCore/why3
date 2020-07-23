@@ -385,6 +385,7 @@ let builtin_module =
   let uc = add_pdecl_no_logic uc pd_real in
   let uc = add_pdecl_no_logic uc pd_str in
   let uc = add_pdecl_no_logic uc pd_equ in
+  let uc = add_pdecl_no_logic uc pd_any_function in
   let m = close_module uc in
   { m with mod_theory = builtin_theory }
 

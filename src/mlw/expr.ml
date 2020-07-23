@@ -881,6 +881,14 @@ let e_func_app fn e =
 
 let e_func_app_l fn el = List.fold_left e_func_app fn el
 
+let rs_any_function = rs_of_ls fs_any_function
+
+let ld_any_function =
+  let v_args = rs_any_function.rs_cty.cty_args in
+  let ity = rs_any_function.rs_cty.cty_result in
+  let c = create_cty v_args [] [] Mxs.empty Mpv.empty eff_empty ity in
+  LDsym (rs_any_function, c_any c)
+
 (* boolean constructors *)
 
 let e_if e0 e1 e2 =

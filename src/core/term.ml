@@ -1021,6 +1021,11 @@ let t_pred_app pr t = t_equ (t_func_app pr t) t_bool_true
 let t_func_app_l fn tl = List.fold_left t_func_app fn tl
 let t_pred_app_l pr tl = t_equ (t_func_app_l pr tl) t_bool_true
 
+let fs_any_function =
+  let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
+  let ty_b = ty_var (create_tvsymbol (id_fresh "b")) in
+  create_fsymbol ~constr:0 (id_fresh "any function") [ty_a] ty_b
+
 (** Term library *)
 
 (* generic map over types, symbols and variables *)

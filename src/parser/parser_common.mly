@@ -219,28 +219,46 @@
     unfold false d pat
 
   (* TODO: fix locations and assert false *)
-  let mk_fun_lit (el,default) =
-     let default = match default with
-       | Some e -> e
-       | None -> if el = [] then assert false else snd (List.hd el)  in
-     let id_var = {id_str = "_x";id_ats = [];id_loc=Loc.dummy_position} in
+  let mk_fun_lit =
+    let dummy = ref 0 in
+    fun (el,default) ->
+    let id_var = {id_str = "_x"; id_ats = []; id_loc = Loc.dummy_position} in
+    let var = {expr_desc = Eident (Qident id_var);
+               expr_loc = Loc.dummy_position} in
+    let default = match default with
+      | Some e -> e
+      | None ->
+         let any_function = Qident { id_str = "any function"; id_ats = [];
+                                     id_loc = Loc.dummy_position} in
+         let dummy_int =
+           { expr_desc = Econst (Constant.int_const (BigInt.of_int !dummy));
+             expr_loc = Loc.dummy_position } in
+         let id_int = {id_str = "int"; id_ats = [];
+                       id_loc = Loc.dummy_position} in
+         let pty_int = PTtyapp (Qident id_int,[]) in
+         let dummy_int = { expr_desc = Ecast (dummy_int, pty_int);
+                           expr_loc = Loc.dummy_position } in
+         dummy := !dummy + 1;
+         let tuple = {expr_desc = Etuple [dummy_int;var];
+                      expr_loc = Loc.dummy_position} in
+         let app = Eidapp (any_function, [tuple]) in
+         { expr_desc = app; expr_loc = Loc.dummy_position } in
 
-     let add_expr (e1,e2) e =
-       let var = {expr_desc = Eident (Qident id_var);
-                  expr_loc = Loc.dummy_position} in
-       let eq_id = {id_str = Ident.op_equ;id_ats = [];id_loc=Loc.dummy_position} in
-       let v_eq_e1 = Einfix (var,eq_id,e1) in
-       let v_eq_e1 = {expr_desc = v_eq_e1; expr_loc = Loc.dummy_position} in
-       {expr_desc = Eif (v_eq_e1,e2,e); expr_loc = Loc.dummy_position}
-     in
+    let add_expr (e1,e2) e =
+      let eq_id = { id_str = Ident.op_equ; id_ats = [];
+                    id_loc = Loc.dummy_position } in
+      let v_eq_e1 = Einfix (var,eq_id,e1) in
+      let v_eq_e1 = {expr_desc = v_eq_e1; expr_loc = Loc.dummy_position} in
+      {expr_desc = Eif (v_eq_e1,e2,e); expr_loc = Loc.dummy_position}
+    in
 
-     let ifte = List.fold_right add_expr el default in
-     let binder = (Loc.dummy_position, Some id_var, false, None) in
-     let pattern = {pat_desc = Ptree.Pvar id_var; pat_loc = Loc.dummy_position }in
-     let spec = { sp_pre = []; sp_post = []; sp_xpost = []; sp_reads = [];
-                  sp_writes = []; sp_alias = []; sp_variant = [];
-                  sp_checkrw = false; sp_diverge = false; sp_partial = false } in
-     Ptree.Efun ([binder], None, pattern, Ity.MaskVisible, spec, ifte)
+    let ifte = List.fold_right add_expr el default in
+    let binder = (Loc.dummy_position, Some id_var, false, None) in
+    let pattern = {pat_desc = Ptree.Pvar id_var; pat_loc = Loc.dummy_position }in
+    let spec = { sp_pre = []; sp_post = []; sp_xpost = []; sp_reads = [];
+                 sp_writes = []; sp_alias = []; sp_variant = [];
+                 sp_checkrw = false; sp_diverge = false; sp_partial = false } in
+    Ptree.Efun ([binder], None, pattern, Ity.MaskVisible, spec, ifte)
 
 %}
 
