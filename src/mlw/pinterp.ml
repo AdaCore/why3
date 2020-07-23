@@ -249,7 +249,7 @@ let rec term_of_value env v =
         let mt, fs = Lists.map_fold_left term_of_field mt fs in
         if rs_kind rs = RKfunc then
           mt, t_app_infer (ls_of_rs rs) fs
-        else (* TODO Not sure if needed *)
+        else (* TODO bench/ce/{record_one_field,record_inv}.mlw/CVC4/WP *)
           kasprintf failwith "Cannot construct term for constructor \
                               %a that is not a function" print_rs rs
     | Vfun (cl, arg, e) ->
@@ -677,6 +677,8 @@ let rec default_value_of_type env known ity : value =
         | cs :: _ -> cs
         | [] ->
             assert its.its_nonfree;
+            (* TODO Axiomatize values of record fields by rules in the reduction engine?
+               Cf. bench/ce/records_inv.mlw *)
             kasprintf failwith "Cannot create default value for non-free type %a@." Ity.print_its its in
       let subst = its_match_regs its l1 l2 in
       let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
