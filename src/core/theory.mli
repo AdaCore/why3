@@ -230,6 +230,8 @@ val highord_theory : theory
 
 val tuple_theory : int -> theory
 
+val any_func_theory : theory
+
 val tuple_theory_name : string -> int option
 
 val add_decl_with_tuples : theory_uc -> decl -> theory_uc

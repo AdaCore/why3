@@ -589,21 +589,24 @@ open Theory
    Therefore we match the exact contents of th_decls, and crash if it
    is not what we expect. *)
 
-let pd_int, pd_real, pd_str, pd_equ, pd_any_function =
+let pd_int, pd_real, pd_str, pd_equ =
   match builtin_theory.th_decls with
   | [{td_node = Decl di}; {td_node = Decl dr};
-     {td_node = Decl ds}; {td_node = Decl de};
-     {td_node = Decl da}] ->
+     {td_node = Decl ds}; {td_node = Decl de}] ->
       mk_decl (PDtype [mk_itd its_int  [] [] [] []]) [di],
       mk_decl (PDtype [mk_itd its_real [] [] [] []]) [dr],
       mk_decl (PDtype [mk_itd its_str  [] [] [] []]) [ds],
-      mk_decl PDpure [de], mk_decl (PDlet ld_any_function) [da]
+      mk_decl PDpure [de]
   | _ -> assert false
 
 let pd_func, pd_func_app = match highord_theory.th_decls with
   | [{td_node = Decl df}; {td_node = Decl da}] ->
       mk_decl (PDtype [mk_itd its_func [] [] [] []]) [df],
       mk_decl (PDlet ld_func_app) [da]
+  | _ -> assert false
+
+let pd_any_function = match any_func_theory.th_decls with
+  | [{td_node = Decl da}] ->  mk_decl (PDlet ld_any_function) [da]
   | _ -> assert false
 
 let pd_bool = match bool_theory.th_decls with
