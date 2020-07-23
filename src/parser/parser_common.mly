@@ -219,7 +219,45 @@
     unfold false d pat
 
   (* TODO: fix locations and assert false *)
-  let mk_fun_lit =
+  let term_fun_lit  : ((term * term) list * term option) -> term_desc =
+    let dummy = ref (-1) in
+    fun (tl,default) ->
+    let id_var = {id_str = "_x"; id_ats = []; id_loc = Loc.dummy_position} in
+    let var = { term_desc = Tident (Qident id_var);
+                term_loc = Loc.dummy_position} in
+    let default = match default with
+      | Some e -> e
+      | None ->
+         let any_function = Qident { id_str = "any function"; id_ats = [];
+                                     id_loc = Loc.dummy_position} in
+         let dummy_int =
+           { term_desc = Tconst (Constant.int_const (BigInt.of_int !dummy));
+             term_loc = Loc.dummy_position } in
+         let id_int = {id_str = "int"; id_ats = [];
+                       id_loc = Loc.dummy_position} in
+         let pty_int = PTtyapp (Qident id_int,[]) in
+         let dummy_int = { term_desc = Tcast (dummy_int, pty_int);
+                           term_loc = Loc.dummy_position } in
+         dummy := !dummy - 1;
+         let tuple = {term_desc = Ttuple [dummy_int;var];
+                      term_loc = Loc.dummy_position} in
+         let app = Tidapp (any_function, [tuple]) in
+         { term_desc = app; term_loc = Loc.dummy_position } in
+
+    let add_expr (t1,t2) t =
+      let eq_id = { id_str = Ident.op_equ; id_ats = [];
+                    id_loc = Loc.dummy_position } in
+      let v_eq_t1 = Tinfix (var,eq_id,t1) in
+      let v_eq_t1 = {term_desc = v_eq_t1; term_loc = Loc.dummy_position} in
+      {term_desc = Tif (v_eq_t1,t2,t); term_loc = Loc.dummy_position}
+    in
+
+    let ifte = List.fold_right add_expr tl default in
+    let binder = (Loc.dummy_position, Some id_var, false, None) in
+    Ptree.Tquant (Dterm.DTlambda, [binder], [], ifte)
+
+  (* TODO: fix locations and assert false *)
+  let expr_fun_lit =
     let dummy = ref 0 in
     fun (el,default) ->
     let id_var = {id_str = "_x"; id_ats = []; id_loc = Loc.dummy_position} in
@@ -867,7 +905,7 @@ term_arg_:
 | FALSE                             { Tfalse }
 | o = oppref ; a = term_arg         { Tidapp (Qident o, [a]) }
 | term_sub_                         { $1 }
-| LEFTSQBAR term_fun_lit BARRIGHTSQ { Tfunlit (fst $2,snd $2) }
+| LEFTSQBAR term_fun_lit BARRIGHTSQ { term_fun_lit $2 }
 
 term_dot_:
 | lqualid                   { Tident $1 }
@@ -1254,7 +1292,7 @@ expr_arg_:
 | FALSE                     { Efalse }
 | o = oppref ; a = expr_arg { Eidapp (Qident o, [a]) }
 | expr_sub_                 { $1 }
-| LEFTSQBAR expr_fun_lit BARRIGHTSQ { mk_fun_lit $2 }
+| LEFTSQBAR expr_fun_lit BARRIGHTSQ { expr_fun_lit $2 }
 
 expr_fun_lit:
 | (* epsilon *)                     { [], None }
