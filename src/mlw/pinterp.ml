@@ -16,6 +16,7 @@ open Ident
 open Ty
 open Ity
 open Expr
+open Pretty
 open Big_real
 open Mlmpfr_wrapper
 
@@ -26,6 +27,10 @@ let pp_indent fmt =
       let n = Pervasives.max 0 (Array.length a - 25) in
       let s = String.make (2 * n) ' ' in
       pp_print_string fmt s
+
+let print_loc fmt loc =
+  let f, l, b, e = Loc.get loc in
+  fprintf fmt "%S, line %d, characters %d-%d" f l b e
 
 let debug =
   Debug.register_info_flag "trace_exec"
@@ -1437,7 +1442,7 @@ let maybe_ce_model_rs env pm loc model rs =
       Some true
   | Contr (_, t) ->
       printf "RAC found a contradiction at different location %a@."
-        (Pp.print_option_or_default "NO LOC" Pretty.print_loc) t.Term.t_loc;
+        (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc;
       None
   | CannotImportModelValue msg ->
       printf "RAC impossible: Cannot import model value: %s@." msg;
