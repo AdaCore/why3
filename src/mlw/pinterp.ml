@@ -676,7 +676,8 @@ let rec default_value_of_type env known ity : value =
         match itd.Pdecl.itd_constructors with
         | cs :: _ -> cs
         | [] ->
-            assert its.its_nonfree;
+            if not its.its_nonfree then
+              kasprintf failwith "not non-free type without constructors: %a" print_its its;
             (* TODO Axiomatize values of record fields by rules in the reduction engine?
                Cf. bench/ce/records_inv.mlw *)
             kasprintf failwith "Cannot create default value for non-free type %a@." Ity.print_its its in
@@ -1282,31 +1283,43 @@ let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 exception CannotImportModelValue of string
 
-let rec import_model_value known ity =
+(* TODO Remove argument [env] after replacing Varray by model substitution *)
+let rec import_model_value env known ity v =
   let open Model_parser in
-  let get_def_subst ity =
+  (* TODO If the type has a model projection `p` and the model value is a
+     projection `p _ = v`, we could add this equality as a rule to the
+     reduction engine. (Cf. bench/ce/oracles/double_projection.mlw) *)
+  (* TODO If the type is a non-free record, we could similarily axiomatize
+     the values of the fields by rules in the reduction engine. (Cf.
+     bench/ce/record_one_field.mlw)  *)
+  let def, subst =
     match ity.ity_node with
     | Ityapp (ts, l1, l2) | Ityreg {reg_its= ts; reg_args= l1; reg_regs= l2} ->
         Pdecl.find_its_defn known ts,
         its_match_regs ts l1 l2
-    | _ -> assert false in
-  let check_construction def =
-    if def.Pdecl.itd_its.its_nonfree then (
-      let msg = asprintf "Value of non-free type %a" print_ity ity in
-      raise (CannotImportModelValue msg) );
-    if is_range_type_def def.Pdecl.itd_its.its_def then (
-      let msg = asprintf "Value of range type %a (TODO)" print_ity ity in
-      raise (CannotImportModelValue msg) );
-    if is_float_type_def def.Pdecl.itd_its.its_def then (
-      let msg = asprintf "Value of float type %a (TODO)" print_ity ity in
-      raise (CannotImportModelValue msg) ) in
-  function
+    | Ityvar _ -> assert false in
+  (* let is_ity_array env ity =
+   *   let pm = Pmodule.read_module env ["array"] "Array" in
+   *   let its_array = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
+   *   match ity.ity_node with
+   *   | Ityreg r -> its_equal r.reg_its its_array
+   *   | _ -> false in *)
+  (* if is_ity_array env ity then (\* TODO *\)
+   *   kasprintf failwith "ARRAY: %a@." Model_parser.print_model_value v
+   * else *)
+  if is_range_type_def def.Pdecl.itd_its.its_def then
+    match v with
+    | Proj (_, Integer s)
+    | Integer s -> value (ty_of_ity ity) (Vnum (BigInt.of_string s))
+    | _ -> assert false
+  else
+    let check_construction def =
+      if def.Pdecl.itd_its.its_nonfree then
+        let msg = asprintf "Value of non-free type %a" print_ity ity in
+        raise (CannotImportModelValue msg) in
+    match v with
     | Integer s ->
-        let is_its_range = function {its_def= Range _} -> true | _ -> false in
-        let is_ity_range ity = match ity.ity_node with
-          | Ityapp (its, _, _) | Ityreg {reg_its= its} -> is_its_range its
-          | _ -> false in
-        assert (ity_equal ity ity_int || is_ity_range ity);
+        assert (ity_equal ity ity_int);
         value (ty_of_ity ity) (Vnum (BigInt.of_string s))
     | String s ->
         assert (ity_equal ity ity_str);
@@ -1315,7 +1328,6 @@ let rec import_model_value known ity =
         assert (ity_equal ity ity_bool);
         value ty_bool (Vbool b)
     | Record r ->
-        let def, subst = get_def_subst ity in
         check_construction def;
         let rs = match def.Pdecl.itd_constructors with [c] -> c | _ -> assert false in
         let assoc_ity rs =
@@ -1325,63 +1337,38 @@ let rec import_model_value known ity =
           let ity = ity_full_inst subst (fd_of_rs rs).pv_ity in
           name, ity in
         let arg_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
-        let fs = List.map (fun (f, mv) -> import_model_value known (Mstr.find f arg_itys) mv) r in
+        let fs = List.map (fun (f, mv) -> import_model_value env known (Mstr.find f arg_itys) mv) r in
         value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
     | Apply (s, mvs) ->
-        let def, subst = get_def_subst ity in
         check_construction def;
         let matching_name rs = String.equal rs.rs_name.id_string s in
         let rs = List.find matching_name def.Pdecl.itd_constructors in
-        let import field_pv = import_model_value known (ity_full_inst subst field_pv.pv_ity) in
+        let import field_pv = import_model_value env known (ity_full_inst subst field_pv.pv_ity) in
         let fs = List.map2 import rs.rs_cty.cty_args mvs in
         value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
     | Proj (s, mv) ->
-        let def, subst = get_def_subst ity in
         check_construction def;
         let matching_name rs = String.equal rs.rs_name.id_string s in
         let rs = List.find matching_name def.Pdecl.itd_constructors in
         let import_or_default field_pv =
           let ity = ity_full_inst subst field_pv.pv_ity in
           if String.equal field_pv.pv_vs.vs_name.id_string s
-          then import_model_value known ity mv
-          else default_value_of_type known ity in
+          then import_model_value env known ity mv
+          else default_value_of_type env known ity in
         let fs = List.map import_or_default rs.rs_cty.cty_args in
         value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
     | Array a ->
-        let def, subst = get_def_subst ity in
         assert (its_equal def.Pdecl.itd_its its_func);
         let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
           | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
           | _ -> assert false in
         let add_index mv ix =
-          let key = import_model_value known key_ity ix.arr_index_key in
-          let value = import_model_value known value_ity ix.arr_index_value in
+          let key = import_model_value env known key_ity ix.arr_index_key in
+          let value = import_model_value env known value_ity ix.arr_index_value in
           Mv.add key value mv in
         let mv = List.fold_left add_index Mv.empty a.arr_indices in
-        let v = import_model_value known value_ity a.arr_others in
-        value (ty_of_ity ity) (Vpurefun (ty_of_ity key_ity, mv, v))
-        (* let def, subst = get_def_subst ity in
-         * if its_equal def.Pdecl.itd_its its_func then
-         *   let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
-         *     | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
-         *     | _ -> assert false in
-         *   let mvs, e0 =
-         *     let pv = create_pvsymbol (id_fresh "default") value_ity in
-         *     let v = import_model_value known value_ity a.arr_others in
-         *     Mvs.singleton pv.pv_vs v, e_var pv in
-         *   let arg_pv = create_pvsymbol (id_fresh "arg") key_ity in
-         *   let aux ix (mvs, e) =
-         *     let key_pv = create_pvsymbol (id_fresh "key") value_ity in
-         *     let value_pv = create_pvsymbol (id_fresh "value") key_ity in
-         *     let key_v = import_model_value known key_ity ix.arr_index_key in
-         *     let value_v = import_model_value known value_ity ix.arr_index_value in
-         *     let mvs = Mvs.add key_pv.pv_vs key_v (Mvs.add (value_pv.pv_vs) value_v mvs) in
-         *     let test = e_exec (c_app rs_dyn_poly_equ [arg_pv; key_pv] [] ity_bool) in
-         *     mvs, e_if test (e_var value_pv) e in
-         *   let mvs, e = List.fold_right aux a.arr_indices (mvs, e0) in
-         *   value (ty_of_ity ity) (Vfun (mvs, arg_pv.pv_vs, e))
-         * else
-         *   failwith "import_model_value array" *)
+        let v0 = import_model_value env known value_ity a.arr_others in
+        value (ty_of_ity ity) (Vpurefun (ty_of_ity key_ity, mv, v0))
     | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
         kasprintf failwith "import_model_value (not implemented): %a" print_model_value v
 
@@ -1397,21 +1384,21 @@ let model_value pv model =
   Opt.bind pv.pv_vs.vs_name.id_loc
     (get_model_value model pv.pv_vs.vs_name.id_string)
 
-let make_global_env ?model known =
+let make_global_env ?model env known =
   let add_glob _id d acc =
     match d.Pdecl.pd_node with
     | Pdecl.PDlet (LDvar (pv, _e)) ->
         (* TODO evaluate _e! *)
         let v = match Opt.bind model (model_value pv) with
-          | Some v -> import_model_value known pv.pv_ity  v
-          | None -> default_value_of_type known pv.pv_ity in
+          | Some v -> import_model_value env known pv.pv_ity  v
+          | None -> default_value_of_type env known pv.pv_ity in
         Mvs.add pv.pv_vs v acc
     | _ -> acc in
   Mid.fold add_glob known Mvs.empty
 
 let eval_global_expr ~rac env mod_known th_known locals e =
   get_builtin_progs env ;
-  let global_env = make_global_env mod_known in
+  let global_env = make_global_env env mod_known in
   let env = add_local_funs locals
       {mod_known; th_known; funenv= Mrs.empty; vsenv= global_env; env} in
   let res = eval_expr ~rac env e in
@@ -1427,15 +1414,15 @@ let eval_rs env mod_known th_known loc model (rs: rsymbol) =
   let get_value pv =
     match model_value pv model with
     | Some mv ->
-        import_model_value mod_known pv.pv_ity mv
+        import_model_value env mod_known pv.pv_ity mv
     | None ->
-        let v = default_value_of_type mod_known pv.pv_ity in
+        let v = default_value_of_type env mod_known pv.pv_ity in
         Debug.dprintf debug_rac "Missing value for parameter %a, continue with default value %a@."
           print_pv pv print_value v;
         v in
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   get_builtin_progs env ;
-  let global_env = make_global_env ~model mod_known in
+  let global_env = make_global_env env ~model mod_known in
   let env = {mod_known; th_known; funenv= Mrs.empty; vsenv= global_env; env} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   exec_call ~rac:true env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
