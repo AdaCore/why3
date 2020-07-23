@@ -1,4 +1,7 @@
 Weakest Precondition
+RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/ref_ex.mlw M test_post'vc: Timeout or Unknown
 Counter-example model:
 File ref_ex.mlw:
@@ -20,6 +23,9 @@ File ref_ex.mlw:
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
+RAC found a contradiction at different location "bench/ce/ref_ex.mlw", line 12, characters 15-21
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/ref_ex.mlw M test_post2'vc: Timeout or Unknown
 Counter-example model:
 File ref_ex.mlw:
@@ -44,6 +50,9 @@ File ref_ex.mlw:
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
 
+RAC does not confirm the counter-example (no contradiction during execution)
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/ref_ex.mlw M incr'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
@@ -93,6 +102,8 @@ File ref_ex.mlw:
     "value" : {"type" : "Integer" , "val" : "2" } }] } }
 
 RAC confirms the counter-example
+RAC found a contradiction at different location "bench/ce/ref_ex.mlw", line 24, characters 12-36
+RAC found a contradiction at different location "bench/ce/ref_ex.mlw", line 24, characters 12-36
 bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File ref_ex.mlw:
@@ -133,8 +144,11 @@ File ref_ex.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
+RAC found a contradiction at different location "bench/ce/ref_ex.mlw", line 38, characters 14-36
 bench/ce/ref_ex.mlw M test_loop'vc: Valid
 RAC confirms the counter-example
+RAC found a contradiction at different location "bench/ce/ref_ex.mlw", line 24, characters 12-36
+RAC found a contradiction at different location "bench/ce/ref_ex.mlw", line 24, characters 12-36
 bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
@@ -193,6 +207,9 @@ File ref_ex.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
+RAC found a contradiction at different location "bench/ce/ref_ex.mlw", line 38, characters 14-36
+RAC found a contradiction at different location "bench/ce/ref_ex.mlw", line 24, characters 12-36
+RAC found a contradiction at different location "bench/ce/ref_ex.mlw", line 24, characters 12-36
 bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:

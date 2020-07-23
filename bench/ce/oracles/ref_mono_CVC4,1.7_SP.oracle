@@ -1,7 +1,11 @@
 Strongest Postcondition
 bench/ce/ref_mono.mlw Ref ref1'vc: Valid
 bench/ce/ref_mono.mlw Ref prefix !'vc: Valid
+RAC does not confirm the counter-example (no contradiction during execution)
 bench/ce/ref_mono.mlw Ref infix :='vc: Valid
+RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/ref_mono.mlw M test_post'vc: Timeout or Unknown
 Counter-example model:
 File ref_mono.mlw:
@@ -32,6 +36,9 @@ File ref_mono.mlw:
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
+RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 26, characters 15-21
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/ref_mono.mlw M test_post2'vc: Timeout or Unknown
 Counter-example model:
 File ref_mono.mlw:
@@ -65,6 +72,9 @@ File ref_mono.mlw:
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
 
+RAC does not confirm the counter-example (no contradiction during execution)
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/ref_mono.mlw M incr'vc: Timeout or Unknown
 Counter-example model:
 File ref_mono.mlw:
@@ -113,6 +123,8 @@ File ref_mono.mlw:
     "value" : {"type" : "Integer" , "val" : "2" } }] } }
 
 RAC confirms the counter-example
+RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36
+RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File ref_mono.mlw:
@@ -153,8 +165,11 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
+RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 51, characters 14-36
 bench/ce/ref_mono.mlw M test_loop'vc: Valid
 RAC confirms the counter-example
+RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36
+RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File ref_mono.mlw:
@@ -212,6 +227,9 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
+RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 51, characters 14-36
+RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36
+RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File ref_mono.mlw:

@@ -1,10 +1,15 @@
 Weakest Precondition
 bench/ce/record_one_field.mlw Ref ref1'vc: Valid
 bench/ce/record_one_field.mlw Ref ref11'vc: Valid
+RAC failure: Cannot construct term for constructor ref1'mk that is not a function
 bench/ce/record_one_field.mlw Ref ref11'vc: Valid
 bench/ce/record_one_field.mlw Ref prefix !'vc: Valid
 bench/ce/record_one_field.mlw Ref infix :='vc: Valid
+RAC failure: Cannot construct term for constructor ref1'mk that is not a function
 bench/ce/record_one_field.mlw Ref infix :='vc: Valid
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
 bench/ce/record_one_field.mlw M test_post'vc: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
@@ -31,6 +36,9 @@ File record_one_field.mlw:
     y, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
     "value" : {"type" : "Integer" , "val" : "0" } }
 
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
 bench/ce/record_one_field.mlw M test_post2'vc: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
@@ -59,6 +67,9 @@ File record_one_field.mlw:
     y, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
     "value" : {"type" : "Integer" , "val" : "42" } }
 
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
 bench/ce/record_one_field.mlw M incr'vc: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
@@ -99,6 +110,8 @@ File record_one_field.mlw:
     "value" : {"type" : "Integer" , "val" : "2" } }
 
 RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
 bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
@@ -135,7 +148,10 @@ File record_one_field.mlw:
     x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
     "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "2" } }
 
+RAC failure: Cannot construct term for constructor ref1'mk that is not a function
 bench/ce/record_one_field.mlw M test_loop'vc: Valid
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
 RAC impossible: Cannot import model value: Value of non-free type ref1
 bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
@@ -186,6 +202,9 @@ File record_one_field.mlw:
     [current iteration] x, [[@introduced]] = {"proj_name" : "contents" ,
     "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "2" } }
 
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
+RAC impossible: Cannot import model value: Value of non-free type ref1
 bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:

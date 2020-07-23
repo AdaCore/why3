@@ -1,4 +1,7 @@
 Strongest Postcondition
+RAC does not confirm the counter-example (no contradiction during execution)
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw M record_match_eval_test1'vc: Timeout or Unknown
 Counter-example model:
 File records.mlw:
@@ -10,7 +13,11 @@ File records.mlw:
   Line 15:
     result, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
 
+RAC does not confirm the counter-example (no contradiction during execution)
 bench/ce/records.mlw M record_match_eval_test1'vc: Valid
+RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw M record_match_eval_test2'vc: Timeout or Unknown
 Counter-example model:
 File records.mlw:
@@ -25,6 +32,9 @@ File records.mlw:
     "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
     "value" : {"type" : "Boolean" , "val" : false } }] } }
 
+RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw M record_match_eval_test3'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
@@ -65,6 +75,9 @@ File records.mlw:
     "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
     "value" : {"type" : "Boolean" , "val" : false } }] } } }] } }
 
+RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw M record_match_eval_test4'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
@@ -106,6 +119,8 @@ File records.mlw:
     "value" : {"type" : "Boolean" , "val" : false } }] } } }] } }
 
 RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw M record_match_eval_test44'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
@@ -146,7 +161,12 @@ File records.mlw:
     "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
     "value" : {"type" : "Boolean" , "val" : false } }] } } }] } }
 
+RAC found a contradiction at different location "bench/ce/records.mlw", line 42, characters 13-22
+RAC found a contradiction at different location "bench/ce/records.mlw", line 42, characters 13-22
 bench/ce/records.mlw M record_match_eval_test44'vc: Valid
+RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw M test_record_match_eval_test5'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
@@ -200,6 +220,9 @@ File records.mlw:
     "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
     "value" : {"type" : "Boolean" , "val" : false } }] } } }] } }
 
+RAC does not confirm the counter-example (no contradiction during execution)
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw Mutable record_match_eval_test1'vc: Unknown (sat)
 Counter-example model:
 File records.mlw:
@@ -211,7 +234,11 @@ File records.mlw:
   Line 65:
     result, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
 
+RAC does not confirm the counter-example (no contradiction during execution)
 bench/ce/records.mlw Mutable record_match_eval_test1'vc: Valid
+RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw Mutable record_match_eval_test2'vc: Unknown (sat)
 Counter-example model:
 File records.mlw:
@@ -226,6 +253,9 @@ File records.mlw:
     "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
     "value" : {"type" : "Boolean" , "val" : false } }] } }
 
+RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw Mutable record_match_eval_test3'vc: Unknown (sat)
 Counter-example model:
 File records.mlw:
@@ -245,6 +275,9 @@ File records.mlw:
     "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
     "value" : {"type" : "Boolean" , "val" : false } }] } }
 
+RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/records.mlw Mutable record_match_eval_test4'vc: Unknown (sat)
 Counter-example model:
 File records.mlw:

@@ -1,6 +1,10 @@
 Weakest Precondition
+RAC confirms the counter-example
 bench/ce/loop_ce.mlw M1 f'vc: Valid
+RAC found a contradiction at different location "bench/ce/loop_ce.mlw", line 13, characters 16-25
 bench/ce/loop_ce.mlw M1 f'vc: Valid
+RAC confirms the counter-example
+RAC confirms the counter-example
 RAC confirms the counter-example
 bench/ce/loop_ce.mlw M1 f'vc: Timeout or Unknown
 Counter-example model:
@@ -34,6 +38,8 @@ File loop_ce.mlw:
     "value" : {"type" : "Integer" , "val" : "6" } }] } }
 
 RAC confirms the counter-example
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/loop_ce.mlw M2 g'vc: Timeout or Unknown
 Counter-example model:
 File loop_ce.mlw:
@@ -56,8 +62,11 @@ File loop_ce.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
+RAC found a contradiction at different location "bench/ce/loop_ce.mlw", line 23, characters 13-23
 bench/ce/loop_ce.mlw M2 g'vc: Valid
 bench/ce/loop_ce.mlw M2 g'vc: Valid
+RAC confirms the counter-example
+RAC confirms the counter-example
 bench/ce/loop_ce.mlw M2 g'vc: Timeout or Unknown
 Counter-example model:
 File loop_ce.mlw:
