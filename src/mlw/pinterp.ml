@@ -1198,7 +1198,7 @@ and exec_match ~rac env t ebl =
 
 and exec_call ~rac ?loc env rs arg_pvs ity_result =
   let arg_vs = List.map (get_pvs env) arg_pvs in
-  Debug.dprintf debug_rac "@[<h>%tExec call %a %a@]@."
+  Debug.dprintf debug "@[<h>%tExec call %a %a@]@."
     pp_indent print_rs rs Pp.(print_list space print_value) arg_vs;
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let oldies =
