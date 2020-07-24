@@ -1,0 +1,29 @@
+
+use int.Int
+use ref.Ref
+let f ()
+  ensures { result = 2 }
+  = let ref x = 0 in
+    let ref i = 0 in
+    while i < 2 do
+      variant { 2 - i }
+      invariant { x >= 0 }
+      x <- x + 1;
+      i <- i + 1
+    done;
+    x
+
+(*
+make -j 4; why3 prove my_examples/ce-rac/while1.mlw -P cvc4-ce --apply-transform=split_vc
+make -j 4; why3 execute my_examples/ce-rac/while1.mlw --use=Top --rac "f ()"
+*)
+
+(*
+counterexamle: x = 0, i = 2
+It is a true counterexample because the underspecification (weak loop invariant wrt postcondition);
+If the program is interpreted (w. rac) from the initial state, it does not fail,
+because it doesn't reach an iteration where x = 0 and i = 2.
+If we execute the iteration where x = 0 and i = 2, then the loop condition will be false
+and the post condition will fail -- we can conclude that the program is underspecified.
+*)
+
