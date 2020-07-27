@@ -52,13 +52,11 @@ module Compare
            value_sub_upper_bound (pelts y) y.offset (y.offset+k-1);
            value_sub_lower_bound (pelts x) x.offset (x.offset+k-1);
            assert { value x k - value y k =
-                    (l2i lx - ly) * (power radix (k-1))
-                  - ((value y (k-1)) - (value x (k-1)))
-                     };
+                    (lx - ly) * (power radix (k-1))
+                  - ((value y (k-1)) - (value x (k-1))) };
            assert { (lx - ly) * (power radix (k-1))
                     >= power radix (k-1)
-                    > ((value y (k-1)) - (value x (k-1)))
-                     };
+                    > ((value y (k-1)) - (value x (k-1))) };
            return 1
           end
           else begin
