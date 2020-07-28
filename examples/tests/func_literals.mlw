@@ -77,3 +77,39 @@ let f15 (x: int) = f13 (x+1)
 
 let function f16 : int -> int = [||]
 let function f17 : int -> int = [|1|]
+
+use seq.Seq
+function s1 : seq int = create 10 [|1;2;3;4|]
+let      s2 : seq int = create 10 [|1;2;3;4|]
+
+function s3 : seq string = create 10 [|"a";"ab";"abc";"abcd"|]
+let      s4 : seq string = create 10 [|"a";"ab";"abc";"abcd"|]
+
+use string.String
+function s5 : seq string = create 10 [|"a";"ab";concat s3[2] s3[0];"abcd"|]
+let      s6 : seq string = create 10 [|"a";"ab";concat s4[11] s4[1];"abcd"|]
+
+function s7 : seq string = create 10 [|2 => "a";0 => "abc"; -1 => "abcd"|]
+let      s8 : seq string = create 10 [|2 => "a";0 => "abc"; -1 => "abcd"|]
+
+function s9  : seq string = create 10 [|2 => "a";0 => "abc"; -1 => "abcd"; _ => ""|]
+let      s10 : seq string = create 10 [|2 => "a";0 => "abc"; -1 => "abcd"; _ => ""|]
+
+use array.Init
+
+let aa1 : array int    = init 10 [|1;2;3;4|]
+let aa2 : array string = init 10 [|"a";"ab";"abc";"abcd"|]
+(* let aa3 : array string = init 10 [|"a";"ab";concat aa2[11] aa2[1];"abcd"|] *)
+let aa4 : array string = init 10 [|2 => "a";0 => "abc"; -1 => "abcd"|]
+let aa5 : array string = init 10 [|2 => "a";0 => "abc"; -1 => "abcd"; _ => ""|]
+
+
+(* cannot be proved *)
+let zero2three_nok (_: int): seq int
+  ensures { result = create 4 [|0;1;2;3|]}
+= create 4 [|0;1;2;3|]
+
+(* can be proved *)
+let zero2three_ok (default: int) : seq int
+  ensures { result = create 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]}
+= create 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]
