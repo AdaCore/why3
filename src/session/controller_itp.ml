@@ -427,7 +427,7 @@ let build_prover_call spa =
         | Trans id -> find_th s (get_trans_parent s id) in
       let th = find_th c.controller_session spa.spa_id in
       let pm = Pmodule.restore_module (Theory.restore_theory (Session_itp.theory_name th)) in
-      let maybe_ce_model = Pinterp.maybe_ce_model c.controller_env pm in
+      let maybe_ce_model = if true (*check_ce_model*) then Pinterp.maybe_ce_model c.controller_env pm else fun _ -> true in
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
           ~limit ~interactive ~maybe_ce_model driver task in
       let pa =

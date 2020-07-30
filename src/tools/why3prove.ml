@@ -29,6 +29,7 @@ let opt_trans = ref []
 let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
 let opt_json = ref false
+let opt_check_ce_model = ref false
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -119,6 +120,8 @@ let option_list =
     "<file> specify a prover's driver (conflicts with -P)";
     Key ('o', "output"), Hnd1 (AString, fun s -> opt_output := Some s),
     "<dir> print the selected goals to separate files in <dir>";
+    KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
+    " check the counter-examples using runtime assertion checking (RAC)";
     KLong "json", Hnd0 (fun () -> opt_json := true),
     " print counterexamples in JSON format";
     KLong "print-theory", Hnd0 (fun () -> opt_print_theory := true),
@@ -234,7 +237,10 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
                    limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
-        let maybe_ce_model = Pinterp.maybe_ce_model env (Pmodule.restore_module th) in
+        let maybe_ce_model =
+          if !opt_check_ce_model then
+            Pinterp.maybe_ce_model env (Pmodule.restore_module th)
+          else fun _ -> true in
         let call =
           Driver.prove_task ~command ~limit ~maybe_ce_model drv task in
         let res = Call_provers.wait_on_call call in
