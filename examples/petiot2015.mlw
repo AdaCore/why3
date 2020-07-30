@@ -1,0 +1,48 @@
+(* From Petiot 2015: Your Proof Fails? Testing Helps to Find the Reason *)
+
+module Petiot2015
+  use array.Array
+  use int.Int
+  use mach.int.Int32
+
+  predicate is_rgf (a: array int) (n: int) =
+    a[0] = 0 /\ forall i. 1 <= i < n -> 0 <= a[i] <= a[i-1]+1
+
+  let rec lemma max_rgf (a: array int) (n: int)
+    requires { is_rgf a n }
+    requires { 0 <= n < a.length }
+    ensures { forall i. 0 <= i < n -> a[i] <= i }
+    variant { n }
+  = if n > 0 then max_rgf a (n - 1)
+
+  let g (a: array int) (i: int)
+    requires { 1 <= i <= a.length }
+    requires { is_rgf a (i+1) }
+    ensures { forall j. 0 <= j <= i -> (old a)[j] = a[j] }
+    ensures { is_rgf a a.length }
+  = for k = i + 1 to a.length - 1 do
+      invariant { is_rgf a k }
+      invariant { forall j. 0 <= j <= i -> (old a)[j] = a[j] }
+      a[k] <- 0
+    done
+
+  let f (a: array int)
+    requires { a.length > 0 }
+    requires { is_rgf a a.length }
+    ensures { is_rgf a a.length }
+    ensures { result = True ->
+      exists j. 0 <= j < a.length /\ (old a)[j] < a[j] /\
+      forall k. 0 <= k < j -> (old a)[k] = a[k] }
+  = let ref i = a.length - 1 in
+    while i >= 1 do
+      invariant { 0 <= i <= a.length - 1 }
+      variant { i }
+      if a[i] <= a[i-1] then break;
+      i <- i - 1
+    done;
+    if i = 0 then return False;
+    a[i] <- a[i] + 1;
+    g a i;
+    assert { forall j. 0 <= j < i -> (old a)[j] = a[j] };
+    return True
+end
