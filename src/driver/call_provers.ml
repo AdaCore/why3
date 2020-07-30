@@ -224,30 +224,55 @@ let analyse_result ?(maybe_ce_model=fun _ -> true) exit_result res_parser printe
       exit_result
   in
 
-  let rec analyse saved_model saved_res l =
+  let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        if saved_res = None then
-          (HighFailure, saved_model)
-        else
-          (Opt.get saved_res, saved_model)
+        let use_incremental_choice = false in
+        (* Search for the first model that is certainly valid (maybe_ce_model m = Some
+           true) (if exists), or the first model that is not certainly invalid
+           (maybe_ce_model m = None) *)
+        let rec select save i = function
+          | [] -> Debug.dprintf debug "Select %s CE model %a@." (if save = None then "no" else "saved")
+                    (Pp.print_option Pp.int) (Opt.map fst save);
+              Opt.map snd save (* Select saved model *)
+          | (res, m) :: ms ->
+              if is_model_empty m then (
+                Debug.dprintf debug "Discard empty model %d@." i;
+                select save (succ i) ms (* Discard empty model *)
+              ) else (
+                Debug.dprintf debug "Check model %d@." i;
+                match maybe_ce_model m with
+                | Some false -> select save (succ i) ms (* Discard bad model *)
+                (* | Some true -> Debug.dprintf debug "Select good CE model@."; Some m (\* Select good model *\)
+                 * | None -> *)
+                | _ ->
+                    match res with (* Save dontknow model in non-incremental mode *)
+                    | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout")
+                      when use_incremental_choice && save <> None ->
+                        Debug.dprintf debug "Retain saved model@.";
+                        select save (succ i) ms
+                    | _ ->
+                        Debug.dprintf debug "Save model@.";
+                        select (Some (i, m)) (succ i) ms ) in
+        let model = select None 0 (List.rev saved_models) in
+        Opt.get_def HighFailure saved_res, model
     | Answer res1 :: (Answer res2 :: tl as tl1) ->
        Debug.dprintf debug "Call_provers: two consecutive answers: %a %a@."
           print_prover_answer res1 print_prover_answer res2;
        begin
          match res1,res2 with
          | Unknown _, Unknown "resourceout" ->
-            analyse saved_model saved_res (Answer StepLimitExceeded :: tl)
+            analyse saved_models saved_res (Answer StepLimitExceeded :: tl)
          | Unknown _, Unknown "timeout" ->
-            analyse saved_model saved_res (Answer Timeout :: tl)
+            analyse saved_models saved_res (Answer Timeout :: tl)
          | (Unknown _, Unknown "")| (_, Unknown "(not unknown!)") ->
-            analyse saved_model saved_res (Answer res1 :: tl)
+            analyse saved_models saved_res (Answer res1 :: tl)
          | Unknown "", Unknown _ ->
-            analyse saved_model saved_res tl1
+            analyse saved_models saved_res tl1
          | Unknown s1, Unknown s2 ->
-            analyse saved_model saved_res (Answer (Unknown (s1 ^ " + " ^ s2)) :: tl)
+            analyse saved_models saved_res (Answer (Unknown (s1 ^ " + " ^ s2)) :: tl)
          | _,_ ->
-            analyse saved_model saved_res tl1
+            analyse saved_models saved_res tl1
        end
     | Answer res :: Model model :: tl ->
         if res = Valid then
@@ -259,25 +284,17 @@ let analyse_result ?(maybe_ce_model=fun _ -> true) exit_result res_parser printe
           debug_print_model ~print_attrs:false m;
           (* TODO remove this use_incremental_choice when choice of the model
              in incremental mode gives satisfying results *)
-          let use_incremental_choice = false in
-          let m =
-            if is_model_empty m || not (maybe_ce_model m) then saved_model
-            else match res, saved_model with
-              | (StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout")),
-                Some saved_model when use_incremental_choice ->
-                  (* we keep the previous model if it was there *)
-                  Some saved_model
-              | _ -> Some m in
-          analyse m (Some res) tl
+          let saved_models = (res, m) :: saved_models in
+          analyse saved_models (Some res) tl
     | Answer res :: tl ->
         if res = Valid then
           (Valid, None)
         else
-          analyse saved_model (Some res) tl
-    | Model _fail :: tl -> analyse saved_model saved_res tl
+          analyse saved_models (Some res) tl
+    | Model _fail :: tl -> analyse saved_models saved_res tl
   in
 
-  analyse None None result_list
+  analyse [] None result_list
 
 let backup_file f = f ^ ".save"
 
