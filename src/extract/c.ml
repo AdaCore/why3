@@ -671,7 +671,7 @@ module Print = struct
                       (print_expr ~prec:1) e1
                       (print_expr ~prec:15) e2
     | Earrow (e,s) ->
-       fprintf fmt (protect_on (prec <= 1) "%a->%s")
+       fprintf fmt (protect_on (prec < 1) "%a->%s")
          (print_expr ~prec:1) e s
     | Esyntax ("%1", _, _, [e,_], _) ->
         print_expr ~prec fmt e
