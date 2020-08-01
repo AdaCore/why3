@@ -239,10 +239,10 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
     | None, Some command ->
         let maybe_ce_model =
           if !opt_check_ce_model then
-            Pinterp.maybe_ce_model env (Pmodule.restore_module th)
-          else fun _ -> true in
+            Some (Pinterp.maybe_ce_model env (Pmodule.restore_module th))
+          else None in
         let call =
-          Driver.prove_task ~command ~limit ~maybe_ce_model drv task in
+          Driver.prove_task ~command ~limit ?maybe_ce_model drv task in
         let res = Call_provers.wait_on_call call in
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string

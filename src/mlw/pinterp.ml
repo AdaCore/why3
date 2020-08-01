@@ -1668,10 +1668,10 @@ let maybe_ce_model env pm m =
     if let f, _, _, _ = Loc.get loc in Sys.file_exists f then
       (* TODO deal with VC from variable declarations and type declarations *)
       let rs = find_rs pm loc in
-      Opt.get_def true (maybe_ce_model_rs env pm m rs)
+      maybe_ce_model_rs env pm m rs
     else
-      true
-  with Not_found -> true
+      None
+  with Not_found -> None
 
 let report_eval_result body fmt (res, final_env) =
   match res with

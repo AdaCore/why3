@@ -136,6 +136,10 @@ val call_on_file :
   string -> prover_call
  *)
 
+type maybe_ce_model = Model_parser.model -> bool option
+(** Check the validity of a CE model. Return [None] in case of incompleteness of the
+   check. *)
+
 val call_on_buffer :
   command         : string ->
   limit           : resource_limit ->
@@ -143,7 +147,7 @@ val call_on_buffer :
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
   gen_new_file    : bool ->
-  ?maybe_ce_model  : (Model_parser.model -> bool) ->
+  ?maybe_ce_model : maybe_ce_model ->
   ?inplace        : bool ->
   Buffer.t -> prover_call
 (** Build a prover call on the task already printed in the {!type: Buffer.t} given.

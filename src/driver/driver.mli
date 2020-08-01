@@ -57,7 +57,7 @@ val print_theory :
 val prove_task :
   command      : string ->
   limit        : Call_provers.resource_limit ->
-  ?maybe_ce_model : (Model_parser.model -> bool) ->
+  ?maybe_ce_model : Call_provers.maybe_ce_model ->
   ?old         : string ->
   ?inplace     : bool ->
   ?interactive : bool ->
@@ -75,7 +75,7 @@ val print_task_prepared :
 val prove_task_prepared :
   command      : string ->
   limit        : Call_provers.resource_limit ->
-  ?maybe_ce_model : (Model_parser.model -> bool) ->
+  ?maybe_ce_model : Call_provers.maybe_ce_model ->
   ?old         : string ->
   ?inplace     : bool ->
   ?interactive : bool ->

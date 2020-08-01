@@ -208,7 +208,9 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-let analyse_result ?(maybe_ce_model=fun _ -> true) exit_result res_parser printer_mapping out =
+type maybe_ce_model = Model_parser.model -> bool option
+
+let analyse_result ?(maybe_ce_model=fun _ -> None) exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
   let list_re = List.map (fun (a, b) -> Re.Str.regexp a, b) list_re in
@@ -405,7 +407,7 @@ type save_data = {
   limit      : resource_limit;
   res_parser : prover_result_parser;
   printer_mapping : Printer.printer_mapping;
-  maybe_ce_model : (Model_parser.model -> bool) option;
+  maybe_ce_model : maybe_ce_model option;
 }
 
 let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
