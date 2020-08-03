@@ -1,24 +1,39 @@
 Strongest Postcondition
-RAC does not confirm the counter-example (no contradiction during execution)
-RAC does not confirm the counter-example (no contradiction during execution)
-RAC does not confirm the counter-example (no contradiction during execution)
+Model 0: don't know (RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
+Model 1: don't know (RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
+Model 2: don't know (RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
 bench/ce/range_type.mlw Range_int f'vc: Timeout or Unknown
 Counter-example model:
 File range_type.mlw:
   Line 7:
-    x, [[@introduced]] = {"proj_name" : "int32'int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "5" } }
+    x [@introduced] =
+      {"proj_name" : "int32'int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "5" } }
   Line 9:
-    x, [[@introduced], [@model_trace:x]] = {"proj_name" : "int32'int" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "5" } }
+    x [@introduced] [@model_trace:x] =
+      {"proj_name" : "int32'int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "5" } }
 
+Model 0: don't know (RAC execution got stuck., 0 warnings)
+Model 1: don't know (RAC execution got stuck., 0 warnings)
+Model 2: don't know (RAC execution got stuck., 0 warnings)
 bench/ce/range_type.mlw Range_float f'vc: Timeout or Unknown
 Counter-example model:
 File range_type.mlw:
   Line 20:
-    x, [[@introduced]] = {"proj_name" : "t'real" , "type" : "Proj" ,
-    "value" : {"type" : "Decimal" , "val" : "10.0" } }
+    x [@introduced] =
+      {"proj_name" : "t'real" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Decimal" ,
+      "val" : "10.0" } }
   Line 22:
-    x, [[@introduced], [@model_trace:x]] = {"proj_name" : "t'real" ,
-    "type" : "Proj" , "value" : {"type" : "Decimal" , "val" : "10.0" } }
+    x [@introduced] [@model_trace:x] =
+      {"proj_name" : "t'real" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Decimal" ,
+      "val" : "10.0" } }
 

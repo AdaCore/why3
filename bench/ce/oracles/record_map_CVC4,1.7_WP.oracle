@@ -1,90 +1,127 @@
 Weakest Precondition
-RAC failure: Cannot create default value for non-free type (->)
-
-RAC failure: Cannot create default value for non-free type (->)
-
-RAC failure: Cannot create default value for non-free type (->)
-
+Model 0: don't know (RAC failure: Cannot create default value for non-free type (->), 0 warnings)
+Model 1: don't know (RAC failure: Cannot create default value for non-free type (->), 0 warnings)
+Model 2: don't know (RAC failure: Cannot create default value for non-free type (->), 0 warnings)
 bench/ce/record_map.mlw M map_record_proj_test1'vc: Unknown (sat)
 Counter-example model:
 File record_map.mlw:
   Line 41:
-    map_rec, [[@introduced], [@model_projected]] = {"type" : "Array" ,
-    "val" : [{"indice" : {"type" : "Boolean" , "val" : true } ,
-    "value" : {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".field_f" ,
-    "value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } } },
-    {"others" : {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } } }] }
+    map_rec [@introduced] [@model_projected] =
+      {"type" : "Array" ,
+      "val" : [{"indice" : {"type" : "Boolean" ,
+      "val" : true } ,
+      "value" : {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : ".field_f" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "-1" } },
+      {"field" : "g" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : false } }] } } },
+      {"others" : {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : ".field_f" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "0" } },
+      {"field" : "g" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : false } }] } } }] }
   Line 42:
-    map_rec, [[@introduced], [@model_projected], [@model_trace:map_rec]] =
-    {"type" : "Array" , "val" : [{"indice" : {"type" : "Boolean" ,
-    "val" : true } , "value" : {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".field_f" ,
-    "value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } } },
-    {"others" : {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } } }] }
+    map_rec [@introduced] [@model_projected] [@model_trace:map_rec] =
+      {"type" : "Array" ,
+      "val" : [{"indice" : {"type" : "Boolean" ,
+      "val" : true } ,
+      "value" : {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : ".field_f" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "-1" } },
+      {"field" : "g" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : false } }] } } },
+      {"others" : {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : ".field_f" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "0" } },
+      {"field" : "g" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : false } }] } } }] }
 
-RAC failure: Cannot create default value for non-free type (->)
-
-RAC failure: Cannot create default value for non-free type (->)
-
-RAC failure: Cannot create default value for non-free type (->)
-
+Model 0: don't know (RAC failure: Cannot create default value for non-free type (->), 0 warnings)
+Model 1: don't know (RAC failure: Cannot create default value for non-free type (->), 0 warnings)
+Model 2: don't know (RAC failure: Cannot create default value for non-free type (->), 0 warnings)
 bench/ce/record_map.mlw M record_map_proj_test2'vc: Unknown (sat)
 Counter-example model:
 File record_map.mlw:
   Line 46:
-    rec_map, [[@introduced], [@model_projected]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
-    "val" : [{"indice" : {"type" : "Boolean" , "val" : true } ,
-    "value" : {"type" : "Integer" , "val" : "-1" } },
-    {"others" : {"type" : "Integer" , "val" : "0" } }] } },
-    {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
-    "val" : false } }] } }
+    rec_map [@introduced] [@model_projected] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "f_map" ,
+      "value" : {"type" : "Array" ,
+      "val" : [{"indice" : {"type" : "Boolean" ,
+      "val" : true } ,
+      "value" : {"type" : "Integer" ,
+      "val" : "-1" } },
+      {"others" : {"type" : "Integer" ,
+      "val" : "0" } }] } },
+      {"field" : "g_bool" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : false } }] } }
   Line 47:
-    rec_map, [[@introduced], [@model_projected], [@model_trace:rec_map]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "f_map" ,
-    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Boolean" ,
-    "val" : true } , "value" : {"type" : "Integer" , "val" : "-1" } },
-    {"others" : {"type" : "Integer" , "val" : "0" } }] } },
-    {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
-    "val" : false } }] } }
+    rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "f_map" ,
+      "value" : {"type" : "Array" ,
+      "val" : [{"indice" : {"type" : "Boolean" ,
+      "val" : true } ,
+      "value" : {"type" : "Integer" ,
+      "val" : "-1" } },
+      {"others" : {"type" : "Integer" ,
+      "val" : "0" } }] } },
+      {"field" : "g_bool" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : false } }] } }
 
-RAC confirms the counter-example
-RAC confirms the counter-example
-RAC confirms the counter-example
+Model 0: good model (RAC confirms the counter-example, 0 warnings)
+Model 1: good model (RAC confirms the counter-example, 0 warnings)
+Model 2: good model (RAC confirms the counter-example, 0 warnings)
 bench/ce/record_map.mlw M record_map_proj_test3'vc: Unknown (sat)
 Counter-example model:
 File record_map.mlw:
   Line 51:
-    re_rec_map, [[@introduced], [@model_projected]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
-    "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
-    {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
-    "val" : true } }] } }
+    re_rec_map [@introduced] [@model_projected] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "f_map" ,
+      "value" : {"type" : "Array" ,
+      "val" : [{"others" : {"type" : "Integer" ,
+      "val" : "0" } }] } },
+      {"field" : "g_bool" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : true } }] } }
   Line 53:
-    rec_map, [[@introduced], [@model_projected]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
-    "val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
-    {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
-    "val" : false } }] } }
+    rec_map [@introduced] [@model_projected] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "f_map" ,
+      "value" : {"type" : "Array" ,
+      "val" : [{"others" : {"type" : "Integer" ,
+      "val" : "0" } }] } },
+      {"field" : "g_bool" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : false } }] } }
   Line 54:
-    re_rec_map,
-    [[@introduced], [@model_projected], [@model_trace:re_rec_map]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "f_map" ,
-    "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-    "val" : "0" } }] } }, {"field" : "g_bool" ,
-    "value" : {"type" : "Boolean" , "val" : true } }] } }
-    rec_map, [[@introduced], [@model_projected], [@model_trace:rec_map]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "f_map" ,
-    "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-    "val" : "0" } }] } }, {"field" : "g_bool" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    re_rec_map [@introduced] [@model_projected] [@model_trace:re_rec_map] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "f_map" ,
+      "value" : {"type" : "Array" ,
+      "val" : [{"others" : {"type" : "Integer" ,
+      "val" : "0" } }] } },
+      {"field" : "g_bool" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : true } }] } }
+    rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "f_map" ,
+      "value" : {"type" : "Array" ,
+      "val" : [{"others" : {"type" : "Integer" ,
+      "val" : "0" } }] } },
+      {"field" : "g_bool" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : false } }] } }
 

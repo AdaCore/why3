@@ -1,60 +1,90 @@
 Strongest Postcondition
 bench/ce/jlamp_projections.mlw AbstractAlone p3'vc: Valid
-RAC impossible: Cannot import model value: Value of non-free type byte
-RAC impossible: Cannot import model value: Value of non-free type byte
-RAC impossible: Cannot import model value: Value of non-free type byte
+Model 0: don't know (Cannot import value from model: Value of non-free type byte, 0 warnings)
+Model 1: don't know (Cannot import value from model: Value of non-free type byte, 0 warnings)
+Model 2: don't know (Cannot import value from model: Value of non-free type byte, 0 warnings)
 bench/ce/jlamp_projections.mlw AbstractAlone p3'vc: Unknown (sat)
 Counter-example model:
 File jlamp_projections.mlw:
   Line 18:
-    a, [[@introduced]] = {"proj_name" : "to_int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "127" } }
+    a [@introduced] =
+      {"proj_name" : "to_int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "127" } }
   Line 28:
-    a, [[@introduced]] = {"proj_name" : "to_int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "127" } }
+    a [@introduced] =
+      {"proj_name" : "to_int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "127" } }
   Line 29:
-    a, [[@introduced], [@model_trace:a]] = {"proj_name" : "to_int" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "127" } }
+    a [@introduced] [@model_trace:a] =
+      {"proj_name" : "to_int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "127" } }
 
 bench/ce/jlamp_projections.mlw AbstractWithRef p3'vc: Valid
-RAC impossible: Cannot import model value: Value of non-free type byte
-RAC impossible: Cannot import model value: Value of non-free type byte
-RAC impossible: Cannot import model value: Value of non-free type byte
+Model 0: don't know (Cannot import value from model: Value of non-free type byte, 0 warnings)
+Model 1: don't know (Cannot import value from model: Value of non-free type byte, 0 warnings)
+Model 2: don't know (Cannot import value from model: Value of non-free type byte, 0 warnings)
 bench/ce/jlamp_projections.mlw AbstractWithRef p3'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
   Line 18:
-    a, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"proj_name" : "to_int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "127" } } }] } }
+    a [@field:0:contents] [@introduced] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"proj_name" : "to_int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "127" } } }] } }
 File jlamp_projections.mlw:
   Line 41:
-    a, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"proj_name" : "to_int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "127" } } }] } }
+    a [@field:0:contents] [@introduced] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"proj_name" : "to_int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "127" } } }] } }
   Line 42:
-    a, [[@field:0:contents], [@introduced], [@model_trace:a]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"proj_name" : "to_int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "127" } } }] } }
+    a [@field:0:contents] [@introduced] [@model_trace:a] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"proj_name" : "to_int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "127" } } }] } }
 
 bench/ce/jlamp_projections.mlw Record p4'vc: Valid
-RAC impossible: Cannot import model value: Value of non-free type byte
-RAC impossible: Cannot import model value: Value of non-free type byte
-RAC impossible: Cannot import model value: Value of non-free type byte
+Model 0: don't know (Cannot import value from model: Value of non-free type byte, 0 warnings)
+Model 1: don't know (Cannot import value from model: Value of non-free type byte, 0 warnings)
+Model 2: don't know (Cannot import value from model: Value of non-free type byte, 0 warnings)
 bench/ce/jlamp_projections.mlw Record p4'vc: Unknown (sat)
 Counter-example model:
 File jlamp_projections.mlw:
   Line 53:
-    b, [[@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "f" , "value" : {"proj_name" : "to_int" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "127" } } },
-    {"field" : "g" , "value" : {"type" : "Boolean" , "val" : true } }] } }
+    b [@introduced] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "f" ,
+      "value" : {"proj_name" : "to_int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "127" } } },
+      {"field" : "g" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : true } }] } }
   Line 54:
-    b, [[@introduced], [@model_trace:b]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "f" , "value" : {"proj_name" : "to_int" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "127" } } },
-    {"field" : "g" , "value" : {"type" : "Boolean" , "val" : true } }] } }
+    b [@introduced] [@model_trace:b] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "f" ,
+      "value" : {"proj_name" : "to_int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "127" } } },
+      {"field" : "g" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : true } }] } }
 

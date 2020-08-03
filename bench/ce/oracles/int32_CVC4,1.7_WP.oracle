@@ -1,32 +1,42 @@
 Weakest Precondition
-RAC execution got stuck.
-RAC execution got stuck.
 bench/ce/int32.mlw Ce_int32 dummy_update'vc: Valid
-RAC execution got stuck.
-RAC execution got stuck.
-RAC execution got stuck.
+Model 0: don't know (RAC execution got stuck., 0 warnings)
+Model 1: don't know (RAC execution got stuck., 0 warnings)
+Model 2: don't know (RAC execution got stuck., 0 warnings)
 bench/ce/int32.mlw Ce_int32 dummy_update'vc: Timeout or Unknown
 Counter-example model:
 File int32.mlw:
   Line 5:
-    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"proj_name" : "int32'int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "22" } } }] } }
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"proj_name" : "int32'int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "22" } } }] } }
   Line 7:
-    r,
-    [[@field:0:contents], [@introduced], [@mlw:reference_var], [@model_trace:r]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"proj_name" : "int32'int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "84" } } }] } }
+    r [@field:0:contents] [@introduced] [@mlw:reference_var]
+      [@model_trace:r] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"proj_name" : "int32'int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "84" } } }] } }
   Line 8:
-    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"proj_name" : "int32'int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "42" } } }] } }
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"proj_name" : "int32'int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "42" } } }] } }
   Line 9:
-    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"proj_name" : "int32'int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "84" } } }] } }
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"proj_name" : "int32'int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "84" } } }] } }
 
