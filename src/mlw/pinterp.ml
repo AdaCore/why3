@@ -14,6 +14,7 @@ open Wstdlib
 open Term
 open Ident
 open Ty
+open Pretty
 open Ity
 open Expr
 open Big_real
@@ -45,9 +46,8 @@ let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, r
     (Pp.print_list sep pp_binding)
     l (snd delims) ()
 
-let pp_typed pp ty fmt x =
-  fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x)
-[@@warning "-32"]
+(* let pp_typed pp ty fmt x =
+ *   fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x) *)
 
 (* EXCEPTIONS *)
 
@@ -209,17 +209,17 @@ let rec print_value fmt v =
   | Vstring s -> Constant.print_string_def fmt s
   | Vvoid -> fprintf fmt "()"
   | Vfun (mvs, vs, e) ->
-      fprintf fmt "@[<v2>(%tfun %a -> %a)@]"
+      fprintf fmt "(@[<v2>%tfun %a -> %a)@]"
         (fun fmt ->
            if not (Mvs.is_empty mvs) then
              fprintf fmt "%a " (pp_bindings Pretty.print_vs print_value) (Mvs.bindings mvs))
         Pretty.print_vs vs
         print_expr e
   | Vconstr (rs, vl) when is_rs_tuple rs ->
-      fprintf fmt "@[(%a)@]" (Pp.print_list Pp.comma print_field) vl
+      fprintf fmt "(@[%a)@]" (Pp.print_list Pp.comma print_field) vl
   | Vconstr (rs, []) -> fprintf fmt "@[%a@]" print_rs rs
   | Vconstr (rs, vl) ->
-      fprintf fmt "@[(%a %a)@]" print_rs rs
+      fprintf fmt "(@[%a %a)@]" print_rs rs
         (Pp.print_list Pp.space print_field)
         vl
   | Varray a ->
@@ -685,7 +685,7 @@ let rec default_value_of_type env known ity : value =
               kasprintf failwith "not non-free type without constructors: %a" print_its its;
             (* TODO Axiomatize values of record fields by rules in the reduction engine?
                Cf. bench/ce/records_inv.mlw *)
-            kasprintf failwith "Cannot create default value for non-free type %a@." Ity.print_its its in
+            kasprintf failwith "Cannot create default value for non-free type %a" Ity.print_its its in
       let subst = its_match_regs its l1 l2 in
       let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
       let tyl = List.map (ity_full_inst subst) ityl in
@@ -781,10 +781,9 @@ let report_cntr fmt (ctx, msg, term) =
     String.compare vs1.vs_name.id_string vs2.vs_name.id_string in
   let mvs = t_freevars Mvs.empty term in
   fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
-  fprintf fmt "@[<hov2>- Term: %a@]@," Pretty.print_term term ;
-  fprintf fmt "@[<hov2>- Variables: %a@]"
-    (pp_vsenv Pretty.print_term)
-    (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_vsenv)));
+  fprintf fmt "@[<hv2>- Term: %a@]@," Pretty.print_term term ;
+  fprintf fmt "@[<hv2>- Variables: %a@]" (pp_vsenv print_value)
+    (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_env.vsenv)));
   fprintf fmt "@]"
 
 let rule_term decl =
@@ -1082,7 +1081,7 @@ let exec_pure env ls pvs =
           Pretty.print_ls ls
 
 let pp_limited ?(n=100) pp fmt x =
-  let s = asprintf "%a@." pp x in
+  let s = asprintf "%a" pp x in
   let s = String.map (function '\n' -> ' ' | c -> c) s in
   let s = String.(if length s > n then sub s 0 (Pervasives.min n (length s)) ^ "..." else s) in
   pp_print_string fmt s

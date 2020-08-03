@@ -528,27 +528,26 @@ let fix_loc_kind ~at_loc name =
 let cmp_attrs a1 a2 =
   String.compare a1.attr_string a2.attr_string
 
-let print_model_element ~at_loc ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
+let print_model_element ?(print_locs=false) ~at_loc ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message -> fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
       let m_element = {m_element with me_name=fix_loc_kind ~at_loc m_element.me_name} in
-      (* fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]" *)
-      fprintf fmt "@[%s%t =@ %a@]"
-        (me_name_trans m_element.me_name)
+      fprintf fmt "@[<hv2>@[<hov2>%s%t%t =@]@ %a@]" (me_name_trans m_element.me_name)
         (fun fmt ->
            if print_attrs then
-             (* fprintf fmt " %a" *)
-             fprintf fmt ",@ @[<h>[%a]@]"
-               Pp.(print_list comma Pretty.print_attr)
+             fprintf fmt " %a" Pp.(print_list space Pretty.print_attr)
                (List.sort cmp_attrs (Sattr.elements m_element.me_name.men_attrs)))
+        (fun fmt ->
+           if print_locs then fprintf fmt " (%a)"
+               (Pp.print_option_or_default "NO LOC "Pretty.print_loc) m_element.me_location)
         print_model_value m_element.me_value
 
 let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ~at_loc ~print_attrs ~print_model_value
+       (print_model_element ?print_locs:None ~at_loc ~print_attrs ~print_model_value
           ~me_name_trans))
     m_elements
 
