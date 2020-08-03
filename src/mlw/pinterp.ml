@@ -263,7 +263,7 @@ let rec term_of_value env v =
           let t = term_of_value env v in
           mt, Mvs.add vs t mv in
         let t = (* Substitute values from the closure *)
-          let mt, mv = Mvs.fold bind_cl cl (mt, Mvs.empty) in
+          let mt, mv = Mvs.fold bind_cl cl (Mtv.empty, Mvs.empty) in
           t_ty_subst mt mv t in
         mt, t_lambda [arg] [] t
     | Varray a ->
