@@ -22,16 +22,16 @@ type result =
   | Irred of Expr.expr
   | Fun of Expr.rsymbol * Ity.pvsymbol list * int
 
+(** Interpreter context *)
+type env
+
 (** {1 Contradiction context} *)
 
 (** Context of a contradiction during RAC *)
 type cntr_ctx =
   { c_desc: string;
     c_trigger_loc: Loc.position option;
-    c_env: Env.env;
-    c_known: Decl.known_map;
-    c_rule_terms: Term.term Ident.Mid.t;
-    c_vsenv: Term.term Term.Mvs.t }
+    c_env: env }
 
 (** Exception [Contr] is raised when a contradiction is observed
     during RAC. *)
@@ -63,14 +63,6 @@ val eval_global_fundef :
 
 exception CannotImportModelValue of string
 
-val eval_rs :
-  abs:bool -> (* execute abstractly *)
-  Env.env ->
-  Pdecl.known_map ->
-  Decl.known_map ->
-  Model_parser.model ->
-  Expr.Mrs.key ->
-  result
 
 val maybe_ce_model_rs :
   Env.env ->

@@ -170,26 +170,6 @@ let v_desc v = v.v_desc
 let v_ty v = v.v_ty
 let field_get (Field r) = r.contents
 
-let rec snapshot v = match v.v_desc with
-  | Vconstr (rs, fs) ->
-      let fs = List.map snapshot_field fs in
-      {v with v_desc= Vconstr (rs, fs)}
-  | Vfun (cl, vs, e) ->
-      let cl = Mvs.map snapshot cl in
-      {v with v_desc= Vfun (cl, vs, e)}
-  | Vpurefun (ty, mv, v) ->
-      let mv = Mv.fold (fun k v -> Mv.add (snapshot k) (snapshot v)) mv Mv.empty in
-      {v with v_desc= Vpurefun (ty, mv, snapshot v)}
-  | Varray a ->
-      let a = Array.map snapshot a in
-      {v with v_desc= Varray a}
-  | Vfloat _ | Vstring _ | Vterm _ | Vbool _
-  | Vreal _ | Vfloat_mode _ | Vvoid | Vnum _ ->
-      v
-
-and snapshot_field f =
-  field (snapshot (field_get f))
-
 let rec print_value fmt v =
   match v.v_desc with
   | Vnum n ->
@@ -233,6 +213,21 @@ let rec print_value fmt v =
       fprintf fmt "(term:@ %a)" Pretty.print_term t
 
 and print_field fmt f = print_value fmt (field_get f)
+
+let rec snapshot v =
+  let v_desc = match v.v_desc with
+    | Vconstr (rs, fs) -> Vconstr (rs, List.map snapshot_field fs)
+    | Vfun (cl, vs, e) -> Vfun (Mvs.map snapshot cl, vs, e)
+    | Vpurefun (ty, mv, v) ->
+        let mv = Mv.(fold (fun k v -> add (snapshot k) (snapshot v)) mv empty) in
+        Vpurefun (ty, mv, snapshot v)
+    | Varray a -> Varray (Array.map snapshot a)
+    | Vfloat _ | Vstring _ | Vterm _ | Vbool _ | Vreal _
+    | Vfloat_mode _ | Vvoid | Vnum _ as vd -> vd in
+  {v with v_desc}
+
+and snapshot_field f =
+  field (snapshot (field_get f))
 
 let rec term_of_value env v =
   let rec term_of_value' mt v : ty Mtv.t * term =
@@ -329,12 +324,13 @@ type env =
     funenv    : Expr.cexp Mrs.t;
     vsenv     : value Mvs.t;
     ce_model  : Model_parser.model;
-    env       : Env.env
-  }
+    env       : Env.env }
 
 let default_env env =
   { mod_known = Mid.empty; th_known = Mid.empty; funenv = Mrs.empty;
     vsenv = Mvs.empty; ce_model = Model_parser.default_model; env }
+
+let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
 let add_local_funs locals env =
   let add acc (rs, ce) = Mrs.add rs ce acc in
@@ -749,10 +745,8 @@ let find_definition env (rs: rsymbol) =
 type cntr_ctx =
   { c_desc: string;
     c_trigger_loc: Loc.position option;
-    c_env: Env.env; (* to get builtins in Reduction_engine.create *)
-    c_known: Decl.known_map; (* becomes Reduction_engine.engine.known_map *)
-    c_rule_terms: term Mid.t;
-    c_vsenv: term Mvs.t }
+    c_env: env;
+  }
 
 exception Contr of cntr_ctx * term
 
@@ -807,17 +801,54 @@ let add_fun_to_known rs cexp known =
     Mid.add rs.rs_name decl known
   with Exit -> known
 
-let cntr_ctx desc ?trigger_loc ?(vsenv = Mvs.empty) env =
-  let rule_terms = Mid.map_filter rule_term env.th_known in
-  let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
-  let env_vsenv = Mvs.map (term_of_value env.env) env.vsenv in
-  let vsenv = Mvs.union (fun _ _ t -> Some t) vsenv env_vsenv in
-  { c_env= env.env;
-    c_desc= desc;
+let cntr_ctx desc ?trigger_loc env =
+  { c_desc= desc;
     c_trigger_loc= trigger_loc;
-    c_known= known;
-    c_rule_terms= rule_terms;
-    c_vsenv= vsenv }
+    c_env= snapshot_env env}
+
+(* VISITED LOCATIONS *)
+
+(* A spurious model element has a location that has not been encountered during RAC.
+
+   TODO Models with spurious elements are considered invalid.
+
+   To identify spurious model elements, we collect initially the location of all variable
+   declarations, and during RAC the locations of all encountered expressions and function
+   parameters. Finally, we check for model elements with locations that have not been
+   recorded. *)
+
+let reset_visited_locs, visit_loc, visited_all_model_locs =
+  let visited = Hstr.create 7 in
+  let reset () =
+    Hstr.reset visited in
+  let visit loc =
+    let f, l, _, _ = Loc.get loc in
+    let lines =
+      try Hstr.find visited f
+      with Not_found -> Sint.empty in
+    Hstr.replace visited f (Sint.add l lines) in
+  let check model =
+    let pp_visited fmt =
+      let pp_f_ls f ls = fprintf fmt "%s:%a" f (Pp.print_list Pp.comma Pp.int) (Sint.elements ls) in
+      Hstr.iter pp_f_ls visited in
+    Debug.dprintf debug_rac "@[<hov2>Visited: %t@]@." pp_visited;
+    let not_visited =
+      List.filter (fun (f, l) -> let lines = Hstr.find_def visited Sint.empty f in not (Sint.mem l lines))
+        (List.map (fun loc -> let f, l, _, _ = Loc.get loc in f, l)
+           (Lists.map_filter (fun me -> me.Model_parser.me_location)
+              (Model_parser.get_model_elements model))) in
+    if not_visited <> [] then (
+      let pp_f_l fmt (f, l) = fprintf fmt "%s:%d" f l in
+      Debug.dprintf debug_rac "@[<hov2>Not visited %a@]@." (Pp.print_list Pp.space pp_f_l) not_visited );
+    not_visited = [] in
+  reset, visit, check
+
+(** Iterate the locations of variable declarations in [known] with function [f]. **)
+let iter_decl_locs f known =
+  let visit_decl d = let open Pdecl in match d.pd_node with
+    | PDlet (LDvar (pv, _)) -> Opt.iter f pv.pv_vs.vs_name.id_loc
+    | _ -> () in
+  Mid.iter (fun _ -> visit_decl) known
 
 (* TERM EVALUATION *)
 
@@ -851,23 +882,27 @@ let fix_vsenv_value vs t (vsenv, mt, mv) =
     @param t Term to be evaluated
     @return A reduction of term [t]
   *)
-let reduce_term ?(mt = Mtv.empty) ?(mv = Mvs.empty) env known rule_terms vsenv t =
+let reduce_term ?(mt = Mtv.empty) ?(mv = Mvs.empty) env t =
   let open Reduction_engine in
   let params =
     { compute_builtin= true;
       compute_defs= true;
       compute_def_set= Sls.empty } in
-  let eng = create params env known in
+  let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
+  let eng = create params env.env known in
+  let rule_terms = Mid.map_filter rule_term env.th_known in
   let eng = Mid.fold try_add_rule rule_terms eng in
+  let vsenv = Mvs.map (term_of_value env.env) env.vsenv in
   let vsenv, mt, mv = Mvs.fold fix_vsenv_value vsenv (Mvs.empty, mt, mv) in
   let t = t_ty_subst mt mv t in
   normalize ~limit:1000 eng vsenv t
 
 (** Evaluate a term and raise an exception [Contr] if the result is false. *)
 let check_term ctx t =
+  Opt.iter visit_loc t.t_loc;
   (* TODO raise NoContrdiction / CannotEvaluate if [t] corresponds to the goal of the CE
      and reduces to true / cannot be reduced. *)
-  match reduce_term ctx.c_env ctx.c_known ctx.c_rule_terms ctx.c_vsenv t with
+  match reduce_term ctx.c_env t with
   | {t_node= Ttrue} ->
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "is ok", t)
@@ -885,16 +920,15 @@ let check_terms ctx = List.iter (check_term ctx)
 
 (* Check a post-condition [t] by binding the result variable to
    the term [vt] representing the result value. *)
-let check_post ctx vt post =
+let check_post ctx v post =
   let vs, t = open_post post in
-  let ctx = {ctx with c_vsenv= Mvs.add vs vt ctx.c_vsenv} in
+  let ctx = {ctx with c_env= {ctx.c_env with vsenv= Mvs.add vs v ctx.c_env.vsenv}} in
   check_term ctx t
 
 let check_posts desc loc env oldies v posts =
   let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
   let ctx = cntr_ctx desc ?trigger_loc:loc env in
-  let vt = term_of_value env.env v in
-  List.iter (check_post ctx vt) posts
+  List.iter (check_post ctx v) posts
 
 (* EXPRESSION EVALUATION *)
 
@@ -959,7 +993,7 @@ let get_model_value model name loc =
   Opt.map (fun me -> me.me_value)
     (List.find_opt aux (Model_parser.get_model_elements model))
 
-let model_value pv model =
+let model_value model pv =
   Opt.bind pv.pv_vs.vs_name.id_loc
     (get_model_value model pv.pv_vs.vs_name.id_string)
 
@@ -1066,12 +1100,9 @@ let exec_pure env ls pvs =
     match Decl.find_logic_definition env.th_known ls with
     | Some defn ->
         let vs, t = Decl.open_ls_defn defn in
-        let rule_terms = Mid.map_filter rule_term env.th_known in
-        let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
         let args = List.map (get_pvs env) pvs in
         let vsenv = List.fold_right2 Mvs.add vs args env.vsenv in
-        let vsenv = Mvs.map (term_of_value env.env) vsenv in
-        let t = reduce_term env.env known rule_terms vsenv t in
+        let t = reduce_term {env with vsenv} t in
         (* TODO A variable x binding the result of exec pure are used as (x = True) in
            subsequent terms, so we map true/false to True/False here. Is this reasonable? *)
         let t = fix_boolean_term t in
@@ -1099,6 +1130,7 @@ let rec eval_expr ~rac ~abs env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
     (if abs then "Abs. " else "Con. ")
     (pp_limited print_expr) e;
+  Opt.iter visit_loc e.e_loc;
   let res = eval_expr' ~rac ~abs env e in
   Debug.dprintf debug "@[<h>%t -> %a@]@." pp_indent (print_result) res;
   res
@@ -1421,11 +1453,7 @@ and eval_expr' ~rac ~abs env e =
       eval_expr ~rac ~abs env e1
   | Epure t ->
       Debug.dprintf debug "@[<h>%tEVAL EXPR: PURE %a@]@." pp_indent Pretty.print_term t;
-      let t =
-        let rule_terms = Mid.map_filter rule_term env.th_known in
-        let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
-        let vsenv = Mvs.map (term_of_value env.env) env.vsenv in
-        reduce_term env.env known rule_terms vsenv t in
+      let t = reduce_term env t in
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
       eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
@@ -1446,6 +1474,7 @@ and exec_match ~rac ~abs env t ebl =
   iter ebl
 
 and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
+  List.iter (Opt.iter visit_loc) (List.map (fun pv -> pv.pv_vs.vs_name.id_loc) arg_pvs);
   let arg_vs = List.map (get_pvs env) arg_pvs in
   Debug.dprintf debug "@[<h>%tExec call %a %a@]@."
     pp_indent print_rs rs Pp.(print_list space print_value) arg_vs;
@@ -1530,12 +1559,12 @@ and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
-let make_global_env ?model env known =
+let make_global_env ?(model=Model_parser.default_model) env known =
   let add_glob _id d acc =
     match d.Pdecl.pd_node with
     | Pdecl.PDlet (LDvar (pv, _e)) ->
         (* TODO evaluate _e! *)
-        let v = match Opt.bind model (model_value pv) with
+        let v = match model_value model pv with
           | Some v -> import_model_value env known pv.pv_ity  v
           | None -> default_value_of_type env known pv.pv_ity in
         Mvs.add pv.pv_vs v acc
@@ -1558,7 +1587,7 @@ let eval_global_fundef ~rac env mod_known mod_theory locals body =
 
 let eval_rs ~abs env mod_known th_known model (rs: rsymbol) =
   let get_value pv =
-    match model_value pv model with
+    match model_value model pv with
     | Some mv ->
         import_model_value env mod_known pv.pv_ity mv
     | None ->
@@ -1572,21 +1601,48 @@ let eval_rs ~abs env mod_known th_known model (rs: rsymbol) =
   let env = { (default_env env) with mod_known; th_known;
                                      vsenv; ce_model = model} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
-  exec_call ~rac:true ~abs env rs rs.rs_cty.cty_args rs.rs_cty.cty_result
+  let res = exec_call ~rac:true ~abs env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
+  res, env
+
+let check_equals loc env exec_value model_value =
+  let ctx = cntr_ctx "Model value equality" ?trigger_loc:loc env in
+  let t1 = term_of_value env.env exec_value in
+  let t2 = term_of_value env.env model_value in
+  try check_term ctx (t_equ t1 t2); true
+  with Contr _ -> false
+
+let values_match env m =
+  let aux vs v1 =
+    match restore_pv vs with
+    | exception Not_found -> true
+    | pv -> match model_value m pv with
+      | None -> true
+      | Some mv2 ->
+          let v2 = import_model_value env.env env.mod_known pv.pv_ity mv2 in
+          check_equals pv.pv_vs.vs_name.id_loc env v1 v2 in
+  Mvs.for_all aux env.vsenv
+
+let generate_warnings env model =
+  if not (visited_all_model_locs model) then
+    printf "Warning: Model contains spurious values for \
+            locations that were not encountered during RAC@.";
+  if not (values_match env model) then
+    printf "Warning: RAC detected value divergence@."
 
 let maybe_ce_model_rs env pm model rs =
   let open Pmodule in
-  let open Theory in
   Debug.dprintf debug_rac "Validating model: %a@."
     (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) model;
+  reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
-    ignore (eval_rs ~abs:false env pm.mod_known pm.mod_theory.th_known model rs);
+    let _, env = eval_rs ~abs:false env pm.mod_known pm.mod_theory.Theory.th_known model rs in
+    generate_warnings env model;
     printf "RAC does not confirm the counter-example (no contradiction \
             during execution)@.";
     None
   with
-  | Contr (_, t) when Opt.equal Loc.equal
-        (Model_parser.get_model_term_loc model) t.Term.t_loc ->
+  | Contr (ctx, t) when Opt.equal Loc.equal (Model_parser.get_model_term_loc model) t.Term.t_loc ->
+      generate_warnings ctx.c_env model;
       printf "RAC confirms the counter-example@.";
       Some true
   | Contr (_, t) ->
