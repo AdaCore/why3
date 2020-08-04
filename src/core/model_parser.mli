@@ -251,6 +251,19 @@ val interleave_with_source :
     were added.
 *)
 
+(** Result when checking a CE model *)
+
+type verdict = Good_model | Bad_model | Dont_know
+type full_verdict = {verdict: verdict; reason: string; warnings: string list}
+
+val print_full_verdict : full_verdict Pp.pp
+
+type check_model = model -> full_verdict
+(** Check the validity of a CE model. *)
+
+val default_check_model : check_model
+(** Completely incomplete model check *)
+
 (*
 ***************************************************************
 **  Filtering the model

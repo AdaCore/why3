@@ -1057,6 +1057,20 @@ let model_for_positions_and_decls model ~positions =
     Mstr.fold add_first_model_line model.model_files model_filtered in
   {model with model_files= model_filtered}
 
+type verdict = Good_model | Bad_model | Dont_know
+type full_verdict = {verdict: verdict; reason: string; warnings: string list}
+
+let print_full_verdict fmt v =
+  let s = match v.verdict with
+    | Good_model -> "good model"
+    | Bad_model -> "bad model"
+    | Dont_know -> "don't know" in
+  fprintf fmt "%s (%s, %d warnings)" s v.reason (List.length v.warnings)
+
+type check_model = model -> full_verdict
+
+let default_check_model (_: model) = {verdict= Dont_know; reason= ""; warnings= []}
+
 (*
 ***************************************************************
 ** Registering model parser

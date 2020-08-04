@@ -19,6 +19,7 @@ open Ity
 open Expr
 open Big_real
 open Mlmpfr_wrapper
+open Model_parser
 
 let pp_indent fmt =
   match Printexc.(backtrace_slots (get_callstack 100)) with
@@ -323,12 +324,12 @@ type env =
     th_known  : Decl.known_map;
     funenv    : Expr.cexp Mrs.t;
     vsenv     : value Mvs.t;
-    ce_model  : Model_parser.model;
+    ce_model  : model;
     env       : Env.env }
 
 let default_env env =
   { mod_known = Mid.empty; th_known = Mid.empty; funenv = Mrs.empty;
-    vsenv = Mvs.empty; ce_model = Model_parser.default_model; env }
+    vsenv = Mvs.empty; ce_model = default_model; env }
 
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
@@ -835,8 +836,8 @@ let reset_visited_locs, visit_loc, visited_all_model_locs =
     let not_visited =
       List.filter (fun (f, l) -> let lines = Hstr.find_def visited Sint.empty f in not (Sint.mem l lines))
         (List.map (fun loc -> let f, l, _, _ = Loc.get loc in f, l)
-           (Lists.map_filter (fun me -> me.Model_parser.me_location)
-              (Model_parser.get_model_elements model))) in
+           (Lists.map_filter (fun me -> me.me_location)
+              (get_model_elements model))) in
     if not_visited <> [] then (
       let pp_f_l fmt (f, l) = fprintf fmt "%s:%d" f l in
       Debug.dprintf debug_rac "@[<hov2>Not visited %a@]@." (Pp.print_list Pp.space pp_f_l) not_visited );
@@ -986,12 +987,11 @@ let fix_boolean_term t =
   if t_equal t t_false then t_bool_false else t
 
 let get_model_value model name loc =
-  let open Model_parser in
   let aux me =
     me.me_name.men_name = name &&
     Opt.equal Loc.equal me.me_location (Some loc) in
   Opt.map (fun me -> me.me_value)
-    (List.find_opt aux (Model_parser.get_model_elements model))
+    (List.find_opt aux (get_model_elements model))
 
 let model_value model pv =
   Opt.bind pv.pv_vs.vs_name.id_loc
@@ -1001,7 +1001,6 @@ exception CannotImportModelValue of string
 
 (* TODO Remove argument [env] after replacing Varray by model substitution *)
 let rec import_model_value env known ity v =
-  let open Model_parser in
   (* TODO If the type has a model projection `p` and the model value is a
      projection `p _ = v`, we could add this equality as a rule to the
      reduction engine. (Cf. bench/ce/oracles/double_projection.mlw) *)
@@ -1021,7 +1020,7 @@ let rec import_model_value env known ity v =
    *   | Ityreg r -> its_equal r.reg_its its_array
    *   | _ -> false in *)
   (* if is_ity_array env ity then (\* TODO *\)
-   *   kasprintf failwith "ARRAY: %a@." Model_parser.print_model_value v
+   *   kasprintf failwith "ARRAY: %a@." print_model_value v
    * else *)
   if is_range_type_def def.Pdecl.itd_its.its_def then
     match v with
@@ -1559,7 +1558,7 @@ and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
-let make_global_env ?(model=Model_parser.default_model) env known =
+let make_global_env ?(model=default_model) env known =
   let add_glob _id d acc =
     match d.Pdecl.pd_node with
     | Pdecl.PDlet (LDvar (pv, _e)) ->
@@ -1622,55 +1621,54 @@ let values_match env m =
           check_equals pv.pv_vs.vs_name.id_loc env v1 v2 in
   Mvs.for_all aux env.vsenv
 
-let generate_warnings env model =
-  if not (visited_all_model_locs model) then
-    printf "Warning: Model contains spurious values for \
-            locations that were not encountered during RAC@.";
-  if not (values_match env model) then
-    printf "Warning: RAC detected value divergence@."
+let warnings env model =
+  if visited_all_model_locs model then [] else
+    ["Warning: Model contains spurious values for \
+      locations that were not encountered during RAC"] @
+  if values_match env model then [] else
+    ["Warning: RAC detected value divergence"]
 
-let maybe_ce_model_rs env pm model rs =
+let check_model_rs env pm model rs =
   let open Pmodule in
   Debug.dprintf debug_rac "Validating model: %a@."
-    (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) model;
+    (print_model ?me_name_trans:None ~print_attrs:false) model;
   reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
     let _, env = eval_rs ~abs:false env pm.mod_known pm.mod_theory.Theory.th_known model rs in
-    generate_warnings env model;
-    printf "RAC does not confirm the counter-example (no contradiction \
-            during execution)@.";
-    None
+    let reason= "RAC does not confirm the counter-example, no contradiction \
+               during execution" in
+    { verdict= Dont_know; reason; warnings= warnings env model}
   with
-  | Contr (ctx, t) when Opt.equal Loc.equal (Model_parser.get_model_term_loc model) t.Term.t_loc ->
-      generate_warnings ctx.c_env model;
-      printf "RAC confirms the counter-example@.";
-      Some true
-  | Contr (_, t) ->
-      printf "RAC found a contradiction at different location %a@."
-        (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc;
-      None
+  | Contr (ctx, t) when Opt.equal Loc.equal (get_model_term_loc model) t.Term.t_loc ->
+      let reason= "RAC confirms the counter-example" in
+      { verdict= Good_model; reason; warnings= warnings ctx.c_env model}
+  | Contr (ctx, t) ->
+      let reason = asprintf
+          "RAC found a contradiction at different location %a"
+          (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
+      {verdict= Dont_know; reason; warnings= warnings ctx.c_env model}
   | CannotImportModelValue msg ->
-      printf "RAC impossible: Cannot import model value: %s@." msg;
-      None
+      let reason = sprintf "Cannot import value from model: %s" msg in
+      {verdict= Dont_know; reason; warnings= []}
   | CannotCompute ->
      (* TODO E.g., bad default value for parameter and cannot evaluate
         pre-condition *)
-      printf "RAC execution got stuck.@.";
-      None
+      let reason = "RAC execution got stuck" in
+      {verdict= Dont_know; reason; warnings= []}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
          term for constructor that is not a function *)
-      printf "RAC failure: %s@." msg;
-      None
-  (* | AbstractExEnded l ->
-   *    printf "Abstractly RAC cannot continue after %a@."
-   *      (Pp.print_option Pretty.print_loc) l;
-   *    None
+      let reason = sprintf "RAC failure: %ss" msg in
+      {verdict= Dont_know; reason; warnings= []}
+(* | AbstractExEnded l ->
+   *    let reason = asprintf "Abstractly RAC cannot continue after %a@."
+   *      (Pp.print_option Pretty.print_loc) l in
+   *    {verdict= Dont_know; reason; warnings= []}
    * | InvCeInfraction l ->
-   *    printf "Abstraclty RAC: counter-example model is not consistent \
-   *            with the invariant %a@."
-   *      (Pp.print_option Pretty.print_loc) l;
-   *    None *)
+   *    let reason = asprintf "Abstraclty RAC: counter-example model
+   *            is not consistent with the invariant %a@."
+   *      (Pp.print_option Pretty.print_loc) l in
+   *    {verdict= Dont_know; reason; warnings= []} *)
 
 (** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
     Relies on [get_multiline] and fails under the same conditions. *)
@@ -1717,16 +1715,23 @@ let find_rs pm loc =
   | () -> raise Not_found
   | exception Found rs -> rs
 
-let maybe_ce_model env pm m =
-  try
-    let loc = Opt.get_exn Not_found (Model_parser.get_model_term_loc m) in
+let check_model env pm m =
+  match get_model_term_loc m with
+  | None ->
+      let reason = "No model term location" in
+      {verdict= Dont_know; reason; warnings= []}
+  | Some loc ->
     if let f, _, _, _ = Loc.get loc in Sys.file_exists f then
-      (* TODO deal with VC from variable declarations and type declarations *)
-      let rs = find_rs pm loc in
-      maybe_ce_model_rs env pm m rs
+      (* TODO deal with VCs from variable declarations and type declarations *)
+      (* TODO deal with VCs from goal definitions *)
+      match find_rs pm loc with
+      | rs -> check_model_rs env pm m rs
+      | exception Not_found ->
+          let reason = "No corresponding routine symbol found" in
+          {verdict= Dont_know; reason; warnings= []}
     else
-      None
-  with Not_found -> None
+      let reason = "Source file does not exist, cannot apply Loc.get_multiline" in
+      {verdict= Dont_know; reason; warnings= [] }
 
 let report_eval_result body fmt (res, final_env) =
   match res with

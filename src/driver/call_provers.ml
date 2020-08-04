@@ -208,9 +208,7 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-type maybe_ce_model = Model_parser.model -> bool option
-
-let analyse_result ?(maybe_ce_model=fun _ -> None) exit_result res_parser printer_mapping out =
+let analyse_result ?(maybe_ce_model=default_check_model) exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
   let list_re = List.map (fun (a, b) -> Re.Str.regexp a, b) list_re in
@@ -229,10 +227,10 @@ let analyse_result ?(maybe_ce_model=fun _ -> None) exit_result res_parser printe
   let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        let use_incremental_choice = false in
         (* Search for the first model that is certainly valid (maybe_ce_model m = Some
            true) (if exists), or the first model that is not certainly invalid
            (maybe_ce_model m = None) *)
+        let use_incremental_choice = false in
         let rec select save i = function
           | [] -> Debug.dprintf debug "Select %s CE model %a@." (if save = None then "no" else "saved")
                     (Pp.print_option Pp.int) (Opt.map fst save);
@@ -243,10 +241,12 @@ let analyse_result ?(maybe_ce_model=fun _ -> None) exit_result res_parser printe
                 select save (succ i) ms (* Discard empty model *)
               ) else (
                 Debug.dprintf debug "Check model %d@." i;
-                match maybe_ce_model m with
-                | Some false -> select save (succ i) ms (* Discard bad model *)
-                (* | Some true -> Debug.dprintf debug "Select good CE model@."; Some m (\* Select good model *\)
-                 * | None -> *)
+                let v = maybe_ce_model m in
+                printf "%s@" (verdict_reason v);
+                match v with
+                | Model_parser.Bad_model _ -> select save (succ i) ms (* Discard bad model *)
+                (* | Model_parser.Good_model _ -> Debug.dprintf debug "Select good CE model@."; Some m (\* Select good model *\)
+                 * | Model_parser.Dont_know -> *)
                 | _ ->
                     match res with (* Save dontknow model in non-incremental mode *)
                     | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout")
@@ -407,7 +407,7 @@ type save_data = {
   limit      : resource_limit;
   res_parser : prover_result_parser;
   printer_mapping : Printer.printer_mapping;
-  maybe_ce_model : maybe_ce_model option;
+  check_model : check_model option;
 }
 
 let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
@@ -437,8 +437,8 @@ let handle_answer answer =
       let out = read_and_delete_file out_file in
       let ret = exit_code in
       let printer_mapping = save.printer_mapping in
-      let ans = parse_prover_run save.res_parser
-          timeout time out ret save.limit save.maybe_ce_model ~printer_mapping in
+      let ans = parse_prover_run save.res_parser timeout time out ret
+          save.limit save.check_model ~printer_mapping in
       id, Some ans
   | Started id ->
       id, None
@@ -451,7 +451,7 @@ type prover_call =
   | EditorCall of int
 
 let call_on_file ~command ~limit ~res_parser ~printer_mapping
-    ?maybe_ce_model ?(inplace=false) fin =
+    ?check_model ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
     actualcommand ~cleanup:true ~inplace command limit fin in
@@ -461,7 +461,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
     limit      = limit;
     res_parser = res_parser;
     printer_mapping = printer_mapping;
-    maybe_ce_model = maybe_ce_model } in
+    check_model = check_model } in
   Hashtbl.add saved_data id save;
   let limit = adapt_limits limit on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
@@ -546,7 +546,7 @@ let rec wait_on_call = function
       editor_result ret
 
 let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
-    ~gen_new_file ?maybe_ce_model ?(inplace=false) buffer =
+    ~gen_new_file ?check_model ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
       Filename.open_temp_file "why_" ("_" ^ filename)
@@ -559,7 +559,7 @@ let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
       end
   in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace ?maybe_ce_model fin
+  call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace ?check_model fin
 
 let call_editor ~command fin =
   let command, use_stdin, _ =

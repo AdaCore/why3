@@ -273,11 +273,11 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ~limit ~gen_new_file ?maybe_ce_model ?inplace ~filename
+let call_on_buffer ~command ~limit ~gen_new_file ?check_model ?inplace ~filename
     ~printer_mapping drv buffer =
   Call_provers.call_on_buffer
     ~command ~limit ~gen_new_file ~res_parser:drv.drv_res_parser
-    ~filename ~printer_mapping ?maybe_ce_model ?inplace buffer
+    ~filename ~printer_mapping ?check_model ?inplace buffer
 
 (** print'n'prove *)
 
@@ -400,7 +400,7 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         true, get_filename drv fn "T" pr.pr_name.id_string
 
-let prove_task_prepared ~command ~limit ?maybe_ce_model ?old ?inplace ?interactive drv task =
+let prove_task_prepared ~command ~limit ?check_model ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let gen_new_file, filename =
@@ -410,14 +410,14 @@ let prove_task_prepared ~command ~limit ?maybe_ce_model ?old ?inplace ?interacti
   pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =
-    call_on_buffer ~command ~limit ~gen_new_file ?maybe_ce_model
+    call_on_buffer ~command ~limit ~gen_new_file ?check_model
                    ?inplace ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 
-let prove_task ~command ~limit ?maybe_ce_model ?old ?inplace ?interactive drv task =
+let prove_task ~command ~limit ?check_model ?old ?inplace ?interactive drv task =
   let task = prepare_task drv task in
-  prove_task_prepared ~command ~limit ?maybe_ce_model ?interactive ?old ?inplace drv task
+  prove_task_prepared ~command ~limit ?check_model ?interactive ?old ?inplace drv task
 
 (* exception report *)
 
