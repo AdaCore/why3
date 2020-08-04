@@ -1073,12 +1073,17 @@ let rec import_model_value env known ity v =
         value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
     | Proj (s, mv) ->
         check_construction def;
-        let matching_name rs = String.equal rs.rs_name.id_string s in
-        let rs = List.find matching_name def.Pdecl.itd_constructors in
+        let rs = match def.Pdecl.itd_constructors with
+          | [rs] -> rs
+          | [] ->
+              eprintf "Cannot import projection to type without constructor";
+              raise CannotCompute
+          | _ -> failwith "(Singleton) record constructor expected" in
         let import_or_default field_pv =
           let ity = ity_full_inst subst field_pv.pv_ity in
-          if String.equal field_pv.pv_vs.vs_name.id_string s
-          then import_model_value env known ity mv
+          let name = field_pv.pv_vs.vs_name.id_string and attrs = field_pv.pv_vs.vs_name.id_attrs in
+          if String.equal (Ident.get_model_trace_string ~name ~attrs) s then
+            import_model_value env known ity mv
           else default_value_of_type env known ity in
         let fs = List.map import_or_default rs.rs_cty.cty_args in
         value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
