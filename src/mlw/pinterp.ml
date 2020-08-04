@@ -106,16 +106,26 @@ end = struct
     | Vpurefun of ty (* keys *) * value Mv.t * value
     | Vterm of term
   and field = Field of value ref
-  let (<?>) c (cmp,x,y) = if c = 0 then cmp x y else c
-  let rec compare_lists c l1 l2 : int = match l1, l2 with
-    | h1::t1, h2::t2 -> c h1 h2 <?> (compare_lists c, t1, t2)
-    | _ -> List.compare_lengths l1 l2
-  let rec compare_values v1 v2 : int =
-    ty_compare v1.v_ty v2.v_ty <?> (compare_desc, v1.v_desc, v2.v_desc)
+
+  type _ cmp = Cmp : ('a -> 'b) * ('b -> 'b -> int) -> 'a cmp
+  let rec cmp ls x y = match ls with
+    | [] -> 0 | Cmp (f, c) :: ls -> match c (f x) (f y) with
+        0 -> cmp ls x y | n -> n
+  let rec cmp_lists ls l1 l2 = match l1, l2 with
+    | h1::t1, h2::t2 ->
+        let ls = [Cmp (fst, cmp ls); Cmp (snd, cmp_lists ls)] in
+        cmp ls (h1, t1) (h2, t2)
+    | [], _ -> -1 | _, [] -> 1
+
+  let rec compare_values v1 v2 =
+    let v_ty v = v.v_ty and v_desc v = v.v_desc in
+    cmp [Cmp (v_ty, ty_compare); Cmp (v_desc, compare_desc)] v1 v2
   and compare_desc d1 d2 =
     match d1, d2 with
     | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
-        rs_compare rs1 rs2 <?> (compare_lists compare_fields, fs1, fs2)
+        let field_get (Field f) = !f in
+        let cmp_fields = cmp_lists [Cmp (field_get, compare_values)] in
+        cmp [Cmp (fst, rs_compare); Cmp (snd, cmp_fields)] (rs1, fs1) (rs2, fs2)
     | Vconstr _, _ -> -1 | _, Vconstr _ -> 1
     | Vnum i1, Vnum i2 ->
         BigInt.compare i1 i2
@@ -142,19 +152,19 @@ end = struct
         failwith "Value.compare: Vfun"
     | Vfun _, _ -> -1 | _, Vfun _ -> 1
     | Vpurefun (ty1, mv1, v1), Vpurefun (ty2, mv2, v2) ->
-        ty_compare ty1 ty2 <?> (compare, v1, v2)
-        <?> (Mv.compare compare, mv1, mv2)
+        cmp [
+          Cmp ((fun (x,_,_) -> x), ty_compare);
+          Cmp ((fun (_,x,_) -> x), Mv.compare compare_values);
+          Cmp ((fun (_,_,x) -> x), compare_values)
+        ] (ty1, mv1, v1) (ty2, mv2, v2)
     | Vpurefun _, _ -> -1 | _, Vpurefun _ -> 1
     | Vterm t1, Vterm t2 ->
         t_compare t1 t2
     | Vterm _, _ -> -1 | _, Vterm _ -> 1
     | Varray a1, Varray a2 ->
-        let rec loop n a1 a2 =
-          if n = 0 then 0
-          else compare a1.(n-1) a2.(n-1) <?> (loop (pred n), a1, a2) in
-        Array.length a2 - Array.length a1 <?> (loop (Array.length a1), a1, a2)
-  and compare_fields (Field r1) (Field r2) =
-    compare !r1 !r2
+        cmp [Cmp (Array.length, (-));
+             Cmp (Array.to_list, cmp_lists [Cmp ((fun x -> x), compare_values)])]
+          a1 a2
 end
 and Mv : Map.S with type key = Value.value =
   Map.Make (struct
