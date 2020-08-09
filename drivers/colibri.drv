@@ -1,0 +1,128 @@
+(** Why3 driver for Colibri (with floating point support) *)
+
+prelude ";; produced by colibri.drv ;;"
+prelude "(set-logic QF_NIRABVFP)"
+prelude "(set-info :smt-lib-version 2.6)"
+
+import "smt-libv2.gen"
+printer "smtv2"
+import "smt-libv2-bv.gen"
+import "cvc4_bv.gen"
+import "smt-libv2-floats.gen"
+(* import "discrimination.gen" *)
+
+theory BuiltIn
+(* Since quantifiers are all removed we can fully discriminate *)
+  meta "select_inst_default" "all"
+  meta "select_lskept_default" "all"
+  meta "select_lsinst_default" "all"
+  meta "select_kept_default" "all"
+end
+
+
+transformation "inline_trivial"
+transformation "simplify_trivial_quantification"
+transformation "simplify_formula"
+transformation "eliminate_builtin"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_literal"
+transformation "eliminate_epsilon"
+transformation "simplify_formula"
+
+(* Prepare for counter-example query: get rid of some quantifiers
+   (makes it possible to query model values of the variables in
+   premises) and introduce counter-example projections.  Note: does
+   nothing if meta get_counterexmp is not set *)
+transformation "prepare_for_counterexmp"
+
+transformation "introduce_premises"
+transformation "instantiate_predicate"
+transformation "abstract_quantifiers"
+
+transformation "discriminate"
+transformation "eliminate_poly_unused_or_fail"
+transformation "eliminate_unknown_ty_constr"
+
+transformation "abstract_quantifiers"
+
+(** Extra theories supported by COLIBRI *)
+
+theory int.EuclideanDivision
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
+  remove prop Mod_bound
+  remove prop Div_mod
+  remove prop Mod_1
+  remove prop Div_1
+end
+
+theory int.ComputerDivision
+  syntax function div "(colibri_cdiv %1 %2)"
+  syntax function mod "(colibri_crem %1 %2)"
+  remove prop Mod_bound
+  remove prop Div_mod
+  remove prop Mod_1
+  remove prop Div_1
+end
+
+theory real.Truncate
+  syntax function floor "(to_int %1)"
+  overriding syntax function truncate "(to_int (colibri_truncate %1))"
+  overriding syntax function ceil "(to_int (colibri_ceil %1))"
+  remove prop Floor_down
+  remove prop Floor_monotonic
+end
+
+theory real.FromInt
+  syntax function from_int "(to_real %1)"
+end
+
+theory real.Abs
+  overriding syntax function abs "(colibri_abs_real %1)"
+end
+
+theory int.Abs
+  syntax function abs "(colibri_abs_int %1)"
+end
+
+theory real.PowerInt
+  syntax function power "(colibri_pow_real_int %1 %2)"
+end
+
+theory int.Power
+  syntax function power "(colibri_pow_int_int %1 %2)"
+end
+
+theory real.ExpLog
+  syntax function exp "(colibri_exp %1)"
+  (* syntax function log "(colibri_ln %1)" *)
+end
+
+theory real.MinMax
+  syntax function min "(colibri_min %1 %2)"
+  syntax function max "(colibri_max %1 %2)"
+end
+
+theory int.MinMax
+  syntax function min "(colibri_min %1 %2)"
+  syntax function max "(colibri_max %1 %2)"
+end
+
+
+(** TODO *)
+
+(**
+- colibri_floor
+- colibri_abs_int
+- colibri_abs_real
+- colibri_truncate
+- colibri_pow_real_int
+- colibri_max
+- colibri_min
+- is_int
+- to_int
+- to_real
+
+*)

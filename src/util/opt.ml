@@ -50,3 +50,5 @@ let compare cmp a b = match a,b with
 let map_fold f acc x = match x with
   | None -> acc, None
   | Some x -> let acc, x = f acc x in acc, Some x
+
+let for_all p = function | None -> true  | Some x -> p x

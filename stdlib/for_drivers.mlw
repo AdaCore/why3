@@ -1,19 +1,141 @@
 theory ComputerOfEuclideanDivision
 
   use int.Int
+  use int.Abs
   use int.EuclideanDivision as ED
   use int.ComputerDivision as CD
 
+
+  let lemma cdiv_cases_0 (n d:int)
+      requires { n >= 0 }
+      requires { d <> 0 }
+      ensures { CD.div n d = ED.div n d } =
+      assert { (ED.div n d) * d + (ED.mod n d) = n = (CD.div n d) * d + (CD.mod n d) };
+      assert { 0 <= (ED.mod n d) < abs d };
+      assert { 0 <= (CD.mod n d) < abs d };
+      assert { - abs d < (CD.mod n d - ED.mod n d) < abs d };
+      assert { (ED.div n d - CD.div n d) * d = (CD.mod n d - ED.mod n d) };
+      if (ED.div n d - CD.div n d) > 0 then begin
+       if d < 0 then absurd else absurd
+      end
+      else if (ED.div n d - CD.div n d) < 0 then begin
+       if d < 0 then absurd else absurd
+      end
+      else
+      ()
+
+  let lemma cdiv_cases_1 (n d:int)
+      requires { n <= 0 }
+      requires { d <> 0 }
+      ensures { CD.div n d = - (ED.div (-n) d) } =
+      assert { -((ED.div (-n) d) * d + (ED.mod (-n) d)) = -(-n) = n = (CD.div n d) * d + (CD.mod n d) };
+      assert { 0 <= (ED.mod (-n) d)  < abs d };
+      assert { 0 <= -(CD.mod n d) < abs d };
+      assert { - abs d < (CD.mod n d + ED.mod (-n) d) < abs d };
+      assert { (ED.div (-n) d + CD.div n d) * d + (CD.mod n d + ED.mod (-n) d) = 0 };
+      if (ED.div (-n) d + CD.div n d) > 0 then begin
+       if d < 0 then absurd else absurd
+      end
+      else if (ED.div (-n) d + CD.div n d) < 0 then begin
+       if d < 0 then absurd else absurd
+      end
+      else
+      ()
+
+
   lemma cdiv_cases : forall n d:int [CD.div n d].
-    ((n >= 0) -> (d > 0) -> CD.div n d = ED.div n d) /\
-    ((n <= 0) -> (d > 0) -> CD.div n d = -(ED.div (-n) d)) /\
-    ((n >= 0) -> (d < 0) -> CD.div n d = -(ED.div n (-d))) /\
-    ((n <= 0) -> (d < 0) -> CD.div n d = ED.div (-n) (-d))
+    ((n >= 0) -> (d <> 0) -> CD.div n d = ED.div n d) /\
+    ((n <= 0) -> (d <> 0) -> CD.div n d = -(ED.div (-n) d))
 
   lemma cmod_cases : forall n d:int [CD.mod n d].
-    ((n >= 0) -> (d > 0) -> CD.mod n d = ED.mod n d) /\
-    ((n <= 0) -> (d > 0) -> CD.mod n d = -(ED.mod (-n) d)) /\
-    ((n >= 0) -> (d < 0) -> CD.mod n d = (ED.mod n (-d))) /\
-    ((n <= 0) -> (d < 0) -> CD.mod n d = -(ED.mod (-n) (-d)))
+    ((n >= 0) -> (d <> 0) -> CD.mod n d = ED.mod n d) /\
+    ((n <= 0) -> (d <> 0) -> CD.mod n d = -(ED.mod (-n) d))
+
+end
+
+theory EuclideanOfComputerDivision
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision as ED
+  use int.ComputerDivision as CD
+
+  let lemma cdiv_cases_0 (n d:int)
+      requires { n >= 0 }
+      requires { d <> 0 }
+      ensures { CD.div n d = ED.div n d } =
+      assert { (ED.div n d) * d + (ED.mod n d) = n = (CD.div n d) * d + (CD.mod n d) };
+      assert { 0 <= (ED.mod n d) < abs d };
+      assert { 0 <= (CD.mod n d) < abs d };
+      assert { - abs d < (CD.mod n d - ED.mod n d) < abs d };
+      assert { (ED.div n d - CD.div n d) * d = (CD.mod n d - ED.mod n d) };
+      if (ED.div n d - CD.div n d) > 0 then begin
+       if d < 0 then absurd else absurd
+      end
+      else if (ED.div n d - CD.div n d) < 0 then begin
+       if d < 0 then absurd else absurd
+      end
+      else
+      ()
+
+  let lemma cdiv_cases_1 (n d:int)
+      requires { n <= 0 }
+      requires { d > 0 }
+      ensures { CD.div n d - (if CD.mod n d = 0 then 0 else 1) = ED.div n d } =
+      assert { ED.div n d * d + (ED.mod n d) = n = (CD.div n d) * d + (CD.mod n d) };
+      if CD.mod n d = 0 then begin
+        ()
+      end else begin
+      assert { ED.div n d * d + (ED.mod n d) = n = (CD.div n d - 1) * d + (CD.mod n d + d) };
+      assert { abs d = d };
+      assert { 0 <= ED.mod n d  < d };
+      assert { 0 < -(CD.mod n d) < d };
+      assert { 0 < CD.mod n d + d < d };
+      assert { -d < - CD.mod n d - d + ED.mod n d < d };
+      assert { (ED.div n d - (CD.div n d - 1)) * d + (- CD.mod n d - d + ED.mod n d) = 0 };
+      if (ED.div n d - (CD.div n d - 1)) > 0 then begin
+       absurd
+      end
+      else if (ED.div n d - (CD.div n d - 1)) < 0 then begin
+       absurd
+      end
+      else
+      ()
+      end
+
+  let lemma cdiv_cases_2 (n d:int)
+      requires { n <= 0 }
+      requires { d < 0 }
+      ensures { CD.div n d + (if CD.mod n d = 0 then 0 else 1) = ED.div n d } =
+      assert { ED.div n d * d + (ED.mod n d) = n = (CD.div n d) * d + (CD.mod n d) };
+      if CD.mod n d = 0 then begin
+        ()
+      end else begin
+      assert { ED.div n d * d + (ED.mod n d) = n = (CD.div n d + 1) * d + (CD.mod n d - d) };
+      assert { abs d = -d };
+      assert { 0 <= ED.mod n d  < -d };
+      assert { 0 < -(CD.mod n d) < -d };
+      assert { d < - CD.mod n d + d < 0 };
+      assert { d < - CD.mod n d + d + ED.mod n d < -d };
+      assert { (ED.div n d - (CD.div n d + 1)) * d + (- CD.mod n d + d + ED.mod n d) = 0 };
+      if (ED.div n d - (CD.div n d + 1)) > 0 then begin
+       absurd
+      end
+      else if (ED.div n d - (CD.div n d + 1)) < 0 then begin
+       absurd
+      end
+      else
+      ()
+      end
+
+  lemma ediv_cases : forall n d:int [ED.div n d].
+    ((n >= 0) -> (d <> 0) -> ED.div n d = CD.div n d) /\
+    ((n <= 0) -> (d > 0) -> ED.div n d = CD.div n d - (if CD.mod n d = 0 then 0 else 1)) /\
+    ((n <= 0) -> (d < 0) -> ED.div n d = CD.div n d + (if CD.mod n d = 0 then 0 else 1))
+
+  lemma emod_cases : forall n d:int [ED.mod n d].
+    ((n >= 0) -> (d <> 0) -> ED.mod n d = CD.mod n d) /\
+    ((n <= 0) -> (d > 0) -> ED.mod n d = CD.mod n d + (if CD.mod n d = 0 then 0 else d)) /\
+    ((n <= 0) -> (d < 0) -> ED.mod n d = CD.mod n d - (if CD.mod n d = 0 then 0 else d))
 
 end
