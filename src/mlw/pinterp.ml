@@ -399,7 +399,7 @@ let eval_int_rel op ls l =
     | [Vnum i1; Vnum i2] -> (
       try Vbool (op i1 i2) with NotNum -> constr ls l )
     | _ -> constr ls l in
-  {v_desc; v_ty= ty_int}
+  {v_desc; v_ty= ty_bool}
 
 (* This initialize Mpfr for float32 behavior *)
 let initialize_float32 () = set_default_prec 24 ; set_emin (-148) ; set_emax 128
