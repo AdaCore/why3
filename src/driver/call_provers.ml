@@ -208,7 +208,7 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-let analyse_result ?(maybe_ce_model=default_check_model) exit_result res_parser printer_mapping out =
+let analyse_result ?(check_model=default_check_model) exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
   let list_re = List.map (fun (a, b) -> Re.Str.regexp a, b) list_re in
@@ -241,11 +241,11 @@ let analyse_result ?(maybe_ce_model=default_check_model) exit_result res_parser 
                 select save (succ i) ms (* Discard empty model *)
               ) else (
                 Debug.dprintf debug "Check model %d@." i;
-                let v = maybe_ce_model m in
-                printf "%s@" (verdict_reason v);
-                match v with
-                | Model_parser.Bad_model _ -> select save (succ i) ms (* Discard bad model *)
-                (* | Model_parser.Good_model _ -> Debug.dprintf debug "Select good CE model@."; Some m (\* Select good model *\)
+                let v = check_model m in
+                printf "Model %d: %a@." i print_full_verdict v;
+                match v.verdict with
+                | Model_parser.Bad_model -> select save (succ i) ms (* Discard bad model *)
+                (* | Model_parser.Good_model -> Debug.dprintf debug "Select good CE model@."; Some m (\* Select good model *\)
                  * | Model_parser.Dont_know -> *)
                 | _ ->
                     match res with (* Save dontknow model in non-incremental mode *)
@@ -301,7 +301,7 @@ let analyse_result ?(maybe_ce_model=default_check_model) exit_result res_parser 
 let backup_file f = f ^ ".save"
 
 
-let parse_prover_run res_parser signaled time out exitcode limit maybe_ce_model ~printer_mapping =
+let parse_prover_run res_parser signaled time out exitcode limit check_model ~printer_mapping =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
   (* the following conversion is incorrect (but does not fail) on 32bit, but if
      the incoming exitcode was really outside the bounds of [int], its exact
@@ -313,7 +313,7 @@ let parse_prover_run res_parser signaled time out exitcode limit maybe_ce_model 
       if signaled then [Answer HighFailure] else
       try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
       with Not_found -> []
-    in analyse_result ?maybe_ce_model exit_result res_parser printer_mapping out
+    in analyse_result ?check_model exit_result res_parser printer_mapping out
   in
   let model = match model with Some s -> s | None -> default_model in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
