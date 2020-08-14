@@ -34,7 +34,8 @@ let prec = ref None
 
 let opt_parser = ref None
 
-let enable_rac = ref false
+let opt_enable_rac = ref false
+let opt_rac_prover = ref None
 
 let use_modules = ref []
 
@@ -46,8 +47,10 @@ let option_list =
       fun (i1, (i2, i3)) -> prec := Some (i1, i2, i3)),
     "<emin>,<emax>,<prec> set format used for real computations\n\
      (e.g., -148,128,24 for float32)";
-    KLong "rac", Hnd0 (fun () -> enable_rac := true),
+    KLong "rac", Hnd0 (fun () -> opt_enable_rac := true),
     " enable runtime basic runtime assertion checking";
+    KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
+    " use prover in RAC when term reduction is insufficient";
     KLong "dispatch", Hnd1 (APair ('/', APair ('.', AString, AString),
     APair ('.', AString, AString)), fun _arg -> eprintf "Dispatch currently not supported"; exit 1),
     ("<f.M>/<g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\
@@ -101,7 +104,11 @@ let do_input f =
   let open Pinterp in
   Opt.iter init_real !prec;
   try
-    let res = eval_global_fundef ~rac:!enable_rac env muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
+    let rac = !opt_enable_rac in
+    let rac_prover = Opt.map (rac_prover config env ~limit_time:2) !opt_rac_prover in
+    let rac_trans = Compute.normalize_goal_transf_all env in
+    let res = eval_global_fundef ~rac ~rac_trans ?rac_prover env
+        muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
   with Contr (ctx, term) ->

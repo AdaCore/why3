@@ -30,6 +30,7 @@ let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
 let opt_json = ref false
 let opt_check_ce_model = ref false
+let opt_rac_prover = ref None
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -122,6 +123,8 @@ let option_list =
     "<dir> print the selected goals to separate files in <dir>";
     KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
     " check the counter-examples using runtime assertion checking (RAC)";
+    KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
+    " use prover in RAC when term reduction is insufficient";
     KLong "json", Hnd0 (fun () -> opt_json := true),
     " print counterexamples in JSON format";
     KLong "print-theory", Hnd0 (fun () -> opt_print_theory := true),
@@ -239,10 +242,11 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
     | None, Some command ->
         let check_model =
           if !opt_check_ce_model then
-            Some (Pinterp.check_model env (Pmodule.restore_module th))
+            let rac_prover = Opt.map (Pinterp.rac_prover config env ~limit_time:2) !opt_rac_prover in
+            let rac_trans = Compute.normalize_goal_transf_all env in
+            Some (Pinterp.check_model ~rac_trans ?rac_prover env (Pmodule.restore_module th))
           else None in
-        let call =
-          Driver.prove_task ~command ~limit ?check_model drv task in
+        let call = Driver.prove_task ~command ~limit ?check_model drv task in
         let res = Call_provers.wait_on_call call in
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string

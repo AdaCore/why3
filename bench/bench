@@ -340,7 +340,7 @@ rac () {
     for func in $@; do
         echo "** $mod.$func"
         echo -n " $func" >&2
-        "bin/why3execute$suffix" --rac --debug=rac "${RACARGS[@]}" "$file" "$func ()" --use="$mod" 2>&1 |\
+        "bin/why3execute$suffix" --rac --rac-prover=Z3,4.8.4 --debug=rac "${RACARGS[@]}" "$file" "$func ()" --use="$mod" 2>&1 |\
             sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" |\
             sed "s|$(bin/why3$suffix --print-libdir)|WHY3LIB|g"
     done
