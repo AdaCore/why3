@@ -893,16 +893,15 @@ let try_add_rule _id t eng =
      *   id.id_string print_term t s; *)
     eng
 
-let fix_vsenv_value vs t (vsenv, mt, mv) =
+let fix_vsenv_value (vs, t) (mt, mv, vsenv) =
   match t.t_ty with
   | None -> (* Don't fix prop-typed terms *)
-      vsenv, mt, mv
+      mt, mv, Mvs.add vs t vsenv
   | Some ty ->
-    let vs' = create_vsymbol (id_clone vs.vs_name) ty in
-    let vsenv = Mvs.add vs' t vsenv in
-    let mt = ty_match mt vs.vs_ty ty in
-    let mv = Mvs.add vs (t_var vs') mv in
-    vsenv, mt, mv
+      let vs' = create_vsymbol (id_clone vs.vs_name) ty in
+      let mt = ty_match mt vs.vs_ty ty in
+      let mv = Mvs.add vs (t_var vs') mv in
+      mt, mv, Mvs.add vs' t vsenv
 
 (** Reduce a term using the reduction engine.
 
