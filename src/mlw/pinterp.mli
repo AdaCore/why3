@@ -48,8 +48,16 @@ exception InvCeInfraction of Loc.position option
 val init_real : int * int * int -> unit
 (** Give a precision on real computation. *)
 
+(* TODO Replace options rac_trans and rac_prover by a strategy *)
+
+type rac_prover
+
+val rac_prover : Whyconf.config -> Env.env -> limit_time:int -> string -> rac_prover
+
 val eval_global_fundef :
   rac:bool ->
+  ?rac_trans:Task.task Trans.tlist ->
+  ?rac_prover:rac_prover ->
   Env.env ->
   Pdecl.known_map ->
   Decl.known_map ->
@@ -64,6 +72,8 @@ val eval_global_fundef :
 (** {1 Check counter-example models using RAC}*)
 
 val check_model_rs :
+  ?rac_trans:Task.task Trans.tlist ->
+  ?rac_prover:rac_prover ->
   Env.env ->
   Pmodule.pmodule ->
   Model_parser.model ->
@@ -73,7 +83,13 @@ val check_model_rs :
     [rs] (abstractly) using the values from the counter-example model [m]
     trigger a RAC contradiction at location [loc]. *)
 
-val check_model : Env.env -> Pmodule.pmodule -> Model_parser.model -> Model_parser.full_verdict
+val check_model :
+  ?rac_trans:Task.task Trans.tlist ->
+  ?rac_prover:rac_prover ->
+  Env.env ->
+  Pmodule.pmodule ->
+  Model_parser.model ->
+  Model_parser.full_verdict
 (** [check_model env pm m] checks if model [m] is valid, i.e. the abstract
     execution using the model values triggers a RAC contradiction in the
     corresponding location. The function returns true if the corresponding

@@ -427,7 +427,12 @@ let build_prover_call spa =
         | Trans id -> find_th s (get_trans_parent s id) in
       let th = find_th c.controller_session spa.spa_id in
       let pm = Pmodule.restore_module (Theory.restore_theory (Session_itp.theory_name th)) in
-      let check_model = if true (*check_ce_model*) then Some (Pinterp.check_model c.controller_env pm) else None in
+      let check_model =
+        if true then (* TODO Check IDE parameter check_ce_model *)
+          let rac_trans = Compute.normalize_goal_transf_all c.controller_env in
+          let rac_prover = Pinterp.rac_prover c.controller_config c.controller_env ~limit_time:2 "z3" in
+          Some (Pinterp.check_model ~rac_trans ~rac_prover c.controller_env pm)
+        else None in
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
           ~limit ~interactive ?check_model driver task in
       let pa =

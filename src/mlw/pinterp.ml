@@ -329,17 +329,30 @@ let print_logic_result fmt r =
 
 (* ENV *)
 
+type rac_prover = Rac_prover of {command: string; driver: Driver.driver; limit_time: int}
+
+let rac_prover config env ~limit_time s =
+  let open Whyconf in
+  let prover = filter_one_prover config (parse_filter_prover s) in
+  let command = String.concat " " (prover.command :: prover.extra_options) in
+  let driver = load_driver (get_main config) env prover.driver prover.extra_drivers in
+  Rac_prover {command; driver; limit_time}
+
 type env =
   { mod_known : Pdecl.known_map;
     th_known  : Decl.known_map;
     funenv    : Expr.cexp Mrs.t;
     vsenv     : value Mvs.t;
     ce_model  : model;
-    env       : Env.env }
+    env       : Env.env;
+    rac_trans : Task.task Trans.tlist option;
+    rac_prover: rac_prover option;
+  }
 
 let default_env env =
-  { mod_known = Mid.empty; th_known = Mid.empty; funenv = Mrs.empty;
-    vsenv = Mvs.empty; ce_model = default_model; env }
+  { mod_known= Mid.empty; th_known= Mid.empty; funenv= Mrs.empty;
+    vsenv= Mvs.empty; ce_model= default_model; rac_trans= None;
+    rac_prover= None; env }
 
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
@@ -1585,21 +1598,21 @@ let make_global_env ?(model=default_model) env known =
     | _ -> acc in
   Mid.fold add_glob known Mvs.empty
 
-let eval_global_expr ~rac env mod_known th_known locals e =
+let eval_global_expr ~rac ?rac_trans ?rac_prover env mod_known th_known locals e =
   get_builtin_progs env ;
   let vsenv = make_global_env env mod_known in
   let env = add_local_funs locals
-      { (default_env env) with mod_known; th_known; vsenv } in
+      { (default_env env) with mod_known; th_known; vsenv; rac_trans; rac_prover } in
   let res = eval_expr ~rac ~abs:false env e in
   res, vsenv
 
-let eval_global_fundef ~rac env mod_known mod_theory locals body =
-  try eval_global_expr ~rac env mod_known mod_theory locals body
+let eval_global_fundef ~rac ?rac_trans ?rac_prover env mod_known mod_theory locals body =
+  try eval_global_expr ~rac ?rac_trans ?rac_prover env mod_known mod_theory locals body
   with CannotFind (l, s, n) ->
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
-let eval_rs ~abs env mod_known th_known model (rs: rsymbol) =
+let eval_rs ?rac_trans ?rac_prover ~abs env mod_known th_known model (rs: rsymbol) =
   let get_value pv =
     match model_value model pv with
     | Some mv ->
@@ -1612,8 +1625,7 @@ let eval_rs ~abs env mod_known th_known model (rs: rsymbol) =
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   get_builtin_progs env ;
   let vsenv = make_global_env env ~model mod_known in
-  let env = { (default_env env) with mod_known; th_known;
-                                     vsenv; ce_model = model} in
+  let env = { (default_env env) with mod_known; th_known; vsenv; rac_trans; rac_prover; ce_model= model} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let res = exec_call ~rac:true ~abs env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   res, env
@@ -1643,13 +1655,13 @@ let warnings env model =
   if values_match env model then [] else
     ["Warning: RAC detected value divergence"]
 
-let check_model_rs env pm model rs =
+let check_model_rs ?rac_trans ?rac_prover env pm model rs =
   let open Pmodule in
   Debug.dprintf debug_rac "Validating model: %a@."
     (print_model ?me_name_trans:None ~print_attrs:false) model;
   reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
-    let _, env = eval_rs ~abs:false env pm.mod_known pm.mod_theory.Theory.th_known model rs in
+    let _, env = eval_rs ~abs:false ?rac_trans ?rac_prover env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason= "RAC does not confirm the counter-example, no contradiction \
                during execution" in
     { verdict= Dont_know; reason; warnings= warnings env model}
@@ -1730,7 +1742,7 @@ let find_rs pm loc =
   | () -> raise Not_found
   | exception Found rs -> rs
 
-let check_model env pm m =
+let check_model ?rac_trans ?rac_prover env pm m =
   match get_model_term_loc m with
   | None ->
       let reason = "No model term location" in
@@ -1740,7 +1752,7 @@ let check_model env pm m =
       (* TODO deal with VCs from variable declarations and type declarations *)
       (* TODO deal with VCs from goal definitions *)
       match find_rs pm loc with
-      | rs -> check_model_rs env pm m rs
+      | rs -> check_model_rs ?rac_trans ?rac_prover env pm m rs
       | exception Not_found ->
           let reason = "No corresponding routine symbol found" in
           {verdict= Dont_know; reason; warnings= []}
