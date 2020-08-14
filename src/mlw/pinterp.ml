@@ -21,23 +21,16 @@ open Big_real
 open Mlmpfr_wrapper
 open Model_parser
 
-let pp_indent fmt =
-  match Printexc.(backtrace_slots (get_callstack 100)) with
-  | None -> ()
-  | Some a ->
-      let n = Pervasives.max 0 (Array.length a - 25) in
-      let s = String.make (2 * n) ' ' in
-      pp_print_string fmt s
-
-let print_loc fmt loc =
-  let f, l, b, e = Loc.get loc in
-  fprintf fmt "%S, line %d, characters %d-%d" f l b e
-
 let debug =
   Debug.register_info_flag "trace_exec"
     ~desc:"trace execution of code given by --exec or --eval"
 
 let debug_rac = Debug.register_info_flag "rac" ~desc:"trace evaluation for RAC"
+let debug_rac_check = Debug.register_info_flag "rac-check" ~desc:"trace checking assertions in RAC"
+
+let print_loc fmt loc =
+  let f, l, b, e = Loc.get loc in
+  fprintf fmt "%S, line %d, characters %d-%d" f l b e
 
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
@@ -47,8 +40,14 @@ let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, r
     (Pp.print_list sep pp_binding)
     l (snd delims) ()
 
-(* let pp_typed pp ty fmt x =
- *   fprintf fmt "(%a: %a)" pp x Pretty.print_ty (ty x) *)
+
+let pp_indent fmt =
+  match Printexc.(backtrace_slots (get_callstack 100)) with
+  | None -> ()
+  | Some a ->
+      let n = Pervasives.max 0 (Array.length a - 25) in
+      let s = String.make (2 * n) ' ' in
+      pp_print_string fmt s
 
 (* EXCEPTIONS *)
 
@@ -203,9 +202,8 @@ let rec print_value fmt v =
       fprintf fmt "(@[<v2>%tfun %a -> %a)@]"
         (fun fmt ->
            if not (Mvs.is_empty mvs) then
-             fprintf fmt "%a " (pp_bindings Pretty.print_vs print_value) (Mvs.bindings mvs))
-        Pretty.print_vs vs
-        print_expr e
+             fprintf fmt "%a " (pp_bindings print_vs print_value) (Mvs.bindings mvs))
+        print_vs vs print_expr e
   | Vconstr (rs, vl) when is_rs_tuple rs ->
       fprintf fmt "(@[%a)@]" (Pp.print_list Pp.comma print_field) vl
   | Vconstr (rs, []) -> fprintf fmt "@[%a@]" print_rs rs
@@ -221,7 +219,7 @@ let rec print_value fmt v =
       fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
         (Mv.bindings mv) print_value v
   | Vterm t ->
-      fprintf fmt "(term:@ %a)" Pretty.print_term t
+      fprintf fmt "(term:@ %a)" print_term t
 
 and print_field fmt f = print_value fmt (field_get f)
 
@@ -792,14 +790,14 @@ let report_cntr_head fmt (ctx, msg, term) =
 
 let pp_vsenv pp_value fmt =
   let delims = Pp.(nothing, nothing) and sep = Pp.comma in
-  fprintf fmt "%a" (pp_bindings ~delims ~sep Pretty.print_vs pp_value)
+  fprintf fmt "%a" (pp_bindings ~delims ~sep print_vs pp_value)
 
 let report_cntr fmt (ctx, msg, term) =
   let cmp_vs (vs1, _) (vs2, _) =
     String.compare vs1.vs_name.id_string vs2.vs_name.id_string in
   let mvs = t_freevars Mvs.empty term in
   fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
-  fprintf fmt "@[<hv2>- Term: %a@]@," Pretty.print_term term ;
+  fprintf fmt "@[<hv2>- Term: %a@]@," print_term term ;
   fprintf fmt "@[<hv2>- Variables: %a@]" (pp_vsenv print_value)
     (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_env.vsenv)));
   fprintf fmt "@]"
@@ -883,7 +881,7 @@ let try_add_rule _id t eng =
     (* TODO Try to evaluate terms of the form `<t> -> if <t> then <t> else <t>` during
        normalization. *)
     (* Format.eprintf "@[<v2>Could not add rule for the axiomatization of %s:@ %a@ because %s.@]@."
-     *   id.id_string Pretty.print_term t s; *)
+     *   id.id_string print_term t s; *)
     eng
 
 let fix_vsenv_value vs t (vsenv, mt, mv) =
@@ -1135,8 +1133,7 @@ let exec_pure env ls pvs =
         let t = fix_boolean_term t in
         Normal (value (Opt.get_def ty_bool t.t_ty) (Vterm t))
     | None ->
-        kasprintf failwith "No logic definition for %a"
-          Pretty.print_ls ls
+        kasprintf failwith "No logic definition for %a" print_ls ls
 
 let pp_limited ?(n=100) pp fmt x =
   let s = asprintf "%a" pp x in
@@ -1179,7 +1176,7 @@ and eval_expr' ~rac ~abs env e =
     if pv_affected e.e_effect.eff_writes pv then begin
         Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
           pp_indent print_pv pv
-          (Pp.print_option Pretty.print_loc) pv.pv_vs.vs_name.id_loc;
+          (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
         let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
         let value = get_value vs.vs_name.id_string pv.pv_ity e_loc in
         bind_vs vs value env end
@@ -1209,7 +1206,7 @@ and eval_expr' ~rac ~abs env e =
   | Eexec (ce, cty) -> (
     match ce.c_node with
       | Cpur (ls, pvs) ->
-          Debug.dprintf debug "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent Pretty.print_ls ls
+          Debug.dprintf debug "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent print_ls ls
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
           exec_pure env ls pvs
       | Cfun e' ->
@@ -1305,7 +1302,7 @@ and eval_expr' ~rac ~abs env e =
       (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
-            (Pp.print_option Pretty.print_loc) t.t_loc;
+            (Pp.print_option print_loc) t.t_loc;
           raise (InvCeInfraction t.t_loc));
       match eval_expr ~rac ~abs env cond with
       | Normal v ->
@@ -1393,13 +1390,13 @@ and eval_expr' ~rac ~abs env e =
             (* assert2 *)
             if not (le a pvs_int) then begin
                 printf "ce model does not satisfy loop bounds %a@."
-                  (Pp.print_option Pretty.print_loc) e.e_loc;
+                  (Pp.print_option print_loc) e.e_loc;
                 raise (InvCeInfraction e.e_loc) end;
             (* assert3 *)
             (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
              | Contr (_,t) ->
                 printf "ce model does not satisfy loop invariant %a@."
-                  (Pp.print_option Pretty.print_loc) t.t_loc;
+                  (Pp.print_option print_loc) t.t_loc;
                 raise (InvCeInfraction t.t_loc));
             if le pvs_int b then begin
                 match eval_expr ~rac ~abs env e1 with
@@ -1479,7 +1476,7 @@ and eval_expr' ~rac ~abs env e =
       (* TODO: do not eval ghost if no assertion check *)
       eval_expr ~rac ~abs env e1
   | Epure t ->
-      Debug.dprintf debug "@[<h>%tEVAL EXPR: PURE %a@]@." pp_indent Pretty.print_term t;
+      Debug.dprintf debug "@[<h>%tEVAL EXPR: PURE %a@]@." pp_indent print_term t;
       let t = reduce_term env t in
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
@@ -1685,16 +1682,16 @@ let check_model_rs ?rac_trans ?rac_prover env pm model rs =
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
          term for constructor that is not a function *)
-      let reason = sprintf "RAC failure: %ss" msg in
+      let reason = sprintf "RAC failure: %s" msg in
       {verdict= Dont_know; reason; warnings= []}
 (* | AbstractExEnded l ->
    *    let reason = asprintf "Abstractly RAC cannot continue after %a@."
-   *      (Pp.print_option Pretty.print_loc) l in
+   *      (Pp.print_option print_loc) l in
    *    {verdict= Dont_know; reason; warnings= []}
    * | InvCeInfraction l ->
    *    let reason = asprintf "Abstraclty RAC: counter-example model
    *            is not consistent with the invariant %a@."
-   *      (Pp.print_option Pretty.print_loc) l in
+   *      (Pp.print_option print_loc) l in
    *    {verdict= Dont_know; reason; warnings= []} *)
 
 (** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
