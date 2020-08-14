@@ -238,76 +238,85 @@ let rec snapshot v =
 and snapshot_field f =
   field (snapshot (field_get f))
 
-let rec term_of_value env v =
-  let rec term_of_value' mt v : ty Mtv.t * term =
-    match v.v_desc with
-    | Vnum i -> mt, t_const (Constant.int_const i) v.v_ty
-    | Vstring s -> mt, t_const (Constant.ConstStr s) ty_str
-    | Vbool b -> mt, if b then t_bool_true else t_bool_false
-    | Vvoid -> mt, t_tuple []
-    | Vterm t -> mt, t
-    | Vreal _ | Vfloat _ | Vfloat_mode _ -> (* TODO *)
-        Format.kasprintf failwith "term_of_value: %a" print_value v
-    | Vconstr (rs, fs) ->
-        let mt, fs = Lists.map_fold_left term_of_field mt fs in
-        if rs_kind rs = RKfunc then
-          mt, t_app_infer (ls_of_rs rs) fs
-        else (* TODO bench/ce/{record_one_field,record_inv}.mlw/CVC4/WP *)
-          kasprintf failwith "Cannot construct term for constructor \
-                              %a that is not a function" print_rs rs
-    | Vfun (cl, arg, e) ->
-        (* TERM: fun arg -> t *)
-        let ty_arg = match v.v_ty.ty_node with
-          | Tyapp (ts, [ty_arg; _]) ->
-              assert (ts_equal ts ts_func); ty_arg
+(** Convert a value into a term. The first component of the result are additional bindings
+    from closures, (roughly) sorted by strongly connected components. *)
+let rec term_of_value env vsenv v : (vsymbol * term) list * term =
+  match v.v_desc with
+  | Vnum i -> vsenv, t_const (Constant.int_const i) v.v_ty
+  | Vstring s -> vsenv, t_const (Constant.ConstStr s) ty_str
+  | Vbool b -> vsenv, if b then t_bool_true else t_bool_false
+  | Vvoid -> vsenv, t_tuple []
+  | Vterm t -> vsenv, t
+  | Vreal _ | Vfloat _ | Vfloat_mode _ -> (* TODO *)
+      Format.kasprintf failwith "term_of_value: %a" print_value v
+  | Vconstr (rs, fs) ->
+      if rs_kind rs = RKfunc then
+        let term_of_field vsenv f = term_of_value env vsenv (field_get f) in
+        let vsenv, fs = Lists.map_fold_left term_of_field vsenv fs in
+        vsenv, t_app_infer (ls_of_rs rs) fs
+      else (* TODO bench/ce/{record_one_field,record_inv}.mlw/CVC4/WP *)
+        kasprintf failwith "Cannot construct term for constructor \
+                            %a that is not a function" print_rs rs
+  | Vfun (cl, arg, e) ->
+      (* TERM: fun arg -> t *)
+      let t = Opt.get_exn (Failure "Cannot convert function body to term")
+          (term_of_expr ~prop:false e) in
+
+      (* Rebind values from closure *)
+      let bind_cl vs v (mt, mv, vsenv) =
+        let vs' = create_vsymbol (id_clone vs.vs_name) v.v_ty in
+        let mt = ty_match mt vs.vs_ty v.v_ty in
+        let mv = Mvs.add vs (t_var vs') mv in
+        let vsenv, t = term_of_value env vsenv v in
+        let vsenv = (vs', t) :: vsenv in
+        mt, mv, vsenv in
+      let mt, mv, vsenv = Mvs.fold bind_cl cl (Mtv.empty, Mvs.empty, vsenv) in
+
+      (* Substitute argument type *)
+      let ty_arg = match v.v_ty.ty_node with
+        | Tyapp (ts, [ty_arg; _]) when ts_equal ts ts_func -> ty_arg
+        | _ -> assert false in
+      let mt = ty_match mt arg.vs_ty ty_arg in
+      let arg' = create_vsymbol (id_clone arg.vs_name) ty_arg in
+      let mv = Mvs.add arg (t_var arg') mv in
+      let t = t_ty_subst mt mv t in
+
+      (* eprintf "FUN %a->%a, %a, %a@." (pp_typed print_vs vs_ty) arg (pp_typed print_vs vs_ty) arg'
+       *   Pp.(print_list space print_vs) (Mvs.keys vsenv)
+       *   (pp_typed print_term (fun t -> Opt.get_def ty_none t.t_ty)) t; *)
+      vsenv, t_lambda [arg'] [] t
+  | Varray a ->
+      (* TERM: [make a.length (eps v. true)][0 <- a[0]]...[n-1 <- a[n-1]] *)
+      let pm = Pmodule.read_module env ["array"] "Array" in
+      let ls_make = Mstr.find "make" pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
+      let ls_update = Mstr.find (Ident.op_update "") pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
+      let rec loop (vsenv, t) ix =
+        if ix = Array.length a then vsenv, t
+        else
+          let t_ix = t_const (Constant.int_const_of_int ix) ty_int in
+          let vsenv, t_a_ix = term_of_value env vsenv a.(ix) in
+          let t = t_app_infer ls_update [t; t_ix; t_a_ix] in
+          loop (vsenv, t) (succ ix) in
+      let t_n = t_const (Constant.int_const_of_int (Array.length a)) ty_int in
+      let t_v =
+        let val_ty = match v.v_ty.ty_node with
+          | Tyapp (_, [ty]) -> ty
           | _ -> assert false in
-        let t = Opt.get (term_of_expr ~prop:false e) in
-        let mt, arg, t = if ty_closed arg.vs_ty then mt, arg, t
-          else (* Substitute types from value in term *)
-            let mt = ty_match mt arg.vs_ty ty_arg in
-            let arg' = create_vsymbol (id_clone arg.vs_name) ty_arg in
-            mt, arg', t_ty_subst mt (Mvs.singleton arg (t_var arg')) t in
-        let bind_cl vs v (mt, mv) =
-          let mt = ty_match mt vs.vs_ty v.v_ty in
-          let t = term_of_value env v in
-          mt, Mvs.add vs t mv in
-        let t = (* Substitute values from the closure *)
-          let mt, mv = Mvs.fold bind_cl cl (Mtv.empty, Mvs.empty) in
-          t_ty_subst mt mv t in
-        mt, t_lambda [arg] [] t
-    | Varray a ->
-        (* TERM: [make a.length (eps v. true)][0 <- a[0]]...[n-1 <- a[n-1]] *)
-        let pm = Pmodule.read_module env ["array"] "Array" in
-        let ls_make = Mstr.find "make" pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
-        let ls_update = Mstr.find (Ident.op_update "") pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
-        let rec loop (mt, t) ix =
-          if ix = Array.length a then mt, t
-          else
-            let t_ix = t_const (Constant.int_const_of_int ix) ty_int in
-            let mt, t_a_ix = term_of_value' mt a.(ix) in
-            let t = t_app_infer ls_update [t; t_ix; t_a_ix] in
-            loop (mt, t) (succ ix) in
-        let t_n = t_const (Constant.int_const_of_int (Array.length a)) ty_int in
-        let t_v =
-          let val_ty = match v.v_ty.ty_node with
-            | Tyapp (_, [ty]) -> ty
-            | _ -> assert false in
-          let vs = create_vsymbol (Ident.id_fresh "v") val_ty in
-          t_eps (t_close_bound vs t_true) in
-        let t_make = t_app_infer ls_make [t_n; t_v] in
-        loop (mt, t_make) 0
-    | Vpurefun (ty, mv, v) ->
-        (* TERM: fun arg -> if arg = k0 then v0 else ... else v *)
-        (* TODO Use function literal [|mv...; _ -> v|] when available in Why3 *)
-        let arg = create_vsymbol (id_fresh "arg") ty in
-        let mk_case key value (mt, t) =
-          let mt, key = term_of_value' mt key in      (* k_i *)
-          let mt, value = term_of_value' mt value in  (* v_i *)
-          mt, t_if (t_equ (t_var arg) key) value t in (* if arg = k_i then v_i else ... *)
-        let mt, t = Mv.fold mk_case mv (term_of_value' mt v) in
-        mt, t_lambda [arg] [] t
-  and term_of_field mt f = term_of_value' mt (field_get f) in
-  snd (term_of_value' Mtv.empty v)
+        let vs = create_vsymbol (Ident.id_fresh "v") val_ty in
+        t_eps (t_close_bound vs t_true) in
+      let t_make = t_app_infer ls_make [t_n; t_v] in
+      loop (vsenv, t_make) 0
+  | Vpurefun (ty, m, v) ->
+      (* TERM: fun arg -> if arg = k0 then v0 else ... else v *)
+      (* TODO Use function literal [|mv...; _ -> v|] when available in Why3 *)
+      let arg = create_vsymbol (id_fresh "arg") ty in
+      let mk_case key value (vsenv, t) =
+        let vsenv, key = term_of_value env vsenv key in      (* k_i *)
+        let vsenv, value = term_of_value env vsenv value in  (* v_i *)
+        let t = t_if (t_equ (t_var arg) key) value t in (* if arg = k_i then v_i else ... *)
+        vsenv, t in
+      let vsenv, t = Mv.fold mk_case m (term_of_value env vsenv v) in
+      vsenv, t_lambda [arg] [] t
 
 (* RESULT *)
 
@@ -1629,9 +1638,9 @@ let eval_rs ?rac_trans ?rac_prover ~abs env mod_known th_known model (rs: rsymbo
 
 let check_equals loc env exec_value model_value =
   let ctx = cntr_ctx "Model value equality" ?trigger_loc:loc env in
-  let t1 = term_of_value env.env exec_value in
-  let t2 = term_of_value env.env model_value in
-  try check_term ctx (t_equ t1 t2); true
+  let vsenv, t1 = term_of_value env.env [] exec_value in
+  let vsenv, t2 = term_of_value env.env vsenv model_value in
+  try check_term ~vsenv ctx (t_equ t1 t2); true
   with Contr _ -> false
 
 let values_match env m =
