@@ -358,8 +358,8 @@ type env =
 
 let default_env env =
   { mod_known= Mid.empty; th_known= Mid.empty; funenv= Mrs.empty;
-    vsenv= Mvs.empty; ce_model= default_model; rac_trans= None;
-    rac_prover= None; env }
+    vsenv= Mvs.empty; ce_model= default_model;
+    rac_trans= None; rac_prover= None; env }
 
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
@@ -811,27 +811,6 @@ let report_cntr fmt (ctx, msg, term) =
     (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_env.vsenv)));
   fprintf fmt "@]"
 
-let rule_term decl =
-  let open Decl in
-  match decl.d_node with
-  | Dprop (Paxiom, _, t) -> Some t
-  | _ -> None
-
-let add_fun_to_known rs cexp known =
-  try
-    let t =
-      match cexp.c_node with
-      | Cfun e -> Opt.get_exn Exit (term_of_expr ~prop:false e)
-      | _ -> raise Exit in
-    let ty_args = List.map (fun pv -> Ity.ty_of_ity pv.pv_ity) rs.rs_cty.cty_args in
-    let ty_res = Ity.ty_of_ity rs.rs_cty.cty_result in
-    let ls = Term.create_lsymbol (id_clone rs.rs_name) ty_args (Some ty_res) in
-    let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
-    let ldecl = Decl.make_ls_defn ls vs_args t in
-    let decl = Decl.create_logic_decl [ldecl] in
-    Mid.add rs.rs_name decl known
-  with Exit -> known
-
 let cntr_ctx desc ?trigger_loc env =
   { c_desc= desc;
     c_trigger_loc= trigger_loc;
@@ -883,68 +862,156 @@ let iter_decl_locs f known =
 
 (* TERM EVALUATION *)
 
-let try_add_rule _id t eng =
-  let open Reduction_engine in
-  try add_rule t eng
-  with NotARewriteRule _s ->
-    (* TODO Try to evaluate terms of the form `<t> -> if <t> then <t> else <t>` during
-       normalization. *)
-    (* Format.eprintf "@[<v2>Could not add rule for the axiomatization of %s:@ %a@ because %s.@]@."
-     *   id.id_string print_term t s; *)
-    eng
 
-let fix_vsenv_value (vs, t) (mt, mv, vsenv) =
-  match t.t_ty with
-  | None -> (* Don't fix prop-typed terms *)
-      mt, mv, Mvs.add vs t vsenv
-  | Some ty ->
-      let vs' = create_vsymbol (id_clone vs.vs_name) ty in
-      let mt = ty_match mt vs.vs_ty ty in
-      let mv = Mvs.add vs (t_var vs') mv in
-      mt, mv, Mvs.add vs' t vsenv
+let task_of_term ?(vsenv=[]) env t =
+  let open Task in let open Decl in
+  let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
+  let task = List.fold_left use_export task Theory.[builtin_theory; bool_theory; highord_theory] in
+  let task = use_export task (Env.read_theory env.env ["map"] "MapExt") in (* TODO remove, use map.MapExt where necessary in program *)
+  (* Add known declarations *)
+  let add_known _ decl task =
+    match decl.d_node with
+    | Dprop (Pgoal, _, _) -> task
+    | Dprop (Plemma, prs, t) ->
+        add_decl task (create_prop_decl Paxiom prs t)
+    | _ -> add_decl task decl in
+  let task = Mid.fold add_known env.th_known task in
+  (* Add declarations from local functions in [env.funenv] *)
+  let bind_fun rs cexp (task, ls_mv) =
+    try
+      let t = match cexp.c_node with
+        | Cfun e -> Opt.get_exn Exit (term_of_expr ~prop:false e)
+        | _ -> raise Exit in
+      let ty_args = List.map (fun pv -> Ity.ty_of_ity pv.pv_ity) rs.rs_cty.cty_args in
+      let ty_res = Ity.ty_of_ity rs.rs_cty.cty_result in
+      let ls, ls_mv = match rs.rs_logic with
+        | RLlemma | RLnone -> raise Exit
+        | RLls ls -> ls, ls_mv
+        | RLpv {pv_vs= vs} ->
+            let ls = create_fsymbol (id_clone rs.rs_name) ty_args ty_res in
+            let vss = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
+            let ts = List.map t_var vss in
+            let t0 = fs_app ls ts ty_res in
+            let t = t_lambda vss [] t0 in
+            let ls_mv = Mvs.add vs t ls_mv in
+            ls, ls_mv in
+      let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
+      let decl = Decl.make_ls_defn ls vs_args t in
+      let task = add_logic_decl task [decl] in
+      task, ls_mv
+    with Exit -> task, ls_mv in
+  let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
+  (* Add declarations for additional term bindings in [vsenv] *)
+  let bind_term (vs, t) (task, ls_mt, ls_mv) =
+    let ty = Opt.get t.t_ty in
+    let ls = create_fsymbol (id_clone vs.vs_name) [] ty in
+    let ls_mt = ty_match ls_mt vs.vs_ty ty in
+    let ls_mv = Mvs.add vs (fs_app ls [] ty) ls_mv in
+    let t = t_ty_subst ls_mt ls_mv t in
+    let defn = make_ls_defn ls [] t in
+    let task = add_logic_decl task [defn] in
+    task, ls_mt, ls_mv in
+  let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
+  (* Add declarations for value bindings in [env.vsenv] *)
+  let bind_value vs v (task, ls_mt, ls_mv) =
+    let ls = create_fsymbol (id_clone vs.vs_name) [] v.v_ty in
+    let ls_mt = ty_match ls_mt vs.vs_ty v.v_ty in
+    let ls_mv = Mvs.add vs (fs_app ls [] v.v_ty) ls_mv in
+    let vsenv, t = term_of_value env.env [] v in
+    let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
+    let t = t_ty_subst ls_mt ls_mv t in
+    let defn = make_ls_defn ls [] t in
+    let task = add_logic_decl task [defn] in
+    task, ls_mt, ls_mv in
+  let task, ls_mt, ls_mv = Mvs.fold bind_value env.vsenv (task, ls_mt, ls_mv) in
+  let t = t_ty_subst ls_mt ls_mv t in
+  let task =
+    if t.t_ty = None then (* Add goal ... *)
+      let prs = create_prsymbol (id_fresh "g") in
+      add_prop_decl task Pgoal prs t
+    else (* ... or declaration *)
+      let ls = create_lsymbol (id_fresh "v") [] t.t_ty in
+      let decl = make_ls_defn ls [] t in
+      add_logic_decl task [decl] in
+  task, ls_mv
 
-(** Reduce a term using the reduction engine.
+let check_term_compute trans task =
+  let is_false = function
+    | Some {Task.task_decl= Theory.{
+        td_node= Decl Decl.{
+            d_node= Dprop (Pgoal, _, {t_node= Tfalse})}}} ->
+        true
+    | _ -> false in
+  match Trans.apply trans task with
+  | [] -> Some true
+  | tasks ->
+      Debug.dprintf debug_rac_check "Transformation produced %d tasks@." (List.length tasks);
+      if List.exists is_false tasks then
+        Some false
+      else (
+        List.iter (Debug.dprintf debug_rac_check "- %a@." print_tdecl)
+          (Lists.map_filter (Opt.map (fun t -> t.Task.task_decl)) tasks);
+        None )
 
-    @param env Why3 environment
-    @param known Global definitions from the interpreted module
-    @param rule_terms Rules to be added to the reduction engine
-    @param vsenv Local variable environment
-    @param t Term to be evaluated
-    @return A reduction of term [t]
-  *)
-let reduce_term ?(mt = Mtv.empty) ?(mv = Mvs.empty) env t =
-  let open Reduction_engine in
-  let params =
-    { compute_builtin= true;
-      compute_defs= true;
-      compute_def_set= Sls.empty } in
-  let known = Mrs.fold add_fun_to_known env.funenv env.th_known in
-  let eng = create params env.env known in
-  let rule_terms = Mid.map_filter rule_term env.th_known in
-  let eng = Mid.fold try_add_rule rule_terms eng in
-  let vsenv = Mvs.map (term_of_value env.env) env.vsenv in
-  let vsenv, mt, mv = Mvs.fold fix_vsenv_value vsenv (Mvs.empty, mt, mv) in
-  let t = t_ty_subst mt mv t in
-  normalize ~limit:1000 eng vsenv t
+let compute_term env t =
+  match env.rac_trans with
+  | None -> t
+  | Some trans ->
+      let task, ls_mv = task_of_term env t in
+      let tasks = Trans.apply trans task in
+      if t.t_ty = None then
+        match List.map Task.task_goal_fmla tasks with
+        | [] -> t_true
+        | t :: ts -> List.fold_left t_and t ts
+      else
+        match tasks with
+        | [Some Task.{task_decl= Theory.{td_node= Decl Decl.{d_node= Dlogic [_, ldef]}}}] ->
+            ( match Decl.open_ls_defn ldef with
+              | [], t ->
+                  (* Free vsymbols in [t] have been substituted in [task] by fresh
+                     lsymbols (actually: ls @ []) to bind them to the task declarations.
+                     Now we have to reverse these substitution to ensures that the reduced
+                     term is valid in the original environment of [t]. *)
+                  let reverse vs t' t = t_replace t' (t_var vs) t in
+                  Mvs.fold reverse ls_mv t
+              | _ -> failwith "compute_term" )
+        | _ -> failwith "compute_term"
 
-(** Evaluate a term and raise an exception [Contr] if the result is false. *)
-let check_term ctx t =
+let check_term_dispatch (Rac_prover {command; driver; limit_time}) task =
+  let open Call_provers in
+  let limit = {empty_limit with limit_time} in
+  let call = Driver.prove_task ~command ~limit driver task in
+  let res = wait_on_call call in
+  Debug.dprintf debug_rac_check "Check term dispatch answer: %a@."
+    print_prover_answer res.pr_answer;
+  match res.pr_answer with
+  | Valid -> Some true
+  | Invalid -> Some false
+  | _ -> None
+
+(* TODO replace by a strategy, e.g., t compute_in_goal; c Z3,4.8.7 2 2000 *)
+let check_term ?vsenv ctx t =
   Opt.iter visit_loc t.t_loc;
-  (* TODO raise NoContrdiction / CannotEvaluate if [t] corresponds to the goal of the CE
-     and reduces to true / cannot be reduced. *)
-  match reduce_term ctx.c_env t with
-  | {t_node= Ttrue} ->
+  Debug.dprintf debug_rac_check "@[<hv2>Check term: %a@]@." print_term t;
+  let task, _ = task_of_term ?vsenv ctx.c_env t in
+  let res = (* Try checking the term using computation first ... *)
+    Opt.map (fun b -> Debug.dprintf debug_rac_check "Computed.@."; b)
+      (Opt.bind ctx.c_env.rac_trans
+         (fun trans -> check_term_compute trans task)) in
+  let res =
+    if res = None then (* ... then try solving using a prover *)
+      Opt.map (fun b -> Debug.dprintf debug_rac_check "Dispatched.@."; b)
+        (Opt.bind ctx.c_env.rac_prover
+           (fun rp -> check_term_dispatch rp task))
+    else res in
+  match res with
+  | Some true ->
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "is ok", t)
-  | {t_node= Tfalse} ->
+  | Some false ->
       raise (Contr (ctx, t))
-  | t' ->
-      eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t) ;
-      if Debug.test_flag debug_rac then
-        eprintf "@[<hv2>- Result: %a@]@." Pretty.print_term t'
-  | exception e when Debug.test_flag debug_rac ->
-      eprintf "%a@." report_cntr (ctx, "WHEN TRYING", t) ;
-      raise e
+  | None ->
+      eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t)
 
 let check_terms ctx = List.iter (check_term ctx)
 
@@ -952,11 +1019,11 @@ let check_terms ctx = List.iter (check_term ctx)
    the term [vt] representing the result value. *)
 let check_post ctx v post =
   let vs, t = open_post post in
-  let ctx = {ctx with c_env= {ctx.c_env with vsenv= Mvs.add vs v ctx.c_env.vsenv}} in
+  let vsenv = Mvs.add vs v ctx.c_env.vsenv in
+  let ctx = {ctx with c_env= {ctx.c_env with vsenv}} in
   check_term ctx t
 
-let check_posts desc loc env oldies v posts =
-  let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
+let check_posts desc loc env v posts =
   let ctx = cntr_ctx desc ?trigger_loc:loc env in
   List.iter (check_post ctx v) posts
 
@@ -1135,7 +1202,7 @@ let exec_pure env ls pvs =
         let vs, t = Decl.open_ls_defn defn in
         let args = List.map (get_pvs env) pvs in
         let vsenv = List.fold_right2 Mvs.add vs args env.vsenv in
-        let t = reduce_term {env with vsenv} t in
+        let t = compute_term {env with vsenv} t in
         (* TODO A variable x binding the result of exec pure are used as (x = True) in
            subsequent terms, so we map true/false to True/False here. Is this reasonable? *)
         let t = fix_boolean_term t in
@@ -1472,8 +1539,7 @@ and eval_expr' ~rac ~abs env e =
       match r with Normal t -> Excep (xs, t) | _ -> r )
   | Eexn (_, e1) -> eval_expr ~rac ~abs env e1
   | Eassert (kind, t) ->
-      let descr =
-        match kind with
+      let descr = match kind with
         | Expr.Assert -> "Assertion"
         | Expr.Assume -> "Assumption"
         | Expr.Check -> "Check" in
@@ -1485,7 +1551,7 @@ and eval_expr' ~rac ~abs env e =
       eval_expr ~rac ~abs env e1
   | Epure t ->
       Debug.dprintf debug "@[<h>%tEVAL EXPR: PURE %a@]@." pp_indent print_term t;
-      let t = reduce_term env t in
+      let t = compute_term env t in
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
       eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
@@ -1515,6 +1581,7 @@ and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
     let snapshot_oldie old_pv pv =
       Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs env.vsenv)) in
     Mpv.fold snapshot_oldie rs.rs_cty.cty_oldies Mvs.empty in
+  let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
   if rac then (
     (* TODO variant *)
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
@@ -1579,11 +1646,11 @@ and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
       match res with
       | Normal v ->
           let desc = cntr_desc "Postcondition" rs.rs_name in
-          check_posts desc loc env oldies v rs.rs_cty.cty_post
+          check_posts desc loc env v rs.rs_cty.cty_post
       | Excep (xs, v) ->
           let desc = cntr_desc "Exceptional postcondition" rs.rs_name in
           let posts = Mxs.find xs rs.rs_cty.cty_xpost in
-          check_posts desc loc env oldies v posts
+          check_posts desc loc env v posts
       | _ -> () );
   res
 
@@ -1662,7 +1729,7 @@ let warnings env model =
 
 let check_model_rs ?rac_trans ?rac_prover env pm model rs =
   let open Pmodule in
-  Debug.dprintf debug_rac "Validating model: %a@."
+  Debug.dprintf debug_rac "Validating model:@\n%a@."
     (print_model ?me_name_trans:None ~print_attrs:false) model;
   reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
