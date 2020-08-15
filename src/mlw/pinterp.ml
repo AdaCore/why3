@@ -106,25 +106,17 @@ end = struct
     | Vterm of term
   and field = Field of value ref
 
-  type _ cmp = Cmp : ('a -> 'b) * ('b -> 'b -> int) -> 'a cmp
-  let rec cmp ls x y = match ls with
-    | [] -> 0 | Cmp (f, c) :: ls -> match c (f x) (f y) with
-        0 -> cmp ls x y | n -> n
-  let rec cmp_lists ls l1 l2 = match l1, l2 with
-    | h1::t1, h2::t2 ->
-        let ls = [Cmp (fst, cmp ls); Cmp (snd, cmp_lists ls)] in
-        cmp ls (h1, t1) (h2, t2)
-    | [], _ -> -1 | _, [] -> 1
+  open Util
 
   let rec compare_values v1 v2 =
     let v_ty v = v.v_ty and v_desc v = v.v_desc in
-    cmp [Cmp (v_ty, ty_compare); Cmp (v_desc, compare_desc)] v1 v2
+    cmp [cmptr v_ty ty_compare; cmptr v_desc compare_desc] v1 v2
   and compare_desc d1 d2 =
     match d1, d2 with
     | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
         let field_get (Field f) = !f in
-        let cmp_fields = cmp_lists [Cmp (field_get, compare_values)] in
-        cmp [Cmp (fst, rs_compare); Cmp (snd, cmp_fields)] (rs1, fs1) (rs2, fs2)
+        let cmp_fields = cmp_lists [cmptr field_get compare_values] in
+        cmp [cmptr fst rs_compare; cmptr snd cmp_fields] (rs1, fs1) (rs2, fs2)
     | Vconstr _, _ -> -1 | _, Vconstr _ -> 1
     | Vnum i1, Vnum i2 ->
         BigInt.compare i1 i2
@@ -144,26 +136,26 @@ end = struct
     | Vbool b1, Vbool b2 ->
         compare b1 b2
     | Vbool _, _ -> -1 | _, Vbool _ -> 1
-    | Vvoid, Vvoid ->
-        0
+    | Vvoid, Vvoid -> 0
     | Vvoid, _ -> -1 | _, Vvoid -> 1
     | Vfun _, Vfun _ ->
         failwith "Value.compare: Vfun"
     | Vfun _, _ -> -1 | _, Vfun _ -> 1
     | Vpurefun (ty1, mv1, v1), Vpurefun (ty2, mv2, v2) ->
         cmp [
-          Cmp ((fun (x,_,_) -> x), ty_compare);
-          Cmp ((fun (_,x,_) -> x), Mv.compare compare_values);
-          Cmp ((fun (_,_,x) -> x), compare_values)
+          cmptr (fun (x,_,_) -> x) ty_compare;
+          cmptr (fun (_,x,_) -> x) (Mv.compare compare_values);
+          cmptr (fun (_,_,x) -> x) compare_values;
         ] (ty1, mv1, v1) (ty2, mv2, v2)
     | Vpurefun _, _ -> -1 | _, Vpurefun _ -> 1
     | Vterm t1, Vterm t2 ->
         t_compare t1 t2
     | Vterm _, _ -> -1 | _, Vterm _ -> 1
     | Varray a1, Varray a2 ->
-        cmp [Cmp (Array.length, (-));
-             Cmp (Array.to_list, cmp_lists [Cmp ((fun x -> x), compare_values)])]
-          a1 a2
+        cmp [
+          cmptr Array.length (-);
+          cmptr Array.to_list (cmp_lists [cmptr (fun x -> x) compare_values]);
+        ] a1 a2
 end
 and Mv : Map.S with type key = Value.value =
   Map.Make (struct

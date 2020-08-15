@@ -210,6 +210,37 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
+let select_model check_model models =
+  let sorted_models =
+    let open Util in
+    let compare = cmp [
+        cmptr (fun (_,r,_,_) -> match r with StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") -> 0 | _ -> 1) (-);
+        cmptr (fun (i,_,_,_) -> i) (fun i1 i2 -> i2 - i1) ;
+      ] in
+    let check_model (i,r,m) =
+      Debug.dprintf debug "Check model %d@." i;
+      let v = check_model m in
+      printf "Model %d: %a@." i print_full_verdict v;
+      i,r,m,v in
+    let not_empty (i,_,m) =
+      let res = not (is_model_empty m) in
+      if res then Debug.dprintf debug "Discard empty model %d@." i;
+      res in
+    let not_bad (_,_,_,v) = v.verdict <> Bad_model in
+    List.sort compare
+      (List.filter not_bad
+           (List.map check_model
+              (List.filter not_empty
+                   (List.mapi (fun i (r,m) -> i,r,m)
+                      models)))) in
+  match sorted_models with
+  | [] ->
+      Debug.dprintf debug "Select no CE model@.";
+      None
+  | (i,r,m,v) :: others ->
+      Debug.dprintf debug "Select saved CE model %d@." i;
+      Some m
+
 let analyse_result ?(check_model=default_check_model) exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
@@ -229,36 +260,7 @@ let analyse_result ?(check_model=default_check_model) exit_result res_parser pri
   let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        (* Search for the first model that is certainly valid (maybe_ce_model m = Some
-           true) (if exists), or the first model that is not certainly invalid
-           (maybe_ce_model m = None) *)
-        let use_incremental_choice = false in
-        let rec select save i = function
-          | [] -> Debug.dprintf debug "Select %s CE model %a@." (if save = None then "no" else "saved")
-                    (Pp.print_option Pp.int) (Opt.map fst save);
-              Opt.map snd save (* Select saved model *)
-          | (res, m) :: ms ->
-              if is_model_empty m then (
-                Debug.dprintf debug "Discard empty model %d@." i;
-                select save (succ i) ms (* Discard empty model *)
-              ) else (
-                Debug.dprintf debug "Check model %d@." i;
-                let v = check_model m in
-                printf "Model %d: %a@." i print_full_verdict v;
-                match v.verdict with
-                | Bad_model -> select save (succ i) ms (* Discard bad model *)
-                (* | Good_model -> Debug.dprintf debug "Select good CE model@."; Some m (\* Select good model *\)
-                 * | Dont_know -> *)
-                | _ ->
-                    match res with (* Save dontknow model in non-incremental mode *)
-                    | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout")
-                      when use_incremental_choice && save <> None ->
-                        Debug.dprintf debug "Retain saved model@.";
-                        select save (succ i) ms
-                    | _ ->
-                        Debug.dprintf debug "Save model@.";
-                        select (Some (i, m)) (succ i) ms ) in
-        let model = select None 0 (List.rev saved_models) in
+        let model = select_model check_model (List.rev saved_models) in
         Opt.get_def HighFailure saved_res, model
     | Answer res1 :: (Answer res2 :: tl as tl1) ->
        Debug.dprintf debug "Call_provers: two consecutive answers: %a %a@."

@@ -70,3 +70,21 @@ val ffalse : 'a -> bool
 
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
+
+(** {3 Lexical comparison using projections}
+
+    For example to lexically sort a list [l] of pairs [(int * string) list]:
+
+      [cmp [cmptr fst Int.compare; cmptr snd String.compare] l] *)
+
+type 'a cmptr
+(** A comparator for values of type ['a] **)
+
+val cmptr : ('a -> 'b) -> ('b -> 'b -> int) -> 'a cmptr
+(** Create a comparator by a projection and a comparison function between projected values *)
+
+val cmp : 'a cmptr list -> 'a -> 'a -> int
+(** Create a comparison function using lexical order defined by a list of comparators *)
+
+val cmp_lists : 'a cmptr list -> 'a list -> 'a list -> int
+(** Create a comparison function for lists using lexical order defined by a list of comparators *)
