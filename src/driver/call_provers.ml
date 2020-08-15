@@ -141,7 +141,7 @@ type prover_result_parser = {
   prp_timeregexps : timeregexp list;
   prp_stepregexps : stepregexp list;
   prp_exitcodes   : (int * prover_answer) list;
-  prp_model_parser : Model_parser.model_parser;
+  prp_model_parser : model_parser;
 }
 
 let print_prover_answer fmt = function
@@ -167,13 +167,15 @@ let print_prover_result ~json_model fmt {pr_answer = ans; pr_status = status;
                                          pr_steps  = s;   pr_model  = m} =
   let print_attrs = Debug.test_flag debug_attrs in
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
-  if not (Model_parser.is_model_empty m) then begin
+  if not (is_model_empty m) then (
     fprintf fmt "\nCounter-example model:";
-    if json_model then
-      Model_parser.print_model ~print_attrs fmt m
-    else
-      Model_parser.print_model_human ~print_attrs fmt m
-  end;
+    (* Opt.iter (fprintf fmt " %a" Loc.report_position) (get_model_term_loc m); *)
+    let print_model =
+      if json_model then
+        print_model ~print_attrs (* TODO use print_model_json *)
+      else print_model_human ~print_attrs in
+    print_model ?me_name_trans:None fmt m;
+  ) ;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
       print_prover_status status out
@@ -204,7 +206,7 @@ let craft_efficient_re l =
 
 let debug_print_model ~print_attrs model =
   Debug.dprintf debug "Call_provers: %a@."
-    (Model_parser.print_model ?me_name_trans:None ~print_attrs) model
+    (print_model ?me_name_trans:None ~print_attrs) model
 
 type answer_or_model = Answer of prover_answer | Model of string
 
@@ -244,9 +246,9 @@ let analyse_result ?(check_model=default_check_model) exit_result res_parser pri
                 let v = check_model m in
                 printf "Model %d: %a@." i print_full_verdict v;
                 match v.verdict with
-                | Model_parser.Bad_model -> select save (succ i) ms (* Discard bad model *)
-                (* | Model_parser.Good_model -> Debug.dprintf debug "Select good CE model@."; Some m (\* Select good model *\)
-                 * | Model_parser.Dont_know -> *)
+                | Bad_model -> select save (succ i) ms (* Discard bad model *)
+                (* | Good_model -> Debug.dprintf debug "Select good CE model@."; Some m (\* Select good model *\)
+                 * | Dont_know -> *)
                 | _ ->
                     match res with (* Save dontknow model in non-incremental mode *)
                     | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout")
@@ -515,7 +517,7 @@ let editor_result ret = {
   pr_output = "";
   pr_time   = 0.0;
   pr_steps  = 0;
-  pr_model  = Model_parser.default_model;
+  pr_model  = default_model;
 }
 
 let query_call = function
