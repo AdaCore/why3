@@ -214,7 +214,6 @@ let select_model check_model models =
   let sorted_models =
     let open Util in
     let compare = cmp [
-        cmptr (fun (_,r,_,_) -> match r with StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") -> 0 | _ -> 1) (-);
         cmptr (fun (i,_,_,_) -> i) (fun i1 i2 -> i2 - i1) ;
       ] in
     let check_model (i,r,m) =
@@ -226,13 +225,16 @@ let select_model check_model models =
       let res = not (is_model_empty m) in
       if res then Debug.dprintf debug "Discard empty model %d@." i;
       res in
-    let not_bad (_,_,_,v) = v.verdict <> Bad_model in
+    let not_limit (_,r,_) =
+      match r with
+      | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") -> false
+      | _ -> true in
     List.sort compare
-      (List.filter not_bad
-           (List.map check_model
-              (List.filter not_empty
-                   (List.mapi (fun i (r,m) -> i,r,m)
-                      models)))) in
+      (List.map check_model
+         (List.filter not_limit
+            (List.filter not_empty
+               (List.mapi (fun i (r,m) -> i,r,m)
+                  models)))) in
   match sorted_models with
   | [] ->
       Debug.dprintf debug "Select no CE model@.";
