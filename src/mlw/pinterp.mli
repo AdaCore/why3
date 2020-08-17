@@ -61,6 +61,12 @@ val eval_global_fundef :
 (** [eval_global_fundef ~rac env disp_ctx known def] evaluates a function definition and
    returns an evaluation result and a final variable environment.
 
+    During RAC, annotations are first reduced by applying transformation [rac_trans], and
+   if the transformation doesn't return to a trivial formula ([true]/[false]), the prover
+   [rac_prover] is applied. Pure expressions and pure executions are reduced only using
+   [rac_trans]. When neither [rac_trans] or [rac_prover] are defined, RAC does not
+    progress.
+
     @raise Contr RAC is enabled and a contradiction was found *)
 
 (** {1 Check counter-example models using RAC}*)
@@ -76,7 +82,9 @@ val check_model_rs :
   Model_parser.full_verdict
 (** [check_model_rs env pm loc m rs] checks if executing the definition of
     [rs] (abstractly) using the values from the counter-example model [m]
-    trigger a RAC contradiction at location [loc]. *)
+    trigger a RAC contradiction at location [loc].
+
+    Optional arguments [rac_trans] and [rac_prover] as in [eval_global_fundef]. *)
 
 val check_model :
   ?rac_trans:Task.task Trans.tlist ->
@@ -89,7 +97,9 @@ val check_model :
     execution using the model values triggers a RAC contradiction in the
     corresponding location. The function returns true if the corresponding
     program definition cannot be identified, or if there is an error during
-    RAC execution *)
+    RAC execution.
+
+    Optional arguments [rac_trans] and [rac_prover] as in [eval_global_fundef]. *)
 
 (** {1 Reporting results} *)
 
