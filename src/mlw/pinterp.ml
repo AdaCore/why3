@@ -32,6 +32,16 @@ let print_loc fmt loc =
   let f, l, b, e = Loc.get loc in
   fprintf fmt "%S, line %d, characters %d-%d" f l b e
 
+(** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
+    Relies on [get_multiline] and fails under the same conditions. *)
+let loc_contains loc1 loc2 =
+  if Loc.equal loc1 Loc.dummy_position || Loc.equal loc2 Loc.dummy_position then false else
+    let f1, (bl1, bc1), (el1, ec1) = Loc.get_multiline loc1 in
+    let f2, (bl2, bc2), (el2, ec2) = Loc.get_multiline loc2 in
+    String.equal f1 f2 &&
+    (bl1 < bl2 || (bl1 = bl2 && bc1 <= bc2)) &&
+    (el1 > el2 || (el1 = el2 && ec1 >= ec2))
+
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
   let pp_binding fmt (k, v) =
@@ -711,6 +721,114 @@ let rec default_value_of_type env known ity : value =
       let fl = List.map (fun ity -> field (default_value_of_type env known ity)) tyl in
       value ty (Vconstr (cs, fl))
 
+(* VALUE IMPORT *)
+
+let get_model_value model name loc =
+  let aux me =
+    me.me_name.men_name = name &&
+    Opt.equal Loc.equal me.me_location (Some loc) in
+  Opt.map (fun me -> me.me_value)
+    (List.find_opt aux (get_model_elements model))
+
+let model_value model pv =
+  Opt.bind pv.pv_vs.vs_name.id_loc
+    (get_model_value model pv.pv_vs.vs_name.id_string)
+
+exception CannotImportModelValue of string
+
+(* TODO Remove argument [env] after replacing Varray by model substitution *)
+let rec import_model_value env known ity v =
+  (* TODO If the type has a model projection `p` and the model value is a
+     projection `p _ = v`, we could add this equality as a rule to the
+     reduction engine. (Cf. bench/ce/oracles/double_projection.mlw) *)
+  (* TODO If the type is a non-free record, we could similarily axiomatize
+     the values of the fields by rules in the reduction engine. (Cf.
+     bench/ce/record_one_field.mlw)  *)
+  let def, subst =
+    match ity.ity_node with
+    | Ityapp (ts, l1, l2) | Ityreg {reg_its= ts; reg_args= l1; reg_regs= l2} ->
+        Pdecl.find_its_defn known ts,
+        its_match_regs ts l1 l2
+    | Ityvar _ -> assert false in
+  (* let is_ity_array env ity =
+   *   let pm = Pmodule.read_module env ["array"] "Array" in
+   *   let its_array = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
+   *   match ity.ity_node with
+   *   | Ityreg r -> its_equal r.reg_its its_array
+   *   | _ -> false in *)
+  (* if is_ity_array env ity then (\* TODO *\)
+   *   kasprintf failwith "ARRAY: %a@." print_model_value v
+   * else *)
+  if is_range_type_def def.Pdecl.itd_its.its_def then
+    match v with
+    | Proj (_, Integer s)
+    | Integer s -> value (ty_of_ity ity) (Vnum (BigInt.of_string s))
+    | _ -> assert false
+  else
+    let check_construction def =
+      if def.Pdecl.itd_its.its_nonfree then
+        let msg = asprintf "Value of non-free type %a" print_ity ity in
+        raise (CannotImportModelValue msg) in
+    match v with
+    | Integer s ->
+        assert (ity_equal ity ity_int);
+        value (ty_of_ity ity) (Vnum (BigInt.of_string s))
+    | String s ->
+        assert (ity_equal ity ity_str);
+        value ty_str (Vstring s)
+    | Boolean b ->
+        assert (ity_equal ity ity_bool);
+        value ty_bool (Vbool b)
+    | Record r ->
+        check_construction def;
+        let rs = match def.Pdecl.itd_constructors with [c] -> c | _ -> assert false in
+        let assoc_ity rs =
+          let name =
+            try Ident.get_model_element_name ~attrs:rs.rs_name.id_attrs
+            with Not_found -> rs.rs_name.id_string in
+          let ity = ity_full_inst subst (fd_of_rs rs).pv_ity in
+          name, ity in
+        let arg_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
+        let fs = List.map (fun (f, mv) -> import_model_value env known (Mstr.find f arg_itys) mv) r in
+        value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
+    | Apply (s, mvs) ->
+        check_construction def;
+        let matching_name rs = String.equal rs.rs_name.id_string s in
+        let rs = List.find matching_name def.Pdecl.itd_constructors in
+        let import field_pv = import_model_value env known (ity_full_inst subst field_pv.pv_ity) in
+        let fs = List.map2 import rs.rs_cty.cty_args mvs in
+        value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
+    | Proj (s, mv) ->
+        check_construction def;
+        let rs = match def.Pdecl.itd_constructors with
+          | [rs] -> rs
+          | [] ->
+              eprintf "Cannot import projection to type without constructor";
+              raise CannotCompute
+          | _ -> failwith "(Singleton) record constructor expected" in
+        let import_or_default field_pv =
+          let ity = ity_full_inst subst field_pv.pv_ity in
+          let name = field_pv.pv_vs.vs_name.id_string and attrs = field_pv.pv_vs.vs_name.id_attrs in
+          if String.equal (Ident.get_model_trace_string ~name ~attrs) s then
+            import_model_value env known ity mv
+          else default_value_of_type env known ity in
+        let fs = List.map import_or_default rs.rs_cty.cty_args in
+        value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
+    | Array a ->
+        assert (its_equal def.Pdecl.itd_its its_func);
+        let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
+          | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
+          | _ -> assert false in
+        let add_index mv ix =
+          let key = import_model_value env known key_ity ix.arr_index_key in
+          let value = import_model_value env known value_ity ix.arr_index_value in
+          Mv.add key value mv in
+        let mv = List.fold_left add_index Mv.empty a.arr_indices in
+        let v0 = import_model_value env known value_ity a.arr_others in
+        value (ty_of_ity ity) (Vpurefun (ty_of_ity key_ity, mv, v0))
+    | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
+        kasprintf failwith "import_model_value (not implemented): %a" print_model_value v
+
 (* ROUTINE DEFINITIONS *)
 
 type routine_defn =
@@ -854,6 +972,16 @@ let iter_decl_locs f known =
 
 (* TERM EVALUATION *)
 
+(* Add declarations for additional term bindings in [vsenv] *)
+let bind_term (vs, t) (task, ls_mt, ls_mv) =
+  let ty = Opt.get t.t_ty in
+  let ls = create_fsymbol (id_clone vs.vs_name) [] ty in
+  let ls_mt = ty_match ls_mt vs.vs_ty ty in
+  let ls_mv = Mvs.add vs (fs_app ls [] ty) ls_mv in
+  let t = t_ty_subst ls_mt ls_mv t in
+  let defn = Decl.make_ls_defn ls [] t in
+  let task = Task.add_logic_decl task [defn] in
+  task, ls_mt, ls_mv
 
 let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
@@ -888,21 +1016,11 @@ let task_of_term ?(vsenv=[]) env t =
             let ls_mv = Mvs.add vs t ls_mv in
             ls, ls_mv in
       let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
-      let decl = Decl.make_ls_defn ls vs_args t in
+      let decl = make_ls_defn ls vs_args t in
       let task = add_logic_decl task [decl] in
       task, ls_mv
     with Exit -> task, ls_mv in
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
-  (* Add declarations for additional term bindings in [vsenv] *)
-  let bind_term (vs, t) (task, ls_mt, ls_mv) =
-    let ty = Opt.get t.t_ty in
-    let ls = create_fsymbol (id_clone vs.vs_name) [] ty in
-    let ls_mt = ty_match ls_mt vs.vs_ty ty in
-    let ls_mv = Mvs.add vs (fs_app ls [] ty) ls_mv in
-    let t = t_ty_subst ls_mt ls_mv t in
-    let defn = make_ls_defn ls [] t in
-    let task = add_logic_decl task [defn] in
-    task, ls_mt, ls_mv in
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
   (* Add declarations for value bindings in [env.vsenv] *)
   let bind_value vs v (task, ls_mt, ls_mv) =
@@ -919,22 +1037,108 @@ let task_of_term ?(vsenv=[]) env t =
   let t = t_ty_subst ls_mt ls_mv t in
   let task =
     if t.t_ty = None then (* Add goal ... *)
-      let prs = create_prsymbol (id_fresh "g") in
+      let prs = create_prsymbol (id_fresh "goal") in
       add_prop_decl task Pgoal prs t
     else (* ... or declaration *)
-      let ls = create_lsymbol (id_fresh "v") [] t.t_ty in
+      let ls = create_lsymbol (id_fresh "value") [] t.t_ty in
       let decl = make_ls_defn ls [] t in
       add_logic_decl task [decl] in
   task, ls_mv
 
-let check_term_compute trans task =
+let bind_univ_quant_vars = true
+let bind_univ_quant_vars_fallback_default = true
+
+let bind_quants env task =
+  let t = Task.task_goal_fmla task in
+  try match t with
+    | {t_node= Tquant (Tforall, tq)} when bind_univ_quant_vars ->
+        let vs, _, t = t_open_quant tq in
+        let get_value vs =
+          match vs.vs_name with
+          | {id_string= name; id_loc= Some loc} -> (
+              match get_model_value env.ce_model name loc with
+              | Some mv ->
+                  let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) mv in
+                  Debug.dprintf debug_rac "Bind value for all-quantified %a to %a@." print_vs vs print_value v;
+                  v
+              | None ->
+                  if bind_univ_quant_vars_fallback_default then (
+                    let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
+                    Debug.dprintf debug_rac "Use default value for all-quantified %a: %a@." print_vs vs print_value v;
+                    v
+                  ) else (
+                    Debug.dprintf debug_rac "No value for all-quantified %a@." print_vs vs;
+                    raise Exit ) )
+          | _ -> raise Exit (* Missing location, cannot identify CE value *) in
+        let values = List.map get_value vs in
+        let _, task = Task.task_separate_goal task in
+        let bind_vs vs v (ls_mv, ls_mt, task) =
+          let ls_mt = ty_match ls_mt vs.vs_ty v.v_ty in
+          let ls = create_lsymbol (id_clone vs.vs_name) [] (Some v.v_ty) in
+          let ls_mv = Mvs.add vs (fs_app ls [] v.v_ty) ls_mv in
+          let vsenv, t = term_of_value env.env [] v in
+          let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
+          let defn = Decl.make_ls_defn ls [] t in
+          let task = Task.add_logic_decl task [defn] in
+          ls_mv, ls_mt, task in
+        let ls_mv, ls_mt, task = List.fold_right2 bind_vs vs values (Mvs.empty, Mtv.empty, task) in
+        let t = t_ty_subst ls_mt ls_mv t in
+        let prs = Decl.create_prsymbol (id_fresh "goal") in
+        Task.add_prop_decl task Decl.Pgoal prs t
+    | _ -> raise Exit
+  with Exit -> task
+
+let task_hd_equal t1 t2 = let open Task in let open Theory in let open Decl in
+  match t1.task_decl.td_node, t2.task_decl.td_node with
+  | Decl {d_node = Dprop (Pgoal,p1,g1)}, Decl {d_node = Dprop (Pgoal,p2,g2)} ->
+      (* Opt.equal (==) t1.task_prev t2.task_prev && *)
+      pr_equal p1 p2 && t_equal_strict g1 g2
+  | _ -> t1 == t2
+
+(** Apply the (reduction) transformation and fill universally quantified variables
+    in the head of the task by values from the CE model, recursively. *)
+let rec trans_and_bind_quants env trans task =
+  let task = bind_quants env task in
+  let tasks = Trans.apply trans task in
+  let task_unchanged = match tasks with
+    | [task'] -> Opt.equal task_hd_equal task' task
+    | _ -> false in
+  if task_unchanged then tasks
+  else List.flatten (List.map (trans_and_bind_quants env trans) tasks)
+
+(** Compute the value of a term by using the (reduction) transformation *)
+let compute_term env t =
+  match env.rac_trans with
+  | None -> t
+  | Some trans ->
+      let task, ls_mv = task_of_term env t in
+      if t.t_ty = None then
+        match List.map Task.task_goal_fmla (trans_and_bind_quants env trans task) with
+        | [] -> t_true
+        | t :: ts -> List.fold_left t_and t ts
+      else
+        let t = match Trans.apply trans task with
+          | [Some Task.{task_decl= Theory.{td_node= Decl Decl.{d_node= Dlogic [_, ldef]}}}] ->
+              ( match Decl.open_ls_defn ldef with
+                | [], t -> t
+                | _ ->  failwith "compute_term" )
+          | _ -> failwith "compute_term" in
+        (* Free vsymbols in [t] have been substituted in [task] by fresh
+           lsymbols (actually: ls @ []) to bind them to the task declarations.
+           Now we have to reverse these substitution to ensures that the reduced
+           term is valid in the original environment of [t]. *)
+        let reverse vs t' t = t_replace t' (t_var vs) t in
+        Mvs.fold reverse ls_mv t
+
+(** Check the validiy of a term that has been encoded in a task by the (reduction) transformation *)
+let check_term_compute env trans task =
   let is_false = function
     | Some {Task.task_decl= Theory.{
         td_node= Decl Decl.{
             d_node= Dprop (Pgoal, _, {t_node= Tfalse})}}} ->
         true
     | _ -> false in
-  match Trans.apply trans task with
+  match trans_and_bind_quants env trans task with
   | [] -> Some true
   | tasks ->
       Debug.dprintf debug_rac_check "Transformation produced %d tasks@." (List.length tasks);
@@ -945,30 +1149,7 @@ let check_term_compute trans task =
           (Lists.map_filter (Opt.map (fun t -> t.Task.task_decl)) tasks);
         None )
 
-let compute_term env t =
-  match env.rac_trans with
-  | None -> t
-  | Some trans ->
-      let task, ls_mv = task_of_term env t in
-      let tasks = Trans.apply trans task in
-      if t.t_ty = None then
-        match List.map Task.task_goal_fmla tasks with
-        | [] -> t_true
-        | t :: ts -> List.fold_left t_and t ts
-      else
-        match tasks with
-        | [Some Task.{task_decl= Theory.{td_node= Decl Decl.{d_node= Dlogic [_, ldef]}}}] ->
-            ( match Decl.open_ls_defn ldef with
-              | [], t ->
-                  (* Free vsymbols in [t] have been substituted in [task] by fresh
-                     lsymbols (actually: ls @ []) to bind them to the task declarations.
-                     Now we have to reverse these substitution to ensures that the reduced
-                     term is valid in the original environment of [t]. *)
-                  let reverse vs t' t = t_replace t' (t_var vs) t in
-                  Mvs.fold reverse ls_mv t
-              | _ -> failwith "compute_term" )
-        | _ -> failwith "compute_term"
-
+(** Check the validiy of a term that has been encoded in a task by dispatching it to a prover *)
 let check_term_dispatch (Rac_prover {command; driver; limit_time}) task =
   let open Call_provers in
   let limit = {empty_limit with limit_time} in
@@ -981,7 +1162,7 @@ let check_term_dispatch (Rac_prover {command; driver; limit_time}) task =
   | Invalid -> Some false
   | _ -> None
 
-(* TODO replace by a strategy, e.g., t compute_in_goal; c Z3,4.8.7 2 2000 *)
+(* TODO replace by a strategy? e.g., t compute_in_goal; c Z3,4.8.7 2 2000 *)
 let check_term ?vsenv ctx t =
   Opt.iter visit_loc t.t_loc;
   Debug.dprintf debug_rac_check "@[<hv2>Check term: %a@]@." print_term t;
@@ -989,7 +1170,7 @@ let check_term ?vsenv ctx t =
   let res = (* Try checking the term using computation first ... *)
     Opt.map (fun b -> Debug.dprintf debug_rac_check "Computed.@."; b)
       (Opt.bind ctx.c_env.rac_trans
-         (fun trans -> check_term_compute trans task)) in
+         (fun trans -> check_term_compute ctx.c_env trans task)) in
   let res =
     if res = None then (* ... then try solving using a prover *)
       Opt.map (fun b -> Debug.dprintf debug_rac_check "Dispatched.@."; b)
@@ -1073,112 +1254,6 @@ let is_false v = match v.v_desc with
 let fix_boolean_term t =
   if t_equal t t_true then t_bool_true else
   if t_equal t t_false then t_bool_false else t
-
-let get_model_value model name loc =
-  let aux me =
-    me.me_name.men_name = name &&
-    Opt.equal Loc.equal me.me_location (Some loc) in
-  Opt.map (fun me -> me.me_value)
-    (List.find_opt aux (get_model_elements model))
-
-let model_value model pv =
-  Opt.bind pv.pv_vs.vs_name.id_loc
-    (get_model_value model pv.pv_vs.vs_name.id_string)
-
-exception CannotImportModelValue of string
-
-(* TODO Remove argument [env] after replacing Varray by model substitution *)
-let rec import_model_value env known ity v =
-  (* TODO If the type has a model projection `p` and the model value is a
-     projection `p _ = v`, we could add this equality as a rule to the
-     reduction engine. (Cf. bench/ce/oracles/double_projection.mlw) *)
-  (* TODO If the type is a non-free record, we could similarily axiomatize
-     the values of the fields by rules in the reduction engine. (Cf.
-     bench/ce/record_one_field.mlw)  *)
-  let def, subst =
-    match ity.ity_node with
-    | Ityapp (ts, l1, l2) | Ityreg {reg_its= ts; reg_args= l1; reg_regs= l2} ->
-        Pdecl.find_its_defn known ts,
-        its_match_regs ts l1 l2
-    | Ityvar _ -> assert false in
-  (* let is_ity_array env ity =
-   *   let pm = Pmodule.read_module env ["array"] "Array" in
-   *   let its_array = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
-   *   match ity.ity_node with
-   *   | Ityreg r -> its_equal r.reg_its its_array
-   *   | _ -> false in *)
-  (* if is_ity_array env ity then (\* TODO *\)
-   *   kasprintf failwith "ARRAY: %a@." print_model_value v
-   * else *)
-  if is_range_type_def def.Pdecl.itd_its.its_def then
-    match v with
-    | Proj (_, Integer s)
-    | Integer s -> value (ty_of_ity ity) (Vnum (BigInt.of_string s))
-    | _ -> assert false
-  else
-    let check_construction def =
-      if def.Pdecl.itd_its.its_nonfree then
-        let msg = asprintf "Value of non-free type %a" print_ity ity in
-        raise (CannotImportModelValue msg) in
-    match v with
-    | Integer s ->
-        assert (ity_equal ity ity_int);
-        value (ty_of_ity ity) (Vnum (BigInt.of_string s))
-    | String s ->
-        assert (ity_equal ity ity_str);
-        value ty_str (Vstring s)
-    | Boolean b ->
-        assert (ity_equal ity ity_bool);
-        value ty_bool (Vbool b)
-    | Record r ->
-        check_construction def;
-        let rs = match def.Pdecl.itd_constructors with [c] -> c | _ -> assert false in
-        let assoc_ity rs =
-          let name =
-            try Ident.get_model_element_name ~attrs:rs.rs_name.id_attrs
-            with Not_found -> rs.rs_name.id_string in
-          let ity = ity_full_inst subst (fd_of_rs rs).pv_ity in
-          name, ity in
-        let arg_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
-        let fs = List.map (fun (f, mv) -> import_model_value env known (Mstr.find f arg_itys) mv) r in
-        value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
-    | Apply (s, mvs) ->
-        check_construction def;
-        let matching_name rs = String.equal rs.rs_name.id_string s in
-        let rs = List.find matching_name def.Pdecl.itd_constructors in
-        let import field_pv = import_model_value env known (ity_full_inst subst field_pv.pv_ity) in
-        let fs = List.map2 import rs.rs_cty.cty_args mvs in
-        value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
-    | Proj (s, mv) ->
-        check_construction def;
-        let rs = match def.Pdecl.itd_constructors with
-          | [rs] -> rs
-          | [] ->
-              eprintf "Cannot import projection to type without constructor";
-              raise CannotCompute
-          | _ -> failwith "(Singleton) record constructor expected" in
-        let import_or_default field_pv =
-          let ity = ity_full_inst subst field_pv.pv_ity in
-          let name = field_pv.pv_vs.vs_name.id_string and attrs = field_pv.pv_vs.vs_name.id_attrs in
-          if String.equal (Ident.get_model_trace_string ~name ~attrs) s then
-            import_model_value env known ity mv
-          else default_value_of_type env known ity in
-        let fs = List.map import_or_default rs.rs_cty.cty_args in
-        value (ty_of_ity ity) (Vconstr (rs, List.map field fs))
-    | Array a ->
-        assert (its_equal def.Pdecl.itd_its its_func);
-        let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
-          | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
-          | _ -> assert false in
-        let add_index mv ix =
-          let key = import_model_value env known key_ity ix.arr_index_key in
-          let value = import_model_value env known value_ity ix.arr_index_value in
-          Mv.add key value mv in
-        let mv = List.fold_left add_index Mv.empty a.arr_indices in
-        let v0 = import_model_value env known value_ity a.arr_others in
-        value (ty_of_ity ity) (Vpurefun (ty_of_ity key_ity, mv, v0))
-    | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
-        kasprintf failwith "import_model_value (not implemented): %a" print_model_value v
 
 let exec_pure env ls pvs =
   if ls_equal ls ps_equ then
@@ -1761,16 +1836,6 @@ let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
                             continue after %a@."
                     abs_Msg (Pp.print_option Pretty.print_loc) l in
      {verdict= Dont_know; kind; reason; warnings= []}
-
-(** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
-    Relies on [get_multiline] and fails under the same conditions. *)
-let loc_contains loc1 loc2 =
-  if Loc.equal loc1 Loc.dummy_position || Loc.equal loc2 Loc.dummy_position then false else
-  let f1, (bl1, bc1), (el1, ec1) = Loc.get_multiline loc1 in
-  let f2, (bl2, bc2), (el2, ec2) = Loc.get_multiline loc2 in
-  String.equal f1 f2 &&
-  (bl1 < bl2 || (bl1 = bl2 && bc1 <= bc2)) &&
-  (el1 > el2 || (el1 = el2 && ec1 >= ec2))
 
 (** Identifies the rsymbol of the definition that contains the given position. Raises
     [Not_found] if no such definition is found. **)
