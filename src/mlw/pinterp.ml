@@ -1793,6 +1793,11 @@ let warnings env model =
   if values_match env model then [] else
     ["Warning: RAC detected value divergence"]
 
+let loc_contains_opt oloc1 oloc2 =
+  match oloc1, oloc2 with
+  | Some loc1, Some loc2 -> loc_contains loc1 loc2
+  | _ -> false
+
 let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
   let open Pmodule in
   let abs_msg = if abs then "abstract" else "concrete" in
@@ -1807,19 +1812,15 @@ let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
                            contradiction during execution" in
     { verdict= Dont_know; kind; reason; warnings= warnings env model}
   with
-  | Contr (ctx, t) when Opt.equal Loc.equal (get_model_term_loc model) t.Term.t_loc ->
+  | Contr (ctx, t) when loc_contains_opt (get_model_term_loc model) t.t_loc ->
      let reason= abs_Msg ^ " RAC confirms the counter-example" in
      { verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model}
   | Contr (ctx, t) ->
-     let reason = asprintf
-                    "%s RAC found a contradiction at different location %a"
-                    abs_Msg
-                    (Pp.print_option_or_default "NO LOC" print_loc)
-                    t.Term.t_loc in
-     {verdict= Dont_know; kind; reason; warnings= warnings ctx.c_env model}
+     let reason = asprintf "%s RAC found a contradiction at different location %a"
+         abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
+     {verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model}
   | CannotImportModelValue msg ->
-     let reason = sprintf "%s RAC: Cannot import value from model: %s"
-                    abs_Msg msg in
+     let reason = sprintf "%s RAC: Cannot import value from model: %s" abs_Msg msg in
      {verdict= Dont_know; kind; reason; warnings= []}
   | CannotCompute ->
      (* TODO E.g., bad default value for parameter and cannot evaluate
