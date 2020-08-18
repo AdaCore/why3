@@ -1765,6 +1765,7 @@ let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
 (** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
     Relies on [get_multiline] and fails under the same conditions. *)
 let loc_contains loc1 loc2 =
+  if Loc.equal loc1 Loc.dummy_position || Loc.equal loc2 Loc.dummy_position then false else
   let f1, (bl1, bc1), (el1, ec1) = Loc.get_multiline loc1 in
   let f2, (bl2, bc2), (el2, ec2) = Loc.get_multiline loc2 in
   String.equal f1 f2 &&
