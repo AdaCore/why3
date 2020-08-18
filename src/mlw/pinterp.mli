@@ -37,12 +37,6 @@ type cntr_ctx =
     during RAC. *)
 exception Contr of cntr_ctx * Term.term
 
-exception AbstractExEnded of Loc.position option
-(* the abstract execution cannot continue *)
-
-exception InvCeInfraction of Loc.position option
-(* the counter-example model is not consistent with an invariant *)
-
 (** {1 Global evaluation} *)
 
 val init_real : int * int * int -> unit
@@ -72,6 +66,7 @@ val eval_global_fundef :
 (** {1 Check counter-example models using RAC}*)
 
 val check_model_rs :
+  ?abs:bool ->                          (* execute abstractly *)
   ?rac_trans:Task.task Trans.tlist ->
   ?rac_prover:rac_prover ->
   Env.env ->
@@ -89,7 +84,7 @@ val check_model :
   Env.env ->
   Pmodule.pmodule ->
   Model_parser.model ->
-  Model_parser.full_verdict
+  Model_parser.full_verdict list
 (** [check_model env pm m] checks if model [m] is valid, i.e. the abstract
     execution using the model values triggers a RAC contradiction in the
     corresponding location. The function returns true if the corresponding

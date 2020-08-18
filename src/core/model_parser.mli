@@ -254,11 +254,19 @@ val interleave_with_source :
 (** Result when checking a CE model *)
 
 type verdict = Good_model | Bad_model | Dont_know
-type full_verdict = {verdict: verdict; reason: string; warnings: string list}
+
+type interp_kind = Concrete | Abstract | NotApplied
+
+type full_verdict = {
+    verdict  : verdict;
+    kind     : interp_kind;
+    reason   : string;
+    warnings : string list
+  }
 
 val print_full_verdict : full_verdict Pp.pp
 
-type check_model = model -> full_verdict
+type check_model = model -> full_verdict list
 (** Check the validity of a CE model. *)
 
 val default_check_model : check_model

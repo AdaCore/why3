@@ -867,8 +867,12 @@ let add_to_model ?vc_term_attrs model model_element =
         | Some vc_term_attrs ->
             fix_kind (filename, line_number) vc_term_attrs model_element
         | None -> model_element in
-      let elements =
-        if found_elements <> [] then elements else model_element :: elements in
+      let elements = model_element :: elements in
+      (* FIXME: find a way to filter elements without breaking the
+         counterexample check. The current filter is removing
+         variables that are required for the interpretation of
+         counterexamples. *)
+      (* if found_elementsts <> [] then elements else model_element :: elements in *)
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 
@@ -1058,18 +1062,30 @@ let model_for_positions_and_decls model ~positions =
   {model with model_files= model_filtered}
 
 type verdict = Good_model | Bad_model | Dont_know
-type full_verdict = {verdict: verdict; reason: string; warnings: string list}
+
+type interp_kind = Concrete | Abstract | NotApplied
+
+type full_verdict = {
+    verdict  : verdict;
+    kind     : interp_kind;
+    reason   : string;
+    warnings : string list
+  }
 
 let print_full_verdict fmt v =
   let s = match v.verdict with
     | Good_model -> "good model"
     | Bad_model -> "bad model"
     | Dont_know -> "don't know" in
-  fprintf fmt "%s (%s, %d warnings)" s v.reason (List.length v.warnings)
+  let k = match v.kind with
+    | Concrete -> "Concrete interpretation: "
+    | Abstract -> "Abstract interpretation: "
+    | NotApplied -> "" in
+  fprintf fmt "%s %s (%s, %d warnings)" k s v.reason (List.length v.warnings)
 
-type check_model = model -> full_verdict
+type check_model = model -> full_verdict list
 
-let default_check_model (_: model) = {verdict= Dont_know; reason= ""; warnings= []}
+let default_check_model (_: model) = []
 
 (*
 ***************************************************************

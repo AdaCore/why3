@@ -1214,8 +1214,7 @@ let print_result fmt = function
   | Fun (rs, _, _) -> fprintf fmt "FUN %a" print_rs rs
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
 
-exception InvCeInfraction of Loc.position option
-exception AbstractExEnded of Loc.position option
+exception AbstractRACStuck of Loc.position option
 
 let rec eval_expr ~rac ~abs env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
@@ -1360,7 +1359,7 @@ and eval_expr' ~rac ~abs env e =
             (invariant does not hold at beginning of execution)
         3 - if assert3 fails, then we have a real counterexample
             (invariant does not hold after iteration)
-        * stop the interpretation here - raise AbstractExEnded *)
+        * stop the interpretation here - raise AbstractRACStuck *)
       (* assert1 *)
       if rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
@@ -1369,8 +1368,8 @@ and eval_expr' ~rac ~abs env e =
       (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
-            (Pp.print_option print_loc) t.t_loc;
-          raise (InvCeInfraction t.t_loc));
+            (Pp.print_option Pretty.print_loc) t.t_loc;
+          raise (AbstractRACStuck t.t_loc));
       match eval_expr ~rac ~abs env cond with
       | Normal v ->
          if is_true v then begin
@@ -1378,7 +1377,7 @@ and eval_expr' ~rac ~abs env e =
              | Normal _ ->
                 if rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                raise (AbstractExEnded e.e_loc)
+                raise (AbstractRACStuck e.e_loc)
              | r -> r
            end
          else if is_false v then
@@ -1457,14 +1456,14 @@ and eval_expr' ~rac ~abs env e =
             (* assert2 *)
             if not (le a pvs_int) then begin
                 printf "ce model does not satisfy loop bounds %a@."
-                  (Pp.print_option print_loc) e.e_loc;
-                raise (InvCeInfraction e.e_loc) end;
+                  (Pp.print_option Pretty.print_loc) e.e_loc;
+                raise (AbstractRACStuck e.e_loc) end;
             (* assert3 *)
             (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
              | Contr (_,t) ->
                 printf "ce model does not satisfy loop invariant %a@."
-                  (Pp.print_option print_loc) t.t_loc;
-                raise (InvCeInfraction t.t_loc));
+                  (Pp.print_option Pretty.print_loc) t.t_loc;
+                raise (AbstractRACStuck t.t_loc));
             if le pvs_int b then begin
                 match eval_expr ~rac ~abs env e1 with
                 | Normal _ ->
@@ -1473,7 +1472,7 @@ and eval_expr' ~rac ~abs env e =
                    (* assert4 *)
                    if rac then
                      check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                   raise (AbstractExEnded e.e_loc)
+                   raise (AbstractRACStuck e.e_loc)
                 | r -> r
               end
             else Normal (value ty_unit Vvoid)
@@ -1676,7 +1675,7 @@ let eval_global_fundef ~rac ?rac_trans ?rac_prover env mod_known mod_theory loca
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
-let eval_rs ?rac_trans ?rac_prover ~abs env mod_known th_known model (rs: rsymbol) =
+let eval_rs ~abs ?rac_trans ?rac_prover env mod_known th_known model (rs: rsymbol) =
   let get_value pv =
     match model_value model pv with
     | Some mv ->
@@ -1719,47 +1718,49 @@ let warnings env model =
   if values_match env model then [] else
     ["Warning: RAC detected value divergence"]
 
-let check_model_rs ?rac_trans ?rac_prover env pm model rs =
+let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
   let open Pmodule in
-  Debug.dprintf debug_rac "Validating model:@\n%a@."
+  let abs_msg = if abs then "abstract" else "concrete" in
+  let abs_Msg = String.capitalize_ascii abs_msg in
+  let kind = if abs then Abstract else Concrete in
+  Debug.dprintf debug_rac "Validating model %s:@\n%a@." (abs_msg ^ "ly")
     (print_model ?me_name_trans:None ~print_attrs:false) model;
   reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
-    let _, env = eval_rs ~abs:false ?rac_trans ?rac_prover env pm.mod_known pm.mod_theory.Theory.th_known model rs in
-    let reason= "RAC does not confirm the counter-example, no contradiction \
-               during execution" in
-    { verdict= Dont_know; reason; warnings= warnings env model}
+    let _, env = eval_rs ~abs ?rac_trans ?rac_prover env pm.mod_known pm.mod_theory.Theory.th_known model rs in
+    let reason= abs_Msg ^ " RAC does not confirm the counter-example, no \
+                           contradiction during execution" in
+    { verdict= Dont_know; kind; reason; warnings= warnings env model}
   with
   | Contr (ctx, t) when Opt.equal Loc.equal (get_model_term_loc model) t.Term.t_loc ->
-      let reason= "RAC confirms the counter-example" in
-      { verdict= Good_model; reason; warnings= warnings ctx.c_env model}
+     let reason= abs_Msg ^ " RAC confirms the counter-example" in
+     { verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model}
   | Contr (ctx, t) ->
-      let reason = asprintf
-          "RAC found a contradiction at different location %a"
-          (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
-      {verdict= Dont_know; reason; warnings= warnings ctx.c_env model}
+     let reason = asprintf
+                    "%s RAC found a contradiction at different location %a"
+                    abs_Msg
+                    (Pp.print_option_or_default "NO LOC" print_loc)
+                    t.Term.t_loc in
+     {verdict= Dont_know; kind; reason; warnings= warnings ctx.c_env model}
   | CannotImportModelValue msg ->
-      let reason = sprintf "Cannot import value from model: %s" msg in
-      {verdict= Dont_know; reason; warnings= []}
+     let reason = sprintf "%s RAC: Cannot import value from model: %s"
+                    abs_Msg msg in
+     {verdict= Dont_know; kind; reason; warnings= []}
   | CannotCompute ->
      (* TODO E.g., bad default value for parameter and cannot evaluate
         pre-condition *)
-      let reason = "RAC execution got stuck" in
-      {verdict= Dont_know; reason; warnings= []}
+     let reason = abs_Msg ^ "RAC execution got stuck" in
+     {verdict= Dont_know; kind; reason; warnings= []}
   | Failure msg ->
-      (* E.g., cannot create default value for non-free type, cannot construct
+     (* E.g., cannot create default value for non-free type, cannot construct
          term for constructor that is not a function *)
-      let reason = sprintf "RAC failure: %s" msg in
-      {verdict= Dont_know; reason; warnings= []}
-(* | AbstractExEnded l ->
-   *    let reason = asprintf "Abstractly RAC cannot continue after %a@."
-   *      (Pp.print_option print_loc) l in
-   *    {verdict= Dont_know; reason; warnings= []}
-   * | InvCeInfraction l ->
-   *    let reason = asprintf "Abstraclty RAC: counter-example model
-   *            is not consistent with the invariant %a@."
-   *      (Pp.print_option print_loc) l in
-   *    {verdict= Dont_know; reason; warnings= []} *)
+     let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
+     {verdict= Dont_know; kind; reason; warnings= []}
+  | AbstractRACStuck l ->
+     let reason = asprintf "%s RAC, with the counterexample model cannot \
+                            continue after %a@."
+                    abs_Msg (Pp.print_option Pretty.print_loc) l in
+     {verdict= Dont_know; kind; reason; warnings= []}
 
 (** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
     Relies on [get_multiline] and fails under the same conditions. *)
@@ -1810,19 +1811,24 @@ let check_model ?rac_trans ?rac_prover env pm m =
   match get_model_term_loc m with
   | None ->
       let reason = "No model term location" in
-      {verdict= Dont_know; reason; warnings= []}
+      [{verdict = Dont_know; kind = NotApplied; reason; warnings = []}]
   | Some loc ->
     if let f, _, _, _ = Loc.get loc in Sys.file_exists f then
       (* TODO deal with VCs from variable declarations and type declarations *)
       (* TODO deal with VCs from goal definitions *)
       match find_rs pm loc with
-      | rs -> check_model_rs ?rac_trans ?rac_prover env pm m rs
+      | rs ->
+         let c_res =
+           check_model_rs ~abs:false ?rac_trans ?rac_prover env pm m rs in
+         let a_res =
+           check_model_rs ~abs:true ?rac_trans ?rac_prover env pm m rs in
+         [c_res;a_res]
       | exception Not_found ->
           let reason = "No corresponding routine symbol found" in
-          {verdict= Dont_know; reason; warnings= []}
+          [{verdict = Dont_know; kind = NotApplied; reason; warnings = []}]
     else
       let reason = "Source file does not exist, cannot apply Loc.get_multiline" in
-      {verdict= Dont_know; reason; warnings= [] }
+      [{verdict = Dont_know; kind = NotApplied; reason; warnings = [] }]
 
 let report_eval_result body fmt (res, final_env) =
   match res with

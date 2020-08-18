@@ -219,7 +219,9 @@ let select_model check_model models =
     let check_model (i,r,m) =
       Debug.dprintf debug "Check model %d@." i;
       let v = check_model m in
-      printf "Model %d: %a@." i print_full_verdict v;
+      printf "@[<hv 2>Model %d:@\n%a@\n@]@." i
+        (Pp.print_list_or_default "(check-ce disable by user)"
+           Pp.newline print_full_verdict) v;
       i,r,m,v in
     let not_empty (i,_,m) =
       let res = not (is_model_empty m) in
