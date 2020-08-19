@@ -35,12 +35,13 @@ let print_loc fmt loc =
 (** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
     Relies on [get_multiline] and fails under the same conditions. *)
 let loc_contains loc1 loc2 =
-  if Loc.equal loc1 Loc.dummy_position || Loc.equal loc2 Loc.dummy_position then false else
-    let f1, (bl1, bc1), (el1, ec1) = Loc.get_multiline loc1 in
-    let f2, (bl2, bc2), (el2, ec2) = Loc.get_multiline loc2 in
-    String.equal f1 f2 &&
-    (bl1 < bl2 || (bl1 = bl2 && bc1 <= bc2)) &&
-    (el1 > el2 || (el1 = el2 && ec1 >= ec2))
+  if Loc.equal loc1 Loc.dummy_position || Loc.equal loc2 Loc.dummy_position then
+    false (* loc_contains doesn't make sense, and calling get_multiline is invalid *)
+  else
+    let f1, b1, e1 = Loc.get_multiline loc1 in
+    let f2, b2, e2 = Loc.get_multiline loc2 in
+    let le (l1, c1) (l2, c2) = l1 < l2 || (l1 = l2 && c1 <= c2) in
+    String.equal f1 f2 && le b1 b2 && le e2 e1
 
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
@@ -282,10 +283,6 @@ let rec term_of_value env vsenv v : (vsymbol * term) list * term =
       let arg' = create_vsymbol (id_clone arg.vs_name) ty_arg in
       let mv = Mvs.add arg (t_var arg') mv in
       let t = t_ty_subst mt mv t in
-
-      (* eprintf "FUN %a->%a, %a, %a@." (pp_typed print_vs vs_ty) arg (pp_typed print_vs vs_ty) arg'
-       *   Pp.(print_list space print_vs) (Mvs.keys vsenv)
-       *   (pp_typed print_term (fun t -> Opt.get_def ty_none t.t_ty)) t; *)
       vsenv, t_lambda [arg'] [] t
   | Varray a ->
       (* TERM: [make a.length (eps v. true)][0 <- a[0]]...[n-1 <- a[n-1]] *)

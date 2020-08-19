@@ -168,7 +168,9 @@ let print_prover_result ~json_model fmt {pr_answer = ans; pr_status = status;
   let print_attrs = Debug.test_flag debug_attrs in
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
   if not (is_model_empty m) then (
-    fprintf fmt "\nCounter-example model:";
+    fprintf fmt "\nCounter-example model for term at %a"
+      (Pp.print_option_or_default "NO LOC" Pretty.print_loc)
+      (Model_parser.get_model_term_loc m);
     (* Opt.iter (fprintf fmt " %a" Loc.report_position) (get_model_term_loc m); *)
     let print_model =
       if json_model then
@@ -217,16 +219,17 @@ let select_model check_model models =
         cmptr (fun (i,_,_,_) -> i) (fun i1 i2 -> i2 - i1) ;
       ] in
     let check_model (i,r,m) =
-      Debug.dprintf debug "Check model %d@." i;
+      Debug.dprintf debug "Check model %d (%a)@." i
+        (Pp.print_option_or_default "NO LOC" Pretty.print_loc) (get_model_term_loc m);
       let v = check_model m in
       printf "@[<hv 2>Model %d:@\n%a@\n@]@." i
         (Pp.print_list_or_default "(check-ce disable by user)"
            Pp.newline print_full_verdict) v;
       i,r,m,v in
     let not_empty (i,_,m) =
-      let res = not (is_model_empty m) in
-      if res then Debug.dprintf debug "Discard empty model %d@." i;
-      res in
+      let empty = is_model_empty m in
+      if empty then Debug.dprintf debug "Model %d is empty@." i;
+      not empty in
     let not_limit (_,r,_) =
       match r with
       | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") -> false
@@ -241,7 +244,7 @@ let select_model check_model models =
   | [] ->
       Debug.dprintf debug "Select no CE model@.";
       None
-  | (i,r,m,v) :: others ->
+  | (i,_,m,_) :: _ ->
       Debug.dprintf debug "Select saved CE model %d@." i;
       Some m
 
