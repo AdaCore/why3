@@ -139,8 +139,6 @@ let rec pp_why_node : type a . Format.formatter -> a why_node -> unit =
   | { desc = Clone_declaration _ } as n -> pp_clone_declaration fmt n
   | { desc = Clone_substitution _ } as n -> pp_clone_substitution fmt n
   | { desc = Theory_declaration _ } as n -> pp_theory_declaration fmt n
-  | { desc = Custom_substitution _ } as n -> pp_custom_substitution fmt n
-  | { desc = Custom_declaration _ } as n -> pp_custom_declaration fmt n
   | { desc = Module _ } as n -> pp_module fmt n
 
 and pp_why_node_option : type a . Format.formatter -> a why_node option -> unit =
@@ -495,8 +493,6 @@ and pp_record_update fmt (n : record_update_id) = Format.fprintf fmt "--pp_recor
 and pp_record_aggregate fmt (n : record_aggregate_id) = Format.fprintf fmt "--pp_record_aggregate NOT IMPLEMENTED"
 and pp_binding_ref fmt (n : binding_ref_id) = Format.fprintf fmt "--pp_binding_ref NOT IMPLEMENTED"
 and pp_exception_declaration fmt (n : exception_declaration_id) = Format.fprintf fmt "--pp_exception_declaration NOT IMPLEMENTED"
-and pp_custom_substitution fmt (n : custom_substitution_id) = Format.fprintf fmt "--pp_custom_substitution NOT IMPLEMENTED"
-and pp_custom_declaration fmt (n : custom_declaration_id) = Format.fprintf fmt "--pp_custom_declaration NOT IMPLEMENTED"
 
 let pp_file fmt f =
   pp_print_list ~pp_sep:Why3.Pp.newline2 pp_why_node fmt f.theory_declarations

@@ -1241,51 +1241,7 @@ let rec mk_declaration (node : declaration_id) =
       let pty = Opt.(get (Ty.mk_tuple []) (map mk_pty_of_type r.arg)) in
       [D.mk_exn id pty Ity.MaskVisible]
 
-let read_mlw_file filename =
-  let ic = open_in filename in
-  let buf = Lexing.from_channel ic in
-  let res = Lexer.parse_mlw_file buf in
-  close_in ic;
-  res
-
-let locate_file_name file_name =
-  let open Filename in
-  let concats = List.fold_left concat in
-  let from_share =
-    let base = (* $(dirname $0)/../../.. *)
-      concats (dirname Sys.executable_name)
-        [parent_dir_name; parent_dir_name; parent_dir_name] in
-    concats base ["share"; "spark"; "theories"; file_name] in
-  let from_proof_dir =
-    let proof_dir = (* TODO Use Gnat_config.proof_dir instead *)
-      let rec search = function
-        | [] -> None
-        | "--proof-dir" :: s :: _ -> Some s
-        | _ :: ss -> search ss in
-      search (Array.to_list Sys.argv) in
-    Opt.map (fun d -> concats d ["_theories"; file_name]) proof_dir in
-  if Sys.file_exists from_share then
-    from_share
-  else match from_proof_dir with
-    | Some dir when Sys.file_exists dir -> dir
-    | _ ->
-        Format.ksprintf failwith "locate_file_name: cannot read theory full_name %S"
-          file_name
-
-let mk_custom_declaration (node: custom_declaration_id) =
-  let Custom_declaration r = node.desc in
-  let file_name =
-    match r.file_name with
-    | Symbol s -> s
-    | No_symbol -> "" in
-  let file_name = locate_file_name file_name in
-  match read_mlw_file file_name with
-  | Modules modules -> modules
-  | Decls _ ->
-      Format.ksprintf invalid_arg
-        "mk_generic_theory: %s contains decls not modules" file_name
-
-let mk_generic_theory (node : generic_theory_id) =
+let mk_theory_declaration (node : theory_declaration_id) =
   match node.desc with
   | Theory_declaration r ->
       (* Ignore [r.kind], because theory and module is the same *)
@@ -1295,14 +1251,9 @@ let mk_generic_theory (node : generic_theory_id) =
       let includes = List.map mk_include_declaration r.includes in
       let declarations = List.concat (List.map mk_declaration r.declarations) in
       [name, includes @ declarations]
-  | Custom_substitution r ->
-      Format.ksprintf invalid_arg "mk_generic_theory: custom substitution %s"
-        (Opt.get "NO_SYMBOL" (string_of_symbol r.from))
-  | Custom_declaration _ as desc ->
-      mk_custom_declaration {node with desc=desc}
 
 let mlw_file nodes =
-  Modules (List.concat (List.map mk_generic_theory nodes))
+  Modules (List.concat (List.map mk_theory_declaration nodes))
 
 (** {1 JSON auxiliaries} *)
 

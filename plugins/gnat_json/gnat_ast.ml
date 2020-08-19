@@ -141,8 +141,6 @@ type meta_declaration_tag = [`Meta_declaration]
 type clone_declaration_tag = [`Clone_declaration]
 type clone_substitution_tag = [`Clone_substitution]
 type theory_declaration_tag = [`Theory_declaration]
-type custom_substitution_tag = [`Custom_substitution]
-type custom_declaration_tag = [`Custom_declaration]
 type module_tag = [`Module]
 
 (* Class tags *)
@@ -335,14 +333,7 @@ type any_node_tag = [
  | `Clone_declaration
  | `Clone_substitution
  | `Theory_declaration
- | `Custom_substitution
- | `Custom_declaration
  | `Module
-]
-type generic_theory_tag = [
- | `Theory_declaration
- | `Custom_substitution
- | `Custom_declaration
 ]
 
 (* Why_Node *)
@@ -412,8 +403,6 @@ and 'a why_node_desc =
   | Clone_declaration : {origin: module_id; as_name: symbol; clone_kind: clone_type; substitutions: clone_substitution_olist; theory_kind: theory_type} -> [> clone_declaration_tag] why_node_desc
   | Clone_substitution : {kind: subst_type; orig_name: name_id; image: name_id} -> [> clone_substitution_tag] why_node_desc
   | Theory_declaration : {declarations: declaration_olist; name: symbol; kind: theory_type; includes: include_declaration_olist; comment: symbol} -> [> theory_declaration_tag] why_node_desc
-  | Custom_substitution : {from: symbol; to_: any_node_id} -> [> custom_substitution_tag] why_node_desc
-  | Custom_declaration : {file_name: symbol} -> [> custom_declaration_tag] why_node_desc
   | Module : {file: symbol; name: symbol} -> [> module_tag] why_node_desc
 
 and 'a why_node_oid = 'a why_node option
@@ -723,16 +712,6 @@ and theory_declaration_olist = theory_declaration_tag why_node_olist
 and theory_declaration_id = theory_declaration_tag why_node_id
 and theory_declaration_list = theory_declaration_tag why_node_list
 
-and custom_substitution_oid = custom_substitution_tag why_node_oid
-and custom_substitution_olist = custom_substitution_tag why_node_olist
-and custom_substitution_id = custom_substitution_tag why_node_id
-and custom_substitution_list = custom_substitution_tag why_node_list
-
-and custom_declaration_oid = custom_declaration_tag why_node_oid
-and custom_declaration_olist = custom_declaration_tag why_node_olist
-and custom_declaration_id = custom_declaration_tag why_node_id
-and custom_declaration_list = custom_declaration_tag why_node_list
-
 and module_oid = module_tag why_node_oid
 and module_olist = module_tag why_node_olist
 and module_id = module_tag why_node_id
@@ -775,12 +754,7 @@ and any_node_olist = any_node_tag why_node_olist
 and any_node_id = any_node_tag why_node_id
 and any_node_list = any_node_tag why_node_list
 
-and generic_theory_oid = generic_theory_tag why_node_oid
-and generic_theory_olist = generic_theory_tag why_node_olist
-and generic_theory_id = generic_theory_tag why_node_id
-and generic_theory_list = generic_theory_tag why_node_list
-
-type file = { theory_declarations: generic_theory_olist }
+type file = { theory_declarations: theory_declaration_olist }
 
 (* Tag coercions *)
 let type_coercion (node : any_node_tag why_node) : type_tag why_node =
@@ -1083,16 +1057,6 @@ let theory_declaration_coercion (node : any_node_tag why_node) : theory_declarat
   | Theory_declaration _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "theory_declaration_coercion"
 
-let custom_substitution_coercion (node : any_node_tag why_node) : custom_substitution_tag why_node =
-  match node.desc with
-  | Custom_substitution _ as desc -> {info=node.info; desc}
-  | _ -> invalid_arg "custom_substitution_coercion"
-
-let custom_declaration_coercion (node : any_node_tag why_node) : custom_declaration_tag why_node =
-  match node.desc with
-  | Custom_declaration _ as desc -> {info=node.info; desc}
-  | _ -> invalid_arg "custom_declaration_coercion"
-
 let module_coercion (node : any_node_tag why_node) : module_tag why_node =
   match node.desc with
   | Module _ as desc -> {info=node.info; desc}
@@ -1307,18 +1271,8 @@ let any_node_coercion (node : any_node_tag why_node) : any_node_tag why_node =
   | Clone_declaration _ as desc -> {info=node.info; desc}
   | Clone_substitution _ as desc -> {info=node.info; desc}
   | Theory_declaration _ as desc -> {info=node.info; desc}
-  | Custom_substitution _ as desc -> {info=node.info; desc}
-  | Custom_declaration _ as desc -> {info=node.info; desc}
   | Module _ as desc -> {info=node.info; desc}
   | _ -> invalid_arg "any_node_coercion"
-  [@@warning "-11"]
-
-let generic_theory_coercion (node : any_node_tag why_node) : generic_theory_tag why_node =
-  match node.desc with
-  | Theory_declaration _ as desc -> {info=node.info; desc}
-  | Custom_substitution _ as desc -> {info=node.info; desc}
-  | Custom_declaration _ as desc -> {info=node.info; desc}
-  | _ -> invalid_arg "generic_theory_coercion"
   [@@warning "-11"]
 
 
@@ -2281,31 +2235,6 @@ module From_json = struct
         comment = symbol_from_json comment;
       } in
       {info; desc}
-    | `List [`String "W_CUSTOM_SUBSTITUTION"; id; node; domain; link; checked; from; to_] ->
-      let info = {
-        id = int_from_json id;
-        node = node_id_from_json node;
-        domain = domain_from_json domain;
-        link = why_node_set_from_json link;
-        checked = boolean_from_json checked;
-      } in
-      let desc = Custom_substitution {
-        from = symbol_from_json from;
-        to_ = any_node_opaque_id_from_json to_;
-      } in
-      {info; desc}
-    | `List [`String "W_CUSTOM_DECLARATION"; id; node; domain; link; checked; file_name] ->
-      let info = {
-        id = int_from_json id;
-        node = node_id_from_json node;
-        domain = domain_from_json domain;
-        link = why_node_set_from_json link;
-        checked = boolean_from_json checked;
-      } in
-      let desc = Custom_declaration {
-        file_name = symbol_from_json file_name;
-      } in
-      {info; desc}
     | `List [`String "W_MODULE"; id; node; domain; link; checked; file; name] ->
       let info = {
         id = int_from_json id;
@@ -2659,16 +2588,6 @@ module From_json = struct
   and theory_declaration_opaque_id_from_json json =  why_node_id_from_json theory_declaration_coercion json
   and theory_declaration_opaque_list_from_json json =  why_node_list_from_json theory_declaration_coercion json
 
-  and custom_substitution_opaque_oid_from_json json =  why_node_oid_from_json custom_substitution_coercion json
-  and custom_substitution_opaque_olist_from_json json =  why_node_olist_from_json custom_substitution_coercion json
-  and custom_substitution_opaque_id_from_json json =  why_node_id_from_json custom_substitution_coercion json
-  and custom_substitution_opaque_list_from_json json =  why_node_list_from_json custom_substitution_coercion json
-
-  and custom_declaration_opaque_oid_from_json json =  why_node_oid_from_json custom_declaration_coercion json
-  and custom_declaration_opaque_olist_from_json json =  why_node_olist_from_json custom_declaration_coercion json
-  and custom_declaration_opaque_id_from_json json =  why_node_id_from_json custom_declaration_coercion json
-  and custom_declaration_opaque_list_from_json json =  why_node_list_from_json custom_declaration_coercion json
-
   and module_opaque_oid_from_json json =  why_node_oid_from_json module_coercion json
   and module_opaque_olist_from_json json =  why_node_olist_from_json module_coercion json
   and module_opaque_id_from_json json =  why_node_id_from_json module_coercion json
@@ -2711,16 +2630,11 @@ module From_json = struct
   and any_node_opaque_id_from_json json =  why_node_id_from_json any_node_coercion json
   and any_node_opaque_list_from_json json =  why_node_list_from_json any_node_coercion json
 
-  and generic_theory_opaque_oid_from_json json =  why_node_oid_from_json generic_theory_coercion json
-  and generic_theory_opaque_olist_from_json json =  why_node_olist_from_json generic_theory_coercion json
-  and generic_theory_opaque_id_from_json json =  why_node_id_from_json generic_theory_coercion json
-  and generic_theory_opaque_list_from_json json =  why_node_list_from_json generic_theory_coercion json
-
   let file_from_json : file from_json = function
     | `Assoc fields when
         List.length fields = 1 && List.mem_assoc "theory_declarations" fields  ->
       let ast_json = List.assoc "theory_declarations" fields in
-      let theory_declarations = generic_theory_opaque_olist_from_json ast_json in
+      let theory_declarations = theory_declaration_opaque_olist_from_json ast_json in
       { theory_declarations }
     | json -> unexpected_json "file_from_json" json
 end
