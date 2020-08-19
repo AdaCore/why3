@@ -344,21 +344,27 @@ let rac_prover config env ~limit_time s =
   let driver = load_driver (get_main config) env prover.driver prover.extra_drivers in
   Rac_prover {command; driver; limit_time}
 
+type model_value = Loc.position * vsymbol * value
+
 type env =
-  { mod_known : Pdecl.known_map;
-    th_known  : Decl.known_map;
-    funenv    : Expr.cexp Mrs.t;
-    vsenv     : value Mvs.t;
-    ce_model  : model;
-    env       : Env.env;
-    rac_trans : Task.task Trans.tlist option;
-    rac_prover: rac_prover option;
+  { mod_known   : Pdecl.known_map;
+    th_known    : Decl.known_map;
+    funenv      : Expr.cexp Mrs.t;
+    vsenv       : value Mvs.t;
+    ce_model    : model;
+    env         : Env.env;
+    rac_trans   : Task.task Trans.tlist option;
+    rac_prover  : rac_prover option;
+    used_values : model_value list ref (* values taken from the ce model *)
   }
 
 let default_env env =
   { mod_known= Mid.empty; th_known= Mid.empty; funenv= Mrs.empty;
-    vsenv= Mvs.empty; ce_model= default_model;
-    rac_trans= None; rac_prover= None; env }
+    vsenv= Mvs.empty; ce_model= default_model; rac_trans= None;
+    rac_prover= None; env; used_values= ref [] }
+
+let register_used_value env loc vs value =
+  env.used_values := (loc,vs,value) :: !(env.used_values)
 
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
@@ -1317,6 +1323,7 @@ and eval_expr' ~rac ~abs env e =
           (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
         let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
         let value = get_value vs.vs_name.id_string pv.pv_ity e_loc in
+        register_used_value env e_loc vs value;
         bind_vs vs value env end
     else env in
   match e.e_node with
@@ -1738,6 +1745,8 @@ let eval_global_expr ~rac ?rac_trans ?rac_prover env mod_known th_known locals e
   let vsenv = make_global_env env mod_known in
   let env = add_local_funs locals
       { (default_env env) with mod_known; th_known; vsenv; rac_trans; rac_prover } in
+  let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
+  Mvs.iter (fun vs v -> register_used_value env e_loc vs v) vsenv;
   let res = eval_expr ~rac ~abs:false env e in
   res, vsenv
 
@@ -1762,6 +1771,8 @@ let eval_rs ~abs ?rac_trans ?rac_prover env mod_known th_known model (rs: rsymbo
   let vsenv = make_global_env env ~model mod_known in
   let env = { (default_env env) with mod_known; th_known; vsenv; rac_trans; rac_prover; ce_model= model} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
+  let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
+  Mvs.iter (fun vs v -> register_used_value env e_loc vs v) env.vsenv;
   let res = exec_call ~rac:true ~abs env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   res, env
 
@@ -1772,6 +1783,7 @@ let check_equals loc env exec_value model_value =
   try check_term ~vsenv ctx (t_equ t1 t2); true
   with Contr _ -> false
 
+(* TODO do we need it? *)
 let values_match env m =
   let aux vs v1 =
     match restore_pv vs with
@@ -1800,6 +1812,9 @@ let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
   let abs_msg = if abs then "abstract" else "concrete" in
   let abs_Msg = String.capitalize_ascii abs_msg in
   let kind = if abs then Abstract else Concrete in
+  let vals_from_model env =
+    let print_vals (loc,vs,v) = (loc,vs,asprintf "%a" print_value v) in
+    List.rev_map print_vals !(env.used_values) in
   Debug.dprintf debug_rac "Validating model %s:@\n%a@." (abs_msg ^ "ly")
     (print_model ?me_name_trans:None ~print_attrs:false) model;
   reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
@@ -1807,33 +1822,40 @@ let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
     let _, env = eval_rs ~abs ?rac_trans ?rac_prover env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason= abs_Msg ^ " RAC does not confirm the counter-example, no \
                            contradiction during execution" in
-    { verdict= Dont_know; kind; reason; warnings= warnings env model}
+    { verdict= Dont_know; kind; reason; warnings= warnings env model;
+      values= vals_from_model env}
   with
   | Contr (ctx, t) when loc_contains_opt (get_model_term_loc model) t.t_loc ->
      let reason= abs_Msg ^ " RAC confirms the counter-example" in
-     { verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model}
+     { verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model;
+       values= vals_from_model ctx.c_env }
   | Contr (ctx, t) ->
-     let reason = asprintf "%s RAC found a contradiction at different location %a"
-         abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
-     {verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model}
+     let reason = asprintf
+                    "%s RAC found a contradiction at different location %a"
+                    abs_Msg
+                    (Pp.print_option_or_default "NO LOC" print_loc)
+                    t.Term.t_loc in
+     {verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model;
+       values= vals_from_model ctx.c_env}
   | CannotImportModelValue msg ->
-     let reason = sprintf "%s RAC: Cannot import value from model: %s" abs_Msg msg in
-     {verdict= Dont_know; kind; reason; warnings= []}
+     let reason = sprintf "%s RAC: Cannot import value from model: %s"
+                    abs_Msg msg in
+     {verdict= Dont_know; kind; reason; warnings= []; values= []}
   | CannotCompute ->
      (* TODO E.g., bad default value for parameter and cannot evaluate
         pre-condition *)
      let reason = abs_Msg ^ "RAC execution got stuck" in
-     {verdict= Dont_know; kind; reason; warnings= []}
+     {verdict= Dont_know; kind; reason; warnings= []; values= []}
   | Failure msg ->
      (* E.g., cannot create default value for non-free type, cannot construct
          term for constructor that is not a function *)
      let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
-     {verdict= Dont_know; kind; reason; warnings= []}
+     {verdict= Dont_know; kind; reason; warnings= []; values= []}
   | AbstractRACStuck l ->
      let reason = asprintf "%s RAC, with the counterexample model cannot \
                             continue after %a@."
                     abs_Msg (Pp.print_option Pretty.print_loc) l in
-     {verdict= Dont_know; kind; reason; warnings= []}
+     {verdict= Dont_know; kind; reason; warnings= []; values= []}
 
 (** Identifies the rsymbol of the definition that contains the given position. Raises
     [Not_found] if no such definition is found. **)
@@ -1875,7 +1897,8 @@ let check_model ?rac_trans ?rac_prover env pm m =
   match get_model_term_loc m with
   | None ->
       let reason = "No model term location" in
-      [{verdict = Dont_know; kind = NotApplied; reason; warnings = []}]
+      [{verdict = Dont_know; kind = NotApplied; reason; warnings = [];
+        values= []}]
   | Some loc ->
     if let f, _, _, _ = Loc.get loc in Sys.file_exists f then
       (* TODO deal with VCs from variable declarations and type declarations *)
@@ -1889,10 +1912,12 @@ let check_model ?rac_trans ?rac_prover env pm m =
          [c_res;a_res]
       | exception Not_found ->
           let reason = "No corresponding routine symbol found" in
-          [{verdict = Dont_know; kind = NotApplied; reason; warnings = []}]
+          [{verdict = Dont_know; kind = NotApplied; reason; warnings = [];
+            values= []}]
     else
       let reason = "Source file does not exist, cannot apply Loc.get_multiline" in
-      [{verdict = Dont_know; kind = NotApplied; reason; warnings = [] }]
+      [{verdict = Dont_know; kind = NotApplied; reason; warnings = [];
+        values= []}]
 
 let report_eval_result body fmt (res, final_env) =
   match res with

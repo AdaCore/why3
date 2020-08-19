@@ -257,11 +257,14 @@ type verdict = Good_model | Bad_model | Dont_know
 
 type interp_kind = Concrete | Abstract | NotApplied
 
+type values = (Loc.position * Term.vsymbol * string) list
+
 type full_verdict = {
     verdict  : verdict;
     kind     : interp_kind;
     reason   : string;
-    warnings : string list
+    warnings : string list;
+    values   : values;
   }
 
 val print_full_verdict : full_verdict Pp.pp

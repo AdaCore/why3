@@ -1065,11 +1065,14 @@ type verdict = Good_model | Bad_model | Dont_know
 
 type interp_kind = Concrete | Abstract | NotApplied
 
+type values = (Loc.position * vsymbol * string) list
+
 type full_verdict = {
     verdict  : verdict;
     kind     : interp_kind;
     reason   : string;
-    warnings : string list
+    warnings : string list;
+    values   : values; (* values taken from model during interpretation *)
   }
 
 let print_full_verdict fmt v =
@@ -1078,10 +1081,14 @@ let print_full_verdict fmt v =
     | Bad_model -> "bad model"
     | Dont_know -> "don't know" in
   let k = match v.kind with
-    | Concrete -> "Concrete interpretation: "
-    | Abstract -> "Abstract interpretation: "
+    | Concrete -> "Concrete RAC: "
+    | Abstract -> "Abstract RAC: "
     | NotApplied -> "" in
-  fprintf fmt "%s %s (%s, %d warnings)" k s v.reason (List.length v.warnings)
+  let print_val fmt (loc,vs,v) =
+    fprintf fmt "%a -> %s, %a" Pretty.print_vs vs v Pretty.print_loc loc in
+  fprintf fmt "@[<hv 2>%s %s (%s, %d warnings)@\n%a@]"
+    k s v.reason (List.length v.warnings)
+    (Pp.print_list Pp.newline print_val) v.values
 
 type check_model = model -> full_verdict list
 
