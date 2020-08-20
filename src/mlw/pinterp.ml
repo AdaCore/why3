@@ -1306,24 +1306,28 @@ let rec eval_expr ~rac ~abs env e =
 (* abs = abstractly - do not execute loops and function calls - use
    instead invariants and function contracts to guide execution. *)
 and eval_expr' ~rac ~abs env e =
-  let get_value name ity loc =
-    match get_model_value env.ce_model name loc with
-    | Some v ->
-       let v = import_model_value env.env env.mod_known ity v in
-       Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
-         pp_indent print_value v;
-       v
-    | None -> Debug.dprintf debug "@[<h>%tVALUE not in ce-model@]@." pp_indent;
-       default_value_of_type env.env env.mod_known ity in
+  let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
+  let get_value vs ity loc =
+    let name = vs.vs_name.id_string in
+    let value = match get_model_value env.ce_model name loc with
+      | Some v ->
+         let v = import_model_value env.env env.mod_known ity v in
+         Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
+           pp_indent print_value v;
+         v
+      | None -> eprintf "@[<h>VALUE for %s %a not in ce-model, taking \
+                         default@]@."
+                  name print_loc loc;
+                default_value_of_type env.env env.mod_known ity in
+    register_used_value env e_loc vs value;
+    value in
   let assign_written_vars env vs _ =
     let pv = restore_pv vs in
     if pv_affected e.e_effect.eff_writes pv then begin
         Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
           pp_indent print_pv pv
           (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
-        let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
-        let value = get_value vs.vs_name.id_string pv.pv_ity e_loc in
-        register_used_value env e_loc vs value;
+        let value = get_value vs pv.pv_ity e_loc in
         bind_vs vs value env end
     else env in
   match e.e_node with
@@ -1429,7 +1433,7 @@ and eval_expr' ~rac ~abs env e =
         ~>
         assert1 {I};
         assign_written_vars_with_ce;
-        assert2 {I};
+        assert2* {I};
         if e1 then (e2;assert3 {I}; absurd* ) else ()
 
         1 - if assert1 fails, then we have a real couterexample
@@ -1494,69 +1498,82 @@ and eval_expr' ~rac ~abs env e =
         ~>
         let a = eval_expr e1 in
         let b = eval_expr e2 in
-        let i = a in assert1 {I};
-        if a <= b then begin
+        if a <= b + 1 then begin
+          (let i = a in assert1 {I});
           assign_written_vars_with_ce;
-          let i = get_model_value i in
-          assert2 { a <= i }; (*?? i <= b + 1 ??*)
-          assert3 { I };
-          if a <= b then begin
+          let i = get_model_value i in  (* i is not registered as asgn *)
+          if a <= i <= b then begin
+            assert2* { I };
             eval_expr e;
-            let i = i + 1 in assert4 {I};
+            let i = i + 1 in
+            assert3 {I};
             absurd
-          end else ()
+          end else begin
+            (* ??? assert4* { i = b + 1 } ???*)
+            let i = b + 1 in assert5* {I}
+          end
         end else ()
 
         1 - if assert1 fails, then we have a real counterexample
             (invariant init doesn't hold)
-        2 - if assert2 fails, then we have a false counterexample
-            (the value assigned to i is not compatible with for loop)
-        3 - if assert3 fails, then we have a false counterexample
+        2 - if assert3 fails, then we have a false counterexample
             (invariant does not hold at beginning of execution)
-        4 - if assert4 fails, then we have a real counterexample
-            (invariant does not hold after iteration) *)
+        3 - if assert4 fails, then we have a real counterexample
+            (invariant does not hold after iteration)
+        (* ??? 4 - if assert2 fails, then we have a false counterexample
+            (the value assigned to i is not compatible with for loop) *)
+        5 - if assert5 fails, then we have a false counterexample
+            (invariant does not hold for the execution to continue) *)
       try
-        let a = big_int_of_value (get_pvs env pvs1) in
-        let b = big_int_of_value (get_pvs env pvs2) in
-        let le, suc = match dir with
-          | To -> BigInt.le, BigInt.succ
-          | DownTo -> BigInt.ge, BigInt.pred in
-        (* assert1 *)
-        if rac then begin
-          let env = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
-          check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
-        if le a b then begin
-            let env = Mvs.fold_left assign_written_vars env env.vsenv in
-            let pvs_v = get_value pvs.pv_vs.vs_name.id_string pvs.pv_ity
-                              (Opt.get pvs.pv_vs.vs_name.id_loc) in
-            let env = bind_vs pvs.pv_vs pvs_v env in
-            let pvs_int = match pvs_v.v_desc with
-                Vnum n -> n | _ -> assert false in
-            (* assert2 *)
-            if not (le a pvs_int) then begin
-                printf "ce model does not satisfy loop bounds %a@."
-                  (Pp.print_option Pretty.print_loc) e.e_loc;
-                raise (AbstractRACStuck (env,e.e_loc)) end;
-            (* assert3 *)
-            (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
-             | Contr (_,t) ->
-                printf "ce model does not satisfy loop invariant %a@."
-                  (Pp.print_option Pretty.print_loc) t.t_loc;
-                raise (AbstractRACStuck (env,t.t_loc)));
-            if le pvs_int b then begin
-                match eval_expr ~rac ~abs env e1 with
-                | Normal _ ->
-                   let env = bind_vs pvs.pv_vs
-                               (value ty_int (Vnum (suc pvs_int))) env in
-                   (* assert4 *)
-                   if rac then
-                     check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                   raise (AbstractRACStuck (env,e.e_loc))
-                | r -> r
-              end
-            else Normal (value ty_unit Vvoid)
-          end
-        else Normal (value ty_unit Vvoid)
+  let a = big_int_of_value (get_pvs env pvs1) in
+  let b = big_int_of_value (get_pvs env pvs2) in
+  let le, suc = match dir with
+    | To -> BigInt.le, BigInt.succ
+    | DownTo -> BigInt.ge, BigInt.pred in
+  (* assert1 *)
+  if le a (suc b) then begin
+    if rac then begin
+      let env = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
+      check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
+    let env = Mvs.fold_left assign_written_vars env env.vsenv in
+    let pvs_v = get_value pvs.pv_vs pvs.pv_ity
+                  (Opt.get pvs.pv_vs.vs_name.id_loc) in
+    let env = bind_vs pvs.pv_vs pvs_v env in
+    let pvs_int = big_int_of_value pvs_v in
+    if le a pvs_int && le pvs_int b then begin
+      (* assert2 *)
+      (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
+       | Contr (_,t) ->
+          printf "ce model does not satisfy loop invariant %a@."
+            (Pp.print_option Pretty.print_loc) t.t_loc;
+          raise (AbstractRACStuck (env,t.t_loc)));
+      match eval_expr ~rac ~abs env e1 with
+      | Normal _ ->
+         let env =
+           bind_vs pvs.pv_vs (value ty_int (Vnum (suc pvs_int))) env in
+         (* assert3 *)
+         if rac then
+           check_terms (cntr_ctx "Loop invariant preservation" env) inv;
+         raise (AbstractRACStuck (env,e.e_loc))
+      | r -> r
+      end
+    else begin
+      (* (\* assert4 *\)
+       * if not (pvs_int = suc b) then begin
+       *     printf "index is not in bounds %a@."
+       *       (Pp.print_option Pretty.print_loc) e.e_loc;
+       *     raise (AbstractRACStuck (env,e.e_loc)) end; *)
+      (* assert5 *)
+      let env = bind_vs pvs.pv_vs (value ty_int (Vnum (suc b))) env in
+      (try check_terms (cntr_ctx "invariant holds after loop" env) inv with
+       | Contr (_,t) ->
+          printf "ce model does not satisfy loop invariant after \
+                  loop %a@." (Pp.print_option Pretty.print_loc) t.t_loc;
+          raise (AbstractRACStuck (env,t.t_loc)));
+      Normal (value ty_unit Vvoid)
+      end
+    end
+  else Normal (value ty_unit Vvoid)
       with NotNum -> Irred e
     end
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) -> (
