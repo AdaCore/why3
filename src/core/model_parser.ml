@@ -847,32 +847,31 @@ let add_to_model ?vc_term_attrs model model_element =
       let el = model_element.me_name in
       (* This removes elements that are duplicated *)
       let found_elements =
-        List.find_all
+        List.exists
           (fun x ->
             let xme = x.me_name in
             Ident.get_model_trace_string ~name:xme.men_name ~attrs:xme.men_attrs
             = Ident.get_model_trace_string ~name:el.men_name ~attrs:el.men_attrs
             &&
+              pos = Opt.get_def Loc.dummy_position x.me_location
             (* TODO Add an efficient version of symmetric difference to extset *)
-            let symm_diff =
-              Sattr.diff
-                (Sattr.union x.me_name.men_attrs el.men_attrs)
-                (Sattr.inter x.me_name.men_attrs el.men_attrs) in
-            Sattr.for_all
-              (fun x -> not (Strings.has_prefix "at" x.attr_string))
-              symm_diff)
+            (* FIXME the following comparison removes too many elements*)
+            (* let symm_diff =
+             *   Sattr.diff
+             *     (Sattr.union xme.men_attrs el.men_attrs)
+             *     (Sattr.inter xme.men_attrs el.men_attrs) in
+             * Sattr.for_all
+             *   (fun x -> not (Strings.has_prefix "at" x.attr_string))
+             *   symm_diff *)
+          )
           elements in
       let model_element =
         match vc_term_attrs with
         | Some vc_term_attrs ->
             fix_kind (filename, line_number) vc_term_attrs model_element
         | None -> model_element in
-      let elements = model_element :: elements in
-      (* FIXME: find a way to filter elements without breaking the
-         counterexample check. The current filter is removing
-         variables that are required for the interpretation of
-         counterexamples. *)
-      (* if found_elementsts <> [] then elements else model_element :: elements in *)
+      let elements = if found_elements then elements
+                     else model_element :: elements in
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 
