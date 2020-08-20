@@ -364,7 +364,7 @@ let default_env env =
     rac_prover= None; env; used_values= ref [] }
 
 let register_used_value env loc vs value =
-  env.used_values := (loc,vs,value) :: !(env.used_values)
+  env.used_values := (loc, vs, snapshot value) :: !(env.used_values)
 
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
@@ -1292,7 +1292,7 @@ let print_result fmt = function
   | Fun (rs, _, _) -> fprintf fmt "FUN %a" print_rs rs
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
 
-exception AbstractRACStuck of Loc.position option
+exception AbstractRACStuck of env * Loc.position option
 
 let rec eval_expr ~rac ~abs env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
@@ -1448,7 +1448,7 @@ and eval_expr' ~rac ~abs env e =
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
             (Pp.print_option Pretty.print_loc) t.t_loc;
-          raise (AbstractRACStuck t.t_loc));
+          raise (AbstractRACStuck (env, t.t_loc)));
       match eval_expr ~rac ~abs env cond with
       | Normal v ->
          if is_true v then begin
@@ -1456,7 +1456,7 @@ and eval_expr' ~rac ~abs env e =
              | Normal _ ->
                 if rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                raise (AbstractRACStuck e.e_loc)
+                raise (AbstractRACStuck (env,e.e_loc))
              | r -> r
            end
          else if is_false v then
@@ -1536,13 +1536,13 @@ and eval_expr' ~rac ~abs env e =
             if not (le a pvs_int) then begin
                 printf "ce model does not satisfy loop bounds %a@."
                   (Pp.print_option Pretty.print_loc) e.e_loc;
-                raise (AbstractRACStuck e.e_loc) end;
+                raise (AbstractRACStuck (env,e.e_loc)) end;
             (* assert3 *)
             (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
              | Contr (_,t) ->
                 printf "ce model does not satisfy loop invariant %a@."
                   (Pp.print_option Pretty.print_loc) t.t_loc;
-                raise (AbstractRACStuck t.t_loc));
+                raise (AbstractRACStuck (env,t.t_loc)));
             if le pvs_int b then begin
                 match eval_expr ~rac ~abs env e1 with
                 | Normal _ ->
@@ -1551,7 +1551,7 @@ and eval_expr' ~rac ~abs env e =
                    (* assert4 *)
                    if rac then
                      check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                   raise (AbstractRACStuck e.e_loc)
+                   raise (AbstractRACStuck (env,e.e_loc))
                 | r -> r
               end
             else Normal (value ty_unit Vvoid)
@@ -1851,11 +1851,12 @@ let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
          term for constructor that is not a function *)
      let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
      {verdict= Dont_know; kind; reason; warnings= []; values= []}
-  | AbstractRACStuck l ->
+  | AbstractRACStuck (env,l) ->
      let reason = asprintf "%s RAC, with the counterexample model cannot \
                             continue after %a@."
                     abs_Msg (Pp.print_option Pretty.print_loc) l in
-     {verdict= Dont_know; kind; reason; warnings= []; values= []}
+     {verdict= Dont_know; kind; reason; warnings= [];
+      values= vals_from_model env}
 
 (** Identifies the rsymbol of the definition that contains the given position. Raises
     [Not_found] if no such definition is found. **)
