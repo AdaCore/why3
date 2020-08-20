@@ -51,7 +51,6 @@ let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, r
     (Pp.print_list sep pp_binding)
     l (snd delims) ()
 
-
 let pp_indent fmt =
   match Printexc.(backtrace_slots (get_callstack 100)) with
   | None -> ()
@@ -993,11 +992,22 @@ let bind_term (vs, t) (task, ls_mt, ls_mv) =
   let task = Task.add_logic_decl task [defn] in
   task, ls_mt, ls_mv
 
+(* Add declarations for value bindings in [env.vsenv] *)
+let bind_value env vs v (task, ls_mt, ls_mv) =
+  let ls = create_fsymbol (id_clone vs.vs_name) [] v.v_ty in
+  let ls_mt = ty_match ls_mt vs.vs_ty v.v_ty in
+  let ls_mv = Mvs.add vs (fs_app ls [] v.v_ty) ls_mv in
+  let vsenv, t = term_of_value env [] v in
+  let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
+  let t = t_ty_subst ls_mt ls_mv t in
+  let defn = Decl.make_ls_defn ls [] t in
+  let task = Task.add_logic_decl task [defn] in
+  task, ls_mt, ls_mv
+
 let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
   let task = List.fold_left use_export task Theory.[builtin_theory; bool_theory; highord_theory] in
-  let task = use_export task (Env.read_theory env.env ["map"] "MapExt") in (* TODO remove, use map.MapExt where necessary in program *)
   (* Add known declarations *)
   let add_known _ decl task =
     match decl.d_node with
@@ -1032,18 +1042,7 @@ let task_of_term ?(vsenv=[]) env t =
     with Exit -> task, ls_mv in
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
-  (* Add declarations for value bindings in [env.vsenv] *)
-  let bind_value vs v (task, ls_mt, ls_mv) =
-    let ls = create_fsymbol (id_clone vs.vs_name) [] v.v_ty in
-    let ls_mt = ty_match ls_mt vs.vs_ty v.v_ty in
-    let ls_mv = Mvs.add vs (fs_app ls [] v.v_ty) ls_mv in
-    let vsenv, t = term_of_value env.env [] v in
-    let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
-    let t = t_ty_subst ls_mt ls_mv t in
-    let defn = make_ls_defn ls [] t in
-    let task = add_logic_decl task [defn] in
-    task, ls_mt, ls_mv in
-  let task, ls_mt, ls_mv = Mvs.fold bind_value env.vsenv (task, ls_mt, ls_mv) in
+  let task, ls_mt, ls_mv = Mvs.fold (bind_value env.env) env.vsenv (task, ls_mt, ls_mv) in
   let t = t_ty_subst ls_mt ls_mv t in
   let task =
     if t.t_ty = None then (* Add goal ... *)
@@ -1055,43 +1054,43 @@ let task_of_term ?(vsenv=[]) env t =
       add_logic_decl task [decl] in
   task, ls_mv
 
-let bind_univ_quant_vars = true
-let bind_univ_quant_vars_fallback_default = true
+(* Parameters for binding universally quantified variables to a value from the CE model or the default value *)
+let bind_univ_quant_vars_ce_model = false
+let bind_univ_quant_vars_default = false
 
-let bind_quants env task =
-  let t = Task.task_goal_fmla task in
-  try match t with
-    | {t_node= Tquant (Tforall, tq)} when bind_univ_quant_vars ->
+(* Get the value of a vsymbol from the CE-model, a default value *)
+let get_value env vs =
+  match vs.vs_name.id_loc with
+  | None -> None
+  | Some loc ->
+      let value =
+        if bind_univ_quant_vars_ce_model then
+          match get_model_value env.ce_model vs.vs_name.id_string loc with
+          | Some mv ->
+              let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) mv in
+              Debug.dprintf debug_rac "Bind value for all-quantified variable %a to %a@." print_vs vs print_value v;
+              Some v
+          | _ -> None
+        else None in
+      if value <> None then value else
+      if bind_univ_quant_vars_default then (
+        let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
+        Debug.dprintf debug_rac "Use default value for quantified variable %a: %a@." print_vs vs print_value v;
+        Some v
+      ) else (
+        Debug.dprintf debug_rac "No value for all-quantified variable %a@." print_vs vs;
+        None )
+
+(** When the task goal is [forall vs* . t], add declarations to the task that bind the
+   variables [vs*] to concrete values (from the CE-model or default values), and make [t]
+   the new goal. *)
+let bind_univ_quant_vars env task =
+  try match (Task.task_goal_fmla task).t_node with
+    | Tquant (Tforall, tq) ->
         let vs, _, t = t_open_quant tq in
-        let get_value vs =
-          match vs.vs_name with
-          | {id_string= name; id_loc= Some loc} -> (
-              match get_model_value env.ce_model name loc with
-              | Some mv ->
-                  let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) mv in
-                  Debug.dprintf debug_rac "Bind value for all-quantified %a to %a@." print_vs vs print_value v;
-                  v
-              | None ->
-                  if bind_univ_quant_vars_fallback_default then (
-                    let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
-                    Debug.dprintf debug_rac "Use default value for all-quantified %a: %a@." print_vs vs print_value v;
-                    v
-                  ) else (
-                    Debug.dprintf debug_rac "No value for all-quantified %a@." print_vs vs;
-                    raise Exit ) )
-          | _ -> raise Exit (* Missing location, cannot identify CE value *) in
-        let values = List.map get_value vs in
+        let values = List.map (fun vs -> Opt.get_exn Exit (get_value env vs)) vs in
         let _, task = Task.task_separate_goal task in
-        let bind_vs vs v (ls_mv, ls_mt, task) =
-          let ls_mt = ty_match ls_mt vs.vs_ty v.v_ty in
-          let ls = create_lsymbol (id_clone vs.vs_name) [] (Some v.v_ty) in
-          let ls_mv = Mvs.add vs (fs_app ls [] v.v_ty) ls_mv in
-          let vsenv, t = term_of_value env.env [] v in
-          let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
-          let defn = Decl.make_ls_defn ls [] t in
-          let task = Task.add_logic_decl task [defn] in
-          ls_mv, ls_mt, task in
-        let ls_mv, ls_mt, task = List.fold_right2 bind_vs vs values (Mvs.empty, Mtv.empty, task) in
+        let task, ls_mt, ls_mv = List.fold_right2 (bind_value env.env) vs values (task, Mtv.empty, Mvs.empty) in
         let t = t_ty_subst ls_mt ls_mv t in
         let prs = Decl.create_prsymbol (id_fresh "goal") in
         Task.add_prop_decl task Decl.Pgoal prs t
@@ -1099,22 +1098,25 @@ let bind_quants env task =
   with Exit -> task
 
 let task_hd_equal t1 t2 = let open Task in let open Theory in let open Decl in
+  (* Task.task_hd_equal is too strict: it requires physical equality between
+     {t1,t2}.task_prev *)
   match t1.task_decl.td_node, t2.task_decl.td_node with
   | Decl {d_node = Dprop (Pgoal,p1,g1)}, Decl {d_node = Dprop (Pgoal,p2,g2)} ->
-      (* Opt.equal (==) t1.task_prev t2.task_prev && *)
       pr_equal p1 p2 && t_equal_strict g1 g2
   | _ -> t1 == t2
 
 (** Apply the (reduction) transformation and fill universally quantified variables
     in the head of the task by values from the CE model, recursively. *)
 let rec trans_and_bind_quants env trans task =
-  let task = bind_quants env task in
+  let task = bind_univ_quant_vars env task in
   let tasks = Trans.apply trans task in
   let task_unchanged = match tasks with
     | [task'] -> Opt.equal task_hd_equal task' task
     | _ -> false in
-  if task_unchanged then tasks
-  else List.flatten (List.map (trans_and_bind_quants env trans) tasks)
+  if task_unchanged then
+    tasks
+  else
+    List.flatten (List.map (trans_and_bind_quants env trans) tasks)
 
 (** Compute the value of a term by using the (reduction) transformation *)
 let compute_term env t =
@@ -1122,21 +1124,21 @@ let compute_term env t =
   | None -> t
   | Some trans ->
       let task, ls_mv = task_of_term env t in
-      if t.t_ty = None then
+      if t.t_ty = None then (* [t] is a formula *)
         match List.map Task.task_goal_fmla (trans_and_bind_quants env trans task) with
         | [] -> t_true
         | t :: ts -> List.fold_left t_and t ts
-      else
+      else (* [t] is not a formula *)
         let t = match Trans.apply trans task with
           | [Some Task.{task_decl= Theory.{td_node= Decl Decl.{d_node= Dlogic [_, ldef]}}}] ->
-              ( match Decl.open_ls_defn ldef with
-                | [], t -> t
-                | _ ->  failwith "compute_term" )
+              let vs, t = Decl.open_ls_defn ldef in
+              if vs <> [] then failwith "compute_term";
+              t
           | _ -> failwith "compute_term" in
-        (* Free vsymbols in [t] have been substituted in [task] by fresh
-           lsymbols (actually: ls @ []) to bind them to the task declarations.
-           Now we have to reverse these substitution to ensures that the reduced
-           term is valid in the original environment of [t]. *)
+        (* Free vsymbols in the original [t] have been substituted in by fresh lsymbols
+           (actually: ls @ []) to bind them to declarations in the task. Now we have to
+           reverse these substitution to ensures that the reduced term is valid in the
+           original environment of [t]. *)
         let reverse vs t' t = t_replace t' (t_var vs) t in
         Mvs.fold reverse ls_mv t
 
