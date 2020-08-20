@@ -1,9 +1,21 @@
 Weakest Precondition
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/bv32.mlw", line 8, characters 15-30, 1 warnings)
-Model 1: don't know (RAC execution got stuck, 0 warnings)
-Model 2: don't know (RAC execution got stuck, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/bv32.mlw", line 8, characters 15-30, 1 warnings)
+    r -> (ref'mk 0), #"bench/ce/bv32.mlw" 7 6 18#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/bv32.mlw", line 8, characters 15-30, 1 warnings)
+    r -> (ref'mk 0), #"bench/ce/bv32.mlw" 7 6 18#
+Model 1:
+  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
+    
+  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
+    
+Model 2:
+  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
+    
+  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
+    
 bench/ce/bv32.mlw Ce_int32bv dummy_update'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/bv32.mlw" 9 14 29#
 File bv32.mlw:
   Line 7:
     r [@field:0:contents] [@introduced] [@mlw:reference_var] =
@@ -12,6 +24,11 @@ File bv32.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "34" } }] } }
   Line 9:
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "132" } }] } }
     r [@field:0:contents] [@introduced] [@mlw:reference_var]
       [@model_trace:r] =
       {"type" : "Record" ,
@@ -31,10 +48,18 @@ File bv32.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "132" } }] } }
 
-Model 0: don't know (RAC execution got stuck, 0 warnings)
-Model 2: don't know (RAC execution got stuck, 0 warnings)
+Model 0:
+  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
+    
+  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
+    
+Model 2:
+  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
+    
+  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
+    
 bench/ce/bv32.mlw Ce_int32bv dummy_update_with_int'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/bv32.mlw" 15 14 28#
 File bv32.mlw:
   Line 13:
     r [@field:0:contents] [@introduced] [@mlw:reference_var] =
@@ -43,6 +68,11 @@ File bv32.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "0" } }] } }
   Line 15:
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "4294967295" } }] } }
     r [@field:0:contents] [@introduced] [@mlw:reference_var]
       [@model_trace:r] =
       {"type" : "Record" ,

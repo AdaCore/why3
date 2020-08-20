@@ -1,9 +1,27 @@
 Strongest Postcondition
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 11 6 22#
+    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 11 6 22#
+    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 11 6 22#
+    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 11 6 22#
+    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 11 6 22#
+    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 11 6 22#
+    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
 bench/ce/records_label.mlw Old record_old_test1'vc: Unknown (sat)
-Counter-example model:
+Counter-example model for term at #"bench/ce/records_label.mlw" 12 14 35#
 File records_label.mlw:
   Line 9:
     y [@at:'Old:loc:bench/ce/records_label.mlw:12] [@introduced] =
@@ -24,12 +42,11 @@ File records_label.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
   Line 12:
-    old x [@at:'Old] [@at:'Old:loc:bench/ce/records_label.mlw:12]
-      [@introduced] [@model_trace:x] =
+    x [@introduced] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "f" ,
       "value" : {"type" : "Integer" ,
-      "val" : "5" } },
+      "val" : "6" } },
       {"field" : "g" ,
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
@@ -60,11 +77,29 @@ File records_label.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 7468 false), #"bench/ce/records_label.mlw" 16 6 21#
+    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 7468 false), #"bench/ce/records_label.mlw" 16 6 21#
+    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 29 false), #"bench/ce/records_label.mlw" 16 6 21#
+    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 29 false), #"bench/ce/records_label.mlw" 16 6 21#
+    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 6058 false), #"bench/ce/records_label.mlw" 16 6 21#
+    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 6058 false), #"bench/ce/records_label.mlw" 16 6 21#
+    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
 bench/ce/records_label.mlw Old record_at_test2'vc: Unknown (sat)
-Counter-example model:
+Counter-example model for term at #"bench/ce/records_label.mlw" 22 13 58#
 File records_label.mlw:
   Line 9:
     y [@introduced] =
@@ -103,24 +138,6 @@ File records_label.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
   Line 22:
-    x at L [@at:L] [@at:L:loc:bench/ce/records_label.mlw:22] [@introduced]
-      [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-    x at M [@at:M] [@at:M:loc:bench/ce/records_label.mlw:22] [@introduced]
-      [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "6" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
     x [@introduced] [@model_trace:x] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "f" ,
@@ -138,10 +155,22 @@ File records_label.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
 
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
+    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
+    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
+    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
+    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
 bench/ce/records_label.mlw Old several_hats'vc: Unknown (sat)
-Counter-example model:
+Counter-example model for term at #"bench/ce/records_label.mlw" 30 13 37#
 File records_label.mlw:
   Line 24:
     x [@at:L:loc:bench/ce/records_label.mlw:30]
@@ -154,15 +183,6 @@ File records_label.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
   Line 30:
-    x at L [@at:L] [@at:L:loc:bench/ce/records_label.mlw:30] [@introduced]
-      [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
     x at M [@at:M] [@at:M:loc:bench/ce/records_label.mlw:30] [@introduced]
       [@model_trace:x] =
       {"type" : "Record" ,

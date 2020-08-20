@@ -1,9 +1,33 @@
 Strongest Postcondition
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 9, characters 15-45, 1 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 9, characters 15-45, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 9, characters 15-45, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
 bench/ce/jlamp0.mlw M p1'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/jlamp0.mlw" 12 13 26#
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -30,11 +54,35 @@ File jlamp0.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "3" } }] } }
 
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 9, characters 15-45, 1 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 9, characters 15-45, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 9, characters 15-45, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 9), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 9), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 9), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 9), #"bench/ce/jlamp0.mlw" 8 6 8#
+    b -> (ref'mk 3), #"bench/ce/jlamp0.mlw" 8 6 8#
+    c -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 8 6 8#
 bench/ce/jlamp0.mlw M p1'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/jlamp0.mlw" 10 15 29#
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -49,6 +97,11 @@ File jlamp0.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "3" } }] } }
   Line 10:
+    a [@field:0:contents] [@introduced] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "9" } }] } }
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
@@ -67,11 +120,35 @@ File jlamp0.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "9" } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
 bench/ce/jlamp0.mlw M p2'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/jlamp0.mlw" 22 18 31#
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -93,11 +170,35 @@ File jlamp0.mlw:
       "val" : "1" } }] } }
 
 bench/ce/jlamp0.mlw M p2'vc: Valid
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
-Model 1: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
-Model 2: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
 bench/ce/jlamp0.mlw M p2'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/jlamp0.mlw" 24 16 18#
 File ref.mlw:
   Line 18:
     c [@field:0:contents] [@introduced] =
@@ -136,6 +237,11 @@ File jlamp0.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "3" } }] } }
   Line 24:
+    c [@field:0:contents] [@introduced] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "4" } }] } }
     c [@field:0:contents] [@introduced] [@model_trace:c] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
@@ -154,11 +260,35 @@ File jlamp0.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "4" } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 1 warnings)
-Model 1: good model (RAC confirms the counter-example, 1 warnings)
-Model 2: good model (RAC confirms the counter-example, 1 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
 bench/ce/jlamp0.mlw M p2'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/jlamp0.mlw" 22 18 31#
 File ref.mlw:
   Line 18:
     c [@field:0:contents] [@introduced] =
@@ -215,11 +345,35 @@ File jlamp0.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "12" } }] } }
 
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
-Model 1: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
-Model 2: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
 bench/ce/jlamp0.mlw M p2'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/jlamp0.mlw" 23 18 31#
 File ref.mlw:
   Line 18:
     c [@field:0:contents] [@introduced] =
@@ -252,6 +406,11 @@ File jlamp0.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "2" } }] } }
   Line 23:
+    a [@field:0:contents] [@introduced] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "9" } }] } }
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
@@ -270,11 +429,35 @@ File jlamp0.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "4" } }] } }
 
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
-Model 1: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
-Model 2: don't know (RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/jlamp0.mlw", line 22, characters 18-31, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/jlamp0.mlw" 17 6 8#
+    c -> (ref'mk 1), #"bench/ce/jlamp0.mlw" 17 6 8#
+    _ -> (), #"bench/ce/jlamp0.mlw" 17 6 8#
 bench/ce/jlamp0.mlw M p2'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/jlamp0.mlw" 19 15 28#
 File ref.mlw:
   Line 18:
     c [@field:0:contents] [@introduced] =
@@ -290,6 +473,11 @@ File jlamp0.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "0" } }] } }
   Line 19:
+    a [@field:0:contents] [@introduced] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "3" } }] } }
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,

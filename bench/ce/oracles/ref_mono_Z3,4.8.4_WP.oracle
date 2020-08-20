@@ -2,11 +2,35 @@ Weakest Precondition
 bench/ce/ref_mono.mlw Ref ref1'vc: Valid
 bench/ce/ref_mono.mlw Ref prefix !'vc: Valid
 bench/ce/ref_mono.mlw Ref infix :='vc: Valid
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> 1, #"bench/ce/ref_mono.mlw" 20 6 15#
+    y -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> 1, #"bench/ce/ref_mono.mlw" 20 6 15#
+    y -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> 1, #"bench/ce/ref_mono.mlw" 20 6 15#
+    y -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> 1, #"bench/ce/ref_mono.mlw" 20 6 15#
+    y -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> 3935, #"bench/ce/ref_mono.mlw" 20 6 15#
+    y -> (ref1'mk 7868), #"bench/ce/ref_mono.mlw" 20 6 15#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> 3935, #"bench/ce/ref_mono.mlw" 20 6 15#
+    y -> (ref1'mk 7868), #"bench/ce/ref_mono.mlw" 20 6 15#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 20 6 15#
 bench/ce/ref_mono.mlw M test_post'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/ref_mono.mlw" 21 14 25#
 File ref_mono.mlw:
   Line 9:
     y [@at:'Old:loc:bench/ce/ref_mono.mlw:21] [@field:0:contents]
@@ -44,11 +68,35 @@ File ref_mono.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "7868" } }] } }
 
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 26, characters 15-21, 1 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 26, characters 15-21, 1 warnings)
+    x1 -> 0, #"bench/ce/ref_mono.mlw" 25 6 16#
+    y2 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 25 6 16#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 25 6 16#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 26, characters 15-21, 1 warnings)
+    x1 -> 0, #"bench/ce/ref_mono.mlw" 25 6 16#
+    y2 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 25 6 16#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 25 6 16#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x1 -> 43, #"bench/ce/ref_mono.mlw" 25 6 16#
+    y2 -> (ref1'mk 42), #"bench/ce/ref_mono.mlw" 25 6 16#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 25 6 16#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x1 -> 43, #"bench/ce/ref_mono.mlw" 25 6 16#
+    y2 -> (ref1'mk 42), #"bench/ce/ref_mono.mlw" 25 6 16#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 25 6 16#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x1 -> 43, #"bench/ce/ref_mono.mlw" 25 6 16#
+    y2 -> (ref1'mk (-7826)), #"bench/ce/ref_mono.mlw" 25 6 16#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 25 6 16#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x1 -> 43, #"bench/ce/ref_mono.mlw" 25 6 16#
+    y2 -> (ref1'mk (-7826)), #"bench/ce/ref_mono.mlw" 25 6 16#
+    y1 -> (ref1'mk 0), #"bench/ce/ref_mono.mlw" 25 6 16#
 bench/ce/ref_mono.mlw M test_post2'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/ref_mono.mlw" 27 14 29#
 File ref_mono.mlw:
   Line 9:
     y [@at:'Old:loc:bench/ce/ref_mono.mlw:27] [@field:0:contents]
@@ -73,11 +121,6 @@ File ref_mono.mlw:
       "val" : "-7868" } }] } }
   Line 27:
     x [@introduced] [@model_trace:x] = {"type" : "Integer" , "val" : "43" }
-    y [@field:0:contents] [@introduced] [@model_trace:y] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "-7826" } }] } }
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:27]
       [@field:0:contents] [@introduced] [@model_trace:y] =
       {"type" : "Record" ,
@@ -91,11 +134,29 @@ File ref_mono.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "-7826" } }] } }
 
-Model 0: don't know (RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 37 6 10#
+    x23 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 37 6 10#
+  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 37 6 10#
+    x23 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 37 6 10#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 37 6 10#
+    x23 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 37 6 10#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 37 6 10#
+    x23 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 37 6 10#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 37 6 10#
+    x23 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 37 6 10#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 37 6 10#
+    x23 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 37 6 10#
 bench/ce/ref_mono.mlw M incr'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/ref_mono.mlw" 38 12 36#
 File ref_mono.mlw:
   Line 9:
     y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
@@ -123,19 +184,19 @@ File ref_mono.mlw:
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
       "value" : {"type" : "Integer" ,
-      "val" : "399" } }] } }
+      "val" : "-1" } }] } }
   Line 38:
-    x23 [@field:0:contents] [@introduced] [@model_trace:x23] =
+    x23 [@field:0:contents] [@introduced] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
       "value" : {"type" : "Integer" ,
-      "val" : "401" } }] } }
+      "val" : "1" } }] } }
     old x23 [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
       [@field:0:contents] [@introduced] [@model_trace:x23] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
       "value" : {"type" : "Integer" ,
-      "val" : "399" } }] } }
+      "val" : "-1" } }] } }
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
       [@field:0:contents] [@introduced] [@model_trace:y] =
       {"type" : "Record" ,
@@ -153,19 +214,37 @@ File ref_mono.mlw:
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
       "value" : {"type" : "Integer" ,
-      "val" : "400" } }] } }
+      "val" : "0" } }] } }
   Line 42:
     x23 [@field:0:contents] [@introduced] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
       "value" : {"type" : "Integer" ,
-      "val" : "401" } }] } }
+      "val" : "1" } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 402), #"bench/ce/ref_mono.mlw" 44 6 15#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 402), #"bench/ce/ref_mono.mlw" 44 6 15#
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/ref_mono.mlw" 51 14 36#
 File ref_mono.mlw:
   Line 35:
     y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
@@ -204,18 +283,6 @@ File ref_mono.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "402" } }] } }
   Line 51:
-    x at L [@at:L] [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
-      [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "400" } }] } }
-    x at M [@at:M] [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
-      [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "402" } }] } }
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
@@ -223,11 +290,29 @@ File ref_mono.mlw:
       "val" : "402" } }] } }
 
 bench/ce/ref_mono.mlw M test_loop'vc: Valid
-Model 0: good model (RAC confirms the counter-example, 2 warnings)
-Model 1: don't know (RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
-Model 2: don't know (RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 2 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 2 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+    y1 -> (ref1'mk (-1)), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+    y1 -> (ref1'mk (-1)), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+    y1 -> (ref1'mk 160), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk (-52)), #"bench/ce/ref_mono.mlw" 44 6 15#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+    y1 -> (ref1'mk 160), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk (-52)), #"bench/ce/ref_mono.mlw" 44 6 15#
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/ref_mono.mlw" 51 14 36#
 File ref_mono.mlw:
   Line 9:
     x [@field:0:contents] [@introduced] =
@@ -284,18 +369,6 @@ File ref_mono.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "54" } }] } }
   Line 51:
-    x at L [@at:L] [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
-      [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "-54" } }] } }
-    x at M [@at:M] [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
-      [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "107" } }] } }
     [current iteration] x [@field:0:contents] [@introduced]
       [@model_trace:x] =
       {"type" : "Record" ,
@@ -309,11 +382,29 @@ File ref_mono.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "53" } }] } }
 
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 51, characters 14-36, 2 warnings)
-Model 1: don't know (RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
-Model 2: don't know (RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 51, characters 14-36, 2 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 51, characters 14-36, 2 warnings)
+    y1 -> (ref1'mk 1), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+    y1 -> (ref1'mk (-2)), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+    y1 -> (ref1'mk (-2)), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk 2), #"bench/ce/ref_mono.mlw" 44 6 15#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+    y1 -> (ref1'mk 798), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk (-398)), #"bench/ce/ref_mono.mlw" 44 6 15#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/ref_mono.mlw", line 38, characters 12-36, 2 warnings)
+    y1 -> (ref1'mk 798), #"bench/ce/ref_mono.mlw" 44 6 15#
+    x2 -> (ref1'mk (-398)), #"bench/ce/ref_mono.mlw" 44 6 15#
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/ref_mono.mlw" 45 12 23#
 File ref_mono.mlw:
   Line 9:
     x [@field:0:contents] [@introduced] =
@@ -353,11 +444,6 @@ File ref_mono.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "-400" } }] } }
   Line 45:
-    x [@field:0:contents] [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }] } }
     old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:45]
       [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type" : "Record" ,

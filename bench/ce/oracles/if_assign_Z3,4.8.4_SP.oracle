@@ -1,9 +1,27 @@
 Strongest Postcondition
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 9 4 5#
+    _a -> 0, #"bench/ce/if_assign.mlw" 9 4 5#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 9 4 5#
+    _a -> 0, #"bench/ce/if_assign.mlw" 9 4 5#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 9 4 5#
+    _a -> 0, #"bench/ce/if_assign.mlw" 9 4 5#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 9 4 5#
+    _a -> 0, #"bench/ce/if_assign.mlw" 9 4 5#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 9 4 5#
+    _a -> 0, #"bench/ce/if_assign.mlw" 9 4 5#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 9 4 5#
+    _a -> 0, #"bench/ce/if_assign.mlw" 9 4 5#
 bench/ce/if_assign.mlw Test f'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/if_assign.mlw" 10 12 23#
 File if_assign.mlw:
   Line 10:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -18,11 +36,29 @@ File if_assign.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "42" } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 15 4 6#
+    _a1 -> 0, #"bench/ce/if_assign.mlw" 15 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 15 4 6#
+    _a1 -> 0, #"bench/ce/if_assign.mlw" 15 4 6#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 15 4 6#
+    _a1 -> 0, #"bench/ce/if_assign.mlw" 15 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 15 4 6#
+    _a1 -> 0, #"bench/ce/if_assign.mlw" 15 4 6#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 15 4 6#
+    _a1 -> 0, #"bench/ce/if_assign.mlw" 15 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 15 4 6#
+    _a1 -> 0, #"bench/ce/if_assign.mlw" 15 4 6#
 bench/ce/if_assign.mlw Test f2'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/if_assign.mlw" 16 12 23#
 File if_assign.mlw:
   Line 16:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -37,11 +73,29 @@ File if_assign.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "42" } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 1 warnings)
-Model 1: good model (RAC confirms the counter-example, 1 warnings)
-Model 2: good model (RAC confirms the counter-example, 1 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 0, #"bench/ce/if_assign.mlw" 21 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 0, #"bench/ce/if_assign.mlw" 21 4 6#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 0, #"bench/ce/if_assign.mlw" 21 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 0, #"bench/ce/if_assign.mlw" 21 4 6#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 0, #"bench/ce/if_assign.mlw" 21 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 0, #"bench/ce/if_assign.mlw" 21 4 6#
 bench/ce/if_assign.mlw Test f3'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/if_assign.mlw" 22 12 23#
 File int.mlw:
   Line 16:
     a [@introduced] = {"type" : "Integer" , "val" : "0" }
@@ -82,11 +136,29 @@ File if_assign.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "42" } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 1 warnings)
-Model 1: good model (RAC confirms the counter-example, 1 warnings)
-Model 2: good model (RAC confirms the counter-example, 1 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 0, #"bench/ce/if_assign.mlw" 21 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 0, #"bench/ce/if_assign.mlw" 21 4 6#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 18), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 2, #"bench/ce/if_assign.mlw" 21 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 18), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 2, #"bench/ce/if_assign.mlw" 21 4 6#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 18), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 2, #"bench/ce/if_assign.mlw" 21 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 1 warnings)
+    x -> (ref'mk 18), #"bench/ce/if_assign.mlw" 21 4 6#
+    a -> 2, #"bench/ce/if_assign.mlw" 21 4 6#
 bench/ce/if_assign.mlw Test f3'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/if_assign.mlw" 22 12 23#
 File int.mlw:
   Line 16:
     a [@introduced] = {"type" : "Integer" , "val" : "2" }
@@ -127,11 +199,29 @@ File if_assign.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "18" } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 0, #"bench/ce/if_assign.mlw" 30 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 0, #"bench/ce/if_assign.mlw" 30 4 6#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 0, #"bench/ce/if_assign.mlw" 30 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 0, #"bench/ce/if_assign.mlw" 30 4 6#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 0, #"bench/ce/if_assign.mlw" 30 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 42), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 0, #"bench/ce/if_assign.mlw" 30 4 6#
 bench/ce/if_assign.mlw Test f4'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/if_assign.mlw" 34 31 38#
 File int.mlw:
   Line 16:
     a [@introduced] = {"type" : "Integer" , "val" : "0" }
@@ -146,10 +236,22 @@ File if_assign.mlw:
       "val" : "42" } }] } }
 
 bench/ce/if_assign.mlw Test f4'vc: Valid
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 18), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 2, #"bench/ce/if_assign.mlw" 30 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 18), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 2, #"bench/ce/if_assign.mlw" 30 4 6#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 18), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 2, #"bench/ce/if_assign.mlw" 30 4 6#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (ref'mk 18), #"bench/ce/if_assign.mlw" 30 4 6#
+    a1 -> 2, #"bench/ce/if_assign.mlw" 30 4 6#
 bench/ce/if_assign.mlw Test f4'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/if_assign.mlw" 31 12 23#
 File int.mlw:
   Line 16:
     a [@introduced] = {"type" : "Integer" , "val" : "2" }

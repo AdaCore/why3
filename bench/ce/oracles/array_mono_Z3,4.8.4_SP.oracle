@@ -1,9 +1,17 @@
 Strongest Postcondition
 bench/ce/array_mono.mlw Array array'vc: Valid
-Model 0: don't know (Cannot import value from model: Value of non-free type array, 0 warnings)
-Model 1: don't know (Cannot import value from model: Value of non-free type array, 0 warnings)
+Model 0:
+  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type array, 0 warnings)
+    
+  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type array, 0 warnings)
+    
+Model 1:
+  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type array, 0 warnings)
+    
+  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type array, 0 warnings)
+    
 bench/ce/array_mono.mlw A f1'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/array_mono.mlw" 36 4 8#
 File array_mono.mlw:
   Line 16:
     a [@introduced] =
@@ -25,9 +33,13 @@ File array_mono.mlw:
       "val" : "0" } }
 
 bench/ce/array_mono.mlw A f2'vc: Valid
-Model 1: don't know (Cannot import value from model: Value of non-free type array, 0 warnings)
+Model 1:
+  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type array, 0 warnings)
+    
+  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type array, 0 warnings)
+    
 bench/ce/array_mono.mlw A f2'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/array_mono.mlw" 40 14 26#
 File array_mono.mlw:
   Line 25:
     old a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]

@@ -1,10 +1,22 @@
 Weakest Precondition
 bench/ce/int32.mlw Ce_int32 dummy_update'vc: Valid
-Model 0: don't know (RAC execution got stuck, 0 warnings)
-Model 1: don't know (RAC execution got stuck, 0 warnings)
-Model 2: don't know (RAC execution got stuck, 0 warnings)
+Model 0:
+  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
+    
+  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
+    
+Model 1:
+  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
+    
+  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
+    
+Model 2:
+  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
+    
+  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
+    
 bench/ce/int32.mlw Ce_int32 dummy_update'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/int32.mlw" 7 14 30#
 File int32.mlw:
   Line 5:
     r [@field:0:contents] [@introduced] [@mlw:reference_var] =
@@ -15,6 +27,13 @@ File int32.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "22" } } }] } }
   Line 7:
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"proj_name" : "int32'int" ,
+      "type" : "Proj" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "84" } } }] } }
     r [@field:0:contents] [@introduced] [@mlw:reference_var]
       [@model_trace:r] =
       {"type" : "Record" ,

@@ -1,9 +1,27 @@
 Weakest Precondition
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/result.mlw", line 10, characters 15-45, 1 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/result.mlw", line 10, characters 15-45, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/result.mlw" 9 6 8#
+    b -> (ref'mk 0), #"bench/ce/result.mlw" 9 6 8#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/result.mlw", line 10, characters 15-45, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/result.mlw" 9 6 8#
+    b -> (ref'mk 0), #"bench/ce/result.mlw" 9 6 8#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 3), #"bench/ce/result.mlw" 9 6 8#
+    b -> (ref'mk 3), #"bench/ce/result.mlw" 9 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 3), #"bench/ce/result.mlw" 9 6 8#
+    b -> (ref'mk 3), #"bench/ce/result.mlw" 9 6 8#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 3), #"bench/ce/result.mlw" 9 6 8#
+    b -> (ref'mk 3), #"bench/ce/result.mlw" 9 6 8#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    a -> (ref'mk 3), #"bench/ce/result.mlw" 9 6 8#
+    b -> (ref'mk 3), #"bench/ce/result.mlw" 9 6 8#
 bench/ce/result.mlw M p1'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/result.mlw" 11 15 38#
 File result.mlw:
   Line 7:
     a [@field:0:contents] [@introduced] =
@@ -18,6 +36,11 @@ File result.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "3" } }] } }
   Line 11:
+    a [@field:0:contents] [@introduced] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : "contents" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "3" } }] } }
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : "contents" ,
@@ -31,11 +54,29 @@ File result.mlw:
       "value" : {"type" : "Integer" ,
       "val" : "3" } }] } }
 
-Model 0: don't know (RAC found a contradiction at different location "bench/ce/result.mlw", line 17, characters 13-20, 1 warnings)
-Model 1: don't know (RAC found a contradiction at different location "bench/ce/result.mlw", line 17, characters 13-20, 1 warnings)
-Model 2: don't know (RAC found a contradiction at different location "bench/ce/result.mlw", line 17, characters 13-20, 1 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/result.mlw", line 17, characters 13-20, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+    a1 -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/result.mlw", line 17, characters 13-20, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+    a1 -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/result.mlw", line 17, characters 13-20, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+    a1 -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/result.mlw", line 17, characters 13-20, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+    a1 -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC found a contradiction at different location "bench/ce/result.mlw", line 17, characters 13-20, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+    a1 -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+  Abstract RAC:  good model (Abstract RAC found a contradiction at different location "bench/ce/result.mlw", line 17, characters 13-20, 1 warnings)
+    a -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
+    a1 -> (ref'mk 0), #"bench/ce/result.mlw" 16 4 5#
 bench/ce/result.mlw M f'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/result.mlw" 18 12 36#
 File result.mlw:
   Line 16:
     A [@at:'Old:loc:bench/ce/result.mlw:18] [@field:0:contents] [@introduced]

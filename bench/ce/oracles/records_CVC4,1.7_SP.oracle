@@ -1,9 +1,27 @@
 Strongest Postcondition
-Model 0: don't know (RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
+    x -> (r'mk 0 false), #"bench/ce/records.mlw" 14 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 14 6 29#
+  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
+    x -> (r'mk 0 false), #"bench/ce/records.mlw" 14 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 14 6 29#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (r'mk 0 true), #"bench/ce/records.mlw" 14 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 14 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (r'mk 0 true), #"bench/ce/records.mlw" 14 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 14 6 29#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x -> (r'mk 0 true), #"bench/ce/records.mlw" 14 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 14 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x -> (r'mk 0 true), #"bench/ce/records.mlw" 14 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 14 6 29#
 bench/ce/records.mlw M record_match_eval_test1'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 15 14 24#
 File records.mlw:
   Line 14:
     x [@introduced] =
@@ -18,11 +36,29 @@ File records.mlw:
     result [@introduced] = {"type" : "Integer" , "val" : "0" }
 
 bench/ce/records.mlw M record_match_eval_test1'vc: Valid
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x1 -> (r'mk 0 false), #"bench/ce/records.mlw" 22 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 22 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x1 -> (r'mk 0 false), #"bench/ce/records.mlw" 22 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 22 6 29#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x1 -> (r'mk 0 false), #"bench/ce/records.mlw" 22 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 22 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x1 -> (r'mk 0 false), #"bench/ce/records.mlw" 22 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 22 6 29#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x1 -> (r'mk 0 false), #"bench/ce/records.mlw" 22 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 22 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x1 -> (r'mk 0 false), #"bench/ce/records.mlw" 22 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 22 6 29#
 bench/ce/records.mlw M record_match_eval_test2'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 23 14 24#
 File records.mlw:
   Line 22:
     x [@introduced] =
@@ -43,11 +79,29 @@ File records.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x2 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 27 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 27 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x2 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 27 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 27 6 29#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x2 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 27 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 27 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x2 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 27 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 27 6 29#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x2 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 27 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 27 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x2 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 27 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 27 6 29#
 bench/ce/records.mlw M record_match_eval_test3'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 28 14 18#
 File ref.mlw:
   Line 18:
     x [@field:0:contents] [@introduced] =
@@ -106,11 +160,29 @@ File records.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x3 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 32 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 32 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x3 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 32 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 32 6 29#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x3 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 32 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 32 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x3 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 32 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 32 6 29#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x3 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 32 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 32 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x3 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 32 6 29#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 32 6 29#
 bench/ce/records.mlw M record_match_eval_test4'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 33 14 22#
 File ref.mlw:
   Line 18:
     x [@field:0:contents] [@introduced] =
@@ -169,11 +241,29 @@ File records.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x4 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 38 6 30#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 38 6 30#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x4 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 38 6 30#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 38 6 30#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x4 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 38 6 30#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 38 6 30#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x4 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 38 6 30#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 38 6 30#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x4 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 38 6 30#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 38 6 30#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x4 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 38 6 30#
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 38 6 30#
 bench/ce/records.mlw M record_match_eval_test44'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 42 13 22#
 File ref.mlw:
   Line 18:
     x [@field:0:contents] [@introduced] =
@@ -233,11 +323,29 @@ File records.mlw:
       "val" : false } }] } } }] } }
 
 bench/ce/records.mlw M record_match_eval_test44'vc: Valid
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 47 6 34#
+    x5 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 47 6 34#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 47 6 34#
+    x5 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 47 6 34#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 47 6 34#
+    x5 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 47 6 34#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    re -> (ref'mk (r'mk 0 false)), #"bench/ce/records.mlw" 47 6 34#
+    x5 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 47 6 34#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    re -> (ref'mk (r'mk 3 false)), #"bench/ce/records.mlw" 47 6 34#
+    x5 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 47 6 34#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    re -> (ref'mk (r'mk 3 false)), #"bench/ce/records.mlw" 47 6 34#
+    x5 -> (ref'mk (r'mk 6 false)), #"bench/ce/records.mlw" 47 6 34#
 bench/ce/records.mlw M test_record_match_eval_test5'vc: Timeout or Unknown
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 48 14 26#
 File ref.mlw:
   Line 18:
     x [@field:0:contents] [@introduced] =
@@ -317,11 +425,23 @@ File records.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } } }] } }
 
-Model 0: don't know (RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
+    x6 -> (r'mk1 0 false), #"bench/ce/records.mlw" 64 6 29#
+  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
+    x6 -> (r'mk1 0 false), #"bench/ce/records.mlw" 64 6 29#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x6 -> (r'mk1 0 true), #"bench/ce/records.mlw" 64 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x6 -> (r'mk1 0 true), #"bench/ce/records.mlw" 64 6 29#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x6 -> (r'mk1 0 true), #"bench/ce/records.mlw" 64 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x6 -> (r'mk1 0 true), #"bench/ce/records.mlw" 64 6 29#
 bench/ce/records.mlw Mutable record_match_eval_test1'vc: Unknown (sat)
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 65 14 24#
 File records.mlw:
   Line 64:
     x [@introduced] =
@@ -336,11 +456,23 @@ File records.mlw:
     result [@introduced] = {"type" : "Integer" , "val" : "0" }
 
 bench/ce/records.mlw Mutable record_match_eval_test1'vc: Valid
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x7 -> (r'mk1 0 false), #"bench/ce/records.mlw" 72 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x7 -> (r'mk1 0 false), #"bench/ce/records.mlw" 72 6 29#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x7 -> (r'mk1 0 false), #"bench/ce/records.mlw" 72 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x7 -> (r'mk1 0 false), #"bench/ce/records.mlw" 72 6 29#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x7 -> (r'mk1 0 false), #"bench/ce/records.mlw" 72 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x7 -> (r'mk1 0 false), #"bench/ce/records.mlw" 72 6 29#
 bench/ce/records.mlw Mutable record_match_eval_test2'vc: Unknown (sat)
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 73 14 24#
 File records.mlw:
   Line 72:
     x [@introduced] =
@@ -361,11 +493,23 @@ File records.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x8 -> (r'mk1 6 false), #"bench/ce/records.mlw" 77 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x8 -> (r'mk1 6 false), #"bench/ce/records.mlw" 77 6 29#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x8 -> (r'mk1 6 false), #"bench/ce/records.mlw" 77 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x8 -> (r'mk1 6 false), #"bench/ce/records.mlw" 77 6 29#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x8 -> (r'mk1 6 false), #"bench/ce/records.mlw" 77 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x8 -> (r'mk1 6 false), #"bench/ce/records.mlw" 77 6 29#
 bench/ce/records.mlw Mutable record_match_eval_test3'vc: Unknown (sat)
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 78 14 17#
 File records.mlw:
   Line 77:
     x [@introduced] =
@@ -377,6 +521,14 @@ File records.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
   Line 78:
+    x [@introduced] =
+      {"type" : "Record" ,
+      "val" : {"Field" : [{"field" : ".my_field_f" ,
+      "value" : {"type" : "Integer" ,
+      "val" : "6" } },
+      {"field" : "g" ,
+      "value" : {"type" : "Boolean" ,
+      "val" : false } }] } }
     x [@introduced] [@model_trace:x] =
       {"type" : "Record" ,
       "val" : {"Field" : [{"field" : ".my_field_f" ,
@@ -395,11 +547,23 @@ File records.mlw:
       "value" : {"type" : "Boolean" ,
       "val" : false } }] } }
 
-Model 0: good model (RAC confirms the counter-example, 0 warnings)
-Model 1: good model (RAC confirms the counter-example, 0 warnings)
-Model 2: good model (RAC confirms the counter-example, 0 warnings)
+Model 0:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x9 -> (r'mk1 6 false), #"bench/ce/records.mlw" 82 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x9 -> (r'mk1 6 false), #"bench/ce/records.mlw" 82 6 29#
+Model 1:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x9 -> (r'mk1 6 false), #"bench/ce/records.mlw" 82 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x9 -> (r'mk1 6 false), #"bench/ce/records.mlw" 82 6 29#
+Model 2:
+  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
+    x9 -> (r'mk1 6 false), #"bench/ce/records.mlw" 82 6 29#
+  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
+    x9 -> (r'mk1 6 false), #"bench/ce/records.mlw" 82 6 29#
 bench/ce/records.mlw Mutable record_match_eval_test4'vc: Unknown (sat)
-Counter-example model:
+Counter-example model for term at #"bench/ce/records.mlw" 83 14 22#
 File records.mlw:
   Line 82:
     x [@introduced] =
