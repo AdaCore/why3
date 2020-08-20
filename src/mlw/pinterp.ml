@@ -344,6 +344,14 @@ let rac_prover config env ~limit_time s =
   let driver = load_driver (get_main config) env prover.driver prover.extra_drivers in
   Rac_prover {command; driver; limit_time}
 
+(* TODO Fuse [rac_config] and [rac] parameter in [env] *)
+type rac_config = {
+  rac_trans: Task.task Trans.tlist option;
+  rac_prover: rac_prover option;
+}
+
+let rac_config ?rac_trans ?rac_prover () = {rac_trans; rac_prover}
+
 type model_value = Loc.position * vsymbol * value
 
 type env =
@@ -353,15 +361,14 @@ type env =
     vsenv       : value Mvs.t;
     ce_model    : model;
     env         : Env.env;
-    rac_trans   : Task.task Trans.tlist option;
-    rac_prover  : rac_prover option;
+    rac_config  : rac_config;
     used_values : model_value list ref (* values taken from the ce model *)
   }
 
 let default_env env =
   { mod_known= Mid.empty; th_known= Mid.empty; funenv= Mrs.empty;
-    vsenv= Mvs.empty; ce_model= default_model; rac_trans= None;
-    rac_prover= None; env; used_values= ref [] }
+    vsenv= Mvs.empty; ce_model= default_model; rac_config= rac_config ();
+    env; used_values= ref [] }
 
 let register_used_value env loc vs value =
   env.used_values := (loc, vs, snapshot value) :: !(env.used_values)
@@ -1111,7 +1118,7 @@ let rec trans_and_bind_quants env trans task =
 
 (** Compute the value of a term by using the (reduction) transformation *)
 let compute_term env t =
-  match env.rac_trans with
+  match env.rac_config.rac_trans with
   | None -> t
   | Some trans ->
       let task, ls_mv = task_of_term env t in
@@ -1172,12 +1179,12 @@ let check_term ?vsenv ctx t =
   let task, _ = task_of_term ?vsenv ctx.c_env t in
   let res = (* Try checking the term using computation first ... *)
     Opt.map (fun b -> Debug.dprintf debug_rac_check "Computed.@."; b)
-      (Opt.bind ctx.c_env.rac_trans
+      (Opt.bind ctx.c_env.rac_config.rac_trans
          (fun trans -> check_term_compute ctx.c_env trans task)) in
   let res =
     if res = None then (* ... then try solving using a prover *)
       Opt.map (fun b -> Debug.dprintf debug_rac_check "Dispatched.@."; b)
-        (Opt.bind ctx.c_env.rac_prover
+        (Opt.bind ctx.c_env.rac_config.rac_prover
            (fun rp -> check_term_dispatch rp task))
     else res in
   match res with
@@ -1757,23 +1764,23 @@ let make_global_env ?(model=default_model) env known =
     | _ -> acc in
   Mid.fold add_glob known Mvs.empty
 
-let eval_global_expr ~rac ?rac_trans ?rac_prover env mod_known th_known locals e =
+let eval_global_expr ~rac rac_config env mod_known th_known locals e =
   get_builtin_progs env ;
   let vsenv = make_global_env env mod_known in
   let env = add_local_funs locals
-      { (default_env env) with mod_known; th_known; vsenv; rac_trans; rac_prover } in
+      { (default_env env) with mod_known; th_known; vsenv; rac_config } in
   let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
   Mvs.iter (fun vs v -> register_used_value env e_loc vs v) vsenv;
   let res = eval_expr ~rac ~abs:false env e in
   res, vsenv
 
-let eval_global_fundef ~rac ?rac_trans ?rac_prover env mod_known mod_theory locals body =
-  try eval_global_expr ~rac ?rac_trans ?rac_prover env mod_known mod_theory locals body
+let eval_global_fundef ~rac rac_config env mod_known mod_theory locals body =
+  try eval_global_expr ~rac rac_config env mod_known mod_theory locals body
   with CannotFind (l, s, n) ->
     eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
-let eval_rs ~abs ?rac_trans ?rac_prover env mod_known th_known model (rs: rsymbol) =
+let eval_rs ~abs rac_config env mod_known th_known model (rs: rsymbol) =
   let get_value pv =
     match model_value model pv with
     | Some mv ->
@@ -1786,7 +1793,7 @@ let eval_rs ~abs ?rac_trans ?rac_prover env mod_known th_known model (rs: rsymbo
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   get_builtin_progs env ;
   let vsenv = make_global_env env ~model mod_known in
-  let env = { (default_env env) with mod_known; th_known; vsenv; rac_trans; rac_prover; ce_model= model} in
+  let env = { (default_env env) with mod_known; th_known; vsenv; rac_config; ce_model= model} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
   Mvs.iter (fun vs v -> register_used_value env e_loc vs v) env.vsenv;
@@ -1824,7 +1831,7 @@ let loc_contains_opt oloc1 oloc2 =
   | Some loc1, Some loc2 -> loc_contains loc1 loc2
   | _ -> false
 
-let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
+let check_model_rs ?(abs=false) rac_config env pm model rs =
   let open Pmodule in
   let abs_msg = if abs then "abstract" else "concrete" in
   let abs_Msg = String.capitalize_ascii abs_msg in
@@ -1836,7 +1843,7 @@ let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
     (print_model ?me_name_trans:None ~print_attrs:false) model;
   reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
-    let _, env = eval_rs ~abs ?rac_trans ?rac_prover env pm.mod_known pm.mod_theory.Theory.th_known model rs in
+    let _, env = eval_rs ~abs rac_config env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason= abs_Msg ^ " RAC does not confirm the counter-example, no \
                            contradiction during execution" in
     { verdict= Dont_know; kind; reason; warnings= warnings env model;
@@ -1911,7 +1918,7 @@ let find_rs pm loc =
   | () -> raise Not_found
   | exception Found rs -> rs
 
-let check_model ?rac_trans ?rac_prover env pm m =
+let check_model rac_config env pm m =
   match get_model_term_loc m with
   | None ->
       let reason = "No model term location" in
@@ -1924,9 +1931,9 @@ let check_model ?rac_trans ?rac_prover env pm m =
       match find_rs pm loc with
       | rs ->
          let c_res =
-           check_model_rs ~abs:false ?rac_trans ?rac_prover env pm m rs in
+           check_model_rs ~abs:false rac_config env pm m rs in
          let a_res =
-           check_model_rs ~abs:true ?rac_trans ?rac_prover env pm m rs in
+           check_model_rs ~abs:true rac_config env pm m rs in
          [c_res;a_res]
       | exception Not_found ->
           let reason = "No corresponding routine symbol found" in

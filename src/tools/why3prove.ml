@@ -242,9 +242,10 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
     | None, Some command ->
         let check_model =
           if !opt_check_ce_model then
-            let rac_prover = Opt.map (Pinterp.rac_prover config env ~limit_time:2) !opt_rac_prover in
+            let open Pinterp in
+            let rac_prover = Opt.map (rac_prover config env ~limit_time:2) !opt_rac_prover in
             let rac_trans = Compute.normalize_goal_transf_all env in
-            Some (Pinterp.check_model ~rac_trans ?rac_prover env (Pmodule.restore_module th))
+            Some (check_model (rac_config ~rac_trans ?rac_prover ()) env (Pmodule.restore_module th))
           else None in
         let call = Driver.prove_task ~command ~limit ?check_model drv task in
         let res = Call_provers.wait_on_call call in
