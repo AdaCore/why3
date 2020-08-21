@@ -213,19 +213,14 @@ let debug_print_model ~print_attrs model =
 type answer_or_model = Answer of prover_answer | Model of string
 
 let select_model check_model models =
-  let sorted_models =
-    let open Util in
-    let compare = cmp [
-        cmptr (fun (i,_,_,_) -> i) (fun i1 i2 -> i2 - i1) ;
-      ] in
+  let filtered_models =
     let check_model (i,r,m) =
       Debug.dprintf debug "Check model %d (%a)@." i
         (Pp.print_option_or_default "NO LOC" Pretty.print_loc) (get_model_term_loc m);
-      let v = check_model m in
+      let mr = check_model m in
       printf "@[<hv 2>Model %d:@\n%a@\n@]@." i
-        (Pp.print_list_or_default "(check-ce disable by user)"
-           Pp.newline print_full_verdict) v;
-      i,r,m,v in
+        print_check_model_result mr;
+      i,r,m,mr in
     let not_empty (i,_,m) =
       let empty = is_model_empty m in
       if empty then Debug.dprintf debug "Model %d is empty@." i;
@@ -234,17 +229,21 @@ let select_model check_model models =
       match r with
       | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") -> false
       | _ -> true in
-    List.sort compare
-      (List.map check_model
-         (List.filter not_limit
-            (List.filter not_empty
-               (List.mapi (fun i (r,m) -> i,r,m)
-                  models)))) in
-  match sorted_models with
+    List.map check_model
+      (List.filter not_limit
+         (List.filter not_empty
+            (List.mapi (fun i (r,m) -> i,r,m)
+               models))) in
+  let compare =
+    let open Util in
+    cmp [
+      cmptr (fun (i,_,_,_) -> -i) (-); (* Most complex model *)
+    ] in
+  match List.sort compare filtered_models with
   | [] ->
       Debug.dprintf debug "Select no CE model@.";
       None
-  | (i,_,m,_) :: _ ->
+  | (i,_,m,mr) :: _ ->
       Debug.dprintf debug "Select saved CE model %d@." i;
       Some m
 

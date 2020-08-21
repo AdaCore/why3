@@ -1861,7 +1861,6 @@ let check_model_rs rac env pm model rs =
   let open Pmodule in
   let abs_msg = if rac.rac_abstract then "abstract" else "concrete" in
   let abs_Msg = String.capitalize_ascii abs_msg in
-  let kind = if rac.rac_abstract then Abstract else Concrete in
   let vals_from_model env =
     let print_vals (loc,vs,v) = (loc,vs,asprintf "%a" print_value v) in
     List.rev_map print_vals !(env.rac.used_values) in
@@ -1872,36 +1871,36 @@ let check_model_rs rac env pm model rs =
     let _, env = eval_rs rac env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason= abs_Msg ^ " RAC does not confirm the counter-example, no \
                            contradiction during execution" in
-    {verdict= Bad_model; kind; reason; warnings= warnings env model;
+    {verdict= Bad_model; reason; warnings= warnings env model;
      values= vals_from_model env}
   with
   | Contr (ctx, t) when loc_contains_opt (get_model_term_loc model) t.t_loc ->
      let reason= abs_Msg ^ " RAC confirms the counter-example" in
-     {verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model;
+     {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
       values= vals_from_model ctx.c_env}
   | Contr (ctx, t) ->
      let reason = asprintf "%s RAC found a contradiction at different location %a"
          abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
-     {verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model;
+     {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
       values= vals_from_model ctx.c_env}
   | CannotImportModelValue msg ->
      let reason = sprintf "%s RAC: Cannot import value from model: %s" abs_Msg msg in
-     {verdict= Dont_know; kind; reason; warnings= []; values= []}
+     {verdict= Dont_know; reason; warnings= []; values= []}
   | CannotCompute ->
      (* TODO E.g., bad default value for parameter and cannot evaluate
         pre-condition *)
      let reason = abs_Msg ^ "RAC execution got stuck" in
-     {verdict= Dont_know; kind; reason; warnings= []; values= []}
+     {verdict= Dont_know; reason; warnings= []; values= []}
   | Failure msg ->
      (* E.g., cannot create default value for non-free type, cannot construct
          term for constructor that is not a function *)
      let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
-     {verdict= Dont_know; kind; reason; warnings= []; values= []}
+     {verdict= Dont_know; reason; warnings= []; values= []}
   | AbstractRACStuck (env,l) ->
       let reason =
         asprintf "%s RAC, with the counterexample model cannot continue after %a@."
           abs_Msg (Pp.print_option Pretty.print_loc) l in
-     {verdict= Bad_model; kind; reason; warnings= [];
+     {verdict= Bad_model; reason; warnings= [];
       values= vals_from_model env}
 
 (** Identifies the rsymbol of the definition that contains the given position. Raises
@@ -1944,27 +1943,21 @@ let check_model reduce env pm model =
   match get_model_term_loc model with
   | None ->
       let reason = "No model term location" in
-      [{verdict = Dont_know; kind = NotApplied; reason; warnings = [];
-        values= []}]
+      Cannot_check_model {reason}
   | Some loc ->
-    if let f, _, _, _ = Loc.get loc in Sys.file_exists f then
-      (* TODO deal with VCs from variable declarations and type declarations *)
-      (* TODO deal with VCs from goal definitions *)
-      match find_rs pm loc with
-      | rs ->
-         let c_res =
-           check_model_rs ~abs:false rac_config env pm m rs in
-         let a_res =
-           check_model_rs ~abs:true rac_config env pm m rs in
-         [c_res;a_res]
-      | exception Not_found ->
-          let reason = "No corresponding routine symbol found" in
-          [{verdict = Dont_know; kind = NotApplied; reason; warnings = [];
-            values= []}]
-    else
-      let reason = "Source file does not exist, cannot apply Loc.get_multiline" in
-      [{verdict = Dont_know; kind = NotApplied; reason; warnings = [];
-        values= []}]
+    (* TODO deal with VCs from variable declarations and type declarations *)
+    (* TODO deal with VCs from goal definitions *)
+    match find_rs pm loc with
+    | rs ->
+        let check_model_rs ~abstract =
+          let rac = rac_config ~concrete:true ~abstract ~reduce ~model () in
+          check_model_rs rac env pm model rs in
+        let concrete = check_model_rs ~abstract:false in
+        let abstract = check_model_rs ~abstract:true in
+        Check_model_result {concrete; abstract}
+    | exception Not_found ->
+        let reason = "No corresponding routine symbol found" in
+        Cannot_check_model {reason}
 
 let report_eval_result body fmt (res, final_env) =
   match res with

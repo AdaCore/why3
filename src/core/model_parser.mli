@@ -255,13 +255,10 @@ val interleave_with_source :
 
 type verdict = Good_model | Bad_model | Dont_know
 
-type interp_kind = Concrete | Abstract | NotApplied
-
 type values = (Loc.position * Term.vsymbol * string) list
 
 type full_verdict = {
     verdict  : verdict;
-    kind     : interp_kind;
     reason   : string;
     warnings : string list;
     values   : values;
@@ -269,7 +266,15 @@ type full_verdict = {
 
 val print_full_verdict : full_verdict Pp.pp
 
-type check_model = model -> full_verdict list
+(** Checking a model either results in a reason why it was not possible or a full
+    verdict from abstract and concrete RAC *)
+type check_model_result =
+  | Cannot_check_model of {reason: string}
+  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
+
+val print_check_model_result : check_model_result Pp.pp
+
+type check_model = model -> check_model_result
 (** Check the validity of a CE model. *)
 
 val default_check_model : check_model

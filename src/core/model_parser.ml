@@ -1068,7 +1068,6 @@ type values = (Loc.position * vsymbol * string) list
 
 type full_verdict = {
     verdict  : verdict;
-    kind     : interp_kind;
     reason   : string;
     warnings : string list;
     values   : values; (* values taken from model during interpretation *)
@@ -1079,19 +1078,28 @@ let print_full_verdict fmt v =
     | Good_model -> "good model"
     | Bad_model -> "bad model"
     | Dont_know -> "don't know" in
-  let k = match v.kind with
-    | Concrete -> "Concrete RAC: "
-    | Abstract -> "Abstract RAC: "
-    | NotApplied -> "" in
   let print_val fmt (loc,vs,v) =
     fprintf fmt "%a -> %s, %a" Pretty.print_vs vs v Pretty.print_loc loc in
-  fprintf fmt "@[<hv 2>%s %s (%s, %d warnings)@\n%a@]"
-    k s v.reason (List.length v.warnings)
+  fprintf fmt "@[<hv 2>%s (%s, %d warnings)@\n%a@]"
+    s v.reason (List.length v.warnings)
     (Pp.print_list Pp.newline print_val) v.values
 
-type check_model = model -> full_verdict list
+type check_model_result =
+  | Cannot_check_model of {reason: string}
+  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
 
-let default_check_model (_: model) = []
+let print_check_model_result fmt = function
+  | Cannot_check_model r ->
+      fprintf fmt "Cannot check model (%s)" r.reason
+  | Check_model_result r ->
+      fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@,@[<hv2>- Abstract: %a@]@]"
+        print_full_verdict r.concrete print_full_verdict r.abstract
+
+type check_model = model -> check_model_result
+
+let default_check_model (_: model) =
+  let reason = "No model checking" in
+  Cannot_check_model {reason}
 
 (*
 ***************************************************************

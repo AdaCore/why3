@@ -112,7 +112,7 @@ val check_model :
   Env.env ->
   Pmodule.pmodule ->
   Model_parser.model ->
-  Model_parser.full_verdict list
+  Model_parser.check_model_result
 (** [check_model env pm m] checks if model [m] is valid, i.e. the abstract
     execution using the model values triggers a RAC contradiction in the
     corresponding location. The function returns true if the corresponding
