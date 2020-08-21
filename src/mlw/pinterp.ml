@@ -432,7 +432,9 @@ let use_float_format (float_format : int) =
   match float_format with
   | 32 -> initialize_float32 ()
   | 64 -> initialize_float64 ()
-  | _ -> raise CannotCompute
+  | _ ->
+      eprintf "Unknown float format: %d@." float_format;
+      raise CannotCompute
 
 let eval_float :
     type a.
@@ -455,7 +457,9 @@ let eval_float :
       | _ -> constr ls l in
     {v_desc; v_ty= ty_result}
   with
-  | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
+  | Mlmpfr_wrapper.Not_Implemented ->
+      eprintf "Mlmpfr wrapper: not implemented@.";
+      raise CannotCompute
   | _ -> assert false
 
 type 'a real_arity =
@@ -479,7 +483,9 @@ let eval_real : type a. a real_arity -> a -> Expr.rsymbol -> value list -> value
     | Big_real.Undetermined ->
         (* Cannot decide interval comparison *)
         constr ls l
-    | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
+    | Mlmpfr_wrapper.Not_Implemented ->
+        eprintf "Mlmpfr wrapper: not implemented@.";
+        raise CannotCompute
     | _ -> assert false in
   {v_desc; v_ty= ty_real}
 
@@ -496,9 +502,10 @@ let exec_array_make ts_array _ args =
         let n = BigInt.to_int n in
         let ty = ty_app ts_array [def.v_ty] in
         value ty (Varray (Array.make n def))
-      with _ -> raise CannotCompute )
-  | _ ->
-      raise CannotCompute
+      with e ->
+        eprintf "Error making array: %a@." Exn_printer.exn_printer e;
+        raise CannotCompute )
+  | _ -> assert false
 
 let exec_array_empty ts_array _ args =
   match args with
@@ -507,21 +514,22 @@ let exec_array_empty ts_array _ args =
          will be the Tuple0 constructor *)
       let ty = ty_app ts_array [ty_var (tv_of_string "a")] in
       value ty (Varray [||])
-  | _ ->
-      raise CannotCompute
+  | _ -> assert false
 
 let exec_array_get _ args =
   match args with
   | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
       try a.(BigInt.to_int i)
-      with _ -> raise CannotCompute )
-  | _ -> raise CannotCompute
+      with e ->
+        eprintf "Error getting array: %a@." Exn_printer.exn_printer e;
+        raise CannotCompute )
+  | _ -> assert false
 
 let exec_array_length _ args =
   match args with
   | [{v_desc= Varray a}] ->
       value ty_int (Vnum (BigInt.of_int (Array.length a)))
-  | _ -> raise CannotCompute
+  | _ -> assert false
 
 let exec_array_set _ args =
   match args with
@@ -529,7 +537,9 @@ let exec_array_set _ args =
       try
         a.(BigInt.to_int i) <- v;
         value ty_unit Vvoid
-      with _ -> raise CannotCompute )
+      with e ->
+        eprintf "Error setting array: %a@." Exn_printer.exn_printer e;
+        raise CannotCompute )
 | _ -> assert false
 
 (* Described as a function so that this code is not executed outside of
@@ -812,7 +822,7 @@ let rec import_model_value env known ity v =
         let rs = match def.Pdecl.itd_constructors with
           | [rs] -> rs
           | [] ->
-              eprintf "Cannot import projection to type without constructor";
+              eprintf "Cannot import projection to type without constructor@.";
               raise CannotCompute
           | _ -> failwith "(Singleton) record constructor expected" in
         let import_or_default field_pv =
@@ -1355,7 +1365,9 @@ and eval_expr' ~rac ~abs env e =
         let p, q = compute_fraction r.Number.rl_real in
         let sp, sq = BigInt.to_string p, BigInt.to_string q in
         try Normal (value ty_real (Vreal (real_from_fraction sp sq)))
-        with Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
+        with Mlmpfr_wrapper.Not_Implemented ->
+          eprintf "Mlmpfr wrapper: not implemented@.";
+          raise CannotCompute
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
@@ -1379,9 +1391,11 @@ and eval_expr' ~rac ~abs env e =
         let mt = Spv.fold match_free cty.cty_effect.eff_reads Mtv.empty in
         let ty = ty_inst mt (ty_of_ity e.e_ity) in
         Normal (value ty (Vfun (cl, arg.pv_vs, e')))
-    | Cany -> raise CannotCompute
+      | Cany ->
+          eprintf "Cannot compute the application of the any-function@.";
+          raise CannotCompute
     | Capp _ when cty.cty_args <> [] ->
-        eprintf "Cannot compute partial function application";
+        eprintf "Cannot compute partial function application@.";
         raise CannotCompute
     | Capp (rs, pvsl) ->
         assert (ce.c_cty.cty_args = []) ;
@@ -1400,7 +1414,7 @@ and eval_expr' ~rac ~abs env e =
                   r := get_pvs env value
                 else
                   search_and_assign pvl vl
-            | _ -> raise CannotCompute in
+            | _ -> assert false in
           search_and_assign cstr.rs_cty.cty_args args)
         l ;
       Normal (value ty_unit Vvoid)
@@ -1708,7 +1722,7 @@ and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
                 eval_expr ~rac ~abs env' body
             | Cany ->
                 Debug.dprintf debug  "@[<hv2>%tEXEC CALL %a: ANY@]@." pp_indent print_rs rs;
-                eprintf "Cannot compute any function %a@." print_rs rs;
+                eprintf "Cannot compute application of local any-function %a@." print_rs rs;
                 raise CannotCompute
             | Cpur _ -> assert false (* TODO ? *) )
       | Builtin f ->
@@ -1731,7 +1745,7 @@ and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
                   if pv_equal pv pv2 then
                     Normal (field_get v)
                   else search pvl vl
-              | _ -> raise CannotCompute in
+              | _ -> assert false in
             search cstr.rs_cty.cty_args args
         | _ -> assert false )
       | exception Not_found ->
@@ -1779,7 +1793,7 @@ let eval_global_expr ~rac rac_config env mod_known th_known locals e =
 let eval_global_fundef ~rac rac_config env mod_known mod_theory locals body =
   try eval_global_expr ~rac rac_config env mod_known mod_theory locals body
   with CannotFind (l, s, n) ->
-    eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
+    eprintf "Cannot find %a.%s.%s@." (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
 let eval_rs ~abs rac_config env mod_known th_known model (rs: rsymbol) =
