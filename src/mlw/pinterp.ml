@@ -1206,7 +1206,9 @@ let check_term ?vsenv ctx t =
   | Some false ->
       raise (Contr (ctx, t))
   | None ->
-      eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t)
+      eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t);
+      if not (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
+        raise CannotCompute
 
 let check_terms ctx = List.iter (check_term ctx)
 
