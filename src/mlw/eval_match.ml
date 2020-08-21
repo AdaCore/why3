@@ -134,7 +134,7 @@ let let_map fn env t1 tb =
   let t2 = fn (Mvs.add x t1 env) t2 in
   (* TODO/FIXME? convert (let x = if f then True else False in h)
      into (forall x. (x = True <-> f) -> h) ? *)
-  t_let_simp t1 (close x t2)
+  t_let_simp_if_not_relevant t1 (close x t2)
 
 let branch_map fn env t1 bl =
   let mk_b b =

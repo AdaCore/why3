@@ -281,6 +281,7 @@ val t_attr_copy : term -> term -> term
 
 val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
+val t_let_simp_if_not_relevant : term -> term_bound -> term
 val t_case_simp : term -> term_branch list -> term
 val t_quant_simp : quant -> term_quant -> term
 val t_forall_simp : term_quant -> term

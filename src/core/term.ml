@@ -1606,6 +1606,11 @@ let t_let_simp e ((v,b,t) as bt) =
   end else
     t_let e bt
 
+let t_let_simp_if_not_relevant t ((v,_,_) as bt) =
+  if relevant_for_counterexample v.vs_name then
+    t_let t bt
+  else t_let_simp t bt
+
 let t_let_close_simp v e t =
   let n = t_v_occurs v t in
   if n = 0 then t else
