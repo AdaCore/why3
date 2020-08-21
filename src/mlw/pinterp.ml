@@ -1872,24 +1872,20 @@ let check_model_rs rac env pm model rs =
     let _, env = eval_rs rac env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason= abs_Msg ^ " RAC does not confirm the counter-example, no \
                            contradiction during execution" in
-    { verdict= Dont_know; kind; reason; warnings= warnings env model;
-      values= vals_from_model env}
+    {verdict= Bad_model; kind; reason; warnings= warnings env model;
+     values= vals_from_model env}
   with
   | Contr (ctx, t) when loc_contains_opt (get_model_term_loc model) t.t_loc ->
      let reason= abs_Msg ^ " RAC confirms the counter-example" in
-     { verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model;
-       values= vals_from_model ctx.c_env }
-  | Contr (ctx, t) ->
-     let reason = asprintf
-                    "%s RAC found a contradiction at different location %a"
-                    abs_Msg
-                    (Pp.print_option_or_default "NO LOC" print_loc)
-                    t.Term.t_loc in
      {verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model;
-       values= vals_from_model ctx.c_env}
+      values= vals_from_model ctx.c_env}
+  | Contr (ctx, t) ->
+     let reason = asprintf "%s RAC found a contradiction at different location %a"
+         abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
+     {verdict= Good_model; kind; reason; warnings= warnings ctx.c_env model;
+      values= vals_from_model ctx.c_env}
   | CannotImportModelValue msg ->
-     let reason = sprintf "%s RAC: Cannot import value from model: %s"
-                    abs_Msg msg in
+     let reason = sprintf "%s RAC: Cannot import value from model: %s" abs_Msg msg in
      {verdict= Dont_know; kind; reason; warnings= []; values= []}
   | CannotCompute ->
      (* TODO E.g., bad default value for parameter and cannot evaluate
@@ -1902,10 +1898,10 @@ let check_model_rs rac env pm model rs =
      let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
      {verdict= Dont_know; kind; reason; warnings= []; values= []}
   | AbstractRACStuck (env,l) ->
-     let reason = asprintf "%s RAC, with the counterexample model cannot \
-                            continue after %a@."
-                    abs_Msg (Pp.print_option Pretty.print_loc) l in
-     {verdict= Dont_know; kind; reason; warnings= [];
+      let reason =
+        asprintf "%s RAC, with the counterexample model cannot continue after %a@."
+          abs_Msg (Pp.print_option Pretty.print_loc) l in
+     {verdict= Bad_model; kind; reason; warnings= [];
       values= vals_from_model env}
 
 (** Identifies the rsymbol of the definition that contains the given position. Raises
