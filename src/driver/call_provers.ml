@@ -225,26 +225,62 @@ let select_model check_model models =
       let empty = is_model_empty m in
       if empty then Debug.dprintf debug "Model %d is empty@." i;
       not empty in
-    let not_limit (_,r,_) =
-      match r with
-      | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") -> false
-      | _ -> true in
-    List.map check_model
-      (List.filter not_limit
+    let model_not_bad (_,_,_,mr) = match mr with
+      | Cannot_check_model _ -> false
+      | Check_model_result r -> (* XXX *)
+          r.concrete.verdict <> Bad_model || r.abstract.verdict <> Bad_model in
+    List.filter model_not_bad
+      (List.map check_model
          (List.filter not_empty
             (List.mapi (fun i (r,m) -> i,r,m)
                models))) in
-  let compare =
+  let is_incomplete (_,_,_,mr) = match mr with
+    | Cannot_check_model _ -> true
+    | Check_model_result r ->
+        r.concrete.verdict = Dont_know && r.abstract.verdict = Dont_know in
+  let incomplete, non_incomplete = List.partition is_incomplete filtered_models in
+  let model_infos =
     let open Util in
-    cmp [
-      cmptr (fun (i,_,_,_) -> -i) (-); (* Most complex model *)
-    ] in
-  match List.sort compare filtered_models with
+    if non_incomplete = [] then
+      (* RAC didn't help, choose the most complex model (as it was done before 2020) *)
+      let compare = cmp [cmptr (fun (i,_,_,_) -> -i) (-)] in
+      List.sort compare incomplete
+    else (* XXX Which model should be preferred? *)
+      let get_concrete = function
+        | Cannot_check_model _ -> failwith "get_concrete"
+        | Check_model_result r -> r.concrete in
+      let get_abstract = function
+        | Cannot_check_model _ -> failwith "get_abstract"
+        | Check_model_result r -> r.abstract in
+      let verdict_index = function Good_model -> 0 | Dont_know -> 1 | Bad_model -> 2 in
+      let compare = cmp [
+          (* sort lexically by concrete and abstract verdicts, preferring good models over don't knows over bad models *)
+          cmptr (fun (_,_,_,mr) -> verdict_index (get_concrete mr).verdict, verdict_index (get_abstract mr).verdict)
+            (cmp [cmptr fst (-); cmptr snd (-)]);
+          (* prefer less complex models *)
+          cmptr (fun (i,_,_,_) -> i) (-);
+        ] in
+      List.sort compare non_incomplete in
+  match model_infos with
   | [] ->
       Debug.dprintf debug "Select no CE model@.";
       None
   | (i,_,m,mr) :: _ ->
-      Debug.dprintf debug "Select saved CE model %d@." i;
+      Debug.dprintf debug "Select CE model %d@." i;
+      (match mr with
+       | Cannot_check_model r ->
+           printf "Cannot check model: %s@." r.reason
+       | Check_model_result r -> (* XXX *)
+           (* Tentatively summarize the verdict of concrete and abstract RAC *)
+           let summary = match r.concrete.verdict, r.abstract.verdict with
+             | Good_model, _ -> "it is verified in RAC"
+             | Bad_model, Good_model -> "it points to a subcontract weakness"
+             | Dont_know, Dont_know -> "it could not be verified, RAC was incomplete"
+             | Dont_know, Good_model -> "???"
+             | Dont_know, Bad_model -> "???"
+             | Bad_model, Dont_know -> "???"
+             | Bad_model, Bad_model -> assert false (* filtered above *) in
+           printf "Selected CE-model %d, %s.@." i summary);
       Some m
 
 let analyse_result ?(check_model=default_check_model) exit_result res_parser printer_mapping out =
