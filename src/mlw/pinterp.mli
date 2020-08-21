@@ -16,42 +16,57 @@ type value
 val v_ty : value -> Ty.ty
 val print_value : Format.formatter -> value -> unit
 
+(** {1 Interpreter types} *)
+
+type env
+(** Context for the interpreter *)
+
 type result =
   | Normal of value
   | Excep of Ity.xsymbol * value
   | Irred of Expr.expr
   | Fun of Expr.rsymbol * Ity.pvsymbol list * int
-
-(** Interpreter context *)
-type env
+(** Result of the interpreter **)
 
 (** {1 Contradiction context} *)
 
-(** Context of a contradiction during RAC *)
 type cntr_ctx =
   { c_desc: string;
     c_trigger_loc: Loc.position option;
     c_env: env }
+(** Context of a contradiction during RAC *)
 
-(** Exception [Contr] is raised when a contradiction is observed
-    during RAC. *)
 exception Contr of cntr_ctx * Term.term
+(** Exception [Contr] is raised when a contradiction is detected during RAC. *)
 
-(** {1 Global evaluation} *)
+(** {1 Interpreter configuration} *)
 
 val init_real : int * int * int -> unit
 (** Give a precision on real computation. *)
 
-(* TODO Replace options rac_trans and rac_prover by a strategy *)
-
 type rac_prover
+(** The configuration of the prover used for reducing terms in RAC *)
 
 val rac_prover : Whyconf.config -> Env.env -> limit_time:int -> string -> rac_prover
+(** [rac_prover cnf env limit prover s] creates a RAC prover configuration for a Why3
+   prover string [s] *)
+
+type rac_config
+(** The configuration for RAC, including (optionally) a transformation for reducing terms
+   (usually: compute_in_goal), and a prover to be used if the transformation does not
+   yield a truth value. When neither transformation nor prover are defined, then RAC does
+   not progress. *)
+
+val rac_config :
+  ?rac_trans:Task.task Trans.tlist ->
+  ?rac_prover:rac_prover ->
+  unit -> rac_config
+
+(** {1 Interpreter} *)
 
 val eval_global_fundef :
   rac:bool ->
-  ?rac_trans:Task.task Trans.tlist ->
-  ?rac_prover:rac_prover ->
+  rac_config ->
   Env.env ->
   Pdecl.known_map ->
   Decl.known_map ->
@@ -73,8 +88,7 @@ val eval_global_fundef :
 
 val check_model_rs :
   ?abs:bool ->                          (* execute abstractly *)
-  ?rac_trans:Task.task Trans.tlist ->
-  ?rac_prover:rac_prover ->
+  rac_config ->
   Env.env ->
   Pmodule.pmodule ->
   Model_parser.model ->
@@ -87,8 +101,7 @@ val check_model_rs :
     Optional arguments [rac_trans] and [rac_prover] as in [eval_global_fundef]. *)
 
 val check_model :
-  ?rac_trans:Task.task Trans.tlist ->
-  ?rac_prover:rac_prover ->
+  rac_config ->
   Env.env ->
   Pmodule.pmodule ->
   Model_parser.model ->

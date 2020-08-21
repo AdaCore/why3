@@ -51,7 +51,6 @@ let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, r
     (Pp.print_list sep pp_binding)
     l (snd delims) ()
 
-
 let pp_indent fmt =
   match Printexc.(backtrace_slots (get_callstack 100)) with
   | None -> ()
@@ -344,6 +343,14 @@ let rac_prover config env ~limit_time s =
   let driver = load_driver (get_main config) env prover.driver prover.extra_drivers in
   Rac_prover {command; driver; limit_time}
 
+(* TODO Fuse [rac_config] and [rac] parameter in [env] *)
+type rac_config = {
+  rac_trans: Task.task Trans.tlist option;
+  rac_prover: rac_prover option;
+}
+
+let rac_config ?rac_trans ?rac_prover () = {rac_trans; rac_prover}
+
 type model_value = Loc.position * vsymbol * value
 
 type env =
@@ -353,15 +360,14 @@ type env =
     vsenv       : value Mvs.t;
     ce_model    : model;
     env         : Env.env;
-    rac_trans   : Task.task Trans.tlist option;
-    rac_prover  : rac_prover option;
+    rac_config  : rac_config;
     used_values : model_value list ref (* values taken from the ce model *)
   }
 
 let default_env env =
   { mod_known= Mid.empty; th_known= Mid.empty; funenv= Mrs.empty;
-    vsenv= Mvs.empty; ce_model= default_model; rac_trans= None;
-    rac_prover= None; env; used_values= ref [] }
+    vsenv= Mvs.empty; ce_model= default_model; rac_config= rac_config ();
+    env; used_values= ref [] }
 
 let register_used_value env loc vs value =
   env.used_values := (loc, vs, snapshot value) :: !(env.used_values)
@@ -426,7 +432,9 @@ let use_float_format (float_format : int) =
   match float_format with
   | 32 -> initialize_float32 ()
   | 64 -> initialize_float64 ()
-  | _ -> raise CannotCompute
+  | _ ->
+      eprintf "Unknown float format: %d@." float_format;
+      raise CannotCompute
 
 let eval_float :
     type a.
@@ -449,7 +457,9 @@ let eval_float :
       | _ -> constr ls l in
     {v_desc; v_ty= ty_result}
   with
-  | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
+  | Mlmpfr_wrapper.Not_Implemented ->
+      eprintf "Mlmpfr wrapper: not implemented@.";
+      raise CannotCompute
   | _ -> assert false
 
 type 'a real_arity =
@@ -473,7 +483,9 @@ let eval_real : type a. a real_arity -> a -> Expr.rsymbol -> value list -> value
     | Big_real.Undetermined ->
         (* Cannot decide interval comparison *)
         constr ls l
-    | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
+    | Mlmpfr_wrapper.Not_Implemented ->
+        eprintf "Mlmpfr wrapper: not implemented@.";
+        raise CannotCompute
     | _ -> assert false in
   {v_desc; v_ty= ty_real}
 
@@ -490,9 +502,10 @@ let exec_array_make ts_array _ args =
         let n = BigInt.to_int n in
         let ty = ty_app ts_array [def.v_ty] in
         value ty (Varray (Array.make n def))
-      with _ -> raise CannotCompute )
-  | _ ->
-      raise CannotCompute
+      with e ->
+        eprintf "Error making array: %a@." Exn_printer.exn_printer e;
+        raise CannotCompute )
+  | _ -> assert false
 
 let exec_array_empty ts_array _ args =
   match args with
@@ -501,21 +514,22 @@ let exec_array_empty ts_array _ args =
          will be the Tuple0 constructor *)
       let ty = ty_app ts_array [ty_var (tv_of_string "a")] in
       value ty (Varray [||])
-  | _ ->
-      raise CannotCompute
+  | _ -> assert false
 
 let exec_array_get _ args =
   match args with
   | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
       try a.(BigInt.to_int i)
-      with _ -> raise CannotCompute )
-  | _ -> raise CannotCompute
+      with e ->
+        eprintf "Error getting array: %a@." Exn_printer.exn_printer e;
+        raise CannotCompute )
+  | _ -> assert false
 
 let exec_array_length _ args =
   match args with
   | [{v_desc= Varray a}] ->
       value ty_int (Vnum (BigInt.of_int (Array.length a)))
-  | _ -> raise CannotCompute
+  | _ -> assert false
 
 let exec_array_set _ args =
   match args with
@@ -523,7 +537,9 @@ let exec_array_set _ args =
       try
         a.(BigInt.to_int i) <- v;
         value ty_unit Vvoid
-      with _ -> raise CannotCompute )
+      with e ->
+        eprintf "Error setting array: %a@." Exn_printer.exn_printer e;
+        raise CannotCompute )
 | _ -> assert false
 
 (* Described as a function so that this code is not executed outside of
@@ -806,7 +822,7 @@ let rec import_model_value env known ity v =
         let rs = match def.Pdecl.itd_constructors with
           | [rs] -> rs
           | [] ->
-              eprintf "Cannot import projection to type without constructor";
+              eprintf "Cannot import projection to type without constructor@.";
               raise CannotCompute
           | _ -> failwith "(Singleton) record constructor expected" in
         let import_or_default field_pv =
@@ -986,11 +1002,22 @@ let bind_term (vs, t) (task, ls_mt, ls_mv) =
   let task = Task.add_logic_decl task [defn] in
   task, ls_mt, ls_mv
 
+(* Add declarations for value bindings in [env.vsenv] *)
+let bind_value env vs v (task, ls_mt, ls_mv) =
+  let ls = create_fsymbol (id_clone vs.vs_name) [] v.v_ty in
+  let ls_mt = ty_match ls_mt vs.vs_ty v.v_ty in
+  let ls_mv = Mvs.add vs (fs_app ls [] v.v_ty) ls_mv in
+  let vsenv, t = term_of_value env [] v in
+  let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
+  let t = t_ty_subst ls_mt ls_mv t in
+  let defn = Decl.make_ls_defn ls [] t in
+  let task = Task.add_logic_decl task [defn] in
+  task, ls_mt, ls_mv
+
 let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
   let task = List.fold_left use_export task Theory.[builtin_theory; bool_theory; highord_theory] in
-  let task = use_export task (Env.read_theory env.env ["map"] "MapExt") in (* TODO remove, use map.MapExt where necessary in program *)
   (* Add known declarations *)
   let add_known _ decl task =
     match decl.d_node with
@@ -1025,18 +1052,7 @@ let task_of_term ?(vsenv=[]) env t =
     with Exit -> task, ls_mv in
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
-  (* Add declarations for value bindings in [env.vsenv] *)
-  let bind_value vs v (task, ls_mt, ls_mv) =
-    let ls = create_fsymbol (id_clone vs.vs_name) [] v.v_ty in
-    let ls_mt = ty_match ls_mt vs.vs_ty v.v_ty in
-    let ls_mv = Mvs.add vs (fs_app ls [] v.v_ty) ls_mv in
-    let vsenv, t = term_of_value env.env [] v in
-    let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
-    let t = t_ty_subst ls_mt ls_mv t in
-    let defn = make_ls_defn ls [] t in
-    let task = add_logic_decl task [defn] in
-    task, ls_mt, ls_mv in
-  let task, ls_mt, ls_mv = Mvs.fold bind_value env.vsenv (task, ls_mt, ls_mv) in
+  let task, ls_mt, ls_mv = Mvs.fold (bind_value env.env) env.vsenv (task, ls_mt, ls_mv) in
   let t = t_ty_subst ls_mt ls_mv t in
   let task =
     if t.t_ty = None then (* Add goal ... *)
@@ -1048,43 +1064,43 @@ let task_of_term ?(vsenv=[]) env t =
       add_logic_decl task [decl] in
   task, ls_mv
 
-let bind_univ_quant_vars = true
-let bind_univ_quant_vars_fallback_default = true
+(* Parameters for binding universally quantified variables to a value from the CE model or the default value *)
+let bind_univ_quant_vars_ce_model = false
+let bind_univ_quant_vars_default = false
 
-let bind_quants env task =
-  let t = Task.task_goal_fmla task in
-  try match t with
-    | {t_node= Tquant (Tforall, tq)} when bind_univ_quant_vars ->
+(* Get the value of a vsymbol from the CE-model, a default value *)
+let get_value env vs =
+  match vs.vs_name.id_loc with
+  | None -> None
+  | Some loc ->
+      let value =
+        if bind_univ_quant_vars_ce_model then
+          match get_model_value env.ce_model vs.vs_name.id_string loc with
+          | Some mv ->
+              let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) mv in
+              Debug.dprintf debug_rac "Bind value for all-quantified variable %a to %a@." print_vs vs print_value v;
+              Some v
+          | _ -> None
+        else None in
+      if value <> None then value else
+      if bind_univ_quant_vars_default then (
+        let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
+        Debug.dprintf debug_rac "Use default value for quantified variable %a: %a@." print_vs vs print_value v;
+        Some v
+      ) else (
+        Debug.dprintf debug_rac "No value for all-quantified variable %a@." print_vs vs;
+        None )
+
+(** When the task goal is [forall vs* . t], add declarations to the task that bind the
+   variables [vs*] to concrete values (from the CE-model or default values), and make [t]
+   the new goal. *)
+let bind_univ_quant_vars env task =
+  try match (Task.task_goal_fmla task).t_node with
+    | Tquant (Tforall, tq) ->
         let vs, _, t = t_open_quant tq in
-        let get_value vs =
-          match vs.vs_name with
-          | {id_string= name; id_loc= Some loc} -> (
-              match get_model_value env.ce_model name loc with
-              | Some mv ->
-                  let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) mv in
-                  Debug.dprintf debug_rac "Bind value for all-quantified %a to %a@." print_vs vs print_value v;
-                  v
-              | None ->
-                  if bind_univ_quant_vars_fallback_default then (
-                    let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
-                    Debug.dprintf debug_rac "Use default value for all-quantified %a: %a@." print_vs vs print_value v;
-                    v
-                  ) else (
-                    Debug.dprintf debug_rac "No value for all-quantified %a@." print_vs vs;
-                    raise Exit ) )
-          | _ -> raise Exit (* Missing location, cannot identify CE value *) in
-        let values = List.map get_value vs in
+        let values = List.map (fun vs -> Opt.get_exn Exit (get_value env vs)) vs in
         let _, task = Task.task_separate_goal task in
-        let bind_vs vs v (ls_mv, ls_mt, task) =
-          let ls_mt = ty_match ls_mt vs.vs_ty v.v_ty in
-          let ls = create_lsymbol (id_clone vs.vs_name) [] (Some v.v_ty) in
-          let ls_mv = Mvs.add vs (fs_app ls [] v.v_ty) ls_mv in
-          let vsenv, t = term_of_value env.env [] v in
-          let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
-          let defn = Decl.make_ls_defn ls [] t in
-          let task = Task.add_logic_decl task [defn] in
-          ls_mv, ls_mt, task in
-        let ls_mv, ls_mt, task = List.fold_right2 bind_vs vs values (Mvs.empty, Mtv.empty, task) in
+        let task, ls_mt, ls_mv = List.fold_right2 (bind_value env.env) vs values (task, Mtv.empty, Mvs.empty) in
         let t = t_ty_subst ls_mt ls_mv t in
         let prs = Decl.create_prsymbol (id_fresh "goal") in
         Task.add_prop_decl task Decl.Pgoal prs t
@@ -1092,44 +1108,47 @@ let bind_quants env task =
   with Exit -> task
 
 let task_hd_equal t1 t2 = let open Task in let open Theory in let open Decl in
+  (* Task.task_hd_equal is too strict: it requires physical equality between
+     {t1,t2}.task_prev *)
   match t1.task_decl.td_node, t2.task_decl.td_node with
   | Decl {d_node = Dprop (Pgoal,p1,g1)}, Decl {d_node = Dprop (Pgoal,p2,g2)} ->
-      (* Opt.equal (==) t1.task_prev t2.task_prev && *)
       pr_equal p1 p2 && t_equal_strict g1 g2
   | _ -> t1 == t2
 
 (** Apply the (reduction) transformation and fill universally quantified variables
     in the head of the task by values from the CE model, recursively. *)
 let rec trans_and_bind_quants env trans task =
-  let task = bind_quants env task in
+  let task = bind_univ_quant_vars env task in
   let tasks = Trans.apply trans task in
   let task_unchanged = match tasks with
     | [task'] -> Opt.equal task_hd_equal task' task
     | _ -> false in
-  if task_unchanged then tasks
-  else List.flatten (List.map (trans_and_bind_quants env trans) tasks)
+  if task_unchanged then
+    tasks
+  else
+    List.flatten (List.map (trans_and_bind_quants env trans) tasks)
 
 (** Compute the value of a term by using the (reduction) transformation *)
 let compute_term env t =
-  match env.rac_trans with
+  match env.rac_config.rac_trans with
   | None -> t
   | Some trans ->
       let task, ls_mv = task_of_term env t in
-      if t.t_ty = None then
+      if t.t_ty = None then (* [t] is a formula *)
         match List.map Task.task_goal_fmla (trans_and_bind_quants env trans task) with
         | [] -> t_true
         | t :: ts -> List.fold_left t_and t ts
-      else
+      else (* [t] is not a formula *)
         let t = match Trans.apply trans task with
           | [Some Task.{task_decl= Theory.{td_node= Decl Decl.{d_node= Dlogic [_, ldef]}}}] ->
-              ( match Decl.open_ls_defn ldef with
-                | [], t -> t
-                | _ ->  failwith "compute_term" )
+              let vs, t = Decl.open_ls_defn ldef in
+              if vs <> [] then failwith "compute_term";
+              t
           | _ -> failwith "compute_term" in
-        (* Free vsymbols in [t] have been substituted in [task] by fresh
-           lsymbols (actually: ls @ []) to bind them to the task declarations.
-           Now we have to reverse these substitution to ensures that the reduced
-           term is valid in the original environment of [t]. *)
+        (* Free vsymbols in the original [t] have been substituted in by fresh lsymbols
+           (actually: ls @ []) to bind them to declarations in the task. Now we have to
+           reverse these substitution to ensures that the reduced term is valid in the
+           original environment of [t]. *)
         let reverse vs t' t = t_replace t' (t_var vs) t in
         Mvs.fold reverse ls_mv t
 
@@ -1172,12 +1191,12 @@ let check_term ?vsenv ctx t =
   let task, _ = task_of_term ?vsenv ctx.c_env t in
   let res = (* Try checking the term using computation first ... *)
     Opt.map (fun b -> Debug.dprintf debug_rac_check "Computed.@."; b)
-      (Opt.bind ctx.c_env.rac_trans
+      (Opt.bind ctx.c_env.rac_config.rac_trans
          (fun trans -> check_term_compute ctx.c_env trans task)) in
   let res =
     if res = None then (* ... then try solving using a prover *)
       Opt.map (fun b -> Debug.dprintf debug_rac_check "Dispatched.@."; b)
-        (Opt.bind ctx.c_env.rac_prover
+        (Opt.bind ctx.c_env.rac_config.rac_prover
            (fun rp -> check_term_dispatch rp task))
     else res in
   match res with
@@ -1350,7 +1369,9 @@ and eval_expr' ~rac ~abs env e =
         let p, q = compute_fraction r.Number.rl_real in
         let sp, sq = BigInt.to_string p, BigInt.to_string q in
         try Normal (value ty_real (Vreal (real_from_fraction sp sq)))
-        with Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
+        with Mlmpfr_wrapper.Not_Implemented ->
+          eprintf "Mlmpfr wrapper: not implemented@.";
+          raise CannotCompute
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
@@ -1374,9 +1395,11 @@ and eval_expr' ~rac ~abs env e =
         let mt = Spv.fold match_free cty.cty_effect.eff_reads Mtv.empty in
         let ty = ty_inst mt (ty_of_ity e.e_ity) in
         Normal (value ty (Vfun (cl, arg.pv_vs, e')))
-    | Cany -> raise CannotCompute
+      | Cany ->
+          eprintf "Cannot compute the application of the any-function@.";
+          raise CannotCompute
     | Capp _ when cty.cty_args <> [] ->
-        eprintf "Cannot compute partial function application";
+        eprintf "Cannot compute partial function application@.";
         raise CannotCompute
     | Capp (rs, pvsl) ->
         assert (ce.c_cty.cty_args = []) ;
@@ -1395,7 +1418,7 @@ and eval_expr' ~rac ~abs env e =
                   r := get_pvs env value
                 else
                   search_and_assign pvl vl
-            | _ -> raise CannotCompute in
+            | _ -> assert false in
           search_and_assign cstr.rs_cty.cty_args args)
         l ;
       Normal (value ty_unit Vvoid)
@@ -1703,7 +1726,7 @@ and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
                 eval_expr ~rac ~abs env' body
             | Cany ->
                 Debug.dprintf debug  "@[<hv2>%tEXEC CALL %a: ANY@]@." pp_indent print_rs rs;
-                eprintf "Cannot compute any function %a@." print_rs rs;
+                eprintf "Cannot compute application of local any-function %a@." print_rs rs;
                 raise CannotCompute
             | Cpur _ -> assert false (* TODO ? *) )
       | Builtin f ->
@@ -1726,7 +1749,7 @@ and exec_call ~rac ~abs ?loc env rs arg_pvs ity_result =
                   if pv_equal pv pv2 then
                     Normal (field_get v)
                   else search pvl vl
-              | _ -> raise CannotCompute in
+              | _ -> assert false in
             search cstr.rs_cty.cty_args args
         | _ -> assert false )
       | exception Not_found ->
@@ -1761,23 +1784,23 @@ let make_global_env ?(model=default_model) env known =
     | _ -> acc in
   Mid.fold add_glob known Mvs.empty
 
-let eval_global_expr ~rac ?rac_trans ?rac_prover env mod_known th_known locals e =
+let eval_global_expr ~rac rac_config env mod_known th_known locals e =
   get_builtin_progs env ;
   let vsenv = make_global_env env mod_known in
   let env = add_local_funs locals
-      { (default_env env) with mod_known; th_known; vsenv; rac_trans; rac_prover } in
+      { (default_env env) with mod_known; th_known; vsenv; rac_config } in
   let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
   Mvs.iter (fun vs v -> register_used_value env e_loc vs v) vsenv;
   let res = eval_expr ~rac ~abs:false env e in
   res, vsenv
 
-let eval_global_fundef ~rac ?rac_trans ?rac_prover env mod_known mod_theory locals body =
-  try eval_global_expr ~rac ?rac_trans ?rac_prover env mod_known mod_theory locals body
+let eval_global_fundef ~rac rac_config env mod_known mod_theory locals body =
+  try eval_global_expr ~rac rac_config env mod_known mod_theory locals body
   with CannotFind (l, s, n) ->
-    eprintf "Cannot find %a.%s.%s" (Pp.print_list Pp.dot pp_print_string) l s n ;
+    eprintf "Cannot find %a.%s.%s@." (Pp.print_list Pp.dot pp_print_string) l s n ;
     assert false
 
-let eval_rs ~abs ?rac_trans ?rac_prover env mod_known th_known model (rs: rsymbol) =
+let eval_rs ~abs rac_config env mod_known th_known model (rs: rsymbol) =
   let get_value pv =
     match model_value model pv with
     | Some mv ->
@@ -1790,7 +1813,7 @@ let eval_rs ~abs ?rac_trans ?rac_prover env mod_known th_known model (rs: rsymbo
   let arg_vs = List.map get_value rs.rs_cty.cty_args in
   get_builtin_progs env ;
   let vsenv = make_global_env env ~model mod_known in
-  let env = { (default_env env) with mod_known; th_known; vsenv; rac_trans; rac_prover; ce_model= model} in
+  let env = { (default_env env) with mod_known; th_known; vsenv; rac_config; ce_model= model} in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
   Mvs.iter (fun vs v -> register_used_value env e_loc vs v) env.vsenv;
@@ -1828,7 +1851,7 @@ let loc_contains_opt oloc1 oloc2 =
   | Some loc1, Some loc2 -> loc_contains loc1 loc2
   | _ -> false
 
-let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
+let check_model_rs ?(abs=false) rac_config env pm model rs =
   let open Pmodule in
   let abs_msg = if abs then "abstract" else "concrete" in
   let abs_Msg = String.capitalize_ascii abs_msg in
@@ -1840,7 +1863,7 @@ let check_model_rs ?(abs=false) ?rac_trans ?rac_prover env pm model rs =
     (print_model ?me_name_trans:None ~print_attrs:false) model;
   reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
-    let _, env = eval_rs ~abs ?rac_trans ?rac_prover env pm.mod_known pm.mod_theory.Theory.th_known model rs in
+    let _, env = eval_rs ~abs rac_config env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason= abs_Msg ^ " RAC does not confirm the counter-example, no \
                            contradiction during execution" in
     { verdict= Dont_know; kind; reason; warnings= warnings env model;
@@ -1915,7 +1938,7 @@ let find_rs pm loc =
   | () -> raise Not_found
   | exception Found rs -> rs
 
-let check_model ?rac_trans ?rac_prover env pm m =
+let check_model rac_config env pm m =
   match get_model_term_loc m with
   | None ->
       let reason = "No model term location" in
@@ -1928,9 +1951,9 @@ let check_model ?rac_trans ?rac_prover env pm m =
       match find_rs pm loc with
       | rs ->
          let c_res =
-           check_model_rs ~abs:false ?rac_trans ?rac_prover env pm m rs in
+           check_model_rs ~abs:false rac_config env pm m rs in
          let a_res =
-           check_model_rs ~abs:true ?rac_trans ?rac_prover env pm m rs in
+           check_model_rs ~abs:true rac_config env pm m rs in
          [c_res;a_res]
       | exception Not_found ->
           let reason = "No corresponding routine symbol found" in
