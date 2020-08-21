@@ -1307,7 +1307,7 @@ let rec eval_expr ~rac ~abs env e =
    instead invariants and function contracts to guide execution. *)
 and eval_expr' ~rac ~abs env e =
   let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
-  let get_value vs ity loc =
+  let get_value ?def vs ity loc =
     let name = vs.vs_name.id_string in
     let value = match get_model_value env.ce_model name loc with
       | Some v ->
@@ -1315,10 +1315,14 @@ and eval_expr' ~rac ~abs env e =
          Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
            pp_indent print_value v;
          v
-      | None -> eprintf "@[<h>VALUE for %s %a not in ce-model, taking \
-                         default@]@."
-                  name print_loc loc;
-                default_value_of_type env.env env.mod_known ity in
+      | None ->
+         let v = match def with
+           | None -> default_value_of_type env.env env.mod_known ity
+           | Some v -> v in
+         eprintf "@[<h>VALUE for %s %a not in ce-model, taking \
+                  default %a@]@." name print_loc loc print_value v;
+         v
+    in
     register_used_value env e_loc vs value;
     value in
   let assign_written_vars env vs _ =
@@ -1434,7 +1438,7 @@ and eval_expr' ~rac ~abs env e =
         assert1 {I};
         assign_written_vars_with_ce;
         assert2* {I};
-        if e1 then (e2;assert3 {I}; absurd* ) else ()
+        if e1 then (e2;assert3 {I}; abort* ) else ()
 
         1 - if assert1 fails, then we have a real couterexample
             (invariant init doesn't hold)
@@ -1491,9 +1495,9 @@ and eval_expr' ~rac ~abs env e =
               print_value v ;
             Irred e )
       | r -> r end
-  | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) when abs -> begin
+  | Efor (i, (pvs1, dir, pvs2), _ii, inv, e1) when abs -> begin
+      (* TODO what to do with _ii? *)
       (* arbitrary execution of an iteartion taken from the counterexample
-
         for i = e1 to e2 do invariant {I} e done
         ~>
         let a = eval_expr e1 in
@@ -1501,29 +1505,31 @@ and eval_expr' ~rac ~abs env e =
         if a <= b + 1 then begin
           (let i = a in assert1 {I});
           assign_written_vars_with_ce;
-          let i = get_model_value i in  (* i is not registered as asgn *)
+          let i = get_model_value ~def:(b+1) i in
+          if not (a <= i <= b + 1) then abort1;
           if a <= i <= b then begin
             assert2* { I };
             eval_expr e;
             let i = i + 1 in
             assert3 {I};
-            absurd
+            abort2
           end else begin
-            (* ??? assert4* { i = b + 1 } ???*)
-            let i = b + 1 in assert5* {I}
+            assert4* {I} (* i is already equal to 'b + 1' *)
           end
         end else ()
 
         1 - if assert1 fails, then we have a real counterexample
             (invariant init doesn't hold)
-        2 - if assert3 fails, then we have a false counterexample
+        2 - if assert2 fails, then we have a false counterexample
             (invariant does not hold at beginning of execution)
-        3 - if assert4 fails, then we have a real counterexample
+        3 - if assert3 fails, then we have a real counterexample
             (invariant does not hold after iteration)
-        (* ??? 4 - if assert2 fails, then we have a false counterexample
-            (the value assigned to i is not compatible with for loop) *)
-        5 - if assert5 fails, then we have a false counterexample
-            (invariant does not hold for the execution to continue) *)
+        4 - if assert4 fails, then we have a false counterexample
+            (invariant does not hold for the execution to continue)
+        5 - abort1: we have a false counterexample
+            (value assigned to i is not compatible with loop range)
+        6 - abort2: we have a false counterexample
+            (the abstract rac cannot continue from this state) *)
       try
   let a = big_int_of_value (get_pvs env pvs1) in
   let b = big_int_of_value (get_pvs env pvs2) in
@@ -1533,14 +1539,17 @@ and eval_expr' ~rac ~abs env e =
   (* assert1 *)
   if le a (suc b) then begin
     if rac then begin
-      let env = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
+      let env = bind_vs i.pv_vs (value ty_int (Vnum a)) env in
       check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
     let env = Mvs.fold_left assign_written_vars env env.vsenv in
-    let pvs_v = get_value pvs.pv_vs pvs.pv_ity
-                  (Opt.get pvs.pv_vs.vs_name.id_loc) in
-    let env = bind_vs pvs.pv_vs pvs_v env in
-    let pvs_int = big_int_of_value pvs_v in
-    if le a pvs_int && le pvs_int b then begin
+    let def = value ty_int (Vnum (suc b)) in
+    let i_val = get_value ~def i.pv_vs i.pv_ity
+                  (Opt.get i.pv_vs.vs_name.id_loc) in
+    let env = bind_vs i.pv_vs i_val env in
+    let i_val = big_int_of_value i_val in
+    if not (le a i_val && le i_val (suc b)) then
+      raise (AbstractRACStuck (env,i.pv_vs.vs_name.id_loc)); (* FIXME loc *)
+    if le a i_val && le i_val b then begin
       (* assert2 *)
       (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
        | Contr (_,t) ->
@@ -1550,7 +1559,7 @@ and eval_expr' ~rac ~abs env e =
       match eval_expr ~rac ~abs env e1 with
       | Normal _ ->
          let env =
-           bind_vs pvs.pv_vs (value ty_int (Vnum (suc pvs_int))) env in
+           bind_vs i.pv_vs (value ty_int (Vnum (suc i_val))) env in
          (* assert3 *)
          if rac then
            check_terms (cntr_ctx "Loop invariant preservation" env) inv;
@@ -1558,13 +1567,8 @@ and eval_expr' ~rac ~abs env e =
       | r -> r
       end
     else begin
-      (* (\* assert4 *\)
-       * if not (pvs_int = suc b) then begin
-       *     printf "index is not in bounds %a@."
-       *       (Pp.print_option Pretty.print_loc) e.e_loc;
-       *     raise (AbstractRACStuck (env,e.e_loc)) end; *)
-      (* assert5 *)
-      let env = bind_vs pvs.pv_vs (value ty_int (Vnum (suc b))) env in
+      (* assert4 *)
+      (* i is already equal to b + 1 *)
       (try check_terms (cntr_ctx "invariant holds after loop" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant after \
