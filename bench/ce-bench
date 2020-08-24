@@ -139,12 +139,12 @@ run () {
             echo "High failure: unknown xfail value $is_xfail";
             exit 2;;
     esac
-    if [ "$str_oracle" = "$str_out" ] ; then
-        echo "ok"
+    if $updateoracle; then
+        echo "Updating oracle for ${file_path}, prover $1"
+        mv "$f.out" "${oracle_file}"
     else
-        if $updateoracle; then
-            echo "Updating oracle for ${file_path}, prover $1"
-            mv "$f.out" "${oracle_file}"
+        if [ "$str_oracle" = "$str_out" ] ; then
+            echo "ok"
         else
             echo "FAILED!"
             # echo "Oracle is ${str_oracle}"
