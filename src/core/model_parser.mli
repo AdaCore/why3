@@ -163,14 +163,12 @@ val print_model_human :
   unit
 (** Same as print_model but is intended to be human readable.*)
 
-(*
 val print_model_json :
   ?me_name_trans:(model_element_name -> string) ->
   ?vc_line_trans:(int -> string) ->
   Format.formatter ->
   model ->
   unit
- *)
 (** Prints counter-example model to json format.
 
     @param me_name_trans see print_model
