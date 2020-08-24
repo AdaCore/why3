@@ -1313,6 +1313,35 @@ let print_result fmt = function
 
 exception AbstractRACStuck of env * Loc.position option
 
+let get_and_register_value env ?def vs ity loc =
+  let name = vs.vs_name.id_string in
+  let value = match get_model_value env.ce_model name loc with
+    | Some v ->
+       let v = import_model_value env.env env.mod_known ity v in
+       Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
+         pp_indent print_value v;
+       v
+    | None ->
+       let v = match def with
+         | None -> default_value_of_type env.env env.mod_known ity
+         | Some v -> v in
+       eprintf "@[<h>VALUE for %s %a not in ce-model, taking \
+                default %a@]@." name print_loc loc print_value v;
+       v
+  in
+  register_used_value env loc vs value;
+  value
+
+let assign_written_vars wrt loc env vs _ =
+  let pv = restore_pv vs in
+  if pv_affected wrt pv then begin
+      Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
+        pp_indent print_pv pv
+        (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
+      let value = get_and_register_value env vs pv.pv_ity loc in
+      bind_vs vs value env end
+  else env
+
 let rec eval_expr ~rac ~abs env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
     (if abs then "Abs. " else "Con. ")
@@ -1326,33 +1355,6 @@ let rec eval_expr ~rac ~abs env e =
    instead invariants and function contracts to guide execution. *)
 and eval_expr' ~rac ~abs env e =
   let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
-  let get_value ?def vs ity loc =
-    let name = vs.vs_name.id_string in
-    let value = match get_model_value env.ce_model name loc with
-      | Some v ->
-         let v = import_model_value env.env env.mod_known ity v in
-         Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
-           pp_indent print_value v;
-         v
-      | None ->
-         let v = match def with
-           | None -> default_value_of_type env.env env.mod_known ity
-           | Some v -> v in
-         eprintf "@[<h>VALUE for %s %a not in ce-model, taking \
-                  default %a@]@." name print_loc loc print_value v;
-         v
-    in
-    register_used_value env e_loc vs value;
-    value in
-  let assign_written_vars env vs _ =
-    let pv = restore_pv vs in
-    if pv_affected e.e_effect.eff_writes pv then begin
-        Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
-          pp_indent print_pv pv
-          (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
-        let value = get_value vs pv.pv_ity e_loc in
-        bind_vs vs value env end
-    else env in
   match e.e_node with
   | Evar pvs -> (
     try
@@ -1473,7 +1475,9 @@ and eval_expr' ~rac ~abs env e =
       (* assert1 *)
       if rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
-      let env = Mvs.fold_left assign_written_vars env env.vsenv in
+      let env = Mvs.fold_left
+                  (assign_written_vars e.e_effect.eff_writes e_loc)
+                  env env.vsenv in
       (* assert2 *)
       (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
        | Contr (_,t) ->
@@ -1528,7 +1532,7 @@ and eval_expr' ~rac ~abs env e =
         if a <= b + 1 then begin
           (let i = a in assert1 {I});
           assign_written_vars_with_ce;
-          let i = get_model_value ~def:(b+1) i in
+          let i = get_and_register_value ~def:(b+1) i in
           if not (a <= i <= b + 1) then abort1;
           if a <= i <= b then begin
             assert2* { I };
@@ -1564,9 +1568,11 @@ and eval_expr' ~rac ~abs env e =
     if rac then begin
       let env = bind_vs i.pv_vs (value ty_int (Vnum a)) env in
       check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
-    let env = Mvs.fold_left assign_written_vars env env.vsenv in
+    let env = Mvs.fold_left
+                (assign_written_vars e.e_effect.eff_writes e_loc)
+                env env.vsenv in
     let def = value ty_int (Vnum (suc b)) in
-    let i_val = get_value ~def i.pv_vs i.pv_ity
+    let i_val = get_and_register_value env ~def i.pv_vs i.pv_ity
                   (Opt.get i.pv_vs.vs_name.id_loc) in
     let env = bind_vs i.pv_vs i_val env in
     let i_val = big_int_of_value i_val in
