@@ -571,11 +571,13 @@ let why_name_trans {men_kind; men_name} =
   | Loop_current_iteration -> "[current iteration] "^men_name
   | _ -> men_name
 
+(* unused
 let json_name_trans {men_kind; men_name} =
   match men_kind with
   | Result -> "result"
   | Old -> "old "^men_name
   | _ -> men_name
+ *)
 
 let print_model ~print_attrs ?(me_name_trans = why_name_trans)
     ~print_model_value fmt model =
@@ -689,13 +691,16 @@ let interleave_with_source ~print_attrs ?(start_comment = "(* ")
     (source_code, gen_loc)
   with Not_found -> (source_code, locations)
 
+(* unused
 let print_attrs_json (me : model_element_name) fmt =
   Json_base.list
     (fun fmt attr -> Json_base.string fmt attr.attr_string)
     fmt
     (List.sort cmp_attrs (Sattr.elements me.men_attrs))
+ *)
 
 (* Compute the kind of a model_element using its attributes and location *)
+(* unused
 let compute_kind (me : model_element) =
   let me_kind = me.me_name.men_kind in
   let location = me.me_location in
@@ -720,10 +725,12 @@ let compute_kind (me : model_element) =
           else me_kind
       | _ -> me_kind ) in
   me_kind
+ *)
 
 (*
 **  Quering the model - json
 *)
+(* unused
 let print_model_element_json me_name_to_str fmt me =
   let print_value fmt = fprintf fmt "%a" print_model_value_sanit me.me_value in
   let print_kind fmt =
@@ -748,10 +755,14 @@ let print_model_element_json me_name_to_str fmt me =
     print_value_or_kind_or_name fmt
     [ ("name", print_name); ("attrs", print_json_attrs); ("value", print_value)
     ; ("kind", print_kind) ]
+ *)
 
+(* unused
 let print_model_elements_json me_name_to_str fmt model_elements =
   Json_base.list (print_model_element_json me_name_to_str) fmt model_elements
+ *)
 
+(* unused
 let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
     (file_name, model_file) =
   Json_base.map_bindings
@@ -765,7 +776,9 @@ let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
     (print_model_elements_json me_name_to_str)
     fmt
     (Mint.bindings model_file)
+ *)
 
+(* unused
 let print_model_json ?(me_name_trans = json_name_trans)
     ?(vc_line_trans = fun i -> string_of_int i) fmt model =
   let model_files_bindings =
@@ -778,6 +791,7 @@ let print_model_json ?(me_name_trans = json_name_trans)
     (fun s -> s)
     (print_model_elements_on_lines_json model me_name_trans vc_line_trans)
     fmt model_files_bindings
+ *)
 
 (*
 ***************************************************************
