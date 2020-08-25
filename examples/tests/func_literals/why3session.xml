@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="func_literals.mlw"/>
+<theory name="Top">
+ <goal name="g1">
+ </goal>
+ <goal name="g2">
+ <transf name="split_vc" >
+  <goal name="g2.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="8925"/></proof>
+  </goal>
+  <goal name="g2.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="9131"/></proof>
+  </goal>
+  <goal name="g2.2">
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g3">
+ </goal>
+ <goal name="zero2three_nok&#39;vc" expl="VC for zero2three_nok">
+ </goal>
+ <goal name="zero2three_ok&#39;vc" expl="VC for zero2three_ok" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="zero2three_ok&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="5750"/></proof>
+  </goal>
+  <goal name="zero2three_ok&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="12885"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="zero2three_ok2&#39;vc" expl="VC for zero2three_ok2" proved="true">
+ <proof prover="1"><result status="valid" time="0.19" steps="767"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
