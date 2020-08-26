@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.7" alternative="counterexamples" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.8.4" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="times2float.mlw"/>
+<theory name="Top">
+ <goal name="f&#39;vc" expl="VC for f">
+ <proof prover="0"><result status="timeout" time="5.00" steps="2009908"/></proof>
+ <proof prover="1"><result status="unknown" time="0.14" steps="387381"/></proof>
+ <proof prover="3"><result status="timeout" time="5.00"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

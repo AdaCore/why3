@@ -1,0 +1,129 @@
+Strongest Postcondition
+bench/ce/loop_inv.mlw M f'vc: Valid
+bench/ce/loop_inv.mlw M f'vc: Timeout or Unknown
+Counter-example model:
+File loop_inv.mlw:
+  Line 10:
+    a, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 12:
+    [previous iteration] b, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 13:
+    [current iteration] a, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var], [@model_trace:a]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    [current iteration] b, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var], [@model_trace:b]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
+  Line 14:
+    [current iteration] b, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
+
+bench/ce/loop_inv.mlw N f'vc: Valid
+bench/ce/loop_inv.mlw N f'vc: Timeout or Unknown
+Counter-example model:
+File loop_inv.mlw:
+  Line 31:
+    a, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 32:
+    b, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 33:
+    [previous iteration] b, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 34:
+    [current iteration] a, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var], [@model_trace:a]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    [current iteration] b, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var], [@model_trace:b]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
+  Line 35:
+    [current iteration] b, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
+
+bench/ce/loop_inv.mlw N f'vc: Valid
+bench/ce/loop_inv.mlw R f'vc: Valid
+bench/ce/loop_inv.mlw R f'vc: Timeout or Unknown
+Counter-example model:
+File loop_inv.mlw:
+  Line 53:
+    a, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Decimal", "val": "1.0"}}]}}
+  Line 54:
+    b, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Decimal", "val": "2.0"}}]}}
+  Line 55:
+    [previous iteration] b, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Decimal", "val": "5.0"}}]}}
+  Line 56:
+    [current iteration] a, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var], [@model_trace:a]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Decimal", "val": "1.0"}}]}}
+    [current iteration] b, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var], [@model_trace:b]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Decimal", "val": "6.0"}}]}}
+  Line 57:
+    [current iteration] b, [[@field:0:contents], [@introduced],
+      [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Decimal", "val": "6.0"}}]}}
+
+bench/ce/loop_inv.mlw R f'vc: Valid

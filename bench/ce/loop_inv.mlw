@@ -1,0 +1,61 @@
+
+module M
+
+use int.Int
+
+let f () : unit
+  diverges
+  =
+  let ref a = 0 in
+  a <- 1;
+  let ref b = 2 in
+  while b < 10 do
+    invariant { b < a + 5 }
+    b <- a + b
+  done
+
+end
+
+module N
+
+use int.Int
+
+val ref a : int
+
+val ref b : int
+
+let f () : int
+  diverges
+  ensures { result < a }
+  =
+  a <- 1;
+  b <- 2;
+  while b < 10 do
+    invariant { b < a + 5 }
+    b <- a + b
+  done;
+  b
+
+end
+
+module R
+
+use real.Real
+
+val ref a : real
+
+val ref b : real
+
+let f () : real
+  diverges
+  ensures { result < a }
+  =
+  a <- 1.0;
+  b <- 2.0;
+  while b < 10.0 do
+    invariant { b < a + 5.0 }
+    b <- a + b
+  done;
+  b
+
+end

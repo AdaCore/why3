@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Z3" version="4.8.4" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="1" name="CVC4" version="1.6" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.4" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file>
+<path name=".."/><path name="bvsum.mlw"/>
+<theory name="PureBV" proved="true">
+ <goal name="add_bv" proved="true">
+ <proof prover="4"><result status="valid" time="0.05" steps="13986"/></proof>
+ </goal>
+ <goal name="g" proved="true">
+ <proof prover="4"><result status="valid" time="0.08" steps="31108"/></proof>
+ </goal>
+</theory>
+<theory name="Mixed">
+ <goal name="add_bv" proved="true">
+ <proof prover="4"><result status="valid" time="0.03" steps="13986"/></proof>
+ </goal>
+ <goal name="add_bv_int">
+ <proof prover="1"><result status="timeout" time="1.00" steps="258185"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <proof prover="3" timelimit="1" memlimit="1000"><result status="timeout" time="1.00"/></proof>
+ <transf name="split_vc" >
+  <goal name="add_bv_int.0">
+  <proof prover="0"><result status="timeout" time="10.00"/></proof>
+  <proof prover="3"><result status="timeout" time="10.00"/></proof>
+  <proof prover="4" timelimit="10" memlimit="4000"><result status="timeout" time="10.00" steps="3358556"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

@@ -1,0 +1,91 @@
+Strongest Postcondition
+bench/ce/threshold.mlw WithInt32 f'vc: Timeout or Unknown
+Counter-example model:
+File threshold.mlw:
+  Line 7:
+    max, [[@introduced]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-1"}}
+    min, [[@introduced]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-2147483648"}}
+    n, [[@introduced]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-2147483648"}}
+  Line 10:
+    max, [[@introduced], [@model_trace:max]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-1"}}
+    min, [[@introduced], [@model_trace:min]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "-2147483648"}}
+
+bench/ce/threshold.mlw WithInt32 f'vc: Timeout or Unknown
+Counter-example model:
+File threshold.mlw:
+  Line 7:
+    max, [[@introduced]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+    min, [[@introduced]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+    n, [[@introduced]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "4"}}
+  Line 8:
+    max, [[@introduced], [@model_trace:max]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+    min, [[@introduced], [@model_trace:min]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "3"}}
+    result, [[@introduced]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
+  Line 10:
+    _x, [[@introduced]] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "5"}}
+
+bench/ce/threshold.mlw WithBV32 f'vc: Timeout or Unknown
+Counter-example model:
+File threshold.mlw:
+  Line 21:
+    max, [[@introduced]] = {"type": "Integer", "val": "4294967295"}
+    min, [[@introduced]] = {"type": "Integer", "val": "4294967295"}
+    n, [[@introduced]] = {"type": "Integer", "val": "0"}
+  Line 25:
+    max, [[@introduced], [@model_trace:max]] =
+      {"type": "Integer", "val": "4294967295"}
+    min, [[@introduced], [@model_trace:min]] =
+      {"type": "Integer", "val": "4294967295"}
+
+bench/ce/threshold.mlw WithBV32 f'vc: Timeout or Unknown
+Counter-example model:
+File threshold.mlw:
+  Line 21:
+    max, [[@introduced]] = {"type": "Integer", "val": "0"}
+    min, [[@introduced]] = {"type": "Integer", "val": "1"}
+    n, [[@introduced]] = {"type": "Integer", "val": "0"}
+  Line 22:
+    max, [[@introduced], [@model_trace:max]] =
+      {"type": "Integer", "val": "0"}
+    min, [[@introduced], [@model_trace:min]] =
+      {"type": "Integer", "val": "1"}
+    result, [[@introduced]] = {"type": "Integer", "val": "0"}
+  Line 25:
+    _x, [[@introduced]] = {"type": "Integer", "val": "1"}
+
