@@ -197,8 +197,27 @@ that expects an argument of a mutable type will accept an argument of
 the corresponding snapshot type as long as it is not modified by the
 function.
 
-Logical expressions: terms and formulas
----------------------------------------
+Logical expressions
+-------------------
+
+A significant part of a typical WhyML source file is occupied by
+non-executable logical content intended for specification and proof:
+function contracts, assertions, definitions of logical functions and
+predicates, axioms, lemmas, etc.
+
+
+.. rubric:: Terms and Formulas
+
+Logical expressions are called *terms*. Boolean terms are called
+*formulas*. Internally, Why3 distinguishes the proper formulas (produced
+by predicate symbols, propositional connectives and quantifiers) and the
+terms of type ``bool`` (produced by Boolean variables and logical
+functions that return ``bool``). However, this distinction is not
+enforced on the syntactical level, and Why3 will perform the necessary
+conversions behind the scenes.
+
+The syntax of WhyML terms is given in :token:`term`.
+
 
 .. productionlist::
     term: `integer`   ; integer constant
@@ -266,20 +285,7 @@ Logical expressions: terms and formulas
     trigger: `term` ("," `term`)*
 
 
-A significant part of a typical WhyML source file is occupied by
-non-executable logical content intended for specification and proof:
-function contracts, assertions, definitions of logical functions and
-predicates, axioms, lemmas, etc.
-
-Logical expressions are called *terms*. Boolean terms are called
-*formulas*. Internally, Why3 distinguishes the proper formulas (produced
-by predicate symbols, propositional connectives and quantifiers) and the
-terms of type ``bool`` (produced by Boolean variables and logical
-functions that return ``bool``). However, this distinction is not
-enforced on the syntactical level, and Why3 will perform the necessary
-conversions behind the scenes.
-
-The syntax of WhyML terms is given in :token:`term`.  The various
+The various
 constructs have the following priorities and associativities, from
 lowest to greatest priority:
 
@@ -338,9 +344,18 @@ example, ``(-)`` refers to the binary subtraction and ``(-_)`` to the
 unary negation. Tight operators cannot be used as infix operators, and
 thus do not require disambiguation.
 
+.. index:: bracket; syntax
+.. index:: collections; syntax
+.. rubric:: Specific syntax for collections
+
 In addition to prefix and infix operators, WhyML supports several mixfix
 bracket operators to manipulate various collection types: dictionaries,
-arrays, sequences, etc. Bracket operators do not have any predefined
+arrays, sequences, etc.
+
+TODO[CL]: document here the syntax for function literals. Do not
+forget to extend the grammar.
+
+Bracket operators do not have any predefined
 meaning and may be used to denote access and update operations for
 various user-defined collection types. We can introduce multiple bracket
 operations in the same scope by disambiguating them with primes after
@@ -357,8 +372,9 @@ with normal identifiers, names with a letter after a prime, such as
 ``(+)'spec``, can only be introduced by Why3, and not by the user in a
 WhyML source.
 
-.. index:: at
-.. index:: old
+.. index:: at; syntax
+.. index:: old; syntax
+.. rubric:: Refering to past program states using "at" and "old" operators
 
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
@@ -378,6 +394,7 @@ can be put over a parenthesised term, and the parentheses can be omitted
 if the term is a record or a record update.
 
 .. index:: &&, ||, by, so
+.. rubric:: Non-standard connectives
 
 The propositional connectives in WhyML formulas are listed in
 :token:`term`. The non-standard connectives — asymmetric
@@ -429,6 +446,11 @@ instead: ``A <-> B <-> C`` is transformed into a conjunction of
 ``A <-> B`` and ``B <-> C``. To reduce ambiguity, WhyML forbids to place
 a non-parenthesised implication at the right-hand side of an
 equivalence: ``A <-> B -> C`` is rejected.
+
+.. index:: conditionals; syntax
+.. index:: let; syntax
+.. index:: pattern-matching; syntax
+.. rubric:: Conditionals, "let" bindings and pattern-matching
 
 .. productionlist::
   term: ...
@@ -597,7 +619,7 @@ collection. The former can be done simultaneously on a tuple of values:
 of the ternary bracket operator ``([]<-)`` and cannot be used in a
 multiple assignment.
 
-.. index:: auto-dereference
+.. index:: auto-dereference; syntax
 .. rubric:: Auto-dereference: Simplified Usage of Mutable variables
 
 TODO: put here what is currently in the release notes.
