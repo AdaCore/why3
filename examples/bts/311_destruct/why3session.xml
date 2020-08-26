@@ -3,9 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.2.0" timelimit="20" steplimit="0" memlimit="1000"/>
-<file format="whyml" proved="true">
+<file format="whyml">
 <path name=".."/><path name="311_destruct.mlw"/>
-<theory name="Top" proved="true">
+<theory name="Top">
  <goal name="g" proved="true">
  <transf name="destruct" proved="true" arg1="H">
   <goal name="g.0" proved="true">
@@ -26,9 +26,13 @@
   </goal>
  </transf>
  </goal>
+ <goal name="H2">
+ </goal>
  <goal name="g5" proved="true">
  <transf name="destruct" proved="true" arg1="H2">
  </transf>
+ </goal>
+ <goal name="H3">
  </goal>
  <goal name="g6" proved="true">
  <transf name="destruct" proved="true" arg1="H3">
