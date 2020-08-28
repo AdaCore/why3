@@ -595,8 +595,22 @@ module Make(E: sig
         ~vertex_dummy
         ~hedge_dummy
         cfg.psh_graph sinit in
-    let output = Fixpoint.analysis_guided manager
-                   cfg.psh_graph sinit make_strategy in
+    Format.eprintf "DP %d@." __LINE__;
+    let initial_strategy =
+      Fixpoint.make_strategy_default
+        ~vertex_dummy
+        ~hedge_dummy
+        cfg.psh_graph sinit in
+    let init_t = Unix.times () in
+    let output = Fixpoint.analysis_std manager
+                   cfg.psh_graph sinit initial_strategy in
+    (* let output = Fixpoint.analysis_guided manager
+     *                cfg.psh_graph sinit make_strategy in *)
+
+    let end_t = Unix.times () in
+    Format.eprintf "Time elapsed %f@."
+      (end_t.tms_utime -. init_t.tms_utime);
+    Format.eprintf "DP %d@." __LINE__;
 
     if Debug.test_flag infer_print_ai_result then begin
         Format.printf "output=%a@." (Fixpoint.print_output manager) output;
