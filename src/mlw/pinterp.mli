@@ -39,7 +39,7 @@ type cntr_ctx =
 exception Contr of cntr_ctx * Term.term
 (** Exception [Contr] is raised when a contradiction is detected during RAC. *)
 
-(** {1 Interpreter configuration} *)
+(** {1 Configuration} *)
 
 val init_real : int * int * int -> unit
 (** Give a precision on real computation. *)
@@ -51,21 +51,29 @@ val rac_prover : Whyconf.config -> Env.env -> limit_time:int -> string -> rac_pr
 (** [rac_prover cnf env limit prover s] creates a RAC prover configuration for a Why3
    prover string [s] *)
 
-type rac_config
+type rac_reduce_config
 (** The configuration for RAC, including (optionally) a transformation for reducing terms
    (usually: compute_in_goal), and a prover to be used if the transformation does not
    yield a truth value. When neither transformation nor prover are defined, then RAC does
    not progress. *)
 
+val rac_reduce_config :
+  ?trans:Task.task Trans.tlist ->
+  ?prover:rac_prover ->
+  unit -> rac_reduce_config
+
+type rac_config
+
 val rac_config :
-  ?rac_trans:Task.task Trans.tlist ->
-  ?rac_prover:rac_prover ->
+  concrete:bool ->
+  abstract:bool ->
+  ?reduce:rac_reduce_config ->
+  ?model:Model_parser.model ->
   unit -> rac_config
 
 (** {1 Interpreter} *)
 
 val eval_global_fundef :
-  rac:bool ->
   rac_config ->
   Env.env ->
   Pdecl.known_map ->
@@ -87,7 +95,6 @@ val eval_global_fundef :
 (** {1 Check counter-example models using RAC}*)
 
 val check_model_rs :
-  ?abs:bool ->                          (* execute abstractly *)
   rac_config ->
   Env.env ->
   Pmodule.pmodule ->
@@ -101,11 +108,11 @@ val check_model_rs :
     Optional arguments [rac_trans] and [rac_prover] as in [eval_global_fundef]. *)
 
 val check_model :
-  rac_config ->
+  rac_reduce_config ->
   Env.env ->
   Pmodule.pmodule ->
   Model_parser.model ->
-  Model_parser.full_verdict list
+  Model_parser.check_model_result
 (** [check_model env pm m] checks if model [m] is valid, i.e. the abstract
     execution using the model values triggers a RAC contradiction in the
     corresponding location. The function returns true if the corresponding

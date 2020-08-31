@@ -430,10 +430,10 @@ let build_prover_call spa =
       let check_model =
         if true then (* TODO Check IDE parameter check_ce_model *)
           let open Pinterp in
-          let rac_trans = Compute.normalize_goal_transf_all c.controller_env in
+          let trans = Compute.normalize_goal_transf_all c.controller_env in
           (* TODO Don't hardcode the RAC prover! *)
-          let rac_prover = rac_prover c.controller_config c.controller_env ~limit_time:2 "z3" in
-          Some (check_model (rac_config ~rac_trans ~rac_prover ()) c.controller_env pm)
+          let prover = rac_prover c.controller_config c.controller_env ~limit_time:2 "z3" in
+          Some (check_model (rac_reduce_config ~trans ~prover ()) c.controller_env pm)
         else None in
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
           ~limit ~interactive ?check_model driver task in

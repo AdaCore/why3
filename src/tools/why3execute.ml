@@ -104,10 +104,12 @@ let do_input f =
   let open Pinterp in
   Opt.iter init_real !prec;
   try
-    let rac = !opt_enable_rac in
-    let rac_trans = Compute.normalize_goal_transf_all env in
-    let rac_prover = Opt.map (rac_prover config env ~limit_time:2) !opt_rac_prover in
-    let res = eval_global_fundef ~rac (rac_config ~rac_trans ?rac_prover ()) env
+    let rac =
+      let concrete = !opt_enable_rac in
+      let trans = Compute.normalize_goal_transf_all env in
+      let prover = Opt.map (rac_prover config env ~limit_time:2) !opt_rac_prover in
+      rac_config ~concrete ~abstract:false ~reduce:(rac_reduce_config ~trans ?prover ()) () in
+    let res = eval_global_fundef rac env
         muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
