@@ -294,7 +294,7 @@ module Make(E: sig
          Mpv.fold_left forget_and_constraints (fun_id, fun_id) cty_oldies in
 
        let constraints = List.map (remove_eps ~ret manpk) cty_post
-                         |> List.fold_left t_and t_true
+                         |> List.fold_left t_and_simp t_true
                          |> QDom.meet_term manpk in
 
        let begin_cp = new_node_cfg cfg expr ~lbl:"exec bgn" in
@@ -609,7 +609,7 @@ module Make(E: sig
 
     let end_t = Unix.times () in
     Format.eprintf "Time elapsed %f@."
-      (end_t.tms_utime -. init_t.tms_utime);
+      Unix.(end_t.tms_utime -. init_t.tms_utime);
     Format.eprintf "DP %d@." __LINE__;
 
     if Debug.test_flag infer_print_ai_result then begin
