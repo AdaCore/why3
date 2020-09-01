@@ -353,17 +353,17 @@ let rac_reduce_config ?trans:rac_trans ?prover:rac_prover () = {rac_trans; rac_p
 type model_value = Loc.position * vsymbol * value
 
 type rac_config = {
-  rac_concrete : bool;
+  do_rac : bool;
   rac_abstract : bool;
   rac_reduce   : rac_reduce_config;
   ce_model     : model;
   used_values  : model_value list ref (* values taken from the ce model *)
 }
 
-let rac_config ~concrete:rac_concrete ~abstract:rac_abstract ?reduce:rac_reduce
+let rac_config ~concrete:do_rac ~abstract:rac_abstract ?reduce:rac_reduce
     ?model:(ce_model=Model_parser.default_model) () =
   let rac_reduce = match rac_reduce with Some r -> r | None -> rac_reduce_config () in
-  {rac_concrete; rac_abstract; rac_reduce; ce_model; used_values= ref []}
+  {do_rac; rac_abstract; rac_reduce; ce_model; used_values= ref []}
 
 type env =
   { mod_known   : Pdecl.known_map;
@@ -1335,7 +1335,8 @@ let get_and_register_value env ?def ?ity vs loc =
        v
     | None ->
        let v = match def with
-         | None -> default_value_of_type env.env env.mod_known ity
+         | None ->
+            default_value_of_type env.env env.mod_known ity
          | Some v -> v in
        eprintf "@[<h>VALUE for %s %a not in ce-model, taking \
                 default %a@]@." name print_loc loc print_value v;
@@ -1398,6 +1399,8 @@ and eval_expr' env e =
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
           exec_pure env ls pvs
       | Cfun e' ->
+         if env.rac.rac_abstract then
+           (eprintf "Cannot compute: not yet implemented@."; raise CannotCompute);
         Debug.dprintf debug "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
         let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
         let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
@@ -1486,7 +1489,7 @@ and eval_expr' env e =
             (invariant does not hold after iteration)
         * stop the interpretation here - raise AbstractRACStuck *)
       (* assert1 *)
-      if env.rac.rac_concrete then
+      if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
       let env = Mvs.fold_left
                   (assign_written_vars e.e_effect.eff_writes e_loc)
@@ -1502,7 +1505,7 @@ and eval_expr' env e =
          if is_true v then begin
              match eval_expr env e1 with
              | Normal _ ->
-                 if env.rac.rac_concrete then
+                 if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
                 raise (AbstractRACStuck (env,e.e_loc))
              | r -> r
@@ -1517,14 +1520,14 @@ and eval_expr' env e =
     end
   | Ewhile (cond, inv, _var, e1) -> begin
       (* TODO variants *)
-      if env.rac.rac_concrete then
+      if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
       match eval_expr env cond with
       | Normal v ->
           if is_true v then (
             match eval_expr env e1 with
             | Normal _ ->
-                if env.rac.rac_concrete then
+                if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv ;
                 eval_expr env e
             | r -> r )
@@ -1578,7 +1581,7 @@ and eval_expr' env e =
     | DownTo -> BigInt.ge, BigInt.pred in
   (* assert1 *)
   if le a (suc b) then begin
-    if env.rac.rac_concrete then begin
+    if env.rac.do_rac then begin
       let env = bind_vs i.pv_vs (value ty_int (Vnum a)) env in
       check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
     let env = Mvs.fold_left
@@ -1603,7 +1606,7 @@ and eval_expr' env e =
          let env =
            bind_vs i.pv_vs (value ty_int (Vnum (suc i_val))) env in
          (* assert3 *)
-         if env.rac.rac_concrete then
+         if env.rac.do_rac then
            check_terms (cntr_ctx "Loop invariant preservation" env) inv;
          raise (AbstractRACStuck (env,e.e_loc))
       | r -> r
@@ -1637,13 +1640,13 @@ and eval_expr' env e =
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum i)) env in
           match eval_expr env' e1 with
           | Normal _ ->
-              if env.rac.rac_concrete then
+              if env.rac.do_rac then
                 check_terms (cntr_ctx "Loop invariant preservation" env') inv ;
               iter (suc i)
           | r -> r
         else
           Normal (value ty_unit Vvoid) in
-      ( if env.rac.rac_concrete then
+      ( if env.rac.do_rac then
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
           check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
       iter a
@@ -1676,7 +1679,7 @@ and eval_expr' env e =
         | Expr.Assert -> "Assertion"
         | Expr.Assume -> "Assumption"
         | Expr.Check -> "Check" in
-      if env.rac.rac_concrete then check_term (cntr_ctx descr env) t ;
+      if env.rac.do_rac then check_term (cntr_ctx descr env) t ;
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
       Debug.dprintf debug "@[<h>%tEVAL EXPR: GHOST %a@]@." pp_indent print_expr e1;
@@ -1718,14 +1721,14 @@ and exec_call ~abs ?loc env rs arg_pvs ity_result =
   let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v)
                                env.vsenv oldies} in
   (* TODO variant *)
-  let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name)
-              ?trigger_loc:loc env in
-  check_terms ctx rs.rs_cty.cty_pre;
+  if env.rac.do_rac then begin
+    let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name)
+                ?trigger_loc:loc env in
+    check_terms ctx rs.rs_cty.cty_pre end;
   let can_interpret_abstracly =
     if rs_equal rs rs_func_app then false else
       match find_definition env rs with
-      | LocalFunction (_,{c_node = Cfun _})
-      | LocalFunction (_,{c_node = Cany}) -> true
+      | LocalFunction _ -> true
       | _ -> false in
   if abs && can_interpret_abstracly then begin
       (* let f (x1: ...) ... (xn: ...) = e
@@ -1742,22 +1745,18 @@ and exec_call ~abs ?loc env rs arg_pvs ity_result =
        *)
       (* assert1 is already done above *)
       let res = match rs.rs_cty.cty_post with
-        | p :: _ -> let (vs,_) = open_post p in vs
-        | _ -> create_vsymbol (id_fresh "result")
-                 (ty_of_ity rs.rs_cty.cty_result) in
-      let loc = Opt.get loc in
+        | p :: _ -> let (vs,_) = open_post p in
+                    id_clone vs.vs_name
+        | _ -> id_fresh "result" in
+      let res = create_vsymbol res (ty_of_ity ity_result) in
+      let loc1 = Opt.get loc in
       let env = Mvs.fold_left
-                  (assign_written_vars rs.rs_cty.cty_effect.eff_writes loc)
+                  (assign_written_vars rs.rs_cty.cty_effect.eff_writes loc1)
                   env env.vsenv in
-      let res_v = get_and_register_value env res loc in
-      let env = bind_vs res res_v env in
-      let posts = List.map (open_post_with (t_var res)) rs.rs_cty.cty_post in
+      let res_v = get_and_register_value ~ity:ity_result env res loc1 in
       (* assert2 *)
-      (try check_terms (cntr_ctx "ce satisfies invariant" env) posts with
-       | Contr (_,t) ->
-          printf "ce model does not satisfy loop invariant %a@."
-            (Pp.print_option Pretty.print_loc) t.t_loc;
-          raise (AbstractRACStuck (env,t.t_loc)));
+      (try check_posts "ce satisfies postcondition" loc env res_v rs.rs_cty.cty_post with
+       | Contr (_,t) -> raise (AbstractRACStuck (env,t.t_loc)));
       Normal res_v end
   else begin
       let res =
