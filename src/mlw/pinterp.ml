@@ -1724,7 +1724,9 @@ and exec_call ~abs ?loc env rs arg_pvs ity_result =
   let can_interpret_abstracly =
     if rs_equal rs rs_func_app then false else
       match find_definition env rs with
-      | LocalFunction (_,{c_node = Cfun _}) -> true | _ -> false in
+      | LocalFunction (_,{c_node = Cfun _})
+      | LocalFunction (_,{c_node = Cany}) -> true
+      | _ -> false in
   if abs && can_interpret_abstracly then begin
       (* let f (x1: ...) ... (xn: ...) = e
          ~>
