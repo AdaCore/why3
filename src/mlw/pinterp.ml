@@ -1023,6 +1023,21 @@ let bind_value env vs v (task, ls_mt, ls_mv) =
   let task = Task.add_logic_decl task [defn] in
   task, ls_mt, ls_mv
 
+(* Create and open a formula `p t` for a non-formula term `t`, to use the reduction engine
+   to evaluate `t` *)
+let p = object
+  val ls_p =
+    let tv = create_tvsymbol (id_fresh "a") in
+    create_psymbol (id_fresh "p") [ty_var tv]
+  method decl =
+    Decl.create_param_decl ls_p
+  method create_app t =
+    t_app ls_p [t] None
+  method open_app t = match t with
+    | {t_node= Tapp (ls, [t])} when ls_equal ls ls_p -> t
+    | _ -> failwith "p#open_app"
+end
+
 let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
@@ -1064,13 +1079,13 @@ let task_of_term ?(vsenv=[]) env t =
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env.env) env.vsenv (task, ls_mt, ls_mv) in
   let t = t_ty_subst ls_mt ls_mv t in
   let task =
-    if t.t_ty = None then (* Add goal ... *)
+    if t.t_ty = None then (* Add a formula as goal directly ... *)
       let prs = create_prsymbol (id_fresh "goal") in
       add_prop_decl task Pgoal prs t
-    else (* ... or declaration *)
-      let ls = create_lsymbol (id_fresh "value") [] t.t_ty in
-      let decl = make_ls_defn ls [] t in
-      add_logic_decl task [decl] in
+    else (* ... and wrap a non-formula in a call to a predicate with no definition *)
+      let task = add_decl task p#decl in
+      let prs = create_prsymbol (id_fresh "goal") in
+      add_prop_decl task Pgoal prs (p#create_app t) in
   task, ls_mv
 
 (* Parameters for binding universally quantified variables to a value from the CE model or the default value *)
@@ -1149,10 +1164,7 @@ let compute_term env t =
         | t :: ts -> List.fold_left t_and t ts
       else (* [t] is not a formula *)
         let t = match Trans.apply trans task with
-          | [Some Task.{task_decl= Theory.{td_node= Decl Decl.{d_node= Dlogic [_, ldef]}}}] ->
-              let vs, t = Decl.open_ls_defn ldef in
-              if vs <> [] then failwith "compute_term";
-              t
+          | [task] -> p#open_app (Task.task_goal_fmla task)
           | _ -> failwith "compute_term" in
         (* Free vsymbols in the original [t] have been substituted in by fresh lsymbols
            (actually: ls @ []) to bind them to declarations in the task. Now we have to
