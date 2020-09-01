@@ -16,6 +16,9 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
+let debug_check_ce = Debug.register_info_flag "check_ce"
+    ~desc:"Check@ CE@ models@ using@ RAC"
+
 let debug_attrs = Debug.register_info_flag "print_model_attrs"
   ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
 
@@ -212,75 +215,76 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
+type ce_summary = NCCE | SWCE | NCCE_SWCE | BAD_CE | UNKNOWN
+
+let ce_summary v_concrete v_abstract = match v_concrete, v_abstract with
+  | Good_model, _ -> NCCE
+  | Bad_model, Good_model -> SWCE
+  | Dont_know, Good_model -> NCCE_SWCE
+  | Dont_know, Dont_know | Dont_know, Bad_model | Bad_model, Dont_know -> UNKNOWN
+  | Bad_model, Bad_model -> BAD_CE
+
+let print_ce_summary fmt summary =
+  let s = match summary with
+  | NCCE -> "The counter-example exposes that the program does not comply with this annotation"
+  | SWCE -> "The counter-example exposes a subcontract weakness"
+  | NCCE_SWCE -> "The counter-example exposes a subcontract weakness or non-compliance between the program and this annotation"
+  | UNKNOWN -> "The counter-example could not be verified"
+  | BAD_CE -> "The counter-example is bad" in
+  pp_print_string fmt s
+
 let select_model check_model models =
   let filtered_models =
     let check_model (i,r,m) =
-      Debug.dprintf debug "Check model %d (%a)@." i
+      Debug.dprintf debug_check_ce "Check model %d (%a)@." i
         (Pp.print_option_or_default "NO LOC" Pretty.print_loc) (get_model_term_loc m);
       let mr = check_model m in
-      printf "@[<hv 2>Model %d:@\n%a@\n@]@." i
+      Debug.dprintf debug_check_ce "@[<hv 2>Model %d:@\n%a@\n@]@." i
         print_check_model_result mr;
       i,r,m,mr in
     let not_empty (i,_,m) =
       let empty = is_model_empty m in
       if empty then Debug.dprintf debug "Model %d is empty@." i;
       not empty in
-    let model_not_bad (_,_,_,mr) = match mr with
-      | Cannot_check_model _ -> false
-      | Check_model_result r -> (* XXX *)
+    let keep_model (_,_,_,mr) = match mr with
+      | Cannot_check_model _ -> true
+      | Check_model_result r ->
+          (* Discard models with both verdicts Bad_model *)
           r.concrete.verdict <> Bad_model || r.abstract.verdict <> Bad_model in
-    List.filter model_not_bad
-      (List.map check_model
-         (List.filter not_empty
-            (List.mapi (fun i (r,m) -> i,r,m)
-               models))) in
-  let is_incomplete (_,_,_,mr) = match mr with
-    | Cannot_check_model _ -> true
-    | Check_model_result r ->
-        r.concrete.verdict = Dont_know && r.abstract.verdict = Dont_know in
-  let incomplete, non_incomplete = List.partition is_incomplete filtered_models in
+    let add_ce_summary (i,r,m,mr) =
+      let summary = match mr with
+        | Cannot_check_model _ -> UNKNOWN
+        | Check_model_result r -> ce_summary r.concrete.verdict r.abstract.verdict in
+      i,r,m,mr,summary in
+    List.map add_ce_summary
+      (List.filter keep_model
+         (List.map check_model
+            (List.filter not_empty
+               (List.mapi (fun i (r,m) -> i,r,m)
+                  models)))) in
+  let is_unknown (_,_,_,_,s) = s = UNKNOWN in
+  let unknowns, knowns = List.partition is_unknown filtered_models in
   let model_infos =
     let open Util in
-    if non_incomplete = [] then
-      (* RAC didn't help, choose the most complex model (as it was done before 2020) *)
-      let compare = cmp [cmptr (fun (i,_,_,_) -> -i) (-)] in
-      List.sort compare incomplete
-    else (* XXX Which model should be preferred? *)
-      let get_concrete = function
-        | Cannot_check_model _ -> failwith "get_concrete"
-        | Check_model_result r -> r.concrete in
-      let get_abstract = function
-        | Cannot_check_model _ -> failwith "get_abstract"
-        | Check_model_result r -> r.abstract in
-      let verdict_index = function Good_model -> 0 | Dont_know -> 1 | Bad_model -> 2 in
+    if knowns <> [] then
+      let ce_summary_index = function
+        | NCCE -> 0 | SWCE -> 1 | NCCE_SWCE -> 2 | UNKNOWN -> 3 | BAD_CE -> 4 in
       let compare = cmp [
-          (* sort lexically by concrete and abstract verdicts, preferring good models over don't knows over bad models *)
-          cmptr (fun (_,_,_,mr) -> verdict_index (get_concrete mr).verdict, verdict_index (get_abstract mr).verdict)
-            (cmp [cmptr fst (-); cmptr snd (-)]);
-          (* prefer less complex models *)
-          cmptr (fun (i,_,_,_) -> i) (-);
+          cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
+          cmptr (fun (i,_,_,_,_) -> i) (-);
         ] in
-      List.sort compare non_incomplete in
+      List.sort compare knowns
+    else
+      (* RAC didn't help, choose the most complex model (as it was done before 2020) *)
+      let compare = cmp [cmptr (fun (i,_,_,_,_) -> -i) (-)] in
+      List.sort compare unknowns in
   match model_infos with
   | [] ->
       Debug.dprintf debug "Select no CE model@.";
       None
-  | (i,_,m,mr) :: _ ->
+  | (i,_,m,_,s) :: _ ->
       Debug.dprintf debug "Select CE model %d@." i;
-      (match mr with
-       | Cannot_check_model r ->
-           printf "Cannot check model: %s@." r.reason
-       | Check_model_result r -> (* XXX *)
-           (* Tentatively summarize the verdict of concrete and abstract RAC *)
-           let summary = match r.concrete.verdict, r.abstract.verdict with
-             | Good_model, _ -> "it is verified in RAC"
-             | Bad_model, Good_model -> "it points to a subcontract weakness"
-             | Dont_know, Dont_know -> "it could not be verified, RAC was incomplete"
-             | Dont_know, Good_model -> "???"
-             | Dont_know, Bad_model -> "???"
-             | Bad_model, Dont_know -> "???"
-             | Bad_model, Bad_model -> assert false (* filtered above *) in
-           printf "Selected CE-model %d, %s.@." i summary);
+      printf "%a.@." print_ce_summary s;
       Some m
 
 let analyse_result ?(check_model=default_check_model) exit_result res_parser printer_mapping out =

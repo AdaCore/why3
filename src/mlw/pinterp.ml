@@ -1024,6 +1024,21 @@ let bind_value env vs v (task, ls_mt, ls_mv) =
   let task = Task.add_logic_decl task [defn] in
   task, ls_mt, ls_mv
 
+(* Create and open a formula `p t` for a non-formula term `t`, to use the reduction engine
+   to evaluate `t` *)
+let p = object
+  val ls_p =
+    let tv = create_tvsymbol (id_fresh "a") in
+    create_psymbol (id_fresh "p") [ty_var tv]
+  method decl =
+    Decl.create_param_decl ls_p
+  method create_app t =
+    t_app ls_p [t] None
+  method open_app t = match t with
+    | {t_node= Tapp (ls, [t])} when ls_equal ls ls_p -> t
+    | _ -> failwith "p#open_app"
+end
+
 let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
@@ -1065,13 +1080,13 @@ let task_of_term ?(vsenv=[]) env t =
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env.env) env.vsenv (task, ls_mt, ls_mv) in
   let t = t_ty_subst ls_mt ls_mv t in
   let task =
-    if t.t_ty = None then (* Add goal ... *)
+    if t.t_ty = None then (* Add a formula as goal directly ... *)
       let prs = create_prsymbol (id_fresh "goal") in
       add_prop_decl task Pgoal prs t
-    else (* ... or declaration *)
-      let ls = create_lsymbol (id_fresh "value") [] t.t_ty in
-      let decl = make_ls_defn ls [] t in
-      add_logic_decl task [decl] in
+    else (* ... and wrap a non-formula in a call to a predicate with no definition *)
+      let task = add_decl task p#decl in
+      let prs = create_prsymbol (id_fresh "goal") in
+      add_prop_decl task Pgoal prs (p#create_app t) in
   task, ls_mv
 
 (* Parameters for binding universally quantified variables to a value from the CE model or the default value *)
@@ -1150,10 +1165,7 @@ let compute_term env t =
         | t :: ts -> List.fold_left t_and t ts
       else (* [t] is not a formula *)
         let t = match Trans.apply trans task with
-          | [Some Task.{task_decl= Theory.{td_node= Decl Decl.{d_node= Dlogic [_, ldef]}}}] ->
-              let vs, t = Decl.open_ls_defn ldef in
-              if vs <> [] then failwith "compute_term";
-              t
+          | [task] -> p#open_app (Task.task_goal_fmla task)
           | _ -> failwith "compute_term" in
         (* Free vsymbols in the original [t] have been substituted in by fresh lsymbols
            (actually: ls @ []) to bind them to declarations in the task. Now we have to
@@ -1322,7 +1334,7 @@ let print_result fmt = function
   | Fun (rs, _, _) -> fprintf fmt "FUN %a" print_rs rs
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
 
-exception AbstractRACStuck of env * Loc.position option
+exception RACStuck of env * Loc.position option
 
 let get_and_register_value env ?def ?ity vs loc =
   let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
@@ -1420,7 +1432,7 @@ and eval_expr' env e =
         raise CannotCompute
     | Capp (rs, pvsl) ->
         assert (ce.c_cty.cty_args = []) ;
-        exec_call ~abs:env.rac.rac_abstract ?loc:e.e_loc env rs pvsl e.e_ity
+        exec_call ?loc:e.e_loc env rs pvsl e.e_ity
     end
   | Eassign l ->
       List.iter
@@ -1487,7 +1499,7 @@ and eval_expr' env e =
             (invariant does not hold at beginning of execution)
         3 - if assert3 fails, then we have a real counterexample
             (invariant does not hold after iteration)
-        * stop the interpretation here - raise AbstractRACStuck *)
+        * stop the interpretation here - raise RACStuck *)
       (* assert1 *)
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
@@ -1499,7 +1511,7 @@ and eval_expr' env e =
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
             (Pp.print_option Pretty.print_loc) t.t_loc;
-          raise (AbstractRACStuck (env, t.t_loc)));
+          raise (RACStuck (env, t.t_loc)));
       match eval_expr env cond with
       | Normal v ->
          if is_true v then begin
@@ -1507,7 +1519,7 @@ and eval_expr' env e =
              | Normal _ ->
                  if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                raise (AbstractRACStuck (env,e.e_loc))
+                raise (RACStuck (env,e.e_loc))
              | r -> r
            end
          else if is_false v then
@@ -1593,14 +1605,14 @@ and eval_expr' env e =
     let env = bind_vs i.pv_vs i_val env in
     let i_val = big_int_of_value i_val in
     if not (le a i_val && le i_val (suc b)) then
-      raise (AbstractRACStuck (env,i.pv_vs.vs_name.id_loc)); (* FIXME loc *)
+      raise (RACStuck (env,i.pv_vs.vs_name.id_loc)); (* FIXME loc *)
     if le a i_val && le i_val b then begin
       (* assert2 *)
       (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
             (Pp.print_option Pretty.print_loc) t.t_loc;
-          raise (AbstractRACStuck (env,t.t_loc)));
+          raise (RACStuck (env,t.t_loc)));
       match eval_expr env e1 with
       | Normal _ ->
          let env =
@@ -1608,7 +1620,7 @@ and eval_expr' env e =
          (* assert3 *)
          if env.rac.do_rac then
            check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-         raise (AbstractRACStuck (env,e.e_loc))
+         raise (RACStuck (env,e.e_loc))
       | r -> r
       end
     else begin
@@ -1618,7 +1630,7 @@ and eval_expr' env e =
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant after \
                   loop %a@." (Pp.print_option Pretty.print_loc) t.t_loc;
-          raise (AbstractRACStuck (env,t.t_loc)));
+          raise (RACStuck (env,t.t_loc)));
       Normal (value ty_unit Vvoid)
       end
     end
@@ -1675,11 +1687,15 @@ and eval_expr' env e =
       match r with Normal t -> Excep (xs, t) | _ -> r )
   | Eexn (_, e1) -> eval_expr env e1
   | Eassert (kind, t) ->
-      let descr = match kind with
-        | Expr.Assert -> "Assertion"
-        | Expr.Assume -> "Assumption"
-        | Expr.Check -> "Check" in
-      if env.rac.do_rac then check_term (cntr_ctx descr env) t ;
+
+      if env.rac.do_rac then (
+        let descr = match kind with
+          | Assert -> "Assertion"
+          | Assume -> "Assumption"
+          | Check -> "Check" in
+        try check_term (cntr_ctx descr env) t
+        with Contr (ctr, t) when kind = Assume ->
+          raise (RACStuck (ctr.c_env, t.t_loc)) );
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
       Debug.dprintf debug "@[<h>%tEVAL EXPR: GHOST %a@]@." pp_indent print_expr e1;
@@ -1707,9 +1723,8 @@ and exec_match env t ebl =
       with NoMatch -> iter rem ) in
   iter ebl
 
-and exec_call ~abs ?loc env rs arg_pvs ity_result =
-  List.iter (Opt.iter visit_loc)
-    (List.map (fun pv -> pv.pv_vs.vs_name.id_loc) arg_pvs);
+and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
+  List.iter (Opt.iter visit_loc) (List.map (fun pv -> pv.pv_vs.vs_name.id_loc) arg_pvs);
   let arg_vs = List.map (get_pvs env) arg_pvs in
   Debug.dprintf debug "@[<h>%tExec call %a %a@]@."
     pp_indent print_rs rs Pp.(print_list space print_value) arg_vs;
@@ -1720,17 +1735,16 @@ and exec_call ~abs ?loc env rs arg_pvs ity_result =
     Mpv.fold snapshot_oldie rs.rs_cty.cty_oldies Mvs.empty in
   let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v)
                                env.vsenv oldies} in
-  (* TODO variant *)
-  if env.rac.do_rac then begin
-    let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name)
-                ?trigger_loc:loc env in
-    check_terms ctx rs.rs_cty.cty_pre end;
-  let can_interpret_abstracly =
+  if env.rac.do_rac then (
+    let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
+    try check_terms ctx rs.rs_cty.cty_pre
+    with Contr (ctx, t) when main_function ->
+      raise (RACStuck (ctx.c_env, t.t_loc)) );
+  let can_interpret_abstractly =
     if rs_equal rs rs_func_app then false else
       match find_definition env rs with
-      | LocalFunction _ -> true
-      | _ -> false in
-  if abs && can_interpret_abstracly then begin
+      | LocalFunction _ -> true | _ -> false in
+  if env.rac.rac_abstract && can_interpret_abstractly && not main_function then begin
       (* let f (x1: ...) ... (xn: ...) = e
          ~>
          assert1 {f_pre};
@@ -1756,7 +1770,7 @@ and exec_call ~abs ?loc env rs arg_pvs ity_result =
       let res_v = get_and_register_value ~ity:ity_result env res loc1 in
       (* assert2 *)
       (try check_posts "ce satisfies postcondition" loc env res_v rs.rs_cty.cty_post with
-       | Contr (_,t) -> raise (AbstractRACStuck (env,t.t_loc)));
+       | Contr (_,t) -> raise (RACStuck (env,t.t_loc)));
       Normal res_v end
   else begin
       let res =
@@ -1781,7 +1795,7 @@ and exec_call ~abs ?loc env rs arg_pvs ity_result =
                | Capp (rs', pvl) ->
                   Debug.dprintf debug "@[<h>%tEXEC CALL %a: Capp %a]@."
                     pp_indent print_rs rs print_rs rs';
-                  exec_call ~abs:env.rac.rac_abstract env rs' (pvl @ arg_pvs) ity_result
+                  exec_call env rs' (pvl @ arg_pvs) ity_result
                | Cfun body ->
                   Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: FUN %a@]@."
                     pp_indent print_rs rs (pp_limited print_expr) body;
@@ -1882,7 +1896,7 @@ let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
   Mvs.iter (fun vs v -> register_used_value env e_loc vs v) env.vsenv;
-  let res = exec_call ~abs:false env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
+  let res = exec_call ~main_function:true env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   res, env
 
 let check_equals loc env exec_value model_value =
@@ -1955,7 +1969,7 @@ let check_model_rs rac env pm model rs =
          term for constructor that is not a function *)
      let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
      {verdict= Dont_know; reason; warnings= []; values= []}
-  | AbstractRACStuck (env,l) ->
+  | RACStuck (env,l) ->
       let reason =
         asprintf "%s RAC, with the counterexample model cannot continue after %a@."
           abs_Msg (Pp.print_option Pretty.print_loc) l in

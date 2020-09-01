@@ -10,7 +10,7 @@ module LoopInvariant
   (*     a[i] <- a[i] + 1 *)
   (*   done *)
 
-  let i () =
+  let f () =
     let ref x1 = 0 in
     let ref x2 = 0 in
     for i = 0 to 1 do
@@ -21,6 +21,16 @@ module LoopInvariant
         x2 <- x2 + 1
     done
 end
+
+(* DISIRED OUTPUT:
+examples/tests/underspec.mlw LoopInvariant i'vc at LOC: EXPLANATION
+Unknown (unknown + incomplete) (0.03s, 6755 steps)
+The following counter-example exposes an under-specification issue:
+  Line 16:
+    i = 0 (0x0)
+    x1 = -1 (-0x1)
+    x2 = 0 (0x0)
+*)
 
 module PostCondition
   use int.Int
