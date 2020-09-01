@@ -8,9 +8,7 @@ mlw_file: MODULE WRITES
 ## MODULE
 ##
 
-module name expected.
-found "$0".
-expecting a capitalized identifier (token UIDENT_NQ)
+expected module name must be an uppercase identifier (token UIDENT_NQ), found "$0"
 
 
 decl_eof: LET VAL
@@ -26,6 +24,4 @@ decl_eof: LET VAL
 ## LET
 ##
 
-identifier expected.
-found "$0".
-expecting a valid lowercase identifier (token LIDENT_NQ)
+expected function name must be a non-reserved lowercase identifier (token LIDENT_NQ), found "$0"
