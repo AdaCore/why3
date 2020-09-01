@@ -720,6 +720,7 @@ let rec default_value_of_type env known ity : value =
   | Ityapp (ts, _, _) when its_equal ts its_int -> value ty (Vnum BigInt.zero)
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
   | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
+  | Ityapp (ts, _, _) when its_equal ts its_str -> value ty (Vstring "")
   (* | Ityapp(ts,_,_) when is_its_tuple ts -> assert false (* TODO *) *)
   | Ityreg {reg_its= its; reg_args= l1; reg_regs= l2}
   | Ityapp (its, l1, l2) ->
@@ -1335,6 +1336,36 @@ let print_result fmt = function
 
 exception RACStuck of env * Loc.position option
 
+let get_and_register_value env ?def ?ity vs loc =
+  let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
+  let name = vs.vs_name.id_string in
+  let value = match get_model_value env.rac.ce_model name loc with
+    | Some v ->
+       let v = import_model_value env.env env.mod_known ity v in
+       Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
+         pp_indent print_value v;
+       v
+    | None ->
+       let v = match def with
+         | None -> default_value_of_type env.env env.mod_known ity
+         | Some v -> v in
+       eprintf "@[<h>VALUE for %s %a not in ce-model, taking \
+                default %a@]@." name print_loc loc print_value v;
+       v
+  in
+  register_used_value env loc vs value;
+  value
+
+let assign_written_vars wrt loc env vs _ =
+  let pv = restore_pv vs in
+  if pv_affected wrt pv then begin
+      Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
+        pp_indent print_pv pv
+        (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
+      let value = get_and_register_value ~ity:pv.pv_ity env vs loc in
+      bind_vs vs value env end
+  else env
+
 let rec eval_expr env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
     (if env.rac.rac_abstract then "Abs. " else "")
@@ -1348,33 +1379,6 @@ let rec eval_expr env e =
    instead invariants and function contracts to guide execution. *)
 and eval_expr' env e =
   let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
-  let get_value ?def vs ity loc =
-    let name = vs.vs_name.id_string in
-    let value = match get_model_value env.rac.ce_model name loc with
-      | Some v ->
-         let v = import_model_value env.env env.mod_known ity v in
-         Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
-           pp_indent print_value v;
-         v
-      | None ->
-         let v = match def with
-           | None -> default_value_of_type env.env env.mod_known ity
-           | Some v -> v in
-         eprintf "@[<h>VALUE for %s %a not in ce-model, taking \
-                  default %a@]@." name print_loc loc print_value v;
-         v
-    in
-    register_used_value env e_loc vs value;
-    value in
-  let assign_written_vars env vs _ =
-    let pv = restore_pv vs in
-    if pv_affected e.e_effect.eff_writes pv then begin
-        Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
-          pp_indent print_pv pv
-          (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
-        let value = get_value vs pv.pv_ity e_loc in
-        bind_vs vs value env end
-    else env in
   match e.e_node with
   | Evar pvs -> (
     try
@@ -1399,7 +1403,7 @@ and eval_expr' env e =
         let s = Format.asprintf "%a" Constant.print_def c in
         Normal (value ty_real (Vfloat (make_from_str s)))
   | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
-  | Eexec (ce, cty) -> (
+  | Eexec (ce, cty) -> begin
     match ce.c_node with
       | Cpur (ls, pvs) ->
           Debug.dprintf debug "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent print_ls ls
@@ -1425,7 +1429,8 @@ and eval_expr' env e =
         raise CannotCompute
     | Capp (rs, pvsl) ->
         assert (ce.c_cty.cty_args = []) ;
-        exec_call ?loc:e.e_loc env rs pvsl e.e_ity )
+        exec_call ?loc:e.e_loc env rs pvsl e.e_ity
+    end
   | Eassign l ->
       List.iter
         (fun (pvs, rs, value) ->
@@ -1495,7 +1500,9 @@ and eval_expr' env e =
       (* assert1 *)
       if env.rac.rac_concrete then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
-      let env = Mvs.fold_left assign_written_vars env env.vsenv in
+      let env = Mvs.fold_left
+                  (assign_written_vars e.e_effect.eff_writes e_loc)
+                  env env.vsenv in
       (* assert2 *)
       (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
        | Contr (_,t) ->
@@ -1550,7 +1557,7 @@ and eval_expr' env e =
         if a <= b + 1 then begin
           (let i = a in assert1 {I});
           assign_written_vars_with_ce;
-          let i = get_model_value ~def:(b+1) i in
+          let i = get_and_register_value ~def:(b+1) i in
           if not (a <= i <= b + 1) then abort1;
           if a <= i <= b then begin
             assert2* { I };
@@ -1586,9 +1593,11 @@ and eval_expr' env e =
     if env.rac.rac_concrete then begin
       let env = bind_vs i.pv_vs (value ty_int (Vnum a)) env in
       check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
-    let env = Mvs.fold_left assign_written_vars env env.vsenv in
+    let env = Mvs.fold_left
+                (assign_written_vars e.e_effect.eff_writes e_loc)
+                env env.vsenv in
     let def = value ty_int (Vnum (suc b)) in
-    let i_val = get_value ~def i.pv_vs i.pv_ity
+    let i_val = get_and_register_value ~def ~ity:i.pv_ity env i.pv_vs
                   (Opt.get i.pv_vs.vs_name.id_loc) in
     let env = bind_vs i.pv_vs i_val env in
     let i_val = big_int_of_value i_val in
@@ -1710,7 +1719,7 @@ and exec_match env t ebl =
       with NoMatch -> iter rem ) in
   iter ebl
 
-and exec_call ?(assume_preconditions=false) ?loc env rs arg_pvs ity_result =
+and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
   List.iter (Opt.iter visit_loc) (List.map (fun pv -> pv.pv_vs.vs_name.id_loc) arg_pvs);
   let arg_vs = List.map (get_pvs env) arg_pvs in
   Debug.dprintf debug "@[<h>%tExec call %a %a@]@."
@@ -1720,80 +1729,123 @@ and exec_call ?(assume_preconditions=false) ?loc env rs arg_pvs ity_result =
     let snapshot_oldie old_pv pv =
       Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs env.vsenv)) in
     Mpv.fold snapshot_oldie rs.rs_cty.cty_oldies Mvs.empty in
-  let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
+  let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v)
+                               env.vsenv oldies} in
   if env.rac.rac_concrete then (
-    (* TODO variant *)
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
     try check_terms ctx rs.rs_cty.cty_pre
-    with Contr (ctx, t) when assume_preconditions ->
+    with Contr (ctx, t) when main_function ->
       raise (RACStuck (ctx.c_env, t.t_loc)) );
-  let res =
-    if rs_equal rs rs_func_app then
-      match arg_vs with
-      | [{v_desc= Vfun (cl, arg, e)}; value] ->
-          let env =
-            {env with vsenv= Mvs.union (fun _ _ v -> Some v) env.vsenv cl} in
-          let env = bind_vs arg value env in
-          eval_expr env e
-      | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
-          let v = try Mv.find value bindings with Not_found -> default in
-          Normal v
-      | _ -> assert false
-    else
+  let can_interpret_abstracly =
+    if rs_equal rs rs_func_app then false else
       match find_definition env rs with
-      | LocalFunction (locals, ce) -> (
-          let env = add_local_funs locals env in
-          match ce.c_node with
-            | Capp (rs', pvl) ->
-                Debug.dprintf debug "@[<h>%tEXEC CALL %a: Capp %a]@." pp_indent print_rs rs print_rs rs';
-                exec_call env rs' (pvl @ arg_pvs) ity_result
-            | Cfun body ->
-                Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: FUN %a@]@." pp_indent print_rs rs (pp_limited print_expr) body;
-                let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
-                eval_expr env' body
-            | Cany ->
-                Debug.dprintf debug  "@[<hv2>%tEXEC CALL %a: ANY@]@." pp_indent print_rs rs;
-                eprintf "Cannot compute application of local any-function %a@." print_rs rs;
-                raise CannotCompute
-            | Cpur _ -> assert false (* TODO ? *) )
-      | Builtin f ->
-          Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
-          Normal (f rs arg_vs)
-      | Constructor _ ->
-          Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
-          let mt = List.fold_left2 ty_match Mtv.empty
-              (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
-          let ty = ty_inst mt (ty_of_ity ity_result) in
-          let fs = List.map field arg_vs in
-          Normal (value ty (Vconstr (rs, fs)))
-      | Projection _d -> (
-        Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
-        match rs.rs_field, arg_vs with
-        | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
-            let rec search constr_args args =
-              match constr_args, args with
-              | pv2 :: pvl, v :: vl ->
-                  if pv_equal pv pv2 then
-                    Normal (field_get v)
-                  else search pvl vl
-              | _ -> assert false in
-            search cstr.rs_cty.cty_args args
-        | _ -> assert false )
-      | exception Not_found ->
-          eprintf "[interp] cannot find definition of routine %s@."
-            rs.rs_name.id_string ;
-          raise CannotCompute in
-  ( if env.rac.rac_concrete then
-      match res with
-      | Normal v ->
-          let desc = cntr_desc "Postcondition" rs.rs_name in
-          check_posts desc loc env v rs.rs_cty.cty_post
-      | Excep (xs, v) ->
-          let desc = cntr_desc "Exceptional postcondition" rs.rs_name in
-          let posts = Mxs.find xs rs.rs_cty.cty_xpost in
-          check_posts desc loc env v posts
-      | _ -> () );
-  res
+      | LocalFunction (_,{c_node = Cfun _}) -> true | _ -> false in
+  if env.rac.rac_abstract && can_interpret_abstracly && not main_function then begin
+      (* let f (x1: ...) ... (xn: ...) = e
+         ~>
+         assert1 {f_pre};
+         assign_written_vars_with_ce;
+         assert2* {f_post};
+
+         1 - if assert1 fails, then we have a real counterexample
+         (precondition doesn't hold)
+         2 - if assert2 fails, then we have a false counterexample
+         (postcondition does not hold with the values obtained
+         from the counterexample)
+       *)
+      (* assert1 is already done above *)
+      let res = match rs.rs_cty.cty_post with
+        | p :: _ -> let (vs,_) = open_post p in vs
+        | _ -> create_vsymbol (id_fresh "result")
+                 (ty_of_ity rs.rs_cty.cty_result) in
+      let loc = Opt.get loc in
+      let env = Mvs.fold_left
+                  (assign_written_vars rs.rs_cty.cty_effect.eff_writes loc)
+                  env env.vsenv in
+      let res_v = get_and_register_value env res loc in
+      let env = bind_vs res res_v env in
+      let posts = List.map (open_post_with (t_var res)) rs.rs_cty.cty_post in
+      (* assert2 *)
+      (try check_terms (cntr_ctx "ce satisfies invariant" env) posts with
+       | Contr (_,t) ->
+          printf "ce model does not satisfy loop invariant %a@."
+            (Pp.print_option Pretty.print_loc) t.t_loc;
+          raise (RACStuck (env,t.t_loc)));
+      Normal res_v end
+  else begin
+      let res =
+        if rs_equal rs rs_func_app then
+          match arg_vs with
+          | [{v_desc= Vfun (cl, arg, e)}; value] ->
+             let env =
+               {env with vsenv= Mvs.union (fun _ _ v -> Some v)
+                                  env.vsenv cl} in
+             let env = bind_vs arg value env in
+             eval_expr env e
+          | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
+             let v = try Mv.find value bindings with Not_found -> default in
+             Normal v
+          | _ -> assert false
+        else
+          match find_definition env rs with
+          | LocalFunction (locals, ce) ->
+             begin
+               let env = add_local_funs locals env in
+               match ce.c_node with
+               | Capp (rs', pvl) ->
+                  Debug.dprintf debug "@[<h>%tEXEC CALL %a: Capp %a]@."
+                    pp_indent print_rs rs print_rs rs';
+                  exec_call env rs' (pvl @ arg_pvs) ity_result
+               | Cfun body ->
+                  Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: FUN %a@]@."
+                    pp_indent print_rs rs (pp_limited print_expr) body;
+                  let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
+                  eval_expr env' body
+               | Cany ->
+                  Debug.dprintf debug  "@[<hv2>%tEXEC CALL %a: ANY@]@."
+                    pp_indent print_rs rs;
+                  eprintf "Cannot compute application of local any-function %a@."
+                    print_rs rs;
+                  raise CannotCompute
+               | Cpur _ -> assert false (* TODO ? *) end
+          | Builtin f ->
+             Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
+             Normal (f rs arg_vs)
+          | Constructor _ ->
+             Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
+             let mt = List.fold_left2 ty_match Mtv.empty
+                        (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
+             let ty = ty_inst mt (ty_of_ity ity_result) in
+             let fs = List.map field arg_vs in
+             Normal (value ty (Vconstr (rs, fs)))
+          | Projection _d -> (
+            Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
+            match rs.rs_field, arg_vs with
+            | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
+               let rec search constr_args args =
+                 match constr_args, args with
+                 | pv2 :: pvl, v :: vl ->
+                    if pv_equal pv pv2 then
+                      Normal (field_get v)
+                    else search pvl vl
+                 | _ -> assert false in
+               search cstr.rs_cty.cty_args args
+            | _ -> assert false )
+          | exception Not_found ->
+             eprintf "[interp] cannot find definition of routine %s@."
+               rs.rs_name.id_string ;
+             raise CannotCompute in
+      ( match res with
+        | Normal v ->
+           let desc = cntr_desc "Postcondition" rs.rs_name in
+           check_posts desc loc env v rs.rs_cty.cty_post
+        | Excep (xs, v) ->
+           let desc = cntr_desc "Exceptional postcondition" rs.rs_name in
+           let posts = Mxs.find xs rs.rs_cty.cty_xpost in
+           check_posts desc loc env v posts
+        | _ -> () );
+      res
+    end
 
 (* GLOBAL EVALUATION *)
 
@@ -1844,7 +1896,7 @@ let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
   Mvs.iter (fun vs v -> register_used_value env e_loc vs v) env.vsenv;
-  let res = exec_call ~assume_preconditions:true env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
+  let res = exec_call ~main_function:true env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   res, env
 
 let check_equals loc env exec_value model_value =

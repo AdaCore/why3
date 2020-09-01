@@ -1,0 +1,15 @@
+
+use int.Int
+val ref z: int
+
+let g (x: int)
+  writes { z }
+  ensures { z > old z }
+  ensures { result = x + 1 }
+= z <- z + 1;
+  x + 1
+
+let f () =
+  z <- 0;
+  let w = g (2) + 3 in
+  assert { z = 1 }
