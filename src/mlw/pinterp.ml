@@ -1333,7 +1333,7 @@ let print_result fmt = function
   | Fun (rs, _, _) -> fprintf fmt "FUN %a" print_rs rs
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
 
-exception AbstractRACStuck of env * Loc.position option
+exception RACStuck of env * Loc.position option
 
 let rec eval_expr env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
@@ -1491,7 +1491,7 @@ and eval_expr' env e =
             (invariant does not hold at beginning of execution)
         3 - if assert3 fails, then we have a real counterexample
             (invariant does not hold after iteration)
-        * stop the interpretation here - raise AbstractRACStuck *)
+        * stop the interpretation here - raise RACStuck *)
       (* assert1 *)
       if env.rac.rac_concrete then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
@@ -1501,7 +1501,7 @@ and eval_expr' env e =
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
             (Pp.print_option Pretty.print_loc) t.t_loc;
-          raise (AbstractRACStuck (env, t.t_loc)));
+          raise (RACStuck (env, t.t_loc)));
       match eval_expr env cond with
       | Normal v ->
          if is_true v then begin
@@ -1509,7 +1509,7 @@ and eval_expr' env e =
              | Normal _ ->
                  if env.rac.rac_concrete then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                raise (AbstractRACStuck (env,e.e_loc))
+                raise (RACStuck (env,e.e_loc))
              | r -> r
            end
          else if is_false v then
@@ -1593,14 +1593,14 @@ and eval_expr' env e =
     let env = bind_vs i.pv_vs i_val env in
     let i_val = big_int_of_value i_val in
     if not (le a i_val && le i_val (suc b)) then
-      raise (AbstractRACStuck (env,i.pv_vs.vs_name.id_loc)); (* FIXME loc *)
+      raise (RACStuck (env,i.pv_vs.vs_name.id_loc)); (* FIXME loc *)
     if le a i_val && le i_val b then begin
       (* assert2 *)
       (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
             (Pp.print_option Pretty.print_loc) t.t_loc;
-          raise (AbstractRACStuck (env,t.t_loc)));
+          raise (RACStuck (env,t.t_loc)));
       match eval_expr env e1 with
       | Normal _ ->
          let env =
@@ -1608,7 +1608,7 @@ and eval_expr' env e =
          (* assert3 *)
          if env.rac.rac_concrete then
            check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-         raise (AbstractRACStuck (env,e.e_loc))
+         raise (RACStuck (env,e.e_loc))
       | r -> r
       end
     else begin
@@ -1618,7 +1618,7 @@ and eval_expr' env e =
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant after \
                   loop %a@." (Pp.print_option Pretty.print_loc) t.t_loc;
-          raise (AbstractRACStuck (env,t.t_loc)));
+          raise (RACStuck (env,t.t_loc)));
       Normal (value ty_unit Vvoid)
       end
     end
@@ -1675,11 +1675,14 @@ and eval_expr' env e =
       match r with Normal t -> Excep (xs, t) | _ -> r )
   | Eexn (_, e1) -> eval_expr env e1
   | Eassert (kind, t) ->
-      let descr = match kind with
-        | Expr.Assert -> "Assertion"
-        | Expr.Assume -> "Assumption"
-        | Expr.Check -> "Check" in
-      if env.rac.rac_concrete then check_term (cntr_ctx descr env) t ;
+      if env.rac.rac_concrete then (
+        let descr = match kind with
+          | Assert -> "Assertion"
+          | Assume -> "Assumption"
+          | Check -> "Check" in
+        try check_term (cntr_ctx descr env) t
+        with Contr (ctr, t) when kind = Assume ->
+          raise (RACStuck (ctr.c_env, t.t_loc)) );
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
       Debug.dprintf debug "@[<h>%tEVAL EXPR: GHOST %a@]@." pp_indent print_expr e1;
@@ -1707,7 +1710,7 @@ and exec_match env t ebl =
       with NoMatch -> iter rem ) in
   iter ebl
 
-and exec_call ?loc env rs arg_pvs ity_result =
+and exec_call ?(assume_preconditions=false) ?loc env rs arg_pvs ity_result =
   List.iter (Opt.iter visit_loc) (List.map (fun pv -> pv.pv_vs.vs_name.id_loc) arg_pvs);
   let arg_vs = List.map (get_pvs env) arg_pvs in
   Debug.dprintf debug "@[<h>%tExec call %a %a@]@."
@@ -1721,7 +1724,9 @@ and exec_call ?loc env rs arg_pvs ity_result =
   if env.rac.rac_concrete then (
     (* TODO variant *)
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
-    check_terms ctx rs.rs_cty.cty_pre );
+    try check_terms ctx rs.rs_cty.cty_pre
+    with Contr (ctx, t) when assume_preconditions ->
+      raise (RACStuck (ctx.c_env, t.t_loc)) );
   let res =
     if rs_equal rs rs_func_app then
       match arg_vs with
@@ -1839,7 +1844,7 @@ let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
   Mvs.iter (fun vs v -> register_used_value env e_loc vs v) env.vsenv;
-  let res = exec_call env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
+  let res = exec_call ~assume_preconditions:true env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   res, env
 
 let check_equals loc env exec_value model_value =
@@ -1912,7 +1917,7 @@ let check_model_rs rac env pm model rs =
          term for constructor that is not a function *)
      let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
      {verdict= Dont_know; reason; warnings= []; values= []}
-  | AbstractRACStuck (env,l) ->
+  | RACStuck (env,l) ->
       let reason =
         asprintf "%s RAC, with the counterexample model cannot continue after %a@."
           abs_Msg (Pp.print_option Pretty.print_loc) l in
