@@ -227,73 +227,70 @@
     fun_lit_id := x + 1;
     Constant.int_const (BigInt.of_int x)
 
-  (* TODO: fix locations and assert false *)
-  let term_fun_lit (tl,default) =
-    let id_var = {id_str = "_x"; id_ats = []; id_loc = Loc.dummy_position} in
-    let var = { term_desc = Tident (Qident id_var);
-                term_loc = Loc.dummy_position} in
+  let term_fun_lit loc_begin loc_end (tl,default) =
+    let id_var = { id_str = "_x"; id_ats = []; id_loc = loc_begin } in
+    let var = { term_desc = Tident (Qident id_var); term_loc = loc_begin } in
     let default = match default with
       | Some e -> e
       | None ->
          let any_function = Qident { id_str = "any function"; id_ats = [];
-                                     id_loc = Loc.dummy_position} in
-         let int_id = { id_str = "int"; id_ats = [];
-                        id_loc = Loc.dummy_position} in
+                                     id_loc = loc_end } in
+         let int_id = { id_str = "int"; id_ats = []; id_loc = loc_end } in
          let int_pty = PTtyapp (Qident int_id,[]) in
          let lit_id_t = { term_desc = Tconst (next_fun_lit_id ());
-                          term_loc = Loc.dummy_position } in
+                          term_loc = loc_end } in
          let lit_id_t = { term_desc = Tcast (lit_id_t, int_pty);
-                          term_loc = Loc.dummy_position } in
+                          term_loc = loc_end } in
          let tuple_t = { term_desc = Ttuple [lit_id_t;var];
-                            term_loc = Loc.dummy_position} in
+                            term_loc = loc_end } in
          let app_t = Tidapp (any_function, [tuple_t]) in
-         { term_desc = app_t; term_loc = Loc.dummy_position } in
+         { term_desc = app_t; term_loc = loc_end } in
 
-    let add_expr (t1,t2) t =
+    let add_term (t1,t2) t =
       let eq_id = { id_str = Ident.op_equ; id_ats = [];
-                    id_loc = Loc.dummy_position } in
+                    id_loc = t1.term_loc } in
       let v_eq_t1 = Tinfix (var,eq_id,t1) in
-      let v_eq_t1 = {term_desc = v_eq_t1; term_loc = Loc.dummy_position} in
-      {term_desc = Tif (v_eq_t1,t2,t); term_loc = Loc.dummy_position}
+      let v_eq_t1 = { term_desc = v_eq_t1; term_loc = t1.term_loc } in
+      { term_desc = Tif (v_eq_t1,t2,t);
+        term_loc = Loc.join t1.term_loc t.term_loc}
     in
 
-    let ifte = List.fold_right add_expr tl default in
-    let binder = (Loc.dummy_position, Some id_var, false, None) in
+    let ifte = List.fold_right add_term tl default in
+    let binder = (loc_begin, Some id_var, false, None) in
     Ptree.Tquant (Dterm.DTlambda, [binder], [], ifte)
 
-  (* TODO: fix locations and assert false *)
-  let expr_fun_lit (el,default) =
-    let id_var = {id_str = "_x"; id_ats = []; id_loc = Loc.dummy_position} in
-    let var = {expr_desc = Eident (Qident id_var);
-               expr_loc = Loc.dummy_position} in
+  let expr_fun_lit loc_begin loc_end (el,default) =
+    let id_var = { id_str = "_x"; id_ats = []; id_loc = loc_begin } in
+    let var = { expr_desc = Eident (Qident id_var); expr_loc = loc_begin } in
     let default = match default with
       | Some e -> e
       | None ->
          let any_function = Qident { id_str = "any function"; id_ats = [];
-                                     id_loc = Loc.dummy_position} in
-         let int_id = {id_str = "int"; id_ats = [];
-                       id_loc = Loc.dummy_position} in
+                                     id_loc = loc_end } in
+         let int_id = { id_str = "int"; id_ats = []; id_loc = loc_end } in
          let int_pty = PTtyapp (Qident int_id,[]) in
          let fun_id_e = { expr_desc = Econst (next_fun_lit_id ());
-                            expr_loc = Loc.dummy_position } in
+                          expr_loc = loc_end } in
          let lit_id_e = { expr_desc = Ecast (fun_id_e, int_pty);
-                          expr_loc = Loc.dummy_position } in
+                          expr_loc = loc_end } in
          let tuple_e = { expr_desc = Etuple [lit_id_e;var];
-                         expr_loc = Loc.dummy_position} in
+                         expr_loc = loc_end } in
          let app_e = Eidapp (any_function, [tuple_e]) in
-         { expr_desc = app_e; expr_loc = Loc.dummy_position } in
+         { expr_desc = app_e; expr_loc = loc_end } in
 
     let add_expr (e1,e2) e =
       let eq_id = { id_str = Ident.op_equ; id_ats = [];
-                    id_loc = Loc.dummy_position } in
+                    id_loc = e1.expr_loc } in
       let v_eq_e1 = Einfix (var,eq_id,e1) in
-      let v_eq_e1 = {expr_desc = v_eq_e1; expr_loc = Loc.dummy_position} in
-      {expr_desc = Eif (v_eq_e1,e2,e); expr_loc = Loc.dummy_position}
+      let v_eq_e1 = { expr_desc = v_eq_e1; expr_loc = e1.expr_loc } in
+      { expr_desc = Eif (v_eq_e1,e2,e);
+        expr_loc = Loc.join e1.expr_loc e.expr_loc }
     in
 
     let ifte = List.fold_right add_expr el default in
-    let binder = (Loc.dummy_position, Some id_var, false, None) in
-    let pattern = {pat_desc = Ptree.Pvar id_var; pat_loc = Loc.dummy_position }in
+    let binder = (loc_begin, Some id_var, false, None) in
+    let pattern = { pat_desc = Ptree.Pvar id_var;
+                    pat_loc = loc_begin } in
     let spec = { sp_pre = []; sp_post = []; sp_xpost = []; sp_reads = [];
                  sp_writes = []; sp_alias = []; sp_variant = [];
                  sp_checkrw = false; sp_diverge = false; sp_partial = false } in
@@ -906,7 +903,10 @@ term_arg_:
 | FALSE                             { Tfalse }
 | o = oppref ; a = term_arg         { Tidapp (Qident o, [a]) }
 | term_sub_                         { $1 }
-| LEFTSQBAR term_fun_lit BARRIGHTSQ { term_fun_lit $2 }
+| LEFTSQBAR term_fun_lit BARRIGHTSQ
+    { let loc_begin = floc $startpos($1) $endpos($1) in
+      let loc_end = floc $startpos($3) $endpos($3) in
+      term_fun_lit loc_begin loc_end $2 }
 
 term_dot_:
 | lqualid                   { Tident $1 }
@@ -1293,7 +1293,10 @@ expr_arg_:
 | FALSE                     { Efalse }
 | o = oppref ; a = expr_arg { Eidapp (Qident o, [a]) }
 | expr_sub_                 { $1 }
-| LEFTSQBAR expr_fun_lit BARRIGHTSQ { expr_fun_lit $2 }
+| LEFTSQBAR expr_fun_lit BARRIGHTSQ
+    { let loc_begin = floc $startpos($1) $endpos($1) in
+      let loc_end = floc $startpos($3) $endpos($3) in
+      expr_fun_lit loc_begin loc_end $2 }
 
 expr_fun_lit:
 | (* epsilon *)                     { [], None }
