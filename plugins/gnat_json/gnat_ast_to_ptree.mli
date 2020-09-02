@@ -1,6 +1,6 @@
 (* {1 Conversion of [Gnat_ast] to [Why3.Ptree]} *)
 
-val gnat_json_format : string
+val gnat_json_format : Why3.Env.fformat
 
 val mk_pty_of_type : Gnat_ast.type_id -> Why3.Ptree.pty
 

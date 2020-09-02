@@ -73,7 +73,8 @@ let mk_label = function
 
 let mk_location = function
   | Source_ptr r ->
-      Some (Loc.user_position r.filename r.line 0 0)
+      let loc = Loc.user_position r.filename r.line 0 0 in
+      Some (mk_pos loc)
   | No_location -> None
 
 let mk_idents ~notation attrs =
@@ -240,11 +241,11 @@ module Curr = struct
     | No_location ->
         []
     | Source_ptr r ->
-        let mark =
+        let filename =
           match !marker_ref with
-          | No_symbol -> ""
-          | Symbol s -> "'@"^s^"@'" in
-        Opt.(to_list (map mk_pos (mk_location (Source_ptr {r with filename=mark^r.filename}))))
+          | No_symbol -> r.filename
+          | Symbol s -> "'@"^s^"@'"^r.filename in
+        Opt.(to_list (mk_location (Source_ptr {r with filename})))
 end
 
 let is_true t = match t.term_desc with
@@ -955,8 +956,8 @@ let mk_function_decl (node: function_decl_id) =
     force_one
       (conversion_error r.name.info.id "quantified or empty function name")
       (mk_idents_of_identifier ~notation:None
-         (Opt.(to_list (map mk_pos (mk_location r.location))) @
-          List.filter_map mk_label r.labels)
+         (List.filter_map mk_label r.labels @
+          Opt.(to_list (mk_location r.location)))
          r.name) in
   let res_pty =
     Opt.map mk_pty_of_type r.return_type in
@@ -1080,7 +1081,7 @@ let mk_function_decl (node: function_decl_id) =
               let def =
                 Opt.(get def
                        (map (fun pos -> T.mk_attr pos def)
-                          (map mk_pos (mk_location r.location)))) in
+                          (mk_location r.location))) in
               D.mk_logic [{decl with ld_type=None; ld_def=Some def}] in
             let val_def =
               (* val <id> <params> : bool ensures { result = <id> <params> }*)
@@ -1151,8 +1152,8 @@ let rec mk_declaration (node : declaration_id) =
       (* val <ident> : <ref_typ> *)
       let ident =
         let labels =
-          Opt.(to_list (map mk_pos (mk_location r.location))) @
-          List.filter_map mk_label r.labels in
+          List.filter_map mk_label r.labels @
+          Opt.(to_list (mk_location r.location)) in
         force_one (conversion_error r.name.info.id "quantified or empty name of global reference")
           (mk_idents_of_identifier ~notation:None labels r.name) in
       let pty =
@@ -1293,6 +1294,9 @@ exception Unexpected_json of string * int list
 
 exception Located_by_marker of string * exn
 
+let gnat_json_format : Env.fformat = "gnat-json"
+let gnat_json_file_ext : string = "gnat-json"
+
 let read_channel env path filename c =
   let json = Yojson.Safe.from_channel c in
   let gnat_file =
@@ -1307,6 +1311,7 @@ let read_channel env path filename c =
         Gnat_ast_pretty.pp_file gnat_file
   end;
   let mlw_file = mlw_file gnat_file.theory_declarations in
+  let mlw_filename = Strings.remove_suffix ("."^gnat_json_file_ext) filename^".mlw" in
   (* Defer printing of mlw file until after the typing, to set the marker of located
      exceptions *)
   let print_mlw_file ?mark () =
@@ -1314,7 +1319,7 @@ let read_channel env path filename c =
       match mark with
       | Some (msg, pos) -> Mlw_printer.(with_marker ~msg pos pp_mlw_file)
       | None -> Mlw_printer.pp_mlw_file in
-    let out = open_out (filename^".mlw") in
+    let out = open_out mlw_filename in
     Format.fprintf (Format.formatter_of_out_channel out) "%a@." pp mlw_file;
     close_out out in
   match Typing.type_mlw_file env path filename mlw_file with
@@ -1327,16 +1332,14 @@ let read_channel env path filename c =
          printing the mlw file and report that. *)
       let msg = Format.asprintf " ERROR %a: @?" Exn_printer.exn_printer e in
       print_mlw_file ~mark:(msg, pos) ();
-      raise (Located_by_marker (Filename.basename filename^".mlw", e))
+      raise (Located_by_marker (mlw_filename, e))
   | exception e ->
       print_mlw_file ();
       raise e
 
-let gnat_json_format = "gnat-json"
-
 let () =
   Env.register_format ~desc:"Gnat@ AST@ in@ JSON@ format"
-    Pmodule.mlw_language gnat_json_format ["gnat-json"] read_channel
+    Pmodule.mlw_language gnat_json_format [gnat_json_file_ext] read_channel
 
 let () =
   Exn_printer.register

@@ -27,9 +27,9 @@ module M4
   use  array.Array
   
   let f (a : Array.array int)
-    requires { Int.(>=) (Array.length a) 1 }
-    returns { _ -> (Array.([]) a 0) = 42 } =
-    Array.([]<-) a 0 42
+    requires { Int.( >= ) (a.Array.length) 1 }
+    ensures { (Array.( [] ) a 0) = 42 } =
+    Array.( []<- ) a 0 42
 end
 Tasks are:
 Task 1: theory Task
