@@ -1,7 +1,7 @@
 open Format
 open Sexplib.Sexp
 
-(* Check if a string contains only characters [a-zA-Z0-9_-] *)
+(* Check if a non-empty string contains only characters [a-zA-Z0-9_-] *)
 let is_simple_token s =
   let rec loop i =
     if i < 0 then
@@ -10,7 +10,7 @@ let is_simple_token s =
       | 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' | '-' ->
           loop (i-1)
       | _ -> false in
-  loop (String.length s-1)
+  String.length s > 0 && loop (String.length s-1)
 
 let rec output fmt = function
   | Atom s ->
