@@ -48,7 +48,7 @@ let mk_term t = { term_desc = t; term_loc = Loc.dummy_position }
 let mk_pat p = { pat_desc = p; pat_loc = Loc.dummy_position }
 let pat_var id = mk_pat (Pvar id)
 
-let mk_var id = mk_term (Tident (Qident id))
+let mk_var id = mk_term (Tident id)
 
 let param0 = [Loc.dummy_position, None, false, Some (PTtuple [])]
 let param1 id ty = [Loc.dummy_position, Some id, false, Some ty]
@@ -64,7 +64,9 @@ let mk_tapp f l = mk_term (Tidapp(f,l))
 
 let mk_eapp f l = mk_expr (Eidapp(f,l))
 
-let mk_evar x = mk_expr(Eident(Qident x))
+let mk_eapply e1 e2 = mk_expr (Eapply(e1,e2))
+
+let mk_evar x = mk_expr(Eident x)
 (* END{helper1} *)
 
 (* declaration of
@@ -116,9 +118,9 @@ let mod_M2 =
   (* f *)
   let f =
     let id_x = mk_ident "x" in
-    let pre = mk_tapp eq_symb [mk_var id_x; mk_tconst 6] in
+    let pre = mk_tapp eq_symb [mk_var (Qident id_x); mk_tconst 6] in
     let result = mk_ident "result" in
-    let post = mk_tapp eq_symb [mk_var result; mk_tconst 42] in
+    let post = mk_tapp eq_symb [mk_var (Qident result); mk_tconst 42] in
     let spec = {
       sp_pre = [pre];
       sp_post = [Loc.dummy_position,[pat_var result,post]];
@@ -132,7 +134,7 @@ let mod_M2 =
       sp_partial = false;
     }
     in
-    let body = mk_eapp mul_int [mk_evar id_x; mk_econst 7] in
+    let body = mk_eapp mul_int [mk_evar (Qident id_x); mk_econst 7] in
     let f =
       Efun(param1 id_x int_type, None, mk_pat Pwild,
            Ity.MaskVisible, spec, body)
@@ -165,7 +167,7 @@ let mod_M3 =
   (* f *)
   let f =
     let result = mk_ident "result" in
-    let post = mk_term(Tidapp(ge_int,[mk_var result;mk_tconst 0])) in
+    let post = mk_term(Tidapp(ge_int,[mk_var (Qident result);mk_tconst 0])) in
     let spec = {
       sp_pre = [];
       sp_post = [Loc.dummy_position,[pat_var result,post]];
@@ -180,10 +182,10 @@ let mod_M3 =
     }
     in
     let body =
-      let e1 = mk_eapp (mk_qualid ["Ref";"ref"]) [mk_econst 42] in
+      let e1 = mk_eapply (mk_evar (mk_qualid ["Ref";"ref"])) (mk_econst 42) in
       let id_x = mk_ident "x" in
       let qid = mk_qualid ["Ref";Ident.op_prefix "!"] in
-      let e2 = mk_eapp qid [mk_evar id_x] in
+      let e2 = mk_eapply (mk_evar qid) (mk_evar (Qident id_x)) in
       mk_expr(Elet(id_x,false,Expr.RKnone,e1,e2))
     in
     let f = Efun(param0,None,mk_pat Pwild,Ity.MaskVisible,spec,body)
@@ -223,10 +225,10 @@ let mod_M4 =
   let f =
     let id_a = mk_ident "a" in
     let pre =
-      mk_tapp ge_int [mk_tapp length [mk_var id_a]; mk_tconst 1]
+      mk_tapp ge_int [mk_tapp length [mk_var (Qident id_a)]; mk_tconst 1]
     in
     let post =
-      mk_tapp eq_symb [mk_tapp array_get [mk_var id_a; mk_tconst 0];
+      mk_tapp eq_symb [mk_tapp array_get [mk_var (Qident id_a); mk_tconst 0];
                        mk_tconst 42]
     in
     let spec = {
@@ -243,7 +245,7 @@ let mod_M4 =
     }
     in
     let body =
-      mk_eapp array_set [mk_evar id_a; mk_econst 0; mk_econst 42]
+      mk_eapp array_set [mk_evar (Qident id_a); mk_econst 0; mk_econst 42]
     in
     let f = Efun(param1 id_a array_int_type,
                  None,mk_pat Pwild,Ity.MaskVisible,spec,body)
@@ -277,7 +279,7 @@ let mod_M5 =
         ld_ident = mk_ident "f";
         ld_params = [(Loc.dummy_position,Some (mk_ident "x"),false,int_type)] ;
         ld_type = Some int_type;
-        ld_def = Some (mk_var (mk_ident "x")) ;
+        ld_def = Some (mk_var (Qident (mk_ident "x"))) ;
       } in
       Dlogic([logic])
     in
