@@ -8,6 +8,33 @@ mlw_file: MODULE WRITES
 ## MODULE
 ##
 
-module name expected.
-found "$0".
-expecting a capitalized identifier (token UIDENT_NQ)
+expected module name must be an capitalized identifier (token UIDENT_NQ), found "$0"
+
+
+decl_eof: LET VAL
+##
+## Ends in an error in state: 1071.
+##
+## prog_decl -> LET . ghost kind attrs(lident_rich) mk_expr(fun_defn) [ VAL USE TYPE THEORY SCOPE PREDICATE MODULE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
+## prog_decl -> LET . ghost kind sym_binder const_defn [ VAL USE TYPE THEORY SCOPE PREDICATE MODULE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
+## prog_decl -> LET . ghost REF ref_binder const_defn [ VAL USE TYPE THEORY SCOPE PREDICATE MODULE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
+## prog_decl -> LET . REC with_list1(rec_defn) [ VAL USE TYPE THEORY SCOPE PREDICATE MODULE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
+##
+## The known suffix of the stack is as follows:
+## LET
+##
+
+expected function name must be a non-reserved uncapitalized identifier (token LIDENT_NQ), found "$0"
+
+
+decl_eof: FUNCTION LET
+##
+## Ends in an error in state: 1113.
+##
+## pure_decl -> FUNCTION . function_decl list(with_logic_decl) [ VAL USE TYPE THEORY SCOPE PREDICATE MODULE META LET LEMMA INDUCTIVE IMPORT GOAL FUNCTION EXCEPTION EOF END CONSTANT COINDUCTIVE CLONE AXIOM ]
+##
+## The known suffix of the stack is as follows:
+## FUNCTION
+##
+
+expected function name must be a non-reserved uncapitalized identifier (token LIDENT_NQ), found "$0"
