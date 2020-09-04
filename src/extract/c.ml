@@ -12,6 +12,7 @@
 open Ident
 
 exception Unsupported = Printer.Unsupported
+
 let current_decl_name = ref ""
 
 module C = struct
@@ -342,13 +343,18 @@ module C = struct
     | Sexpr _ -> true
     | _ -> false
 
+  exception Unsupported_stmt of stmt
+
   let rec simplify_expr (d,s) : expr =
     match (d,elim_empty_blocks(elim_nop s)) with
     | [], Sblock([],s) -> simplify_expr ([],s)
     | [], Sexpr e -> e
     | [], Sif(c,t,e) ->
        Equestion (c, simplify_expr([],t), simplify_expr([],e))
-    | _ -> raise (Invalid_argument "simplify_expr")
+    | [], s ->
+       raise (Unsupported_stmt s)
+    | _ ->
+       raise (Unsupported "simplify_expr")
 
   let rec simplify_cond (cd, cs) =
     match cd,elim_empty_blocks(elim_nop cs) with
@@ -1165,7 +1171,7 @@ module MLToC = struct
          | [] -> C.([], expr_or_return env Enothing);
          | [e] -> expr info env e
          | _ ->
-            let id_struct = id_register (id_fresh "result") in
+            let id_struct = id_register (result_id ()) in
             let e_struct = C.Evar id_struct in
             let d_struct =
               C.(Ddecl(Tstruct
@@ -1829,6 +1835,15 @@ let c_printer = Pdriver.{
 
 let () =
   Pdriver.register_printer "c" c_printer
+
+let () =
+  Exn_printer.register
+    (fun fmt exn ->
+      match exn with
+      | C.Unsupported_stmt s ->
+         Format.fprintf fmt "@[Unsupported statement @[%a@]@]"
+           (Print.print_stmt ~braces:true) s
+      | e -> raise e)
 
 (*
 Local Variables:

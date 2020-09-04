@@ -102,10 +102,10 @@ let cty_purify c =
 
 let make_post t = match t.t_ty with
   | Some ty ->
-      let res = create_vsymbol (id_fresh "result") ty in
+      let res = create_vsymbol (result_id ()) ty in
       create_post res (t_equ (t_var res) t)
   | None ->
-      let res = create_vsymbol (id_fresh "result") ty_bool in
+      let res = create_vsymbol (result_id ()) ty_bool in
       create_post res (t_iff (t_equ (t_var res) t_bool_true) t)
 
 let add_post c t = cty_add_post c [make_post t]
@@ -667,7 +667,7 @@ let rec post_of_expr res e = match e.e_node with
 
 let local_post_of_expr e =
   if ity_equal e.e_ity ity_unit || not (eff_pure e.e_effect) then [] else
-  let res = create_vsymbol (id_fresh "result") (ty_of_ity e.e_ity) in
+  let res = create_vsymbol (result_id ()) (ty_of_ity e.e_ity) in
   try let t = pure_of_expr (ity_equal e.e_ity ity_bool) e in
       let t = match t.t_node with
         | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
@@ -794,11 +794,22 @@ let c_pur s vl ityl ity =
   let cty = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
   mk_cexp (Cpur (s,vl)) cty
 
+let mk_proxy_decl ~ghost e =
+  let id =
+    match e.e_node with
+    | Eexec ({ c_node = Capp (_rs,_)},cty) ->
+       result_id ?loc:e.e_loc ~attrs:proxy_attrs ~ql:cty.cty_post ()
+    | Eexec ({ c_node = Cpur _},_) ->
+       result_id ?loc:e.e_loc ~attrs:proxy_attrs ()
+    | _ ->
+       id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o"
+  in
+  let_var ~ghost id e
+
 let mk_proxy ghost e hd = match e.e_node with
   | Evar v when Sattr.is_empty e.e_attrs -> hd, v
   | _ ->
-      let id = id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o" in
-      let ld, v = let_var ~ghost id e in ld::hd, v
+      let ld, v = mk_proxy_decl ~ghost e in ld::hd, v
 
 let add_proxy ghost e (hd,vl) =
   let hd, v = mk_proxy ghost e hd in hd, v::vl
