@@ -18,7 +18,8 @@ API calls
 
 (* BEGIN{buildenv} *)
 open Why3
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 let main : Whyconf.main = Whyconf.get_main config
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 open Ptree
@@ -295,10 +296,16 @@ let mod_M5 =
   (mk_ident "M5",[use_int_Int ; scope_S ; import_S ; g])
 
 (* BEGIN{getmodules} *)
-let mods =
-  let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4] in
-  Typing.type_mlw_file env [] "myfile.mlw" mlw_file
+let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4]
 (* END{getmodules} *)
+
+(* Printing back the mlw file *)
+
+let () = Format.printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+
+(* BEGIN{typemodules} *)
+let mods = Typing.type_mlw_file env [] "myfile.mlw" mlw_file
+(* END{typemodules} *)
 
 (* Checking the VCs *)
 
@@ -331,7 +338,7 @@ let alt_ergo : Whyconf.config_prover =
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Alt-Ergo not installed or not configured@.";
-    exit 0
+    exit 1
   end else
     snd (Whyconf.Mprover.max_binding provers)
 
@@ -363,6 +370,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma -I `ocamlfind query menhirLib` menhirLib.cmo -I `ocamlfind query camlzip` zip.cma ../../lib/why3/why3.cma mlw_tree.ml"
+compile-command: "ocamlfind ocaml ../../lib/why3/why3.cma mlw_tree.ml"
 End:
 *)

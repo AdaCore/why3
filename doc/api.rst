@@ -510,8 +510,10 @@ The examples of this section are available in the file
 :file:`examples/use_api/mlw_tree.ml` of the distribution.
 
 The first step is to build an environment as already illustrated in
-:numref:`sec.api.callingprovers`, and open the OCaml module ``Ptree`` (“parse tree”)
-which contains most of the OCaml functions we need in this section.
+:numref:`sec.api.callingprovers`, and open the OCaml module ``Ptree``
+(“parse tree”) which contains most of the OCaml functions we need in
+this section, and is documented `here
+<http://why3.lri.fr/api/Ptree.html>`_.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml

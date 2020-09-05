@@ -18,7 +18,8 @@ API calls
 
 (* BEGIN{buildenv} *)
 open Why3
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 let main : Whyconf.main = Whyconf.get_main config
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 open Ptree
@@ -86,7 +87,7 @@ let alt_ergo : Whyconf.config_prover =
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Alt-Ergo not installed or not configured@.";
-    exit 0
+    exit 1
   end else
     snd (Whyconf.Mprover.max_binding provers)
 
