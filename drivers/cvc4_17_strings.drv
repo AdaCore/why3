@@ -1,0 +1,52 @@
+(** Why3 driver for CVC4 1.7 *)
+
+prelude ";; produced by cvc4_17_strings.drv ;;"
+
+import "cvc4_17.drv"
+
+import "smtlib-strings.gen"
+
+theory string.String
+
+  remove prop lt_empty
+  remove prop lt_not_com
+  remove prop lt_ref
+  remove prop lt_ref
+  remove prop lt_trans
+  remove prop le_empty
+  remove prop le_ref
+  remove prop lt_le
+  remove prop lt_le_eq
+  remove prop le_trans
+  remove prop replaceall_empty1
+  remove prop not_contains_replaceall
+
+  syntax predicate lt        "(str.< %1 %2)"
+  syntax predicate le        "(str.<= %1 %2)"
+
+  syntax function replaceall "(str.replaceall %1 %2 %3)"
+
+end
+
+theory string.RegExpr
+
+  syntax type re             "RegLan"
+
+  syntax function to_re      "(str.to.re %1)"
+  syntax predicate in_re     "(str.in.re %1 %2)"
+
+  syntax function concat     "(re.++ %1 %2)"
+  syntax function union      "(re.union %1 %2)"
+  syntax function inter      "(re.inter %1 %2)"
+  syntax function star       "(re.* %1)"
+  syntax function plus       "(re.+ %1)"
+
+  syntax function none       "re.nostr"
+  syntax function allchar    "re.allchar"
+
+  syntax function opt        "(re.opt %1)"
+  syntax function range      "(re.range %1 %2)"
+  syntax function power      "(re.loop %2 %1 %1)"
+  syntax function loop       "(re.loop %3 %1 %2)"
+
+end
