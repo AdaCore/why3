@@ -1687,7 +1687,6 @@ and eval_expr' env e =
       match r with Normal t -> Excep (xs, t) | _ -> r )
   | Eexn (_, e1) -> eval_expr env e1
   | Eassert (kind, t) ->
-
       if env.rac.do_rac then (
         let descr = match kind with
           | Assert -> "Assertion"
@@ -1695,6 +1694,7 @@ and eval_expr' env e =
           | Check -> "Check" in
         try check_term (cntr_ctx descr env) t
         with Contr (ctr, t) when kind = Assume ->
+          printf "contradiction in assume";
           raise (RACStuck (ctr.c_env, t.t_loc)) );
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
@@ -1739,6 +1739,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
     try check_terms ctx rs.rs_cty.cty_pre
     with Contr (ctx, t) when main_function ->
+      printf "contradiction in preconditions of main function";
       raise (RACStuck (ctx.c_env, t.t_loc)) );
   let can_interpret_abstractly =
     if rs_equal rs rs_func_app then false else
@@ -1942,39 +1943,38 @@ let check_model_rs rac env pm model rs =
   reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
     let _, env = eval_rs rac env pm.mod_known pm.mod_theory.Theory.th_known model rs in
-    let reason= abs_Msg ^ " RAC does not confirm the counter-example, no \
-                           contradiction during execution" in
+    let reason = sprintf "%s RAC does not confirm the counter-example, no \
+                          contradiction during execution" abs_Msg in
     {verdict= Bad_model; reason; warnings= warnings env model;
      values= vals_from_model env}
   with
   | Contr (ctx, t) when loc_contains_opt (get_model_term_loc model) t.t_loc ->
-     let reason= abs_Msg ^ " RAC confirms the counter-example" in
-     {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
-      values= vals_from_model ctx.c_env}
+      let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
+      {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
+       values= vals_from_model ctx.c_env}
   | Contr (ctx, t) ->
-     let reason = asprintf "%s RAC found a contradiction at different location %a"
-         abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
-     {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
-      values= vals_from_model ctx.c_env}
+      let reason = asprintf "%s RAC found a contradiction at different location %a"
+          abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
+      {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
+       values= vals_from_model ctx.c_env}
   | CannotImportModelValue msg ->
-     let reason = sprintf "%s RAC: Cannot import value from model: %s" abs_Msg msg in
-     {verdict= Dont_know; reason; warnings= []; values= []}
+      let reason = sprintf "%s RAC: Cannot import value from model: %s" abs_Msg msg in
+      {verdict= Dont_know; reason; warnings= []; values= []}
   | CannotCompute ->
-     (* TODO E.g., bad default value for parameter and cannot evaluate
-        pre-condition *)
-     let reason = abs_Msg ^ "RAC execution got stuck" in
-     {verdict= Dont_know; reason; warnings= []; values= []}
+      (* TODO E.g., bad default value for parameter and cannot evaluate
+         pre-condition *)
+      let reason = sprintf "%s RAC execution got stuck" abs_Msg in
+      {verdict= Dont_know; reason; warnings= []; values= []}
   | Failure msg ->
-     (* E.g., cannot create default value for non-free type, cannot construct
-         term for constructor that is not a function *)
-     let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
-     {verdict= Dont_know; reason; warnings= []; values= []}
+      (* E.g., cannot create default value for non-free type, cannot construct
+          term for constructor that is not a function *)
+      let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
+      {verdict= Dont_know; reason; warnings= []; values= []}
   | RACStuck (env,l) ->
       let reason =
         asprintf "%s RAC, with the counterexample model cannot continue after %a@."
           abs_Msg (Pp.print_option Pretty.print_loc) l in
-     {verdict= Bad_model; reason; warnings= [];
-      values= vals_from_model env}
+      {verdict= Bad_model; reason; warnings= []; values= vals_from_model env}
 
 (** Identifies the rsymbol of the definition that contains the given position. Raises
     [Not_found] if no such definition is found. **)
