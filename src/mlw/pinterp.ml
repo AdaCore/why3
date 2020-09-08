@@ -353,14 +353,14 @@ let rac_reduce_config ?trans:rac_trans ?prover:rac_prover () = {rac_trans; rac_p
 type model_value = Loc.position * vsymbol * value
 
 type rac_config = {
-  do_rac : bool;
+  do_rac       : bool;
   rac_abstract : bool;
   rac_reduce   : rac_reduce_config;
   ce_model     : model;
   used_values  : model_value list ref (* values taken from the ce model *)
 }
 
-let rac_config ~concrete:do_rac ~abstract:rac_abstract ?reduce:rac_reduce
+let rac_config ~do_rac ~abstract:rac_abstract ?reduce:rac_reduce
     ?model:(ce_model=Model_parser.default_model) () =
   let rac_reduce = match rac_reduce with Some r -> r | None -> rac_reduce_config () in
   {do_rac; rac_abstract; rac_reduce; ce_model; used_values= ref []}
@@ -376,7 +376,7 @@ type env =
 
 let default_env env =
   { mod_known= Mid.empty; th_known= Mid.empty; funenv= Mrs.empty;
-    vsenv= Mvs.empty; rac= rac_config ~concrete:false ~abstract:false (); env }
+    vsenv= Mvs.empty; rac= rac_config ~do_rac:false ~abstract:false (); env }
 
 let register_used_value env loc vs value =
   env.rac.used_values := (loc, vs, snapshot value) :: !(env.rac.used_values)
@@ -2023,7 +2023,7 @@ let check_model reduce env pm model =
     match find_rs pm loc with
     | rs ->
         let check_model_rs ~abstract =
-          let rac = rac_config ~concrete:true ~abstract ~reduce ~model () in
+          let rac = rac_config ~do_rac:true ~abstract ~reduce ~model () in
           check_model_rs rac env pm model rs in
         let concrete = check_model_rs ~abstract:false in
         let abstract = check_model_rs ~abstract:true in

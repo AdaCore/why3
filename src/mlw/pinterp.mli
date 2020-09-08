@@ -65,7 +65,7 @@ val rac_reduce_config :
 type rac_config
 
 val rac_config :
-  concrete:bool ->
+  do_rac:bool ->
   abstract:bool ->
   ?reduce:rac_reduce_config ->
   ?model:Model_parser.model ->
