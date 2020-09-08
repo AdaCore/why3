@@ -16,8 +16,8 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
-let debug_check_ce = Debug.register_info_flag "check_ce"
-    ~desc:"Check@ CE@ models@ using@ RAC"
+let debug_check_ce = Debug.register_info_flag "check-ce"
+    ~desc:"Debug@ info@ for@ --check-ce"
 
 let debug_attrs = Debug.register_info_flag "print_model_attrs"
   ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
@@ -244,7 +244,7 @@ let select_model check_model models =
       i,r,m,mr in
     let not_empty (i,_,m) =
       let empty = is_model_empty m in
-      if empty then Debug.dprintf debug "Model %d is empty@." i;
+      if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
       not empty in
     let keep_model (_,_,_,mr) = match mr with
       | Cannot_check_model _ -> true
@@ -280,10 +280,10 @@ let select_model check_model models =
       List.sort compare unknowns in
   match model_infos with
   | [] ->
-      Debug.dprintf debug "Select no CE model@.";
+      Debug.dprintf debug_check_ce "Select no CE model@.";
       None
   | (i,_,m,_,s) :: _ ->
-      Debug.dprintf debug "Select CE model %d@." i;
+      Debug.dprintf debug_check_ce "Select CE model %d@." i;
       printf "%a.@." print_ce_summary s;
       Some m
 
