@@ -4,40 +4,57 @@ Counter-example model:
 File bv32.mlw:
   Line 7:
     r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "34" } }] } }
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "34"}}]}}
   Line 9:
-    r,
-    [[@field:0:contents], [@introduced], [@mlw:reference_var], [@model_trace:r]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "132" } }] } }
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var],
+      [@model_trace:r]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "132"}}]}}
   Line 10:
     r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "66" } }] } }
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "66"}}]}}
   Line 11:
     r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "132" } }] } }
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "132"}}]}}
 
 bench/ce/bv32.mlw Ce_int32bv dummy_update_with_int'vc: Timeout or Unknown
 Counter-example model:
 File bv32.mlw:
   Line 13:
     r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 15:
-    r,
-    [[@field:0:contents], [@introduced], [@mlw:reference_var], [@model_trace:r]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "132" } }] } }
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var],
+      [@model_trace:r]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "132"}}]}}
   Line 16:
     r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "66" } }] } }
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "66"}}]}}
   Line 17:
     r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "4294967295" } }] } }
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value": {"type": "Integer", "val": "4294967295"}}]}}
 

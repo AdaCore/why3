@@ -91,13 +91,13 @@ let pp_bool ?true_ ?false_ fmt = function
 
 let expr_closed e = match e.expr_desc with
   | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Efor _ | Ewhile _
-  | Eassert _ | Eabsurd | Escope _ | Eidapp (_, []) | Ecast _ | Einfix _ | Einnfix _ ->
+  | Eassert _ | Eabsurd | Escope _ | Eidapp (_, []) | Einnfix _ ->
       true
   | _ -> marker e.expr_loc <> None
 
 let term_closed t = match t.term_desc with
   | Ttrue | Tfalse | Tconst _ | Tident _ | Tupdate _ | Trecord _ | Ttuple _ | Tscope _
-  | Tidapp (_, []) | Tcast _ | Tinfix _ | Tinnfix _ | Tbinop _ | Tbinnop _ ->
+  | Tidapp (_, []) | Tinnfix _ | Tbinnop _ ->
       true
   | _ -> marker t.term_loc <> None
 
@@ -116,20 +116,36 @@ let pp_closed is_closed pp fmt x =
   then pp fmt x
   else fprintf fmt "@[<hv 1>(%a)@]" pp x
 
-let pp_id fmt id =
-  pp_maybe_marker fmt id.id_loc;
-  let open Ident in
-  match sn_decode id.id_str with
-  | SNword s -> pp_print_string fmt s
-  | SNinfix s -> fprintf fmt "( %s )" s
-  | SNprefix s -> fprintf fmt "( %s_ )" s
-  | SNtight s -> fprintf fmt "( %s )" s
-  | SNget s -> fprintf fmt "( []%s )" s
-  | SNset s -> fprintf fmt "( []%s<- )" s
-  | SNupdate s -> fprintf fmt "( [<-]%s )" s
-  | SNcut s -> fprintf fmt "( [..]%s )" s
-  | SNlcut s -> fprintf fmt "(  [.._]%s )" s
-  | SNrcut s -> fprintf fmt "( [_..]%s )" s
+let remove_id_attr s id =
+  let p = function
+    | ATstr a -> a.Ident.attr_string <> s
+    | _ -> true in
+  {id with id_ats= List.filter p id.id_ats}
+
+let pp_attr fmt = function
+  | ATstr att -> fprintf fmt "[@%s]" att.Ident.attr_string
+  | ATpos loc ->
+      let filename, line, bchar, echar = Loc.get loc in
+      fprintf fmt "[#%S %d %d %d]" filename line bchar echar
+
+let pp_id fmt (id: ident) =
+  let pp_decode fmt str =
+    let open Ident in
+    match sn_decode str with
+    | SNword s -> pp_print_string fmt s
+    | SNinfix s -> fprintf fmt "( %s )" s
+    | SNprefix s -> fprintf fmt "( %s_ )" s
+    | SNtight s -> fprintf fmt "( %s )" s
+    | SNget s -> fprintf fmt "( []%s )" s
+    | SNset s -> fprintf fmt "( []%s<- )" s
+    | SNupdate s -> fprintf fmt "( [<-]%s )" s
+    | SNcut s -> fprintf fmt "( [..]%s )" s
+    | SNlcut s -> fprintf fmt "(  [.._]%s )" s
+    | SNrcut s -> fprintf fmt "( [_..]%s )" s  in
+  fprintf fmt "%a%a%a"
+    pp_maybe_marker id.id_loc
+    pp_decode id.id_str
+    (pp_print_opt_list ~prefix:" " pp_attr) id.id_ats
 
 let rec pp_qualid fmt = function
   | Qident id -> pp_id fmt id
@@ -144,17 +160,18 @@ let pp_false fmt () =
 let pp_const fmt c =
   Constant.print_def fmt c
 
-let pp_ident fmt id =
-  pp_qualid fmt id
-
 let pp_asref fmt qid =
   fprintf fmt "@[<h>&%a@]" pp_qualid qid
 
 let pp_idapp pp fmt qid xs =
   match qid with
-  | Qdot _ ->
-      let pp_args = pp_print_list ~pp_sep:pp_print_space pp.closed in
-      fprintf fmt "@[<hv 3>%a@ %a@]" pp_qualid qid pp_args xs
+  | Qdot (_, id) -> (
+      match Ident.sn_decode id.id_str, xs with
+      | Ident.SNword s, [x] when 'a' <= s.[0] && s.[0] <= 'z' ->
+          fprintf fmt "@[<hv2>%a%a.%a@]" pp_maybe_marker id.id_loc pp.closed x pp_qualid qid
+      | _ ->
+          let pp_args = pp_print_list ~pp_sep:pp_print_space pp.closed in
+          fprintf fmt "@[<hv 3>%a@ %a@]" pp_qualid qid pp_args xs )
   | Qident id ->
       match Ident.sn_decode id.id_str, xs with
       | Ident.SNword s, [x] when 'a' <= s.[0] && s.[0] <= 'z' ->
@@ -194,14 +211,13 @@ let pp_idapp pp fmt qid xs =
 let pp_apply pp fmt x1 x2 =
   fprintf fmt "@[<hv 2>%a@ %a@]" pp.closed x1 pp.closed x2
 
-let pp_infix pp fmt x1 op x2 =
-  let op =
-    pp_maybe_marker fmt op.id_loc;
-    let open Ident in
-    match sn_decode op.id_str with
-    | SNinfix s -> s
-    | _ -> failwith ("pp_infix: "^op.id_str) in
-  fprintf fmt "@[<hv 2>%a@ %s %a@]" pp.closed x1 op pp.closed x2
+let pp_infix pp fmt x ops =
+  let pp_op fmt (op, x) =
+    let s = match Ident.sn_decode op.id_str with
+      | Ident.SNinfix s -> s
+      | _ -> failwith ("pp_infix: "^op.id_str) in
+    fprintf fmt "%a%s@ %a" pp_maybe_marker op.id_loc s pp.closed x in
+  fprintf fmt "%a@ %a" pp.closed x (pp_print_opt_list ~sep:"@ " pp_op) ops
 
 let pp_innfix pp fmt x1 op x2 =
   let op =
@@ -266,9 +282,9 @@ let pp_ghost fmt ghost =
 let pp_mutable fmt mutable_ =
   if mutable_ then pp_print_string fmt "mutable "
 
-let pp_kind ~unary fmt = function
+let pp_kind fmt = function
   | Expr.RKnone -> ()
-  | Expr.RKfunc -> pp_print_string fmt (if unary then "constant " else "function ")
+  | Expr.RKfunc -> pp_print_string fmt ((* if unary then "constant " else *) "function ")
   | Expr.RKpred -> pp_print_string fmt "predicate "
   | Expr.RKlemma -> pp_print_string fmt "lemma "
   | Expr.RKlocal -> todo fmt "RKLOCAL" (* assert false? does not occur in parser *)
@@ -279,14 +295,15 @@ let opt_ref_pty = function
 
 let pp_binder fmt (loc, opt_id, ghost, opt_pty) =
   let opt_ref, opt_pty = match Opt.map opt_ref_pty opt_pty with Some (ref, pty) -> ref, Some pty | None -> "", None in
-  let pp_opt_id fmt = match opt_id with
+  let pp_opt_id fmt opt_id = match opt_id with
     | None -> pp_print_string fmt "_"
     | Some id -> pp_id fmt id in
   if ghost || opt_pty <> None then
-    fprintf fmt "%a(%a%s%t%a)" pp_maybe_marker loc pp_ghost ghost
-      opt_ref pp_opt_id pp_opt_pty opt_pty
+    let opt_id = Opt.map (remove_id_attr "mlw:reference_var") opt_id in
+    fprintf fmt "%a(%a%s%a%a)" pp_maybe_marker loc pp_ghost ghost
+      opt_ref pp_opt_id opt_id pp_opt_pty opt_pty
   else
-    fprintf fmt "%a%t" pp_maybe_marker loc pp_opt_id
+    fprintf fmt "%a%a" pp_maybe_marker loc pp_opt_id opt_id
 
 let pp_binders fmt =
   pp_print_opt_list ~prefix:" " pp_binder fmt
@@ -300,12 +317,13 @@ let pp_comma_binders fmt =
   pp_print_opt_list ~prefix:" " ~sep:", " pp_comma_binder fmt
 
 let pp_param fmt (loc, opt_id, ghost, pty) =
-  let opt_ref, pty = match pty with PTref [pty] -> "ref ", pty | _ -> "", pty in
+  let opt_ref, pty, opt_id = match pty with
+    | PTref [pty] -> "ref ", pty, Opt.map (remove_id_attr "mlw:reference_var") opt_id
+    | _ -> "", pty, opt_id in
   if ghost || opt_id <> None || opt_ref <> "" then
     let pp_id fmt id = fprintf fmt "%a:" pp_id id in
-    fprintf fmt "%a(%a%s%a %a)" pp_maybe_marker loc
-      pp_ghost ghost opt_ref (Pp.print_option pp_id) opt_id
-      pp_pty.marked pty
+    fprintf fmt "%a(%a%s%a %a)" pp_maybe_marker loc pp_ghost ghost
+      opt_ref (Pp.print_option pp_id) opt_id pp_pty.marked pty
   else
     fprintf fmt "%a%a" pp_maybe_marker loc pp_pty.closed pty
 
@@ -317,15 +335,10 @@ let pp_if pp fmt x1 x2 x3 =
     pp.closed x1 pp.closed x2 pp.closed x3
 
 let pp_cast pp fmt x pty =
-  fprintf fmt "@[<hv 1>(%a :@ %a)@]" pp.marked x pp_pty.marked pty
+  fprintf fmt "@[<hv 2>%a :@ %a@]" pp.closed x pp_pty.closed pty
 
 let pp_attr pp fmt attr x =
-  match attr with
-  | ATstr a ->
-      fprintf fmt "@[[@%s]@ %a@]" a.Ident.attr_string pp x
-  | ATpos loc ->
-      let filename, line, bchar, echar = Loc.get loc in
-      fprintf fmt "[# %S %d %d %d]@ %a" filename line bchar echar pp x
+  fprintf fmt "@[%a@ %a@]" pp_attr attr pp x
 
 let rec pp_pty_mask fmt = function
   | PTtuple [], Ity.MaskVisible -> ()
@@ -366,11 +379,22 @@ let pp_exn fmt (id, pty, m) =
   let pp_space fmt = if pty <> PTtuple [] then fprintf fmt " " in
   fprintf fmt "@[<h>exception %a%t%a@]" pp_id id pp_space pp_pty_mask (pty, m)
 
-let pp_let pp fmt (id, ghost, kind, x) =
-  fprintf fmt "@[<hv 2>let %a%a%a =@ %a@]" pp_ghost ghost
-    (pp_kind ~unary:true) kind pp_id id pp.marked x
+let remove_witness_existence spec =
+  let not_witness_existence = function
+    | {term_desc= Tattr (ATstr {Ident.attr_string= "expl:witness existence"}, _)} -> false
+    | _ -> true in
+  {spec with sp_pre= List.filter not_witness_existence spec.sp_pre}
 
-let remove_attr s t = match t.term_desc with
+let pp_let pp is_ref fmt (id, ghost, kind, x) =
+  match is_ref x with
+  | Some x when List.exists (function ATstr a -> a.Ident.attr_string = "mlw:reference_var" | _ -> false) id.id_ats ->
+      fprintf fmt "@[<hv 2>let %aref %a%a =@ %a@]" pp_ghost ghost
+        pp_kind kind pp_id (remove_id_attr "mlw:reference_var" id) pp.marked x
+  | _ ->
+      fprintf fmt "@[<hv 2>let %a%a%a =@ %a@]" pp_ghost ghost
+        pp_kind kind pp_id id pp.marked x
+
+let remove_term_attr s t = match t.term_desc with
   | Tattr (ATstr attr, t) when attr.Ident.attr_string = s -> t
   | _ -> t
 
@@ -378,8 +402,8 @@ let pp_clone_subst fmt = function
   | CSaxiom qid ->
       fprintf fmt "axiom %a" pp_qualid qid
   | CStsym (qid, args, pty) ->
-      let pp_args = pp_print_list ~pp_sep:(pp_sep " ") pp_id in
-      fprintf fmt "type %a = %a%a" pp_qualid qid pp_pty.marked pty pp_args args
+      let pp_args = pp_print_opt_list ~every:" '" pp_id in
+      fprintf fmt "type %a%a = %a" pp_qualid qid pp_args args pp_pty.marked pty
   | CSfsym (qid, qid') ->
       fprintf fmt "function %a = %a" pp_qualid qid pp_qualid qid'
   | CSpsym (qid, qid') ->
@@ -419,37 +443,96 @@ let pp_match pp pp_pattern fmt x cases xcases =
 
 let pp_partial = pp_bool ~true_:"partial " ~false_:""
 
+let is_ref_expr = function
+  | {expr_desc= Eapply ({expr_desc= Eref}, e2)} -> Some e2
+  | _ -> None
+
+let is_ref_pattern _ = None
+
+let term_hyp_name = function
+  | {term_desc= Tattr (ATstr {Ident.attr_string= attr}, t)}
+    when Strings.has_prefix "hyp_name:" attr ->
+      " " ^ Strings.remove_prefix "hyp_name:" attr, t
+  | t -> "", t
+
+let attr_equals at1 at2 =
+  match at1, at2 with
+  | ATstr at1, ATstr at2 ->
+      at1.Ident.attr_string = at2.Ident.attr_string
+  | ATpos loc1, ATpos loc2 ->
+      Loc.equal loc1 loc2
+  | _ -> false
+
+let ident_equals id1 id2 =
+  id1.id_str = id2.id_str && Lists.equal attr_equals id1.id_ats id2.id_ats
+
+let rec qualid_equals qid1 qid2 =
+  match qid1, qid2 with
+  | Qident id1, Qident id2 ->
+      ident_equals id1 id2
+  | Qdot (qid1, id1), Qdot (qid2, id2) ->
+      qualid_equals qid1 qid2 && ident_equals id1 id2
+  | _ -> false
+
+let pty_equals _ _ = true (* TODO *)
+
+let rec pat_equals p1 p2 =
+  match p1.pat_desc, p2.pat_desc with
+  | Pwild, Pwild -> true
+  | Pvar id1, Pvar id2 -> ident_equals id1 id2
+  | Papp (qid1, pats1), Papp (qid2, pats2) ->
+      qualid_equals qid1 qid2 && Lists.equal pat_equals pats1 pats2
+  | Prec l1, Prec l2 ->
+      let equals (qid1, pat1) (qid2, pat2) =
+        qualid_equals qid1 qid2 && pat_equals pat1 pat2 in
+      Lists.equal equals l1 l2
+  | Ptuple pats1, Ptuple pats2 ->
+      Lists.equal pat_equals pats1 pats2
+  | Pas (p1, id1, g1), Pas (p2, id2, g2) ->
+      pat_equals p1 p2 && ident_equals id1 id2 && g1 = g2
+  | Por (p1, p1'), Por (p2, p2') ->
+      pat_equals p1 p2 && pat_equals p1' p2'
+  | Pcast (p1, pty1), Pcast (p2, pty2) ->
+      pat_equals p1 p2 && pty_equals pty1 pty2
+  | Pscope (qid1, p1), Pscope (qid2, p2) ->
+      qualid_equals qid1 qid2 && pat_equals p1 p2
+  | Pparen p1, Pparen p2 ->
+      pat_equals p1 p2
+  | Pghost p1, Pghost p2 ->
+      pat_equals p1 p2
+  | _ -> false
+
 let rec pp_fun pp fmt = function
-  | [], None, {pat_desc= Pwild}, Ity.MaskVisible, spec, e ->
-      fprintf fmt "@[<hv>@[<v2>begin@ %a%a@]@ end@]" pp_spec spec pp.marked e
+  | [], None, pat, Ity.MaskVisible, spec, e when pat.pat_desc = Pwild->
+      fprintf fmt "@[<hv>@[<v2>begin@ %a%a@]@ end@]" (pp_spec pat) spec pp.marked e
   | binders, opt_pty, pat, mask, spec, e ->
     fprintf fmt "@[<hv 2>fun %a%a%a ->@ @[%a@]@]" pp_binders binders
-      pp_opt_result (opt_pty, pat, mask) pp_spec spec pp.marked e
+      pp_opt_result (opt_pty, pat, mask) (pp_spec pat) spec pp.marked e
 
 and pp_let_fun pp fmt = function
-  | id, ghost, kind, ([], None, {pat_desc= Pwild}, Ity.MaskVisible, spec, x) ->
+  | id, ghost, kind, ([], None, pat, Ity.MaskVisible, spec, x) when pat.pat_desc = Pwild ->
       fprintf fmt "@[<hv>@[<v2>let %a%a%a%a = begin@ %a%a@]@ end@]"
-        pp_ghost ghost pp_partial spec.sp_partial (pp_kind ~unary:false) kind pp_id id
-        pp_spec {spec with sp_partial= false} pp.marked x
+        pp_ghost ghost pp_partial spec.sp_partial pp_kind kind pp_id id
+        (pp_spec pat) {spec with sp_partial= false} pp.marked x
   | id, ghost, kind, (binders, opt_pty, pat, mask, spec, x) ->
       fprintf fmt "@[<v2>let %a%a%a%a%a%a%a =@ %a@]"
-        pp_ghost ghost pp_partial spec.sp_partial (pp_kind ~unary:false) kind pp_id id
-        pp_binders binders pp_opt_result (opt_pty, pat, mask) pp_spec {spec with sp_partial= false} pp.marked x
+        pp_ghost ghost pp_partial spec.sp_partial pp_kind kind pp_id id
+        pp_binders binders pp_opt_result (opt_pty, pat, mask) (pp_spec pat) {spec with sp_partial= false} pp.marked x
 
 and pp_let_any fmt (id, ghost, kind, (params, kind', opt_pty, pat, mask, spec)) =
   if kind' <> Expr.RKnone then
     todo fmt "LET-ANY kind<>RKnone" (* Concrete syntax? *)
   else
     fprintf fmt "@[<v 2>val %a%a%a%a%a%a%a@]" pp_ghost ghost pp_partial spec.sp_partial
-      (pp_kind ~unary:true) kind pp_id id pp_params params pp_opt_result (opt_pty, pat, mask)
-      pp_spec {spec with sp_partial=false} (* [sic!] *)
+      pp_kind kind pp_id id pp_params params pp_opt_result (opt_pty, pat, mask)
+      (pp_spec pat) {spec with sp_partial= false}
 
 and pp_fundef fmt (id, ghost, kind, binders, pty_opt, pat, mask, spec, e) =
   fprintf fmt "%a%a%a%a%a%a =@ %a"
-    pp_ghost ghost (pp_kind ~unary:false) kind
+    pp_ghost ghost pp_kind kind
     pp_id id pp_binders binders
     pp_opt_result (pty_opt, pat, mask)
-    pp_spec spec pp_expr.marked e
+    (pp_spec pat) spec pp_expr.marked e
 
 and pp_expr =
   let raw fmt e =
@@ -462,40 +545,48 @@ and pp_expr =
         pp_false fmt ()
     | Econst c ->
         pp_const fmt c
-    | Eident id ->
-        pp_ident fmt id
+    | Eident qid ->
+        pp_qualid fmt qid
     | Easref qid ->
         pp_qualid fmt qid
     | Eidapp (qid, es) ->
         pp_idapp pp_expr fmt qid es
     | Eapply (e1, e2) ->
         pp_apply pp_expr fmt e1 e2
-    | Einfix (e1, op, e2) ->
-        pp_infix pp_expr fmt e1 op e2
+    | Einfix (e, op, e') ->
+        let rec collect op e = match e.expr_desc with
+          | Einfix (e, op', e') -> (op, e) :: collect op' e'
+          | _ -> [op, e] in
+        pp_infix pp_expr fmt e (collect op e')
     | Einnfix (e1, op, e2) ->
         pp_innfix pp_expr fmt e1 op e2;
     | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e1)}, e2) ->
         fprintf fmt "@[<v>%a in@ %a@]"
           (pp_let_fun pp_expr) (id, ghost, kind, (binders, pty_opt, pat, mask, spec, e1))
           pp_expr.marked e2
-    | Elet (id, ghost, kind, {expr_desc=Eany (params, kind', pty_opt, pat, mask, spec)}, e2) ->
-        fprintf fmt "@[<v>%a in@ %a@]"
-          pp_let_any (id, ghost, kind, (params, kind', pty_opt, pat, mask, spec))
-          pp_expr.marked e2
+    (* | Elet (id, ghost, kind, {expr_desc=Eany (params, kind', pty_opt, pat, mask, spec)}, e2) ->
+     *     fprintf fmt "@[<v>%a in@ %a@]"
+     *       pp_let_any (id, ghost, kind, (params, kind', pty_opt, pat, mask, remove_witness_existence spec))
+     *       pp_expr.marked e2 *)
     | Elet (id, ghost, kind, e1, e2) ->
-        fprintf fmt "@[<hv>@[<v 2>%a@] in@ %a@]" (pp_let pp_expr) (id, ghost, kind, e1)
+        fprintf fmt "@[<hv>@[<v 2>%a@] in@ %a@]" (pp_let pp_expr is_ref_expr) (id, ghost, kind, e1)
           pp_expr.marked e2
     | Erec (defs, e) ->
         let pp_fundefs = pp_print_list ~pp_sep:(pp_sep "@]@ @[<hv 2>with ") pp_fundef in
         fprintf fmt "@[<v>@[<v 2>let rec %a in@]@ %a@]" pp_fundefs defs pp_expr.marked e
-    | Efun ([], None, {pat_desc=Pwild}, Ity.MaskVisible, spec, {expr_desc=Etuple []}) ->
-        fprintf fmt "@[<v>@[<v 2>begin%a@]@ end@]" pp_spec spec
-    | Efun ([], None, {pat_desc=Pwild}, Ity.MaskVisible, spec, e) ->
-        fprintf fmt "@[<v>@[<v 2>begin%a@ %a@]@ end@]" pp_spec spec pp_expr.marked e
+    | Efun ([], None, pat, Ity.MaskVisible, spec, {expr_desc=Etuple []}) when pat.pat_desc = Pwild ->
+        fprintf fmt "@[<v>@[<v 2>begin%a@]@ end@]" (pp_spec pat) spec
+    | Efun ([], None, pat, Ity.MaskVisible, spec, e) when pat.pat_desc = Pwild ->
+        fprintf fmt "@[<v>@[<v 2>begin%a@ %a@]@ end@]" (pp_spec pat) spec pp_expr.marked e
     | Efun (binders, opt_pty, pat, mask, spec, e) ->
         pp_fun pp_expr fmt (binders, opt_pty, pat, mask, spec, e)
-    | Eany ([], _kind, Some pty, _pat, _mask, spec) ->
-        fprintf fmt "@[<hv 2>any %a%a@]" pp_pty.marked pty pp_spec spec
+    | Eany ([], _kind, Some pty, pat, mask, spec) ->
+        let pat =
+          if pat.pat_desc <> Pwild then pat
+          else match spec.sp_post with
+            | (_, (pat, _) :: _) :: _ -> pat
+            | _ -> pat in
+        fprintf fmt "@[<hv 2>any %a%a@]" (pp_pty_pat_mask ~closed:true) (pty, (pat, mask)) (pp_spec pat) (remove_witness_existence spec)
     | Eany _ ->
         todo fmt "EANY" (* assert false? *)
     | Etuple es ->
@@ -558,8 +649,9 @@ and pp_expr =
         fprintf fmt "raise %a%a" pp_qualid qid (pp_opt ~prefix:" " pp_expr.closed) opt_arg
     | Eexn (id, pty, mask, e) ->
         fprintf fmt "@[%a in@ %a@]" pp_exn (id, pty, mask) pp_expr.marked e
-    | Eoptexn ({id_str="'Return"|"'Break"|"'Continue"; id_loc}, _mask, e)
-      when marker id_loc = None ->
+    | Eoptexn (id, _mask, e)
+      when List.exists (fun s -> Strings.ends_with id.id_str s) ["'Return"; "'Break"; "'Continue"]
+        && marker id.id_loc = None ->
         (* Syntactic sugar *)
         pp_expr.marked fmt e
     | Eoptexn (id, mask, e) ->
@@ -586,7 +678,8 @@ and pp_expr =
           | Expr.Assert -> "assert"
           | Expr.Assume -> "assume"
           | Expr.Check -> "check" in
-        fprintf fmt "@[<hv 2>%s {@ %a }@]" kind pp_term.marked t
+        let s, t = term_hyp_name t in
+        fprintf fmt "@[<hv 2>%s%s {@ %a }@]" kind s pp_term.marked t
     | Escope (qid, e) ->
         pp_scope pp_expr fmt qid e
     | Elabel (id, e) ->
@@ -624,20 +717,27 @@ and pp_term =
         pp_false fmt ()
     | Tconst c ->
         pp_const fmt c
-    | Tident id ->
-        pp_ident fmt id
+    | Tident qid ->
+        pp_qualid fmt qid
     | Tasref qid ->
         pp_asref fmt qid
     | Tidapp (qid, ts) ->
         pp_idapp pp_term fmt qid ts
     | Tapply (t1, t2) ->
         pp_apply pp_term fmt t1 t2
-    | Tinfix (t1, op, t2) ->
-        pp_infix pp_term fmt t1 op t2
+    | Tinfix (t, op, t') ->
+        let rec collect op t = match t.term_desc with
+          | Tinfix (t, op', t') -> (op, t) :: collect op' t'
+          | _ -> [op, t] in
+        pp_infix pp_term fmt t (collect op t')
     | Tinnfix (t1, op, t2) ->
         pp_innfix pp_term fmt t1 op t2;
-    | Tbinop (t1, op, t2) ->
-        fprintf fmt "@[<hv 2>%a %a@ %a@]" pp_term.closed t1 pp_binop op pp_term.closed t2
+    | Tbinop (t, op, t') ->
+        let rec collect op t = match t.term_desc with
+          | Tbinop (t, op', t') -> (op, t) :: collect op' t'
+          | _ -> [op, t] in
+        let pp_op fmt (op, t) = fprintf fmt "%a@ %a" pp_binop op pp_term.closed t in
+        fprintf fmt "@[<hv2>%a@ %a@]" pp_term.closed t (pp_print_opt_list ~sep:"@ " pp_op) (collect op t')
     | Tbinnop (t1, op, t2) ->
         fprintf fmt "@[<hv 3>(%a %a@ %a)@]" pp_term.closed t1 pp_binop op pp_term.closed t2
     | Tnot t ->
@@ -659,7 +759,7 @@ and pp_term =
         pp_attr (pp_closed term_closed pp_term.marked) fmt attr t
     | Tlet (id, t1, t2) ->
         fprintf fmt "@[<v>%a in@ %a@]"
-          (pp_let pp_term) (id, false, Expr.RKnone, t1) pp_term.marked t2
+          (pp_let pp_term is_ref_pattern) (id, false, Expr.RKnone, t1) pp_term.marked t2
     | Tcase (t, cases) ->
         pp_match pp_term pp_pattern fmt t cases []
     | Tcast (t, pty) ->
@@ -680,25 +780,38 @@ and pp_term =
   let closed fmt = pp_closed term_closed marked fmt in
   { closed; marked }
 
-and pp_variants fmt =
+and pp_variants fmt vs =
+  let pp = match vs with [] | [_] -> pp_term.marked | _ -> pp_term.closed in
   let pp_variant fmt (t, qid_opt) =
-    pp_term.marked fmt t;
-    pp_opt ~prefix:" with " pp_qualid fmt qid_opt in
-  pp_print_opt_list ~prefix:"@ @[<hv2>variant {@ " ~suffix:"@] }" ~sep:",@ " pp_variant fmt
+    fprintf fmt "%a%a" pp t
+      (pp_opt ~prefix:" with " pp_qualid) qid_opt in
+  pp_print_opt_list ~prefix:"@ @[<hv2>variant {@ " ~suffix:"@] }" ~sep:",@ " pp_variant fmt vs
 
 and pp_invariants fmt =
   let pp_invariant fmt t =
-    fprintf fmt "@[<hv 2>invariant {@ %a@] }" pp_term.marked
-      (remove_attr "hyp_name:LoopInvariant" t) in
+    let s, t = term_hyp_name t in
+    fprintf fmt "@[<hv 2>invariant%s {@ %a@] }" s pp_term.marked
+      (remove_term_attr "hyp_name:LoopInvariant"
+        (remove_term_attr "hyp_name:TypeInvariant" t)) in
   pp_print_opt_list ~prefix:"@ " ~sep:"@ " pp_invariant fmt
 
-and pp_spec fmt s =
-  let pp_requires fmt t = fprintf fmt "@[<hv>@[<hv2>requires { %a@]@ }@]"
-      pp_term.marked (remove_attr "hyp_name:Requires" t) in
+and pp_spec result_pat fmt s =
+  let pp_requires fmt t =
+    let s, t = term_hyp_name t in
+    fprintf fmt "@[<hv>@[<hv2>requires%s { %a@]@ }@]"
+      s pp_term.marked (remove_term_attr "hyp_name:Requires" t) in
+  let is_ensures pat =
+    match result_pat.pat_desc, pat.pat_desc with
+    | Pwild, Pvar id ->  id.id_str = "result"
+    | _ -> pat_equals result_pat pat in
+  let is_not_marked pat = match pat.pat_desc with
+    | Pvar id -> marker id.id_loc = None
+    | _ -> true in
   let pp_post fmt = function
-    | loc, [{pat_desc=Pvar {id_str="result"; id_loc}}, t] when marker id_loc = None ->
-        fprintf fmt "@ @[<hv 2>%aensures { %a@] }" pp_maybe_marker loc
-          pp_term.marked (remove_attr "hyp_name:Ensures" t)
+    | loc, [pat, t] when is_ensures pat && is_not_marked pat ->
+        let s, t = term_hyp_name t in
+        fprintf fmt "@ @[<hv 2>%aensures%s { %a@] }" pp_maybe_marker loc
+          s pp_term.marked (remove_term_attr "hyp_name:Ensures" t)
     | loc, cases ->
         let pp_case fmt (p, t) =
           fprintf fmt "%a -> %a" pp_pattern.marked p pp_term.marked t in
@@ -716,13 +829,16 @@ and pp_spec fmt s =
     fprintf fmt "%a with %a" pp_term.marked t1 pp_term.marked t2 in
   pp_print_opt_list ~prefix:"@ @[<hv 2>reads { " ~suffix:"@] }" ~sep:",@ " pp_qualid fmt s.sp_reads;
   pp_print_opt_list ~prefix:"@ " ~sep:"@ " pp_requires fmt s.sp_pre;
-  pp_print_opt_list ~prefix:"@ @[<hv 2>writes { " ~sep:",@ " ~suffix:"@] }" pp_term.marked fmt s.sp_writes;
+  if s.sp_checkrw then
+    fprintf fmt "@ @[<hv 2>writes { %a }" (pp_print_opt_list ~sep:",@ " pp_term.marked) s.sp_writes
+  else
+    pp_print_opt_list ~prefix:"@ @[<hv 2>writes { " ~sep:",@ " ~suffix:"@] }" pp_term.marked fmt s.sp_writes;
   pp_print_list pp_post fmt s.sp_post;
   pp_print_opt_list ~prefix:"@ " ~sep:"@ " pp_xpost fmt s.sp_xpost;
   pp_print_opt_list ~prefix:"@ @[<hv 2>alias { " ~sep:",@ " ~suffix:"@] }" pp_alias fmt s.sp_alias;
   pp_variants fmt s.sp_variant;
   pp_bool ~true_:"@ diverges" fmt s.sp_diverge;
-  pp_bool ~true_:"@ partial" fmt s.sp_partial;
+  pp_bool ~true_:"@ partial" fmt s.sp_partial
 
 and pp_pattern =
   let pp_pattern_raw fmt p =
@@ -831,13 +947,14 @@ and pp_decl fmt = function
         | Decl.Plemma -> "lemma"
         | Decl.Paxiom -> "axiom"
         | Decl.Pgoal -> "goal" in
+      let id = remove_id_attr "useraxiom" id in
       fprintf fmt "@[<hv 2>%s %a:@ %a@]" keyword pp_id id pp_term.marked t
   | Dlet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e)}) ->
       pp_let_fun pp_expr fmt (id, ghost, kind, (binders, pty_opt, pat, mask, spec, e))
   | Dlet (id, ghost, kind, {expr_desc=Eany (params, kind', pty_opt, pat, mask, spec)}) ->
-      pp_let_any fmt (id, ghost, kind, (params, kind', pty_opt, pat, mask, spec))
+      pp_let_any fmt (id, ghost, kind, (params, kind', pty_opt, pat, mask, remove_witness_existence spec))
   | Dlet (id, ghost, kind, e) ->
-      pp_let pp_expr fmt (id, ghost, kind, e)
+      pp_let pp_expr is_ref_expr fmt (id, ghost, kind, e)
   | Drec defs ->
       let pp_fundefs = pp_print_list ~pp_sep:(pp_sep "@]@ @[<hv 2>with ") pp_fundef in
       fprintf fmt "@[<v>@[<v 2>let rec %a@]@]" pp_fundefs defs

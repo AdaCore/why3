@@ -1455,12 +1455,11 @@ let load_session (dir : string) =
   let file = Filename.concat dir db_filename in
   if Sys.file_exists file then
     try
-      let xml,sum_shape_version =
-        read_file_session_and_shapes (Termcode.Gshape.create ())
-          (* session.shapes.session_global_shapes *) dir file
-      in
+      let gs = Termcode.Gshape.create () in
+      let xml,sum_shape_version = read_file_session_and_shapes gs dir file in
       let session = empty_session ?sum_shape_version dir in
       build_session ?sum_shape_version session xml.Xml.content;
+      Termcode.Gshape.copy gs session.shapes.session_global_shapes;
       session
     with
     | Sys_error msg ->

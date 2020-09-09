@@ -83,7 +83,7 @@ module Base64
     else absurd
 
   (** character '=' *)
-  let function char_eq : char = chr 61
+  let function eq_symbol : char = chr 61
 
   (** `valid_b64_char c` is true, if and only if, `c` is in the table
   above *)
@@ -100,18 +100,18 @@ module Base64
     if 48 <= code c <= 57  then code c - 48 + 52 else (* 52 - 61 *)
     if code c = 43         then 62               else (* 62 *)
     if code c = 47         then 63               else (* 63 *)
-    if c = char_eq         then 0                else (* 0 *)
+    if c = eq_symbol       then 0                else (* 0 *)
     64                                                (* 64 *)
 
   let b642int (c: char) : int63
-    requires { valid_b64_char c || c = char_eq }
+    requires { valid_b64_char c || c = eq_symbol }
     ensures  { result = b642int c }
   = if 65 <= code c <= 90  then code c - 65      else
     if 97 <= code c <= 122 then code c - 97 + 26 else
     if 48 <= code c <= 57  then code c - 48 + 52 else
     if code c = 43         then 62               else
     if code c = 47         then 63               else
-    if eq_char c char_eq   then 0                else
+    if eq_char c eq_symbol then 0                else
     absurd
 
   lemma b642int_int2b64: forall i. 0 <= i < 64 -> b642int (int2b64 i) = i
@@ -119,14 +119,14 @@ module Base64
   (** `get_pad s` calculates the number of padding characters in the
   string `s` (between 0 and 2) *)
   function get_pad (s: string): int =
-    if length s >= 1 && s[length s - 1] = char_eq then
-        (if length s >= 2 && s[length s - 2] = char_eq then 2 else 1)
+    if length s >= 1 && s[length s - 1] = eq_symbol then
+        (if length s >= 2 && s[length s - 2] = eq_symbol then 2 else 1)
     else 0
 
   let get_pad (s: string): int63
     ensures { result = get_pad s }
-  = if length s >= 1 && eq_char s[length s - 1] char_eq then
-        (if length s >= 2 && eq_char s[length s - 2] char_eq then 2 else 1)
+  = if length s >= 1 && eq_char s[length s - 1] eq_symbol then
+        (if length s >= 2 && eq_char s[length s - 2] eq_symbol then 2 else 1)
     else 0
 
   (** `calc_pad s` returns the number of padding characters that will
@@ -155,9 +155,9 @@ module Base64
         s1[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4))) &&
     ( forall i. 0 <= i < length s2 - get_pad s2 -> valid_b64_char s2[i] ) &&
     ( get_pad s2 = 1 -> mod (b642int s2[length s2 - 2]) 4  = 0 /\
-                       s2[length s2 - 1] = char_eq ) &&
+                       s2[length s2 - 1] = eq_symbol ) &&
     ( get_pad s2 = 2 -> mod (b642int s2[length s2 - 3]) 16 = 0 /\
-                       s2[length s2 - 2] = s2[length s2 - 1] = char_eq ) &&
+                       s2[length s2 - 2] = s2[length s2 - 1] = eq_symbol ) &&
     calc_pad s1 = get_pad s2
 
   (** `valid_b64 s` is true, if and only if, `s` is a valid Base64
@@ -169,10 +169,10 @@ module Base64
     (mod (length s) 4 = 0) &&
     (forall i. 0 <= i < length s - get_pad s -> valid_b64_char s[i]) &&
     (get_pad s = 1 -> mod (b642int s[length s - 2]) 4  = 0 &&
-                      s[length s - 1] = char_eq) &&
+                      s[length s - 1] = eq_symbol) &&
     (get_pad s = 2 -> mod (b642int s[length s - 3]) 16 = 0 &&
-                      s[length s - 2] = char_eq &&
-                      s[length s - 1] = char_eq)
+                      s[length s - 2] = eq_symbol &&
+                      s[length s - 1] = eq_symbol)
 
   let lemma encoding_valid_b64 (s1 s2: string)
     requires { encoding s1 s2 }
@@ -187,12 +187,12 @@ module Base64
       let last = div (length s1) 3 in
       valid_b64_char s2[last*4] && valid_b64_char s2[last*4+1] &&
       if last * 3 + 1 = length s1 then
-        s2[last*4+2] = char_eq && s2[last*4+3] = char_eq
-      else valid_b64_char s2[last*4+2] && s2[last*4+3] = char_eq
+        s2[last*4+2] = eq_symbol && s2[last*4+3] = eq_symbol
+      else valid_b64_char s2[last*4+2] && s2[last*4+3] = eq_symbol
     };
     assert { forall i.
       (0 <= i < length s2 - get_pad s2 -> valid_b64_char s2[i]) &&
-      (length s2 - get_pad s2 <= i < length s2 -> s2[i] = char_eq) }
+      (length s2 - get_pad s2 <= i < length s2 -> s2[i] = eq_symbol) }
 
 
   (** the decode of a string is unique *)
@@ -218,12 +218,12 @@ module Base64
           ( if i * 3 + 2 < length s1 then
               s2[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
               s2[i*4+3] = int2b64 (mod (code a3) 64)
-            else (s2[i*4+2] = int2b64 (mod (code a2) 16 * 4) && s2[i*4+3] = char_eq)
+            else (s2[i*4+2] = int2b64 (mod (code a2) 16 * 4) && s2[i*4+3] = eq_symbol)
           )
         )      else
         (    s2[i*4+1] = int2b64 (mod (code a1) 4 * 16)
-          && s2[i*4+2] = char_eq
-          && s2[i*4+3] = char_eq)
+          && s2[i*4+2] = eq_symbol
+          && s2[i*4+3] = eq_symbol)
     };
     assert { forall i. 0 <= i < div (length s3) 4 ->
         let a1, a2, a3 = s1[i*3], s1[i*3+1], s1[i*3+2] in
@@ -233,12 +233,12 @@ module Base64
           ( if i * 3 + 2 < length s1 then
               s3[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
               s3[i*4+3] = int2b64 (mod (code a3) 64)
-            else (s3[i*4+2] = int2b64 (mod (code a2) 16 * 4) && s3[i*4+3] = char_eq)
+            else (s3[i*4+2] = int2b64 (mod (code a2) 16 * 4) && s3[i*4+3] = eq_symbol)
           )
         )      else
         (    s3[i*4+1] = int2b64 (mod (code a1) 4 * 16)
-          && s3[i*4+2] = char_eq
-          && s3[i*4+3] = char_eq)
+          && s3[i*4+2] = eq_symbol
+          && s3[i*4+3] = eq_symbol)
     };
     assert { forall i. 0 <= i < div (length s2) 4 ->
                 s2[i*4]   = s3[i*4]   /\ s2[i*4+1] = s3[i*4+1]
@@ -287,7 +287,7 @@ module Base64
     assert { padding = 1 -> mod (b642int r[length r - 2]) 4  = 0 };
     assert { padding = 2 -> mod (b642int r[length r - 3]) 16 = 0 };
     StringBuffer.truncate r (length r - padding);
-    StringBuffer.add_string r (make padding char_eq);
+    StringBuffer.add_string r (make padding eq_symbol);
     StringBuffer.contents r
 
   let decode (s: string) : string

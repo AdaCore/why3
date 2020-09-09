@@ -1,5 +1,13 @@
 :x: marks a potential source of incompatibility
 
+Version 1.3.2, September 5, 2020
+--------------------------------
+
+Bug fixes
+  * fixed compilation on BSD/macOS
+  * fixed `use_api` examples
+  * removed support for strings from the default variant of CVC4 1.7
+
 Version 1.3.1, March 24, 2020
 -----------------------------
 

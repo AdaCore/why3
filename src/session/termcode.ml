@@ -589,7 +589,8 @@ module Gshape = struct
           ""
     with Not_found -> ""
 
-  let t_shape_task_v5 ~expl gs t =
+  let t_bound_shape_task gs ~version ~expl t =
+    assert (is_bound_sum_shape_version version);
     let current_shape = ref [] in
     Buffer.clear Shape.shape_buffer;
     let pr = Ident.create_ident_printer [] in
@@ -605,7 +606,7 @@ module Gshape = struct
       | Dparam _ls -> ()
       | Dprop (_, _pr, f) ->
           let sh =
-            (try Shape.t_shape ~version:SV5 pr c m f with Shape.ShapeTooLong -> ());
+            (try Shape.t_shape ~version pr c m f with Shape.ShapeTooLong -> ());
             Buffer.contents Shape.shape_buffer in
           Buffer.clear Shape.shape_buffer;
           add_and_prepend gs current_shape sh
@@ -617,38 +618,13 @@ module Gshape = struct
     (* The order should be [|shape|] :: [|goal|] :: [|rest of decl|] *)
     !current_shape
 
-  let t_bound_shape_task gs ~version ~expl t =
-    if is_bound_sum_shape_version version then
-      t_shape_task_v5 gs ~expl t
-    else
-      assert false
-
   let empty_bshape = []
 
 end
 
-(*
-let time = ref 0.0
- *)
-
 let t_shape_task ~version ~expl t =
-  try
-    (*
-      let   tim = Unix.gettimeofday () in
-     *)
-    let s =
-      match version with
-      | SV1 | SV2 | SV3 | SV4 | SV5 -> Shape.t_shape_task ~version ~expl t
-      | SV6 -> raise InvalidShape
-    in
-    (*
-      let tim = Unix.gettimeofday () -. tim in
-      time := !time +. tim;
-      Format.eprintf "[Shape times] %f/%f@." tim !time;
-     *)
-    s
-  with InvalidShape -> empty_shape
-
+  if is_bound_sum_shape_version version then empty_shape else
+  Shape.t_shape_task ~version ~expl t
 
 (* Checksums *)
 

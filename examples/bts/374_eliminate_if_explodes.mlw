@@ -1,0 +1,25 @@
+module Lexer__read_token__subprogram_def
+ use        "int".Int
+ use bool.Bool
+
+ exception Exc7
+ exception Exc4
+
+ val c     : int 
+
+ let def  ()
+   = 
+     try
+        if c = 40 then ()
+        else if c = 41 then ()
+        else if c = 121 then ()
+        else if c = 35 then ()
+        else if andb (48 <= c) (c <= 57)then ()
+        else if orb (orb (andb (65 <= c) (c <= 90)) (andb (97 <= c) (c <= 122))) (orb (orb (orb (orb (orb (orb (andb (33 <= c) (c <= 33)) (andb (36 <= c) (c <= 38))) (andb (42 <= c) (c <= 43))) (andb (45 <= c) (c <= 47))) (andb (60 <= c) (c <= 64))) (andb (94 <= c) (c <= 95))) (andb (126 <= c) (c <= 126))) then raise Exc7 
+        else if c = 34 then raise Exc4 else ();
+      with
+      | Exc4 -> ()
+      | Exc7 -> ()
+     end;
+    assert { false }
+end

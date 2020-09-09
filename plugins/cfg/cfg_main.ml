@@ -249,17 +249,7 @@ let read_channel env _path file c =
   in
   Debug.dprintf debug "%s parsed successfully.@." file;
   let ptree = Modules (List.map translate f) in
-  let mm = try
-      Typing.type_mlw_file env [] (file ^ ".mlw") ptree
-    with
-      Loc.Located(loc,e) ->
-      let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
-      Format.eprintf "%a%s@." Loc.report_position loc msg;
-      Debug.dprintf debug "%a@."
-        (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
-        ptree;
-      exit 1
-  in
+  let mm = Typing.type_mlw_file env [] (file ^ ".mlw") ptree in
   Debug.dprintf debug "%a@." Mlw_printer.pp_mlw_file ptree;
   mm
 

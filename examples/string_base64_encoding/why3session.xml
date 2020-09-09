@@ -3,7 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="string_base64_encoding.mlw"/>
@@ -11,7 +13,7 @@
  <goal name="int2b64&#39;vc" expl="VC for int2b64" proved="true">
  <proof prover="2" timelimit="1"><result status="valid" time="0.05" steps="316"/></proof>
  </goal>
- <goal name="char_eq&#39;vc" expl="VC for char_eq" proved="true">
+ <goal name="eq_symbol&#39;vc" expl="VC for eq_symbol" proved="true">
  <proof prover="2" timelimit="1"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
  <goal name="int2b64_valid_4_char" proved="true">
@@ -744,26 +746,18 @@
     <goal name="encode&#39;vc.44.0.5" expl="VC for encode" proved="true">
     <transf name="assert" proved="true" arg1="(get_pad r = padding)">
      <goal name="encode&#39;vc.44.0.5.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; length r1 -&gt; r1[i] &lt;&gt; char_eq)">
+     <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; length r1 -&gt; r1[i] &lt;&gt; eq_symbol)">
       <goal name="encode&#39;vc.44.0.5.0.0" expl="asserted formula" proved="true">
-      <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; 64 -&gt; int2b64 i &lt;&gt; char_eq)">
+      <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; 64 -&gt; int2b64 i &lt;&gt; eq_symbol)">
        <goal name="encode&#39;vc.44.0.5.0.0.0" expl="asserted formula" proved="true">
-       <transf name="introduce_premises" proved="true" >
-        <goal name="encode&#39;vc.44.0.5.0.0.0.0" expl="asserted formula" proved="true">
-        <transf name="instantiate" proved="true" arg1="LoopInvariant" arg2="(div i 4)">
-         <goal name="encode&#39;vc.44.0.5.0.0.0.0.0" expl="asserted formula" proved="true">
-         <proof prover="2"><result status="valid" time="0.17" steps="201"/></proof>
-         </goal>
-        </transf>
-        </goal>
-       </transf>
+       <proof prover="3"><result status="valid" time="0.26" steps="36339"/></proof>
        </goal>
        <goal name="encode&#39;vc.44.0.5.0.0.1" expl="asserted formula" proved="true">
        <transf name="introduce_premises" proved="true" >
         <goal name="encode&#39;vc.44.0.5.0.0.1.0" expl="asserted formula" proved="true">
         <transf name="instantiate" proved="true" arg1="LoopInvariant" arg2="(div i 4)">
          <goal name="encode&#39;vc.44.0.5.0.0.1.0.0" expl="asserted formula" proved="true">
-         <proof prover="2"><result status="valid" time="0.86" steps="1661"/></proof>
+         <proof prover="1"><result status="valid" time="1.16" steps="1604"/></proof>
          </goal>
         </transf>
         </goal>
@@ -772,7 +766,7 @@
       </transf>
       </goal>
       <goal name="encode&#39;vc.44.0.5.0.1" expl="asserted formula" proved="true">
-      <proof prover="2" timelimit="30"><result status="valid" time="0.88" steps="1919"/></proof>
+      <proof prover="3"><result status="valid" time="0.64" steps="63900"/></proof>
       </goal>
      </transf>
      </goal>
@@ -787,26 +781,18 @@
     <goal name="encode&#39;vc.44.0.7" expl="VC for encode" proved="true">
     <transf name="assert" proved="true" arg1="(get_pad r = padding)">
      <goal name="encode&#39;vc.44.0.7.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; length r1 -&gt; r1[i] &lt;&gt; char_eq)">
+     <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; length r1 -&gt; r1[i] &lt;&gt; eq_symbol)">
       <goal name="encode&#39;vc.44.0.7.0.0" expl="asserted formula" proved="true">
-      <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; 64 -&gt; int2b64 i &lt;&gt; char_eq)">
+      <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; 64 -&gt; int2b64 i &lt;&gt; eq_symbol)">
        <goal name="encode&#39;vc.44.0.7.0.0.0" expl="asserted formula" proved="true">
-       <transf name="introduce_premises" proved="true" >
-        <goal name="encode&#39;vc.44.0.7.0.0.0.0" expl="asserted formula" proved="true">
-        <transf name="instantiate" proved="true" arg1="LoopInvariant" arg2="(div i 4)">
-         <goal name="encode&#39;vc.44.0.7.0.0.0.0.0" expl="asserted formula" proved="true">
-         <proof prover="2"><result status="valid" time="0.19" steps="309"/></proof>
-         </goal>
-        </transf>
-        </goal>
-       </transf>
+       <proof prover="3"><result status="valid" time="0.33" steps="35840"/></proof>
        </goal>
        <goal name="encode&#39;vc.44.0.7.0.0.1" expl="asserted formula" proved="true">
        <transf name="introduce_premises" proved="true" >
         <goal name="encode&#39;vc.44.0.7.0.0.1.0" expl="asserted formula" proved="true">
         <transf name="instantiate" proved="true" arg1="LoopInvariant" arg2="(div i 4)">
          <goal name="encode&#39;vc.44.0.7.0.0.1.0.0" expl="asserted formula" proved="true">
-         <proof prover="2"><result status="valid" time="0.89" steps="1777"/></proof>
+         <proof prover="1"><result status="valid" time="1.21" steps="1777"/></proof>
          </goal>
         </transf>
         </goal>
@@ -815,7 +801,7 @@
       </transf>
       </goal>
       <goal name="encode&#39;vc.44.0.7.0.1" expl="asserted formula" proved="true">
-      <proof prover="2" timelimit="30"><result status="valid" time="0.55" steps="675"/></proof>
+      <proof prover="3"><result status="valid" time="0.65" steps="61336"/></proof>
       </goal>
      </transf>
      </goal>
@@ -833,26 +819,18 @@
     <goal name="encode&#39;vc.44.0.10" expl="VC for encode" proved="true">
     <transf name="assert" proved="true" arg1="(get_pad r = padding)">
      <goal name="encode&#39;vc.44.0.10.0" expl="asserted formula" proved="true">
-     <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; length r1 -&gt; r1[i] &lt;&gt; char_eq)">
+     <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; length r1 -&gt; r1[i] &lt;&gt; eq_symbol)">
       <goal name="encode&#39;vc.44.0.10.0.0" expl="asserted formula" proved="true">
-      <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; 64 -&gt; int2b64 i &lt;&gt; char_eq)">
+      <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; 64 -&gt; int2b64 i &lt;&gt; eq_symbol)">
        <goal name="encode&#39;vc.44.0.10.0.0.0" expl="asserted formula" proved="true">
-       <transf name="introduce_premises" proved="true" >
-        <goal name="encode&#39;vc.44.0.10.0.0.0.0" expl="asserted formula" proved="true">
-        <transf name="instantiate" proved="true" arg1="LoopInvariant" arg2="(div i 4)">
-         <goal name="encode&#39;vc.44.0.10.0.0.0.0.0" expl="asserted formula" proved="true">
-         <proof prover="2"><result status="valid" time="0.23" steps="251"/></proof>
-         </goal>
-        </transf>
-        </goal>
-       </transf>
+       <proof prover="3"><result status="valid" time="0.31" steps="39444"/></proof>
        </goal>
        <goal name="encode&#39;vc.44.0.10.0.0.1" expl="asserted formula" proved="true">
        <transf name="introduce_premises" proved="true" >
         <goal name="encode&#39;vc.44.0.10.0.0.1.0" expl="asserted formula" proved="true">
         <transf name="instantiate" proved="true" arg1="LoopInvariant" arg2="(div i 4)">
          <goal name="encode&#39;vc.44.0.10.0.0.1.0.0" expl="asserted formula" proved="true">
-         <proof prover="2"><result status="valid" time="0.76" steps="1425"/></proof>
+         <proof prover="1"><result status="valid" time="1.06" steps="1425"/></proof>
          </goal>
         </transf>
         </goal>
@@ -861,7 +839,7 @@
       </transf>
       </goal>
       <goal name="encode&#39;vc.44.0.10.0.1" expl="asserted formula" proved="true">
-      <proof prover="2" timelimit="30"><result status="valid" time="2.07" steps="4576"/></proof>
+      <proof prover="3"><result status="valid" time="0.24" steps="34455"/></proof>
       </goal>
      </transf>
      </goal>
