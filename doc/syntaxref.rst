@@ -237,6 +237,8 @@ The syntax of WhyML terms is given in :token:`term`.
         : | `term` "[" `term` ".." `term` "]" "'"*   ; collection slice
         : | `term` "[" `term` ".." "]" "'"*   ; right-open slice
         : | `term` "[" ".." `term` "]" "'"*   ; left-open slice
+        : | "[|" (`term` "=>" `term` ";")* ("_" "=>" `term`)? "|]" ; function literal
+        : | "[|" (`term` ";")* "|]" ; function literal (domain over int)
         : | `term` `term`+   ; application
         : | `prefix_op` `term`   ; prefix operator
         : | `term` `infix_op_4` `term`   ; infix operator 4
@@ -346,15 +348,12 @@ unary negation. Tight operators cannot be used as infix operators, and
 thus do not require disambiguation.
 
 .. index:: bracket; syntax
-.. index:: collections; syntax
+.. index:: collections; syntax; function literals
 .. rubric:: Specific syntax for collections
 
 In addition to prefix and infix operators, WhyML supports several mixfix
 bracket operators to manipulate various collection types: dictionaries,
 arrays, sequences, etc.
-
-TODO[CL]: document here the syntax for function literals. Do not
-forget to extend the grammar.
 
 Bracket operators do not have any predefined
 meaning and may be used to denote access and update operations for
@@ -372,6 +371,30 @@ infix operator ``(+)`` may be called ``(+)'spec`` or ``(+)_spec``. As
 with normal identifiers, names with a letter after a prime, such as
 ``(+)'spec``, can only be introduced by Why3, and not by the user in a
 WhyML source.
+
+Functions can be written using a special syntax for `function
+literals`. The function literal ``[|t1 => u1; ...; tn => un|]``, where
+``t1 ... tn`` have some type ``'a`` and ``u1 ... un`` some type
+``'b``, represents the term (or expression) of the form ``fun x -> if
+x = t1 then u1 else if ... else if x = tn then un else nondet_value``,
+where ``nondet_value`` represents some non-deterministic value. It is
+possible to avoid the non-deterministic value by specifying a default
+value such as ``[|t1 => u1; ...; tn => un; _ => d|]``, where
+``d:'a``. This represents the function ``fun x -> if x = t1
+then u1 else if ... else if x = tn then un else d``.
+
+When the domain of the function ranges over the ``int``
+type it is possible to write ``[|t1;t2;t3|]`` instead of ``[|0 => t1;
+1 => t2; 2 => t3|]``.
+
+TODO: move this into a better place
+
+When writing function literal expressions, it is naturally required
+that equality is defined for the type of the function literal's
+domain. For the expression ``[|t1 => u1|]`` to be well typed, if
+``t1`` is of type ``t`` then the function ``val (=) (_ _: t): bool``
+should be visible in the current scope. This problem does not appear in terms
+because equality is polymorphic.
 
 .. index:: at; syntax
 .. index:: old; syntax
@@ -544,6 +567,8 @@ conjunction and disjunction, respectively.
         : | `expr` "[" `expr` ".." `expr` "]" "'"*   ; collection slice
         : | `expr` "[" `expr` ".." "]" "'"*   ; right-open slice
         : | `expr` "[" ".." `expr` "]" "'"*   ; left-open slice
+        : | "[|" (`expr` "=>" `expr` ";")* ("_" "=>" `expr`)? "|]" ; function literal
+        : | "[|" (`expr` ";")* "|]" ; function literal (domain over int)
         : | `expr` `expr`+   ; application
         : | `prefix_op` `expr`   ; prefix operator
         : | `expr` `infix_op_4` `expr`   ; infix operator 4
@@ -602,7 +627,6 @@ conjunction and disjunction, respectively.
     invariant: "invariant" "{" `term` "}"   ; loop and type invariant
     variant: "variant" "{" `variant_term` ("," `variant_term`)* "}"   ; termination variant
     variant_term: `term` ("with" `lqualid`)?   ; variant term + WF-order
-
 
 .. index:: ghost expressions
 .. rubric:: Ghost expressions
