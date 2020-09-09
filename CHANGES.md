@@ -7,6 +7,7 @@ Bug fixes
   * fixed compilation on BSD/macOS
   * fixed `use_api` examples
   * removed support for strings from the default variant of CVC4 1.7
+  * fixed custom editors for provers not being saved
 
 Version 1.3.1, March 24, 2020
 -----------------------------
