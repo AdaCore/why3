@@ -29,7 +29,6 @@ case (Z_le_dec 0 (n mod (Zpos d))); intros H2.
 * destruct (H2 H0).
 Qed.
 
-
 (* Why3 goal *)
 Lemma cdiv_cases :
   forall (n:Numbers.BinNums.Z) (d:Numbers.BinNums.Z),
@@ -42,7 +41,7 @@ Lemma cdiv_cases :
   ((n <= 0%Z)%Z -> (d < 0%Z)%Z ->
    ((ZArith.BinInt.Z.quot n d) = (int.EuclideanDivision.div (-n)%Z (-d)%Z))).
   intros n d.
-  destruct d as [|d|d]; destruct n as [|n|n]; intuition (try contradiction; try discriminate; auto).
+  destruct d as [|d|d]; destruct n as [|n|n]; intuition (try discriminate; try contradiction).
     + assert (NZ_d:((Zpos d) <> 0)%Z) by discriminate.
       rewrite (Z.quot_div (Z.pos n) (Z.pos d) NZ_d).
       rewrite on_pos_euclidean_is_div.
@@ -83,7 +82,7 @@ Lemma cmod_cases :
   omega.
   rewrite H.
   assert (H2:=cdiv_cases n d).
-  intuition.
+  intuition idtac.
   + rewrite H1.
     reflexivity.
   + rewrite H4.

@@ -45,7 +45,7 @@ Lemma Mod_bound :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), ~ (y = 0%Z) ->
   (0%Z <= (mod1 x y))%Z /\ ((mod1 x y) < (ZArith.BinInt.Z.abs y))%Z.
 intros x y Zy.
-zify.
+assert (H := Zabs_spec y).
 assert (H1 := Z_mod_neg x y).
 assert (H2 := Z_mod_lt x y).
 unfold mod1, div.

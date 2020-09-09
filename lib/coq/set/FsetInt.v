@@ -132,7 +132,7 @@ Qed.
 
 Lemma seqZ_le2: forall len x l, List.In x (seqZ l len) -> (x < l + Z.of_nat len)%Z.
 Proof.
-induction len; simpl; intuition.
+induction len; simpl; intuition idtac.
 - subst. zify. omega.
 - eapply IHlen in H0. zify. omega.
 Qed.
@@ -244,13 +244,11 @@ split.
   {
     eapply Nat.le_antisymm.
     + eapply List.NoDup_incl_length. eapply seqZ_NoDup. intro. rewrite H2.
-      rewrite seqZ_In_iff. destruct Z_le_dec; try destruct Z_lt_dec; intuition.
+      rewrite seqZ_In_iff. destruct Z_le_dec; try destruct Z_lt_dec; intuition idtac.
       rewrite Z2Nat.id in H5; omega.
     + eapply List.NoDup_incl_length. assumption. intro. rewrite H2.
-      rewrite seqZ_In_iff. destruct Z_le_dec; try destruct Z_lt_dec; intuition.
-      rewrite Z2Nat.id; omega. 
-      inversion H3.
-      inversion H3.
+      rewrite seqZ_In_iff. destruct Z_le_dec; try destruct Z_lt_dec; intuition (try discriminate).
+      rewrite Z2Nat.id; omega.
   }
   rewrite <- H3. rewrite seqZ_length. rewrite Z2Nat.id; omega.
 + intros. destruct a. 
