@@ -224,6 +224,7 @@ The syntax of WhyML terms is given in :token:`term`.
         : | `real`   ; real constant
         : | "true" | "false"   ; Boolean constant
         : | "()"   ; empty tuple
+        : | `string` ; string constant
         : | `qualid`   ; qualified identifier
         : | `qualifier`? "(" `term` ")"   ; term in a scope
         : | `qualifier`? "begin" `term` "end"   ; idem
@@ -530,6 +531,7 @@ conjunction and disjunction, respectively.
         : | `real`   ; real constant
         : | "true" | "false"   ; Boolean constant
         : | "()"   ; empty tuple
+        : | `string` ; string constant
         : | `qualid`   ; identifier in a scope
         : | `qualifier`? "(" `expr` ")"   ; expression in a scope
         : | `qualifier`? "begin" `expr` "end"   ; idem
