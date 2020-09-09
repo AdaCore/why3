@@ -255,61 +255,62 @@ let is_true t = match t.term_desc with
 let no_vcs_in_spec spec =
   spec.sp_post = [] && spec.sp_xpost = [] && spec.sp_variant = []
 
-(** Check (syntactically) if an expression does not trigger any VCs, i.e. it does
-    not contain any application (idapp, apply, infix, or innfix, any, which may
-    generate preconditions), declaration (fun, rec, which may generate
-    postconditions), or logical statement (absurd, assert, check). *)
-let rec no_vcs_in_expr e = match e.expr_desc with
+(** Check (syntactically) if an expression has no side-effects (assignments, and,
+   potentially, applications), and does not trigger any VCs, i.e. it does not contain any
+   application (idapp, apply, infix, or innfix, any, which may generate preconditions),
+   declaration (fun, rec, which may generate postconditions), or logical statement
+   (absurd, assert, check). *)
+let rec no_vcs_no_side_effects e = match e.expr_desc with
   | Eref | Etrue | Efalse | Econst _ | Eident _ | Easref _ ->
       true
   | Eidapp _ | Eapply _ | Einfix _ | Einnfix _ ->
-      false (* preconditions of the callee *)
+      false (* VCs from preconditions of the callee, possible side-effects *)
   | Elet (_, _, _, e1, e2) ->
-      no_vcs_in_expr e1 && no_vcs_in_expr e2
+      no_vcs_no_side_effects e1 && no_vcs_no_side_effects e2
   | Erec (funs, e) ->
       let aux (_, _, _, _, _, _, _, spec, e) =
-        no_vcs_in_spec spec && no_vcs_in_expr e in
-      List.for_all aux funs && no_vcs_in_expr e
+        no_vcs_in_spec spec && no_vcs_no_side_effects e in
+      List.for_all aux funs && no_vcs_no_side_effects e
   | Efun (_, _, _, _, spec, e) ->
-      no_vcs_in_spec spec && no_vcs_in_expr e
+      no_vcs_in_spec spec && no_vcs_no_side_effects e
   | Eany (_, _, _, _, _, spec) ->
       spec.sp_pre = [] (* existence *)
   | Etuple es ->
-      List.for_all no_vcs_in_expr es
+      List.for_all no_vcs_no_side_effects es
   | Erecord fs ->
-      List.for_all (fun (_, e) -> no_vcs_in_expr e) fs
+      List.for_all (fun (_, e) -> no_vcs_no_side_effects e) fs
   | Eupdate (e, fs) ->
-      no_vcs_in_expr e &&
-      List.for_all (fun (_, e) -> no_vcs_in_expr e) fs
+      no_vcs_no_side_effects e &&
+      List.for_all (fun (_, e) -> no_vcs_no_side_effects e) fs
   | Eassign ans ->
-      List.for_all (fun (e1, _, e2) -> no_vcs_in_expr e1 && no_vcs_in_expr e2) ans
+      false
   | Esequence (e1, e2) ->
-      no_vcs_in_expr e1 && no_vcs_in_expr e2
+      no_vcs_no_side_effects e1 && no_vcs_no_side_effects e2
   | Eif (e1, e2, e3) ->
-      no_vcs_in_expr e1 && no_vcs_in_expr e2 && no_vcs_in_expr e3
+      no_vcs_no_side_effects e1 && no_vcs_no_side_effects e2 && no_vcs_no_side_effects e3
   | Ewhile (e1, inv, var, e2) ->
       inv = [] && var = [] &&
-      no_vcs_in_expr e1 && no_vcs_in_expr e2
+      no_vcs_no_side_effects e1 && no_vcs_no_side_effects e2
   | Eand (e1, e2) | Eor (e1, e2) ->
-      no_vcs_in_expr e1 && no_vcs_in_expr e2
+      no_vcs_no_side_effects e1 && no_vcs_no_side_effects e2
   | Enot e ->
-      no_vcs_in_expr e
+      no_vcs_no_side_effects e
   | Ematch (e, regs, exns) ->
-      no_vcs_in_expr e &&
-      List.for_all (fun (_, e) -> no_vcs_in_expr e) regs &&
-      List.for_all (fun (_, _, e) -> no_vcs_in_expr e) exns
+      no_vcs_no_side_effects e &&
+      List.for_all (fun (_, e) -> no_vcs_no_side_effects e) regs &&
+      List.for_all (fun (_, _, e) -> no_vcs_no_side_effects e) exns
   | Eabsurd ->
       false
   | Epure _ | Eidpur _ | Eraise (_, None) ->
       true
   | Eraise (_, Some e) | Eexn (_, _, _, e) | Eoptexn (_, _, e) ->
-      no_vcs_in_expr e
+      no_vcs_no_side_effects e
   | Efor (_, e1, _, e2, inv, e3) ->
-      inv = [] && no_vcs_in_expr e1 && no_vcs_in_expr e2 && no_vcs_in_expr e3
+      inv = [] && no_vcs_no_side_effects e1 && no_vcs_no_side_effects e2 && no_vcs_no_side_effects e3
   | Eassert (Expr.(Assert|Check), _) -> false
   | Eassert (Expr.Assume, _) -> true
   | Escope (_, e) | Elabel (_, e) | Ecast (e, _) | Eghost e | Eattr (_, e) ->
-      no_vcs_in_expr e
+      no_vcs_no_side_effects e
 
 (* The conversion from Gnat_ast to Ptree is parameterized in ['a]/[t] by the targeted type
    ([Ptree.expr] or [Ptree.term]) and the corresponding smart constructors from
@@ -580,9 +581,17 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
           force_one (conversion_error r.name.info.id "qualified or empty identifier")
             (mk_idents_of_identifier ~notation:None
                (mk_identifier_labels r.name) r.name) in
-        let def = mk_of_expr r.def in
-        let body = mk_of_expr r.context in
-        mk_let id def body
+        expr_or_term
+          ~expr:(fun () ->
+              let def = mk_expr_of_expr r.def in
+              let body = mk_expr_of_expr r.context in
+              if id.id_str = "_" && no_vcs_no_side_effects def
+              then body
+              else E.mk_let id def body)
+          ~term:(fun () ->
+              let def = mk_term_of_expr r.def in
+              let body = mk_term_of_expr r.context in
+              T.mk_let id def body) ()
 
     | Elsif _ ->
         conversion_error node.info.id "unexpected elsif" ()
@@ -852,7 +861,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         expr_only
           E.(let post = mk_term_of_pred r.post in
              let expr = mk_expr_of_prog r.expr in
-             if is_true post && no_vcs_in_expr expr then
+             if is_true post && no_vcs_no_side_effects expr then
                mk_tuple []
              else
                let pat = P.mk_wild () in
