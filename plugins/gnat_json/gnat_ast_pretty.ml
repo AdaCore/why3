@@ -413,7 +413,7 @@ and pp_raise fmt (n : raise_id) =
 and pp_elsif fmt (n : elsif_id) =
   match n.desc with
   | Elsif r ->
-    Format.fprintf fmt "@[(if@ %a@ then@ @[%a@]@@])"
+    Format.fprintf fmt "@[(if@ %a@ then@ @[%a@]@])"
       pp_why_node r.condition pp_why_node r.then_part
 
 and pp_range_constant fmt (n : range_constant_id) =
