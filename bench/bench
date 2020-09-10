@@ -312,6 +312,45 @@ extract_and_test_wmp () {
     fi
 }
 
+extract_and_test_c () {
+    dir=$1
+    shift
+    printf "  $dir... "
+    printf "clean... "
+    if BENCH=yes make -C $dir clean > /dev/null; then
+        printf "extract... "
+        if BENCH=yes make -C $dir extract > /dev/null; then
+            printf "compile... "
+            if BENCH=yes make -C $dir cfiles > /dev/null; then
+                printf "execute... "
+                if BENCH=yes make -C $dir tests > /dev/null; then
+                    echo "ok"
+                else
+                    echo "execution failed!"
+                    echo BENCH=yes make -C $dir tests
+                    BENCH=yes make -C $dir tests
+                    exit 1
+                fi
+            else
+                echo "compilation failed!"
+                echo BENCH=yes make -C $dir cfiles
+                BENCH=yes make -C $dir cfiles
+                exit 1
+            fi
+        else
+            echo "extract failed!"
+            echo BENCH=yes make -C $dir extract
+            BENCH=yes make -C $dir extract
+            exit 1
+        fi
+    else
+        echo "clean failed!"
+        echo BENCH=yes make -C $dir clean
+        BENCH=yes make -C $dir clean
+        exit 1
+    fi
+}
+
 list_stuff () {
     pgm="bin/why3$suffix"
     printf '  %s ' "$1"
@@ -325,9 +364,24 @@ list_stuff () {
 }
 
 test_mlw_printer () {
-    python3 -m sexpdata || return
-    bench/test_mlw_printer bench/valid/*.mlw
-    bench/test_mlw_printer bench/typing/good/*.mlw
+    why3pp="bin/why3pp$suffix"
+    if ! python3 -m sexpdata 2> /dev/null; then
+        echo "Skipping (Python module sexpdata not installed)" >&2
+        return
+    fi
+    if ! "$why3pp" --output=sexp <(echo '') > /dev/null 2>&1; then
+        echo 'Skipping (s-exp output unavailable for why3pp)' >&2
+        return
+    fi
+    find stdlib examples bench -name '*.mlw' \
+         -not -path '*/\.*' \
+         -not -path "bench/parsing/bad/*" \
+         -not -path "bench/programs/bad-to-keep/*" \
+         -not -path "examples/in_progress/*" |
+    sort | \
+    while read filename; do
+        bench/test_mlw_printer "$why3pp" "$filename" || exit 1
+    done
 }
 
 rac () {
@@ -533,12 +587,14 @@ echo ""
 
 echo "=== Checking extraction to C ==="
 extract_and_test_wmp examples/multiprecision
+extract_and_test_c examples/c_cursor
 echo ""
 fi
 
 if enabled replay-without-shapes; then
 echo "=== Checking replay without shapes ==="
-replay_without_shape examples/replay
+replay_without_shape examples/tests/replay
+echo ""
 fi
 
 if enabled replay; then
@@ -556,6 +612,7 @@ replay examples/WP_revisited --merging-only
 replay examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps --merging-only"
 replay examples/bitvectors "-L examples/bitvectors --merging-only"
 replay examples/avl "-L examples/avl --merging-only"
+replay examples/c_cursor "-L examples/c_cursor --merging-only"
 replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication --merging-only"
 replay examples/double_wp "-L examples/double_wp --merging-only"
 #replay examples/in_progress/ring_decision "-L examples/in_progress/ring_decision --merging-only"
@@ -578,7 +635,7 @@ fi
 
 if enabled realizations; then
 echo "=== Checking realizations ==="
-exec bench/check_realizations.sh
+bench/check_realizations.sh || exit $?
 fi
 
 if enabled mlwprinter; then

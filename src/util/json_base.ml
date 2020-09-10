@@ -39,13 +39,14 @@ let standard_float fmt f = fprintf fmt "%f" f
 let float fmt f = fprintf fmt "%g" f
 
 let print_json_field key value_pr fmt value =
-  fprintf fmt "%a : %a " string key value_pr value
+  fprintf fmt "@[<hv 1>%a:@ %a@]" string key value_pr value
 
 let list pr fmt l =
   if l = [] then fprintf fmt "[]"
   else
-    Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma
-      pr fmt l
+    fprintf fmt "@[<hv 1>%a@]"
+      (Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma pr)
+      l
 
 let print_map_binding key_to_str value_pr fmt binding =
   let (key, value) = binding in
@@ -54,8 +55,9 @@ let print_map_binding key_to_str value_pr fmt binding =
 let map_bindings key_to_str value_pr fmt map_bindings =
   if map_bindings = [] then fprintf fmt "{}"
   else
-    Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.comma
-      (print_map_binding key_to_str value_pr) fmt map_bindings
+    fprintf fmt "@[<hv 1>%a@]"
+     (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.comma
+      (print_map_binding key_to_str value_pr)) map_bindings
 
 (* Convert a list of bindings into a map *)
 let convert_record l =

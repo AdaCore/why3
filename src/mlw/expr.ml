@@ -636,12 +636,7 @@ let rec post_of_expr res e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_true
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Evar v -> post_of_term res (t_var v.pv_vs)
-  | Econst (Constant.ConstInt _ as c)->
-      post_of_term res (t_const c ty_int)
-  | Econst (Constant.ConstReal _ as c)->
-      post_of_term res (t_const c ty_real)
-  | Econst (Constant.ConstStr _ as c) ->
-      post_of_term res (t_const c ty_str)
+  | Econst c -> post_of_term res (t_const c (ty_of_ity e.e_ity))
   | Epure t -> post_of_term res t
   | Eghost e | Eexn (_,e) -> post_of_expr res e
   | Eexec (_,c) ->

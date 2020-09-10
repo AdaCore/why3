@@ -496,7 +496,7 @@ meta_arg:
 (* Type declarations *)
 
 type_decl:
-| attrs(lident_nq) ty_var* typedefn invariant* type_witness
+| attrs(lident_nq) ty_var* typedefn type_invariant* type_witness
   { let (vis, mut), def = $3 in
     { td_ident = $1; td_params = $2;
       td_vis = vis; td_mut = mut;
@@ -1332,6 +1332,10 @@ xsymbol:
 invariant:
 | INVARIANT option(ident_nq) LEFTBRC term RIGHTBRC
     { name_term $2 "LoopInvariant" $4 }
+
+type_invariant:
+| INVARIANT option(ident_nq) LEFTBRC term RIGHTBRC
+    { name_term $2 "TypeInvariant" $4 }
 
 variant:
 | VARIANT LEFTBRC comma_list1(single_variant) RIGHTBRC { $3 }

@@ -14,7 +14,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="Transitivity" proved="true">
+<theory name="Transitivity">
+ <goal name="transitivity">
+ </goal>
  <goal name="G" proved="true">
  <transf name="apply" proved="true" arg1="transitivity" arg2="with" arg3="c">
   <goal name="G.0" expl="apply premises" proved="true">
@@ -26,7 +28,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="Transitivity2" proved="true">
+<theory name="Transitivity2">
+ <goal name="t">
+ </goal>
  <goal name="G" proved="true">
  <transf name="apply" proved="true" arg1="t" arg2="with" arg3="c,0">
   <goal name="G.0" expl="apply premises" proved="true">
@@ -113,6 +117,8 @@
  </goal>
 </theory>
 <theory name="Hide">
+ <goal name="h">
+ </goal>
  <goal name="G">
  <transf name="hide" arg1="t" arg2="(1 + 1)">
   <goal name="G.0">
@@ -171,6 +177,8 @@
  </goal>
 </theory>
 <theory name="Remove">
+ <goal name="h">
+ </goal>
  <goal name="G">
  <transf name="remove" arg1="h">
   <goal name="G.0">
@@ -243,6 +251,8 @@
  </goal>
 </theory>
 <theory name="Unfold">
+ <goal name="h">
+ </goal>
  <goal name="G">
  <transf name="unfold" arg1="p">
   <goal name="G.0">
