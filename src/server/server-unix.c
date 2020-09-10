@@ -43,6 +43,10 @@
 #include "logging.h"
 #include "proc.h"
 
+#if defined(__OpenBSD__) && !defined(RLIMIT_AS)
+#define RLIMIT_AS RLIMIT_DATA
+#endif
+
 #define READ_ONCE 1024
 
 typedef struct {
