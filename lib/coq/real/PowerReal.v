@@ -23,6 +23,13 @@ Require real.FromInt.
 Require real.Square.
 Require real.ExpLog.
 
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
 Import Rpower.
 
 (* Why3 comment *)

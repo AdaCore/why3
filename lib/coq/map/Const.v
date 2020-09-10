@@ -16,6 +16,13 @@ Require BuiltIn.
 Require HighOrd.
 Require map.Map.
 
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
 (* Why3 assumption *)
 Definition const {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} 
     (v:b) : a -> b :=

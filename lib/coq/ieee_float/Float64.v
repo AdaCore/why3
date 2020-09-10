@@ -26,6 +26,13 @@ Require bv.Pow2int.
 Require ieee_float.RoundingMode.
 Require ieee_float.GenericFloat.
 
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
 Import Flocq.Core.Core.
 Import Flocq.IEEE754.Binary.
 Import ieee_float.RoundingMode.

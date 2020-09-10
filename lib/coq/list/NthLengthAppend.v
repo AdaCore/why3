@@ -23,6 +23,13 @@ Require list.NthLength.
 Require list.Append.
 
 (* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
+(* Why3 goal *)
 Lemma nth_append_1 {a:Type} {a_WT:WhyType a} :
   forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a)
     (i:Numbers.BinNums.Z),

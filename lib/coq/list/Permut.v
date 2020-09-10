@@ -21,6 +21,13 @@ Require list.Append.
 Require list.Reverse.
 Require list.NumOcc.
 
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
 (* Why3 assumption *)
 Definition permut {a:Type} {a_WT:WhyType a} (l1:Init.Datatypes.list a)
     (l2:Init.Datatypes.list a) : Prop :=

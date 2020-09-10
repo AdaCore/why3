@@ -22,6 +22,13 @@ Require real.Real.
 Require real.Abs.
 Require real.Square.
 
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
 Require Import Reals.
 
 (* Why3 comment *)

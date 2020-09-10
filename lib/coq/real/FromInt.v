@@ -16,6 +16,13 @@ Require BuiltIn.
 Require int.Int.
 Require real.Real.
 
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
 (* Why3 comment *)
 (* from_int is replaced with (BuiltIn.IZR x) by the coq driver *)
 

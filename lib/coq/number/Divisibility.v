@@ -19,6 +19,13 @@ Require int.EuclideanDivision.
 Require int.ComputerDivision.
 Require number.Parity.
 
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
 (* Hack so that Why3 does not override the notation below.
 
 (* Why3 assumption *)

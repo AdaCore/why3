@@ -18,6 +18,13 @@ Require int.Int.
 Require map.Map.
 
 (* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
+(* Why3 goal *)
 Definition occ {a:Type} {a_WT:WhyType a} :
   a -> (Numbers.BinNums.Z -> a) -> Numbers.BinNums.Z -> Numbers.BinNums.Z ->
   Numbers.BinNums.Z.

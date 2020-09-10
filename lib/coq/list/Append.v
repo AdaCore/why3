@@ -19,6 +19,13 @@ Require list.Length.
 Require list.Mem.
 
 (* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
+(* Why3 goal *)
 Lemma infix_plpl'def {a:Type} {a_WT:WhyType a} :
   forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a),
   ((Init.Datatypes.app l1 l2) =

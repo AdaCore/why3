@@ -15,6 +15,13 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require list.List.
 
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
 (* Why3 assumption *)
 Fixpoint mem {a:Type} {a_WT:WhyType a} (x:a)
   (l:Init.Datatypes.list a) {struct l}: Prop :=

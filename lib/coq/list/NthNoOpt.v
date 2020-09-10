@@ -17,6 +17,13 @@ Require int.Int.
 Require list.List.
 
 (* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
+(* Why3 goal *)
 Definition nth {a:Type} {a_WT:WhyType a} :
   Numbers.BinNums.Z -> Init.Datatypes.list a -> a.
 exact (fix nth n l := match l with nil => why_inhabitant | cons h t => if Zeq_bool n Z0 then h else nth (n - 1)%Z t end).

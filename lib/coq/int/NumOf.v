@@ -16,6 +16,13 @@ Require BuiltIn.
 Require HighOrd.
 Require int.Int.
 
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
 Fixpoint numof_aux (f : Z -> bool) (a : Z) (n : nat) : Z :=
   match n with
     | S n => (numof_aux f a n + (if f (a + (Z.of_nat n)) then 1%Z else 0%Z))%Z

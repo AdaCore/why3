@@ -18,6 +18,13 @@ Require list.List.
 Require option.Option.
 
 (* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
+
+(* Why3 goal *)
 Definition nth {a:Type} {a_WT:WhyType a} :
   Numbers.BinNums.Z -> Init.Datatypes.list a -> Init.Datatypes.option a.
 exact (fix nth n l := match l with nil => None | cons h t => if Zeq_bool n Z0 then Some h else nth (n - 1)%Z t end).
