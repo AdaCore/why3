@@ -33,7 +33,7 @@ module Heap
   axiom min_def:
     forall h. 0 < size h -> is_minimum (minimum h) h
 
-  val empty () : heap
+  val empty : heap
     ensures { size result = 0 }
     ensures { forall x. occ x result = 0 }
 
@@ -163,11 +163,10 @@ module LeftistHeap
    predicate leftist_heap (h: t) =
     is_heap h && leftist h
 
-  let empty () : t
+  let empty : t = E
     ensures { size result = 0 }
     ensures { forall x. occ x result = 0 }
     ensures { leftist_heap result }
-  = E
 
   let is_empty (h: t) : bool
     ensures { result <-> size h = 0 }

@@ -59,12 +59,11 @@ module BraunHeaps
   | Node l _ r -> (size l = size r || size l = size r + 1) && inv l && inv r
   end
 
-  let empty () : tree elt
+  let constant empty : tree elt = Empty
     ensures { heap result }
     ensures { inv result }
     ensures { size result = 0 }
     ensures { forall e. not (mem e result) }
-    = Empty
 
   let get_min (t: tree elt) : elt
     requires { heap t && 0 < size t }
