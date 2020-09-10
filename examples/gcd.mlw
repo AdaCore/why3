@@ -28,17 +28,17 @@ module EuclideanAlgorithmIterative
     requires { u0 >= 0 /\ v0 >= 0 }
     ensures  { result = gcd u0 v0 }
   =
-    let u = ref u0 in
-    let v = ref v0 in
-    while !v <> 0 do
-      invariant { !u >= 0 /\ !v >= 0 }
-      invariant { gcd !u !v = gcd u0 v0 }
-      variant   { !v }
-      let tmp = !v in
-      v := !u % !v;
-      u := tmp
+    let ref u = u0 in
+    let ref v = v0 in
+    while v <> 0 do
+      invariant { u >= 0 /\ v >= 0 }
+      invariant { gcd u v = gcd u0 v0 }
+      variant   { v }
+      let tmp = v in
+      v <- u % v;
+      u <- tmp
     done;
-    !u
+    u
 
 end
 

@@ -345,20 +345,17 @@ endif
 PARSERS=src/parser/parser_common.mly src/parser/parser.mly
 
 src/parser/parser_messages.ml: src/parser/handcrafted.messages
-	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
-	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --update-errors \
-	src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
-	diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; \
-	RET_CODE=$$?; \
-	if [ $$RET_CODE -ne 0 ]; then \
-		echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
+	@rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
+	@$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --update-errors \
+		src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
+	@if  ! diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; then \
+			echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
 contains an updated version that must be checked before replacing 'src/parser/handcrafted.messages'"; \
 		exit 1; \
 	fi
-	rm -f src/parser/handcrafted.messages.temp
+	@rm -f src/parser/handcrafted.messages.temp
 	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --compile-errors \
-	src/parser/handcrafted.messages > src/parser/parser_messages.ml.tmp
-	mv src/parser/parser_messages.ml.tmp src/parser/parser_messages.ml
+		src/parser/handcrafted.messages > src/parser/parser_messages.ml
 
 clean::
 	rm -f src/parser/parser_messages.ml.tmp src/parser/handcrafted.messages.temp

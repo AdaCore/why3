@@ -703,15 +703,26 @@ module RefreshLetBindings = struct
     let id' = id_clone (pv_name pv) in
     create_pvsymbol id' pv.pv_ity
 
-  let rec expr ((accv, accf) as acc) e =
+  let rec expr ((accv, accf, accx) as acc) e =
     let acc,e = e_map_fold expr acc e in
     let mk e_node = { e with e_node = e_node } in
     match e.e_node with
-    (* collect let-bindings *)
+    (* collect bindings *)
     | Elet (ld, e) ->
        let acc, ld' = ldef acc ld in
        let acc, e' = expr acc e in
        acc, mk (Elet (ld', e'))
+    | Ematch (e, bl, el) ->
+        let acc, bl = Lists.map_fold_left match_pat acc bl in
+        let acc, el = Lists.map_fold_left match_exn acc el in
+        acc, mk (Ematch (e, bl, el))
+    | Eexn (xs, ty, e) ->
+        assert (not (Mid.mem xs.xs_name accx));
+        let id = id_clone xs.xs_name in
+        let xs = create_xsymbol id ~mask:xs.xs_mask xs.xs_ity in
+        let acc = accv, accf, Mid.add xs.xs_name xs accx in
+        let acc, e = expr acc e in
+        acc, mk (Eexn (xs, ty, e))
     (* apply transformation under lambdas *)
     | Efun (vl, e) ->
        assert (List.for_all (fun (id,_,_) -> not (Mid.mem id accv)) vl);
@@ -724,23 +735,24 @@ module RefreshLetBindings = struct
     | Eapp (rs, el, p) ->
        let rs' = Mrs.find_def rs rs accf in
        acc, mk (Eapp (rs', el, p))
-    | _ -> acc, e
+    | Eraise (xs, e) ->
+        let xs = Mid.find_def xs xs.xs_name accx in
+        acc, mk (Eraise (xs, e))
+    | Econst _ | Eif _ | Eassign _ | Eblock _ | Ewhile _ | Efor _
+    | Eignore _ | Eabsurd -> acc, e
 
   and pvs accv pv = Mid.find_def pv (pv_name pv) accv
 
-  and ldef ((accv, accf) as acc) ld =
+  and ldef ((accv, accf, accx) as acc) ld =
     match ld with
     | Lvar (pv, e) ->
-      let id = Translate.pv_name pv in
-      assert (not (Mid.mem id accv));
-      let pv' = clone_pv pv in
-      let acc = (Mid.add id pv' accv, accf) in
-      let acc', e' = expr acc e in
-      acc', Lvar (pv', e')
+        let (acc, pv) = refresh_pv acc pv in
+        let acc, e = expr acc e in
+        acc, Lvar (pv, e)
     | Lsym (rs, tv, rty, vl, e) ->
        assert (List.for_all (fun (id,_,_) -> not (Mid.mem id accv)) vl);
        let rs' = clone_rs rs in
-       let acc = (accv, Mrs.add rs rs' accf) in
+       let acc = (accv, Mrs.add rs rs' accf, accx) in
        let acc', e' = expr acc e in
        acc', Lsym (rs, tv, rty, vl, e')
     | Lany _ -> acc, ld
@@ -752,6 +764,7 @@ module RefreshLetBindings = struct
              let rs' = clone_rs rs in
              Mrs.add rs rs' acc, { rd with rec_sym = rs' })
            accf rl in
+       let acc = accv, accf, accx in
        let acc, rl =
          Lists.map_fold_left
            (fun acc rd ->
@@ -759,10 +772,49 @@ module RefreshLetBindings = struct
                        (fun (id,_,_) -> not (Mid.mem id accv))
                        rd.rec_args);
              let acc, e = expr acc rd.rec_exp in
-             acc, { rd with rec_exp = e }) (accv, accf) rl in
+             acc, { rd with rec_exp = e }) acc rl in
        acc, Lrec rl
 
-  let expr e = let _, e' = expr (Mid.empty, Mrs.empty) e in e'
+  and refresh_pv (accv, accf, accx) pv =
+    let id = Translate.pv_name pv in
+    assert (not (Mid.mem id accv));
+    let pv = clone_pv pv in
+    let acc = Mid.add id pv accv, accf, accx in
+    acc, pv
+
+  and match_pat acc (p, e) =
+    let rec aux acc = function
+      | Pwild ->
+          acc, Pwild
+      | Pvar vs ->
+          let pv = restore_pv vs in
+          let acc, pv = refresh_pv acc pv in
+          acc, Pvar pv.pv_vs
+      | Papp (ls, pl) ->
+          let acc, pl = Lists.map_fold_left aux acc pl in
+          acc, Papp (ls, pl)
+      | Ptuple pl ->
+          let acc, pl = Lists.map_fold_left aux acc pl in
+          acc, Ptuple pl
+      | Por (p1, p2) ->
+          let acc, p1 = aux acc p1 in
+          let acc, p2 = aux acc p2 in
+          acc, Por (p1, p2)
+      | Pas (pat, vs) ->
+          let pv = restore_pv vs in
+          let acc, pv = refresh_pv acc pv in
+          acc, Pas (pat, pv.pv_vs) in
+    let acc, p = aux acc p in
+    let acc, e = expr acc e in
+    acc, (p, e)
+
+  and match_exn ((_accv, _accf, accx) as acc) (xs, pl, e) =
+    let xs = Mid.find_def xs xs.xs_name accx in
+    let acc, pl = Lists.map_fold_left refresh_pv acc pl in
+    let acc, e = expr acc e in
+    acc, (xs, pl, e)
+
+  let expr e = let _, e' = expr (Mid.empty, Mrs.empty, Mid.empty) e in e'
 
 end
 

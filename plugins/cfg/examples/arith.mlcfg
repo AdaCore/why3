@@ -26,3 +26,31 @@ module Fib
     }
 
 end
+
+module Fact
+
+  (* Factorial computation, following Nielson and Nielson's implementation
+     in their book "Formal Methods -- An Appetizer" (Section 1.1, page 1) *)
+
+  use int.Int, int.Fact
+
+  let cfg fact (x0: int) : int
+    requires { x0 >= 0 }
+    ensures  { result = fact x0 }
+  = var y: int;
+    var x: int;
+    {
+      y <- 1;
+      x <- x0;
+      goto L1
+    }
+    L1 {
+      invariant I1 { 0 <= x <= x0 };
+      invariant I2 { fact x * y = fact x0 };
+      switch (x <= 0)
+      | True  -> y
+      | False -> y <- x * y; x <- x - 1; goto L1
+      end
+    }
+
+end

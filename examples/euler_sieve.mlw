@@ -1,0 +1,884 @@
+
+(** Euler's Sieve
+
+    This is a variant of Eratosthenes's sieve with complexity O(N),
+    where N is the upper limit of the sieve.
+    Cf https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes#Euler's_sieve
+
+    Euler's Sieve makes use of a linked list of all integers,
+    and marks composite numbers as in Eratosthenes's sieve.
+
+    In the program below, the linked list is implemented with an array
+    (where each integer is mapped to the next one) and negative values
+    are used to represent marked integers.
+    In addition, the list only contains the odd integers (to save half
+    of space).
+
+    Author: Josué Moreau (Université Paris-Saclay)
+*)
+
+module ArithmeticResults
+
+  use int.Int
+  use number.Divisibility
+  use number.Prime
+  use int.EuclideanDivision
+
+  let lemma mult_croissance_locale (n a: int)
+    requires { n > 0 /\ 0 <= a }
+    ensures  { n * a < n * (a + 1) } = ()
+
+  let rec lemma mult_croissance (n a b: int)
+    requires { n > 0 /\ 0 <= a < b }
+    ensures  { n * a < n * b }
+    variant  { b - a }
+    = if a + 1 = b then ()
+      else mult_croissance n (a + 1) b
+
+  let lemma comp_mult_2 (n k: int)
+    requires { n > 0 /\ k >= 2 }
+    ensures  { n * k >= n * 2 } = ()
+
+  let lemma div_croissance_locale1 (i n: int)
+    requires { 0 <= i /\ n > 0 }
+    ensures  { div i n <= div (i + 1) n } = ()
+
+  let rec lemma div_croissance1 (i j n: int)
+    requires { 0 <= i <= j /\ n > 0 }
+    ensures  { div i n <= div j n }
+    variant  { j - i }
+    = if i < j then
+        div_croissance1 i (j - 1) n
+
+  let rec lemma div_croissance_locale2 (m i: int)
+    requires { i > 0 /\ m >= 0 }
+    ensures  { div m (i + 1) <= div m i }
+    variant  { m }
+    = if m > 0 then div_croissance_locale2 (m - 1) i
+
+  let rec lemma div_croissance2 (m i j: int)
+    requires { 0 < i <= j /\ m >= 0 }
+    ensures  { div m i >= div m j }
+    variant  { j - i }
+    = if i < j then div_croissance2 m i (j - 1)
+
+  let lemma div_mult_1 (n k max: int)
+    requires { n > 0 /\ max >= n /\ n * k <= max }
+    ensures  { k = div (n * k) n <= div max n } = ()
+
+  let lemma mult_borne_sous_exp (n a b: int)
+    requires { a >= 1 /\ b >= 1 /\ n >= 1 /\ a * b < n }
+    ensures  { a < n /\ b < n } = ()
+
+  let rec lemma sq_ineq (a b: int)
+    requires { a >= 0 /\ b >= 0 }
+    requires { a * a < b * b }
+    ensures  { a < b }
+    variant  { b * b - a * a }
+    = if (b - 1) * (b - 1) > a * a then
+        sq_ineq a (b - 1)
+
+end
+
+module DivisibilityResults
+
+  use int.Int
+  use int.EuclideanDivision
+  use number.Divisibility
+  use number.Prime
+
+  let lemma divides_div (n m k: int)
+    requires { 2 <= n /\ 2 <= m /\ 2 <= k < n /\ divides n m /\ not divides k m }
+    ensures  { not divides k (div m n) } = ()
+
+  let lemma divides_inf (n m: int)
+    requires { 2 <= n /\ 2 <= m /\ divides n m /\
+               forall k. 2 <= k < n -> not divides k m }
+    ensures  { forall k. 2 <= k < n -> not divides k (div m n) } = ()
+
+  let lemma not_prime_divider_limits (n: int)
+    requires { not prime n /\ 2 <= n }
+    ensures  { exists i. 2 <= i /\ i * i <= n /\ divides i n } = ()
+
+  let lemma no_prod_impl_no_divider (n: int)
+    requires { n >= 0 }
+    ensures  { forall i.
+                 2 <= i < n * n ->
+                 not (exists k l. 2 <= k < n /\ 2 <= l < i /\ k * l = i ) ->
+                 not (exists k. 2 <= k < n /\ k <> i /\ divides k i) } = ()
+
+  use ArithmeticResults
+
+  let lemma not_prime_impl_divisor_under_sqrt (n: int)
+    requires { n >= 2 }
+    ensures  { forall i.
+                 2 <= i < n * n ->
+                 not prime i ->
+                 exists j. 2 <= j < i /\ ((j < n)
+                           by j * j < n * n /\ j >= 0) /\ divides j i } = ()
+
+end
+
+module EulerSieveSpec
+
+  use int.Int
+  use number.Divisibility
+  use number.Prime
+  use seq.Seq
+  use int.EuclideanDivision
+
+  use ArithmeticResults
+  use DivisibilityResults
+
+
+(*******************************************************************************)
+(*                                                                             *)
+(*         INVARIANTS SUR LES RELATIONS ENTRE STRUCTURES DE DONNEES            *)
+(*                                                                             *)
+(*******************************************************************************)
+
+  predicate inv_nexts (nexts: seq int) (n: int) =
+    forall i. 0 <= i < n ->
+              i < nexts[i] <= n
+
+  predicate inv_marked_nexts (marked: seq bool)
+                             (nexts: seq int) =
+    marked.length = nexts.length /\
+    forall i. 0 <= i < marked.length ->
+              forall j. i < j < nexts[i] ->
+                        marked[j]
+
+  predicate inv_marked_old_nexts1 (marked_old: seq bool)
+                                  (nexts: seq int)
+                                  (min: int) =
+    marked_old.length = nexts.length /\
+    forall i. min <= i < marked_old.length ->
+              forall j. i < j < nexts[i] ->
+                        marked_old[j]
+
+  predicate inv_marked_old_nexts2 (marked_old: seq bool)
+                                  (nexts: seq int)
+                                  (n: int) =
+    marked_old.length = nexts.length /\
+    marked_old.length >= 2 /\
+    n >= 2 /\
+    forall i. 2 <= i <= div (marked_old.length - 1) n ->
+              nexts[i] <= div (marked_old.length - 1) n ->
+              not marked_old[i] ->
+              not marked_old[nexts[i]]
+
+  predicate inv_marked_marked_old (marked: seq bool)
+                                  (marked_old: seq bool) =
+    marked.length = marked_old.length /\
+    forall i. 0 <= i < marked.length ->
+              not marked[i] ->
+              not marked_old[i]
+
+  predicate inv_marked_old_nexts2_partial (marked_old: seq bool)
+                                          (nexts: seq int)
+                                          (n: int)
+                                          (p: int) =
+    marked_old.length = nexts.length /\
+    marked_old.length >= 2 /\
+    n >= 2 /\
+    p <= div (marked_old.length - 1) n /\
+    forall i. 2 <= i < p ->
+              nexts[i] <= div (marked_old.length - 1) n ->
+              not marked_old[i] ->
+              not marked_old[nexts[i]]
+
+
+(*******************************************************************************)
+(*                                                                             *)
+(*                   PROPRIETES LIEES AUX NOMBRES PREMIERS                     *)
+(*                                                                             *)
+(*******************************************************************************)
+
+  predicate all_primes (marked: seq bool) (n: int) =
+    forall i. 0 <= i < n -> not marked[i] <-> prime i
+
+  predicate all_products_marked (marked: seq bool) (i max: int) =
+    2 <= i < marked.length /\
+    forall k. 2 <= k < max ->
+              i * k < marked.length ->
+              marked[i * k]
+
+  predicate previously_marked_products (marked: seq bool) (n: int) =
+    forall i. 2 <= i < n ->
+              all_products_marked marked i marked.length
+
+  predicate only_products_marked (marked: seq bool) (n: int) =
+    forall k. 2 <= k < marked.length ->
+              marked[k] ->
+              exists i j. 2 <= i < n /\ 2 <= j < marked.length /\ i * j = k
+
+  predicate prime_products_marked (marked_old: seq bool)
+                                  (marked: seq bool)
+                                  (n max: int) =
+    marked_old.length = marked.length /\
+    n < max <= marked.length /\
+    forall i. n <= i < max ->
+              not marked_old[i] ->
+              n * i < marked_old.length ->
+              marked[n * i]
+
+  predicate inv_remove_products (nexts: seq int)
+                                (marked: seq bool)
+                                (n: int) =
+    nexts.length = marked.length /\
+    not marked[2] /\
+    all_primes marked n /\
+    prime n /\
+    not marked[n] /\
+    inv_nexts nexts nexts.length
+
+
+(*******************************************************************************)
+(*                                                                             *)
+(*             QUELQUES LEMMES DE CONSERVATION DES STRUCTURES                  *)
+(*                                                                             *)
+(*******************************************************************************)
+
+
+  let lemma conservation_inv_marked_nexts_on_marked_change (marked: seq bool)
+                                                           (nexts: seq int)
+                                                           (i: int)
+    requires { marked.length = nexts.length }
+    requires { inv_nexts nexts nexts.length }
+    requires { inv_marked_nexts marked nexts }
+    requires { 0 <= i < marked.length }
+    ensures  { inv_marked_nexts marked[i <- true] nexts } = ()
+
+  let lemma conservation_inv_marked_nexts_on_nexts_change (marked: seq bool)
+                                                          (nexts: seq int)
+                                                          (i v: int)
+    requires { marked.length = nexts.length }
+    requires { inv_marked_nexts marked nexts }
+    requires { inv_nexts nexts marked.length }
+    requires { 0 <= i < marked.length }
+    requires { i < v <= marked.length }
+    requires { forall j. i < j < v -> marked[j] }
+    ensures  { inv_marked_nexts marked nexts[i <- v] } = ()
+
+(*******************************************************************************)
+(*                                                                             *)
+(*                         QUELQUES PREDICATS UTILES                           *)
+(*                                                                             *)
+(*******************************************************************************)
+
+  predicate all_differents (a: seq 'a) (n: int) =
+    forall i j. 0 <= i < j < n -> a[i] <> a[j]
+
+  predicate all_inf_or_eq (a: seq int) (n k: int) =
+    forall i. 0 <= i < n -> a[i] <= k
+
+end
+
+module EulerSieve
+
+  use int.Int
+  use number.Divisibility
+  use number.Prime
+  use seq.Seq
+  use int.EuclideanDivision
+
+  use ArithmeticResults
+  use DivisibilityResults
+
+  use EulerSieveSpec
+
+(*******************************************************************************)
+(*                                                                             *)
+(*                   PROPRIETES LIEES AUX NOMBRES PREMIERS                     *)
+(*                                                                             *)
+(*******************************************************************************)
+
+  let lemma marked_impl_all_products_marked (marked: seq bool) (n: int)
+    requires { 2 <= n <= marked.length }
+    requires { previously_marked_products marked n }
+    ensures  { forall k i.
+                2 <= k < n ->
+                2 <= i < marked.length ->
+                k * i < marked.length ->
+                forall j.
+                  1 <= j < marked.length ->
+                  k * i * j < marked.length ->
+                  (marked[k * i * j]
+                   by 1 <= i * j < marked.length
+                   by k >= 2 /\ i >= 2 /\ j >= 1 /\ k * (i * j) < marked.length) }
+    = ()
+
+  let lemma prev_and_new_impl_all_products_marked (marked_old marked: seq bool)
+                                                  (n max: int)
+    requires { 2 <= n < marked.length /\ 2 <= max < marked.length /\
+               marked_old.length = marked.length }
+    requires { inv_marked_marked_old marked marked_old }
+    requires { previously_marked_products marked_old n }
+    requires { previously_marked_products marked n }
+    requires { only_products_marked marked_old n }
+    requires { prime_products_marked marked_old marked n marked.length }
+    ensures  { all_products_marked marked n marked.length } =
+    assert { forall i. 2 <= i < n /\ 2 <= i < marked.length ->
+                       not marked_old[i] ->
+                       i * n < marked.length ->
+                       marked[i * n] };
+    assert { forall k. 2 <= k < marked_old.length ->
+                       marked_old[k] ->
+                       n * k < marked_old.length ->
+                       exists i j. 2 <= i < n /\ 2 <= j < marked_old.length /\
+                                   i * j = k /\ marked_old[i * j] };
+    marked_impl_all_products_marked marked_old n;
+    marked_impl_all_products_marked marked n;
+    assert { marked.length = marked_old.length };
+    assert { forall k. 2 <= k < marked_old.length ->
+                       marked_old[k] ->
+                       n * k < marked_old.length ->
+                       marked[k * n]
+             by forall k. 2 <= k < marked_old.length ->
+                       marked_old[k] ->
+                       n * k < marked_old.length ->
+                       marked_old[k * n] };
+    assert { prime_products_marked marked_old marked n marked.length };
+    assert { (forall k. 2 <= k < marked.length ->
+                       not marked_old[k] -> n * k < marked.length ->
+                       marked[n * k]) }
+
+  let lemma conservation_only_products_marked (marked: seq bool) (n i j: int)
+    requires { 2 <= i < n /\ 2 <= j < marked.length /\ i * j < marked.length }
+    requires { only_products_marked marked n }
+    ensures  { only_products_marked marked[(i * j) <- true] n } =
+    assert { forall k. 0 <= k < marked.length ->
+                       k <> i * j ->
+                       marked[(i * j) <- true][k] = marked[k] };
+    assert { forall k.
+               2 <= k < marked.length ->
+               k <> i * j ->
+               marked[(i * j) <- true][k] ->
+               exists x y. 2 <= x < n /\ 2 <= y < marked.length /\ k = x * y };
+    assert { marked[i * j] -> 2 <= i < n -> 2 <= j < marked.length ->
+             exists x y. 2 <= x < n /\ 2 <= y < marked.length /\ x * y = i * j }
+
+  let lemma conservation_previously_marked_products (marked: seq bool)
+                                                    (nexts: seq int)
+                                                    (n: int)
+    requires { 2 <= n < marked.length /\ marked.length = nexts.length /\
+               nexts[n] <= marked.length }
+    requires { previously_marked_products marked n }
+    requires { only_products_marked marked (n + 1) }
+    requires { inv_marked_nexts marked nexts }
+    requires { inv_marked_old_nexts2 marked nexts nexts[n] }
+    requires { all_products_marked marked n marked.length }
+    ensures  { previously_marked_products marked nexts[n] } =
+    assert { previously_marked_products marked (n + 1) };
+    assert { forall i. n < i < nexts[n] -> marked[i] };
+    assert { forall i. n < i < nexts[n] ->
+              ((exists k l. 2 <= k <= n /\ 2 <= l < marked.length /\ k * l = i)
+               by marked[i]) };
+    marked_impl_all_products_marked marked (n + 1);
+    assert { forall i j.
+              n < i < nexts[n] ->
+              2 <= j < marked.length ->
+              i * j < marked.length ->
+              (marked[i * j]
+               by (exists k l. 2 <= k <= n /\ 2 <= l < marked.length /\ k * l = i)) };
+    assert { forall i.
+              n < i < nexts[n] ->
+              all_products_marked marked i marked.length }
+
+  lemma conservation_previously_marked_products_on_marked_change:
+    forall marked n.
+      previously_marked_products marked n ->
+      forall i. 0 <= i < marked.length ->
+                previously_marked_products marked[i <- true] n
+
+
+(*******************************************************************************)
+(*                                                                             *)
+(*                      INVARIANTS SIMPLES DE FONCTIONS                        *)
+(*                                                                             *)
+(*******************************************************************************)
+
+  let lemma conservation_inv_marked_old_nexts2 (marked: seq bool)
+                                               (nexts: seq int)
+                                               (max n p: int)
+    requires { inv_marked_old_nexts2 marked nexts n /\
+                 nexts[n] > n > 0 /\
+                 div max nexts[n] <= div max n
+                 by forall i. p < i < nexts[p] -> marked[i] /\
+                    inv_marked_old_nexts2_partial marked nexts n p }
+    ensures  { inv_marked_old_nexts2 marked nexts nexts[n] } = ()
+
+  let lemma unchanged_other_elements (s1: seq 'a) (s2: seq 'a) (i: int) (v: 'a)
+    requires { 0 <= i < length s1 /\ length s1 = length s2 }
+    requires { s1 = s2[i <- v] }
+    ensures  { forall j. 0 <= j < length s1 -> i <> j -> s1[j] = s2[j] } = ()
+
+  use mach.int.Int63
+
+  type t = private {
+    mutable ghost nexts: seq int;
+    mutable ghost marked: seq bool;
+    max: int63;
+  }
+    invariant { max_int > max >= 3 }
+    invariant { nexts.length = marked.length = max + 1 }
+    invariant { inv_nexts nexts nexts.length }
+    invariant { inv_marked_nexts marked nexts }
+    invariant { forall i. 3 <= i <= max -> mod i 2 = 0 -> marked[i] }
+    invariant { forall i. 3 <= i < max - 1 ->
+                          mod i 2 = 1 ->
+                          mod (Seq.get nexts i) 2 = 1 \/ Seq.get nexts i = max + 1 }
+    invariant { Seq.get nexts max = max + 1 /\
+                (mod (max - 1) 2 = 0 -> Seq.get nexts (max - 1) = max) /\
+                (mod (max - 1) 2 = 1 -> Seq.get nexts (max - 1) = max + 1) }
+
+    by { nexts = Seq.create 4 (fun i -> i + 1);
+         marked = Seq.create 4 (fun i -> i < 2);
+         max = 3 }
+
+  val create (max: int63) : t
+    requires { max_int > max >= 3 }
+    ensures  { result.max = max }
+    ensures  { Seq.get result.marked 0 = Seq.get result.marked 1 = true /\
+               not Seq.get result.marked 2 }
+    ensures  { forall i. 3 <= i <= max ->
+                         mod i 2 = 0 <-> Seq.get result.marked i }
+    ensures  { forall i. 3 <= i < max - 1 ->
+                         mod i 2 = 0 -> Seq.get result.nexts i = i + 1 }
+    ensures  { forall i. 3 <= i < max - 1 ->
+                         mod i 2 = 1 -> Seq.get result.nexts i = i + 2 }
+    ensures  { forall i. 0 <= i <= max ->
+                         Seq.get result.marked i -> i < 2 \/ divides 2 i }
+
+  val set_next (t: t) (i v: int63) : unit
+    requires { 0 <= i <= t.max /\ i < v <= t.max + 1 }
+    requires { mod i 2 = 1 }
+    requires { forall j. i < j < v -> Seq.get t.marked j }
+    requires { not Seq.get t.marked i }
+    requires { mod v 2 = 1 \/ v = t.max + 1 }
+    writes   { t.nexts }
+    ensures  { t.nexts = (old t.nexts)[i <- v] }
+
+  val get_next (t: t) (i: int63) : int63
+    requires { 3 <= i <= t.max }
+    requires { mod i 2 = 1 }
+    ensures  { 3 <= result <= t.max + 1 }
+    ensures  { result = t.nexts[i] }
+    ensures  { mod result 2 = 1 \/ result = t.max + 1 }
+
+  val set_mark (t: t) (i: int63) : unit
+    requires { 0 <= i <= t.max }
+    requires { mod i 2 = 1 }
+    writes   { t.marked }
+    ensures  { t.marked = (old t.marked)[i <- true] }
+
+  val get_mark (t: t) (i: int63) : bool
+    requires { 0 <= i <= t.max }
+    requires { mod i 2 = 1 }
+    ensures { result = t.marked[i] }
+
+  val get_max (t: t) : int63
+    ensures { result = t.max /\ result >= 2 }
+
+  let remove_products (t: t) (n: int63) : unit
+    requires { 3 <= n <= t.max /\ n * n <= t.max }
+    requires { inv_remove_products t.nexts t.marked n }
+    requires { previously_marked_products t.marked n }
+    requires { only_products_marked t.marked n }
+    requires { inv_marked_old_nexts2 t.marked t.nexts n }
+    ensures  { inv_remove_products t.nexts t.marked n }
+    ensures  { inv_marked_old_nexts2 t.marked t.nexts t.nexts[n] }
+    ensures  { previously_marked_products t.marked t.nexts[n] }
+    ensures  { only_products_marked t.marked t.nexts[n] }
+    = let d = get_max t / n in
+      let ghost max = t.max in
+      let ghost marked_old = t.marked in
+      let rec loop (p: int63) (ghost x: int) =
+        requires { n <= p <= max /\ 3 <= n <= max /\ mod p 2 = 1 /\
+                   p <= x < t.nexts[p] /\ t.nexts[x] = t.nexts[p] /\
+                   t.marked[n * n] }
+        requires { inv_remove_products t.nexts t.marked n }
+        requires { previously_marked_products t.marked n }
+        requires { not t.marked[p] }
+        requires { inv_marked_marked_old t.marked marked_old }
+        requires { inv_marked_old_nexts1 marked_old t.nexts x }
+        requires { inv_marked_old_nexts2 marked_old t.nexts n }
+        requires { prime_products_marked marked_old t.marked n t.nexts[x] }
+        requires { inv_marked_old_nexts2_partial t.marked t.nexts n p }
+        requires { only_products_marked t.marked (n + 1) }
+        ensures  { inv_remove_products t.nexts t.marked n }
+        ensures  { inv_marked_old_nexts2 t.marked t.nexts t.nexts[n] }
+        ensures  { inv_marked_marked_old t.marked marked_old }
+        ensures  { previously_marked_products t.marked n }
+        ensures  { prime_products_marked marked_old t.marked n t.marked.length }
+        ensures  { only_products_marked t.marked (n + 1) }
+        variant  { max - t.nexts[p] }
+        let next = get_next t p in
+        if 0 <= next <= get_max t then (* 0 <= next < get_max t + 1 -> 0 <= next <= get_max t *)
+          if next <= d then begin
+            assert { n * next <= max by n * next <= n * d by next <= d };
+            ghost (conservation_only_products_marked t.marked (to_int n + 1) (to_int n)
+                                                     t.nexts[to_int p]);
+            let ghost marked_copy = t.marked in
+            set_mark t (n * next);
+            unchanged_other_elements t.marked marked_copy (to_int n * to_int next) true;
+            assert { p < 2 * p < 2 * t.nexts[p] <= n * t.nexts[p] = n * next };
+            assert { not t.marked[p] by n * next > p /\ p <= length t.marked };
+            assert { not marked_old[t.nexts[p]] by 2 <= p < next <= div max n };
+            assert { prime_products_marked marked_old t.marked n t.nexts[next]
+                     by prime_products_marked marked_old t.marked n t.nexts[x] };
+            assert { forall i. 0 <= i < p -> t.nexts[i] <= p
+                     by forall i. 0 <= i < p ->
+                                  forall j. i < j < t.nexts[i] -> t.marked[j] };
+            if get_mark t next then begin
+              assert { t.nexts[p] <> t.marked.length };
+              let ghost nexts_copy = t.nexts in
+              set_next t p (get_next t next);
+              unchanged_other_elements t.nexts nexts_copy (to_int p) nexts_copy[to_int next];
+              assert { inv_marked_old_nexts1 marked_old t.nexts next
+                       by p <= x < next /\
+                          forall j. next <= j < length t.nexts ->
+                                    t.nexts[j] = nexts_copy[j] };
+              loop p (to_int next)
+            end else begin
+              assert { forall i. p < i < t.nexts[p] -> t.marked[i] };
+              loop next (to_int next)
+            end
+          end else begin
+            assert { n * next > max by n * (div max n + 1) > max >= n * div max n /\ n * next >= n * (d + 1) by next >= d + 1 };
+            ghost (conservation_inv_marked_old_nexts2 t.marked t.nexts (to_int max) (to_int n) (to_int p))
+        end else ghost (conservation_inv_marked_old_nexts2 t.marked t.nexts (to_int max) (to_int n) (to_int p)) in
+        ghost (conservation_only_products_marked t.marked (to_int n + 1) (to_int n) (to_int n));
+        let ghost marked_copy = t.marked in
+        set_mark t (n * n);
+        unchanged_other_elements t.marked marked_copy (to_int n * to_int n) true;
+        assert { forall i. 0 <= i < n -> t.nexts[i] <> n * n
+                 by forall i. 0 <= i < n -> t.nexts[i] <= n < n * n
+                 by not t.marked[n] /\
+                    forall i. 0 <= i < n ->
+                              forall j. i < j < t.nexts[i] -> t.marked[j] };
+        loop n (to_int n);
+        ghost (prev_and_new_impl_all_products_marked marked_old t.marked (to_int n) (to_int max));
+        ghost (conservation_previously_marked_products t.marked t.nexts (to_int n))
+
+  let lemma previously_marked_products_impl_prime (marked: seq bool) (n: int)
+    requires { 2 <= n < marked.length /\ not marked[n] }
+    requires { previously_marked_products marked n }
+    ensures  { prime n } =
+    assert { forall k.
+               2 <= k < n -> not divides k n
+             by forall k.
+                  2 <= k < n ->
+                  not (exists i. 2 <= i < marked.length /\ n = k * i) }
+
+  let lemma only_products_marked_impl_not_marked (marked: seq bool)
+                                                 (nexts: seq int)
+                                                 (n: int)
+    requires { 2 <= n < marked.length }
+    requires { only_products_marked marked nexts[n] }
+    requires { prime n }
+    ensures  { not marked[n] } =
+    assert { forall i j. 2 <= i < n -> 2 <= j < marked.length -> i * j <> n }
+
+end
+
+module EulerSieveImpl
+
+  use int.Int
+  use seq.Seq
+  use mach.int.Int63
+  use mach.array.ArrayInt63
+  (* use array.Init *)
+
+  use int.Abs
+  use int.EuclideanDivision
+  use number.Divisibility
+  use number.Prime
+
+  use DivisibilityResults
+  use EulerSieveSpec
+
+  let lemma conservation_inv_arr_on_mark (arr: seq int) (i: int)
+    requires { forall j k. 0 <= j < length arr ->
+                           j < k < div (abs arr[j]) 2 -> arr[k] < 0 }
+    requires { forall i. 0 <= i < length arr -> i < div (abs arr[i]) 2 <= length arr }
+    requires { 0 <= i < length arr }
+    requires { arr[i] >= 0 }
+    ensures  { forall j k. 0 <= j < length arr ->
+                           j < k < div (abs arr[i <- - arr[i]][j]) 2 ->
+                           arr[i <- - arr[i]][k] < 0 } =
+    assert { forall j. 0 <= j < length arr ->
+                       arr[j] < i -> arr[j] = arr[i <- - arr[i]][j] };
+    assert { forall j. 0 <= j < length arr ->
+                       arr[i] < j -> arr[j] = arr[i <- - arr[i]][j] }
+
+  let lemma conservation_inv_arr_on_jump (arr: seq int) (min i: int)
+    requires { min >= 0 }
+    requires { forall j k. min <= j < length arr ->
+                           j < k < div (abs arr[j]) 2 -> arr[k] < 0 }
+    requires { forall i. min <= i < length arr -> i < div (abs arr[i]) 2 <= length arr }
+    requires { min <= i < length arr }
+    requires { 0 <= div arr[i] 2 < length arr }
+    requires { arr[div arr[i] 2] < 0 }
+    ensures  { forall j k. min <= j < length arr ->
+                           j < k < div (abs arr[i <- - arr[div arr[i] 2]][j]) 2 ->
+                           arr[i <- - arr[div arr[i] 2]][k] < 0 } =
+    let ghost next = div (Seq.get arr i) 2 in
+    let ghost arr1 = arr[i <- - Seq.get arr next] in
+    assert { forall j. min <= j < i -> arr[j] = arr1[j] };
+    assert { forall j. i < j < length arr -> arr[j] = arr1[j] }
+
+  type t = {
+    mutable ghost nexts: seq int;
+    mutable ghost marked: seq bool;
+    arr: array63;
+    max: int63;
+    max_arr: int63
+  }
+    invariant { max_int > max >= 3 }
+    invariant { Seq.length nexts = Seq.length marked = max + 1 }
+    invariant { div (max - 1) 2 = max_arr }
+    invariant { length arr = max_arr + 1 }
+    invariant { inv_nexts nexts (Seq.length nexts) }
+    invariant { inv_marked_nexts marked nexts }
+    invariant { forall i. 3 <= i <= max -> mod i 2 = 0 -> Seq.get marked i }
+    invariant { forall i. 3 <= i < max - 1 ->
+                          mod i 2 = 1 ->
+                          mod (Seq.get nexts i) 2 = 1 \/ Seq.get nexts i = max + 1 }
+    invariant { Seq.get nexts max = max + 1 /\
+                (mod (max - 1) 2 = 0 -> Seq.get nexts (max - 1) = max) /\
+                (mod (max - 1) 2 = 1 -> Seq.get nexts (max - 1) = max + 1) }
+    (* glueing invariant *)
+    invariant { forall i. 0 <= i <= max_arr -> -(max + 1) <= arr[i] <= max + 1 }
+    invariant { forall i. 0 <= i <= max_arr ->
+                          Seq.get marked (2 * i + 1) <-> arr[i] < 0 }
+    invariant { forall i. 0 <= i <= max_arr ->
+                          not Seq.get marked (2 * i + 1) ->
+                          arr[i] = Seq.get nexts (2 * i + 1) }
+    invariant { forall i. 0 <= i <= max_arr ->
+                          Seq.get marked (2 * i + 1) ->
+                          arr[i] = - Seq.get nexts (2 * i + 1) }
+    invariant { forall i. 0 <= i <= max_arr ->
+                          i < div (abs arr[i]) 2 <= max_arr + 1 /\ abs arr[i] <= max + 1 }
+    invariant { forall i j. 0 <= i <= max_arr -> i < j < div (abs arr[i]) 2 -> arr[j] < 0 }
+    by { nexts = Seq.create 4 (fun i -> i + 1);
+         marked = Seq.create 4 (fun i -> i < 2);
+         arr = ArrayInt63.set (ArrayInt63.make 2 (-2)) 1 4;
+         max = 3; max_arr = 1 }
+
+  let create (max: int63) : t
+    requires { max_int > max >= 3 }
+    ensures  { result.max = max }
+    ensures  { Seq.get result.marked 0 = Seq.get result.marked 1 = true /\
+               not Seq.get result.marked 2 }
+    ensures  { forall i. 1 <= i <= div (max - 1) 2 ->
+                         not Seq.get result.marked (2 * i + 1) }
+    ensures  { forall i. 2 <= i <= div (max + 1) 2 ->
+                         2 * i <= max ->
+                         Seq.get result.marked (2 * i) }
+    ensures  { forall i. 1 <= i <= div (max - 1) 2 ->
+                         2 * i + 1 < max - 1 ->
+                         Seq.get result.nexts (2 * i + 1) = 2 * i + 3 }
+    ensures  { forall i. 2 <= i <= div (max - 1) 2 ->
+                         2 * i < max - 1 ->
+                         Seq.get result.nexts (2 * i) = 2 * i + 1 }
+    ensures  { forall i. 0 <= i <= max ->
+                         Seq.get result.marked i -> i < 2 \/ divides 2 i }
+  = let ghost len = pure { max + 1 } in
+    let len_arr = (max - 1) / 2 + 1 in
+    let ghost nexts = Seq.create len (pure { fun (i: int) ->
+          if i = max then max + 1
+          else if i = max - 1 then if mod i 2 = 0 then max else max + 1
+          else if i < 3 || mod i 2 = 0 then i + 1
+          else i + 2}) in
+    let ghost marked = Seq.create len (fun i ->
+          i = 0 || i = 1 || (i > 2 && mod i 2 = 0)) in
+    let ghost f = pure { fun i -> if i = len_arr - 1 then max + 1
+          else if i = 0 then -2
+          else 2 * i + 3 } in
+    let arr = ArrayInt63.make len_arr (-2) in
+    for i = 1 to len_arr - 1 do
+      invariant { forall j. 0 <= j < i -> arr[j] = f j }
+      arr[i] <- if i = len_arr - 1 then max + 1 else 2 * i + 3
+    done;
+    { nexts = nexts;
+      marked = marked;
+      arr = arr;
+      max = max;
+      max_arr = (max - 1) / 2 }
+
+  let set_next (t: t) (i v: int63) : unit
+    requires { 0 <= i <= t.max /\ i < v <= t.max + 1 }
+    requires { mod i 2 = 1 }
+    requires { forall j. i < j < v -> Seq.get t.marked j }
+    requires { not Seq.get t.marked i }
+    requires { mod v 2 = 1 \/ v = t.max + 1 }
+    writes   { t.nexts, t.arr }
+    ensures  { t.nexts = Seq.set (old t.nexts) i v }
+  = ghost ( conservation_inv_marked_nexts_on_nexts_change t.marked t.nexts (to_int i) (to_int v) );
+    t.arr[i / 2] <- v;
+    ghost (t.nexts <- Seq.set t.nexts (to_int i) (to_int v))
+
+  let get_next (t: t) (i: int63) : int63
+    requires { 3 <= i <= t.max }
+    requires { mod i 2 = 1 }
+    ensures  { 3 <= result <= t.max + 1 }
+    ensures  { result = Seq.get t.nexts i }
+    ensures  { mod result 2 = 1 \/ result = t.max + 1 }
+  = let x = i / 2 in
+    if t.arr[x] < 0 then - t.arr[x] else t.arr[x]
+
+  let set_mark (t: t) (i: int63) : unit
+    requires { 0 <= i <= t.max }
+    requires { mod i 2 = 1 }
+    writes   { t.marked, t.arr }
+    ensures  { t.marked = Seq.set (old t.marked) i true }
+  = let x = i / 2 in
+    ghost ( conservation_inv_marked_nexts_on_marked_change t.marked t.nexts (to_int i));
+    if t.arr[x] >= 0 then begin
+      ghost ( conservation_inv_arr_on_mark t.arr.elts (to_int x) );
+      t.arr[x] <- - t.arr[x]
+    end;
+    ghost (t.marked <- Seq.set t.marked (to_int i) true)
+
+  let get_mark (t: t) (i: int63) : bool
+    requires { 0 <= i <= t.max }
+    requires { mod i 2 = 1 }
+    ensures  { result = Seq.get t.marked i }
+  = t.arr[i / 2] < 0
+
+  let get_max (t: t) : int63
+    ensures { result = t.max /\ result >= 2 }
+  = t.max
+
+  clone EulerSieve with type t = t,
+    val create = create,
+    val set_next = set_next, val get_next = get_next,
+    val set_mark = set_mark, val get_mark = get_mark,
+    val get_max = get_max
+
+  predicate inv_count (arr: seq int) (min: int) =
+    forall i. min <= i < arr.length ->
+              (i < div (abs arr[i]) 2 <= arr.length /\
+               - max_int <= arr[i] <= max_int /\
+               (forall j. i < j < div (abs arr[i]) 2 -> arr[j] < 0) /\
+               (forall j. 2 * i + 1 < j < abs arr[i] -> not prime j))
+
+  let euler_sieve (max: int63) : array63
+    requires { max_int > max >= 3 }
+    ensures { all_differents result result.length }
+    ensures { forall i. 0 <= i < result.length -> prime result[i] }
+    ensures { forall i. 2 <= i <= max -> prime i ->
+                        exists j. 0 <= j < result.length /\ result[j] = i }
+  = let t = create max in
+    let rec loop (n: int63) =
+      requires { 3 <= n <= max }
+      requires { n * n <= max }
+      requires { previously_marked_products t.marked n }
+      requires { only_products_marked t.marked n }
+      requires { inv_marked_old_nexts2 t.marked t.nexts n }
+      requires { inv_remove_products t.nexts t.marked n }
+      ensures { forall i. 0 <= i < Seq.length t.marked ->
+                          not Seq.get t.marked i <-> prime i }
+      variant { max + 1 - n }
+        remove_products t n;
+        let nn = get_next t n in
+        if nn <= max / nn then begin
+          assert { nn * nn <= max };
+          ghost (previously_marked_products_impl_prime t.marked (to_int nn));
+          assert { (forall i. n < i < nn -> not prime i)
+                   by (forall i.
+                      n < i < nn ->
+                      (exists j k.
+                         2 <= j < nn /\
+                         2 <= k < Seq.length t.marked /\
+                         j * k = i)
+                         by Seq.get t.marked i) };
+          loop (nn)
+        end else begin
+          ghost (not_prime_impl_divisor_under_sqrt (to_int nn));
+          assert { forall i.
+                     2 <= i < Seq.length t.marked ->
+                     not Seq.get t.marked i ->
+                     not (exists k l. 2 <= k < nn /\ 2 <= l < i /\
+                                      k * l = i) };
+          ghost (no_prod_impl_no_divider (to_int nn));
+          assert { Seq.length t.marked <= nn * nn
+                   by nn * nn > max
+                   by nn * (div max nn + 1) > max >= nn * div max nn
+                      /\ nn * nn >= nn * (div max nn + 1)
+                   by nn >= div max nn + 1 };
+          assert { forall i. 2 <= i < Seq.length t.marked ->
+                             not Seq.get t.marked i ->
+                             prime i
+                   by forall i.
+                        2 <= i < Seq.length t.marked ->
+                        not Seq.get t.marked i ->
+                        (not (exists k. 2 <= k < nn /\ k <> i /\
+                                        divides k i)
+                         by forall k.
+                              2 <= k ->
+                              k <> i ->
+                              (divides k i <-> exists l. 2 <= l < i /\ k * l = i)
+                              by divides k i -> 2 <= div i k < i) }
+        end in
+    if max >= 9 then loop 3;
+    assert { forall i. 1 <= i <= t.max_arr -> t.arr[i] >= 0 <-> prime (2 * i + 1) };
+    assert { forall p i. 1 <= p <= t.max_arr -> 2 * p + 1 < i < abs t.arr[p] -> not prime i
+             by mod i 2 = 0 -> (Seq.get t.marked i
+             by Seq.get t.nexts (2 * i + 1) = t.arr[i]) };
+    assert { forall j. 1 <= j <= t.max_arr -> t.arr[0 <- 2][j] = t.arr[j] };
+    let ref cnt = 1:int63 in
+    let ref p = 1 in
+    t.arr[0] <- 2;
+    while 2 * p + 1 <= max do
+      invariant { 1 <= p <= t.max_arr + 1 }
+      invariant { 1 <= cnt <= p }
+      invariant { 2 * p + 1 <= max -> t.arr[p] >= 0 }
+      invariant { 2 * p + 1 <= max -> prime (2 * p + 1) }
+      invariant { inv_count t.arr cnt }
+      invariant { all_differents t.arr cnt }
+      invariant { all_inf_or_eq t.arr cnt (2 * p) }
+      invariant { forall i. cnt <= i <= t.max_arr -> t.arr[i] >= 0 <-> prime (2 * i + 1) }
+      invariant { forall i. 0 <= i < cnt -> prime t.arr[i] }
+      invariant { forall i. 2 <= i < 2 * p + 1 -> prime i ->
+                            exists j. 0 <= j < cnt /\ t.arr[j] = i }
+      variant { t.max_arr + 1 - p , max + 1 - t.arr[p] }
+      let next = t.arr[p] / 2 in
+      if next <= t.max_arr then begin
+        assert { 1 <= p <= t.max_arr /\ t.arr[p] >= 0 /\ prime (2 * p + 1) };
+        if t.arr[next] < 0 then begin
+          label BeforeAssign in
+          t.arr[p] <- - t.arr[next];
+          unchanged_other_elements t.arr.elts (pure { t.arr.elts at BeforeAssign }) (to_int p)
+            (- to_int t.arr[next]);
+          assert { forall i. p < i < div t.arr[p] 2 -> t.arr[i] < 0 };
+          assert { t.arr[p] = abs (t.arr at BeforeAssign)[next] > (t.arr at BeforeAssign)[p] > p };
+          conservation_inv_arr_on_jump (pure { t.arr.elts at BeforeAssign }) (to_int cnt) (to_int p);
+          assert { cnt <= next < length t.arr };
+          assert { (forall j. 2 * p + 1 < j < (t.arr at BeforeAssign)[p] ->
+                              not prime j) /\
+                   (forall j. 2 * next + 1 < j < abs (t.arr at BeforeAssign)[next] ->
+                              not prime j) }
+        end else begin
+          label BeforeAssign in
+          t.arr[cnt] <- 2 * p + 1;
+          unchanged_other_elements t.arr.elts (pure { t.arr.elts at BeforeAssign }) (to_int cnt) (2 * to_int p + 1);
+          cnt <- cnt + 1;
+          p <- next;
+          assert { forall k. cnt <= k < length (t.arr at BeforeAssign) ->
+                             t.arr[k] = (t.arr at BeforeAssign)[k] }
+        end
+      end else begin
+        label BeforeAssign in
+        t.arr[cnt] <- 2 * p + 1;
+        unchanged_other_elements t.arr.elts (pure { t.arr.elts at BeforeAssign }) (to_int cnt) (2 * to_int p + 1);
+        cnt <- cnt + 1;
+        p <- t.max_arr + 1;
+        assert { forall k. cnt <= k < length (t.arr at BeforeAssign) ->
+                           t.arr[k] = (t.arr at BeforeAssign)[k] }
+      end
+    done;
+    sub t.arr 0 cnt
+
+end

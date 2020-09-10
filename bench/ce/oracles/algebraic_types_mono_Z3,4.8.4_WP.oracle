@@ -3,96 +3,389 @@ bench/ce/algebraic_types_mono.mlw M G: Unknown (sat)
 Counter-example model:
 File algebraic_types_mono.mlw:
   Line 6:
-    x, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
+    x, [[@introduced]] = {"type": "Integer", "val": "0"}
 
 bench/ce/algebraic_types_mono.mlw M g2: Unknown (sat)
 Counter-example model:
 File algebraic_types_mono.mlw:
   Line 10:
-    x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "B" ,
-    "list" : [{"type" : "Integer" , "val" : "0" }] } }
+    x, [[@introduced]] =
+      {"type": "Apply",
+       "val": {"apply": "B", "list": [{"type": "Integer", "val": "0"}]}}
 
 bench/ce/algebraic_types_mono.mlw M g4: Unknown (sat)
 Counter-example model:
 File algebraic_types_mono.mlw:
   Line 12:
-    x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "A" ,
-    "list" : [] } }
+    x, [[@introduced]] = {"type": "Apply", "val": {"apply": "A", "list": []}}
 
 bench/ce/algebraic_types_mono.mlw M g5: Unknown (sat)
 Counter-example model:
 File algebraic_types_mono.mlw:
   Line 16:
-    x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Au" ,
-    "list" : [{"type" : "Integer" , "val" : "1" }, {"type" : "Integer" ,
-    "val" : "0" }] } }
+    x, [[@introduced]] =
+      {"type": "Apply",
+       "val":
+        {"apply": "Au",
+         "list":
+          [{"type": "Integer", "val": "1"}, {"type": "Integer", "val": "0"}]}}
 
 bench/ce/algebraic_types_mono.mlw M g1: Timeout or Unknown
 Counter-example model:
 File algebraic_types_mono.mlw:
   Line 25:
-    l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "36" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "171" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "168" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "180" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "167" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "177" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "176" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "179" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "164" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "163" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "53" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "181" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "172" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "157" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "162" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "174" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "175" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "154" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "152" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "155" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "156" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "103" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "90" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "88" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "153" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "151" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "150" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "148" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "145" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "144" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "143" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "140" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "141" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "182" }, {"type" : "Apply" , "val" : {"apply" : "Nil" ,
-    "list" : [] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }] } }
+    l, [[@introduced]] =
+      {"type": "Apply",
+       "val":
+        {"apply": "Cons",
+         "list":
+          [{"type": "Integer", "val": "36"},
+           {"type": "Apply",
+            "val":
+             {"apply": "Cons",
+              "list":
+               [{"type": "Integer", "val": "173"},
+                {"type": "Apply",
+                 "val":
+                  {"apply": "Cons",
+                   "list":
+                    [{"type": "Integer", "val": "170"},
+                     {"type": "Apply",
+                      "val":
+                       {"apply": "Cons",
+                        "list":
+                         [{"type": "Integer", "val": "182"},
+                          {"type": "Apply",
+                           "val":
+                            {"apply": "Cons",
+                             "list":
+                              [{"type": "Integer", "val": "169"},
+                               {"type": "Apply",
+                                "val":
+                                 {"apply": "Cons",
+                                  "list":
+                                   [{"type": "Integer", "val": "179"},
+                                    {"type": "Apply",
+                                     "val":
+                                      {"apply": "Cons",
+                                       "list":
+                                        [{"type": "Integer", "val": "178"},
+                                         {"type": "Apply",
+                                          "val":
+                                           {"apply": "Cons",
+                                            "list":
+                                             [{"type": "Integer",
+                                               "val": "181"},
+                                              {"type": "Apply",
+                                               "val":
+                                                {"apply": "Cons",
+                                                 "list":
+                                                  [{"type": "Integer",
+                                                    "val": "166"},
+                                                   {"type": "Apply",
+                                                    "val":
+                                                     {"apply": "Cons",
+                                                      "list":
+                                                       [{"type": "Integer",
+                                                         "val": "165"},
+                                                        {"type": "Apply",
+                                                         "val":
+                                                          {"apply": "Cons",
+                                                           "list":
+                                                            [{"type":
+                                                               "Integer",
+                                                              "val": "54"},
+                                                             {"type": "Apply",
+                                                              "val":
+                                                               {"apply":
+                                                                 "Cons",
+                                                                "list":
+                                                                 [{"type":
+                                                                    "Integer",
+                                                                   "val":
+                                                                    "183"},
+                                                                  {"type":
+                                                                    "Apply",
+                                                                   "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "174"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "159"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "164"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "176"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "177"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "156"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "154"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "157"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "158"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "105"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "93"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "89"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "155"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "153"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "152"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "150"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "147"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "146"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "145"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "142"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "143"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "184"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Nil",
+                                                                    "list":
+                                                                    []}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}
 
 bench/ce/algebraic_types_mono.mlw M g7: Timeout or Unknown
 Counter-example model:
 File algebraic_types_mono.mlw:
   Line 27:
-    l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "12" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
-    "val" : "27" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-    "list" : [{"type" : "Integer" , "val" : "28" }, {"type" : "Apply" ,
-    "val" : {"apply" : "Nil" , "list" : [] } }] } }] } }] } }
+    l, [[@introduced]] =
+      {"type": "Apply",
+       "val":
+        {"apply": "Cons",
+         "list":
+          [{"type": "Integer", "val": "44"},
+           {"type": "Apply",
+            "val":
+             {"apply": "Cons",
+              "list":
+               [{"type": "Integer", "val": "34"},
+                {"type": "Apply",
+                 "val":
+                  {"apply": "Cons",
+                   "list":
+                    [{"type": "Integer", "val": "33"},
+                     {"type": "Apply",
+                      "val":
+                       {"apply": "Cons",
+                        "list":
+                         [{"type": "Integer", "val": "32"},
+                          {"type": "Apply",
+                           "val":
+                            {"apply": "Cons",
+                             "list":
+                              [{"type": "Integer", "val": "31"},
+                               {"type": "Apply",
+                                "val":
+                                 {"apply": "Cons",
+                                  "list":
+                                   [{"type": "Integer", "val": "21"},
+                                    {"type": "Apply",
+                                     "val":
+                                      {"apply": "Cons",
+                                       "list":
+                                        [{"type": "Integer", "val": "20"},
+                                         {"type": "Apply",
+                                          "val":
+                                           {"apply": "Cons",
+                                            "list":
+                                             [{"type": "Integer",
+                                               "val": "18"},
+                                              {"type": "Apply",
+                                               "val":
+                                                {"apply": "Cons",
+                                                 "list":
+                                                  [{"type": "Integer",
+                                                    "val": "19"},
+                                                   {"type": "Apply",
+                                                    "val":
+                                                     {"apply": "Nil",
+                                                      "list": []}}]}}]}}]}}]}}]}}]}}]}}]}}]}}
 

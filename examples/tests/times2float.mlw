@@ -1,0 +1,8 @@
+
+
+use ieee_float.Float32
+
+let f (x: Float32.t) : Float32.t
+   requires { lt (0.0:t) x /\ lt x (1000.0:t) }
+   ensures  { not (eq (add RNE x x) result) }
+ = mul RNE x (2.0:Float32.t)

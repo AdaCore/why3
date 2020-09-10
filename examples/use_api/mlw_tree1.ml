@@ -59,11 +59,14 @@ let mk_tapp f l = mk_term (Tidapp(f,l))
 
 let mk_eapp f l = mk_expr (Eidapp(f,l))
 
-let mk_evar x = mk_expr(Eident(Qident x))
+let mk_apply e1 e2 = mk_expr (Eapply(e1,e2))
+
+let mk_evar x = mk_expr(Eident(x))
 
 (*BEGIN{helper2}*)
 (* ... *)
 let pat_wild = mk_pat Pwild
+let pat_var id = mk_pat (Pvar id)
 
 let mk_ewhile e1 i v e2 = mk_expr (Ewhile (e1,i,v,e2))
 (*END{helper2}*)
@@ -110,7 +113,7 @@ let mod_M1 =
     let post  = mk_tapp eq_symb [t_x; mk_tconst 100] in
     let spec  = {
       sp_pre     = [pre];
-      sp_post    = [Loc.dummy_position,[pat_wild, post]];
+      sp_post    = [Loc.dummy_position,[pat_var (mk_ident "result"), post]];
       sp_xpost   = [];
       sp_reads   = [];
       sp_writes  = [];
@@ -121,7 +124,7 @@ let mod_M1 =
       sp_partial = false;
     }
     in
-    let var_x      = mk_evar id_x in
+    let var_x      = mk_evar (Qident id_x) in
     (* !x *)
     let e_x        = mk_eapp ref_access [var_x] in
     (* !x < 100 *)
@@ -129,7 +132,7 @@ let mod_M1 =
     (* 100 - !x *)
     let while_vari = mk_tapp minus_int [mk_tconst 100; t_x], None in
     (* incr x *)
-    let incr       = mk_eapp ref_int_incr [var_x] in
+    let incr       = mk_apply (mk_evar ref_int_incr) var_x in
     (* while (!x < 100) do variant { 100 - !x } incr x done *)
     let while_loop = mk_ewhile while_cond [] [while_vari] incr in
     let f =

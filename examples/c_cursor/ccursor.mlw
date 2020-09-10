@@ -10,6 +10,7 @@ module PtrCursor
   val ghost dummy_nonnull () : ptr int32
     ensures { is_not_null result /\ plength result = 1 /\ offset result = 0 }
     ensures { min result = 0 /\ max result = plength result }
+    ensures { writable result }
     ensures { (data result)[0] = 0 }
 
   type cursor = {
@@ -27,6 +28,7 @@ module PtrCursor
                 min current = 0 /\
                 max current = len /\
                 is_not_null current /\
+                writable current /\
                 forall i. 0 <= i < len -> (data current)[i] < bound) }
     by { current = dummy_nonnull (); new = true;
          len = 1; freed = false; bound = 42 }
