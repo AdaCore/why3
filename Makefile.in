@@ -203,7 +203,7 @@ GENERATED =
 # Why3 library
 ##############
 
-LIBGENERATED = src/util/config.ml \
+LIBGENERATED = src/util/config.ml src/util/re.ml \
 	       src/util/rc.ml src/util/lexlib.ml src/util/mysexplib.ml \
 	       src/util/json_parser.mli src/util/json_parser.ml \
 	       src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
@@ -225,7 +225,6 @@ LIB_UTIL = mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
 	   cmdline warning sysutil rc plugin bigInt number constant vector pqueue
 
 ifeq (@enable_re@,no)
-LIBGENERATED += src/util/re.ml
 LIB_UTIL += re
 endif
 
@@ -381,11 +380,7 @@ endif
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml Makefile
 	cp $< $@
-
-GENERATED += re.ml
 endif
-clean::
-	rm -f src/util/re.ml
 
 # build targets
 
