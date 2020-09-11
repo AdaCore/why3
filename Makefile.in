@@ -203,7 +203,7 @@ GENERATED =
 # Why3 library
 ##############
 
-LIBGENERATED = src/util/config.ml src/util/re.ml \
+LIBGENERATED = src/util/config.ml \
 	       src/util/rc.ml src/util/lexlib.ml src/util/mysexplib.ml \
 	       src/util/json_parser.mli src/util/json_parser.ml \
 	       src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
@@ -380,6 +380,7 @@ endif
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml Makefile
 	cp $< $@
+GENERATED += src/util/re.ml
 endif
 
 # build targets
