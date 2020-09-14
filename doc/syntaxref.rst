@@ -347,6 +347,8 @@ example, ``(-)`` refers to the binary subtraction and ``(-_)`` to the
 unary negation. Tight operators cannot be used as infix operators, and
 thus do not require disambiguation.
 
+.. _rubric.collections_syntax:
+
 .. index:: bracket; syntax
 .. index:: collections; syntax; function literals
 .. rubric:: Specific syntax for collections
@@ -373,28 +375,20 @@ with normal identifiers, names with a letter after a prime, such as
 WhyML source.
 
 Functions can be written using a special syntax for `function
-literals`. The function literal ``[|t1 => u1; ...; tn => un|]``, where
-``t1 ... tn`` have some type ``'a`` and ``u1 ... un`` some type
-``'b``, represents the term (or expression) of the form ``fun x -> if
-x = t1 then u1 else if ... else if x = tn then un else nondet_value``,
-where ``nondet_value`` represents some non-deterministic value. It is
-possible to avoid the non-deterministic value by specifying a default
-value such as ``[|t1 => u1; ...; tn => un; _ => d|]``, where
-``d:'a``. This represents the function ``fun x -> if x = t1
-then u1 else if ... else if x = tn then un else d``.
+literals`. The function literal ``[|t1 => u1; ...; tn => un; _ =>
+default|]``, where ``t1, ..., tn`` have some type ``t`` and ``u1,
+..., un, default`` some type ``u``, represents the term with a total
+function of the form ``fun x -> if x = t1 then u1 else if ... else if
+x = tn then un else default``. The default value can be omitted, and
+thus the function will map non-enumerated values into a
+non-deterministic value with the appropriate type. For instance, the
+function literal ``[|t1 => u1|]`` represents the term ``fun x -> if x
+= t1 then u1 else nondet``, where ``nondet`` is some non-deterministic
+value.
 
 When the domain of the function ranges over the ``int``
 type it is possible to write ``[|t1;t2;t3|]`` instead of ``[|0 => t1;
 1 => t2; 2 => t3|]``.
-
-TODO: move this into a better place
-
-When writing function literal expressions, it is naturally required
-that equality is defined for the type of the function literal's
-domain. For the expression ``[|t1 => u1|]`` to be well typed, if
-``t1`` is of type ``t`` then the function ``val (=) (_ _: t): bool``
-should be visible in the current scope. This problem does not appear in terms
-because equality is polymorphic.
 
 .. index:: at; syntax
 .. index:: old; syntax
@@ -735,6 +729,17 @@ within annotations. A different name can be specified, using syntax
 
 Constructions ``break`` and ``continue`` can be used in for each
 loops, with the expected semantics.
+
+.. index:: collections; syntax; function literals
+.. rubric:: Function literals
+
+Function literals can be used in expressions and have the same syntax
+as function literals in terms. However, when writing function literal
+expressions it is required that equality is defined for the type of
+the function literal's domain. For the expression ``[|t1 => u1|]`` to
+be well typed, if ``t1`` is of type ``t`` then a function ``val (=) (_
+_: t): bool`` should be visible in the current scope. This problem
+does not appear in terms because equality is polymorphic.
 
 Modules
 -------
