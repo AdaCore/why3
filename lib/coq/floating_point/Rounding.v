@@ -24,3 +24,4 @@ Inductive mode :=
   | NearestTiesToAway : mode.
 Axiom mode_WhyType : WhyType mode.
 Existing Instance mode_WhyType.
+

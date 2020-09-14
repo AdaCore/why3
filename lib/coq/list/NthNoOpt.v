@@ -42,3 +42,4 @@ generalize (Zeq_bool_if n 0).
 case Zeq_bool ; try easy.
 now intros ->.
 Qed.
+

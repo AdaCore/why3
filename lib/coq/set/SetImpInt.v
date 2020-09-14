@@ -52,3 +52,4 @@ intros s h1.
 destruct h1. unfold to_fset, Fset.is_empty, Fset.mem, set.Set.mem.
 intuition.
 Qed.
+

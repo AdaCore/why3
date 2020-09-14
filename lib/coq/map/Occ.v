@@ -376,7 +376,7 @@ Qed.
 (* Why3 goal *)
 Lemma occ_exchange {a:Type} {a_WT:WhyType a} :
   forall (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
-    (u:Numbers.BinNums.Z) (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z) (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z) 
     (x:a) (y:a) (z:a),
   (l <= i)%Z /\ (i < u)%Z -> (l <= j)%Z /\ (j < u)%Z -> ~ (i = j) ->
   ((occ z (map.Map.set (map.Map.set m i x) j y) l u) =
@@ -388,3 +388,4 @@ apply not_eq_sym in h3.
 rewrite 2!(proj2 (Map.set'def _ _ _ _) h3).
 ring.
 Qed.
+

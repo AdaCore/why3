@@ -78,3 +78,4 @@ Definition log2 (x:Reals.Rdefinitions.R) : Reals.Rdefinitions.R :=
 (* Why3 assumption *)
 Definition log10 (x:Reals.Rdefinitions.R) : Reals.Rdefinitions.R :=
   ((Reals.Rpower.ln x) / (Reals.Rpower.ln 10%R))%R.
+
