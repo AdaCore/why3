@@ -19,8 +19,19 @@ theory BuiltIn
   meta "select_kept_default" "all"
 end
 
+theory bool.Bool
+  meta "inline:no" function andb
+  meta "inline:no" function orb
+  meta "inline:no" function notb
+  meta "inline:no" function xorb
+  meta "inline:no" function implb
+end
 
-transformation "inline_trivial"
+theory bool.Ite
+   meta "inline:no" function ite
+end
+
+transformation "inline_all_in_goal"
 transformation "simplify_trivial_quantification"
 transformation "simplify_formula"
 transformation "eliminate_builtin"

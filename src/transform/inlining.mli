@@ -26,6 +26,7 @@ val get_counterexmp : Task.task -> bool
 val t :
   ?use_meta:bool ->
   ?in_goal:bool ->
+  ?only_top_in_goal:bool ->
   notls:(for_counterexample:bool -> Term.lsymbol -> bool) ->
   notdef:(Term.term -> bool) ->
   Task.task Trans.trans

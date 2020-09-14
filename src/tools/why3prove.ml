@@ -121,7 +121,7 @@ let option_list = [
       " same as -t";
   "-m", Arg.Int (fun i -> opt_memlimit := Some i),
       "<MiB> set the prover's memory limit (default: no limit)";
-  "--memlimit", Arg.Int (fun i -> opt_timelimit := Some i),
+  "--memlimit", Arg.Int (fun i -> opt_memlimit := Some i),
       " same as -m";
   "-a", Arg.String add_opt_trans,
       "<transformation> apply a transformation to every task";
@@ -250,7 +250,7 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
     { Call_provers.empty_limit with
       Call_provers.limit_time = timelimit;
-                   limit_mem = memlimit } in
+      limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
         let call =

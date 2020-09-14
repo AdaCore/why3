@@ -62,10 +62,11 @@ let rec f_replace_top env f = match f.t_node with
 
 (* treat a declaration *)
 
-let fold in_goal notls notdef d (env, task) =
+let fold in_goal only_top_in_goal notls notdef d (env, task) =
   let d = match d.d_node with
-    | Dprop (Pgoal,_,_) when in_goal ->
-        decl_map (f_replace_top env) d
+    | Dprop (Pgoal,_,_) ->
+        let replace = if only_top_in_goal then f_replace_top else t_replace_all in
+        decl_map (replace env) d
     | _ when in_goal ->
         d
     | _ ->
@@ -83,10 +84,10 @@ let fold in_goal notls notdef d (env, task) =
     | _ ->
         env, Task.add_decl task d
 
-let fold in_goal notls notdef task_hd (env, task) =
+let fold in_goal only_top_in_goal notls notdef task_hd (env, task) =
   match task_hd.task_decl.td_node with
     | Decl d ->
-        fold in_goal notls notdef d (env, task)
+        fold in_goal only_top_in_goal notls notdef d (env, task)
     | _ ->
         env, add_tdecl task task_hd.task_decl
 
@@ -95,10 +96,10 @@ let fold in_goal notls notdef task_hd (env, task) =
 let meta = Theory.register_meta "inline:no" [Theory.MTlsymbol]
   ~desc:"Disallow@ the@ inlining@ of@ the@ given@ function/predicate@ symbol."
 
-let t ?(use_meta=true) ?(in_goal=false) ~notls ~notdef =
+let t ?(use_meta=true) ?(in_goal=false) ?(only_top_in_goal=in_goal) ~notls ~notdef =
   Trans.bind (Trans.store get_counterexmp) (fun for_counterexample ->
     let trans notls =
-      Trans.fold_map (fold in_goal notls notdef) Mls.empty None in
+      Trans.fold_map (fold in_goal only_top_in_goal notls notdef) Mls.empty None in
     if use_meta then
       Trans.on_tagged_ls meta (fun sls ->
         let notls ls = Sls.mem ls sls || notls ~for_counterexample ls in
@@ -108,10 +109,16 @@ let t ?(use_meta=true) ?(in_goal=false) ~notls ~notdef =
 
 let all =
   t ~use_meta:true ~in_goal:false ~notdef:Util.ffalse
+    ~only_top_in_goal:false
     ~notls:(fun ~for_counterexample:_ _ -> false)
 
 let goal =
   t ~use_meta:true ~in_goal:true ~notdef:Util.ffalse
+    ~only_top_in_goal:true
+    ~notls:(fun ~for_counterexample:_ _ -> false)
+
+let all_in_goal =
+  t ~use_meta:true ~in_goal:true ~only_top_in_goal:false ~notdef:Util.ffalse
     ~notls:(fun ~for_counterexample:_ _ -> false)
 
 (* inline_trivial *)
@@ -142,12 +149,15 @@ let trivial =
     for_counterexample && ls.ls_args = [] &&
       Sattr.mem intro_attr ls.ls_name.id_attrs in
   t ~use_meta:true ~in_goal:false ~notls ~notdef
+    ~only_top_in_goal:false
 
 let () =
   Trans.register_transform "inline_all" all
     ~desc:"Inline@ non-recursive@ definitions.";
   Trans.register_transform "inline_goal" goal
-    ~desc:"Same@ as@ 'inline_all', but@ only@ inline in@ goals.";
+    ~desc:"Same@ as@ 'inline_all', but@ only@ inline in@ goals and only top symbol.";
+  Trans.register_transform "inline_all_in_goal" all_in_goal
+    ~desc:"Same@ as@ 'inline_all', but@ only@ inline in@ goals (and all occurences).";
   Trans.register_transform "inline_trivial" trivial
     ~desc:"Inline@ trivial@ definitions@ like@ @[f(x,y) = g(y,x,0)@]. \
            Add@ the@ [@@inline:trivial]@ attribute@ to@ force@ inlining."
