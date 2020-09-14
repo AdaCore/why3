@@ -13,14 +13,8 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require AnyFunction.
 Require list.List.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 (* Why3 comment *)
 (* combine is replaced with (Lists.List.combine x x1) by the coq driver *)
@@ -37,4 +31,3 @@ Lemma combine'def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
 Proof.
 now intros [|xh xt] [|yh yt].
 Qed.
-

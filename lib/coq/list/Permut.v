@@ -13,6 +13,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require AnyFunction.
 Require int.Int.
 Require list.List.
 Require list.Length.
@@ -20,13 +21,6 @@ Require list.Mem.
 Require list.Append.
 Require list.Reverse.
 Require list.NumOcc.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 (* Why3 assumption *)
 Definition permut {a:Type} {a_WT:WhyType a} (l1:Init.Datatypes.list a)
@@ -184,4 +178,3 @@ induction l1 as [|l1h l1t IHl1].
   simpl in H.
   omega.
 Qed.
-

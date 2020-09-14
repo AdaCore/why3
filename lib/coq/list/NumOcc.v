@@ -13,19 +13,13 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require AnyFunction.
 Require int.Int.
 Require list.List.
 Require list.Length.
 Require list.Mem.
 Require list.Append.
 Require list.Reverse.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 (* Why3 goal *)
 Definition num_occ {a:Type} {a_WT:WhyType a} :
@@ -118,4 +112,3 @@ ring_simplify.
 simpl (num_occ x (a0 :: nil))%list.
 ring.
 Qed.
-

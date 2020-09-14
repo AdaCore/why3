@@ -13,13 +13,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
+Require AnyFunction.
 
 (* Why3 goal *)
 Lemma andb'def :
@@ -84,4 +78,3 @@ Lemma implb'def :
 Proof.
 now intros [|] [|].
 Qed.
-

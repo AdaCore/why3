@@ -14,19 +14,13 @@
 Require Import BuiltIn.
 Require Reals.Rbasic_fun.
 Require BuiltIn.
+Require AnyFunction.
 Require int.Int.
 Require real.Real.
 Require real.Abs.
 Require real.FromInt.
 Require floating_point.Rounding.
 Require floating_point.SingleFormat.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 Require Import floating_point.GenFloat.
 
@@ -252,4 +246,3 @@ Definition lt (x:floating_point.SingleFormat.single)
 Definition gt (x:floating_point.SingleFormat.single)
     (y:floating_point.SingleFormat.single) : Prop :=
   ((value y) < (value x))%R.
-

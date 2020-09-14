@@ -13,15 +13,9 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require AnyFunction.
 Require int.Int.
 Require list.List.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 (* Why3 goal *)
 Definition nth {a:Type} {a_WT:WhyType a} :
@@ -48,4 +42,3 @@ generalize (Zeq_bool_if n 0).
 case Zeq_bool ; try easy.
 now intros ->.
 Qed.
-

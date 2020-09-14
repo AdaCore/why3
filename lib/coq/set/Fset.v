@@ -14,20 +14,14 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
+Require AnyFunction.
 Require int.Int.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 (* Why3 goal *)
 Definition fset : forall (a:Type), Type.
 Proof.
 intros.
-(* "apply (sig Cardinal.is_finite)." is not possible: a is not Why3Type *) 
+(* "apply (sig Cardinal.is_finite)." is not possible: a is not Why3Type *)
 apply (sig (fun (f: a -> bool) => exists l: List.list a, List.NoDup l /\ forall e, List.In e l <-> f e = true)).
 Defined.
 
@@ -90,7 +84,7 @@ Definition is_empty {a:Type} {a_WT:WhyType a} (s:fset a) : Prop :=
 (* Why3 goal *)
 Definition empty {a:Type} {a_WT:WhyType a} : fset a.
 Proof.
-exists (fun x => false). 
+exists (fun x => false).
 (* TODO remove this *)
 Require Cardinal.
 apply Cardinal.is_finite_empty. unfold set.Set.is_empty.
@@ -109,7 +103,7 @@ Lemma empty_is_empty {a:Type} {a_WT:WhyType a} :
 Proof.
 intros s h1.
 eapply extensionality. intro. unfold empty, is_empty, mem, set.Set.mem in *.
-destruct s. intuition. destruct (h1 _ H). 
+destruct s. intuition. destruct (h1 _ H).
 Qed.
 
 (* Why3 goal *)
@@ -601,4 +595,3 @@ unfold cardinal, inter, disjoint, mem in *.
 destruct s.
 eapply Cardinal.cardinal_map; eauto.
 Qed.
-

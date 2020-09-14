@@ -13,14 +13,8 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require AnyFunction.
 Require int.Int.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 Require Import int.EuclideanDivision.
 
@@ -37,4 +31,3 @@ intros H1 H2.
 simpl in H1.
 omega.
 Qed.
-

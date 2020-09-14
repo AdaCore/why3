@@ -14,14 +14,8 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
+Require AnyFunction.
 Require int.Int.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 Fixpoint numof_aux (f : Z -> bool) (a : Z) (n : nat) : Z :=
   match n with
@@ -341,4 +335,3 @@ intros p1 p2 a b h1.
 apply le_ge_eq.
 split; apply numof_change_any; intros; now apply h1.
 Qed.
-

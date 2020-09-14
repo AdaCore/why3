@@ -13,13 +13,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
+Require AnyFunction.
 
 (* Why3 assumption *)
 Definition is_nil {a:Type} {a_WT:WhyType a} (l:Init.Datatypes.list a) : Prop :=

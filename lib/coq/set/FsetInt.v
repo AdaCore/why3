@@ -14,15 +14,9 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
+Require AnyFunction.
 Require int.Int.
 Require set.Fset.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 (* Why3 goal *)
 Definition min_elt : set.Fset.fset Numbers.BinNums.Z -> Numbers.BinNums.Z.
@@ -44,7 +38,7 @@ Lemma min_elt_def :
   (forall (x:Numbers.BinNums.Z), set.Fset.mem x s -> ((min_elt s) <= x)%Z).
 Proof.
 intros s h1.
-unfold min_elt, Fset.is_empty, Fset.mem, set.Set.mem in *. 
+unfold min_elt, Fset.is_empty, Fset.mem, set.Set.mem in *.
 destruct s. simpl.
 destruct ClassicalEpsilon.constructive_indefinite_description as [l [Hdupl Heql]].
 destruct l.
@@ -57,7 +51,7 @@ induction l0; intros.
 assert (forall l z, List.fold_left (fun x1 acc : int => if Z_le_dec x1 acc then x1 else acc) l z <= z)%Z.
 {
   induction l1; intros; simpl; eauto. omega.
-  simpl. destruct Z_le_dec. eauto. eapply Z.le_trans with a0; eauto. omega. 
+  simpl. destruct Z_le_dec. eauto. eapply Z.le_trans with a0; eauto. omega.
 }
 simpl. destruct Z_le_dec.
 destruct (Z_le_dec z0 x0).
@@ -164,7 +158,7 @@ Proof.
 induction len; intros.
 + constructor.
 + simpl. constructor; eauto.
-  intro Habs. eapply seqZ_le in Habs. omega. 
+  intro Habs. eapply seqZ_le in Habs. omega.
 Qed.
 
 Lemma seqZ_length: forall len l, List.length (seqZ l len) = len.
@@ -178,13 +172,13 @@ Definition interval :
   Numbers.BinNums.Z -> Numbers.BinNums.Z -> set.Fset.fset Numbers.BinNums.Z.
 Proof.
 intros l r.
-exists (fun x => if Z_le_dec l x then 
-                   if Z_lt_dec x r then true 
-                   else false 
+exists (fun x => if Z_le_dec l x then
+                   if Z_lt_dec x r then true
+                   else false
                  else false).
 destruct (Z_le_dec l r).
 + exists (seqZ l (Z.to_nat (r - l))%Z).
-  split. 
+  split.
   - eapply seqZ_NoDup.
   - intros.
     rewrite seqZ_In_iff.
@@ -194,7 +188,7 @@ destruct (Z_le_dec l r).
       intuition.
       intuition. inversion H.
     * intuition. inversion H.
-+ exists List.nil. 
++ exists List.nil.
   split.
   - constructor.
   - intros.
@@ -214,12 +208,12 @@ unfold interval, Fset.mem, set.Set.mem.
 destruct Z_le_dec; try destruct Z_lt_dec; intuition; try inversion H.
 Qed.
 
-Lemma interval_is_finite: forall l r, 
-  Cardinal.is_finite (fun x : int => 
-    if Z_le_dec l x then if Z_lt_dec x r then true 
+Lemma interval_is_finite: forall l r,
+  Cardinal.is_finite (fun x : int =>
+    if Z_le_dec l x then if Z_lt_dec x r then true
     else false else false).
 Proof.
-intros. 
+intros.
 unfold Cardinal.is_finite.
 destruct (Z_le_dec l r).
 + exists (seqZ l (Z.to_nat (r - l)%Z)).
@@ -241,12 +235,12 @@ Proof.
 intros l r.
 unfold interval, Fset.mem, set.Set.mem, Fset.cardinal, Cardinal.cardinal.
 assert (H := interval_is_finite l r).
-destruct ClassicalEpsilon.excluded_middle_informative; [| intuition]. 
+destruct ClassicalEpsilon.excluded_middle_informative; [| intuition].
 destruct ClassicalEpsilon.classical_indefinite_description.
 specialize (a i).
 split.
 + intros.
-  destruct a. 
+  destruct a.
   assert (length (seqZ l (Z.to_nat (r - l)%Z)) = length x).
   {
     eapply Nat.le_antisymm.
@@ -255,14 +249,13 @@ split.
       rewrite Z2Nat.id in H5; omega.
     + eapply List.NoDup_incl_length. assumption. intro. rewrite H2.
       rewrite seqZ_In_iff. destruct Z_le_dec; try destruct Z_lt_dec; intuition.
-      rewrite Z2Nat.id; omega. 
+      rewrite Z2Nat.id; omega.
       inversion H3.
       inversion H3.
   }
   rewrite <- H3. rewrite seqZ_length. rewrite Z2Nat.id; omega.
-+ intros. destruct a. 
++ intros. destruct a.
   destruct x. reflexivity.
-  specialize (H2 z). contradict H2. destruct Z_le_dec. 
+  specialize (H2 z). contradict H2. destruct Z_le_dec.
   destruct Z_lt_dec. omega. intuition. intuition.
 Qed.
-

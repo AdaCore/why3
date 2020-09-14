@@ -16,19 +16,13 @@ Require Reals.Rtrigo_def.
 Require Reals.Rpower.
 Require Reals.R_sqrt.
 Require BuiltIn.
+Require AnyFunction.
 Require int.Int.
 Require int.Power.
 Require real.Real.
 Require real.FromInt.
 Require real.Square.
 Require real.ExpLog.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 Import Rpower.
 
@@ -141,4 +135,3 @@ rewrite <- INR_IZR_INZ.
 apply Rpower_pow.
 now apply (IZR_lt 0).
 Qed.
-

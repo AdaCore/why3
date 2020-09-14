@@ -13,14 +13,8 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require AnyFunction.
 Require int.Int.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 (* Why3 comment *)
 (* abs is replaced with (ZArith.BinInt.Z.abs x) by the coq driver *)
@@ -55,4 +49,3 @@ Lemma Abs_pos :
   forall (x:Numbers.BinNums.Z), (0%Z <= (ZArith.BinInt.Z.abs x))%Z.
 exact Zabs_pos.
 Qed.
-

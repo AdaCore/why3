@@ -14,16 +14,10 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
+Require AnyFunction.
 Require int.Int.
 Require map.Map.
 Require map.Occ.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 (* Why3 assumption *)
 Definition permut {a:Type} {a_WT:WhyType a} (m1:Numbers.BinNums.Z -> a)
@@ -59,4 +53,3 @@ generalize (map.Occ.occ_exists v a1 l u H).
 intros (j, (hj1,hj2)).
 exists j; intuition.
 Qed.
-

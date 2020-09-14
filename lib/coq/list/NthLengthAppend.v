@@ -13,6 +13,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require AnyFunction.
 Require int.Int.
 Require list.List.
 Require list.Length.
@@ -21,13 +22,6 @@ Require list.Nth.
 Require option.Option.
 Require list.NthLength.
 Require list.Append.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 (* Why3 goal *)
 Lemma nth_append_1 {a:Type} {a_WT:WhyType a} :
@@ -79,4 +73,3 @@ intros _.
 apply IHl1.
 omega.
 Qed.
-

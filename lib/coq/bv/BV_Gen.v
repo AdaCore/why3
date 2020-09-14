@@ -13,18 +13,12 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require AnyFunction.
 Require bool.Bool.
 Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
 Require bv.Pow2int.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 Local Parameter last_bit : nat.
 (* Important notice: do not remove 'Local' above, otherwise 'why3 realize' will
@@ -2159,4 +2153,3 @@ Lemma Extensionality : forall (x:t) (y:t), eq_sub x y 0%Z size -> (x = y).
   intros x y.
   apply Extensionality_aux.
 Qed.
-

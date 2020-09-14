@@ -13,15 +13,9 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require AnyFunction.
 Require int.Int.
 Require int.Abs.
-
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
 
 Require Import Zquot.
 
@@ -178,4 +172,3 @@ apply Zplus_le_0_compat with (1 := Hz).
 apply Zmult_le_0_compat with (1 := Hy).
 now apply Zlt_le_weak.
 Qed.
-
