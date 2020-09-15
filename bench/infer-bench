@@ -4,7 +4,7 @@ updateoracle=false
 files=""
 dirs=""
 success=true
-why3="why3 prove"
+why3prove="bin/why3prove"
 
 if test $# = 0; then
   printf "no files provided\n"
@@ -50,7 +50,7 @@ run () {
   file_dir="$(dirname $1)"
   oracle_file="$file_dir/${file_base%.*}.oracle"
   str_oracle=$(cat $oracle_file 2> /dev/null)
-  str_output=$($why3 $1 --debug=print-inferred-invs | \
+  str_output=$($why3prove $1 --debug=print-inferred-invs | \
                    sed -n '/^### Debug: inferred invariants ###/,/^###/p')
   if [ "$str_oracle" = "$str_output" ] ; then
     printf " - ok\n"

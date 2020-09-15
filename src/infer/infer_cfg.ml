@@ -587,6 +587,18 @@ module Make(E: sig
     let manager = get_fixpoint_man cfg manpk in
     let compare_no_closured = PSHGraph.stdcompare.PSHGraph.comparev in
     let sinit = PSette.singleton compare_no_closured 0 in
+    let init_t = Unix.times () in
+    (* standard strategy *)
+    (* let initial_strategy =
+     *   Fixpoint.make_strategy_default
+     *     ~vertex_dummy
+     *     ~hedge_dummy
+     *     cfg.psh_graph sinit in
+     * let output = Fixpoint.analysis_std manager
+     *                cfg.psh_graph sinit initial_strategy in *)
+
+    (* uses the technique of Gopan and Reps published in Static
+       Anlaysis Symposium, SAS'2007 *)
     let make_strategy is_active =
       Fixpoint.make_strategy_default
         ~widening_start:E.widening
@@ -595,22 +607,12 @@ module Make(E: sig
         ~vertex_dummy
         ~hedge_dummy
         cfg.psh_graph sinit in
-    Format.eprintf "DP %d@." __LINE__;
-    let initial_strategy =
-      Fixpoint.make_strategy_default
-        ~vertex_dummy
-        ~hedge_dummy
-        cfg.psh_graph sinit in
-    let init_t = Unix.times () in
-    let output = Fixpoint.analysis_std manager
-                   cfg.psh_graph sinit initial_strategy in
-    (* let output = Fixpoint.analysis_guided manager
-     *                cfg.psh_graph sinit make_strategy in *)
+    let output = Fixpoint.analysis_guided manager
+                   cfg.psh_graph sinit make_strategy in
 
     let end_t = Unix.times () in
     Format.eprintf "Time elapsed %f@."
       Unix.(end_t.tms_utime -. init_t.tms_utime);
-    Format.eprintf "DP %d@." __LINE__;
 
     if Debug.test_flag infer_print_ai_result then begin
         Format.printf "output=%a@." (Fixpoint.print_output manager) output;
