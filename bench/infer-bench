@@ -1,5 +1,12 @@
 #!/bin/bash
 
+has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
+
+if test -z "$has_infer"; then
+    echo "Inference of loop invariants not enabled!"
+    exit 3
+fi
+
 updateoracle=false
 files=""
 dirs=""
