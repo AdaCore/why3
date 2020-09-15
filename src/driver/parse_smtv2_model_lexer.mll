@@ -24,6 +24,21 @@
     | 'v'  -> '\x0B'
     | _ as c -> c
 
+let bin_of_int d =
+  if d < 0 then invalid_arg "bin_of_int" else
+  if d = 0 then "0" else
+    let rec aux acc d =
+      if d = 0 then acc else
+        aux (string_of_int (d land 1) :: acc) (d lsr 1)
+    in
+    String.concat "" (aux [] d)
+
+let binary l s =
+  let i = int_of_string s in
+  let l = int_of_string l in
+  let b = bin_of_int i in
+  let p = String.make (l-String.length b) '0' in
+  Printf.sprintf "#b%s%s" p b
 }
 
 let atom = [^'('')'' ''\t''\n''"']
@@ -88,6 +103,10 @@ rule token = parse
   | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Not_a_number }
   | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
       { FLOAT_VALUE (Model_parser.interp_float ~interp:false b eb sb) }
+  | "(fp" space+ "(_" space+ "bv"(num as b) space+ (num as b_num)")"
+      space+ "(_" space+ "bv"(num as eb) space+ (num as eb_num)")"
+      space+ "(_" space+ "bv"(num as sb) space+ (num as sb_num)")"  ")"
+      { FLOAT_VALUE (Model_parser.interp_float ~interp:false (binary b_num b) (binary eb_num eb) (binary sb_num sb)) }
   | bv_num as bv_value { BITVECTOR_VALUE_SHARP bv_value }
 
   | num as integer

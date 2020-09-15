@@ -96,6 +96,10 @@ smt_term:
     {  match $3 with
     | None -> Sval (Other "")
     | Some (t1, t2) -> Ite (t1, t2, $4, $5) }
+(* | LPAREN ITE smt_term smt_term smt_term RPAREN
+ *     {  match $3 with
+ *        | Apply ("=", [t1; t2]) -> Ite (t1, t2, $4, $5)
+ *        | _ -> Sval (Other "") } *)
 (* No parsable value are applications. *)
 | application { $1 }
 
@@ -122,6 +126,7 @@ pair_equal:
 | application { None }
 | name { None }
 (* ITE containing boolean expressions cannot be dealt with for counterex *)
+| LPAREN ITE smt_term smt_term smt_term RPAREN { None }
 | LPAREN NOT smt_term RPAREN { None }
 
 list_pair_equal:
@@ -136,8 +141,7 @@ application:
 | LPAREN name list_smt_term RPAREN { Apply ($2, List.rev $3) }
 | LPAREN binop smt_term smt_term RPAREN { Apply ($2, [$3;$4]) }
 (* This should not happen in relevant part of the model *)
-| LPAREN INT_TO_BV smt_term RPAREN {
-  Apply ($2, [$3]) }
+| LPAREN INT_TO_BV smt_term RPAREN {Apply ($2, [$3]) }
 
 
 binop:
