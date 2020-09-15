@@ -231,7 +231,7 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
     { Call_provers.empty_limit with
       Call_provers.limit_time = timelimit;
-                   limit_mem = memlimit } in
+      limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
         let call =
