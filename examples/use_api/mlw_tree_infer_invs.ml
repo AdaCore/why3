@@ -228,6 +228,6 @@ let () =
    in the why3 root directory *)
 (*
 Local Variables:
-compile-command: "ocamlfind ocamlopt -linkpkg -package why3 mlw_tree1.ml"
+compile-command: "ocamlfind ocamlopt -linkpkg -package why3 mlw_tree_infer_invs.ml"
 End:
 *)

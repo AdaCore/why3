@@ -660,13 +660,13 @@ while loop and an attribute that triggers the inference of loop
 invariants during VC generation. For more information about the
 inference of loop invariants refer to :numref:`sec.installinferloop`
 and :numref:`sec.runwithinferloop`. The examples shown below are
-available in the file :file:`examples/use_api/mlw_tree1.ml`.
+available in the file :file:`examples/use_api/mlw_tree_infer_invs.ml`.
 
 We build an environment and define the some helper functions exactly
 as in :numref:`sec.build_untyped`. Additionally we create two other
 helper functions as follows:
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{helper2}
    :end-before: END{helper2}
@@ -677,14 +677,14 @@ trigger the inference of loop invariants during VC generation (make
 sure that the why3 library was compiled with support for `infer-loop`,
 see :numref:`sec.installinferloop` for more information).
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{source1}
    :end-before: END{source1}
 
 The OCaml code that builds such a module is shown below.
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{code1}
    :end-before: END{code1}
@@ -693,7 +693,7 @@ The debugging flags mentioned in :numref:`sec.runwithinferloop` can be
 enabled using the API as follows (the line(s) corresponding to the
 desired flag(s) should be uncommented).
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{flags}
    :end-before: END{flags}
