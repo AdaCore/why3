@@ -81,8 +81,8 @@ module Make_from_apron(M:sig
     let th_int = Env.read_theory env ["int"] "Int" in
     let int_tys = Theory.(ns_find_ts th_int.th_export ["int"]) in
     let ty_int = (Ty.ty_app int_tys []) in
-    let int_zero = t_nat_const 0 in
-    let int_one = t_nat_const 1 in
+    let int_zero = t_nat_dec_const 0 in
+    let int_one = t_nat_dec_const 1 in
     let int_le = Theory.(ns_find_ls th_int.th_export ["infix <="]) in
     let int_lt = Theory.(ns_find_ls th_int.th_export ["infix <"]) in
     let int_add =  begin fun a ->
@@ -125,7 +125,7 @@ module Make_from_apron(M:sig
     let coeff_to_term = function
       | Coeff.Scalar s ->
          let i = int_of_s s in
-         let n = Constant.int_const_of_int (abs i) in
+         let n = Constant.int_dec_const_of_int (abs i) in
          if i = 1 then COne
          else if i = -1 then CMinusOne
          else if i > 0 then CPos (t_const n Ty.ty_int)

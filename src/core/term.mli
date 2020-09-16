@@ -249,7 +249,12 @@ val t_false : term
 val t_nat_const : int -> term
 (** [t_nat_const n] builds the constant integer term [n],
     n must be non-negative *)
+val t_nat_dec_const : int -> term
+(** [t_nat_dec_const n] builds the decimal constant integer term [n],
+    n must be non-negative *)
 val t_int_const : BigInt.t -> term
+val t_int_dec_const : BigInt.t -> term
+
 val t_real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> term
 val t_string_const : string -> term
 

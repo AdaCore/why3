@@ -925,9 +925,9 @@ let normalize ~limit engine t0 =
       (* FIXME: what if there is an overflow *)
       let a = BigInt.to_int t in
       if a >= 0 then
-        t_nat_const a
+        t_nat_dec_const a
       else
-        t_app_infer !ls_minus [t_nat_const (-a)]
+        t_app_infer !ls_minus [t_nat_dec_const (-a)]
     | _, [] -> assert false
     | _ ->
       if n = limit then

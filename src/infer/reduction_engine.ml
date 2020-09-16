@@ -10,7 +10,7 @@ let v_label_copy orig v =
   | Term t -> Term (t_label_copy orig t)
 
 let const_of_positive n =
-    t_const (Number.ConstInt (Number.int_const_dec (BigInt.to_string n)))
+    t_const (Number.ConstInt (Number.int_dec_const_dec (BigInt.to_string n)))
 
 let ls_minus = ref ps_equ (* temporary *)
 

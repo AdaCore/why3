@@ -866,6 +866,13 @@ let t_nat_const n =
 let t_int_const n =
   t_const (Constant.int_const n) Ty.ty_int
 
+let t_nat_dec_const n =
+  assert (n >= 0);
+  t_const (Constant.int_dec_const_of_int n) ty_int
+
+let t_int_dec_const n =
+  t_const (Constant.int_dec_const n) Ty.ty_int
+
 let t_real_const ?pow2 ?pow5 s =
   t_const (Constant.real_const ?pow2 ?pow5 s) Ty.ty_real
 

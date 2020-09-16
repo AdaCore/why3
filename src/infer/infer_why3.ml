@@ -54,8 +54,8 @@ module Make(S: sig
   let min_int = ns_find_ls th_int.th_export ["infix -"]
   let min_u_int = ns_find_ls th_int.th_export ["prefix -"]
   let mult_int = ns_find_ls th_int.th_export ["infix *"]
-  let zero_int = t_nat_const 0
-  let one_int = t_nat_const 1
+  let zero_int = t_nat_dec_const 0
+  let one_int = t_nat_dec_const 1
   let int_add = function
     | [t1; t2] when t_equal t1 zero_int -> t2
     | [t1; t2] when t_equal t2 zero_int -> t1
@@ -84,7 +84,7 @@ module Make(S: sig
   let acoeff2coeff = function
     | Coeff.Scalar s ->
        let i = int_of_string (Scalar.to_string s) in
-       let n = Constant.int_const_of_int (abs i) in
+       let n = Constant.int_dec_const_of_int (abs i) in
        if i = 1 then COne
        else if i = -1 then CMinusOne
        else if i > 0 then CPos (t_const n Ty.ty_int)

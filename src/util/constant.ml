@@ -37,6 +37,12 @@ let int_const n =
 let int_const_of_int n =
   int_const (BigInt.of_int n)
 
+let int_dec_const n =
+  ConstInt { il_kind = ILitDec; il_int = n }
+
+let int_dec_const_of_int n =
+  int_dec_const (BigInt.of_int n)
+
 let real_const ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) i =
   ConstReal { rl_kind = RLitUnk; rl_real = real_value ~pow2 ~pow5 i }
 

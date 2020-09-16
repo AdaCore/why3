@@ -21,8 +21,14 @@ type constant =
 val compare_const : constant -> constant -> int
 (** structural comparison; two mathematically equal values might differ *)
 
+(* integer constant with unknown kind *)
 val int_const : BigInt.t -> constant
 val int_const_of_int : int -> constant
+
+(* integer constant with decimal kind *)
+val int_dec_const : BigInt.t -> constant
+val int_dec_const_of_int : int -> constant
+
 val real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> constant
 val string_const : string -> constant
 

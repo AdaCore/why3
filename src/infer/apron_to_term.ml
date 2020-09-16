@@ -11,8 +11,8 @@ module Apron_to_term(E: sig
   let int_tys = Theory.(ns_find_ts th_int.th_export ["int"])
   let ty_int = (Ty.ty_app int_tys [])
   (*let int_zero = fs_app Theory.(ns_find_ls th_int.th_export ["zero"]) [] ty_int (* not nice *) *)
-  let int_zero = t_nat_const 0
-  let int_one = t_nat_const 1
+  let int_zero = t_nat_dec_const 0
+  let int_one = t_nat_dec_const 1
   let int_le = Theory.(ns_find_ls th_int.th_export ["infix <="])
   let int_lt = Theory.(ns_find_ls th_int.th_export ["infix <"])
   let int_add =  begin fun a ->
@@ -50,7 +50,7 @@ module Apron_to_term(E: sig
   let coeff_to_term = function
     | Coeff.Scalar s ->
       let i = int_of_string (Scalar.to_string s) in
-      let n = Constant.int_const_of_int (abs i) in
+      let n = Constant.int_dec_const_of_int (abs i) in
 
       if i = 1 then
         COne
