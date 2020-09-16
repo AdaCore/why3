@@ -181,6 +181,7 @@ let constr rs vl = Vconstr (rs, List.map field vl)
 let v_desc v = v.v_desc
 let v_ty v = v.v_ty
 let field_get (Field r) = r.contents
+let field_set (Field r) v = r := v
 
 let rec print_value fmt v =
   match v.v_desc with
@@ -701,14 +702,14 @@ let add_builtin_mo env (l, n, t, d) =
 let get_builtin_progs env =
   List.iter (add_builtin_mo env) (built_in_modules env)
 
+let get_vs env vs =
+  try Mvs.find vs env.vsenv
+  with Not_found ->
+    ksprintf failwith "program variable %s not found in env@."
+      vs.vs_name.id_string
+
 let get_pvs env pvs =
-  let t =
-    try Mvs.find pvs.pv_vs env.vsenv
-    with Not_found ->
-      eprintf "program variable %s not found in env@."
-        pvs.pv_vs.vs_name.id_string ;
-      assert false in
-  t
+  get_vs env pvs.pv_vs
 
 (* DEFAULTS *)
 
@@ -716,7 +717,7 @@ let get_pvs env pvs =
 let rec default_value_of_type env known ity : value =
   let ty = ty_of_ity ity in
   match ity.ity_node with
-  | Ityvar _ -> assert false
+  | Ityvar _ -> value ty_int (Vnum BigInt.zero) (* assert false *) (* failwith "default_value_of_type: type variable" *)
   | Ityapp (ts, _, _) when its_equal ts its_int -> value ty (Vnum BigInt.zero)
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
   | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
@@ -1225,6 +1226,8 @@ let check_term ?vsenv ctx t =
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "is ok", t)
   | Some false ->
+      if Debug.test_flag debug_rac then
+        eprintf "%a@." report_cntr_head (ctx, "has failed", t);
       raise (Contr (ctx, t))
   | None ->
       eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t);
@@ -1350,22 +1353,39 @@ let get_and_register_value env ?def ?ity vs loc =
          | None ->
             default_value_of_type env.env env.mod_known ity
          | Some v -> v in
-       eprintf "@[<h>VALUE for %s %a not in ce-model, taking \
+       Debug.dprintf debug "@[<h>VALUE for %s %a not in ce-model, taking \
                 default %a@]@." name print_loc loc print_value v;
        v
   in
   register_used_value env loc vs value;
   value
 
-let assign_written_vars wrt loc env vs _ =
+let rec set_fields fs1 fs2 =
+  let set_field f1 f2 =
+    match (field_get f1).v_desc, (field_get f2).v_desc with
+    | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
+        assert (rs_equal rs1 rs2);
+        set_fields fs1 fs2
+    | _ -> field_set f1 (field_get f2) in
+  List.iter2 set_field fs1 fs2
+
+let set_constr v1 v2 =
+  (match v1.v_desc, v2.v_desc with
+   | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
+       assert (rs_equal rs1 rs2);
+       set_fields fs1 fs2;
+   | _ -> failwith "set_constr")
+
+let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs v =
   let pv = restore_pv vs in
   if pv_affected wrt pv then begin
-      Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
-        pp_indent print_pv pv
-        (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
-      let value = get_and_register_value ~ity:pv.pv_ity env vs loc in
-      bind_vs vs value env end
-  else env
+    Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
+      pp_indent print_pv pv
+      (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
+    let pv = Mpv.find_def pv pv vars_map in
+    let value = get_and_register_value ~ity:pv.pv_ity env pv.pv_vs loc in
+    set_constr (get_vs env vs) value
+  end
 
 let rec eval_expr env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
@@ -1503,11 +1523,9 @@ and eval_expr' env e =
       (* assert1 *)
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
-      let env = Mvs.fold_left
-                  (assign_written_vars e.e_effect.eff_writes e_loc)
-                  env env.vsenv in
+      Mvs.iter (assign_written_vars e.e_effect.eff_writes e_loc env) env.vsenv;
       (* assert2 *)
-      (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
+      (try check_terms (cntr_ctx "Invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
             (Pp.print_option Pretty.print_loc) t.t_loc;
@@ -1596,9 +1614,7 @@ and eval_expr' env e =
     if env.rac.do_rac then begin
       let env = bind_vs i.pv_vs (value ty_int (Vnum a)) env in
       check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
-    let env = Mvs.fold_left
-                (assign_written_vars e.e_effect.eff_writes e_loc)
-                env env.vsenv in
+    Mvs.iter (assign_written_vars e.e_effect.eff_writes e_loc env) env.vsenv;
     let def = value ty_int (Vnum (suc b)) in
     let i_val = get_and_register_value ~def ~ity:i.pv_ity env i.pv_vs
                   (Opt.get i.pv_vs.vs_name.id_loc) in
@@ -1608,7 +1624,7 @@ and eval_expr' env e =
       raise (RACStuck (env,i.pv_vs.vs_name.id_loc)); (* FIXME loc *)
     if le a i_val && le i_val b then begin
       (* assert2 *)
-      (try check_terms (cntr_ctx "ce satisfies invariant" env) inv with
+      (try check_terms (cntr_ctx "Invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
             (Pp.print_option Pretty.print_loc) t.t_loc;
@@ -1739,7 +1755,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
     try check_terms ctx rs.rs_cty.cty_pre
     with Contr (ctx, t) when main_function ->
-      printf "contradiction in preconditions of main function";
+      Debug.dprintf debug_rac_check "Contradiction in preconditions of main function@.";
       raise (RACStuck (ctx.c_env, t.t_loc)) );
   let can_interpret_abstractly =
     if rs_equal rs rs_func_app then false else
@@ -1765,12 +1781,11 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
         | _ -> id_fresh "result" in
       let res = create_vsymbol res (ty_of_ity ity_result) in
       let loc1 = Opt.get loc in
-      let env = Mvs.fold_left
-                  (assign_written_vars rs.rs_cty.cty_effect.eff_writes loc1)
-                  env env.vsenv in
+      let vars_map = Mpv.of_list (List.combine rs.rs_cty.cty_args arg_pvs) in
+      Mvs.iter (assign_written_vars ~vars_map rs.rs_cty.cty_effect.eff_writes loc1 env) env.vsenv;
       let res_v = get_and_register_value ~ity:ity_result env res loc1 in
       (* assert2 *)
-      (try check_posts "ce satisfies postcondition" loc env res_v rs.rs_cty.cty_post with
+      (try check_posts "Postcondition" loc env res_v rs.rs_cty.cty_post with
        | Contr (_,t) -> raise (RACStuck (env,t.t_loc)));
       Normal res_v end
   else begin
