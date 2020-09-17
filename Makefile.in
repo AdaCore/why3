@@ -2147,14 +2147,13 @@ clean::
 	$(HIDE)$(MENHIR) --table --explain --strict $<
 
 src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
-	$(SHOW) 'Menhir $<'
+	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser $^
 
-plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: plugins/cfg/cfg_parser.mly
-	$(SHOW) 'Menhir $<'
+plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
+	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --base plugins/cfg/cfg_parser \
-		--external-tokens Cfg_tokens \
-		src/parser/parser_common.mly $^
+		--external-tokens Cfg_tokens $^
 
 
 %.dep: %.ml %.mli
