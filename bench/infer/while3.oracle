@@ -1,8 +1,6 @@
 ### Debug: inferred invariants ###
-(((1 = 1 /\ 0 = 0) /\ 0 < contents i) /\ contents i <= 10) /\
-(2 * contents i) = (2 + contents j)
-(((1 = 1 /\ 0 = 0) /\ 0 < contents i) /\ contents i <= 10) /\
-(2 * contents i) = (2 + contents j)
+(0 < contents i /\ contents i <= 10) /\ (2 * contents i) = (2 + contents j)
+(0 < contents i /\ contents i <= 10) /\ (2 * contents i) = (2 + contents j)
 ###
 ### Debug: inferred invariants ###
 ((((((((((10 <= contents i1 /\ (contents i1 + 8) <= contents j1) /\
@@ -150,20 +148,11 @@
 0 < contents i1
 ###
 ### Debug: inferred invariants ###
-((((((1 = contents i2 /\ 0 = contents j2) /\ 1 = contents i2) /\
-    1 = contents i2) /\
-   contents j2 = 0 \/ 2 = 2) /\
-  1 = 1) /\
- 0 = 0) /\
-0 < contents i2
-((((((((1 = contents i2 /\ 0 = contents j2) /\ 1 = contents i2) /\
-      1 = contents i2) /\
-     contents j2 = 0 \/
-     (((2 = contents i2 /\ 2 = contents j2) /\ contents j2 = contents i2) /\
-      2 = contents i2) /\
-     2 = contents i2 \/ (3 <= contents i2 /\ 4 <= contents j2) /\ 2 = 2) /\
-    1 = 1) /\
-   0 = 0) /\
+forall w3:int. 0 < contents i2
+(((((1 = contents i2 /\ 0 = contents j2) /\ 1 = contents i2) /\
+   contents j2 = 0 \/
+   ((2 = contents i2 /\ 2 = contents j2) /\ contents j2 = contents i2) /\
+   2 = contents i2 \/ 3 <= contents i2 /\ 4 <= contents j2) /\
   0 <= contents j2) /\
  contents i2 <= 10) /\
 0 < contents i2

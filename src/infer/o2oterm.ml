@@ -7,6 +7,17 @@ module Make(S:sig type t end) = struct
     let compare = compare
   end)
 
+  let compare t1 t2 = match t1.t_node, t2.t_node with
+    | Tconst c1, Tconst c2 -> Constant.compare_const_val c1 c2
+    | _ -> t_compare t1 t2
+
+  module Mterm =  Extmap.Make(struct
+    type t = term
+    let compare t1 t2 = match t1.t_node, t2.t_node with
+      | Tconst c1, Tconst c2 -> Constant.compare_const_val c1 c2
+      | _ -> t_compare t1 t2
+  end)
+
   type t = {
     to_term : term TMap.t;
        to_t : S.t Mterm.t;

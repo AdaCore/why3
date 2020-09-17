@@ -1,7 +1,5 @@
 ### Debug: inferred invariants ###
-(((((102 = contents i /\ 102 = contents i) /\ 102 = contents i) /\ 1 = 1 \/
-   contents i <= 99) /\
-  0 = 0) /\
+((102 = contents i /\ 102 = contents i \/ contents i <= 99) /\
  0 <= contents i) /\
 contents i <= 102
 ###
@@ -11,11 +9,10 @@ contents i <= 102
 0 <= contents i1
 ###
 ### Debug: inferred invariants ###
-(((0 = contents i2 /\ contents i2 = 0 \/
-   (2 <= contents i2 /\ contents i2 <= 99) /\ 1 = 1 \/
-   (1 = contents i2 /\ 1 = contents i2) /\ 1 = contents i2 \/
-   ((102 = contents i2 /\ 1 = 1) /\ 102 = contents i2) /\ 102 = contents i2) /\
-  0 = 0) /\
+((0 = contents i2 /\ contents i2 = 0 \/
+  2 <= contents i2 /\ contents i2 <= 99 \/
+  1 = contents i2 /\ 1 = contents i2 \/
+  102 = contents i2 /\ 102 = contents i2) /\
  contents i2 <= 102) /\
 0 <= contents i2
 ###

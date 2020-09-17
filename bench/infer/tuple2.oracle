@@ -1,12 +1,10 @@
 ### Debug: inferred invariants ###
-((((((((1 = match _1 with
-        | $pat, _ -> $pat
-        end /\ 2 = match _1 with
-               | _, $pat -> $pat
-               end) /\
-       0 = 0) /\
-      (1, 2) = _1) /\
-     4 = 4) /\
+((((((1 = match _1 with
+      | $pat, _ -> $pat
+      end /\ 2 = match _1 with
+             | _, $pat -> $pat
+             end) /\
+     (1, 2) = _1) /\
     0 <= contents i) /\
    contents i <= 10) /\
   1 = match _1 with
@@ -898,20 +896,18 @@
 end
 ###
 ### Debug: inferred invariants ###
-((((((((((((0 = contents i2 /\ 0 = contents j2) /\ contents i2 = 0) /\
-          contents j2 = 0 \/
-          ((1 = contents i2 /\ 2 = contents j2) /\
-           contents i2 = match _15 with
-           | $pat, _ -> $pat
-           end) /\
-          contents j2 = match _15 with
-          | _, $pat -> $pat
-          end \/ 2 <= contents i2 /\ 4 <= contents j2) /\
-         4 = 4) /\
-        2 = match _15 with
+((((((((((0 = contents i2 /\ 0 = contents j2) /\ contents i2 = 0) /\
+        contents j2 = 0 \/
+        ((1 = contents i2 /\ 2 = contents j2) /\
+         contents i2 = match _15 with
+         | $pat, _ -> $pat
+         end) /\
+        contents j2 = match _15 with
         | _, $pat -> $pat
-        end) /\
-       0 = 0) /\
+        end \/ 2 <= contents i2 /\ 4 <= contents j2) /\
+       2 = match _15 with
+       | _, $pat -> $pat
+       end) /\
       (1, 2) = _15) /\
      1 = match _15 with
      | $pat, _ -> $pat

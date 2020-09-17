@@ -1,9 +1,8 @@
 ### Debug: inferred invariants ###
-((((length a = (1 + contents u) /\ 0 = contents l) /\
-   (length a - 1) = contents u) /\
-  contents l = 0 \/ contents l <= (1 + contents u)) /\
- 0 = 0) /\
-1 = 1
+forall w1:int.
+ ((length a = (1 + contents u) /\ 0 = contents l) /\
+  (length a - 1) = contents u) /\
+ contents l = 0 \/ contents l <= (1 + contents u)
 ###
 ### Debug: inferred invariants ###
 forall w2:int.
@@ -12,5 +11,5 @@ forall w2:int.
  contents l1 = 0 \/ 0 < length a1
 ###
 ### Debug: inferred invariants ###
-0 = 0 /\ 1 = 1
+forall w3:int. true
 ###

@@ -21,6 +21,9 @@ type constant =
 val compare_const : constant -> constant -> int
 (** structural comparison; two mathematically equal values might differ *)
 
+val compare_const_val : constant -> constant -> int
+(** comparison of values *)
+
 val int_const : BigInt.t -> constant
 val int_const_of_int : int -> constant
 val real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> constant

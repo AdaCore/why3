@@ -1,8 +1,8 @@
 ### Debug: inferred invariants ###
 (((((x = contents x1 /\ x <= 0) /\ contents y = True) /\ ref'mk x = x1) /\
   x = contents x1 \/
-  ((((1 + x) = contents x1 /\ x < 0) /\ (1 + x) = contents x1) /\ 0 = 0) /\
-  1 = 1 \/ ((x + 2) <= contents x1 /\ 1 = 1) /\ 0 = 0) /\
+  ((1 + x) = contents x1 /\ x < 0) /\ (1 + x) = contents x1 \/
+  (x + 2) <= contents x1) /\
  contents x1 <= 0) /\
 x <= contents x1
 ###
@@ -16,7 +16,5 @@ x <= contents x1
 x2 <= 0
 ###
 ### Debug: inferred invariants ###
-(((contents y2 = True /\ ref'mk x4 = x5) /\ x4 = contents x5 \/ 1 = 1) /\
- contents x5 <= 0) /\
-x4 <= 0
+contents x5 <= 0 /\ x4 <= 0
 ###

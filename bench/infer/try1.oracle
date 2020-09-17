@@ -1,7 +1,5 @@
 ### Debug: inferred invariants ###
-(((0 = contents i /\ contents i = 0 \/
-   (6 = contents i /\ 5 = 5) /\ 1 = 1 \/ (12 = contents i /\ 5 = 5) /\ 1 = 1) /\
-  0 = 0) /\
+((0 = contents i /\ contents i = 0 \/ 6 = contents i \/ 12 = contents i) /\
  0 <= contents i) /\
 contents i <= 12
 ###
