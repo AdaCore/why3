@@ -11,6 +11,29 @@
 
 %{
 
+  open Ptree
+
+  let add_record_projections (d: Ptree.decl) =
+    let meta_id = {id_str = Theory.(meta_record.meta_name);
+                   id_ats = [];
+                   id_loc = Loc.dummy_position}
+    in
+    match d with
+    | Dtype dl ->
+        List.iter (fun td ->
+          match td.td_def with
+          | TDrecord fl ->
+              List.iter (fun field ->
+                let m = Dmeta (meta_id, [Mfs (Qident field.f_ident)]) in
+                Typing.add_decl field.f_loc m
+                )
+                fl
+          | _ -> ()
+          )
+          dl
+    | _ -> ()
+
+
 %}
 
 (* Entry points *)
@@ -52,3 +75,109 @@ term_comma_list_eof:
 | comma_list1(single_term) EOF { $1 }
 (* we use single_term to avoid conflict with tuples, that
    do not need parentheses *)
+
+
+(* Modules and scopes *)
+
+mlw_file:
+| EOF
+| mlw_module mlw_module_no_decl* EOF
+    { Typing.close_file () }
+| module_decl module_decl_no_head* EOF
+    { let loc = floc $startpos($3) $endpos($3) in
+      Typing.close_module loc; Typing.close_file () }
+
+mlw_file_parsing_only:
+| EOF { (Modules([])) }
+| mlw_module_parsing_only mlw_module_no_decl_parsing_only* EOF { (Modules( [$1] @ $2)) }
+| module_decl_parsing_only module_decl_no_head_parsing_only* EOF { (Decls( [$1] @ $2)) }
+
+
+mlw_module:
+| module_head module_decl_no_head* END
+    { Typing.close_module (floc $startpos($3) $endpos($3)) }
+
+mlw_module_parsing_only:
+| module_head_parsing_only module_decl_no_head_parsing_only* END { ($1,$2) }
+
+module_head:
+| THEORY attrs(uident_nq)  { Typing.open_module $2 }
+| MODULE attrs(uident_nq)  { Typing.open_module $2 }
+
+scope_head:
+| SCOPE boption(IMPORT) attrs(uident_nq)
+    { Typing.open_scope (floc $startpos $endpos) $3; $2 }
+
+module_decl:
+| scope_head module_decl* END
+    { Typing.close_scope (floc $startpos($1) $endpos($1)) ~import:$1 }
+| IMPORT uqualid
+    { Typing.add_decl (floc $startpos $endpos) (Dimport($2)) }
+| d = pure_decl | d = prog_decl | d = meta_decl
+    { Typing.add_decl (floc $startpos $endpos) d;
+      add_record_projections d
+    }
+| use_clone { () }
+
+(* Do not open inside another module *)
+
+mlw_module_no_decl:
+| SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| mlw_module
+   { $1 }
+
+mlw_module_no_decl_parsing_only:
+| SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| mlw_module_parsing_only
+   { $1 }
+
+module_decl_no_head:
+| THEORY | MODULE
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| module_decl
+   { $1 }
+
+module_decl_no_head_parsing_only:
+| THEORY | MODULE
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| module_decl_parsing_only
+   { $1 }
+
+
+(* Use and clone *)
+
+use_clone:
+| USE EXPORT tqualid
+    { let loc = floc $startpos $endpos in
+      let decl = Ptree.Duseexport $3 in
+      Typing.add_decl loc decl
+    }
+| CLONE EXPORT tqualid clone_subst
+    { let loc = floc $startpos $endpos in
+      let decl = Ptree.Dcloneexport($3,$4) in
+      Typing.add_decl loc decl
+    }
+| USE boption(IMPORT) m_as_list = comma_list1(use_as)
+    { let loc = floc $startpos $endpos in
+      let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
+      let import = $2 in
+      if import && not exists_as then Warning.emit ~loc
+        "the keyword `import' is redundant here and can be omitted";
+      let decl = Ptree.Duseimport(loc,import,m_as_list) in
+      Typing.add_decl loc decl
+    }
+| CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
+    { let loc = floc $startpos $endpos in
+      let import = $2 in
+      let as_opt = $4 in
+      if import && as_opt = None then Warning.emit ~loc
+        "the keyword `import' is redundant here and can be omitted";
+      let decl = Ptree.Dcloneimport(loc,import,$3,as_opt,$5) in
+      Typing.add_decl loc decl
+    }

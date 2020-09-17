@@ -178,26 +178,6 @@
     "Symbol %s cannot be user-defined. User-defined symbol cannot use ' \
       before a letter. You can only use ' followed by _ or a number."
 
-  let add_record_projections (d: Ptree.decl) =
-    let meta_id = {id_str = Theory.(meta_record.meta_name);
-                   id_ats = [];
-                   id_loc = Loc.dummy_position}
-    in
-    match d with
-    | Dtype dl ->
-        List.iter (fun td ->
-          match td.td_def with
-          | TDrecord fl ->
-              List.iter (fun field ->
-                let m = Dmeta (meta_id, [Mfs (Qident field.f_ident)]) in
-                Typing.add_decl field.f_loc m
-                )
-                fl
-          | _ -> ()
-          )
-          dl
-    | _ -> ()
-
   let name_term id_opt def t =
     let name = Opt.fold (fun _ id -> id.id_str) def id_opt in
     let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
@@ -298,58 +278,22 @@
 %nonassoc LEFTSQ
 %nonassoc OPPREF
 
-(* No entry points here, see `parser.mly` *)
+(*
+
+No entry points here, see `parser.mly`
+
+The implicit/shared entry point is `module_decl_parsing_only`
+
+See also `plugins/cfg/cfg_parser.mly`
+
+*)
 
 %%
 
-(* Modules and scopes *)
-
-mlw_file:
-| EOF
-| mlw_module mlw_module_no_decl* EOF
-    { Typing.close_file () }
-| module_decl module_decl_no_head* EOF
-    { let loc = floc $startpos($3) $endpos($3) in
-      Typing.close_module loc; Typing.close_file () }
-
-mlw_file_parsing_only:
-| EOF { (Modules([])) }
-| mlw_module_parsing_only mlw_module_no_decl_parsing_only* EOF { (Modules( [$1] @ $2)) }
-| module_decl_parsing_only module_decl_no_head_parsing_only* EOF { (Decls( [$1] @ $2)) }
-
-mlw_module:
-| module_head module_decl_no_head* END
-    { Typing.close_module (floc $startpos($3) $endpos($3)) }
-
-mlw_module_parsing_only:
-| module_head_parsing_only module_decl_no_head_parsing_only* END { ($1,$2) }
-
-module_head:
-| THEORY attrs(uident_nq)  { Typing.open_module $2 }
-| MODULE attrs(uident_nq)  { Typing.open_module $2 }
-
-module_head_parsing_only:
+%public module_head_parsing_only:
 | THEORY attrs(uident_nq)  { $2 }
 | MODULE attrs(uident_nq)  { $2 }
 
-scope_head:
-| SCOPE boption(IMPORT) attrs(uident_nq)
-    { Typing.open_scope (floc $startpos $endpos) $3; $2 }
-
-scope_head_parsing_only:
-| SCOPE boption(IMPORT) attrs(uident_nq)
-    { let loc = floc $startpos $endpos in (loc, $2, $3) }
-
-module_decl:
-| scope_head module_decl* END
-    { Typing.close_scope (floc $startpos($1) $endpos($1)) ~import:$1 }
-| IMPORT uqualid
-    { Typing.add_decl (floc $startpos $endpos) (Dimport($2)) }
-| d = pure_decl | d = prog_decl | d = meta_decl
-    { Typing.add_decl (floc $startpos $endpos) d;
-      add_record_projections d
-    }
-| use_clone { () }
 
 %public module_decl_parsing_only:
 | scope_head_parsing_only module_decl_parsing_only* END
@@ -358,67 +302,10 @@ module_decl:
 | d = pure_decl | d = prog_decl | d = meta_decl { d }
 | use_clone_parsing_only { $1 }
 
-(* Do not open inside another module *)
+scope_head_parsing_only:
+| SCOPE boption(IMPORT) attrs(uident_nq)
+    { let loc = floc $startpos $endpos in (loc, $2, $3) }
 
-mlw_module_no_decl:
-| SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
-   { let loc = floc $startpos $endpos in
-     Loc.errorm ~loc "trying to open a module inside another module" }
-| mlw_module
-   { $1 }
-
-mlw_module_no_decl_parsing_only:
-| SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
-   { let loc = floc $startpos $endpos in
-     Loc.errorm ~loc "trying to open a module inside another module" }
-| mlw_module_parsing_only
-   { $1 }
-
-module_decl_no_head:
-| THEORY | MODULE
-   { let loc = floc $startpos $endpos in
-     Loc.errorm ~loc "trying to open a module inside another module" }
-| module_decl
-   { $1 }
-
-module_decl_no_head_parsing_only:
-| THEORY | MODULE
-   { let loc = floc $startpos $endpos in
-     Loc.errorm ~loc "trying to open a module inside another module" }
-| module_decl_parsing_only
-   { $1 }
-
-(* Use and clone *)
-
-use_clone:
-| USE EXPORT tqualid
-    { let loc = floc $startpos $endpos in
-      let decl = Ptree.Duseexport $3 in
-      Typing.add_decl loc decl
-    }
-| CLONE EXPORT tqualid clone_subst
-    { let loc = floc $startpos $endpos in
-      let decl = Ptree.Dcloneexport($3,$4) in
-      Typing.add_decl loc decl
-    }
-| USE boption(IMPORT) m_as_list = comma_list1(use_as)
-    { let loc = floc $startpos $endpos in
-      let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
-      let import = $2 in
-      if import && not exists_as then Warning.emit ~loc
-        "the keyword `import' is redundant here and can be omitted";
-      let decl = Ptree.Duseimport(loc,import,m_as_list) in
-      Typing.add_decl loc decl
-    }
-| CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
-    { let loc = floc $startpos $endpos in
-      let import = $2 in
-      let as_opt = $4 in
-      if import && as_opt = None then Warning.emit ~loc
-        "the keyword `import' is redundant here and can be omitted";
-      let decl = Ptree.Dcloneimport(loc,import,$3,as_opt,$5) in
-      Typing.add_decl loc decl
-    }
 use_clone_parsing_only:
 | USE EXPORT tqualid
     { (Duseexport $3) }
@@ -436,10 +323,10 @@ use_clone_parsing_only:
         "the keyword `import' is redundant here and can be omitted";
       (Dcloneimport (loc, $2, $3, $4, $5)) }
 
-use_as:
+%public use_as:
 | n = tqualid q = option(preceded(AS, uident)) { (n, q) }
 
-clone_subst:
+%public clone_subst:
 | (* epsilon *)                         { [] }
 | WITH comma_list1(single_clone_subst)  { $2 }
 
@@ -465,7 +352,7 @@ single_clone_subst:
 
 (* Meta declarations *)
 
-meta_decl:
+%public meta_decl:
 | META sident comma_list1(meta_arg)  { Dmeta ($2, $3) }
 
 meta_arg:
@@ -1460,7 +1347,7 @@ ref_binder: (* let ref and val ref *)
 | ident                   { Qident $1 }
 | uqualid DOT ident       { Qdot ($1, $3) }
 
-uqualid:
+%public uqualid:
 | uident                  { Qident $1 }
 | uqualid DOT uident      { Qdot ($1, $3) }
 
@@ -1474,7 +1361,7 @@ lqualid_rich:
 | uqualid DOT lident      { Qdot ($1, $3) }
 | uqualid DOT lident_op   { Qdot ($1, $3) }
 
-tqualid:
+%public tqualid:
 | uident                  { Qident $1 }
 | squalid DOT uident      { Qdot ($1, $3) }
 
