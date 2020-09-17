@@ -167,8 +167,8 @@ module Make(S:sig
   exception Constant
 
   let t_z_const a =
-    if a >= 0 then t_nat_dec_const a
-    else t_app min_u_int [t_nat_dec_const (-a)] (Some Ty.ty_int)
+    if a >= 0 then t_nat_const a
+    else t_app min_u_int [t_nat_const (-a)] (Some Ty.ty_int)
 
  (* let engine = Reduction_engine0.create {compute_defs = true; compute_builtin = true; compute_def_set = Sls.empty; } env known_logical_ident*)
 

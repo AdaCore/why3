@@ -492,7 +492,7 @@ module Make(E: sig
          (fun _ -> constraints_e) ~lbl:"for lo<=pv<=up";
 
        let vret_pv = create_vreturn manpk Ty.ty_int in
-       let res = t_app E.Infer_why3.ad_int [pv_t; t_nat_dec_const 1] (Some Ty.ty_int) in
+       let res = t_app E.Infer_why3.ad_int [pv_t; t_nat_const 1] (Some Ty.ty_int) in
        let next_assign =
          t_app ps_equ [t_var vret_pv; res] None
          |> QDom.meet_term manpk in
