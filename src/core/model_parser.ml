@@ -27,112 +27,31 @@ let debug = Debug.register_info_flag "model_parser"
 ****************************************************************
 *)
 
-type float_type =
-  | Plus_infinity
-  | Minus_infinity
-  | Plus_zero
-  | Minus_zero
-  | Not_a_number
-  | Float_value of string * string * string
-  | Float_hexa of string * float
+type model_int = { int_value: BigInt.t; int_verbatim: string }
 
-type repr = BinRepr | HexaRepr
+type model_dec = { dec_int: BigInt.t; dec_frac: BigInt.t; dec_verbatim: string }
 
-let interp_float ?(interp = true) b eb sb =
-  let convert (r : repr) s =
-    (* Convert number of less than 63 bits TODO *)
-    match r with
-    | BinRepr when String.length s <= 62 -> int_of_string ("0b" ^ s)
-    | HexaRepr when String.length s <= 15 -> int_of_string ("0x" ^ s)
-    | _ -> (* Too big to fit into an integer *) raise Exit in
-  let rec pow x n =
-    assert (n <= 63) ;
-    match n with p when p <= 0 -> 1 | 1 -> x | p -> x * pow x (p - 1) in
-  let get_repr s len =
-    if String.sub s 0 2 = "#b" then (BinRepr, String.sub s 2 (len - 2), len - 2)
-    else if String.sub s 0 2 = "#x" then
-      (HexaRepr, String.sub s 2 (len - 2), (len - 2) * 4)
-    else raise Exit in
-  let pad_with_zeros width s =
-    let s_len = String.length s in
-    let filled =
-      let len = width - s_len in
-      if len <= 0 then "" else String.make len '0' in
-    filled ^ s in
-  let only_zeros s =
-    (* Check that there is only 0 in the string *)
-    let b = ref true in
-    for i = 0 to String.length s - 1 do
-      b := !b && s.[i] = '0'
-    done ;
-    !b in
-  try
-    (* We don't interpret when this is disable *)
-    if not interp then raise Exit ;
-    let is_neg =
-      match b with "#b0" -> false | "#b1" -> true | _ -> raise Exit in
-    let eb_len = String.length eb in
-    let sb_len = String.length sb in
-    if eb_len < 2 || sb_len < 2 then raise Exit ;
-    let eb_repr, eb, eb_size = get_repr eb eb_len in
-    let sb_repr, sb, sb_size = get_repr sb sb_len in
-    (* Values for the type of float obtained *)
-    (* Exponent bias *)
-    let exp_bias = pow 2 (eb_size - 1) - 1 in
-    (* Maximum exponent value *)
-    let max_exp = pow 2 eb_size - 1 in
-    (* Length of the hexadecimal representation (after the ".") *)
-    let length_of_number =
-      if sb_size mod 4 = 0 then sb_size / 4 else (sb_size / 4) + 1 in
-    (* Compute exponent (int) and mantissa (string of hexa) *)
-    let exp = convert eb_repr eb in
-    let mant_base16 =
-      let c = convert sb_repr sb in
-      let c =
-        (* The hex value is used after the decimal point. So we need to adjust
-           it to the number of binary elements there are.
-           Example in 32bits: significand is 23 bits, and the hexadecimal
-           representation will have a multiple of 4 bits (ie 24). So, we need to
-           multiply by two to account the difference. *)
-        if sb_repr = BinRepr then
-          let adjust = 4 - (sb_size mod 4) in
-          (* No adjustment needed *)
-          if adjust = 4 then c else pow 2 adjust * c
-        else c in
-      pad_with_zeros length_of_number (Format.asprintf "%x" c) in
-    match exp with
-    | 0 (* subnormals and zero *) ->
-        (* Case for zero *)
-        if only_zeros mant_base16 then if is_neg then Minus_zero else Plus_zero
-        else
-          (* Subnormals *)
-          let s =
-            (if is_neg then "-" else "")
-            ^ "0x0." ^ mant_base16 ^ "p-" ^ string_of_int exp_bias in
-          Float_hexa (s, float_of_string s)
-    | e when e = max_exp (* infinities and NaN *) ->
-        if only_zeros mant_base16 then
-          if is_neg then Minus_infinity else Plus_infinity
-        else Not_a_number
-    | _ (* Normal floats *) ->
-        let exp = exp - exp_bias in
-        let s =
-          (if is_neg then "-" else "")
-          ^ "0x1." ^ mant_base16 ^ "p" ^ string_of_int exp in
-        Float_hexa (s, float_of_string s)
-  with Exit -> Float_value (b, eb, sb)
+type model_frac = { frac_nom: BigInt.t; frac_den: BigInt.t; frac_verbatim: string }
+
+type model_bv = { bv_value: BigInt.t; bv_length: int; bv_verbatim: string }
+
+type model_float_binary = { sign: model_bv; exp: model_bv; mant: model_bv }
+
+type model_float =
+  | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
+  | Float_number of {hex: string option; binary: model_float_binary}
 
 type model_value =
-  | String of string
-  | Integer of string
-  | Decimal of (string * string)
-  | Fraction of (string * string)
-  | Float of float_type
   | Boolean of bool
+  | String of string
+  | Integer of model_int
+  | Float of model_float
+  | Bitvector of model_bv
+  | Decimal of model_dec
+  | Fraction of model_frac
   | Array of model_array
   | Record of model_record
   | Proj of model_proj
-  | Bitvector of string
   | Apply of string * model_value list
   | Unparsed of string
 
@@ -157,7 +76,81 @@ let array_add_element ~array ~index ~value =
   let arr_index = {arr_index_key= index; arr_index_value= value} in
   {arr_others= array.arr_others; arr_indices= arr_index :: array.arr_indices}
 
-let convert_float_value f =
+let pad_with_zeros width s =
+  let filled =
+    let len = width - String.length s in
+    if len <= 0 then "" else String.make len '0' in
+  filled ^ s
+
+(* (-) integer . fractional e (-) exponent *)
+(* ?%d+.%d*E-?%d+ *)
+(* 0X-?%x+.%x*P-?%d+ *)
+
+let float_of_binary binary =
+  try
+    let open BigInt in
+    let {sign; mant; exp} = binary in
+    let exp_bias = pred (pow_int_pos 2 (exp.bv_length - 1)) in
+    let exp_max = pred (pow_int_pos 2 exp.bv_length) in
+    let frac_len = (* Length of the hexadecimal representation (after the ".") *)
+      if mant.bv_length mod 4 = 0
+      then mant.bv_length / 4
+      else (mant.bv_length / 4) + 1 in
+    let is_neg = match to_int sign.bv_value with 0 -> false | 1 -> true | _ -> raise Exit in
+    (* Compute exponent (int) and frac (string of hexa) *)
+    let frac =
+      (* The hex value is used after the decimal point. So we need to adjust
+         it to the number of binary elements there are.
+         Example in 32bits: significand is 23 bits, and the hexadecimal
+         representation will have a multiple of 4 bits (ie 24). So, we need to
+         multiply by two to account the difference. *)
+      if Strings.has_prefix "#b" mant.bv_verbatim then
+        let rem = mant.bv_length mod 4 in
+        if rem = 0 then
+          mant.bv_value (* No adjustment needed *)
+        else
+          mul (pow_int_pos 2 (4-rem)) mant.bv_value
+      else mant.bv_value in
+    let frac = pad_with_zeros frac_len (Format.sprintf "%x" (to_int frac)) in
+    if eq exp.bv_value zero then (* subnormals and zero *)
+      (* Case for zero *)
+      if eq mant.bv_value zero then
+        if is_neg then Minus_zero else Plus_zero
+      else
+        (* Subnormals *)
+        let hex = Format.asprintf "%t0x0.%sp-%s"
+            (fun fmt -> if is_neg then Pp.string fmt "-")
+            frac (to_string exp_bias) in
+        Float_number {hex= Some hex; binary}
+    else if eq exp.bv_value exp_max (* infinities and NaN *) then
+      if eq mant.bv_value zero then
+        if is_neg then Minus_infinity else Plus_infinity
+      else Not_a_number
+    else
+      let exp = sub exp.bv_value exp_bias in
+      let hex = Format.asprintf "%t0x1.%sp%s"
+          (fun fmt -> if is_neg then Pp.string fmt "-")
+          frac (to_string exp) in
+      Float_number {hex= Some hex; binary}
+  with Exit ->
+    Float_number {hex= None; binary}
+
+let binary_of_bigint d =
+  let open BigInt in
+  if lt d zero then invalid_arg "bin_of_int";
+  if eq d zero then "0" else
+    let rec loop acc d =
+      if eq d zero then acc else
+        let d, m = computer_div_mod d (of_int 2) in
+        loop (BigInt.to_string m :: acc) d in
+    String.concat "" (loop [] d)
+
+let binary_of_bv bv =
+  let b = binary_of_bigint bv.bv_value in
+  let p = String.make (bv.bv_length-String.length b) '0' in
+  Printf.sprintf "#b%s%s" p b
+
+let convert_float_value ?(force_binary_bv=false) f =
   match f with
   | Plus_infinity ->
       let m = Mstr.add "cons" (Json_base.String "Plus_infinity") Mstr.empty in
@@ -174,16 +167,22 @@ let convert_float_value f =
   | Not_a_number ->
       let m = Mstr.add "cons" (Json_base.String "Not_a_number") Mstr.empty in
       Json_base.Record m
-  | Float_value (b, eb, sb) ->
+  | Float_number {binary= {sign; exp; mant}} when force_binary_bv ->
       let m = Mstr.add "cons" (Json_base.String "Float_value") Mstr.empty in
-      let m = Mstr.add "sign" (Json_base.String b) m in
-      let m = Mstr.add "exponent" (Json_base.String eb) m in
-      let m = Mstr.add "significand" (Json_base.String sb) m in
+      let m = Mstr.add "sign" (Json_base.String (binary_of_bv sign)) m in
+      let m = Mstr.add "exponent" (Json_base.String (binary_of_bv exp)) m in
+      let m = Mstr.add "significand" (Json_base.String (binary_of_bv mant)) m in
       Json_base.Record m
-  | Float_hexa (s, f) ->
+  | Float_number {hex= Some hex} ->
       let m = Mstr.add "cons" (Json_base.String "Float_hexa") Mstr.empty in
-      let m = Mstr.add "str_hexa" (Json_base.String s) m in
-      let m = Mstr.add "value" (Json_base.Float f) m in
+      let m = Mstr.add "str_hexa" (Json_base.String hex) m in
+      let m = Mstr.add "value" (Json_base.Float (float_of_string hex)) m in
+      Json_base.Record m
+  | Float_number {binary= {sign; exp; mant}} ->
+      let m = Mstr.add "cons" (Json_base.String "Float_value") Mstr.empty in
+      let m = Mstr.add "sign" (Json_base.String sign.bv_verbatim) m in
+      let m = Mstr.add "exponent" (Json_base.String exp.bv_verbatim) m in
+      let m = Mstr.add "significand" (Json_base.String mant.bv_verbatim) m in
       Json_base.Record m
 
 let rec convert_model_value value : Json_base.json =
@@ -192,30 +191,29 @@ let rec convert_model_value value : Json_base.json =
       let m = Mstr.add "type" (Json_base.String "String") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String s) m in
       Json_base.Record m
-  | Integer s ->
+  | Integer r ->
       let m = Mstr.add "type" (Json_base.String "Integer") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String s) m in
+      let m = Mstr.add "val" (Json_base.String (BigInt.to_string r.int_value)) m in
       Json_base.Record m
   | Float f ->
       let m = Mstr.add "type" (Json_base.String "Float") Mstr.empty in
       let m = Mstr.add "val" (convert_float_value f) m in
       Json_base.Record m
-  | Decimal (int_part, fract_part) ->
+  | Decimal d ->
       let m = Mstr.add "type" (Json_base.String "Decimal") Mstr.empty in
-      let m =
-        Mstr.add "val" (Json_base.String (int_part ^ "." ^ fract_part)) m in
+      let m = Mstr.add "val" (Json_base.String (Format.sprintf "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac))) m in
       Json_base.Record m
-  | Fraction (num, den) ->
+  | Fraction f ->
       let m = Mstr.add "type" (Json_base.String "Fraction") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String (num ^ "/" ^ den)) m in
+      let m = Mstr.add "val" (Json_base.String (Format.sprintf "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den))) m in
       Json_base.Record m
   | Unparsed s ->
       let m = Mstr.add "type" (Json_base.String "Unparsed") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String s) m in
       Json_base.Record m
-  | Bitvector v ->
-      let m = Mstr.add "type" (Json_base.String "Bv") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String v) m in
+  | Bitvector bv ->
+      let m = Mstr.add "type" (Json_base.String "Integer") Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String (BigInt.to_string bv.bv_value)) m in
       Json_base.Record m
   | Boolean b ->
       let m = Mstr.add "type" (Json_base.String "Boolean") Mstr.empty in
@@ -292,8 +290,10 @@ let print_float_human fmt f =
   | Plus_zero -> fprintf fmt "+0"
   | Minus_zero -> fprintf fmt "-0"
   | Not_a_number -> fprintf fmt "NaN"
-  | Float_value (b, eb, sb) -> fprintf fmt "float_bits(%s,%s,%s)" b eb sb
-  | Float_hexa (s, f) -> fprintf fmt "%s (%g)" s f
+  | Float_number {hex= Some hex} ->
+      fprintf fmt "%s (%g)" hex (float_of_string hex)
+  | Float_number {binary= {sign; exp; mant}} ->
+      fprintf fmt "float_bits(%s,%s,%s)" sign.bv_verbatim exp.bv_verbatim mant.bv_verbatim
 
 let rec print_array_human fmt (arr : model_array) =
   let print_others fmt v =
@@ -323,40 +323,19 @@ and print_proj_human fmt p =
   let s, v = p in
   fprintf fmt "@[{%s =>@ %a}@]" s print_model_value_human v
 
-and print_integer fmt (i : string) =
-  (* TODO This conversion is adhoc plus it is not the most efficient. But it
-     should be ok as we use this only for display. *)
-  let print_big_int fmt (bn : BigInt.t) =
-    let to_hexa n = sprintf "%X" n in
-    let base = BigInt.of_int 16 in
-    let rec convert_big_int_hexa (bn : BigInt.t) : string =
-      if BigInt.lt bn base then to_hexa (BigInt.to_int bn)
-      else
-        let q, r = BigInt.euclidean_div_mod bn base in
-        convert_big_int_hexa q ^ to_hexa (BigInt.to_int r) in
-    fprintf fmt "%s (%s0x%s)" (BigInt.to_string bn)
-      (if BigInt.sign bn >= 0 then "" else "-")
-      (convert_big_int_hexa (BigInt.abs bn)) in
-  let bn = BigInt.of_string i in
-  try
-    let i = BigInt.to_int bn in
-    if i >= 0 then fprintf fmt "%d (0x%X)" i i
-    else fprintf fmt "%d (-0x%X)" i (-i)
-  with Failure _ (* "int_of_big_int" *) -> print_big_int fmt bn
-
-and print_bv fmt (bv : string) =
+and print_bv fmt (bv : model_bv) =
   (* TODO Not implemented yet. Ideally, fix the differentiation made in the
      parser between Bv_int and Bv_sharp -> convert Bv_int to Bitvector not
      Integer. And print Bv_int exactly like Bv_sharp.
   *)
-  Format.fprintf fmt "%s" bv
+  fprintf fmt "%s" bv.bv_verbatim
 
 and print_model_value_human fmt (v : model_value) =
   match v with
   | String s -> Constant.print_string_def fmt s
-  | Integer s -> print_integer fmt s
-  | Decimal (s1, s2) -> fprintf fmt "%s" (s1 ^ "." ^ s2)
-  | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
+  | Integer i -> fprintf fmt "%s (%s)" (BigInt.to_string i.int_value) i.int_verbatim
+  | Decimal d -> fprintf fmt "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac)
+  | Fraction f -> fprintf fmt "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den)
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b" b
   | Apply (s, []) -> fprintf fmt "%s" s

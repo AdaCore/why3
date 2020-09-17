@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Wstdlib
+open Model_parser
 open Smt2_model_defs
 
 exception Not_value
@@ -67,26 +68,27 @@ type correspondence_table = tree Mstr.t
 (** Printing functions *)
 let print_float fmt f =
   match f with
-  | Model_parser.Plus_infinity -> Format.fprintf fmt "Plus_infinity"
-  | Model_parser.Minus_infinity -> Format.fprintf fmt "Minus_infinity"
-  | Model_parser.Plus_zero -> Format.fprintf fmt "Plus_zero"
-  | Model_parser.Minus_zero -> Format.fprintf fmt "Minus_zero"
-  | Model_parser.Not_a_number -> Format.fprintf fmt "NaN"
-  | Model_parser.Float_value (b, eb, sb) -> Format.fprintf fmt "(%s, %s, %s)" b eb sb
-  | Model_parser.Float_hexa(s,f) -> Format.fprintf fmt "%s (%g)" s f
+  | Plus_infinity -> Format.fprintf fmt "Plus_infinity"
+  | Minus_infinity -> Format.fprintf fmt "Minus_infinity"
+  | Plus_zero -> Format.fprintf fmt "Plus_zero"
+  | Minus_zero -> Format.fprintf fmt "Minus_zero"
+  | Not_a_number -> Format.fprintf fmt "NaN"
+  | Float_number {hex= Some hex} ->
+      Format.fprintf fmt "%s (%g)" hex (float_of_string hex)
+  | Float_number {binary= {sign; exp; mant}} ->
+      Format.fprintf fmt "(%s, %s, %s)" (BigInt.to_string sign.bv_value) (BigInt.to_string exp.bv_value) (BigInt.to_string mant.bv_value)
 
 let print_value fmt v =
   match v with
   | String s ->
      Format.fprintf fmt "String: %a" Constant.print_string_def s
-  | Integer s -> Format.fprintf fmt "Integer: %s" s
-  | Decimal (s1, s2) -> Format.fprintf fmt "Decimal: %s . %s" s1 s2
-  | Fraction (s1, s2) -> Format.fprintf fmt "Fraction: %s / %s" s1 s2
+  | Integer i -> Format.fprintf fmt "Integer: %s" (BigInt.to_string i.int_value)
+  | Decimal r -> Format.fprintf fmt "Decimal: %s . %s" (BigInt.to_string r.dec_int) (BigInt.to_string r.dec_frac)
+  | Fraction r -> Format.fprintf fmt "Fraction: %s / %s" (BigInt.to_string r.frac_nom) (BigInt.to_string r.frac_den)
   | Float f -> Format.fprintf fmt "Float: %a" print_float f
-  | Other s -> Format.fprintf fmt "Other: %s" s
-  | Bitvector (Bv_int bv) -> Format.fprintf fmt "Bv: %s" bv
-  | Bitvector (Bv_sharp bv) -> Format.fprintf fmt "Bv: %s" bv
+  | Bitvector bv -> Format.fprintf fmt "Bv: %s" bv.bv_verbatim
   | Boolean b -> Format.fprintf fmt "Boolean: %b " b
+  | Other s -> Format.fprintf fmt "Other: %s" s
 
 let rec print_array fmt a =
   match a with
@@ -474,19 +476,10 @@ let convert_simple_to_model_value (v: simple_value) =
   match v with
   | String s -> Model_parser.String s
   | Integer i -> Model_parser.Integer i
-  | Decimal (d1, d2) -> Model_parser.Decimal (d1, d2)
-  | Fraction (s1, s2) -> Model_parser.Fraction (s1, s2)
+  | Decimal d -> Model_parser.Decimal d
+  | Fraction f -> Model_parser.Fraction f
   | Float f -> Model_parser.Float f
-  | Bitvector (Bv_int bv) -> Model_parser.Integer bv
-  | Bitvector (Bv_sharp bv) ->
-      (* Convert "#x0032" to "0x0032" then to "50" for uniformity with Bv_int *)
-      begin try
-        let a = ref 0 in
-        let bv = "0" ^ String.sub bv 1 (String.length bv - 1) in
-        Scanf.sscanf bv "%i" (fun x -> a := x);
-        let bv = Format.asprintf "%d" !a in
-        Model_parser.Integer bv
-      with _ -> Model_parser.Bitvector bv end
+  | Bitvector bv -> Model_parser.Integer {int_value= bv.bv_value; int_verbatim= bv.bv_verbatim}
   | Boolean b -> Model_parser.Boolean b
   | Other _s -> raise Not_value
 

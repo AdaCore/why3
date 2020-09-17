@@ -11,42 +11,44 @@
 
 (** {1 Counter-example model values} *)
 
-type float_type =
-  | Plus_infinity
-  | Minus_infinity
-  | Plus_zero
-  | Minus_zero
-  | Not_a_number
-  | Float_value of string * string * string
-    (** [Float_value (sign, exponent, mantissa)] *)
-  | Float_hexa of string * float
+type model_int = { int_value: BigInt.t; int_verbatim: string }
 
-val interp_float: ?interp:bool -> string -> string -> string -> float_type
+type model_dec = { dec_int: BigInt.t; dec_frac: BigInt.t; dec_verbatim: string }
+
+type model_frac = { frac_nom: BigInt.t; frac_den: BigInt.t; frac_verbatim: string }
+
+type model_bv = { bv_value: BigInt.t; bv_length: int; bv_verbatim: string }
+
+type model_float_binary = { sign: model_bv; exp: model_bv; mant: model_bv }
+
+type model_float =
+  | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
+  | Float_number of {hex: string option (* e.g., 0x1.ffp99 *); binary: model_float_binary}
 
 type model_value =
- | String of string
- | Integer of string
- | Decimal of (string * string)
- | Fraction of (string * string)
- | Float of float_type
- | Boolean of bool
- | Array of model_array
- | Record of model_record
- | Proj of model_proj
- | Bitvector of string
- | Apply of string * model_value list
- | Unparsed of string
-and  arr_index = {
-  arr_index_key : model_value;
-  arr_index_value : model_value;
-}
-and model_array = {
-  arr_others  : model_value;
-  arr_indices : arr_index list;
-}
-and model_proj = (proj_name * model_value)
-and proj_name = string
+  | Boolean of bool
+  | String of string
+  | Integer of model_int
+  | Float of model_float
+  | Bitvector of model_bv
+  | Decimal of model_dec
+  | Fraction of model_frac
+  | Array of model_array
+  | Record of model_record
+  | Proj of model_proj
+  | Apply of string * model_value list
+  | Unparsed of string
+
+and arr_index = {arr_index_key: model_value; arr_index_value: model_value}
+
+and model_array = {arr_others: model_value; arr_indices: arr_index list}
+
 and model_record = (field_name * model_value) list
+
+and model_proj = proj_name * model_value
+
+and proj_name = string
+
 and field_name = string
 
 val array_create_constant :
@@ -66,6 +68,8 @@ val array_add_element :
 
     @param value : the value of the element to be added
 *)
+
+val float_of_binary : model_float_binary -> model_float
 
 val print_model_value : Format.formatter -> model_value -> unit
 

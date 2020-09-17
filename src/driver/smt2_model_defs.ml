@@ -11,23 +11,20 @@
 
 
 open Wstdlib
+open Model_parser
 
 type variable = string
 
-type bv_value =
-  | Bv_int of string
-  | Bv_sharp of string
-
 (* Simple counterexample that already represent a complete value *)
 type simple_value =
-  | String of string
-  | Integer of string
-  | Decimal of (string * string)
-  | Fraction of (string * string)
-  | Float of Model_parser.float_type
-  | Other of string
-  | Bitvector of bv_value
   | Boolean of bool
+  | String of string
+  | Integer of model_int
+  | Decimal of model_dec
+  | Fraction of model_frac
+  | Float of model_float
+  | Bitvector of model_bv
+  | Other of string
 
 type array =
   | Array_var of variable

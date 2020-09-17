@@ -10,10 +10,12 @@
 (********************************************************************)
 
 %{
+open Model_parser
 open Smt2_model_defs
 %}
 
 %start <Smt2_model_defs.definition Wstdlib.Mstr.t> output
+%type <Smt2_model_defs.term> smt_term
 %token <string> ATOM
 %token MODEL
 %token STORE
@@ -34,23 +36,21 @@ open Smt2_model_defs
 %token LET
 %token AND LE GE NOT
 %token DIV
-%token <Model_parser.float_type> FLOAT_VALUE
+%token <Model_parser.model_float> FLOAT_VALUE
 %token <string> COMMENT
 %token <string> STRING
-%token <string> BITVECTOR_VALUE_SHARP
-%token <string> BITVECTOR_VALUE_INT
-%token <string> BITVECTOR_EXTRACT
+%token <Model_parser.model_bv> BV_VALUE_BIN
+%token <Model_parser.model_bv> BV_VALUE_HEX
+%token <Model_parser.model_bv> BV_VALUE
+%token <string> BV_EXTRACT
 %token <string> INT_TO_BV
-%token BITVECTOR_TYPE
+%token BV_TYPE
 %token <string * string> FLOAT_TYPE
-%token <string> INT_STR
-%token <string> MINUS_INT_STR
-%token <string * string> DEC_STR
-%token <string * string> MINUS_DEC_STR
+%token <Model_parser.model_int> INT
+%token <Model_parser.model_dec> DEC
 %token LPAREN RPAREN
 %token EOF
 %%
-
 
 output:
 | EOF { Wstdlib.Mstr.empty }
@@ -82,8 +82,8 @@ decl:
 smt_term:
 | name      { Variable $1         }
 | STRING    { Sval (String $1)    }
-| integer   { Sval (Integer $1)   }
-| decimal   { Sval (Decimal $1)   }
+| INT       { Sval (Integer $1)   }
+| DEC       { Sval (Decimal $1)   }
 | fraction  { Sval (Fraction $1)  }
 | array     { Array $1            }
 | bitvector { Sval (Bitvector $1) }
@@ -134,7 +134,7 @@ list_smt_term:
 
 application:
 | LPAREN name list_smt_term RPAREN { Apply ($2, List.rev $3) }
-| LPAREN binop smt_term smt_term RPAREN { Apply ($2, [$3;$4]) }
+| LPAREN binop smt_term smt_term RPAREN { Apply ($2, [$3; $4]) }
 (* This should not happen in relevant part of the model *)
 | LPAREN INT_TO_BV smt_term RPAREN {
   Apply ($2, [$3]) }
@@ -144,24 +144,16 @@ binop:
 | LE { "<=" }
 | GE { ">=" }
 
-
 array:
-| LPAREN
-    LPAREN AS CONST ireturn_type
-    RPAREN smt_term
-  RPAREN{ Const $7 }
-| LPAREN
-    STORE array smt_term smt_term
-  RPAREN { Store ($3, $4, $5) }
-| LPAREN
-    STORE name smt_term smt_term
-  RPAREN { Store (Array_var $3, $4, $5) }
+| LPAREN LPAREN AS CONST ireturn_type RPAREN smt_term RPAREN
+    { Const $7 }
+| LPAREN STORE array smt_term smt_term RPAREN
+    { Store ($3, $4, $5) }
+| LPAREN STORE name smt_term smt_term RPAREN
+    { Store (Array_var $3, $4, $5) }
 (* When array is of type int -> bool, Cvc4 returns something that looks like:
    (ARRAY_LAMBDA (LAMBDA ((BOUND_VARIABLE_1162 Int)) false)) *)
-| LPAREN
-    ARRAY_LAMBDA
-    LPAREN LAMBDA LPAREN args_lists RPAREN smt_term
-  RPAREN RPAREN
+| LPAREN ARRAY_LAMBDA LPAREN LAMBDA LPAREN args_lists RPAREN smt_term RPAREN RPAREN
     { Const $8 }
 
 args_lists:
@@ -175,8 +167,8 @@ args:
 name:
 | ATOM { $1 }
 (* Should not happen in relevant part of the model (ad hoc) *)
-| BITVECTOR_TYPE { "" }
-| BITVECTOR_EXTRACT { $1 }
+| BV_TYPE { "" }
+| BV_EXTRACT { $1 }
 | FLOAT_TYPE { "" }
 
 (* Z3 specific boolean expression. This should maybe be used in the future as
@@ -186,37 +178,23 @@ boolean_expression:
 | LPAREN NOT smt_term RPAREN { }
 | LPAREN AND list_smt_term RPAREN { }
 
-integer:
-| INT_STR { $1 }
-| LPAREN MINUS_INT_STR RPAREN
-    { $2 }
-
-decimal:
-| DEC_STR { $1 }
-| LPAREN MINUS_DEC_STR RPAREN
-    { $2 }
-
 fraction:
-| LPAREN DIV integer integer RPAREN
-    { ($3, $4) }
+| LPAREN; DIV; nom=INT; den=INT; RPAREN
+    { {frac_nom= nom.int_value; frac_den= den.int_value; frac_verbatim= Format.sprintf "(/ %s %s)" nom.int_verbatim den.int_verbatim} }
 (* Integer from z3 can be written 1.0 *)
-| LPAREN DIV decimal decimal RPAREN
-    { let (num, numdot) = $3 in
-      let (dec, decdot) = $4 in
-      if numdot = "0" && decdot = "0" then
-        (num, dec)
+| LPAREN; DIV; d1=DEC; d2=DEC; RPAREN
+    { if BigInt.(eq d1.dec_frac zero && eq d2.dec_frac zero) then
+        {frac_nom= d1.dec_int; frac_den= d2.dec_int; frac_verbatim= Format.sprintf "(/ %s %s)" d1.dec_verbatim d2.dec_verbatim}
       else
         (* Should not happen. If it does, change the parsing *)
-        assert (false)
-    }
+        assert (false) }
 
 (* Example:
    (_ bv2048 16) *)
 bitvector:
-| BITVECTOR_VALUE_INT
-    { Bv_int $1 }
-| BITVECTOR_VALUE_SHARP
-    { Bv_sharp $1 }
+| BV_VALUE { $1 }
+| BV_VALUE_BIN { $1 }
+| BV_VALUE_HEX { $1 }
 
 boolean:
 | TRUE  { true  }
@@ -229,7 +207,7 @@ ireturn_type:
 | LPAREN idata_type RPAREN { None }
 
 isort_def:
-| name integer { }
+| name INT { }
 
 idata_def:
 (* cvc4,1.5 with smtlib2.5 compat *)
@@ -240,7 +218,7 @@ idata_def:
 
 ilist_app:
 | name { }
-| INT_STR { }
+| INT { }
 | name ilist_app { }
 | LPAREN idata_type RPAREN { }
 | LPAREN idata_type RPAREN ilist_app { }
@@ -249,6 +227,6 @@ idata_type:
 | name { }
 | name idata_type { }
 (* Z3 return bv can be "(_ bv 129)" which is not interpreted as a value *)
-| UNDERSCORE name INT_STR { }
+| UNDERSCORE name INT { }
 | LPAREN idata_type RPAREN option(idata_type) { }
 (* END IGNORED TYPES *)

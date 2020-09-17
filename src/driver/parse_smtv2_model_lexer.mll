@@ -11,6 +11,7 @@
 
 {
   open Parse_smtv2_model_parser
+  open Model_parser
   exception SyntaxError
 
   let char_for_backslash = function
@@ -24,6 +25,18 @@
     | 'v'  -> '\x0B'
     | _ as c -> c
 
+  let bv_of_string s =
+    let v, l =
+      try BigInt.of_string ("0b"^Strings.remove_prefix "#b" s), String.length s-2 with Not_found ->
+      try BigInt.of_string ("0x"^Strings.remove_prefix "#x" s), (String.length s-2) * 4 with Not_found ->
+        failwith "bv_of_string" in
+    {bv_value= v; bv_length= l; bv_verbatim= s}
+
+let float_of_binary sign exp mant =
+    let sign = bv_of_string sign in
+    let exp = bv_of_string exp in
+    let mant = bv_of_string mant in
+    float_of_binary {sign; exp; mant}
 }
 
 let atom = [^'('')'' ''\t''\n''"']
@@ -32,6 +45,7 @@ let num = ['0'-'9']+
 let opt_num = ['0'-'9']*
 let hex     = ['0'-'9' 'a'-'f' 'A'-'F']
 let hexa_num = hex+
+let binary_num = ['0' '1']+
 let dec_num = num"."num
 let name = (['a'-'z']*'_'*['0'-'9']*)*
 let dummy = ('_''_''_')?
@@ -76,29 +90,29 @@ rule token = parse
   | "LAMBDA" { LAMBDA }
   | "lambda" { LAMBDA }
   | "ARRAY_LAMBDA" { ARRAY_LAMBDA }
-  | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE_INT bv_value }
-  | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
-  | "(_" space+ "extract" space+ num space+ num ")" as s { BITVECTOR_EXTRACT s }
+  | "(_" space+ "bv"(num as v) space+ (num as l)")" as s { BV_VALUE {bv_value= BigInt.of_string v; bv_length= int_of_string l; bv_verbatim= s} }
+  | "(_" space+ "BitVec" space+ num")" { BV_TYPE }
+  | "(_" space+ "extract" space+ num space+ num ")" as s { BV_EXTRACT s }
   | "(_" space+ "int2bv" space+ num ")" as s { INT_TO_BV s}
   | "(_" space+ "FloatingPoint" space+ (num as exp) space+ (num as mantissa)")" { FLOAT_TYPE (exp, mantissa) }
-  | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_zero }
-  | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_zero }
-  | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_infinity }
-  | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_infinity }
-  | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Not_a_number }
+  | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Plus_zero }
+  | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Minus_zero }
+  | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Plus_infinity }
+  | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Minus_infinity }
+  | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Not_a_number }
   | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
-      { FLOAT_VALUE (Model_parser.interp_float b eb sb) }
-  | bv_num as bv_value { BITVECTOR_VALUE_SHARP bv_value }
+      { FLOAT_VALUE (float_of_binary b eb sb) }
+  | "#x" (hexa_num as v) as s { BV_VALUE_HEX {bv_value= BigInt.of_string ("0x"^v); bv_length= String.length v/4; bv_verbatim= s} }
+  | "#b" (binary_num as v) as s {BV_VALUE_BIN {bv_value= BigInt.of_string ("0b"^v); bv_length= String.length v/4; bv_verbatim= s} }
 
-  | num as integer
-      { INT_STR (integer) }
-  | '-'space*(num as integer) { MINUS_INT_STR ("-"^integer) }
-  | (num as int_part)"."(num as fract_part)
-      { DEC_STR (int_part, fract_part)  }
-  | '-'space*(num as int_part)"."(num as fract_part)
-      {MINUS_DEC_STR (("-"^int_part), fract_part)}
-  | '|' (variable as at) '|' { ATOM (at) }
-  | atom+ as at { ATOM (at) }
+  | num as i                                         { INT {int_value= BigInt.of_string i; int_verbatim= i} }
+  | '(' space* '-' space* (num as i) space* ')' as s
+      { INT {int_value= BigInt.minus (BigInt.of_string i); int_verbatim= "-"^i} }
+  | (num as i)"."(num as f) as s                     { DEC {dec_int= BigInt.of_string i; dec_frac= BigInt.of_string f; dec_verbatim= s} }
+  | '(' space* '-' space* (num as i) '.' (num as f) space* ')' as s
+    { DEC { dec_int= BigInt.minus (BigInt.of_string i); dec_frac= BigInt.of_string f; dec_verbatim= "-"^i^"."^f } }
+  | '|' (variable as at) '|'                         { ATOM (at) }
+  | atom+ as at                                      { ATOM (at) }
   | eof
       { EOF }
   | _
