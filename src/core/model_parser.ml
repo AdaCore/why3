@@ -1075,7 +1075,11 @@ type full_verdict = {
 
 let print_values fmt vs =
   let print_val fmt (loc,vs,v) =
-    fprintf fmt "%a -> %s, %a" Pretty.print_vs vs v Pretty.print_loc loc in
+    let print_loc fmt loc =
+      (* All values come from the same file, right? *)
+      let _, l, bc, ec = Loc.get loc in
+      fprintf fmt "line %d, characters %d-%d" l bc ec in
+    fprintf fmt "%a -> %s (%a)" Ident.print_decoded vs.vs_name.id_string v print_loc loc in
   Pp.print_list Pp.newline print_val fmt vs
 
 let print_full_verdict fmt v =

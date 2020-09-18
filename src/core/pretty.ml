@@ -91,6 +91,7 @@ module type Printer = sig
 
     val print_attr : formatter -> attribute -> unit
     val print_loc : formatter -> Loc.position -> unit
+    val print_loc' : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit
     val print_meta_arg_type : formatter -> meta_arg_type -> unit
@@ -164,6 +165,10 @@ let print_attrs = print_iter1 Sattr.iter space print_attr
 let print_loc fmt l =
   let (f,l,b,e) = Loc.get l in
   fprintf fmt "#\"%s\" %d %d %d#" f l b e
+
+let print_loc' fmt l =
+  let (f,l,b,e) = Loc.get l in
+  fprintf fmt "%S, line %d, characters %d-%d" f l b e
 
 let print_id_attrs fmt id =
   if Debug.test_flag debug_print_attrs &&

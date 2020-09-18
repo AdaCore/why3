@@ -170,14 +170,14 @@ type prover_result_parser = {
 }
 
 let print_prover_answer fmt = function
-  | Valid -> fprintf fmt "Valid"
-  | Invalid -> fprintf fmt "Invalid"
-  | Timeout -> fprintf fmt "Timeout"
-  | OutOfMemory -> fprintf fmt "Out Of Memory"
-  | StepLimitExceeded -> fprintf fmt "Step limit exceeded"
-  | Unknown s -> fprintf fmt "Unknown (%s)" s
-  | Failure s -> fprintf fmt "Failure (%s)" s
-  | HighFailure -> fprintf fmt "HighFailure"
+  | Valid -> fprintf fmt "valid"
+  | Invalid -> fprintf fmt "invalid"
+  | Timeout -> fprintf fmt "timeout"
+  | OutOfMemory -> fprintf fmt "out Of Memory"
+  | StepLimitExceeded -> fprintf fmt "step limit exceeded"
+  | Unknown s -> fprintf fmt "unknown (%s)" s
+  | Failure s -> fprintf fmt "failure (%s)" s
+  | HighFailure -> fprintf fmt "highFailure"
 
 let print_prover_status fmt = function
   | Unix.WSTOPPED n -> fprintf fmt "stopped by signal %d" n
@@ -190,11 +190,11 @@ let print_steps fmt s =
 let print_prover_result ~json_model fmt {pr_answer = ans; pr_status = status;
                                          pr_output = out; pr_time   = t;
                                          pr_steps  = s;   pr_model  = (m, vs)} =
-  fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
+  fprintf fmt "%a (%.2fs%a)." print_prover_answer ans t print_steps s;
   if not (is_model_empty m) then
-    fprintf fmt "@\n@[<v2>%a@]@." print_ce_summary vs;
+    fprintf fmt "@\n@[<v2>%a@]" print_ce_summary vs;
   if ans == HighFailure then
-    fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
+    fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s"
       print_prover_status status out
 
 let rec grep out l = match l with
@@ -323,10 +323,7 @@ let analyse_result ?(check_model=default_check_model) exit_result res_parser pri
           let m = res_parser.prp_model_parser model printer_mapping in
           Debug.dprintf debug "Call_provers: model:@.";
           debug_print_model ~print_attrs:false m;
-          (* TODO remove this use_incremental_choice when choice of the model
-             in incremental mode gives satisfying results *)
-          let saved_models = (res, m) :: saved_models in
-          analyse saved_models (Some res) tl
+          analyse ((res, m) :: saved_models) (Some res) tl
     | Answer res :: tl ->
         if res = Valid then
           (Valid, None)
