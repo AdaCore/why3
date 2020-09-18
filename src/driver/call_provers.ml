@@ -19,9 +19,6 @@ let debug = Debug.register_info_flag "call_prover"
 let debug_check_ce = Debug.register_info_flag "check-ce"
     ~desc:"Debug@ info@ for@ --check-ce"
 
-let debug_attrs = Debug.register_info_flag "print_model_attrs"
-  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
-
 (* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
   | Valid
@@ -34,6 +31,31 @@ type prover_answer =
   | HighFailure
 (* END{proveranswer} anchor for automatic documentation, do not remove *)
 
+(** See output of [print_ce_summary] for details *)
+type ce_summary = NCCE of values | SWCE of values | NCCE_SWCE of values | BAD_CE | UNKNOWN
+
+let ce_summary_unknown = UNKNOWN
+
+let print_ce_summary fmt = function
+  | NCCE vs ->
+      fprintf fmt "The following counterexample exposes that the program does not comply with this annotation:@\n%a"
+        print_values vs
+  | SWCE vs ->
+      fprintf fmt "The following counterexample exposes a subcontract weakness:@\n%a"
+        print_values vs
+  | NCCE_SWCE vs ->
+      fprintf fmt "The following counterexample exposes a subcontract weakness or non-compliance between the program and this annotation:@\n%a"
+        print_values vs
+  | BAD_CE -> fprintf fmt "The counterexample is bad"
+  | UNKNOWN -> fprintf fmt "No verified counterexample available"
+
+let ce_summary v_concrete v_abstract = match v_concrete.verdict, v_abstract.verdict with
+  | Good_model, _ -> NCCE v_concrete.values
+  | Bad_model, Good_model -> SWCE v_abstract.values
+  | Dont_know, Good_model -> NCCE_SWCE v_abstract.values
+  | Dont_know, Dont_know | Dont_know, Bad_model | Bad_model, Dont_know -> UNKNOWN
+  | Bad_model, Bad_model -> BAD_CE
+
 (* BEGIN{proverresult} anchor for automatic documentation, do not remove *)
 type prover_result = {
   pr_answer : prover_answer;
@@ -41,7 +63,7 @@ type prover_result = {
   pr_output : string;
   pr_time   : float;
   pr_steps  : int;		(* -1 if unknown *)
-  pr_model  : model;
+  pr_model  : model * ce_summary;
 }
 (* END{proverresult} anchor for automatic documentation, do not remove *)
 
@@ -167,20 +189,10 @@ let print_steps fmt s =
 
 let print_prover_result ~json_model fmt {pr_answer = ans; pr_status = status;
                                          pr_output = out; pr_time   = t;
-                                         pr_steps  = s;   pr_model  = m} =
-  let print_attrs = Debug.test_flag debug_attrs in
+                                         pr_steps  = s;   pr_model  = (m, vs)} =
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
-  if not (is_model_empty m) then (
-    fprintf fmt "\nCounter-example model for term at %a"
-      (Pp.print_option_or_default "NO LOC" Pretty.print_loc)
-      (Model_parser.get_model_term_loc m);
-    (* Opt.iter (fprintf fmt " %a" Loc.report_position) (get_model_term_loc m); *)
-    let print_model =
-      if json_model then
-        print_model ~print_attrs (* TODO use print_model_json *)
-      else print_model_human ~print_attrs in
-    print_model ?me_name_trans:None fmt m;
-  ) ;
+  if not (is_model_empty m) then
+    fprintf fmt "@\n@[<v2>%a@]@." print_ce_summary vs;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
       print_prover_status status out
@@ -215,24 +227,6 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-type ce_summary = NCCE | SWCE | NCCE_SWCE | BAD_CE | UNKNOWN
-
-let ce_summary v_concrete v_abstract = match v_concrete, v_abstract with
-  | Good_model, _ -> NCCE
-  | Bad_model, Good_model -> SWCE
-  | Dont_know, Good_model -> NCCE_SWCE
-  | Dont_know, Dont_know | Dont_know, Bad_model | Bad_model, Dont_know -> UNKNOWN
-  | Bad_model, Bad_model -> BAD_CE
-
-let print_ce_summary fmt summary =
-  let s = match summary with
-  | NCCE -> "The counter-example exposes that the program does not comply with this annotation"
-  | SWCE -> "The counter-example exposes a subcontract weakness"
-  | NCCE_SWCE -> "The counter-example exposes a subcontract weakness or non-compliance between the program and this annotation"
-  | UNKNOWN -> "The counter-example could not be verified"
-  | BAD_CE -> "The counter-example is bad" in
-  pp_print_string fmt s
-
 let select_model check_model models =
   let filtered_models =
     let check_model (i,r,m) =
@@ -254,7 +248,7 @@ let select_model check_model models =
     let add_ce_summary (i,r,m,mr) =
       let summary = match mr with
         | Cannot_check_model _ -> UNKNOWN
-        | Check_model_result r -> ce_summary r.concrete.verdict r.abstract.verdict in
+        | Check_model_result r -> ce_summary r.concrete r.abstract in
       i,r,m,mr,summary in
     List.map add_ce_summary
       (List.filter keep_model
@@ -268,7 +262,7 @@ let select_model check_model models =
     let open Util in
     if knowns <> [] then
       let ce_summary_index = function
-        | NCCE -> 0 | SWCE -> 1 | NCCE_SWCE -> 2 | UNKNOWN -> 3 | BAD_CE -> 4 in
+        | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2 | UNKNOWN -> 3 | BAD_CE -> 4 in
       let compare = cmp [
           cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
           cmptr (fun (i,_,_,_,_) -> i) (-);
@@ -279,13 +273,8 @@ let select_model check_model models =
       let compare = cmp [cmptr (fun (i,_,_,_,_) -> -i) (-)] in
       List.sort compare unknowns in
   match model_infos with
-  | [] ->
-      Debug.dprintf debug_check_ce "Select no CE model@.";
-      None
-  | (i,_,m,_,s) :: _ ->
-      Debug.dprintf debug_check_ce "Select CE model %d@." i;
-      printf "%a.@." print_ce_summary s;
-      Some m
+  | [] -> None
+  | (_,_,m,_,s) :: _ -> Some (m, s)
 
 let analyse_result ?(check_model=default_check_model) exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
@@ -365,7 +354,7 @@ let parse_prover_run res_parser signaled time out exitcode limit check_model ~pr
       with Not_found -> []
     in analyse_result ?check_model exit_result res_parser printer_mapping out
   in
-  let model = match model with Some s -> s | None -> default_model in
+  let model = match model with Some s -> s | None -> default_model, UNKNOWN in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
@@ -565,7 +554,7 @@ let editor_result ret = {
   pr_output = "";
   pr_time   = 0.0;
   pr_steps  = 0;
-  pr_model  = default_model;
+  pr_model  = default_model, UNKNOWN;
 }
 
 let query_call = function

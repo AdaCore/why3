@@ -257,6 +257,8 @@ type verdict = Good_model | Bad_model | Dont_know
 
 type values = (Loc.position * Term.vsymbol * string) list
 
+val print_values : values Pp.pp
+
 type full_verdict = {
     verdict  : verdict;
     reason   : string;

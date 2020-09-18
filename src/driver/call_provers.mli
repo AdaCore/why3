@@ -34,6 +34,10 @@ type prover_answer =
       (** An error occured during the call to the prover or none
           of the given regexps match the output of the prover *)
 
+type ce_summary
+val ce_summary_unknown : ce_summary
+val print_ce_summary : ce_summary Pp.pp
+
 type prover_result = {
   pr_answer : prover_answer;
   (** The answer of the prover on the given task *)
@@ -45,7 +49,7 @@ type prover_result = {
   (** The time taken by the prover *)
   pr_steps  : int;
   (** The number of steps taken by the prover (-1 if not available) *)
-  pr_model  : model;
+  pr_model  : model * ce_summary;
   (** The model produced by a the solver *)
 }
 

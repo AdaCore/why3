@@ -83,7 +83,7 @@ let convert_proof_result (pr: prover_result) =
         "pr_output", String pr.pr_output;
         "pr_time", Float pr.pr_time;
         "pr_steps", Int pr.pr_steps;
-        "pr_model", convert_model pr.pr_model])
+        "pr_model", convert_model (fst pr.pr_model)])
 
 let convert_proof_attempt (pas: proof_attempt_status) =
   Record (match pas with
@@ -645,7 +645,7 @@ let parse_prover_result j =
     pr_output = pr_output;
     pr_time = pr_time;
     pr_steps = pr_steps;
-    pr_model = Model_parser.default_model (* pr_model *)}
+    pr_model = Model_parser.default_model, Call_provers.ce_summary_unknown (* pr_model *)}
     (* TODO pr_model is a string, should be model *)
 
 exception NotProofAttempt

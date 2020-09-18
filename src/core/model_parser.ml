@@ -1073,16 +1073,19 @@ type full_verdict = {
     values   : values; (* values taken from model during interpretation *)
   }
 
+let print_values fmt vs =
+  let print_val fmt (loc,vs,v) =
+    fprintf fmt "%a -> %s, %a" Pretty.print_vs vs v Pretty.print_loc loc in
+  Pp.print_list Pp.newline print_val fmt vs
+
 let print_full_verdict fmt v =
   let s = match v.verdict with
     | Good_model -> "good model"
     | Bad_model -> "bad model"
     | Dont_know -> "don't know" in
-  let print_val fmt (loc,vs,v) =
-    fprintf fmt "%a -> %s, %a" Pretty.print_vs vs v Pretty.print_loc loc in
   fprintf fmt "@[<hv 2>%s (%s, %d warnings)@\n%a@]"
     s v.reason (List.length v.warnings)
-    (Pp.print_list Pp.newline print_val) v.values
+    print_values v.values
 
 type check_model_result =
   | Cannot_check_model of {reason: string}

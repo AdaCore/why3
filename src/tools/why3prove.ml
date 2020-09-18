@@ -250,6 +250,8 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
           else None in
         let call = Driver.prove_task ~command ~limit ?check_model drv task in
         let res = Call_provers.wait_on_call call in
+        printf "%a" (Pp.print_option Loc.report_position) (task_goal_fmla task).Term.t_loc;
+        (* TODO Show only goal explanation and prover results (the latter includes the CE model) )*)
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
           (Call_provers.print_prover_result ~json_model:!opt_json) res;
