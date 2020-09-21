@@ -571,7 +571,7 @@ let why_name_trans {men_kind; men_name} =
   | Old -> "old "^men_name
   | At l -> men_name^" at "^l
   (* | Loop_before -> "[before loop] "^men_name *)
-  | Loop_previous_iteration -> "[previous iteration] "^men_name
+  | Loop_previous_iteration -> "[before iteration] "^men_name
   | Loop_current_iteration -> "[current iteration] "^men_name
   | _ -> men_name
 
@@ -741,7 +741,7 @@ let print_model_element_json me_name_to_str fmt me =
     | Other -> fprintf fmt "%a" Json_base.string "other"
     | Loop_before -> fprintf fmt "%a" Json_base.string "before-loop"
     | Loop_previous_iteration ->
-        fprintf fmt "%a" Json_base.string "previous-iteration"
+        fprintf fmt "%a" Json_base.string "before-iteration"
     | Loop_current_iteration ->
         fprintf fmt "%a" Json_base.string "current-iteration" in
   let print_name fmt = Json_base.string fmt (me_name_to_str me.me_name) in
