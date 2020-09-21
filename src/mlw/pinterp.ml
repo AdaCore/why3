@@ -1376,16 +1376,15 @@ let set_constr v1 v2 =
        set_fields fs1 fs2;
    | _ -> failwith "set_constr")
 
-let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs v =
+let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
   let pv = restore_pv vs in
-  if pv_affected wrt pv then begin
+  if pv_affected wrt pv then (
     Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
       pp_indent print_pv pv
       (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
     let pv = Mpv.find_def pv pv vars_map in
     let value = get_and_register_value ~ity:pv.pv_ity env pv.pv_vs loc in
-    set_constr (get_vs env vs) value
-  end
+    set_constr (get_vs env vs) value )
 
 let rec eval_expr env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
@@ -1523,7 +1522,8 @@ and eval_expr' env e =
       (* assert1 *)
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
-      Mvs.iter (assign_written_vars e.e_effect.eff_writes e_loc env) env.vsenv;
+      List.iter (assign_written_vars e.e_effect.eff_writes e_loc env)
+        (Mvs.keys env.vsenv);
       (* assert2 *)
       (try check_terms (cntr_ctx "Invariant" env) inv with
        | Contr (_,t) ->
@@ -1614,7 +1614,8 @@ and eval_expr' env e =
     if env.rac.do_rac then begin
       let env = bind_vs i.pv_vs (value ty_int (Vnum a)) env in
       check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
-    Mvs.iter (assign_written_vars e.e_effect.eff_writes e_loc env) env.vsenv;
+    List.iter (assign_written_vars e.e_effect.eff_writes e_loc env)
+      (Mvs.keys env.vsenv);
     let def = value ty_int (Vnum (suc b)) in
     let i_val = get_and_register_value ~def ~ity:i.pv_ity env i.pv_vs
                   (Opt.get i.pv_vs.vs_name.id_loc) in
@@ -1782,7 +1783,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
       let res = create_vsymbol res (ty_of_ity ity_result) in
       let loc1 = Opt.get loc in
       let vars_map = Mpv.of_list (List.combine rs.rs_cty.cty_args arg_pvs) in
-      Mvs.iter (assign_written_vars ~vars_map rs.rs_cty.cty_effect.eff_writes loc1 env) env.vsenv;
+      List.iter (assign_written_vars ~vars_map rs.rs_cty.cty_effect.eff_writes loc1 env)
+        (Mvs.keys env.vsenv);
       let res_v = get_and_register_value ~ity:ity_result env res loc1 in
       (* assert2 *)
       (try check_posts "Postcondition" loc env res_v rs.rs_cty.cty_post with
