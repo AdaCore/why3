@@ -31,23 +31,33 @@ type prover_answer =
   | HighFailure
 (* END{proveranswer} anchor for automatic documentation, do not remove *)
 
-(** See output of [print_ce_summary] for details *)
+(** See output of [ce_summary_title] for details *)
 type ce_summary = NCCE of values | SWCE of values | NCCE_SWCE of values | BAD_CE | UNKNOWN
 
-let ce_summary_unknown = UNKNOWN
+let ce_summary_title = function
+  | NCCE _ ->
+      "The following counterexample values reveal that the program does not "^
+      "comply with the verification goal"
+  | SWCE _ ->
+      "The following counterexample values reveal a subcontract weakness"
+  | NCCE_SWCE _ ->
+      "The following counterexample values reveal a subcontract weakness "^
+      "or non-compliance between the program and the verification goal:@\n%a"
+  | BAD_CE ->
+      "The counterexample is bad"
+  | UNKNOWN ->
+      "The following counterexample model has not been verified "^
+      "(missing option --check-ce, or RAC incompleteness)"
 
-let print_ce_summary fmt = function
-  | NCCE vs ->
-      fprintf fmt "The following counterexample exposes that the program does not comply with this annotation:@\n%a"
-        print_values vs
-  | SWCE vs ->
-      fprintf fmt "The following counterexample exposes a subcontract weakness:@\n%a"
-        print_values vs
-  | NCCE_SWCE vs ->
-      fprintf fmt "The following counterexample exposes a subcontract weakness or non-compliance between the program and this annotation:@\n%a"
-        print_values vs
-  | BAD_CE -> fprintf fmt "The counterexample is bad"
-  | UNKNOWN -> fprintf fmt "No verified counterexample available"
+let print_ce_summary_with_model m fmt s =
+  Pp.string fmt (ce_summary_title s);
+  match s with
+  | NCCE vs | SWCE vs | NCCE_SWCE vs ->
+      fprintf fmt (":@\n%a") print_values vs
+  | UNKNOWN ->
+      let me_name_trans = None and print_attrs = false in
+      fprintf fmt ":@\n%a" (print_model_human ?me_name_trans ~print_attrs) m
+  | BAD_CE -> ()
 
 let ce_summary v_concrete v_abstract = match v_concrete.verdict, v_abstract.verdict with
   | Good_model, _ -> NCCE v_concrete.values
@@ -63,7 +73,7 @@ type prover_result = {
   pr_output : string;
   pr_time   : float;
   pr_steps  : int;		(* -1 if unknown *)
-  pr_model  : model * ce_summary;
+  pr_model  : (model * ce_summary) option;
 }
 (* END{proverresult} anchor for automatic documentation, do not remove *)
 
@@ -83,6 +93,11 @@ let limit_max =
     { limit_time = single_limit_max a.limit_time b.limit_time;
       limit_steps = single_limit_max a.limit_steps b.limit_steps;
       limit_mem = single_limit_max a.limit_mem b.limit_mem; }
+
+let get_model r =
+  match r.pr_model with
+  | Some (m, _) -> m
+  | None -> default_model
 
 type timeunit =
   | Hour
@@ -187,15 +202,24 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ~json_model fmt {pr_answer = ans; pr_status = status;
-                                         pr_output = out; pr_time   = t;
-                                         pr_steps  = s;   pr_model  = (m, vs)} =
-  fprintf fmt "%a (%.2fs%a)." print_prover_answer ans t print_steps s;
-  if not (is_model_empty m) then
-    fprintf fmt "@\n@[<v2>%a@]" print_ce_summary vs;
-  if ans == HighFailure then
+let print_prover_result fmt r =
+  fprintf fmt "%a (%.2fs%a)." print_prover_answer r.pr_answer
+    r.pr_time print_steps r.pr_steps;
+  (match r.pr_model with
+   | Some (m, s) when not (is_model_empty m) ->
+       fprintf fmt "@\n@[<v>%a@]" (print_ce_summary_with_model m) s
+   | _ -> ());
+  if r.pr_answer == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s"
-      print_prover_status status out
+      print_prover_status r.pr_status r.pr_output
+
+let print_prover_result_json fmt r =
+  fprintf fmt "%a (%.2fs%a)." print_prover_answer r.pr_answer
+    r.pr_time print_steps r.pr_steps;
+  print_model_json fmt (get_model r);
+  if r.pr_answer == HighFailure then
+    fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s"
+      print_prover_status r.pr_status r.pr_output
 
 let rec grep out l = match l with
   | [] ->
@@ -351,7 +375,6 @@ let parse_prover_run res_parser signaled time out exitcode limit check_model ~pr
       with Not_found -> []
     in analyse_result ?check_model exit_result res_parser printer_mapping out
   in
-  let model = match model with Some s -> s | None -> default_model, UNKNOWN in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
@@ -551,7 +574,7 @@ let editor_result ret = {
   pr_output = "";
   pr_time   = 0.0;
   pr_steps  = 0;
-  pr_model  = default_model, UNKNOWN;
+  pr_model  = None;
 }
 
 let query_call = function

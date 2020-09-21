@@ -543,7 +543,7 @@ let print_proof_attempt fmt pa =
   fprintf fmt "%a tl=%d %a"
           Whyconf.print_prover pa.prover
           pa.limit.Call_provers.limit_time
-          (Pp.print_option (Call_provers.print_prover_result ~json_model:false))
+          (Pp.print_option Call_provers.print_prover_result)
           pa.proof_state
 
 let rec print_proof_node s (fmt: Format.formatter) p =
@@ -1006,7 +1006,7 @@ let default_unknown_result =
        Call_provers.pr_output = "";
        Call_provers.pr_status = Unix.WEXITED 0;
        Call_provers.pr_steps = -1;
-       Call_provers.pr_model = Model_parser.default_model, Call_provers.ce_summary_unknown;
+       Call_provers.pr_model = None;
      }
 
 let load_result a (path,acc) r =
@@ -1050,7 +1050,7 @@ let load_result a (path,acc) r =
        Call_provers.pr_output = "";
        Call_provers.pr_status = Unix.WEXITED 0;
        Call_provers.pr_steps = steps;
-       Call_provers.pr_model = Model_parser.default_model, Call_provers.ce_summary_unknown;
+       Call_provers.pr_model = None;
        }
      in (path,Some res)
   | "undone" | "unedited" -> (path,acc)

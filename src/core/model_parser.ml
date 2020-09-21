@@ -1062,8 +1062,6 @@ let model_for_positions_and_decls model ~positions =
 
 type verdict = Good_model | Bad_model | Dont_know
 
-type interp_kind = Concrete | Abstract | NotApplied
-
 type values = (Loc.position * vsymbol * string) list
 
 type full_verdict = {
@@ -1074,13 +1072,27 @@ type full_verdict = {
   }
 
 let print_values fmt vs =
-  let print_val fmt (loc,vs,v) =
-    let print_loc fmt loc =
-      (* All values come from the same file, right? *)
-      let _, l, bc, ec = Loc.get loc in
-      fprintf fmt "line %d, characters %d-%d" l bc ec in
-    fprintf fmt "%a -> %s (%a)" Ident.print_decoded vs.vs_name.id_string v print_loc loc in
-  Pp.print_list Pp.newline print_val fmt vs
+  let rec aux fmt file line = function
+    | [] -> ()
+    | (loc, vs, v) :: rest ->
+        let f, l, _, _ = Loc.get loc in
+        if file <> f then (
+          if file <> "" then
+            fprintf fmt "@]@\n";
+          fprintf fmt "@[<v2>File %s:@\n" (Filename.basename f) );
+        if line <> l then (
+          if line <> -1 then
+            fprintf fmt "@]@\n";
+          fprintf fmt "@[<v2>Line %d:@\n" l )
+        else
+          fprintf fmt "@\n";
+        fprintf fmt "%a = %s" Ident.print_decoded vs.vs_name.id_string v;
+        aux fmt f l rest in
+  fprintf fmt "@[<v>%t%t@]"
+    (fun fmt -> aux fmt "" (-1) vs)
+    (fun fmt ->
+       if vs <> [] then
+         fprintf fmt "@]")
 
 let print_full_verdict fmt v =
   let s = match v.verdict with

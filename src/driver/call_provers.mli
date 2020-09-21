@@ -35,8 +35,10 @@ type prover_answer =
           of the given regexps match the output of the prover *)
 
 type ce_summary
-val ce_summary_unknown : ce_summary
-val print_ce_summary : ce_summary Pp.pp
+
+val print_ce_summary_with_model : model -> ce_summary Pp.pp
+(** Prints the summary with its values, if there is any, or the given
+    model otherwise *)
 
 type prover_result = {
   pr_answer : prover_answer;
@@ -49,18 +51,23 @@ type prover_result = {
   (** The time taken by the prover *)
   pr_steps  : int;
   (** The number of steps taken by the prover (-1 if not available) *)
-  pr_model  : model * ce_summary;
+  pr_model  : (model * ce_summary) option;
   (** The model produced by a the solver *)
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit
 (** Pretty-print a {! prover_answer} *)
 
-val print_prover_result :
-  json_model:bool -> Format.formatter -> prover_result -> unit
+val print_prover_result : Format.formatter -> prover_result -> unit
 (** Pretty-print a prover_result. The answer and the time are output.
     The output of the prover is printed if and only if the answer is
     a [HighFailure] *)
+
+val print_prover_result_json : Format.formatter -> prover_result -> unit
+
+val get_model : prover_result -> model
+(** Get the CE model from the prover result if any, or the defaul_model
+    otherwise*)
 
 val debug : Debug.flag
 (** debug flag for the calling procedure (option "--debug call_prover")

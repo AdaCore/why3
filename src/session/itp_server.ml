@@ -937,7 +937,7 @@ end
       | None          -> list_loc in
     let (source_result, list_loc) =
       Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
-      ?me_name_trans:None (fst res.Call_provers.pr_model) ~rel_filename:filename
+        ?me_name_trans:None (Call_provers.get_model res) ~rel_filename:filename
       ~source_code:source_code ~locations:list_loc
     in
     let goal_loc, list_loc = List.partition (fun (_, y) -> y = Goal_loc) list_loc in
@@ -1008,7 +1008,7 @@ end
                 in
                 let ce_result =
                   Pp.string_of (Model_parser.print_model_human ~print_attrs ?me_name_trans:None)
-                  (fst res.Call_provers.pr_model)
+                    (Call_provers.get_model res)
                 in
                 if ce_result = "" then
                   let result_pr =

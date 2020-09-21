@@ -251,10 +251,18 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let call = Driver.prove_task ~command ~limit ?check_model drv task in
         let res = Call_provers.wait_on_call call in
         let t = task_goal_fmla task in
-        let expls = String.capitalize_ascii (String.concat ", " (Termcode.get_expls_fmla t)) in
-        printf "@[<v>%s at %a:@\nProover result: %a@]@\n@."
-          expls (Pp.print_option_or_default "unknown location" Pretty.print_loc') t.Term.t_loc
-          (Call_provers.print_prover_result ~json_model:!opt_json) res;
+        let expls = Termcode.get_expls_fmla t in
+        let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
+        ( match t.Term.t_loc with
+          | Some loc -> Loc.report_position Format.std_formatter loc
+          | None -> printf "File %s:@." fname );
+        ( if expls = [] then
+            printf "Verification condition %s.@." goal_name
+          else
+            let expls = String.capitalize_ascii (String.concat ", " expls) in
+            printf "%s from verification condition %s.@." expls goal_name );
+        printf "Proover result is: %a@\n@."
+          Call_provers.(if !opt_json then print_prover_result_json else print_prover_result) res;
         if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task
