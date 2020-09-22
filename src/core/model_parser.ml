@@ -105,12 +105,13 @@ let float_of_binary binary =
          representation will have a multiple of 4 bits (ie 24). So, we need to
          multiply by two to account the difference. *)
       if Strings.has_prefix "#b" mant.bv_verbatim then
-        let rem = mant.bv_length mod 4 in
-        if rem = 0 then
+        let adjust = 4 - (mant.bv_length mod 4) in
+        if adjust = 4 then
           mant.bv_value (* No adjustment needed *)
         else
-          mul (pow_int_pos 2 (4-rem)) mant.bv_value
-      else mant.bv_value in
+          mul (pow_int_pos 2 adjust) mant.bv_value
+      else
+        mant.bv_value in
     let frac = pad_with_zeros frac_len (Format.sprintf "%x" (to_int frac)) in
     if eq exp.bv_value zero then (* subnormals and zero *)
       (* Case for zero *)
@@ -469,7 +470,8 @@ type model =
 
 let empty_model = Mstr.empty
 let empty_model_file = Mint.empty
-let is_model_empty model = model.model_files = empty_model
+let empty_model_files = Mstr.empty
+let is_model_empty m = Mstr.is_empty m.model_files
 
 let default_model =
   {vc_term_loc=None; vc_term_attrs=Sattr.empty; model_files=empty_model}

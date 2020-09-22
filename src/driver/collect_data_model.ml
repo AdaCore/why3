@@ -11,7 +11,7 @@
 
 open Wstdlib
 open Model_parser
-open Smt2_model_defs
+open Smtv2_model_defs
 
 exception Not_value
 
@@ -40,7 +40,7 @@ and tarray =
   | TStore of tarray * tterm * tterm
 
 and tterm =
-  | TSval of simple_value
+  | TSval of model_value
   | TApply of (string * tterm list)
   | TArray of tarray
   | TCvc4_Variable of tree_variable
@@ -65,30 +65,6 @@ and tree =
 type correspondence_table = tree Mstr.t
 
 
-(** Printing functions *)
-let print_float fmt f =
-  match f with
-  | Plus_infinity -> Format.fprintf fmt "Plus_infinity"
-  | Minus_infinity -> Format.fprintf fmt "Minus_infinity"
-  | Plus_zero -> Format.fprintf fmt "Plus_zero"
-  | Minus_zero -> Format.fprintf fmt "Minus_zero"
-  | Not_a_number -> Format.fprintf fmt "NaN"
-  | Float_number {hex= Some hex} ->
-      Format.fprintf fmt "%s (%g)" hex (float_of_string hex)
-  | Float_number {binary= {sign; exp; mant}} ->
-      Format.fprintf fmt "(%s, %s, %s)" (BigInt.to_string sign.bv_value) (BigInt.to_string exp.bv_value) (BigInt.to_string mant.bv_value)
-
-let print_value fmt v =
-  match v with
-  | String s ->
-     Format.fprintf fmt "String: %a" Constant.print_string_def s
-  | Integer i -> Format.fprintf fmt "Integer: %s" (BigInt.to_string i.int_value)
-  | Decimal r -> Format.fprintf fmt "Decimal: %s . %s" (BigInt.to_string r.dec_int) (BigInt.to_string r.dec_frac)
-  | Fraction r -> Format.fprintf fmt "Fraction: %s / %s" (BigInt.to_string r.frac_nom) (BigInt.to_string r.frac_den)
-  | Float f -> Format.fprintf fmt "Float: %a" print_float f
-  | Bitvector bv -> Format.fprintf fmt "Bv: %s" bv.bv_verbatim
-  | Boolean b -> Format.fprintf fmt "Boolean: %b " b
-  | Other s -> Format.fprintf fmt "Other: %s" s
 
 let rec print_array fmt a =
   match a with
@@ -101,7 +77,7 @@ let rec print_array fmt a =
 (* Printing function for terms *)
 and print_term fmt t =
   match t with
-  | TSval v -> print_value fmt v
+  | TSval v -> print_model_value fmt v
   | TApply (s, lt) ->
       Format.fprintf fmt "Apply: (%s, %a)" s
         (Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma print_term)
@@ -202,16 +178,16 @@ let rec get_variables_term (table: initial_definition Mstr.t) t =
   | Trees _ -> raise Not_found
 
 and get_variables_array table a =
-   match a with
-   | Array_var _v ->
-     table
-   | Const t ->
-    let table = get_variables_term table t in
-    table
-   | Store (a, t1, t2) ->
-     let table = get_variables_array table a in
-     let table = get_variables_term table t1 in
-     get_variables_term table t2
+  match a with
+  | Avar _v ->
+       table
+   | Aconst t ->
+       let table = get_variables_term table t in
+       table
+   | Astore (a, t1, t2) ->
+       let table = get_variables_array table a in
+       let table = get_variables_term table t1 in
+       get_variables_term table t2
 
 let get_all_var (table: definition Mstr.t) : definition Mstr.t =
   Mstr.fold (fun _key element table ->
@@ -472,17 +448,6 @@ let refine_variable_value table key t =
   let encountered_key = Hstr.create 16 in
   refine_variable_value ~enc:encountered_key table key t
 
-let convert_simple_to_model_value (v: simple_value) =
-  match v with
-  | String s -> Model_parser.String s
-  | Integer i -> Model_parser.Integer i
-  | Decimal d -> Model_parser.Decimal d
-  | Fraction f -> Model_parser.Fraction f
-  | Float f -> Model_parser.Float f
-  | Bitvector bv -> Model_parser.Integer {int_value= bv.bv_value; int_verbatim= bv.bv_verbatim}
-  | Boolean b -> Model_parser.Boolean b
-  | Other _s -> raise Not_value
-
 (* In the following lf is the list of fields. It is used to differentiate
    projections from fields so that projections cannot be reconstructed into a
    record. *)
@@ -491,20 +456,24 @@ let rec convert_array_value lf (a: array) : Model_parser.model_array =
 
   let rec create_array_value a =
     match a with
-    | Array_var _v -> raise Not_value
-    | Const t -> { Model_parser.arr_indices = !array_indices;
-                   Model_parser.arr_others = convert_to_model_value lf t}
-    | Store (a, t1, t2) ->
-        let new_index =
-          { Model_parser.arr_index_key = convert_to_model_value lf t1;
-            Model_parser.arr_index_value = convert_to_model_value lf t2} in
+    | Avar _v -> raise Not_value
+    | Aconst t -> {
+        Model_parser.arr_indices = !array_indices;
+        Model_parser.arr_others = convert_to_model_value lf t;
+      }
+    | Astore (a, t1, t2) ->
+        let new_index = {
+          Model_parser.arr_index_key = convert_to_model_value lf t1;
+          Model_parser.arr_index_value = convert_to_model_value lf t2;
+        } in
         array_indices := new_index :: !array_indices;
         create_array_value a in
   create_array_value a
 
 and convert_to_model_value lf (t: term): Model_parser.model_value =
   match t with
-  | Sval v -> convert_simple_to_model_value v
+  | Sval (Unparsed _) -> raise Not_value
+  | Sval v -> v
   | Array a -> Model_parser.Array (convert_array_value lf a)
   | Record (_n, l) ->
       Model_parser.Record (convert_record lf l)
@@ -538,16 +507,16 @@ and convert_z3_array (t: term) : array =
        the new array generated (which will still contain a To_array).
        Example of value for multidim array:
        To_array (Ite (x, 1, (To_array t), To_array t')) -> call on complete term ->
-       Store (1, To_array t, To_array t') -> call on subpart (To_array t) ->
-       Store (1, Const t, To_array t') -> call on subpart (To_array t') ->
-       Store (1, Const t, Const t')
+       Astore (1, To_array t, To_array t') -> call on subpart (To_array t) ->
+       Astore (1, Aconst t, To_array t') -> call on subpart (To_array t') ->
+       Astore (1, Aconst t, Aconst t')
      *)
 
     | Ite (Function_Local_Variable _x, if_t, t1, t2) ->
-      Store (convert_array t2, if_t, t1)
+      Astore (convert_array t2, if_t, t1)
     | Ite (if_t, Function_Local_Variable _x, t1, t2) ->
-      Store (convert_array t2, if_t, t1)
-    | t -> Const t
+      Astore (convert_array t2, if_t, t1)
+    | t -> Aconst t
   in
   convert_array t
 
@@ -566,15 +535,15 @@ let default_apply_to_record (list_records: (string list) Mstr.t)
 
   let rec array_apply_to_record (a: array) =
     match a with
-    | Array_var _v -> raise Not_value
-    | Const x ->
+    | Avar _v -> raise Not_value
+    | Aconst x ->
         let x = apply_to_record x in
-        Const x
-    | Store (a, t1, t2) ->
+        Aconst x
+    | Astore (a, t1, t2) ->
         let a = array_apply_to_record a in
         let t1 = apply_to_record t1 in
         let t2 = apply_to_record t2 in
-        Store (a, t1, t2)
+        Astore (a, t1, t2)
 
   and apply_to_record (v: term) =
     match v with
@@ -650,13 +619,12 @@ and convert_to_tree_term (t: term) : tterm =
 
 and convert_to_tree_array a =
   match a with
-  | Array_var v -> TArray_var v
-  | Const t -> TConst (convert_to_tree_term t)
-  | Store (a, t1, t2) ->
+  | Avar v -> TArray_var v
+  | Aconst t -> TConst (convert_to_tree_term t)
+  | Astore (a, t1, t2) ->
       TStore (convert_to_tree_array a, convert_to_tree_term t1, convert_to_tree_term t2)
 
-let rec convert_tree_to_term (t: tree) : term =
-  match t with
+let rec convert_tree_to_term = function
   | Node mpt ->
       let l = Mpr.bindings mpt in
       let l = List.map (fun (k,e) -> (k, convert_tree_to_term e)) l in
@@ -664,14 +632,16 @@ let rec convert_tree_to_term (t: tree) : term =
   | Leaf t ->
       convert_tdef_to_term t
 
-and convert_tdef_to_term (t: tree_definition) =
-  match t with
-  | TFunction (_l, t) -> convert_tterm_to_term t
-  | TTerm t -> convert_tterm_to_term t
-  | TNoelement -> Sval (Other ("error")) (* TODO check which error can be raised here *)
+and convert_tdef_to_term = function
+  | TFunction (_l, t) ->
+      convert_tterm_to_term t
+  | TTerm t ->
+      convert_tterm_to_term t
+  | TNoelement ->
+      (* TODO check which error can be raised here *)
+      Sval (Unparsed ("error: tdef"))
 
-and convert_tterm_to_term t =
-  match t with
+and convert_tterm_to_term = function
   | TSval v -> Sval v
   | TApply (s, tl) -> Apply (s, List.map convert_tterm_to_term tl)
   | TArray ta -> Array (convert_tarray_to_array ta)
@@ -691,9 +661,9 @@ and convert_tterm_to_term t =
 
 and convert_tarray_to_array a =
   match a with
-  | TArray_var v -> Array_var v
-  | TConst t -> Const (convert_tterm_to_term t)
-  | TStore (a, t1, t2) -> Store (convert_tarray_to_array a, convert_tterm_to_term t1, convert_tterm_to_term t2)
+  | TArray_var v -> Avar v
+  | TConst t -> Aconst (convert_tterm_to_term t)
+  | TStore (a, t1, t2) -> Astore (convert_tarray_to_array a, convert_tterm_to_term t1, convert_tterm_to_term t2)
 
 let create_list pm (table: definition Mstr.t) =
 

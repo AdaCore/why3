@@ -14,25 +14,13 @@ open Model_parser
 
 type variable = string
 
-(* Simple counterexample that already represent a complete value *)
-type simple_value =
-  | Boolean of bool
-  | String of string
-  | Integer of model_int
-  | Decimal of model_dec
-  | Fraction of model_frac
-  | Float of model_float
-  | Bitvector of model_bv
-  | Other of string
-
 type array =
-  (* Array_var is used by let-bindings only *)
-  | Array_var of variable
-  | Const of term
-  | Store of array * term * term
+  | Avar of variable (* Used by let-bindings only *)
+  | Aconst of term
+  | Astore of array * term * term
 
 and term =
-  | Sval of simple_value
+  | Sval of model_value
   | Apply of (string * term list)
   | Array of array
   | Cvc4_Variable of variable
@@ -53,6 +41,9 @@ val add_element: (string * definition) option ->
   definition Mstr.t -> definition Mstr.t
 
 val make_local: (variable * string option) list -> term -> term
+(** For a definition of function f, local variables being in vars_lists and the
+    returned term being t, this function changes the term to give an appropriate
+    tag to variables that are actually local. *)
 
-(* Used for let bindings of z3 *)
 val substitute: (string * term) list -> term -> term
+(** Substitute variables by terms. Used for let bindings of z3 *)
