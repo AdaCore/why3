@@ -168,6 +168,7 @@ val id_unique_attr :
 
 val proxy_attr: attribute
 val useraxiom_attr: attribute
+val funlit: attribute
 
 (** {2 Attributes for handling counterexamples} *)
 

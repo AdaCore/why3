@@ -257,7 +257,9 @@
 
     let ifte = List.fold_right add_term tl default in
     let binder = (loc_begin, Some id_var, false, None) in
-    Ptree.Tquant (Dterm.DTlambda, [binder], [], ifte)
+    let desc = Ptree.Tquant (Dterm.DTlambda, [binder], [], ifte) in
+    let t = { term_desc = desc; term_loc = Loc.join loc_begin loc_end } in
+    Ptree.Tattr (Ptree.ATstr Ident.funlit, t)
 
   let expr_fun_lit loc_begin loc_end (el,default) =
     let id_var = { id_str = "_x"; id_ats = []; id_loc = loc_begin } in
@@ -294,7 +296,9 @@
     let spec = { sp_pre = []; sp_post = []; sp_xpost = []; sp_reads = [];
                  sp_writes = []; sp_alias = []; sp_variant = [];
                  sp_checkrw = false; sp_diverge = false; sp_partial = false } in
-    Ptree.Efun ([binder], None, pattern, Ity.MaskVisible, spec, ifte)
+    let desc = Ptree.Efun ([binder], None, pattern, Ity.MaskVisible, spec, ifte) in
+    let e = { expr_desc = desc; expr_loc = Loc.join loc_begin loc_end } in
+    Ptree.Eattr (Ptree.ATstr Ident.funlit, e)
 
 %}
 
@@ -941,7 +945,7 @@ term_fun_lit:
 | mapping_list_with_default(term)   { $1 }
 | semicolon_list1(term)
     { let mk_index_pair i t =
-        let const = Constant.int_const (BigInt.of_int i) in
+        let const = Constant.int_const ~il_kind:Number.ILitDec (BigInt.of_int i) in
         let tconst = {term_desc = Tconst const; term_loc  = t.term_loc} in
         tconst, t in
       List.mapi mk_index_pair $1, None }
@@ -1303,7 +1307,7 @@ expr_fun_lit:
 | mapping_list_with_default(expr)   { $1 }
 | semicolon_list1(expr)
     { let mk_index_pair i e =
-        let const = Constant.int_const (BigInt.of_int i) in
+        let const = Constant.int_const ~il_kind:Number.ILitDec (BigInt.of_int i) in
         let econst = {expr_desc = Econst const; expr_loc  = e.expr_loc} in
         econst, e in
       List.mapi mk_index_pair $1, None }
