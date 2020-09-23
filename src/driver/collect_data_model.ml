@@ -32,7 +32,7 @@ module Mpr: Extmap.S with type key = projection_name = Mstr
 
 type tree_variable =
   | Tree of tree
-  | Var of string
+  | Tree_var of string
 
 and tarray =
   | TArray_var of variable
@@ -43,9 +43,9 @@ and tterm =
   | TSval of model_value
   | TApply of (string * tterm list)
   | TArray of tarray
-  | TCvc4_Variable of tree_variable
-  | TFunction_Local_Variable of variable
-  | TVariable of variable
+  | TVar of variable
+  | TFunction_var of variable
+  | TProver_var of tree_variable
   | TIte of tterm * tterm * tterm * tterm
   | TRecord of string * ((string * tterm) list)
   | TTo_array of tterm
@@ -83,10 +83,10 @@ and print_term fmt t =
         (Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma print_term)
         lt
   | TArray a -> Format.fprintf fmt "Array: %a" print_array a
-  | TCvc4_Variable (Var cvc) -> Format.fprintf fmt "CVC4VAR: %s" cvc
-  | TCvc4_Variable _ -> Format.fprintf fmt "CVC4VAR: TREE"
-  | TFunction_Local_Variable v -> Format.fprintf fmt "LOCAL: %s" v
-  | TVariable v -> Format.fprintf fmt "VAR: %s" v
+  | TProver_var (Tree_var v) -> Format.fprintf fmt "PROVERVAR: %s" v
+  | TProver_var _ -> Format.fprintf fmt "PROVERVAR: TREE"
+  | TFunction_var v -> Format.fprintf fmt "LOCAL: %s" v
+  | TVar v -> Format.fprintf fmt "VAR: %s" v
   | TIte (teq1, teq2, tthen, telse) ->
       Format.fprintf fmt "ITE (%a = %a) then %a else %a"
         print_term teq1 print_term teq2 print_term tthen print_term telse
@@ -114,9 +114,9 @@ and print_mpt fmt t =
 let subst_local_var var value t =
   let rec aux t =
     match t with
-    | TFunction_Local_Variable var' when var' = var ->
+    | TFunction_var var' when var' = var ->
         value
-    | TFunction_Local_Variable _ | TVariable _ | TCvc4_Variable _ | TSval _ ->
+    | TFunction_var _ | TVar _ | TProver_var _ | TSval _ ->
         t
     | TApply (s, args) ->
         TApply (s, List.map aux args)
@@ -147,14 +147,14 @@ let print_table (t: correspondence_table) =
     t;
   Debug.dprintf debug_cntex "End table@."
 
-(* Adds all referenced cvc4 variables found in the term t to table.
+(* Adds all referenced prover variables found in the term t to table.
    In particular, this function helps us to collect all the target prover's
    generated constants so that they become part of constant-to-value
    correspondence.  *)
 let rec get_variables_term (table: initial_definition Mstr.t) t =
   match t with
   | Sval _ -> table
-  | Variable _ | Function_Local_Variable _ -> table
+  | Var _ | Function_var _ -> table
   | Array a ->
     get_variables_array table a
   | Ite (t1, t2, t3, t4) ->
@@ -163,11 +163,11 @@ let rec get_variables_term (table: initial_definition Mstr.t) t =
     let table = get_variables_term table t3 in
     let table = get_variables_term table t4 in
     table
-  | Cvc4_Variable cvc ->
-    if Mstr.mem cvc table then
+  | Prover_var v ->
+    if Mstr.mem v table then
       table
     else
-      Mstr.add cvc Noelement table
+      Mstr.add v Noelement table
   | Record (_, l) ->
     List.fold_left (fun table (_f, t) -> get_variables_term table t) table l
   | To_array t ->
@@ -230,52 +230,52 @@ let rec simplify_value table v =
       List.fold_right2 subst_local_var vars args body |>
       simplify_value table
   | TIte (
-      TIte (TFunction_Local_Variable x,
-            TCvc4_Variable cvc,
-            TCvc4_Variable cvc1,
+      TIte (TFunction_var x,
+            TProver_var cvc,
+            TProver_var cvc1,
             _),
-      TCvc4_Variable cvc2,
+      TProver_var cvc2,
       tth,
       tel) when cvc = cvc1 && cvc = cvc2 ->
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc, tth, tel) in
+      let t = TIte (TFunction_var x, TProver_var cvc, tth, tel) in
       simplify_value table t
   | TIte (
-      TIte (TCvc4_Variable cvc,
-            TFunction_Local_Variable x,
-            TCvc4_Variable cvc1,
+      TIte (TProver_var cvc,
+            TFunction_var x,
+            TProver_var cvc1,
             _),
-      TCvc4_Variable cvc2,
+      TProver_var cvc2,
       tth,
       tel) when cvc = cvc1 && cvc = cvc2 (* Same as above *) ->
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc, tth, tel) in
+      let t = TIte (TFunction_var x, TProver_var cvc, tth, tel) in
       simplify_value table t
   | TIte (
-      TIte (TFunction_Local_Variable x,
-            TCvc4_Variable cvc,
-            TCvc4_Variable cvc1,
-            TCvc4_Variable cvc3),
-      TCvc4_Variable cvc2,
+      TIte (TFunction_var x,
+            TProver_var cvc,
+            TProver_var cvc1,
+            TProver_var cvc3),
+      TProver_var cvc2,
       tth,
       tel) when cvc = cvc1 && cvc <> cvc2 && cvc3 = cvc2 ->
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc3, tth, tel) in
+      let t = TIte (TFunction_var x, TProver_var cvc3, tth, tel) in
       simplify_value table t
   | TIte (
-      TIte (TCvc4_Variable cvc,
-            TFunction_Local_Variable x,
-            TCvc4_Variable cvc1,
-            TCvc4_Variable cvc3),
-      TCvc4_Variable cvc2,
+      TIte (TProver_var cvc,
+            TFunction_var x,
+            TProver_var cvc1,
+            TProver_var cvc3),
+      TProver_var cvc2,
       tth,
       tel) when cvc = cvc1 && cvc <> cvc2 && cvc3 = cvc2 (* Same as above *) ->
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc3, tth, tel) in
+      let t = TIte (TFunction_var x, TProver_var cvc3, tth, tel) in
       simplify_value table t
   | TIte (eq1, eq2, tthen, telse) ->
       TIte (eq1, eq2, simplify_value table tthen, simplify_value table telse)
@@ -305,16 +305,16 @@ let add_vars_to_table (table: correspondence_table) key value : correspondence_t
 
     let value = simplify_value table value in
     match value with
-    | TIte (TCvc4_Variable (Var cvc), TFunction_Local_Variable _x, t1, t2) ->
+    | TIte (TProver_var (Tree_var cvc), TFunction_var _x, t1, t2) ->
         let table = add_var_ite cvc t1 table in
         add_vars_to_table ~type_value table t2
-    | TIte (TFunction_Local_Variable _x, TCvc4_Variable (Var cvc), t1, t2) ->
+    | TIte (TFunction_var _x, TProver_var (Tree_var cvc), t1, t2) ->
         let table = add_var_ite cvc t1 table in
         add_vars_to_table ~type_value table t2
-    | TIte (t, TFunction_Local_Variable _x, TCvc4_Variable (Var cvc), t2) ->
+    | TIte (t, TFunction_var _x, TProver_var (Tree_var cvc), t2) ->
         let table = add_var_ite cvc t table in
         add_vars_to_table ~type_value table t2
-    | TIte (TFunction_Local_Variable _x, t, TCvc4_Variable (Var cvc), t2) ->
+    | TIte (TFunction_var _x, t, TProver_var (Tree_var cvc), t2) ->
         let table = add_var_ite cvc t table in
         add_vars_to_table ~type_value table t2
     | TIte _ -> table
@@ -388,8 +388,7 @@ and refine_array ~enc table a =
 and refine_function ~enc (table: correspondence_table) (term: tterm) =
   match term with
   | TSval _ -> term
-  | TCvc4_Variable (Var v) ->
-      begin
+  | TProver_var (Tree_var v) -> begin
         try (
           let tree = Mstr.find v table in
           (* Here, it is very *important* to have [enc] so that we don't go in
@@ -399,22 +398,22 @@ and refine_function ~enc (table: correspondence_table) (term: tterm) =
              defined
           *)
           if Hstr.mem enc v then
-            TCvc4_Variable (Tree tree)
+            TProver_var (Tree tree)
           else
             let () = Hstr.add enc v () in
             let table = refine_variable_value ~enc table v tree in
             let tree = Mstr.find v table in
-            TCvc4_Variable (Tree tree)
+            TProver_var (Tree tree)
         )
       with
       | Not_found -> term
       | Not_value -> term
     end
-  | TCvc4_Variable (Tree t) ->
+  | TProver_var (Tree t) ->
       let t = refine_tree ~enc table t in
-      TCvc4_Variable (Tree t)
-  | TFunction_Local_Variable _ -> term
-  | TVariable _ -> term
+      TProver_var (Tree t)
+  | TFunction_var _ -> term
+  | TVar _ -> term
   | TIte (t1, t2, t3, t4) ->
     let t1 = refine_function ~enc table t1 in
     let t2 = refine_function ~enc table t2 in
@@ -493,11 +492,11 @@ and convert_to_model_value lf (t: term): Model_parser.model_value =
             let (proj_name, proj_value) = List.hd l in
             Model_parser.Proj (proj_name, convert_to_model_value lf proj_value)
       end
-  | Cvc4_Variable _v -> raise Not_value (*Model_parser.Unparsed "!"*)
-  (* TODO change the value returned for non populated Cvc4 variable '!' -> '?' ? *)
+  | Prover_var _v -> raise Not_value (*Model_parser.Unparsed "!"*)
+  (* TODO change the value returned for non populated prover variable '!' -> '?' ? *)
   | To_array t -> convert_to_model_value lf (Array (convert_z3_array t))
   | Apply (s, lt) -> Model_parser.Apply (s, List.map (convert_to_model_value lf) lt)
-  | Function_Local_Variable _ | Variable _ | Ite _ -> raise Not_value
+  | Function_var _ | Var _ | Ite _ -> raise Not_value
 
 and convert_z3_array (t: term) : array =
 
@@ -512,9 +511,9 @@ and convert_z3_array (t: term) : array =
        Astore (1, Aconst t, Aconst t')
      *)
 
-    | Ite (Function_Local_Variable _x, if_t, t1, t2) ->
+    | Ite (Function_var _x, if_t, t1, t2) ->
       Astore (convert_array t2, if_t, t1)
-    | Ite (if_t, Function_Local_Variable _x, t1, t2) ->
+    | Ite (if_t, Function_var _x, t1, t2) ->
       Astore (convert_array t2, if_t, t1)
     | t -> Aconst t
   in
@@ -548,11 +547,11 @@ let default_apply_to_record (list_records: (string list) Mstr.t)
   and apply_to_record (v: term) =
     match v with
     | Sval _ -> v
-    (* Variable with no arguments can actually be constructors. We check this
+    (* Var with no arguments can actually be constructors. We check this
        here and if it is the case we change the variable into a value. *)
-    | Variable s when List.mem s noarg_constructors ->
+    | Var s when List.mem s noarg_constructors ->
         Apply (s, [])
-    | Cvc4_Variable _ | Function_Local_Variable _ | Variable _ -> v
+    | Prover_var _ | Function_var _ | Var _ -> v
     | Array a ->
         Array (array_apply_to_record a)
     | Record (s, l) ->
@@ -607,9 +606,9 @@ and convert_to_tree_term (t: term) : tterm =
   | Sval v -> TSval v
   | Apply (s, tl) -> TApply(s, List.map convert_to_tree_term tl)
   | Array a -> TArray (convert_to_tree_array a)
-  | Cvc4_Variable v -> TCvc4_Variable (Var v)
-  | Function_Local_Variable v -> TFunction_Local_Variable v
-  | Variable v -> TVariable v
+  | Prover_var v -> TProver_var (Tree_var v)
+  | Function_var v -> TFunction_var v
+  | Var v -> TVar v
   | Ite (t1, t2, t3, t4) ->
       TIte (convert_to_tree_term t1, convert_to_tree_term t2, convert_to_tree_term t3, convert_to_tree_term t4)
   | Record (s, tl) -> TRecord (s, List.map (fun (s, t) -> (s, convert_to_tree_term t)) tl)
@@ -645,10 +644,10 @@ and convert_tterm_to_term = function
   | TSval v -> Sval v
   | TApply (s, tl) -> Apply (s, List.map convert_tterm_to_term tl)
   | TArray ta -> Array (convert_tarray_to_array ta)
-  | TCvc4_Variable (Var v) -> Cvc4_Variable v
-  | TCvc4_Variable (Tree v) -> convert_tree_to_term v
-  | TFunction_Local_Variable v -> Function_Local_Variable v
-  | TVariable v -> Variable v
+  | TProver_var (Tree_var v) -> Prover_var v
+  | TProver_var (Tree v) -> convert_tree_to_term v
+  | TFunction_var v -> Function_var v
+  | TVar v -> Var v
   | TIte (t1, t2, t3, t4) ->
       let t1 = convert_tterm_to_term t1 in
       let t2 = convert_tterm_to_term t2 in
@@ -675,7 +674,7 @@ let create_list pm (table: definition Mstr.t) =
   in
 
   (* Convert Apply that were actually recorded as record to Record. Also replace
-     Variable that are originally unary constructor  *)
+     Var that are originally unary constructor  *)
   let table =
     Mstr.fold (fun key value acc ->
       let value =
@@ -725,7 +724,7 @@ let create_list pm (table: definition Mstr.t) =
     Mstr.fold (fun key v acc -> refine_variable_value acc key v) table table
   in
 
-  Debug.dprintf debug_cntex "Variable values were propagated@.";
+  Debug.dprintf debug_cntex "Var values were propagated@.";
   print_table table;
 
   (* Then converts all variables to raw_model_element *)

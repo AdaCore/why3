@@ -23,9 +23,9 @@ and term =
   | Sval of model_value
   | Apply of (string * term list)
   | Array of array
-  | Cvc4_Variable of variable
-  | Function_Local_Variable of variable
-  | Variable of variable
+  | Var of variable
+  | Function_var of variable (* Function parameter *)
+  | Prover_var of variable (* Variable introduced by prover (e.g. @x or x!0) *)
   | Ite of term * term * term * term
   | Record of string * ((string * term) list)
   | To_array of term

@@ -58,9 +58,11 @@ module FromSexp = struct
     { int_value= v; int_verbatim= s }
 
   let minus_model_int = function
-    | List [Atom "-"; i] ->
-        let i = model_int i in
-        {int_value= BigInt.minus i.int_value; int_verbatim= "-"^i.int_verbatim}
+    | List [Atom "-"; i] as sexp -> (
+        try
+          let i' = atom BigInt.of_string i in
+          {int_value= BigInt.minus i'; int_verbatim= "-"^string_of_sexp i}
+        with _ -> error sexp "minus_model_int" )
     | sexp -> error sexp "minus_model_int"
 
   let model_int sexp =
@@ -175,7 +177,7 @@ module FromSexp = struct
 
   let rec term sexp =
     try Sval (value sexp) with _ ->
-    try Variable (name sexp) with _ ->
+    try Var (name sexp) with _ ->
     try Array (array sexp) with _ ->
     try ite sexp with _ ->
     try apply_eq sexp; Sval (Unparsed "apply_eq") with _ ->
@@ -228,7 +230,7 @@ module FromSexp = struct
 
   and as_array = function
     | List [Atom "_"; Atom "as-array"; n] ->
-        To_array (Variable (name n))
+        To_array (Var (name n))
     | sexp -> error sexp "as_array"
 
   and application = function

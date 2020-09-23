@@ -24,9 +24,9 @@ and term =
   | Sval of model_value
   | Apply of (string * term list)
   | Array of array
-  | Cvc4_Variable of variable
-  | Function_Local_Variable of variable
-  | Variable of variable
+  | Var of variable
+  | Function_var of variable
+  | Prover_var of variable
   | Ite of term * term * term * term
   | Record of string * ((string * term) list)
   | To_array of term
@@ -60,18 +60,18 @@ let rec make_local_array vars_lists a =
 
 and make_local vars_lists t =
   match t with
-  | Variable s ->
+  | Var s ->
       begin
         if (List.exists (fun x -> s = fst x) vars_lists) then
-          Function_Local_Variable s
+          Function_var s
         else
           try
           (* Check that s is a Cvc4 or z3 variable. Note that s is a variable
              name so it is of size > 0 *)
             (if (String.get s 0 = '@' || String.contains s '!') then
-              Cvc4_Variable s
+              Prover_var s
             else
-              Variable s
+              Var s
             ) (* should not happen *)
           with
             _ -> raise Bad_local_variable (* Should not happen. s = "" *)
@@ -90,8 +90,8 @@ and make_local vars_lists t =
     let lt = List.map (make_local vars_lists) lt in
     Apply (s, lt)
   | Sval v -> Sval v
-  | Cvc4_Variable _ -> raise Bad_local_variable
-  | Function_Local_Variable _ -> raise Bad_local_variable
+  | Prover_var _ -> raise Bad_local_variable
+  | Function_var _ -> raise Bad_local_variable
   | Record (n, l) -> Record (n, List.map (fun (f, x) -> f, make_local vars_lists x) l)
   | To_array t -> To_array (make_local vars_lists t)
   (* TODO tree does not exist yet *)
@@ -100,9 +100,9 @@ and make_local vars_lists t =
 let rec subst var value = function
   | Sval _ as t -> t
   | Array a -> Array (subst_array var value a)
-  | Cvc4_Variable _ -> raise Bad_local_variable
-  | Function_Local_Variable _ as t -> t
-  | Variable v as t -> if v = var then value else t
+  | Var v as t -> if v = var then value else t
+  | Prover_var _ -> raise Bad_local_variable
+  | Function_var _ as t -> t
   | Ite (t1, t2, t3, t4) ->
     let t1 = subst var value t1 in
     let t2 = subst var value t2 in
