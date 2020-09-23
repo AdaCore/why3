@@ -21,6 +21,9 @@ module type INFERCFG = sig
   val empty_context  : unit -> context
   val start_cfg      : unit -> cfg
 
+  val cfg_size  : cfg -> int * int
+  (** (number of nodes, number of hyperedges) *)
+
   val put_expr_in_cfg   : cfg -> context -> ?ret:vsymbol option -> expr ->
                          control_points
   val put_expr_with_pre : cfg -> context -> expr -> term list ->

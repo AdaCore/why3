@@ -37,6 +37,7 @@ let def_wid = 3
 type ('context,'cfg,'control_points,'domain) ai_ops = {
     empty_context     : unit -> 'context;
     start_cfg         : unit -> 'cfg;
+    cfg_size : 'cfg -> int * int;
     put_expr_in_cfg   :
       'cfg -> 'context -> ?ret:vsymbol option -> expr -> 'control_points;
     put_expr_with_pre :
@@ -46,8 +47,8 @@ type ('context,'cfg,'control_points,'domain) ai_ops = {
     add_variable      : 'context -> pvsymbol -> unit;
 }
 
-let ai_ops a b c d e f g =
-  {empty_context     = a; start_cfg      = b; put_expr_in_cfg = c;
+let ai_ops a b b' c d e f g =
+  {empty_context     = a; start_cfg      = b; cfg_size = b'; put_expr_in_cfg = c;
    put_expr_with_pre = d; eval_fixpoints = e; domain_to_term  = f;
    add_variable      = g}
 
@@ -57,6 +58,8 @@ let infer_with_ops ai_ops e cty =
   List.iter (ai_ops.add_variable context) cty.cty_args;
   Mpv.iter (fun pv _ -> ai_ops.add_variable context pv) cty.cty_effect.eff_reads;
   ignore (ai_ops.put_expr_with_pre cfg context e cty.cty_pre);
+  let (n,h) = ai_ops.cfg_size cfg in
+  Format.eprintf "CFG size: %d nodes, %d hyperedges@." n h;
   let fixp = ai_ops.eval_fixpoints cfg context in
   let domain2term (e,d) =
     let expl = "infer:inferred with apron" in
@@ -85,21 +88,21 @@ let infer_loops_for_dom ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
   | Polyhedra ->
      let module Infer = Infer(Domain.Polyhedra) in
      let ai_ops =
-       ai_ops Infer.empty_context Infer.start_cfg Infer.put_expr_in_cfg
+       ai_ops Infer.empty_context Infer.start_cfg Infer.cfg_size Infer.put_expr_in_cfg
          Infer.put_expr_with_pre Infer.eval_fixpoints
          Infer.domain_to_term Infer.add_variable in
      infer_with_ops ai_ops e cty
   | Box ->
      let module Infer = Infer(Domain.Box) in
      let ai_ops =
-       ai_ops Infer.empty_context Infer.start_cfg Infer.put_expr_in_cfg
+       ai_ops Infer.empty_context Infer.start_cfg  Infer.cfg_size Infer.put_expr_in_cfg
          Infer.put_expr_with_pre Infer.eval_fixpoints
          Infer.domain_to_term Infer.add_variable in
      infer_with_ops ai_ops e cty
   | Oct ->
      let module Infer = Infer(Domain.Oct) in
      let ai_ops =
-       ai_ops Infer.empty_context Infer.start_cfg Infer.put_expr_in_cfg
+       ai_ops Infer.empty_context Infer.start_cfg  Infer.cfg_size Infer.put_expr_in_cfg
          Infer.put_expr_with_pre Infer.eval_fixpoints
          Infer.domain_to_term Infer.add_variable in
      infer_with_ops ai_ops e cty
