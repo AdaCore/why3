@@ -1795,7 +1795,7 @@ src/trywhy3/%.cmi: src/trywhy3/%.mli
 
 $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo alt_ergo_worker.cmo): BFLAGS += -package js_of_ocaml
 
-$(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml.ppx
+$(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 -include $(TRYWHY3DEP)
@@ -1818,7 +1818,7 @@ CLEANDIRS += src/trywhy3
 
 ifeq (@enable_web_ide@,yes)
 
-JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
+JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml-ppx \
         -I src/ide
 
 src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma

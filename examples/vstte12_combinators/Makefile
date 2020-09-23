@@ -58,7 +58,7 @@ clean::
 
 JSMAIN=jsmain
 
-JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx -package js_of_ocaml-lwt
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml-ppx -package js_of_ocaml-lwt
 
 $(JSMAIN).js: $(JSMAIN).byte
 	js_of_ocaml --pretty --noinline +nat.js $(JSMAIN).byte
