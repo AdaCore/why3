@@ -27,7 +27,7 @@ let compare_const ?(structural=true) c1 c2 =
       if c <> 0 then c else BigInt.compare i1 i2
   | ConstReal { rl_kind = k1; rl_real = r1 }, ConstReal { rl_kind = k2; rl_real = r2 } ->
       let c = if structural then Pervasives.compare k1 k2 else 0 in
-      if c <> 0 then c else compare_real r1 r2
+      if c <> 0 then c else compare_real ~structural r1 r2
   | _, _ ->
       Pervasives.compare c1 c2
 
