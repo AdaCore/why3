@@ -1,3 +1,5 @@
+CFG size: 44 nodes, 44 hyperedges
+Time elapsed 0.134762
 ### Debug: inferred invariants ###
 (((((x = contents x1 /\ x <= 0) /\ contents y = True) /\ ref'mk x = x1) /\
   x = contents x1 \/
@@ -6,6 +8,8 @@
  contents x1 <= 0) /\
 x <= contents x1
 ###
+CFG size: 44 nodes, 44 hyperedges
+Time elapsed 0.533122
 ### Debug: inferred invariants ###
 ((((((contents x3 <= x2 /\ contents y1 = True) /\ ref'mk x2 = x3) /\
     x2 = contents x3 \/
@@ -15,6 +19,11 @@ x <= contents x1
  x2 <= contents x3) /\
 x2 <= 0
 ###
+CFG size: 44 nodes, 44 hyperedges
+Time elapsed 0.007042
 ### Debug: inferred invariants ###
 contents x5 <= 0 /\ x4 <= 0
 ###
+bench/infer/bools.mlw Example1 f'vc: Unknown () (0.02s)
+bench/infer/bools.mlw Example1 f2'vc: Unknown () (0.02s)
+bench/infer/bools.mlw Example1 f3'vc: Unknown () (0.02s)

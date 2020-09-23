@@ -1,7 +1,47 @@
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by _1 of type list
+'xi
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret1 of type list
+int
+CFG size: 23 nodes, 23 hyperedges
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret1 of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by 
+Nil: list int of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by _1 of type list
+'xi
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret1 of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by 
+Nil: list int of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by _1 of type list
+'xi
+Time elapsed 0.009821
 ### Debug: inferred invariants ###
 ((((_2 = 5 /\ ll _1 = 0) /\ 0 <= contents k) /\ contents k <= 3) /\ 0 = ll _1) /\
 5 = _2
 ###
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by _5 of type list
+'xi1
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret3 of type list
+int
+CFG size: 23 nodes, 23 hyperedges
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret3 of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by 
+Nil: list int of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by _5 of type list
+'xi1
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret3 of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by 
+Nil: list int of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by _5 of type list
+'xi1
+Time elapsed 0.137780
 ### Debug: inferred invariants ###
 ((((((((((((((((((_6 = 5 /\ ll _5 = 0) /\ contents k1 <= 3) /\
                 (contents k1 + 2) <= _6) /\
@@ -22,6 +62,41 @@
  ll _5 <= 0) /\
 0 <= ll _5
 ###
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by _9 of type list
+'xi2
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret5 of type list
+int
+CFG size: 23 nodes, 23 hyperedges
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret5 of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by 
+Nil: list int of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by _9 of type list
+'xi2
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret5 of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by 
+Nil: list int of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret5 of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by 
+Nil: list int of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret5 of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by 
+Nil: list int of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by $ret5 of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by 
+Nil: list int of type list
+int
+-- warning: Recursive types is not supported in abstract interpretation. -- triggered by _9 of type list
+'xi2
+Time elapsed 0.008291
 ### Debug: inferred invariants ###
 ((((((0 = contents k2 /\ contents k2 = 0 \/
       2 = contents k2 \/ 1 = contents k2 \/ 3 = contents k2) /\
@@ -32,3 +107,8 @@
  5 = _10) /\
 0 = ll _9
 ###
+bench/infer/uf6.mlw Uf1 cons'vc: Unknown () (0.10s)
+bench/infer/uf6.mlw Uf1 nil'vc: Unknown () (0.00s)
+bench/infer/uf6.mlw Uf1 b'vc: Timeout (1.00s)
+bench/infer/uf6.mlw Uf1 b2'vc: Timeout (1.00s)
+bench/infer/uf6.mlw Uf1 b3'vc: Timeout (1.00s)

@@ -1,0 +1,25 @@
+
+
+(*
+
+Tests for path sensitivity with respect to Integer expressions
+
+*)
+
+use ref.Ref
+use int.Int
+
+val x : ref int
+val y : ref int
+
+
+(* just the expression 'x=y' *)
+
+let test1 [@infer:Polyhedra:4] () : unit =
+  x := 0;
+  y := 0;
+  while (!x <= 10) do
+    variant { 10 - !x }
+    if !x = !y then y := !y+1 else y := 0;
+     x := !x + 1;
+  done

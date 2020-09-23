@@ -1,9 +1,15 @@
+CFG size: 26 nodes, 26 hyperedges
+Time elapsed 0.011940
 ### Debug: inferred invariants ###
 0 <= contents i /\ contents i <= 10
 ###
+CFG size: 26 nodes, 26 hyperedges
+Time elapsed 0.072042
 ### Debug: inferred invariants ###
 contents i1 <= 10 /\ 0 <= contents i1
 ###
+CFG size: 26 nodes, 26 hyperedges
+Time elapsed 0.171736
 ### Debug: inferred invariants ###
 ((((0 = contents i2 /\ j2 = i2) /\ contents i2 = 0) /\ contents j2 = 0 \/
   10 = contents i2 \/
@@ -16,3 +22,6 @@ contents i1 <= 10 /\ 0 <= contents i1
  contents i2 <= 10) /\
 0 <= contents i2
 ###
+bench/infer/aliasing.mlw Aliasing1 b'vc: Valid (0.00s, 8 steps)
+bench/infer/aliasing.mlw Aliasing1 c'vc: Valid (0.01s, 8 steps)
+bench/infer/aliasing.mlw Aliasing1 d'vc: Valid (0.01s, 20 steps)

@@ -1,27 +1,45 @@
+CFG size: 17 nodes, 17 hyperedges
+Time elapsed 0.015730
 ### Debug: inferred invariants ###
 (0 = contents k /\ contents k = 0 \/ 0 < contents k /\ contents k <= x) /\
 0 <= contents k
 ###
+CFG size: 17 nodes, 17 hyperedges
+Time elapsed 1.768310
 ### Debug: inferred invariants ###
 (0 = contents k1 /\ contents k1 = 0 \/
  0 < x1 /\ 1 = contents k1 \/ 2 <= x1 /\ 2 <= contents k1) /\
 0 <= contents k1
 ###
+CFG size: 35 nodes, 35 hyperedges
+Time elapsed 0.040517
 ### Debug: inferred invariants ###
 ((((0 = contents j /\ 0 = contents k2) /\ contents k2 = 0) /\ contents j = 0 \/
   0 < contents k2 /\ contents k2 <= x2) /\
  0 <= contents k2) /\
 (2 * contents k2) = contents j
 ###
+CFG size: 17 nodes, 17 hyperedges
+Time elapsed 0.000711
 ### Debug: inferred invariants ###
 (x3 = contents k3 /\ 0 < x3) /\ x3 = contents k3
 ###
+CFG size: 17 nodes, 17 hyperedges
+Time elapsed 0.001944
 ### Debug: inferred invariants ###
 ((((x4 = contents k4 /\ contents k4 <= x4) /\ 0 < contents k4) /\
   2 <= (x4 + contents k4)) /\
  x4 <= contents k4) /\
 0 < x4
 ###
+CFG size: 17 nodes, 17 hyperedges
+Time elapsed 0.000282
 ### Debug: inferred invariants ###
 (x5 = contents k5 /\ 0 < contents k5) /\ 0 < x5
 ###
+bench/infer/auto_ref3.mlw Test b'vc: Valid (0.00s, 10 steps)
+bench/infer/auto_ref3.mlw Test b3'vc: Valid (0.01s, 13 steps)
+bench/infer/auto_ref3.mlw Test c'vc: Valid (0.01s, 13 steps)
+bench/infer/auto_ref3.mlw Test e'vc: Unknown () (0.02s)
+bench/infer/auto_ref3.mlw Test e2'vc: Unknown () (0.02s)
+bench/infer/auto_ref3.mlw Test e3'vc: Unknown () (0.02s)

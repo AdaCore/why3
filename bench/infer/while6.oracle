@@ -1,3 +1,5 @@
+CFG size: 29 nodes, 29 hyperedges
+Time elapsed 2.626054
 ### Debug: inferred invariants ###
 ((0 = contents i /\ contents i = 0 \/
   42 = contents i \/
@@ -17,6 +19,8 @@
  0 <= contents i) /\
 contents i <= 102
 ###
+CFG size: 29 nodes, 29 hyperedges
+Time elapsed 19.335422
 ### Debug: inferred invariants ###
 ((contents i1 <= 0 /\ contents i1 = 0 \/
   84 <= contents i1 /\ contents i1 <= 84 \/
@@ -39,3 +43,5 @@ contents i <= 102
  contents i1 <= 102) /\
 0 <= contents i1
 ###
+bench/infer/while6.mlw While6 b'vc: Unknown () (0.04s)
+bench/infer/while6.mlw While6 b2'vc: Unknown () (0.04s)

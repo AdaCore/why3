@@ -1,8 +1,14 @@
+CFG size: 42 nodes, 43 hyperedges
+Time elapsed 0.043240
 ### Debug: inferred invariants ###
 ((0 <= contents i /\ contents j <= (1 + contents i)) /\ contents j <= 10) /\
 contents i <= contents j
 ###
+CFG size: 42 nodes, 43 hyperedges
+Time elapsed 0.044849
 ### Debug: inferred invariants ###
 ((contents j1 <= contents i1 /\ 0 <= contents j1) /\ contents j1 <= 9) /\
 contents i1 <= (1 + contents j1)
 ###
+bench/infer/if.mlw If1 b'vc: Unknown () (0.07s)
+bench/infer/if.mlw If1 c'vc: Unknown () (0.04s)

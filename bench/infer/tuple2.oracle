@@ -1,3 +1,5 @@
+CFG size: 65 nodes, 65 hyperedges
+Time elapsed 0.077693
 ### Debug: inferred invariants ###
 ((((((1 = match _1 with
       | $pat, _ -> $pat
@@ -15,6 +17,8 @@
  end) /\
 (2 * contents i) = contents j
 ###
+CFG size: 65 nodes, 65 hyperedges
+Time elapsed 29.512841
 ### Debug: inferred invariants ###
 ((((((((((((((((((((((((((((((((((((((((((((((((match _8 with
                                                 | $pat, _ -> $pat
@@ -895,6 +899,8 @@
 | $pat, _ -> $pat
 end
 ###
+CFG size: 65 nodes, 65 hyperedges
+Time elapsed 4.663505
 ### Debug: inferred invariants ###
 ((((((((((0 = contents i2 /\ 0 = contents j2) /\ contents i2 = 0) /\
         contents j2 = 0 \/
@@ -922,3 +928,6 @@ end
 | $pat, _ -> $pat
 end
 ###
+bench/infer/tuple2.mlw Tuple2 b'vc: Valid (0.00s, 12 steps)
+bench/infer/tuple2.mlw Tuple2 b2'vc: Valid (0.08s, 322 steps)
+bench/infer/tuple2.mlw Tuple2 b3'vc: Unknown () (0.03s)

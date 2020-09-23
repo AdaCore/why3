@@ -1,3 +1,5 @@
+CFG size: 14 nodes, 14 hyperedges
+Time elapsed 0.009821
 ### Debug: inferred invariants ###
 ((forall w1:int.
    ((length (make x 2) = length a /\ length (make x 2) = x) /\ w1 < 0) /\
@@ -10,6 +12,8 @@
  x = length a) /\
 x = length a
 ###
+CFG size: 14 nodes, 14 hyperedges
+Time elapsed 0.031981
 ### Debug: inferred invariants ###
 (((forall w2:int.
     ((((w2 < 0 /\ length (make x1 2) <= x1) /\ x1 <= length (make x1 2)) /\
@@ -30,9 +34,13 @@ x = length a
  length a1 <= x1) /\
 x1 <= length a1
 ###
+CFG size: 14 nodes, 14 hyperedges
+Time elapsed 0.000527
 ### Debug: inferred invariants ###
 length (make x2 2) = length a2 /\ x2 = length a2
 ###
+CFG size: 20 nodes, 20 hyperedges
+Time elapsed 0.017877
 ### Debug: inferred invariants ###
 (((((forall w4:int.
       (((length (make n 10) = length a3 /\ length (make n 10) = n) /\ w4 < 0) /\
@@ -50,6 +58,8 @@ length (make x2 2) = length a2 /\ x2 = length a2
  n = length a3) /\
 (elts a3 @ 5) = b
 ###
+CFG size: 20 nodes, 20 hyperedges
+Time elapsed 0.054571
 ### Debug: inferred invariants ###
 (((((((((forall w5:int.
           ((((((((((0 <= length (make n1 10) /\ w5 < length (make n1 10)) /\
@@ -99,6 +109,8 @@ length (make x2 2) = length a2 /\ x2 = length a2
  (elts a4 @ 5) <= b1) /\
 0 <= n1
 ###
+CFG size: 20 nodes, 20 hyperedges
+Time elapsed 0.003085
 ### Debug: inferred invariants ###
 ((((forall w6:int.
      w6 < 0 /\ length (make n2 10) = length a5 \/
@@ -109,3 +121,23 @@ length (make x2 2) = length a2 /\ x2 = length a2
  0 <= length a5) /\
 0 <= n2
 ###
+bench/infer/auto_array1.mlw Test basic'vc: Unknown () (0.02s)
+bench/infer/auto_array1.mlw Test basic1'vc: Unknown () (0.02s)
+bench/infer/auto_array1.mlw Test basic2'vc: Unknown () (0.02s)
+bench/infer/auto_array1.mlw Test b'vc: Unknown () (0.02s)
+bench/infer/auto_array1.mlw Test b2'vc: Unknown () (0.02s)
+bench/infer/auto_array1.mlw Test c'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test d_basic'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test d'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test e'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test f'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test cond'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test cond2'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test init1'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test init2'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test init3'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test init5'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test init_non_lin'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test instantiation'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test instantiation2'vc: Timeout (1.00s)
+bench/infer/auto_array1.mlw Test instantiation3'vc: Timeout (1.00s)

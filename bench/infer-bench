@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
@@ -55,22 +55,21 @@ run () {
   printf "running for $1"
   file_base="$(basename $1)"
   file_dir="$(dirname $1)"
+  out_file="$file_dir/${file_base%.*}.out"
   oracle_file="$file_dir/${file_base%.*}.oracle"
-  str_oracle=$(cat $oracle_file 2> /dev/null)
-  str_output=$($why3prove $1 --debug=print-inferred-invs | \
-                   sed -n '/^### Debug: inferred invariants ###/,/^###/p')
-  if [ "$str_oracle" = "$str_output" ] ; then
+  $why3prove $1 -t 1 -P alt-ergo --debug=print-inferred-invs > "$out_file" 2>&1
+  if cmp "$oracle_file" "$out_file" > /dev/null ; then
     printf " - ok\n"
   else
     printf "\n"
     if $updateoracle; then
       echo "Updating oracle for $file_base"
-      echo "$str_output" > "${oracle_file}"
+      mv "$out_file" "$oracle_file"
     else
       echo "FAILED!"
       echo "diff is the following:"
       echo "$f"
-      diff <(echo "$str_oracle") <(echo "$str_output")
+      diff "$str_oracle" "$out_file"
       failed="$failed\n$1"
       success=false
     fi

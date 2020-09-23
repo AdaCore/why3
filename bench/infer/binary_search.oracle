@@ -1,15 +1,34 @@
+CFG size: 80 nodes, 81 hyperedges
+Couldn't understand entirely the post condition:
+forall i1:int, i2:int.
+ 0 <= i1 /\ i1 <= i2 /\ i2 < length a -> (elts a @ i1) <= (elts a @ i2)
+Time elapsed 1.595482
 ### Debug: inferred invariants ###
 forall w1:int.
  ((length a = (1 + contents u) /\ 0 = contents l) /\
   (length a - 1) = contents u) /\
  contents l = 0 \/ contents l <= (1 + contents u)
 ###
+CFG size: 80 nodes, 81 hyperedges
+Couldn't understand entirely the post condition:
+forall i11:int, i2:int.
+ 0 <= i11 /\ i11 <= i2 /\ i2 < length a1 -> (elts a1 @ i11) <= (elts a1 @ i2)
+Time elapsed 0.733269
 ### Debug: inferred invariants ###
 forall w2:int.
  (((0 <= contents l1 /\ contents l1 <= 0) /\ length a1 <= (1 + contents u1)) /\
   contents u1 < length a1) /\
  contents l1 = 0 \/ 0 < length a1
 ###
+CFG size: 80 nodes, 81 hyperedges
+Couldn't understand entirely the post condition:
+forall i11:int, i21:int.
+ 0 <= i11 /\ i11 <= i21 /\ i21 < length a2 ->
+ (elts a2 @ i11) <= (elts a2 @ i21)
+Time elapsed 0.019722
 ### Debug: inferred invariants ###
 forall w3:int. true
 ###
+bench/infer/binary_search.mlw BinarySearch binary_search'vc: Timeout (1.00s)
+bench/infer/binary_search.mlw BinarySearch binary_search2'vc: Timeout (1.00s)
+bench/infer/binary_search.mlw BinarySearch binary_search3'vc: Timeout (1.00s)

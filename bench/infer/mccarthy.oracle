@@ -1,7 +1,11 @@
+CFG size: 63 nodes, 64 hyperedges
+Time elapsed 0.023747
 ### Debug: inferred invariants ###
 ((101 <= n0 /\ 0 <= contents e) /\ contents e <= 1) /\
 (n0 + (10 * contents e)) = (10 + contents n)
 ###
+CFG size: 63 nodes, 64 hyperedges
+Time elapsed 0.079740
 ### Debug: inferred invariants ###
 (((((((((((((((((((102 <= (n01 + contents e1) /\ 0 < contents e1) /\
                   n01 <= contents n1) /\
@@ -26,11 +30,15 @@
  101 <= (n01 + contents e1)) /\
 101 <= n01
 ###
+CFG size: 63 nodes, 64 hyperedges
+Time elapsed 1.672582
 ### Debug: inferred invariants ###
 ((3 <= contents e2 /\ contents n2 <= 111 \/ 91 <= contents n2) /\
  0 <= contents e2) /\
 101 <= n02
 ###
+CFG size: 63 nodes, 64 hyperedges
+Time elapsed 0.515569
 ### Debug: inferred invariants ###
 (91 <= contents n3 \/
  (((n03 + (11 * contents e3)) = (11 + contents n3) /\ n03 <= 100) /\
@@ -38,6 +46,8 @@
  0 < contents e3 \/ contents n3 <= 111 /\ 3 <= contents e3) /\
 0 <= contents e3
 ###
+CFG size: 63 nodes, 64 hyperedges
+Time elapsed 0.788591
 ### Debug: inferred invariants ###
 ((((((n04 = contents n4 /\ 1 = contents e4) /\ ref'mk n04 = n4) /\
     n04 = contents n4) /\
@@ -65,6 +75,8 @@
  (n04 + (10 * contents e4)) <= (10 + contents n4)) /\
 (n04 + (11 * contents e4)) <= (11 + contents n4)
 ###
+CFG size: 63 nodes, 64 hyperedges
+Time elapsed 1.618466
 ### Debug: inferred invariants ###
 (((1 = contents e5 /\ ref'mk n05 = n5) /\ n05 = contents n5) /\
  contents e5 = 1 \/
@@ -73,3 +85,11 @@
  91 <= contents n5) /\
 0 <= contents e5
 ###
+bench/infer/mccarthy.mlw McCarthy91 f91'vc: Valid (0.01s, 40 steps)
+bench/infer/mccarthy.mlw McCarthy91 f91_nonrec'vc: Valid (0.01s, 22 steps)
+bench/infer/mccarthy.mlw McCarthy91 f91_nonrec_oct'vc: Valid (0.02s, 52 steps)
+bench/infer/mccarthy.mlw McCarthy91 f91_nonrec_box'vc: Timeout (1.00s)
+bench/infer/mccarthy.mlw McCarthy91 f91_nonrec2'vc: Unknown () (0.28s)
+bench/infer/mccarthy.mlw McCarthy91 f91_nonrec_hard'vc: Valid (0.03s, 109 steps)
+bench/infer/mccarthy.mlw McCarthy91 f91_nonrec_hard_box'vc: Timeout (1.00s)
+bench/infer/mccarthy.mlw McCarthy91 f91_pseudorec'vc: Valid (0.01s, 57 steps)
