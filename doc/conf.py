@@ -87,23 +87,18 @@ html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
-# documentation: https://alabaster.readthedocs.io/en/latest/customization.html
-#
+# documentation.
+
+# Alabaster's documentation: https://alabaster.readthedocs.io/en/latest/customization.html
+
 html_theme_options = {
-    # makes the contents sidebar keep in place when scrolling
-    # problem: when sidebar is higher than page height the bottom is not
-    # accessible anymore!
-    # 'fixed_sidebar': 'true',
-    # sets the page width as large as possible
-    # not bad, still not all the width is used unless
-    # ones manually enlarges the text with control-+
-    # that's the text width that should be enlarged, but how ??
-    'page_width': '98%',
+    'page_width': 'max(940px,90%)',
+    'sidebar_width': 'max(220px,20%)',
+    'body_max_width': 'auto',
     'body_text_align': 'justify',
 #    'logo': 'logo-why.png',
 #    'logo_name': True,
-#    'page_width': '73em',
-#    'sidebar_width': '18em',
+#    'fixed_sidebar': 'true',
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
