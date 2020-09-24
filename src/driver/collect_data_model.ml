@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Wstdlib
+open Printer
 open Model_parser
 open Smtv2_model_defs
 
@@ -21,10 +22,6 @@ let debug_cntex = Debug.register_flag "cntex_collection"
 (** Intermediate data structure for propagations of tree projections inside
     counterexamples.
 *)
-
-(* Similar to definition except that we have a tree like structure for
-    variables *)
-type initial_definition = definition
 
 type projection_name = string
 
@@ -63,8 +60,6 @@ and tree =
    Initially all var name begins with its original definition which is then
    refined using projections (that are saved in the tree) *)
 type correspondence_table = tree Mstr.t
-
-
 
 let rec print_array fmt a =
   match a with
@@ -147,54 +142,33 @@ let print_table (t: correspondence_table) =
     t;
   Debug.dprintf debug_cntex "End table@."
 
-(* Adds all referenced prover variables found in the term t to table.
-   In particular, this function helps us to collect all the target prover's
-   generated constants so that they become part of constant-to-value
-   correspondence.  *)
-let rec get_variables_term (table: initial_definition Mstr.t) t =
-  match t with
-  | Sval _ -> table
-  | Var _ | Function_var _ -> table
-  | Array a ->
-    get_variables_array table a
+let rec collect_prover_vars_term = function
+  | Prover_var v -> Sstr.singleton v
+  | Sval _ | Var _ | Function_var _ -> Sstr.empty
+  | Array a -> collect_prover_vars_array a
   | Ite (t1, t2, t3, t4) ->
-    let table = get_variables_term table t1 in
-    let table = get_variables_term table t2 in
-    let table = get_variables_term table t3 in
-    let table = get_variables_term table t4 in
-    table
-  | Prover_var v ->
-    if Mstr.mem v table then
-      table
-    else
-      Mstr.add v Noelement table
-  | Record (_, l) ->
-    List.fold_left (fun table (_f, t) -> get_variables_term table t) table l
-  | To_array t ->
-    get_variables_term table t
-  | Apply (_s, lt) ->
-      List.fold_left (fun table t -> get_variables_term table t) table lt
-  (* TODO does not exist at this moment *)
-  | Trees _ -> raise Not_found
+      let ss = List.map collect_prover_vars_term [t1; t2; t3; t4] in
+      List.fold_right Sstr.union ss Sstr.empty
+  | Record (_, fs) ->
+      let ss = List.map collect_prover_vars_term (List.map snd fs) in
+      List.fold_right Sstr.union ss Sstr.empty
+  | To_array t -> collect_prover_vars_term t
+  | Apply (_, ts) ->
+      let ss = List.map collect_prover_vars_term ts in
+      List.fold_right Sstr.union ss Sstr.empty
+  | Trees _ -> assert false (* Does not exist at this moment *)
 
-and get_variables_array table a =
-  match a with
-  | Avar _v ->
-       table
-   | Aconst t ->
-       let table = get_variables_term table t in
-       table
-   | Astore (a, t1, t2) ->
-       let table = get_variables_array table a in
-       let table = get_variables_term table t1 in
-       get_variables_term table t2
+and collect_prover_vars_array = function
+  | Avar _ -> Sstr.empty
+  | Aconst t -> collect_prover_vars_term t
+  | Astore (a, t1, t2) ->
+      List.fold_left Sstr.union (collect_prover_vars_array a)
+        (List.map collect_prover_vars_term [t1; t2])
 
-let get_all_var (table: definition Mstr.t) : definition Mstr.t =
-  Mstr.fold (fun _key element table ->
-    match element with
-    | Noelement -> table
-    | Function (_, t) -> get_variables_term table t
-    | Term t -> get_variables_term table t) table table
+let collect_prover_vars = function
+  | Noelement -> Sstr.empty
+  | Function (_, t) | Term t ->
+      collect_prover_vars_term t
 
 exception Bad_variable
 
@@ -282,7 +256,7 @@ let rec simplify_value table v =
   | _ -> v
 
 (* Add the variables that can be deduced from ITE to the table of variables *)
-let add_vars_to_table (table: correspondence_table) key value : correspondence_table =
+let add_vars_to_table key value (table: correspondence_table) : correspondence_table =
 
   let rec add_vars_to_table ~type_value (table: correspondence_table) value =
 
@@ -443,7 +417,7 @@ and refine_variable_value ~enc (table: correspondence_table) key (t: tree) : cor
    inefficient. ie we calculate the value of constants several time during
    propagation without saving it: this is currently ok as counterexamples
    parsing is *not* notably taking time/memory *)
-let refine_variable_value table key t =
+let refine_variable_value key t table =
   let encountered_key = Hstr.create 16 in
   refine_variable_value ~enc:encountered_key table key t
 
@@ -523,9 +497,9 @@ and convert_record lf l =
   List.map (fun (f, v) -> f, convert_to_model_value lf v) l
 
 let convert_to_model_element pm name (t: term) =
-  let value = convert_to_model_value pm.Printer.list_fields t in
+  let value = convert_to_model_value pm.list_fields t in
   let attrs =
-    try Mstr.find name pm.Printer.set_str
+    try Mstr.find name pm.set_str
     with Not_found -> Ident.Sattr.empty in
   Model_parser.create_model_element ~name ~value ~attrs
 
@@ -638,7 +612,7 @@ and convert_tdef_to_term = function
       convert_tterm_to_term t
   | TNoelement ->
       (* TODO check which error can be raised here *)
-      Sval (Unparsed ("error: tdef"))
+      Sval (Unparsed ("error"))
 
 and convert_tterm_to_term = function
   | TSval v -> Sval v
@@ -666,25 +640,23 @@ and convert_tarray_to_array a =
 
 let create_list pm (table: definition Mstr.t) =
 
-  (* Convert list_records to take replace fields with model_trace when
-     necessary. *)
+  (* Convert list_records to take replace fields with model_trace when necessary. *)
   let list_records =
-    Mstr.fold (fun key l acc ->
-        Mstr.add key (List.map (fun (a, b) -> if b = "" then a else b) l) acc) pm.Printer.list_records Mstr.empty
-  in
+    let select (a, b) = if b = "" then a else b in
+    Mstr.mapi (fun _ -> List.map select) pm.list_records in
 
   (* Convert Apply that were actually recorded as record to Record. Also replace
      Var that are originally unary constructor  *)
   let table =
-    Mstr.fold (fun key value acc ->
-      let value =
-        definition_apply_to_record list_records pm.Printer.noarg_constructors value
-      in
-      Mstr.add key value acc) table Mstr.empty
-  in
+    Mstr.mapi (fun _ -> definition_apply_to_record list_records pm.noarg_constructors)
+      table in
 
-  (* First populate the table with all references to a cvc variable *)
-  let table = get_all_var table in
+  (* First populate the table with all references to prover variables *)
+  let table =
+    let var_sets = List.map collect_prover_vars (Mstr.values table) in
+    let vars = List.fold_right Sstr.union var_sets Sstr.empty in
+    let vars = Sstr.filter (fun v -> not (Mstr.mem v table)) vars in
+    Sstr.fold (fun v -> Mstr.add v Noelement) vars table in
 
   Debug.dprintf debug_cntex "After parsing@.";
   Mstr.iter (fun k e ->
@@ -693,48 +665,33 @@ let create_list pm (table: definition Mstr.t) =
         k print_def t)
     table;
 
-  let table: tree_definition Mstr.t =
-    Mstr.fold (fun k elt acc ->
-        let elt = convert_to_tree_def elt in
-        Mstr.add k elt acc) table Mstr.empty
-  in
-
-  (* Convert the table to a table of tree *)
-  (* TODO this could probably be optimized away *)
-  let table1 = Mstr.fold (fun key value acc ->
-      Mstr.add key (Leaf value) acc) table Mstr.empty
-  in
+  let table : tree_definition Mstr.t = Mstr.map convert_to_tree_def table in
 
   (* First recover values stored in projections that were registered *)
-  let table =
-    Mstr.fold (fun key value acc ->
-        if Mstr.mem key pm.Printer.list_projections || Mstr.mem key pm.Printer.list_fields then
-        add_vars_to_table acc key value
-      else
-        acc)
-      table table1
-  in
+  let table : tree Mstr.t =
+    (* Convert the table to a table of tree *)
+    (* TODO this could probably be optimized away *)
+    let table_leaves = Mstr.map (fun v -> Leaf v) table in
+    let table_projs_fields = Mstr.filter (fun key _ ->
+        Mstr.mem key pm.list_projections || Mstr.mem key pm.list_fields) table in
+    Mstr.fold add_vars_to_table table_projs_fields table_leaves in
 
   (* Only printed in debug *)
   Debug.dprintf debug_cntex "Value were queried from projections@.";
   print_table table;
 
   (* Then substitute all variables with their values *)
-  let table =
-    Mstr.fold (fun key v acc -> refine_variable_value acc key v) table table
-  in
+  let table = Mstr.fold refine_variable_value table table in
 
   Debug.dprintf debug_cntex "Var values were propagated@.";
   print_table table;
 
-  (* Then converts all variables to raw_model_element *)
-  Mstr.fold
-    (fun name term list_acc ->
-      try (convert_to_model_element pm name term :: list_acc)
-      with Not_value when not (Debug.test_flag debug_cntex &&
-                               Debug.test_flag Debug.stack_trace) ->
-        Debug.dprintf debug_cntex "Element creation failed: %s@." name;
-        list_acc
-      | e -> raise e)
-    (Mstr.map convert_tree_to_term table)
-    []
+  let table : term Mstr.t = Mstr.map convert_tree_to_term table in
+
+  Lists.map_filter
+    (fun (name, term) ->
+       try Some (convert_to_model_element pm name term)
+       with Not_value when not Debug.(test_flag debug_cntex && test_flag stack_trace) ->
+         Debug.dprintf debug_cntex "Element creation failed: %s@." name;
+           None)
+    (List.rev (Mstr.bindings table))
