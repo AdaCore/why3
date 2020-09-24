@@ -139,8 +139,8 @@ Installation can be tested as follows:
 Local Use, Without Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It is not mandatory to install Why3 into system directories. Why3 can be
-configured and compiled for local use as follows:
+Installing Why3 is not mandatory. It can be configured in a way such that
+it can be used from its compilation directory:
 
 ::
 
@@ -148,7 +148,7 @@ configured and compiled for local use as follows:
     make
 
 The Why3 executable files are then available in the subdirectory :file:`bin/`.
-This directory can be added in your :envvar:`PATH`.
+This directory can be added to your :envvar:`PATH`.
 
 .. _sec.installlib:
 
