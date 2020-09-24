@@ -9,7 +9,7 @@ languages, written in special comments.
 These input formats are described below.
 
 Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.) can be passed a file
-with a suffix ``.c`` or ``.py``, which triggers the corresponding input format.
+with a suffix :file:`.c` or :file:`.py`, which triggers the corresponding input format.
 These input formats can also be used in on-line versions of Why3, at
 http://why3.lri.fr/micro-C/ and http://why3.lri.fr/python/, respectively.
 
@@ -64,7 +64,7 @@ functions such as ``printf`` (see below) is accepted by a C compiler.
        : | "-" `expr` | "!" `expr`
        : | `expr` ( "+" | "-" | "*" | "/" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" ) `expr`
        : | identifier "(" (`expr` ("," `expr`)*)? ")"
-       : | "scanf" "(" "\"%d\"" "," "&" identifier ")"
+       : | "scanf" "(" '"%d"' "," "&" identifier ")"
        : | "(" `expr` ")"
 
 .. rubric:: C statement
@@ -139,18 +139,18 @@ Built-in functions and predicates
 
 .. rubric:: C code
 
-* ``scanf``, with a syntax limited to ``scanf("%d", &x)``
-* ``printf``, limited to ``printf(string-literal,
-  expr1, ..., exprn)`` and assuming that the string literal
-  contains exactly n occurrences of ``%d`` (not checked by Why3).
-* ``rand()``, returns a pseudo-random integer in the range 0 to
+* ``scanf`` is limited to the syntax ``scanf("%d", &x)``.
+* ``printf`` is limited to ``printf(string-literal,
+  expr1, ..., exprn)``. The string literal should
+  contain exactly ``n`` occurrences of ``%d`` (not checked by Why3).
+* ``rand()`` returns a pseudo-random integer in the range ``0`` to
   ``RAND_MAX`` inclusive.
 
 .. rubric:: Logic
 
-* ``int length(int a[])``, the length of array ``a``
-* ``int occurrence(int v, int a[])``, the number of occurrences of the
-  value ``v`` in array ``a``
+* ``int length(int a[])`` returns the length of array ``a``.
+* ``int occurrence(int v, int a[])`` returns the number of occurrences of the
+  value ``v`` in array ``a``.
 
 
 .. index:: Python
@@ -170,7 +170,7 @@ special symbols ``NEWLINE``, ``INDENT``,
 and ``DEDENT`` mark an end of line, the beginning of a new
 indentation block, and its end, respectively.
 
-Logical annotations are inserted in special comments starting with `#@`.
+Logical annotations are inserted in special comments starting with ``#@``.
 
 .. productionlist:: microPython
    file: `decl`*
@@ -185,7 +185,7 @@ interpreter (see below).
 ..  rubric:: Function definition
 
 .. productionlist:: microPython
-    py_function: "def" identifier "(" [ `params` ] ")" ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
+    py_function: "def" identifier "(" `params`? ")" ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
     params: identifier ("," identifier)*
 
 .. rubric:: Function specification
@@ -269,18 +269,18 @@ Built-in functions and predicates
 
 .. rubric:: Python code
 
-* ``len(l)``, the length of list ``l``
-* ``int(input())``, reads an integer from standard input
-* ``range(l, u)``, returns the list of integers
-  from ``l`` inclusive to ``u`` exclusive
-  (in particular, ``for x in range(l, u):`` is supported)
-* ``randint(l, u)``, returns a pseudo-random integer
-  in the range ``l`` to ``u`` inclusive
+* ``len(l)`` returns the length of list ``l``.
+* ``int(input())`` reads an integer from standard input.
+* ``range(l, u)`` returns the list of integers
+  from ``l`` inclusive to ``u`` exclusive.
+  In particular, ``for x in range(l, u):`` is supported.
+* ``randint(l, u)`` returns a pseudo-random integer
+  in the range ``l`` to ``u`` inclusive.
 
 .. rubric:: Logic
 
-* ``len(l)``, the length of list ``l``
-* ``occurrence(v, l)``, the number of occurrences of the value ``v`` in list ``l``
+* ``len(l)`` returns the length of list ``l``.
+* ``occurrence(v, l)`` returns the number of occurrences of the value ``v`` in list ``l``.
 
 Limitations
 ~~~~~~~~~~~
@@ -405,12 +405,12 @@ an array of integers.
 The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_array`.
 
 .. graphviz:: images/max_array.dot
-   :caption: Control-flow graph of "max_array" example.
+   :caption: Control-flow graph of the ``max_array`` function.
    :name: fig.cfg.max_array
 
 Below is a version of this code in the Why3-CFG language, where label
-"L" corresponds
-to node "L", label "L1" to node "invariant", label "L2" to node "do".
+``L`` corresponds to node ``L``, label ``L1`` to node ``invariant``,
+label ``L2`` to node ``do``.
 
 .. code-block:: whyml
 
@@ -485,7 +485,7 @@ Current limitations
 - New keywords ``cfg``, ``goto``, ``switch``, and ``var`` cannot be used as
   regular identifiers anymore.
 
-- Trailing code after "switch" is not supported: in principle, it
+- Trailing code after ``switch`` is not supported. In principle, it
   should be possible to have a ``switch`` with type ``unit`` and to transfer
   the execution to the instructions after the ``switch`` for branches
   not containing ``goto``. This is not
