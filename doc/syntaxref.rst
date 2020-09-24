@@ -201,7 +201,7 @@ Logical expressions: terms and formulas
 ---------------------------------------
 
 .. productionlist::
-    term: `integer`   ; integer constant
+    term0: `integer`   ; integer constant
         : | `real`   ; real constant
         : | "true" | "false"   ; Boolean constant
         : | "()"   ; empty tuple
@@ -238,7 +238,7 @@ Logical expressions: terms and formulas
         : | `attribute`+ `term`   ; attributes
         : | `term` ("," `term`)+   ; tuple
         : | `quantifier` `quant_vars` `triggers`? "." `term`   ; quantifier
-        : | ...   ; (to be continued)
+        : | ...   ; (to be continued in `term`)
     formula: `term`   ; no distinction as far as syntax is concerned
     term_field: `lqualid` "=" `term` ";"   ; field = value
     qualid: `qualifier`? (`lident_ext` | `uident`)   ; qualified identifier
@@ -415,7 +415,8 @@ proof justifies the affirmation), and finally, ``A -> D`` (the proof of
 ``A`` is discarded and ``A`` is used to prove ``D``).
 
 The behavior of the splitting transformations is further controlled by
-attributes ``[@stop_split]`` and ``[@case_split]``. Consult the documentation
+attributes :why3:attribute:`[@stop_split]` and :why3:attribute:`[@case_split]`.
+Consult the documentation
 of transformation :why3:transform:`split_goal` in
 :numref:`sec.transformations` for details.
 
@@ -431,7 +432,7 @@ a non-parenthesised implication at the right-hand side of an
 equivalence: ``A <-> B -> C`` is rejected.
 
 .. productionlist::
-  term: ...
+  term: `term0`
       : | "if" `term` "then" `term` "else" `term`   ; conditional
       : | "match" `term` "with" `term_case`+ "end"   ; pattern matching
       : | "let" `pattern` "=" `term` "in" `term`   ; let-binding
@@ -459,12 +460,12 @@ conditionals, let-bindings, pattern matching, and local function
 definitions, either via the ``let-in`` construction or the ``fun``
 keyword. The pure logical functions defined in this way are called
 *mappings*; they are first-class values of “arrow” type
-`t -> u`.
+``t -> u``.
 
-The patterns are similar to those of OCaml, though the `when` clauses
-and numerical constants are not supported. Unlike in OCaml, `as` binds
-stronger than the comma: in the pattern `(p,q as x)`, variable
-`x` is bound to the value matched by pattern `q`. Also notice
+The patterns are similar to those of OCaml, though the ``when`` clauses
+and numerical constants are not supported. Unlike in OCaml, ``as`` binds
+stronger than the comma: in the pattern ``(p,q as x)``, variable
+``x`` is bound to the value matched by pattern ``q``. Also notice
 the closing ``end`` after the ``match with`` term. A ``let in``
 construction with a non-trivial pattern is translated as a
 ``match with`` term with a single branch.
@@ -598,7 +599,7 @@ of the ternary bracket operator ``([]<-)`` and cannot be used in a
 multiple assignment.
 
 .. index:: auto-dereference
-.. rubric:: Auto-dereference: Simplified Usage of Mutable variables
+.. rubric:: Auto-dereference: simplified usage of mutable variables
 
 TODO: put here what is currently in the release notes.
 
@@ -623,7 +624,7 @@ the value of term `t` in the prestate. Within the scope of a code mark
 point corresponding to `L`.
 
 .. index:: for loop, invariant; for loop
-.. rubric:: The “For” loop
+.. rubric:: The “for” loop
 
 The “for” loop of Why3 has the following general form:
 
@@ -657,13 +658,13 @@ It is also possible for ``v`` to be an integer range type (see
 :numref:`sec.range_types`) instead of an integer.
 
 .. index:: for each loop, invariant; for each loop
-.. rubric:: The “For each” loop
+.. rubric:: The “for each” loop
 
 The “for each” loop of Why3 has the following syntax:
 
 .. code-block:: whyml
 
-    for p in e1 with S do invariants/variant... e2 done
+    for p in e1 with S do invariant/variant... e2 done
 
 Here, ``p`` is a pattern, ``S`` is a namespace, and ``e1`` and ``e2``
 are program expressions. Such a for each loop is syntactic sugar for
@@ -672,10 +673,12 @@ the following:
 .. code-block:: whyml
 
     let it = S.create e1 in
-    try while true do
-      invariants/variant...
-      let p = S.next it in
-      e2
+    try
+      while true do
+        invariant/variant...
+        let p = S.next it in
+        e2
+      done
     with S.Done -> ()
 
 That is, namespace ``S`` is assumed to declare at least a function
@@ -876,7 +879,7 @@ One cannot modify mutable fields of private types either.
 One may wonder what is the purpose of private types, if one cannot
 build values in those types. The purpose is to build
 interfaces, to be later refined with actual implementations (see
-section :ref:`Module Cloning` below). Indeed, if we cannot build
+section :ref:`Module cloning` below). Indeed, if we cannot build
 record instances, we can still *declare* operations that
 return such records. For instance, we can declare the following two
 functions:
@@ -1019,7 +1022,7 @@ A declaration of the form ``type r = <range a b>`` defines a type that
 projects into the integer range ``[a,b]``. Note that in order to make
 such a declaration the theory ``int.Int`` must be imported.
 
-Why3 let you cast an integer literal in a range type (e.g. ``(42:r)``)
+Why3 let you cast an integer literal in a range type (e.g., ``(42:r)``)
 and will check at typing that the literal is in range. Defining such a
 range type :math:`r` automatically introduces the following:
 
@@ -1062,7 +1065,7 @@ number of bits in the significand (including the hidden bit). Note that
 in order to make such a declaration the theory ``real.Real`` must be
 imported.
 
-Why3 let you cast a real literal in a float type (e.g. ``(0.5:f)``) and
+Why3 let you cast a real literal in a float type (e.g., ``(0.5:f)``) and
 will check at typing that the literal is representable in the format.
 Note that Why3 do not implicitly round a real literal when casting to a
 float type, it refuses the cast if the literal is not representable.
@@ -1162,9 +1165,9 @@ used in the ghost code.
 
 .. index:: clone
 .. index:: module cloning
-.. _Module Cloning:
+.. _Module cloning:
 
-Module Cloning
+Module cloning
 ^^^^^^^^^^^^^^
 
 Why3 features a mechanism to make an instance of a module, by
@@ -1295,7 +1298,7 @@ We can make plenty other instances of our module ``Exp``.
 For instance, we get
 `Russian multiplication
 <https://en.wikipedia.org/wiki/Ancient_Egyptian_multiplication>`_ for free
-instantiating ``Exp`` with zero and addition instead.
+by instantiating ``Exp`` with zero and addition instead.
 
 .. code-block:: whyml
 
@@ -1313,8 +1316,8 @@ The Why3 Standard Library
 The Why3 standard library provides general-purpose modules, to be used
 in logic and/or programs. It can be browsed on-line at
 http://why3.lri.fr/stdlib/. Each file contains one or several modules.
-To ``use`` or ``clone`` a module ``M`` from file ``file``, use the
-syntax ``file.M``, since ``file`` is available in Why3’s default load
+To ``use`` or ``clone`` a module ``M`` from file :file:`file.mlw`, use the
+syntax ``file.M``, since :file:`file.mlw` is available in Why3’s default load
 path. For instance, the module of integers and the module of arrays
 indexed by integers are imported as follows:
 
@@ -1323,7 +1326,7 @@ indexed by integers are imported as follows:
       use int.Int
       use array.Array
 
-A sub-directory ``mach/`` provides various modules to model machine
+A sub-directory :file:`mach/` provides various modules to model machine
 arithmetic. For instance, the module of 63-bit integers and the module
 of arrays indexed by 63-bit integers are imported as follows:
 
@@ -1336,54 +1339,54 @@ In particular, the types and operations from these modules are mapped to
 native OCaml’s types and operations when Why3 code is extracted to OCaml
 (see :numref:`sec.extract`).
 
-Library `int`: mathematical integers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Library ``int``: mathematical integers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The library `int` contains several modules whose dependencies are
+The ``int`` library contains several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.int`.
 
 .. %EXECUTE bin/why3pp --output=dep stdlib/int.mlw | tred > doc/stdlib-dot/library-int.dot
 
 .. graphviz:: stdlib-dot/library-int.dot
-   :caption: Module dependencies in library `int`
+   :caption: Module dependencies in library ``int``.
    :name: fig.lib.int
 
-The main module is `Int` which provides basic operations like addition
+The main module is ``Int`` which provides basic operations like addition
 and multiplication, and comparisons.
 
 The division of modulo operations are defined in other modules. They
-indeed come into two flavours: the module `EuclideanDivision` proposes
-a version where the result of the modulo is always non-negative,
-whereas the module `ComputerDivision` provides a version which matches
-the standard definition available in programming languages like C,
-Java or OCaml. Note that these modules do not provide any divsion or
-modulo operations to be used in programs. For those, you must use the
-module `mach.int.Int` instead, which provides these operations,
-including proper pre-conditions, and with the usual infix syntax `x /
-y` and `x % y`.
+indeed come into two flavors: the module ``EuclideanDivision`` proposes
+a version where the result of the modulo is always non-negative, whereas
+the module ``ComputerDivision`` provides a version which matches the
+standard definition available in programming languages like C, Java or
+OCaml. Note that these modules do not provide any divsion or modulo
+operations to be used in programs. For those, you must use the module
+``mach.int.Int`` instead, which provides these operations, including
+proper pre-conditions, and with the usual infix syntax ``x / y`` and ``x
+% y``.
 
 The detailed documentation of the library is available on-line at
 http://why3.lri.fr/stdlib/int.html
 
 
-Library `array`: array data structure
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Library ``array``: array data structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The library `array` contains several modules whose dependencies are
+The ``array`` library contains several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.array`.
 
 .. %EXECUTE bin/why3pp --output=dep stdlib/array.mlw | tred > doc/stdlib-dot/library-array.dot
 
 .. graphviz:: stdlib-dot/library-array.dot
-   :caption: Module dependencies in library `array`
+   :caption: Module dependencies in library ``array``.
    :name: fig.lib.array
 
-The main module is `Array`, providing the operations for accessing and
-updating an array element, with respective syntax `a[i]` and `a[i] <-
-e`, and proper pre-conditions for the indexes. The length of an array
-is denoted as `a.length`. A fresh array can be created using `make l
-v` where `l` is the desired length and `v` is the initial values of
-all cells.
+The main module is ``Array``, providing the operations for accessing and
+updating an array element, with respective syntax ``a[i]`` and ``a[i] <-
+e``, and proper pre-conditions for the indexes. The length of an array is
+denoted as ``a.length``. A fresh array can be created using ``make l v``
+where ``l`` is the desired length and ``v`` is the initial value of each
+cell.
 
 The detailed documentation of the library is available on-line at
 http://why3.lri.fr/stdlib/array.html

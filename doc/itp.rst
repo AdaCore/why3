@@ -274,7 +274,7 @@ the following form.
 
     why3_end
 
-See directory ``lib/isabelle`` for examples.
+See directory :file:`lib/isabelle` for examples.
 
 .. index:: PVS proof assistant, proof assistant; PVS
 .. _sec.pvs:
