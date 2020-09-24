@@ -1,15 +1,15 @@
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.014653
+Time elapsed 0.020117s
 ### Debug: inferred invariants ###
 (0 = contents i /\ contents i = 0 \/ 0 < contents i /\ contents i <= x) /\
 0 <= contents i
 ###
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 1.707683
+Time elapsed 3.203133s
 ### Debug: inferred invariants ###
 (0 = contents i1 /\ contents i1 = 0 \/
  0 < x1 /\ 1 = contents i1 \/ 2 <= x1 /\ 2 <= contents i1) /\
 0 <= contents i1
 ###
-bench/infer/incr.mlw Incr incr1'vc: Valid (0.02s, 20 steps)
+bench/infer/incr.mlw Incr incr1'vc: Valid (0.01s, 20 steps)
 bench/infer/incr.mlw Incr incr3'vc: Timeout (1.00s)

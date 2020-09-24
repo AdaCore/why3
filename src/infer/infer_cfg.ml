@@ -616,7 +616,7 @@ module Make(E: sig
                    cfg.psh_graph sinit make_strategy in
 
     let end_t = Unix.times () in
-    Format.eprintf "Time elapsed %f@."
+    Format.eprintf "Time elapsed %fs@."
       Unix.(end_t.tms_utime -. init_t.tms_utime);
 
     if Debug.test_flag infer_print_ai_result then begin

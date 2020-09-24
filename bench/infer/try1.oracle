@@ -1,12 +1,12 @@
 CFG size: 44 nodes, 44 hyperedges
-Time elapsed 0.031645
+Time elapsed 0.057067s
 ### Debug: inferred invariants ###
 ((0 = contents i /\ contents i = 0 \/ 6 = contents i \/ 12 = contents i) /\
  0 <= contents i) /\
 contents i <= 12
 ###
 CFG size: 44 nodes, 44 hyperedges
-Time elapsed 0.104231
+Time elapsed 0.170863s
 ### Debug: inferred invariants ###
 ((contents i1 <= 0 /\ contents i1 = 0 \/
   6 <= contents i1 /\ contents i1 <= 6 \/ 12 <= contents i1) /\
@@ -14,4 +14,4 @@ Time elapsed 0.104231
 0 <= contents i1
 ###
 bench/infer/try1.mlw Try1 b'vc: Valid (0.01s, 14 steps)
-bench/infer/try1.mlw Try1 b2'vc: Valid (0.00s, 18 steps)
+bench/infer/try1.mlw Try1 b2'vc: Valid (0.01s, 18 steps)

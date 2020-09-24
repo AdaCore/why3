@@ -9,14 +9,14 @@ Couldn't understand entirely the post condition:
 le (elts a @ (contents i + (- 1))) (elts a @ contents i)
 Couldn't understand entirely the post condition:
 le (elts a @ (contents i + (- 1))) (elts a @ contents i)
-Time elapsed 0.011737
+Time elapsed 0.020959s
 ### Debug: inferred invariants ###
 (0 <= lo /\ contents i <= length a) /\ lo < contents i
 ###
 CFG size: 17 nodes, 17 hyperedges
 Couldn't understand entirely the post condition:
 le (elts a1 @ (contents i1 + (- 1))) (elts a1 @ contents i1)
-Time elapsed 0.000464
+Time elapsed 0.000872s
 ### Debug: inferred invariants ###
 (0 < contents i1 /\ 0 < length a1) /\ 0 <= lo1
 ###
@@ -373,7 +373,7 @@ Couldn't understand entirely the post condition:
 permut a2 a3 o7 hi
 Couldn't understand entirely the post condition:
 permut a2 a3 o7 hi
-Time elapsed 5.350993
+Time elapsed 8.961970s
 ### Debug: inferred invariants ###
 (((0 = contents lo2 /\ 2 <= contents first_run) /\ contents lo2 = 0 \/
   ((contents first_run = contents lo2 /\ 2 <= contents first_run) /\ 2 <= n) /\
@@ -397,15 +397,15 @@ Time elapsed 5.350993
 0 <= contents first_run
 ###
 bench/infer/merge_sort.mlw Elt Refl: Unknown () (0.02s)
-bench/infer/merge_sort.mlw Elt Trans: Unknown () (0.02s)
+bench/infer/merge_sort.mlw Elt Trans: Unknown () (0.00s)
 bench/infer/merge_sort.mlw Elt Total: Unknown () (0.00s)
 bench/infer/merge_sort.mlw Merge merge'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw Merge merge_using'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw TopDownMergesort mergesort_rec'vc: Timeout (1.00s)
-bench/infer/merge_sort.mlw TopDownMergesort mergesort'vc: Valid (0.01s, 91 steps)
+bench/infer/merge_sort.mlw TopDownMergesort mergesort'vc: Valid (0.03s, 91 steps)
 bench/infer/merge_sort.mlw BottomUpMergesort bottom_up_mergesort'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw NaturalMergesort find_run'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw NaturalMergesort find_run2'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw NaturalMergesort natural_mergesort'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw NaturalMergesort naturalrec'vc: Timeout (1.00s)
-bench/infer/merge_sort.mlw NaturalMergesort natural_mergesort2'vc: Valid (0.01s, 60 steps)
+bench/infer/merge_sort.mlw NaturalMergesort natural_mergesort2'vc: Valid (0.02s, 60 steps)

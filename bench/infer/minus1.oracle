@@ -1,10 +1,10 @@
 CFG size: 53 nodes, 53 hyperedges
-Time elapsed 0.032617
+Time elapsed 0.076060s
 ### Debug: inferred invariants ###
 (0 < contents i /\ contents i <= 10) /\ 20 = ((2 * contents i) + contents j)
 ###
 CFG size: 53 nodes, 53 hyperedges
-Time elapsed 6.035222
+Time elapsed 10.166980s
 ### Debug: inferred invariants ###
 ((((((((((((contents i1 <= 1 /\ (contents i1 + 17) <= contents j1) /\
            19 <= (contents i1 + contents j1)) /\
@@ -80,7 +80,7 @@ Time elapsed 6.035222
 0 < contents i1
 ###
 CFG size: 53 nodes, 53 hyperedges
-Time elapsed 3.509141
+Time elapsed 6.688073s
 ### Debug: inferred invariants ###
 (((((1 = contents i2 /\ 18 = contents j2) /\ 1 = contents i2) /\
    18 = contents j2 \/
@@ -91,5 +91,5 @@ Time elapsed 3.509141
 0 < contents i2
 ###
 bench/infer/minus1.mlw Minus1 b'vc: Valid (0.01s, 14 steps)
-bench/infer/minus1.mlw Minus1 b2'vc: Valid (0.04s, 112 steps)
-bench/infer/minus1.mlw Minus1 b3'vc: Unknown () (0.04s)
+bench/infer/minus1.mlw Minus1 b2'vc: Valid (0.05s, 112 steps)
+bench/infer/minus1.mlw Minus1 b3'vc: Unknown () (0.05s)

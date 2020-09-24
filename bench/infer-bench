@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
@@ -58,7 +58,9 @@ run () {
   out_file="$file_dir/${file_base%.*}.out"
   oracle_file="$file_dir/${file_base%.*}.oracle"
   $why3prove $1 -t 1 -P alt-ergo --debug=print-inferred-invs > "$out_file" 2>&1
-  if cmp "$oracle_file" "$out_file" > /dev/null ; then
+  str_out=$(sed 's/[0-9]\+\.[0-9]\+s//g' $out_file | sed 's/[0-9]\+ steps//g')
+  str_oracle=$(sed 's/[0-9]\+\.[0-9]\+s//g' $oracle_file | sed 's/[0-9]\+ steps//g')
+  if [ "$str_oracle" = "$str_out" ] ; then
     printf " - ok\n"
   else
     printf "\n"
@@ -69,7 +71,7 @@ run () {
       echo "FAILED!"
       echo "diff is the following:"
       echo "$f"
-      diff "$str_oracle" "$out_file"
+      diff <(echo "$str_oracle") <(echo "$str_out")
       failed="$failed\n$1"
       success=false
     fi
