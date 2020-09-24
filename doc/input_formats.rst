@@ -41,10 +41,10 @@ functions such as ``printf`` (see below) is accepted by a C compiler.
 .. rubric:: Function definition
 
 .. productionlist:: micro-C
-     c_function: `return_type` identifier "(" `params`? ")" `spec`* `block`
-    return_type: "void" | "int"
-         params: `param` ("," `param`)*
-          param: "int" identifier | "int" identifier "[]"
+   c_function: `return_type` identifier "(" `params`? ")" `spec`* `block`
+   return_type: "void" | "int"
+   params: `param` ("," `param`)*
+   param: "int" identifier | "int" identifier "[]"
 
 .. rubric:: Function specification
 
@@ -70,7 +70,7 @@ functions such as ``printf`` (see below) is accepted by a C compiler.
 .. rubric:: C statement
 
 .. productionlist:: micro-C
-       stmt: ";"
+   stmt: ";"
             : | "return" `expr` ";"
             : | "int" identifier ";"
             : | "int" identifier "[" `expr` "]" ";"
@@ -83,15 +83,15 @@ functions such as ``printf`` (see below) is accepted by a C compiler.
             : | `block`
             : | "//@" "label" identifier ";"
             : | "//@" ( "assert" | "assume" | "check" ) `term` ";"
-      block: "{" `stmt`* "}"
-  expr_stmt: "int" identifier "=" `expr`
+   block: "{" `stmt`* "}"
+   expr_stmt: "int" identifier "=" `expr`
             : | identifier `assignop` `expr`
             : | identifier "[" `expr` "]" `assignop` `expr`
             : | `expr`
    assignop: "=" | "+=" | "-=" | "*=" | "/="
-  loop_body: `loop_annot`* `stmt`
+   loop_body: `loop_annot`* `stmt`
             : | "{" `loop_annot`* `stmt`* "}"
- loop_annot: "//@" "invariant" `term` ";"
+   loop_annot: "//@" "invariant" `term` ";"
             : | "//@" "variant" `term` ("," `term`)* ";"
 
 Note that the syntax for loop bodies allows the loop annotations to be
@@ -173,9 +173,9 @@ indentation block, and its end, respectively.
 Logical annotations are inserted in special comments starting with `#@`.
 
 .. productionlist:: microPython
-      file: `decl`*
-      decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
- py_import: "from" identifier "import" identifier ("," identifier)* NEWLINE
+   file: `decl`*
+   decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
+   py_import: "from" identifier "import" identifier ("," identifier)* NEWLINE
 
 Directives ``import`` are ignored during the translation to
 Why3. They are allowed anyway, such that a Python source code using
@@ -210,31 +210,31 @@ interpreter (see below).
 .. rubric:: Python statement
 
 .. productionlist:: microPython
-       stmt: `simple_stmt` NEWLINE
+   stmt: `simple_stmt` NEWLINE
             : | "if" `expr` ":" `suite` `else_branch`
             : | "while" `expr` ":" `loop_body`
             : | "for" identifier "in" `expr` ":" `loop_body`
-    else_branch: /* nothing */
+   else_branch: /* nothing */
             : | "else:" `suite`
             : | "elif" `expr` ":" `suite` `else_branch`
-      suite: `simple_stmt` NEWLINE
+   suite: `simple_stmt` NEWLINE
             : | NEWLINE INDENT `stmt` `stmt`* DEDENT
-  simple_stmt: `expr`
+   simple_stmt: `expr`
             : | "return" `expr`
             : | identifier "=" `expr`
             : | identifier "[" `expr` "]" "=" `expr`
             : | "break"
             : | "#@" "label" identifier
             : | "#@" ( "assert" | "assume" | "check" ) `term`
-  loop_body: `simple_stmt` NEWLINE
+   loop_body: `simple_stmt` NEWLINE
             : | NEWLINE INDENT `loop_annot`* `stmt` `stmt`* DEDENT
- loop_annot: "#@" "invariant" `term` NEWLINE
+   loop_annot: "#@" "invariant" `term` NEWLINE
             : | "#@" "variant" `term` ("," `term`)* NEWLINE
 
 .. rubric:: Logic declaration
 
 .. productionlist:: microPython
-  logic-declaration: "#@" "function" identifier "(" `params` ")" NEWLINE
+   logic_declaration: "#@" "function" identifier "(" `params` ")" NEWLINE
                  : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
