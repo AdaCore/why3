@@ -258,7 +258,7 @@ Yet, they can be axiomatized, using toplevel ``assume`` statements.
        : | "-" `term`
        : | `term` ( "->" | "<->" | "or" | "and" ) `term`
        : | `term` ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) `term`
-       : | `term` ( "+" | "-" | "*" | "//" | "% ) `term`
+       : | `term` ( "+" | "-" | "*" | "//" | "%" ) `term`
        : | "if" `term` "then" `term` "else `term`
        : | "let" identifier "=" `term` "in" `term`
        : | ( "forall" | "exists" ) identifier ("," identifier)* "." `term`
@@ -306,31 +306,25 @@ languages in Why3, for example assembly code.
 Syntax of the MLCFG language
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The MLCFG syntax is an extension of the regular WhyML syntax: every
+The MLCFG syntax is an extension of the regular WhyML syntax. Every
 WhyML declaration is allowed, plus an additional declaration of
 program function of the following form, introduced by keywords ``let cfg``:
 
-| ``let cfg`` :math:`f (x_1:t_1) ... (x_n:t_n) : t`
-|   ``requires`` { :math:`Pre` }
-|   ``ensures``  { :math:`Post` }
-|   ``=``
-|   ``var`` :math:`y_1 : u_1`;
-|   :math:`\vdots`
-|   ``var`` :math:`y_k : u_k`;
-|   {
-|     :math:`instructions`
-|   }
-|   :math:`L_1`
-|   {
-|     :math:`instructions`
-|   }
-|   :math:`\vdots`
-|   :math:`L_j`
-|   {
-|     :math:`instructions`
-|   }
+.. parsed-literal::
 
-It defines a program function `f`, with the usual syntax for
+   let cfg *f* (*x*:sub:`1`: *t*:sub:`1`) ... (*x*:sub:`n`: *t*:sub:`n`): *t*
+     requires { *Pre* }
+     ensures  { *Post* }
+   =
+    var *y*:sub:`1`: *u*:sub:`1`;
+    ...
+    var *y*:sub:`k`: *u*:sub:`k`;
+    { *instructions* }
+    *L*:sub:`1` { *instructions*:sub:`1` }
+    ...
+    *L*:sub:`j` { *instructions*:sub:`j` }
+
+It defines a program function *f*, with the usual syntax for
 its contract. The difference is the body, which is made of a sequence
 of declarations of mutable variables with their types, an initial block
 of instructions, and a sequence of other blocks of instructions, each
@@ -339,24 +333,26 @@ instructions are semi-colon separated sequences of either regular
 WhyML expressions of type ``unit`` (apart from the last one in the
 sequence, when returning a value), or CFG-specific instructions below:
 
-- a ``goto`` statement: ``goto L`` where ``L`` is one of the label of the
+- a ``goto`` statement: :samp:`goto {L}` where *L* is one of the labels of the
   other blocks. It instructs to continue execution at the
   given block.
 
-- a code invariant: ``invariant`` `I` ``{`` `t` ``}`` where `I` is a
-  name and `t`
-  a predicate. It is similar to an assert expression, meaning that `t`
+- a code invariant: :samp:`invariant {I} \\{ {t} }` where *I* is a
+  name and *t*
+  a predicate. It is similar to an assert expression, meaning that *t*
   must hold when execution reaches this statement. Additionally, it
   acts as a cut in the generation of VC, similarly to a loop
   invariant. See example below.
 
 - a ``switch`` statement, of the form
 
-  | ``switch`` ``(`` :math:`e` ``)``
-  | ``|`` :math:`pat_1` ``->`` :math:`instructions_1`
-  | :math:`\vdots`
-  | ``|`` :math:`pat_k` ``->`` :math:`instructions_k`
-  | ``end``
+  .. parsed-literal::
+
+     switch (*e*)
+     | *pat*:sub:`1` -> *instructions*:sub:`1`
+     ...
+     | *pat*:sub:`k` -> *instructions*:sub:`k`
+     end
 
   It is similar to a ``match ... with ... end`` expression, except that
   the branches may recursively contain CFG instructions.
@@ -481,7 +477,7 @@ the following errors.
 - “unsupported: trailing code after switch”: see limitations below.
 
 
-Current Limitations
+Current limitations
 ~~~~~~~~~~~~~~~~~~~
 
 - There is no way to prove termination.
