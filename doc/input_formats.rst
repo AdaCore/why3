@@ -9,7 +9,7 @@ languages, written in special comments.
 These input formats are described below.
 
 Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.) can be passed a file
-with a suffix `.c` or `.py`, which triggers the corresponding input format.
+with a suffix ``.c`` or ``.py``, which triggers the corresponding input format.
 These input formats can also be used in on-line versions of Why3, at
 http://why3.lri.fr/micro-C/ and http://why3.lri.fr/python/, respectively.
 
@@ -26,7 +26,7 @@ Syntax of micro-C
 ~~~~~~~~~~~~~~~~~
 
 Logical annotations are inserted in special comments starting
-with `//@` or `/*@`. In the following grammar, we
+with ``//@`` or ``/*@``. In the following grammar, we
 only use the former kind, for simplicity, but both kinds are allowed.
 
 .. productionlist:: micro-C
@@ -34,9 +34,9 @@ only use the former kind, for simplicity, but both kinds are allowed.
     decl: `c_include` | `c_function` | `logic_declaration`
     c_include: "#include" "<" file-name ">"
 
-Directives `#include` are ignored during the translation to
+Directives ``#include`` are ignored during the translation to
 Why3. They are allowed anyway, such that a C source code using
-functions such as `printf` (see below) is accepted by a C compiler.
+functions such as ``printf`` (see below) is accepted by a C compiler.
 
 .. rubric:: Function definition
 
@@ -139,18 +139,18 @@ Built-in functions and predicates
 
 .. rubric:: C code
 
-* `scanf`, with a syntax limited to `scanf("%d", &x)`
-* `printf`, limited to `printf(string-literal,
-  expr1, ..., exprn)` and assuming that the string literal
-  contains exactly n occurrences of `%d` (not checked by Why3).
-* `rand()`, returns a pseudo-random integer in the range 0 to
-  `RAND_MAX` inclusive.
+* ``scanf``, with a syntax limited to ``scanf("%d", &x)``
+* ``printf``, limited to ``printf(string-literal,
+  expr1, ..., exprn)`` and assuming that the string literal
+  contains exactly n occurrences of ``%d`` (not checked by Why3).
+* ``rand()``, returns a pseudo-random integer in the range 0 to
+  ``RAND_MAX`` inclusive.
 
 .. rubric:: Logic
 
-* `int length(int[] a)`, the length of array `a`
-* `int occurrence(int v, int[] a)`, the number of occurrences of the
-  value `v` in array `a`
+* ``int length(int a[])``, the length of array ``a``
+* ``int occurrence(int v, int a[])``, the number of occurrences of the
+  value ``v`` in array ``a``
 
 
 .. index:: Python
@@ -166,8 +166,8 @@ Syntax of micro-Python
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Notation: In the grammar of micro-Python given below,
-special symbols `NEWLINE`, `INDENT`,
-and `DEDENT` mark an end of line, the beginning of a new
+special symbols ``NEWLINE``, ``INDENT``,
+and ``DEDENT`` mark an end of line, the beginning of a new
 indentation block, and its end, respectively.
 
 Logical annotations are inserted in special comments starting with `#@`.
@@ -177,9 +177,9 @@ Logical annotations are inserted in special comments starting with `#@`.
       decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
  py_import: "from" identifier "import" identifier ("," identifier)* NEWLINE
 
-Directives `import` are ignored during the translation to
+Directives ``import`` are ignored during the translation to
 Why3. They are allowed anyway, such that a Python source code using
-functions such as `randint` is accepted by a Python
+functions such as ``randint`` is accepted by a Python
 interpreter (see below).
 
 ..  rubric:: Function definition
@@ -238,7 +238,7 @@ interpreter (see below).
                  : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
-Yet, they can be axiomatized, using toplevel `assume` statements.
+Yet, they can be axiomatized, using toplevel ``assume`` statements.
 
 
 .. rubric:: Logical term
@@ -269,18 +269,18 @@ Built-in functions and predicates
 
 .. rubric:: Python code
 
-* `len(l)`, the length of list `l`
-* `int(input())`, reads an integer from standard input
-* `range(l, u)`, returns the list of integers
-  from `l` inclusive to `u` exclusive <br>
-  (in particular, `for x in range(l, u):` is supported)
-* `randint(l, u)`, returns a pseudo-random integer
-  in the range `l` to `u` inclusive
+* ``len(l)``, the length of list ``l``
+* ``int(input())``, reads an integer from standard input
+* ``range(l, u)``, returns the list of integers
+  from ``l`` inclusive to ``u`` exclusive
+  (in particular, ``for x in range(l, u):`` is supported)
+* ``randint(l, u)``, returns a pseudo-random integer
+  in the range ``l`` to ``u`` inclusive
 
 .. rubric:: Logic
 
-* `len(l)`, the length of list `l`
-* `occurrence(v, l)`, the number of occurrences of the value `v` in list `l`
+* ``len(l)``, the length of list ``l``
+* ``occurrence(v, l)``, the number of occurrences of the value ``v`` in list ``l``
 
 Limitations
 ~~~~~~~~~~~
@@ -292,7 +292,7 @@ Python lists are modeled as arrays, whose size cannot be modified.
 .. index:: CFG
 .. _format.CFG:
 
-MLCFG: Function Bodies on the Style of Control-Flow Graphs
+MLCFG: function bodies on the style of control-flow graphs
 ----------------------------------------------------------
 
 The MLCFG language is an experimental extension of the regular WhyML
@@ -462,23 +462,23 @@ Error messages
 The translation from the CFG language to regular WhyML code may raise
 the following errors.
 
-- "cycle without invariant": in order to perform the translation, any
+- “cycle without invariant”: in order to perform the translation, any
   cycle on the control-flow graph must contain at least one
-  "invariant" clause. It corresponds to the idea that any loop must
+  ``invariant`` clause. It corresponds to the idea that any loop must
   contain a loop invariant.
 
-- "cycle without invariant (starting from :math:`I`)": same error as
+- “cycle without invariant (starting from `I`)”: same error as
   above, except that the cycle was not reachable from the start of the
-  function body, but from the other "invariant" clause named
+  function body, but from the other ``invariant`` clause named
   :math:`I`.
 
-- "label :math:`L` not found for goto": there is a goto instruction
+- “label `L` not found for goto”: there is a ``goto`` instruction
   to a non-existent label.
 
-- "unreachable code after goto": any code occuring after a goto
+- “unreachable code after goto”: any code occurring after a ``goto``
   statement is unreachable and is not allowed.
 
-- "unsupported: trailing code after switch": see limitations below.
+- “unsupported: trailing code after switch”: see limitations below.
 
 
 Current Limitations
@@ -486,7 +486,7 @@ Current Limitations
 
 - There is no way to prove termination.
 
-- New keywords "cfg", "goto", "switch" and "var" cannot be used as
+- New keywords ``cfg``, ``goto``, ``switch``, and ``var`` cannot be used as
   regular identifiers anymore.
 
 - Trailing code after "switch" is not supported: in principle, it
