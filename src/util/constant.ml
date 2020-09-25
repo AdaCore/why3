@@ -31,13 +31,6 @@ let compare_const ?(structural=true) c1 c2 =
   | _, _ ->
       Pervasives.compare c1 c2
 
-let compare_const_val c1 c2 = match c1, c2 with
-  | ConstInt { il_int = i1 }, ConstInt { il_int = i2 } ->
-     BigInt.compare i1 i2
-  | ConstReal { rl_real = r1 }, ConstReal { rl_real = r2 } ->
-     compare_real r1 r2
-  | _, _ -> Pervasives.compare c1 c2
-
 let int_const n =
   ConstInt { il_kind = ILitUnk; il_int = n }
 

@@ -1,5 +1,8 @@
 open Term
 
+module Mterm =
+  (val (mterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
+
 module Make(S:sig type t end) = struct
 
   module TMap = Map.Make(struct
@@ -7,16 +10,7 @@ module Make(S:sig type t end) = struct
     let compare = compare
   end)
 
-  let compare t1 t2 = match t1.t_node, t2.t_node with
-    | Tconst c1, Tconst c2 -> Constant.compare_const_val c1 c2
-    | _ -> t_compare t1 t2
-
-  module Mterm =  Extmap.Make(struct
-    type t = term
-    let compare t1 t2 = match t1.t_node, t2.t_node with
-      | Tconst c1, Tconst c2 -> Constant.compare_const_val c1 c2
-      | _ -> t_compare t1 t2
-  end)
+  module Mterm = Mterm
 
   type t = {
     to_term : term TMap.t;

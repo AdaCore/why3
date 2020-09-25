@@ -17,7 +17,7 @@ Nil: list int of type list
 int
 -- warning: Recursive types is not supported in abstract interpretation. -- triggered by _1 of type list
 'xi
-Time elapsed 0.019502s
+Time elapsed 0.016094s
 ### Debug: inferred invariants ###
 ((((_2 = 5 /\ ll _1 = 0) /\ 0 <= contents k) /\ contents k <= 3) /\ 0 = ll _1) /\
 5 = _2
@@ -41,7 +41,7 @@ Nil: list int of type list
 int
 -- warning: Recursive types is not supported in abstract interpretation. -- triggered by _5 of type list
 'xi1
-Time elapsed 0.245690s
+Time elapsed 0.259485s
 ### Debug: inferred invariants ###
 ((((((((((((((((((_6 = 5 /\ ll _5 = 0) /\ contents k1 <= 3) /\
                 (contents k1 + 2) <= _6) /\
@@ -96,7 +96,7 @@ Nil: list int of type list
 int
 -- warning: Recursive types is not supported in abstract interpretation. -- triggered by _9 of type list
 'xi2
-Time elapsed 0.014800s
+Time elapsed 0.017946s
 ### Debug: inferred invariants ###
 ((((((0 = contents k2 /\ contents k2 = 0 \/
       2 = contents k2 \/ 1 = contents k2 \/ 3 = contents k2) /\
@@ -107,8 +107,8 @@ Time elapsed 0.014800s
  5 = _10) /\
 0 = ll _9
 ###
-bench/infer/uf6.mlw Uf1 cons'vc: Unknown () (0.16s)
-bench/infer/uf6.mlw Uf1 nil'vc: Unknown () (0.00s)
+bench/infer/uf6.mlw Uf1 cons'vc: Unknown () (0.18s)
+bench/infer/uf6.mlw Uf1 nil'vc: Unknown () (0.02s)
 bench/infer/uf6.mlw Uf1 b'vc: Timeout (1.00s)
 bench/infer/uf6.mlw Uf1 b2'vc: Timeout (1.00s)
 bench/infer/uf6.mlw Uf1 b3'vc: Timeout (1.00s)

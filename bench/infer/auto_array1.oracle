@@ -1,5 +1,5 @@
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.013856s
+Time elapsed 0.020426s
 ### Debug: inferred invariants ###
 ((forall w1:int.
    ((length (make x 2) = length a /\ length (make x 2) = x) /\ w1 < 0) /\
@@ -13,7 +13,7 @@ Time elapsed 0.013856s
 x = length a
 ###
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.054556s
+Time elapsed 0.070510s
 ### Debug: inferred invariants ###
 (((forall w2:int.
     ((((w2 < 0 /\ length (make x1 2) <= x1) /\ x1 <= length (make x1 2)) /\
@@ -35,12 +35,12 @@ Time elapsed 0.054556s
 x1 <= length a1
 ###
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.001067s
+Time elapsed 0.001055s
 ### Debug: inferred invariants ###
 length (make x2 2) = length a2 /\ x2 = length a2
 ###
 CFG size: 20 nodes, 20 hyperedges
-Time elapsed 0.041203s
+Time elapsed 0.037483s
 ### Debug: inferred invariants ###
 (((((forall w4:int.
       (((length (make n 10) = length a3 /\ length (make n 10) = n) /\ w4 < 0) /\
@@ -59,7 +59,7 @@ Time elapsed 0.041203s
 (elts a3 @ 5) = b
 ###
 CFG size: 20 nodes, 20 hyperedges
-Time elapsed 0.106937s
+Time elapsed 0.125136s
 ### Debug: inferred invariants ###
 (((((((((forall w5:int.
           ((((((((((0 <= length (make n1 10) /\ w5 < length (make n1 10)) /\
@@ -110,7 +110,7 @@ Time elapsed 0.106937s
 0 <= n1
 ###
 CFG size: 20 nodes, 20 hyperedges
-Time elapsed 0.005650s
+Time elapsed 0.005571s
 ### Debug: inferred invariants ###
 ((((forall w6:int.
      w6 < 0 /\ length (make n2 10) = length a5 \/
@@ -121,9 +121,9 @@ Time elapsed 0.005650s
  0 <= length a5) /\
 0 <= n2
 ###
-bench/infer/auto_array1.mlw Test basic'vc: Unknown () (0.00s)
+bench/infer/auto_array1.mlw Test basic'vc: Unknown () (0.02s)
 bench/infer/auto_array1.mlw Test basic1'vc: Unknown () (0.02s)
-bench/infer/auto_array1.mlw Test basic2'vc: Unknown () (0.00s)
+bench/infer/auto_array1.mlw Test basic2'vc: Unknown () (0.02s)
 bench/infer/auto_array1.mlw Test b'vc: Unknown () (0.02s)
 bench/infer/auto_array1.mlw Test b2'vc: Unknown () (0.00s)
 bench/infer/auto_array1.mlw Test c'vc: Timeout (1.00s)
