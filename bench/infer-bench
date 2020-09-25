@@ -8,6 +8,7 @@ if test -z "$has_infer"; then
 fi
 
 updateoracle=false
+forceupdateoracle=false
 files=""
 dirs=""
 success=true
@@ -22,6 +23,8 @@ while test $# != 0; do
 case "$1" in
   "-update-oracle")
       updateoracle=true;;
+  "-force-update-oracle")
+      forceupdateoracle=true;;
   "-"*)
       printf "unknown option: %s\n" "$1"
       printf "usage: infer-bench [-update-oracle] <file>\n"
@@ -44,6 +47,7 @@ shift
 done
 
 for d in $dirs; do
+  d=$(echo $d | sed 's:/*$::') #remove trailling slashs
   mlw="$(ls $d/*.mlw 2> /dev/null)"
   files="$files $mlw"
 done
@@ -75,6 +79,10 @@ run () {
       failed="$failed\n$1"
       success=false
     fi
+  fi
+  if $forceupdateoracle; then
+    echo "Forcing update oracle for $file_base"
+    mv "$out_file" "$oracle_file"
   fi
 }
 
