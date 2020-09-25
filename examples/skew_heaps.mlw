@@ -29,7 +29,7 @@ module Heap
   axiom min_is_min:
     forall t: t. 0 < size t -> is_minimum (minimum t) t
 
-  val empty () : t
+  val constant empty : t
     ensures { size result = 0 }
     ensures { forall e. not (mem e result) }
 
@@ -103,12 +103,10 @@ module SkewHeaps
         if not (is_empty r) then root_is_min r
     end
 
-  let empty () : tree elt
+  let constant empty : tree elt = Empty
     ensures { heap result }
     ensures { size result = 0 }
     ensures { forall e. not (mem e result) }
-  =
-    Empty
 
   let get_min (t: tree elt) : elt
     requires { heap t && 0 < size t }
@@ -177,7 +175,7 @@ module HeapSort
     ensures { permut_all (old a) a }
   =
     let n = length a in
-    let t = ref (empty ()) in
+    let t = ref empty in
     for i = 0 to n - 1 do
       invariant { heap !t && size !t = i }
       invariant { forall e.

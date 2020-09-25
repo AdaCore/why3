@@ -27,6 +27,7 @@
 #include <poll.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/wait.h>
@@ -41,6 +42,10 @@
 #include "options.h"
 #include "logging.h"
 #include "proc.h"
+
+#if defined(__OpenBSD__) && !defined(RLIMIT_AS)
+#define RLIMIT_AS RLIMIT_DATA
+#endif
 
 #define READ_ONCE 1024
 

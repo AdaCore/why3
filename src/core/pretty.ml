@@ -818,6 +818,11 @@ let () = Exn_printer.register
       fprintf fmt "Not a term: %a" print_term t
   | Term.FmlaExpected t ->
       fprintf fmt "Not a formula: %a" print_term t
+  | Term.InvalidIntegerLiteralType ty
+  | Term.InvalidRealLiteralType ty
+  | Term.InvalidStringLiteralType ty when
+         (match ty.ty_node with Tyvar _ -> true | _ -> false) ->
+      fprintf fmt "literal has an ambiguous type"
   | Term.InvalidIntegerLiteralType ty ->
       fprintf fmt "Cannot cast an integer literal to type %a" print_ty ty
   | Term.InvalidRealLiteralType ty ->

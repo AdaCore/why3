@@ -1,0 +1,28 @@
+
+module PureBV
+
+use bv.BV32
+
+lemma add_bv : forall x y. add x y = add (bw_and x y) (bw_or x y)
+
+goal g : forall x y z.
+  add (add x y) z = add (bw_and (add (bw_and x y) (bw_or x y)) z) (bw_or (add (bw_and x y) (bw_or x y)) z)
+
+end 
+
+module Mixed
+
+use bv.BV32
+use int.Int
+
+lemma add_bv : forall x y. add x y = add (bw_and x y) (bw_or x y)
+
+lemma add_bv_int : forall x y. to_int x + to_int y = to_int (bw_and x y) + to_int (bw_or x y)
+
+(*
+goal g : forall x y z.
+  to_int x + to_int y + to_int z = (bw_and (add (bw_and x y) (bw_or x y)) z) (bw_or (add (bw_and x y) (bw_or x y)) z)
+*)
+
+end 
+

@@ -225,7 +225,6 @@ LIB_UTIL = mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
 	   cmdline warning sysutil rc plugin bigInt number constant vector pqueue
 
 ifeq (@enable_re@,no)
-LIBGENERATED += src/util/re.ml
 LIB_UTIL += re
 endif
 
@@ -345,20 +344,17 @@ endif
 PARSERS=src/parser/parser_common.mly src/parser/parser.mly
 
 src/parser/parser_messages.ml: src/parser/handcrafted.messages
-	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
-	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --update-errors \
-	src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
-	diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; \
-	RET_CODE=$$?; \
-	if [ $$RET_CODE -ne 0 ]; then \
-		echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
+	@rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
+	@$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --update-errors \
+		src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
+	@if  ! diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; then \
+			echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
 contains an updated version that must be checked before replacing 'src/parser/handcrafted.messages'"; \
 		exit 1; \
 	fi
-	rm -f src/parser/handcrafted.messages.temp
+	@rm -f src/parser/handcrafted.messages.temp
 	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --compile-errors \
-	src/parser/handcrafted.messages > src/parser/parser_messages.ml.tmp
-	mv src/parser/parser_messages.ml.tmp src/parser/parser_messages.ml
+		src/parser/handcrafted.messages > src/parser/parser_messages.ml
 
 clean::
 	rm -f src/parser/parser_messages.ml.tmp src/parser/handcrafted.messages.temp
@@ -384,8 +380,7 @@ endif
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml Makefile
 	cp $< $@
-
-GENERATED += re.ml
+GENERATED += src/util/re.ml
 endif
 
 # build targets
@@ -2156,14 +2151,13 @@ clean::
 	$(HIDE)$(MENHIR) --table --explain --strict $<
 
 src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
-	$(SHOW) 'Menhir $<'
+	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser $^
 
-plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: plugins/cfg/cfg_parser.mly
-	$(SHOW) 'Menhir $<'
+plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
+	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --base plugins/cfg/cfg_parser \
-		--external-tokens Cfg_tokens \
-		src/parser/parser_common.mly $^
+		--external-tokens Cfg_tokens $^
 
 
 %.dep: %.ml %.mli

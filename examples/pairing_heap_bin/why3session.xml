@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -43,25 +44,32 @@
  <proof prover="3"><result status="valid" time="0.01" steps="5169"/></proof>
  </goal>
  <goal name="is_empty&#39;vc" expl="VC for is_empty" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
  <goal name="size&#39;vc" expl="VC for size" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="merge&#39;vc" expl="VC for merge" proved="true">
- <proof prover="3"><result status="valid" time="0.06" steps="18126"/></proof>
+ <proof prover="0"><result status="valid" time="0.23"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.06" steps="18126"/></proof>
  </goal>
  <goal name="insert&#39;vc" expl="VC for insert" proved="true">
- <proof prover="3"><result status="valid" time="0.03" steps="8225"/></proof>
+ <proof prover="0"><result status="valid" time="0.09"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.03" steps="8225"/></proof>
  </goal>
  <goal name="find_min&#39;vc" expl="VC for find_min" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
  <goal name="merge_pairs&#39;vc" expl="VC for merge_pairs" proved="true">
- <proof prover="3"><result status="valid" time="0.27" steps="46953"/></proof>
+ <proof prover="0"><result status="valid" time="0.56"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.27" steps="46953"/></proof>
  </goal>
  <goal name="delete_min&#39;vc" expl="VC for delete_min" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="174"/></proof>
+ <proof prover="0"><result status="valid" time="0.08"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.02" steps="174"/></proof>
  </goal>
 </theory>
 </file>

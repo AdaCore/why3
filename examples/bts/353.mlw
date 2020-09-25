@@ -1,0 +1,22 @@
+
+module M
+
+  use int.Int
+  use ref.Ref
+
+  let f (a: ref int)
+    requires { !a = 42 }
+    ensures { !a = 2 + old !a + result } =
+    a := 0;
+    a := 1;
+    !a+1
+
+  let g (a: ref int)
+    requires { !a = 42 }
+    ensures { !a = 2 + old !a + result } =
+    a := 0;
+    a := 1;
+    let b = !a + !a in
+    b+1
+
+end

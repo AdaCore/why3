@@ -94,11 +94,11 @@ module Sig
 
   function length rope: int
 
-  val empty () : rope
+  val constant empty : rope
     ensures { length result = 0 /\ string result == S.empty }
 
   val is_empty (r: rope) : bool
-    ensures  { result <-> string r == empty }
+    ensures  { result <-> string r == S.empty }
 
   val of_string (s: char_string) : rope
     requires { 0 <= S.length s }
@@ -170,14 +170,12 @@ module Rope (* : Sig *)
   contracts *)
 
   (* empty rope *)
-  let empty () : rope
+  let constant empty : rope = Emp
     ensures { length result = 0 /\ inv result /\ string result == S.empty }
-  = Emp
-
 
   let is_empty (r: rope) : bool
     requires { inv r }
-    ensures  { result <-> string r == empty }
+    ensures  { result <-> string r == S.empty }
   = match r with Emp -> true | _ -> false end
 
   (* string conversion into a rope *)

@@ -27,7 +27,7 @@ def read(why3pp, filename):
         return sexpdata.loads(s, **loads_kwargs) if s else None
     else:
         raise CommandFailed("cannot print s-expr for original file (returncode={})"
-                            .format(p2.returncode))
+                            .format(p.returncode))
 
 # Pretty-print a whyml file and read the result as a s-exp
 def print_and_read(why3pp, filename):
@@ -46,11 +46,37 @@ def is_location(sexp):
     except:
         return False
 
-def is_annots(sexp, strs):
+IGNORE_ID_ATTRS = [
+    "W:unused_variable:N", "extraction:array_make", "extraction:array",
+    "induction", "mlw:reference_var", "infer", "useraxiom", "W:non_conservative_extension:N",
+    "model_trace:flag", "model_trace:first_val", "model_trace:sec_val", "model_trace:TEMP_NAME",
+    "model",
+]
+
+def keep_id_attr(at):
     try:
-        return len(sexp) == 1 and sexp[0][0].value() == "ATstr" and sexp[0][1][0][1].value() in strs
-    except AttributeError:
-        return False
+        # (ATstr ((attr_string "...") (attr_tag N)))
+        variant, fields = at
+        field0, field1 = fields
+        field, value = field0
+        if variant.value() == 'ATstr' and field.value() == 'attr_string':
+            return value not in IGNORE_ID_ATTRS
+        else:
+            return True
+    except:
+        return True
+
+def ignore_id_attrs(sexp):
+    try:
+        # (id_ats (at ...))
+        field, value = sexp
+        if field.value() == 'id_ats':
+            ats = [at for at in value if keep_id_attr(at)]
+            return [sexp[0], ats]
+        else:
+            return sexp
+    except:
+        return sexp
 
 # Test for sexp (<field_name> _)
 def is_field(sexp, field_name):
@@ -86,35 +112,27 @@ def assert_equal(path, sexp0, sexp1):
                     sexp0 = sexp0[1][0][1]
                 elif sexp1[0].value() == "Ptuple" and len(sexp1[1]) == 1 and sexp0[0].value() != "Ptuple":
                     sexp1 = sexp1[1][0][1]
+                elif ((sexp0[0].value() == "Tinfix" and sexp1[0].value() == "Tinnfix") or
+                      (sexp0[0].value() == "Tinnfix" and sexp1[0].value() == "Tinfix") or
+                      (sexp0[0].value() == "Tbinop" and sexp1[0].value() == "Tbinnop") or
+                      (sexp0[0].value() == "Tbinnop" and sexp1[0].value() == "Tbinop") or
+                      (sexp0[0].value() == "Einfix" and sexp1[0].value() == "Einnfix") or
+                      (sexp0[0].value() == "Einnfix" and sexp1[0].value() == "Einfix")):
+                    sexp0 = sexp0[1:]
+                    sexp1 = sexp1[1:]
                 else:
                     break
             except AttributeError:
                 break
-        ignore_annots = [
-            "W:unused_variable:N", "extraction:array_make", "extraction:array",
-            "induction", "mlw:reference_var", "infer", "useraxiom", "W:non_conservative_extension:N",
-            "model_trace:flag", "model_trace:first_val", "model_trace:sec_val", "model_trace:TEMP_NAME",
-            "model",
-        ]
-        # Remove annotations that are not generated from the lists
-        sexp0 = [s for s in sexp0 if is_annots(sexp0, ignore_annots)]
-        sexp1 = [s for s in sexp1 if is_annots(sexp0, ignore_annots)]
+        sexp0 = ignore_id_attrs(sexp0)
+        sexp1 = ignore_id_attrs(sexp1)
         if len(sexp0) > len(sexp1):
-            if debug:
-                print("  ", sexpdata.dumps(sexp0))
-                print("  ", sexpdata.dumps(sexp1))
-            raise NotEqual(path+[len(sexp1)], sexp0[len(sexp1)], None)
+            raise NotEqual(path, sexp0, sexp1)
         if len(sexp0) < len(sexp1):
-            if debug:
-                print("  ", sexpdata.dumps(sexp0))
-                print("  ", sexpdata.dumps(sexp1))
-            raise NotEqual(path+[len(sexp0)], None, sexp1[len(sexp0)])
+            raise NotEqual(path, sexp0, sexp1)
         for i, (s0, s1) in enumerate(zip(sexp0, sexp1)):
             assert_equal(path+[i], s0, s1)
     else:
-        if debug:
-            print("  ", sexpdata.dumps(sexp0))
-            print("  ", sexpdata.dumps(sexp1))
         raise NotEqual(path, sexp0, sexp1)
 
 def trace(path, sexp, sexp1):
@@ -126,7 +144,6 @@ def trace(path, sexp, sexp1):
         return [trace(path[1:], sexp[i], sexp1)
                 if i == path[0] else sexp[i]
                 for i, x in enumerate(sexp)]
-    return sexp
 
 def test(why3pp, filename):
     print("  {}: ".format(filename), end='', flush=True)
@@ -139,7 +156,7 @@ def test(why3pp, filename):
     except NotEqual as e:
         print("FAILED")
         if debug:
-            sexpdata.dump(trace(e.path, sexp0, e.sexp1), sys.stdout)
+            sexpdata.dump(trace(e.path, sexp0, e.sexp1) or "NO TRACE", sys.stdout)
         return False
     except CommandFailed as e:
         print("COMMAND FAILED:", e.msg)

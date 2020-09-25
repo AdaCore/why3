@@ -1,5 +1,23 @@
 :x: marks a potential source of incompatibility
 
+Version 1.3.3, September 11, 2020
+---------------------------------
+
+Bug fixes
+  * fixed compilation on OpenBSD
+
+Provers
+  * support for Coq 8.12.0 (released Jul 27, 2020)
+
+Version 1.3.2, September 5, 2020
+--------------------------------
+
+Bug fixes
+  * fixed compilation on FreeBSD and macOS
+  * fixed `use_api` examples
+  * removed support for strings from the default variant of CVC4 1.7
+  * fixed custom editors for provers not being saved
+
 Version 1.3.1, March 24, 2020
 -----------------------------
 

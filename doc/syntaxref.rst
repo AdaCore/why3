@@ -642,8 +642,13 @@ for ``v`` taking all the values between ``n1`` and ``n2`` included.
 
 Regarding verification conditions, one must prove that ``i[v <- n1]``
 holds (invariant initialization) ; and that ``forall n. n1 <= n <= n2
-/\ i[v <- n] -> i[v <- n+1]`` (invariant preservation). Beware that at
-loop exit, the property which is known is ``i[v <- n2+1]``.
+/\ i[v <- n] -> i[v <- n+1]`` (invariant preservation). At loop exit,
+the property which is known is ``i[v <- n2+1]`` (notice the index
+``n2+1``). A special case occurs when the initial value ``n1`` is
+larger than ``n2+1``: in that case the VC generator does not produce
+any VC to prove, the loop just acts as a no-op instruction. Yet in the
+case when ``n1 = n2+1``, the formula ``i[v <- n2+1]`` is asserted and
+thus need to be proved as a VC.
 
 The variant with keyword ``downto`` instead of ``to`` iterates
 backwards.
