@@ -225,7 +225,6 @@ LIB_UTIL = mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
 	   cmdline warning sysutil rc plugin bigInt number constant vector pqueue
 
 ifeq (@enable_re@,no)
-LIBGENERATED += src/util/re.ml
 LIB_UTIL += re
 endif
 
@@ -381,8 +380,7 @@ endif
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml Makefile
 	cp $< $@
-
-GENERATED += re.ml
+GENERATED += src/util/re.ml
 endif
 
 # build targets
@@ -1799,7 +1797,7 @@ src/trywhy3/%.cmi: src/trywhy3/%.mli
 
 $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo alt_ergo_worker.cmo): BFLAGS += -package js_of_ocaml
 
-$(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml.ppx
+$(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 -include $(TRYWHY3DEP)
@@ -1822,7 +1820,7 @@ CLEANDIRS += src/trywhy3
 
 ifeq (@enable_web_ide@,yes)
 
-JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
+JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml-ppx \
         -I src/ide
 
 src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma
@@ -2151,14 +2149,13 @@ clean::
 	$(HIDE)$(MENHIR) --table --explain --strict $<
 
 src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
-	$(SHOW) 'Menhir $<'
+	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser $^
 
-plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: plugins/cfg/cfg_parser.mly
-	$(SHOW) 'Menhir $<'
+plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
+	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --base plugins/cfg/cfg_parser \
-		--external-tokens Cfg_tokens \
-		src/parser/parser_common.mly $^
+		--external-tokens Cfg_tokens $^
 
 
 %.dep: %.ml %.mli

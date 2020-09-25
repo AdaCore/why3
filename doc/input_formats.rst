@@ -9,7 +9,7 @@ languages, written in special comments.
 These input formats are described below.
 
 Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.) can be passed a file
-with a suffix `.c` or `.py`, which triggers the corresponding input format.
+with a suffix :file:`.c` or :file:`.py`, which triggers the corresponding input format.
 These input formats can also be used in on-line versions of Why3, at
 http://why3.lri.fr/micro-C/ and http://why3.lri.fr/python/, respectively.
 
@@ -26,7 +26,7 @@ Syntax of micro-C
 ~~~~~~~~~~~~~~~~~
 
 Logical annotations are inserted in special comments starting
-with `//@` or `/*@`. In the following grammar, we
+with ``//@`` or ``/*@``. In the following grammar, we
 only use the former kind, for simplicity, but both kinds are allowed.
 
 .. productionlist:: micro-C
@@ -34,17 +34,17 @@ only use the former kind, for simplicity, but both kinds are allowed.
     decl: `c_include` | `c_function` | `logic_declaration`
     c_include: "#include" "<" file-name ">"
 
-Directives `#include` are ignored during the translation to
+Directives ``#include`` are ignored during the translation to
 Why3. They are allowed anyway, such that a C source code using
-functions such as `printf` (see below) is accepted by a C compiler.
+functions such as ``printf`` (see below) is accepted by a C compiler.
 
 .. rubric:: Function definition
 
 .. productionlist:: micro-C
-     c_function: `return_type` identifier "(" `params`? ")" `spec`* `block`
-    return_type: "void" | "int"
-         params: `param` ("," `param`)*
-          param: "int" identifier | "int" identifier "[]"
+   c_function: `return_type` identifier "(" `params`? ")" `spec`* `block`
+   return_type: "void" | "int"
+   params: `param` ("," `param`)*
+   param: "int" identifier | "int" identifier "[]"
 
 .. rubric:: Function specification
 
@@ -64,13 +64,13 @@ functions such as `printf` (see below) is accepted by a C compiler.
        : | "-" `expr` | "!" `expr`
        : | `expr` ( "+" | "-" | "*" | "/" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" ) `expr`
        : | identifier "(" (`expr` ("," `expr`)*)? ")"
-       : | "scanf" "(" "\"%d\"" "," "&" identifier ")"
+       : | "scanf" "(" '"%d"' "," "&" identifier ")"
        : | "(" `expr` ")"
 
 .. rubric:: C statement
 
 .. productionlist:: micro-C
-       stmt: ";"
+   stmt: ";"
             : | "return" `expr` ";"
             : | "int" identifier ";"
             : | "int" identifier "[" `expr` "]" ";"
@@ -83,15 +83,15 @@ functions such as `printf` (see below) is accepted by a C compiler.
             : | `block`
             : | "//@" "label" identifier ";"
             : | "//@" ( "assert" | "assume" | "check" ) `term` ";"
-      block: "{" `stmt`* "}"
-  expr_stmt: "int" identifier "=" `expr`
+   block: "{" `stmt`* "}"
+   expr_stmt: "int" identifier "=" `expr`
             : | identifier `assignop` `expr`
             : | identifier "[" `expr` "]" `assignop` `expr`
             : | `expr`
    assignop: "=" | "+=" | "-=" | "*=" | "/="
-  loop_body: `loop_annot`* `stmt`
+   loop_body: `loop_annot`* `stmt`
             : | "{" `loop_annot`* `stmt`* "}"
- loop_annot: "//@" "invariant" `term` ";"
+   loop_annot: "//@" "invariant" `term` ";"
             : | "//@" "variant" `term` ("," `term`)* ";"
 
 Note that the syntax for loop bodies allows the loop annotations to be
@@ -139,18 +139,18 @@ Built-in functions and predicates
 
 .. rubric:: C code
 
-* `scanf`, with a syntax limited to `scanf("%d", &x)`
-* `printf`, limited to `printf(string-literal,
-  expr1, ..., exprn)` and assuming that the string literal
-  contains exactly n occurrences of `%d` (not checked by Why3).
-* `rand()`, returns a pseudo-random integer in the range 0 to
-  `RAND_MAX` inclusive.
+* ``scanf`` is limited to the syntax ``scanf("%d", &x)``.
+* ``printf`` is limited to ``printf(string-literal,
+  expr1, ..., exprn)``. The string literal should
+  contain exactly ``n`` occurrences of ``%d`` (not checked by Why3).
+* ``rand()`` returns a pseudo-random integer in the range ``0`` to
+  ``RAND_MAX`` inclusive.
 
 .. rubric:: Logic
 
-* `int length(int[] a)`, the length of array `a`
-* `int occurrence(int v, int[] a)`, the number of occurrences of the
-  value `v` in array `a`
+* ``int length(int a[])`` returns the length of array ``a``.
+* ``int occurrence(int v, int a[])`` returns the number of occurrences of the
+  value ``v`` in array ``a``.
 
 
 .. index:: Python
@@ -166,26 +166,26 @@ Syntax of micro-Python
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Notation: In the grammar of micro-Python given below,
-special symbols `NEWLINE`, `INDENT`,
-and `DEDENT` mark an end of line, the beginning of a new
+special symbols ``NEWLINE``, ``INDENT``,
+and ``DEDENT`` mark an end of line, the beginning of a new
 indentation block, and its end, respectively.
 
-Logical annotations are inserted in special comments starting with `#@`.
+Logical annotations are inserted in special comments starting with ``#@``.
 
 .. productionlist:: microPython
-      file: `decl`*
-      decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
- py_import: "from" identifier "import" identifier ("," identifier)* NEWLINE
+   file: `decl`*
+   decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
+   py_import: "from" identifier "import" identifier ("," identifier)* NEWLINE
 
-Directives `import` are ignored during the translation to
+Directives ``import`` are ignored during the translation to
 Why3. They are allowed anyway, such that a Python source code using
-functions such as `randint` is accepted by a Python
+functions such as ``randint`` is accepted by a Python
 interpreter (see below).
 
 ..  rubric:: Function definition
 
 .. productionlist:: microPython
-    py_function: "def" identifier "(" [ `params` ] ")" ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
+    py_function: "def" identifier "(" `params`? ")" ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
     params: identifier ("," identifier)*
 
 .. rubric:: Function specification
@@ -210,35 +210,35 @@ interpreter (see below).
 .. rubric:: Python statement
 
 .. productionlist:: microPython
-       stmt: `simple_stmt` NEWLINE
+   stmt: `simple_stmt` NEWLINE
             : | "if" `expr` ":" `suite` `else_branch`
             : | "while" `expr` ":" `loop_body`
             : | "for" identifier "in" `expr` ":" `loop_body`
-    else_branch: /* nothing */
+   else_branch: /* nothing */
             : | "else:" `suite`
             : | "elif" `expr` ":" `suite` `else_branch`
-      suite: `simple_stmt` NEWLINE
+   suite: `simple_stmt` NEWLINE
             : | NEWLINE INDENT `stmt` `stmt`* DEDENT
-  simple_stmt: `expr`
+   simple_stmt: `expr`
             : | "return" `expr`
             : | identifier "=" `expr`
             : | identifier "[" `expr` "]" "=" `expr`
             : | "break"
             : | "#@" "label" identifier
             : | "#@" ( "assert" | "assume" | "check" ) `term`
-  loop_body: `simple_stmt` NEWLINE
+   loop_body: `simple_stmt` NEWLINE
             : | NEWLINE INDENT `loop_annot`* `stmt` `stmt`* DEDENT
- loop_annot: "#@" "invariant" `term` NEWLINE
+   loop_annot: "#@" "invariant" `term` NEWLINE
             : | "#@" "variant" `term` ("," `term`)* NEWLINE
 
 .. rubric:: Logic declaration
 
 .. productionlist:: microPython
-  logic-declaration: "#@" "function" identifier "(" `params` ")" NEWLINE
+   logic_declaration: "#@" "function" identifier "(" `params` ")" NEWLINE
                  : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
-Yet, they can be axiomatized, using toplevel `assume` statements.
+Yet, they can be axiomatized, using toplevel ``assume`` statements.
 
 
 .. rubric:: Logical term
@@ -258,7 +258,7 @@ Yet, they can be axiomatized, using toplevel `assume` statements.
        : | "-" `term`
        : | `term` ( "->" | "<->" | "or" | "and" ) `term`
        : | `term` ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) `term`
-       : | `term` ( "+" | "-" | "*" | "//" | "% ) `term`
+       : | `term` ( "+" | "-" | "*" | "//" | "%" ) `term`
        : | "if" `term` "then" `term` "else `term`
        : | "let" identifier "=" `term` "in" `term`
        : | ( "forall" | "exists" ) identifier ("," identifier)* "." `term`
@@ -269,18 +269,18 @@ Built-in functions and predicates
 
 .. rubric:: Python code
 
-* `len(l)`, the length of list `l`
-* `int(input())`, reads an integer from standard input
-* `range(l, u)`, returns the list of integers
-  from `l` inclusive to `u` exclusive <br>
-  (in particular, `for x in range(l, u):` is supported)
-* `randint(l, u)`, returns a pseudo-random integer
-  in the range `l` to `u` inclusive
+* ``len(l)`` returns the length of list ``l``.
+* ``int(input())`` reads an integer from standard input.
+* ``range(l, u)`` returns the list of integers
+  from ``l`` inclusive to ``u`` exclusive.
+  In particular, ``for x in range(l, u):`` is supported.
+* ``randint(l, u)`` returns a pseudo-random integer
+  in the range ``l`` to ``u`` inclusive.
 
 .. rubric:: Logic
 
-* `len(l)`, the length of list `l`
-* `occurrence(v, l)`, the number of occurrences of the value `v` in list `l`
+* ``len(l)`` returns the length of list ``l``.
+* ``occurrence(v, l)`` returns the number of occurrences of the value ``v`` in list ``l``.
 
 Limitations
 ~~~~~~~~~~~
@@ -292,7 +292,7 @@ Python lists are modeled as arrays, whose size cannot be modified.
 .. index:: CFG
 .. _format.CFG:
 
-MLCFG: Function Bodies on the Style of Control-Flow Graphs
+MLCFG: function bodies on the style of control-flow graphs
 ----------------------------------------------------------
 
 The MLCFG language is an experimental extension of the regular WhyML
@@ -306,31 +306,25 @@ languages in Why3, for example assembly code.
 Syntax of the MLCFG language
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The MLCFG syntax is an extension of the regular WhyML syntax: every
+The MLCFG syntax is an extension of the regular WhyML syntax. Every
 WhyML declaration is allowed, plus an additional declaration of
 program function of the following form, introduced by keywords ``let cfg``:
 
-| ``let cfg`` :math:`f (x_1:t_1) ... (x_n:t_n) : t`
-|   ``requires`` { :math:`Pre` }
-|   ``ensures``  { :math:`Post` }
-|   ``=``
-|   ``var`` :math:`y_1 : u_1`;
-|   :math:`\vdots`
-|   ``var`` :math:`y_k : u_k`;
-|   {
-|     :math:`instructions`
-|   }
-|   :math:`L_1`
-|   {
-|     :math:`instructions`
-|   }
-|   :math:`\vdots`
-|   :math:`L_j`
-|   {
-|     :math:`instructions`
-|   }
+.. parsed-literal::
 
-It defines a program function `f`, with the usual syntax for
+   let cfg *f* (*x*:sub:`1`: *t*:sub:`1`) ... (*x*:sub:`n`: *t*:sub:`n`): *t*
+     requires { *Pre* }
+     ensures  { *Post* }
+   =
+    var *y*:sub:`1`: *u*:sub:`1`;
+    ...
+    var *y*:sub:`k`: *u*:sub:`k`;
+    { *instructions* }
+    *L*:sub:`1` { *instructions*:sub:`1` }
+    ...
+    *L*:sub:`j` { *instructions*:sub:`j` }
+
+It defines a program function *f*, with the usual syntax for
 its contract. The difference is the body, which is made of a sequence
 of declarations of mutable variables with their types, an initial block
 of instructions, and a sequence of other blocks of instructions, each
@@ -339,24 +333,26 @@ instructions are semi-colon separated sequences of either regular
 WhyML expressions of type ``unit`` (apart from the last one in the
 sequence, when returning a value), or CFG-specific instructions below:
 
-- a ``goto`` statement: ``goto L`` where ``L`` is one of the label of the
+- a ``goto`` statement: :samp:`goto {L}` where *L* is one of the labels of the
   other blocks. It instructs to continue execution at the
   given block.
 
-- a code invariant: ``invariant`` `I` ``{`` `t` ``}`` where `I` is a
-  name and `t`
-  a predicate. It is similar to an assert expression, meaning that `t`
+- a code invariant: :samp:`invariant {I} \\{ {t} }` where *I* is a
+  name and *t*
+  a predicate. It is similar to an assert expression, meaning that *t*
   must hold when execution reaches this statement. Additionally, it
   acts as a cut in the generation of VC, similarly to a loop
   invariant. See example below.
 
 - a ``switch`` statement, of the form
 
-  | ``switch`` ``(`` :math:`e` ``)``
-  | ``|`` :math:`pat_1` ``->`` :math:`instructions_1`
-  | :math:`\vdots`
-  | ``|`` :math:`pat_k` ``->`` :math:`instructions_k`
-  | ``end``
+  .. parsed-literal::
+
+     switch (*e*)
+     | *pat*:sub:`1` -> *instructions*:sub:`1`
+     ...
+     | *pat*:sub:`k` -> *instructions*:sub:`k`
+     end
 
   It is similar to a ``match ... with ... end`` expression, except that
   the branches may recursively contain CFG instructions.
@@ -409,12 +405,12 @@ an array of integers.
 The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_array`.
 
 .. graphviz:: images/max_array.dot
-   :caption: Control-flow graph of "max_array" example.
+   :caption: Control-flow graph of the ``max_array`` function.
    :name: fig.cfg.max_array
 
 Below is a version of this code in the Why3-CFG language, where label
-"L" corresponds
-to node "L", label "L1" to node "invariant", label "L2" to node "do".
+``L`` corresponds to node ``L``, label ``L1`` to node ``invariant``,
+label ``L2`` to node ``do``.
 
 .. code-block:: whyml
 
@@ -462,34 +458,34 @@ Error messages
 The translation from the CFG language to regular WhyML code may raise
 the following errors.
 
-- "cycle without invariant": in order to perform the translation, any
+- “cycle without invariant”: in order to perform the translation, any
   cycle on the control-flow graph must contain at least one
-  "invariant" clause. It corresponds to the idea that any loop must
+  ``invariant`` clause. It corresponds to the idea that any loop must
   contain a loop invariant.
 
-- "cycle without invariant (starting from :math:`I`)": same error as
+- “cycle without invariant (starting from `I`)”: same error as
   above, except that the cycle was not reachable from the start of the
-  function body, but from the other "invariant" clause named
+  function body, but from the other ``invariant`` clause named
   :math:`I`.
 
-- "label :math:`L` not found for goto": there is a goto instruction
+- “label `L` not found for goto”: there is a ``goto`` instruction
   to a non-existent label.
 
-- "unreachable code after goto": any code occuring after a goto
+- “unreachable code after goto”: any code occurring after a ``goto``
   statement is unreachable and is not allowed.
 
-- "unsupported: trailing code after switch": see limitations below.
+- “unsupported: trailing code after switch”: see limitations below.
 
 
-Current Limitations
+Current limitations
 ~~~~~~~~~~~~~~~~~~~
 
 - There is no way to prove termination.
 
-- New keywords "cfg", "goto", "switch" and "var" cannot be used as
+- New keywords ``cfg``, ``goto``, ``switch``, and ``var`` cannot be used as
   regular identifiers anymore.
 
-- Trailing code after "switch" is not supported: in principle, it
+- Trailing code after ``switch`` is not supported. In principle, it
   should be possible to have a ``switch`` with type ``unit`` and to transfer
   the execution to the instructions after the ``switch`` for branches
   not containing ``goto``. This is not

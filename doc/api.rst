@@ -672,7 +672,7 @@ helper functions as follows:
    :end-before: END{helper2}
 
 Our goal is now to build a program equivalent to the following. Note
-that the let declaration contains an attribute ``[@infer]`` which will
+that the let declaration contains an attribute :why3:attribute:`[@infer]` which will
 trigger the inference of loop invariants during VC generation (make
 sure that the why3 library was compiled with support for `infer-loop`,
 see :numref:`sec.installinferloop` for more information).

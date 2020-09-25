@@ -159,12 +159,10 @@ module BinomialHeap
 
   (** Heap operations. *)
 
-  let empty () : heap
+  let empty : heap = Nil
     ensures { heaps result }
     ensures { inv 0 result }
     ensures { forall e. not (mem e result) }
-    =
-    Nil
 
   let is_empty (h: heap) : bool
     ensures { result <-> h = Nil }
