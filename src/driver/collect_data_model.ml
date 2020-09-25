@@ -27,42 +27,36 @@ type projection_name = string
 
 module Mpr: Extmap.S with type key = projection_name = Mstr
 
-type tree_variable =
-  | Tree of tree
-  | Tree_var of string
+type tterm =
+  | TSval of model_value
+  | TApply of (string * tterm list)
+  | TArray of tarray
+  | TVar of variable
+  | TFunction_var of variable
+  | TProver_var of tvariable
+  | TIte of tterm * tterm * tterm * tterm
+  | TRecord of string * ((string * tterm) list)
+  | TTo_array of tterm
 
 and tarray =
   | TArray_var of variable
   | TConst of tterm
   | TStore of tarray * tterm * tterm
 
-and tterm =
-  | TSval of model_value
-  | TApply of (string * tterm list)
-  | TArray of tarray
-  | TVar of variable
-  | TFunction_var of variable
-  | TProver_var of tree_variable
-  | TIte of tterm * tterm * tterm * tterm
-  | TRecord of string * ((string * tterm) list)
-  | TTo_array of tterm
-
-and tree_definition =
+and tdefinition =
   | TFunction of (variable * string option) list * tterm
   | TTerm of tterm
   | TNoelement
 
+and tvariable =
+  | Tree of tree
+  | Tree_var of string
+
 and tree =
   | Node of tree Mpr.t
-  | Leaf of tree_definition
+  | Leaf of tdefinition
 
-(* correpondence_table = map from var_name to tree representing its definition:
-   Initially all var name begins with its original definition which is then
-   refined using projections (that are saved in the tree) *)
-type correspondence_table = tree Mstr.t
-
-let rec print_array fmt a =
-  match a with
+let rec print_array fmt = function
   | TArray_var v -> Format.fprintf fmt "ARRAY_VAR : %s" v
   | TConst t -> Format.fprintf fmt "CONST : %a" print_term t
   | TStore (a, t1, t2) ->
@@ -70,8 +64,7 @@ let rec print_array fmt a =
         print_array a print_term t1 print_term t2
 
 (* Printing function for terms *)
-and print_term fmt t =
-  match t with
+and print_term fmt = function
   | TSval v -> print_model_value fmt v
   | TApply (s, lt) ->
       Format.fprintf fmt "Apply: (%s, %a)" s
@@ -107,11 +100,10 @@ and print_mpt fmt t =
   Mpr.iter (fun key e -> Format.fprintf fmt "P: %s; T: %a" key print_tree e) t
 
 let subst_local_var var value t =
-  let rec aux t =
-    match t with
+  let rec aux = function
     | TFunction_var var' when var' = var ->
         value
-    | TFunction_var _ | TVar _ | TProver_var _ | TSval _ ->
+    | TFunction_var _ | TVar _ | TProver_var _ | TSval _ as t ->
         t
     | TApply (s, args) ->
         TApply (s, List.map aux args)
@@ -124,10 +116,8 @@ let subst_local_var var value t =
         TRecord (s, List.map aux_field fields)
     | TTo_array t ->
         TTo_array (aux t)
-  and aux_array a =
-    match a with
-    | TArray_var _ ->
-        a
+  and aux_array = function
+    | TArray_var _ as a -> a
     | TConst t ->
         TConst (aux t)
     | TStore (a, t1, t2) ->
@@ -135,7 +125,7 @@ let subst_local_var var value t =
   aux t
 
 (* Printing function for debugging *)
-let print_table (t: correspondence_table) =
+let debug_table t =
   Debug.dprintf debug_cntex "Correspondence table key and value@.";
   Mstr.iter (fun key t ->
       Debug.dprintf debug_cntex "%s %a@." key print_tree t)
@@ -191,8 +181,7 @@ exception Incorrect_table
 
 (* Simplify if-then-else in value so that it can be read by
    add_vars_to_table. *)
-let rec simplify_value table v =
-  match v with
+let rec simplify_value table = function
   | TApply (s, args') ->
       let vars, body = (* Function binding for s *)
         match Mstr.find s table with
@@ -253,14 +242,14 @@ let rec simplify_value table v =
       simplify_value table t
   | TIte (eq1, eq2, tthen, telse) ->
       TIte (eq1, eq2, simplify_value table tthen, simplify_value table telse)
-  | _ -> v
+  | v -> v
 
 (* Add the variables that can be deduced from ITE to the table of variables *)
-let add_vars_to_table key value (table: correspondence_table) : correspondence_table =
+let add_vars_to_table key value table  =
 
-  let rec add_vars_to_table ~type_value (table: correspondence_table) value =
+  let rec add_vars_to_table ~type_value table value =
 
-    let add_var_ite cvc t1 table : correspondence_table =
+    let add_var_ite cvc t1 table =
       let t1 = Leaf (TTerm t1) in
       match Mstr.find cvc table with
       | Node tree ->
@@ -337,15 +326,13 @@ let add_vars_to_table key value (table: correspondence_table) : correspondence_t
     Debug.dprintf debug_cntex "Badly formed table@.";
     table
 
-let rec refine_definition ~enc (table: correspondence_table) t =
-  match t with
+let rec refine_definition ~enc table = function
   | TTerm t -> TTerm (refine_function ~enc table t)
   | TFunction (vars, t) -> TFunction (vars, refine_function ~enc table t)
   | TNoelement -> TNoelement
 
-and refine_array ~enc table a =
-  match a with
-  | TArray_var _v -> a
+and refine_array ~enc table = function
+  | TArray_var _ as a -> a
   | TConst t ->
     let t = refine_function ~enc table t in
     TConst t
@@ -359,10 +346,9 @@ and refine_array ~enc table a =
    the variables with the constant associated with them in the table. If their
    value is not a constant yet, recursively apply on these variables and update
    their value. *)
-and refine_function ~enc (table: correspondence_table) (term: tterm) =
-  match term with
-  | TSval _ -> term
-  | TProver_var (Tree_var v) -> begin
+and refine_function ~enc table = function
+  | TSval _ as t -> t
+  | TProver_var (Tree_var v) as t -> begin
         try (
           let tree = Mstr.find v table in
           (* Here, it is very *important* to have [enc] so that we don't go in
@@ -380,14 +366,14 @@ and refine_function ~enc (table: correspondence_table) (term: tterm) =
             TProver_var (Tree tree)
         )
       with
-      | Not_found -> term
-      | Not_value -> term
+      | Not_found -> t
+      | Not_value -> t
     end
   | TProver_var (Tree t) ->
       let t = refine_tree ~enc table t in
       TProver_var (Tree t)
-  | TFunction_var _ -> term
-  | TVar _ -> term
+  | TFunction_var _ as t -> t
+  | TVar _ as t -> t
   | TIte (t1, t2, t3, t4) ->
     let t1 = refine_function ~enc table t1 in
     let t2 = refine_function ~enc table t2 in
@@ -403,12 +389,11 @@ and refine_function ~enc (table: correspondence_table) (term: tterm) =
   | TApply (s1, lt) ->
     TApply (s1, List.map (refine_function ~enc table) lt)
 
-and refine_tree ~enc table t =
-  match t with
+and refine_tree ~enc table = function
   | Leaf t -> Leaf (refine_definition ~enc table t)
   | Node mpr -> Node (Mpr.map (fun x -> refine_tree ~enc table x) mpr)
 
-and refine_variable_value ~enc (table: correspondence_table) key (t: tree) : correspondence_table =
+and refine_variable_value ~enc table key (t: tree) =
   let t = refine_tree ~enc table t in
   Mstr.add key t table
 
@@ -427,8 +412,7 @@ let refine_variable_value key t table =
 let rec convert_array_value lf (a: array) : Model_parser.model_array =
   let array_indices = ref [] in
 
-  let rec create_array_value a =
-    match a with
+  let rec create_array_value = function
     | Avar _v -> raise Not_value
     | Aconst t -> {
         Model_parser.arr_indices = !array_indices;
@@ -443,8 +427,7 @@ let rec convert_array_value lf (a: array) : Model_parser.model_array =
         create_array_value a in
   create_array_value a
 
-and convert_to_model_value lf (t: term): Model_parser.model_value =
-  match t with
+and convert_to_model_value lf = function
   | Sval (Unparsed _) -> raise Not_value
   | Sval v -> v
   | Array a -> Model_parser.Array (convert_array_value lf a)
@@ -474,8 +457,7 @@ and convert_to_model_value lf (t: term): Model_parser.model_value =
 
 and convert_z3_array (t: term) : array =
 
-  let rec convert_array t =
-    match t with
+  let rec convert_array = function
     (* This works for multidim array because, we call convert_to_model_value on
        the new array generated (which will still contain a To_array).
        Example of value for multidim array:
@@ -506,8 +488,7 @@ let convert_to_model_element pm name (t: term) =
 let default_apply_to_record (list_records: (string list) Mstr.t)
     (noarg_constructors: string list) (t: term) =
 
-  let rec array_apply_to_record (a: array) =
-    match a with
+  let rec array_apply_to_record = function
     | Avar _v -> raise Not_value
     | Aconst x ->
         let x = apply_to_record x in
@@ -518,14 +499,13 @@ let default_apply_to_record (list_records: (string list) Mstr.t)
         let t2 = apply_to_record t2 in
         Astore (a, t1, t2)
 
-  and apply_to_record (v: term) =
-    match v with
-    | Sval _ -> v
+  and apply_to_record = function
+    | Sval _ as v -> v
     (* Var with no arguments can actually be constructors. We check this
        here and if it is the case we change the variable into a value. *)
     | Var s when List.mem s noarg_constructors ->
         Apply (s, [])
-    | Prover_var _ | Function_var _ | Var _ -> v
+    | Prover_var _ | Function_var _ | Var _ as v -> v
     | Array a ->
         Array (array_apply_to_record a)
     | Record (s, l) ->
@@ -561,46 +541,47 @@ let apply_to_record list_records noarg_constructors t =
   | None -> default_apply_to_record list_records noarg_constructors t
   | Some f -> f list_records noarg_constructors t
 
-let definition_apply_to_record list_records noarg_constructors d =
-    match d with
+let definition_apply_to_record list_records noarg_constructors = function
     | Function (lt, t) ->
         Function (lt, apply_to_record list_records noarg_constructors t)
     | Term t -> Term (apply_to_record list_records noarg_constructors  t)
     | Noelement -> Noelement
 
-let rec convert_to_tree_def (d: definition) : tree_definition =
-  match d with
-  | Function (l, t) ->
-      TFunction (l, convert_to_tree_term t)
-  | Term t -> TTerm (convert_to_tree_term t)
+let rec convert_to_tree_def = function
   | Noelement -> TNoelement
+  | Term t -> TTerm (convert_to_tree_term t)
+  | Function (l, t) -> TFunction (l, convert_to_tree_term t)
 
-and convert_to_tree_term (t: term) : tterm =
-  match t with
+and convert_to_tree_term = function
   | Sval v -> TSval v
-  | Apply (s, tl) -> TApply(s, List.map convert_to_tree_term tl)
+  | Apply (s, tl) -> TApply (s, List.map convert_to_tree_term tl)
   | Array a -> TArray (convert_to_tree_array a)
   | Prover_var v -> TProver_var (Tree_var v)
   | Function_var v -> TFunction_var v
   | Var v -> TVar v
   | Ite (t1, t2, t3, t4) ->
-      TIte (convert_to_tree_term t1, convert_to_tree_term t2, convert_to_tree_term t3, convert_to_tree_term t4)
-  | Record (s, tl) -> TRecord (s, List.map (fun (s, t) -> (s, convert_to_tree_term t)) tl)
-  | To_array t -> TTo_array (convert_to_tree_term t)
-  (* TODO should not appear here *)
-  | Trees _ -> raise Not_value
+      let t1 = convert_to_tree_term t1 and t2 = convert_to_tree_term t2 in
+      let t3 = convert_to_tree_term t3 and t4 = convert_to_tree_term t4 in
+      TIte (t1, t2, t3, t4)
+  | Record (s, fs) ->
+      let fs = List.map (fun (s, t) -> s, convert_to_tree_term t) fs in
+      TRecord (s, fs)
+  | To_array t ->
+      TTo_array (convert_to_tree_term t)
+  | Trees _ -> raise Not_value (* TODO should not appear here *)
 
-and convert_to_tree_array a =
-  match a with
+and convert_to_tree_array = function
   | Avar v -> TArray_var v
   | Aconst t -> TConst (convert_to_tree_term t)
   | Astore (a, t1, t2) ->
-      TStore (convert_to_tree_array a, convert_to_tree_term t1, convert_to_tree_term t2)
+      let a = convert_to_tree_array a in
+      let t1 = convert_to_tree_term t1 and t2 = convert_to_tree_term t2 in
+      TStore (a, t1, t2)
 
 let rec convert_tree_to_term = function
   | Node mpt ->
-      let l = Mpr.bindings mpt in
-      let l = List.map (fun (k,e) -> (k, convert_tree_to_term e)) l in
+      let l = List.map (fun (k, e) -> k, convert_tree_to_term e)
+          (Mpr.bindings mpt) in
       Trees l
   | Leaf t ->
       convert_tdef_to_term t
@@ -636,7 +617,10 @@ and convert_tarray_to_array a =
   match a with
   | TArray_var v -> Avar v
   | TConst t -> Aconst (convert_tterm_to_term t)
-  | TStore (a, t1, t2) -> Astore (convert_tarray_to_array a, convert_tterm_to_term t1, convert_tterm_to_term t2)
+  | TStore (a, t1, t2) ->
+      let a = convert_tarray_to_array a in
+      let t1 = convert_tterm_to_term t1 and t2 = convert_tterm_to_term t2 in
+      Astore (a, t1, t2)
 
 let create_list pm (table: definition Mstr.t) =
 
@@ -645,8 +629,8 @@ let create_list pm (table: definition Mstr.t) =
     let select (a, b) = if b = "" then a else b in
     Mstr.mapi (fun _ -> List.map select) pm.list_records in
 
-  (* Convert Apply that were actually recorded as record to Record. Also replace
-     Var that are originally unary constructor  *)
+  (* Convert calls [r'mk v1 .. vn] to [{f1= v1; ...; fn= vn}] and unary calls
+     to constructors where applicable *)
   let table =
     Mstr.mapi (fun _ -> definition_apply_to_record list_records pm.noarg_constructors)
       table in
@@ -658,19 +642,15 @@ let create_list pm (table: definition Mstr.t) =
     let vars = Sstr.filter (fun v -> not (Mstr.mem v table)) vars in
     Sstr.fold (fun v -> Mstr.add v Noelement) vars table in
 
-  Debug.dprintf debug_cntex "After parsing@.";
-  Mstr.iter (fun k e ->
-      let t = convert_to_tree_def e in
-      Debug.dprintf debug_cntex "constant %s : %a@."
-        k print_def t)
-    table;
+  (* Convert from Smtv2_model_defs.definition to Collect_data_model.tdefinition *)
+  let table : tdefinition Mstr.t = Mstr.map convert_to_tree_def table in
 
-  let table : tree_definition Mstr.t = Mstr.map convert_to_tree_def table in
+  Debug.dprintf debug_cntex "After parsing@.";
+  Mstr.iter (fun k -> Debug.dprintf debug_cntex "constant %s : %a@." k print_def) table;
 
   (* First recover values stored in projections that were registered *)
   let table : tree Mstr.t =
     (* Convert the table to a table of tree *)
-    (* TODO this could probably be optimized away *)
     let table_leaves = Mstr.map (fun v -> Leaf v) table in
     let table_projs_fields = Mstr.filter (fun key _ ->
         Mstr.mem key pm.list_projections || Mstr.mem key pm.list_fields) table in
@@ -678,13 +658,13 @@ let create_list pm (table: definition Mstr.t) =
 
   (* Only printed in debug *)
   Debug.dprintf debug_cntex "Value were queried from projections@.";
-  print_table table;
+  debug_table table;
 
   (* Then substitute all variables with their values *)
   let table = Mstr.fold refine_variable_value table table in
 
   Debug.dprintf debug_cntex "Var values were propagated@.";
-  print_table table;
+  debug_table table;
 
   let table : term Mstr.t = Mstr.map convert_tree_to_term table in
 
@@ -693,5 +673,5 @@ let create_list pm (table: definition Mstr.t) =
        try Some (convert_to_model_element pm name term)
        with Not_value when not Debug.(test_flag debug_cntex && test_flag stack_trace) ->
          Debug.dprintf debug_cntex "Element creation failed: %s@." name;
-           None)
+         None)
     (List.rev (Mstr.bindings table))
