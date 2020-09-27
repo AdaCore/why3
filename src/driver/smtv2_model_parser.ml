@@ -211,7 +211,7 @@ module FromSexp = struct
         let t1 = term t1 and t2 = term t2 in
         ( match pair_equal eq with
           | Some (t1', t2') -> Ite (t1', t2', t1, t2)
-          | None -> Sval (Unparsed "") )
+          | None -> Sval (Unparsed "ite") )
     | sexp -> error sexp "ite"
 
   and pair_equal = function

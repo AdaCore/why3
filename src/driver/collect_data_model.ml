@@ -14,10 +14,12 @@ open Printer
 open Model_parser
 open Smtv2_model_defs
 
-exception Not_value
+exception No_value
 
 let debug_cntex = Debug.register_flag "cntex_collection"
     ~desc:"Intermediate representation debugging for counterexamples"
+
+let map_snd f (x, y) = x, f y
 
 (** Intermediate data structure for propagations of tree projections inside
     counterexamples.
@@ -28,25 +30,25 @@ type projection_name = string
 module Mpr: Extmap.S with type key = projection_name = Mstr
 
 type tterm =
-  | TSval of model_value
-  | TApply of (string * tterm list)
-  | TArray of tarray
-  | TVar of variable
-  | TFunction_var of variable
-  | TProver_var of tvariable
-  | TIte of tterm * tterm * tterm * tterm
-  | TRecord of string * ((string * tterm) list)
-  | TTo_array of tterm
+  | Tsval of model_value
+  | Tapply of (string * tterm list)
+  | Tarray of tarray
+  | Tvar of variable
+  | Tfunction_var of variable
+  | Tprover_var of tvariable
+  | Tite of tterm * tterm * tterm * tterm
+  | Trecord of string * ((string * tterm) list)
+  | Tto_array of tterm
 
 and tarray =
-  | TArray_var of variable
-  | TConst of tterm
-  | TStore of tarray * tterm * tterm
+  | TAvar of variable
+  | TAconst of tterm
+  | TAstore of tarray * tterm * tterm
 
 and tdefinition =
-  | TFunction of (variable * string option) list * tterm
-  | TTerm of tterm
-  | TNoelement
+  | Tfunction of (variable * string option) list * tterm
+  | Tterm of tterm
+  | Tnoelement
 
 and tvariable =
   | Tree of tree
@@ -57,71 +59,65 @@ and tree =
   | Leaf of tdefinition
 
 let rec print_array fmt = function
-  | TArray_var v -> Format.fprintf fmt "ARRAY_VAR : %s" v
-  | TConst t -> Format.fprintf fmt "CONST : %a" print_term t
-  | TStore (a, t1, t2) ->
-      Format.fprintf fmt "STORE : %a %a %a"
-        print_array a print_term t1 print_term t2
+  | TAvar v -> Format.fprintf fmt "@[<hv2>(Array_var %s)@]" v
+  | TAconst t -> Format.fprintf fmt "@[<hv2>(Aconst %a)@]" print_term t
+  | TAstore (a, t1, t2) -> Format.fprintf fmt "@[<hv2>(Astore %a %a %a)@]"
+                             print_array a print_term t1 print_term t2
 
 (* Printing function for terms *)
-and print_term fmt = function
-  | TSval v -> print_model_value fmt v
-  | TApply (s, lt) ->
-      Format.fprintf fmt "Apply: (%s, %a)" s
-        (Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma print_term)
-        lt
-  | TArray a -> Format.fprintf fmt "Array: %a" print_array a
-  | TProver_var (Tree_var v) -> Format.fprintf fmt "PROVERVAR: %s" v
-  | TProver_var _ -> Format.fprintf fmt "PROVERVAR: TREE"
-  | TFunction_var v -> Format.fprintf fmt "LOCAL: %s" v
-  | TVar v -> Format.fprintf fmt "VAR: %s" v
-  | TIte (teq1, teq2, tthen, telse) ->
-      Format.fprintf fmt "ITE (%a = %a) then %a else %a"
+and print_term fmt = let open Format in function
+  | Tsval v -> print_model_value fmt v
+  | Tapply (s, lt) ->
+      fprintf fmt "@[<hv2>(Apply %s %a)@]" s
+        Pp.(print_list space print_term) lt
+  | Tarray a -> fprintf fmt "@[<hv>(Array %a)@]" print_array a
+  | Tprover_var (Tree_var v) -> fprintf fmt "(Provervar treevar %s)" v
+  | Tprover_var (Tree t) -> fprintf fmt "@[<hv2>(Provervar tree@ %a)@]" print_tree t
+  | Tfunction_var v -> fprintf fmt "(Funvar %s)" v
+  | Tvar v -> fprintf fmt "(Var %s)" v
+  | Tite (teq1, teq2, tthen, telse) ->
+      fprintf fmt "@[<hv2>(Ite@ %a@ %a@ %a@ %a)@]"
         print_term teq1 print_term teq2 print_term tthen print_term telse
-  | TRecord (n, l) ->
-      Format.fprintf fmt "record_type: %s; list_fields: %a" n
-        (Pp.print_list Pp.semi
-           (fun fmt (x, a) -> Format.fprintf fmt "(%s, %a)" x print_term a))
-        l
-  | TTo_array t -> Format.fprintf fmt "TO_array: %a@." print_term t
+  | Trecord (n, l) ->
+      fprintf fmt "@[<hv2>(Record %s %a)@]" n
+        Pp.(print_list semi (fun fmt (x, a) -> fprintf fmt "(%s, %a)" x print_term a)) l
+  | Tto_array t -> fprintf fmt "@[<hv2>(To_array %a)@]" print_term t
 
-let print_def fmt d =
-  match d with
-  | TFunction (_vars, t) -> Format.fprintf fmt "FUNCTION : %a" print_term t
-  | TTerm t -> Format.fprintf fmt "TERM : %a" print_term t
-  | TNoelement -> Format.fprintf fmt "NOELEMENT"
+and print_tree fmt =
+  let open Format in function
+    | Node mpr -> fprintf fmt "@[<hv2>(Node %a)@]" Pp.(print_list space (print_pair string print_tree)) (Mpr.bindings mpr)
+    | Leaf td -> fprintf fmt "@[<hv2>(Leaf %a)@]" print_def td
 
-let rec print_tree fmt t =
-  match t with
-  | Node mpt -> Format.fprintf fmt "NODE : [%a]" print_mpt mpt
-  | Leaf td -> Format.fprintf fmt "LEAF: %a" print_def td
-
-and print_mpt fmt t =
-  Mpr.iter (fun key e -> Format.fprintf fmt "P: %s; T: %a" key print_tree e) t
+and print_def fmt =
+  let open Format in function
+    | Tfunction (vars, t) ->
+        fprintf fmt "@[<hv2>(Function %a@ %a)@]" Pp.(print_list space string) (List.map fst vars) print_term t
+    | Tterm t -> fprintf fmt "@[<hv2>(Term %a)@]" print_term t
+    | Tnoelement -> fprintf fmt "Noelement"
 
 let subst_local_var var value t =
   let rec aux = function
-    | TFunction_var var' when var' = var ->
+    | Tfunction_var var' when var' = var ->
         value
-    | TFunction_var _ | TVar _ | TProver_var _ | TSval _ as t ->
+    | Tfunction_var _ | Tvar _ | Tprover_var _ | Tsval _ as t ->
         t
-    | TApply (s, args) ->
-        TApply (s, List.map aux args)
-    | TIte (t1, t2, t3, t4) ->
-        TIte (aux t1, aux t2, aux t3, aux t4)
-    | TArray tarray ->
-        TArray (aux_array tarray)
-    | TRecord (s, fields) ->
+    | Tapply (s, args) ->
+        Tapply (s, List.map aux args)
+    | Tite (t1, t2, t3, t4) ->
+        Tite (aux t1, aux t2, aux t3, aux t4)
+    | Tarray tarray ->
+        Tarray (aux_array tarray)
+    | Trecord (s, fields) ->
         let aux_field (s, t) = (s, aux t) in
-        TRecord (s, List.map aux_field fields)
-    | TTo_array t ->
-        TTo_array (aux t)
+        Trecord (s, List.map aux_field fields)
+    | Tto_array t ->
+        Tto_array (aux t)
   and aux_array = function
-    | TArray_var _ as a -> a
-    | TConst t ->
-        TConst (aux t)
-    | TStore (a, t1, t2) ->
-        TStore (aux_array a, aux t1, aux t2) in
+    | TAvar _ as a -> a
+    | TAconst t ->
+        TAconst (aux t)
+    | TAstore (a, t1, t2) ->
+        TAstore (aux_array a, aux t1, aux t2) in
   aux t
 
 (* Printing function for debugging *)
@@ -182,66 +178,66 @@ exception Incorrect_table
 (* Simplify if-then-else in value so that it can be read by
    add_vars_to_table. *)
 let rec simplify_value table = function
-  | TApply (s, args') ->
+  | Tapply (s, args') ->
       let vars, body = (* Function binding for s *)
         match Mstr.find s table with
-        | Leaf (TFunction (vars, body)) -> vars, body
+        | Leaf (Tfunction (vars, body)) -> vars, body
         | _ -> raise Incorrect_table
         | exception Not_found -> raise Incorrect_table in
       let vars = List.map fst vars in
       let args = List.map (simplify_value table) args' in
       List.fold_right2 subst_local_var vars args body |>
       simplify_value table
-  | TIte (
-      TIte (TFunction_var x,
-            TProver_var cvc,
-            TProver_var cvc1,
+  | Tite (
+      Tite (Tfunction_var x,
+            Tprover_var cvc,
+            Tprover_var cvc1,
             _),
-      TProver_var cvc2,
+      Tprover_var cvc2,
       tth,
       tel) when cvc = cvc1 && cvc = cvc2 ->
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = TIte (TFunction_var x, TProver_var cvc, tth, tel) in
+      let t = Tite (Tfunction_var x, Tprover_var cvc, tth, tel) in
       simplify_value table t
-  | TIte (
-      TIte (TProver_var cvc,
-            TFunction_var x,
-            TProver_var cvc1,
+  | Tite (
+      Tite (Tprover_var cvc,
+            Tfunction_var x,
+            Tprover_var cvc1,
             _),
-      TProver_var cvc2,
+      Tprover_var cvc2,
       tth,
       tel) when cvc = cvc1 && cvc = cvc2 (* Same as above *) ->
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = TIte (TFunction_var x, TProver_var cvc, tth, tel) in
+      let t = Tite (Tfunction_var x, Tprover_var cvc, tth, tel) in
       simplify_value table t
-  | TIte (
-      TIte (TFunction_var x,
-            TProver_var cvc,
-            TProver_var cvc1,
-            TProver_var cvc3),
-      TProver_var cvc2,
+  | Tite (
+      Tite (Tfunction_var x,
+            Tprover_var cvc,
+            Tprover_var cvc1,
+            Tprover_var cvc3),
+      Tprover_var cvc2,
       tth,
       tel) when cvc = cvc1 && cvc <> cvc2 && cvc3 = cvc2 ->
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = TIte (TFunction_var x, TProver_var cvc3, tth, tel) in
+      let t = Tite (Tfunction_var x, Tprover_var cvc3, tth, tel) in
       simplify_value table t
-  | TIte (
-      TIte (TProver_var cvc,
-            TFunction_var x,
-            TProver_var cvc1,
-            TProver_var cvc3),
-      TProver_var cvc2,
+  | Tite (
+      Tite (Tprover_var cvc,
+            Tfunction_var x,
+            Tprover_var cvc1,
+            Tprover_var cvc3),
+      Tprover_var cvc2,
       tth,
       tel) when cvc = cvc1 && cvc <> cvc2 && cvc3 = cvc2 (* Same as above *) ->
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = TIte (TFunction_var x, TProver_var cvc3, tth, tel) in
+      let t = Tite (Tfunction_var x, Tprover_var cvc3, tth, tel) in
       simplify_value table t
-  | TIte (eq1, eq2, tthen, telse) ->
-      TIte (eq1, eq2, simplify_value table tthen, simplify_value table telse)
+  | Tite (eq1, eq2, tthen, telse) ->
+      Tite (eq1, eq2, simplify_value table tthen, simplify_value table telse)
   | v -> v
 
 (* Add the variables that can be deduced from ITE to the table of variables *)
@@ -250,7 +246,7 @@ let add_vars_to_table key value table  =
   let rec add_vars_to_table ~type_value table value =
 
     let add_var_ite cvc t1 table =
-      let t1 = Leaf (TTerm t1) in
+      let t1 = Leaf (Tterm t1) in
       match Mstr.find cvc table with
       | Node tree ->
           if Mpr.mem key tree then
@@ -258,7 +254,7 @@ let add_vars_to_table key value table  =
           else
             let new_tree = Node (Mpr.add key t1 tree) in
             Mstr.add cvc new_tree table
-      | Leaf TNoelement ->
+      | Leaf Tnoelement ->
           Mstr.add cvc (Node (Mpr.add key t1 Mpr.empty)) table
       | Leaf _ ->
           raise Incorrect_table
@@ -268,19 +264,19 @@ let add_vars_to_table key value table  =
 
     let value = simplify_value table value in
     match value with
-    | TIte (TProver_var (Tree_var cvc), TFunction_var _x, t1, t2) ->
+    | Tite (Tprover_var (Tree_var cvc), Tfunction_var _x, t1, t2) ->
         let table = add_var_ite cvc t1 table in
         add_vars_to_table ~type_value table t2
-    | TIte (TFunction_var _x, TProver_var (Tree_var cvc), t1, t2) ->
+    | Tite (Tfunction_var _x, Tprover_var (Tree_var cvc), t1, t2) ->
         let table = add_var_ite cvc t1 table in
         add_vars_to_table ~type_value table t2
-    | TIte (t, TFunction_var _x, TProver_var (Tree_var cvc), t2) ->
+    | Tite (t, Tfunction_var _x, Tprover_var (Tree_var cvc), t2) ->
         let table = add_var_ite cvc t table in
         add_vars_to_table ~type_value table t2
-    | TIte (TFunction_var _x, t, TProver_var (Tree_var cvc), t2) ->
+    | Tite (Tfunction_var _x, t, Tprover_var (Tree_var cvc), t2) ->
         let table = add_var_ite cvc t table in
         add_vars_to_table ~type_value table t2
-    | TIte _ -> table
+    | Tite _ -> table
     | _ ->
       begin
         match type_value with
@@ -293,8 +289,8 @@ let add_vars_to_table key value table  =
               match Re.Str.search_forward match_str (remove_end_num key_val) 0 with
               | exception Not_found -> acc
               | _ ->
-                  if l_elt = Leaf TNoelement then
-                    Mstr.add key_val (Node (Mpr.add key (Leaf (TTerm value)) Mpr.empty)) acc
+                  if l_elt = Leaf Tnoelement then
+                    Mstr.add key_val (Node (Mpr.add key (Leaf (Tterm value)) Mpr.empty)) acc
                   else
                     begin match l_elt with
                       | Node mpt ->
@@ -303,7 +299,7 @@ let add_vars_to_table key value table  =
                           if Mpr.mem key mpt then
                             acc
                           else
-                            Mstr.add key_val (Node (Mpr.add key (Leaf (TTerm value)) mpt)) acc
+                            Mstr.add key_val (Node (Mpr.add key (Leaf (Tterm value)) mpt)) acc
                       | _ -> acc
                     end
               )
@@ -312,14 +308,14 @@ let add_vars_to_table key value table  =
   in
 
   let type_value, t = match value with
-  | TTerm t -> (None, t)
-  | TFunction (cvc_var_list, t) ->
+  | Tterm t -> (None, t)
+  | Tfunction (cvc_var_list, t) ->
     begin
       match cvc_var_list with
       | [(_, type_value)] -> (type_value, t)
       | _ -> (None, t)
     end
-  | TNoelement -> raise Bad_variable in
+  | Tnoelement -> raise Bad_variable in
 
   try add_vars_to_table ~type_value table t
   with Incorrect_table ->
@@ -327,28 +323,28 @@ let add_vars_to_table key value table  =
     table
 
 let rec refine_definition ~enc table = function
-  | TTerm t -> TTerm (refine_function ~enc table t)
-  | TFunction (vars, t) -> TFunction (vars, refine_function ~enc table t)
-  | TNoelement -> TNoelement
+  | Tterm t -> Tterm (refine_function ~enc table t)
+  | Tfunction (vars, t) -> Tfunction (vars, refine_function ~enc table t)
+  | Tnoelement -> Tnoelement
 
 and refine_array ~enc table = function
-  | TArray_var _ as a -> a
-  | TConst t ->
+  | TAvar _ as a -> a
+  | TAconst t ->
     let t = refine_function ~enc table t in
-    TConst t
-  | TStore (a, t1, t2) ->
+    TAconst t
+  | TAstore (a, t1, t2) ->
     let a = refine_array ~enc table a in
     let t1 = refine_function ~enc table t1 in
     let t2 = refine_function ~enc table t2 in
-    TStore (a, t1, t2)
+    TAstore (a, t1, t2)
 
 (* This function takes the table of assigned variables and a term and replace
    the variables with the constant associated with them in the table. If their
    value is not a constant yet, recursively apply on these variables and update
    their value. *)
 and refine_function ~enc table = function
-  | TSval _ as t -> t
-  | TProver_var (Tree_var v) as t -> begin
+  | Tsval _ as t -> t
+  | Tprover_var (Tree_var v) as t -> begin
         try (
           let tree = Mstr.find v table in
           (* Here, it is very *important* to have [enc] so that we don't go in
@@ -358,36 +354,36 @@ and refine_function ~enc table = function
              defined
           *)
           if Hstr.mem enc v then
-            TProver_var (Tree tree)
+            Tprover_var (Tree tree)
           else
             let () = Hstr.add enc v () in
             let table = refine_variable_value ~enc table v tree in
             let tree = Mstr.find v table in
-            TProver_var (Tree tree)
+            Tprover_var (Tree tree)
         )
       with
       | Not_found -> t
-      | Not_value -> t
+      | No_value -> t
     end
-  | TProver_var (Tree t) ->
+  | Tprover_var (Tree t) ->
       let t = refine_tree ~enc table t in
-      TProver_var (Tree t)
-  | TFunction_var _ as t -> t
-  | TVar _ as t -> t
-  | TIte (t1, t2, t3, t4) ->
+      Tprover_var (Tree t)
+  | Tfunction_var _ as t -> t
+  | Tvar _ as t -> t
+  | Tite (t1, t2, t3, t4) ->
     let t1 = refine_function ~enc table t1 in
     let t2 = refine_function ~enc table t2 in
     let t3 = refine_function ~enc table t3 in
     let t4 = refine_function ~enc table t4 in
-    TIte (t1, t2, t3, t4)
-  | TArray a ->
-    TArray (refine_array ~enc table a)
-  | TRecord (n, l) ->
-    TRecord (n, List.map (fun (f, v) -> f, refine_function ~enc table v) l)
-  | TTo_array t ->
-    TTo_array (refine_function ~enc table t)
-  | TApply (s1, lt) ->
-    TApply (s1, List.map (refine_function ~enc table) lt)
+    Tite (t1, t2, t3, t4)
+  | Tarray a ->
+    Tarray (refine_array ~enc table a)
+  | Trecord (n, l) ->
+    Trecord (n, List.map (fun (f, v) -> f, refine_function ~enc table v) l)
+  | Tto_array t ->
+    Tto_array (refine_function ~enc table t)
+  | Tapply (s1, lt) ->
+    Tapply (s1, List.map (refine_function ~enc table) lt)
 
 and refine_tree ~enc table = function
   | Leaf t -> Leaf (refine_definition ~enc table t)
@@ -406,90 +402,12 @@ let refine_variable_value key t table =
   let encountered_key = Hstr.create 16 in
   refine_variable_value ~enc:encountered_key table key t
 
-(* In the following lf is the list of fields. It is used to differentiate
-   projections from fields so that projections cannot be reconstructed into a
-   record. *)
-let rec convert_array_value lf (a: array) : Model_parser.model_array =
-  let array_indices = ref [] in
-
-  let rec create_array_value = function
-    | Avar _v -> raise Not_value
-    | Aconst t -> {
-        Model_parser.arr_indices = !array_indices;
-        Model_parser.arr_others = convert_to_model_value lf t;
-      }
-    | Astore (a, t1, t2) ->
-        let new_index = {
-          Model_parser.arr_index_key = convert_to_model_value lf t1;
-          Model_parser.arr_index_value = convert_to_model_value lf t2;
-        } in
-        array_indices := new_index :: !array_indices;
-        create_array_value a in
-  create_array_value a
-
-and convert_to_model_value lf = function
-  | Sval (Unparsed _) -> raise Not_value
-  | Sval v -> v
-  | Array a -> Model_parser.Array (convert_array_value lf a)
-  | Record (_n, l) ->
-      Model_parser.Record (convert_record lf l)
-  | Trees tree ->
-      begin match tree with
-      | [] -> raise Not_value
-      | [field, value] ->
-          Model_parser.Proj (field, convert_to_model_value lf value)
-      | l ->
-          if List.for_all (fun x -> Mstr.mem (fst x) lf) l then
-            Model_parser.Record
-              (List.map (fun (field, value) ->
-                   let model_value = convert_to_model_value lf value in
-                   (field, model_value))
-                  l)
-          else
-            let (proj_name, proj_value) = List.hd l in
-            Model_parser.Proj (proj_name, convert_to_model_value lf proj_value)
-      end
-  | Prover_var _v -> raise Not_value (*Model_parser.Unparsed "!"*)
-  (* TODO change the value returned for non populated prover variable '!' -> '?' ? *)
-  | To_array t -> convert_to_model_value lf (Array (convert_z3_array t))
-  | Apply (s, lt) -> Model_parser.Apply (s, List.map (convert_to_model_value lf) lt)
-  | Function_var _ | Var _ | Ite _ -> raise Not_value
-
-and convert_z3_array (t: term) : array =
-
-  let rec convert_array = function
-    (* This works for multidim array because, we call convert_to_model_value on
-       the new array generated (which will still contain a To_array).
-       Example of value for multidim array:
-       To_array (Ite (x, 1, (To_array t), To_array t')) -> call on complete term ->
-       Astore (1, To_array t, To_array t') -> call on subpart (To_array t) ->
-       Astore (1, Aconst t, To_array t') -> call on subpart (To_array t') ->
-       Astore (1, Aconst t, Aconst t')
-     *)
-
-    | Ite (Function_var _x, if_t, t1, t2) ->
-      Astore (convert_array t2, if_t, t1)
-    | Ite (if_t, Function_var _x, t1, t2) ->
-      Astore (convert_array t2, if_t, t1)
-    | t -> Aconst t
-  in
-  convert_array t
-
-and convert_record lf l =
-  List.map (fun (f, v) -> f, convert_to_model_value lf v) l
-
-let convert_to_model_element pm name (t: term) =
-  let value = convert_to_model_value pm.list_fields t in
-  let attrs =
-    try Mstr.find name pm.set_str
-    with Not_found -> Ident.Sattr.empty in
-  Model_parser.create_model_element ~name ~value ~attrs
 
 let default_apply_to_record (list_records: (string list) Mstr.t)
     (noarg_constructors: string list) (t: term) =
 
   let rec array_apply_to_record = function
-    | Avar _v -> raise Not_value
+    | Avar _v -> raise No_value
     | Aconst x ->
         let x = apply_to_record x in
         Aconst x
@@ -527,7 +445,7 @@ let default_apply_to_record (list_records: (string list) Mstr.t)
         let t1 = apply_to_record t1 in
         To_array t1
     (* TODO Does not exist yet *)
-    | Trees _ -> raise Not_value
+    | Trees _ -> raise No_value
   in
   apply_to_record t
 
@@ -548,79 +466,105 @@ let definition_apply_to_record list_records noarg_constructors = function
     | Noelement -> Noelement
 
 let rec convert_to_tree_def = function
-  | Noelement -> TNoelement
-  | Term t -> TTerm (convert_to_tree_term t)
-  | Function (l, t) -> TFunction (l, convert_to_tree_term t)
+  | Noelement -> Tnoelement
+  | Term t -> Tterm (convert_to_tree_term t)
+  | Function (l, t) -> Tfunction (l, convert_to_tree_term t)
 
 and convert_to_tree_term = function
-  | Sval v -> TSval v
-  | Apply (s, tl) -> TApply (s, List.map convert_to_tree_term tl)
-  | Array a -> TArray (convert_to_tree_array a)
-  | Prover_var v -> TProver_var (Tree_var v)
-  | Function_var v -> TFunction_var v
-  | Var v -> TVar v
+  | Sval v -> Tsval v
+  | Apply (s, tl) -> Tapply (s, List.map convert_to_tree_term tl)
+  | Array a -> Tarray (convert_to_tree_array a)
+  | Prover_var v -> Tprover_var (Tree_var v)
+  | Function_var v -> Tfunction_var v
+  | Var v -> Tvar v
   | Ite (t1, t2, t3, t4) ->
       let t1 = convert_to_tree_term t1 and t2 = convert_to_tree_term t2 in
       let t3 = convert_to_tree_term t3 and t4 = convert_to_tree_term t4 in
-      TIte (t1, t2, t3, t4)
+      Tite (t1, t2, t3, t4)
   | Record (s, fs) ->
       let fs = List.map (fun (s, t) -> s, convert_to_tree_term t) fs in
-      TRecord (s, fs)
+      Trecord (s, fs)
   | To_array t ->
-      TTo_array (convert_to_tree_term t)
-  | Trees _ -> raise Not_value (* TODO should not appear here *)
+      Tto_array (convert_to_tree_term t)
+  | Trees _ -> raise No_value (* TODO should not appear here *)
 
 and convert_to_tree_array = function
-  | Avar v -> TArray_var v
-  | Aconst t -> TConst (convert_to_tree_term t)
+  | Avar v -> TAvar v
+  | Aconst t -> TAconst (convert_to_tree_term t)
   | Astore (a, t1, t2) ->
       let a = convert_to_tree_array a in
       let t1 = convert_to_tree_term t1 and t2 = convert_to_tree_term t2 in
-      TStore (a, t1, t2)
+      TAstore (a, t1, t2)
 
-let rec convert_tree_to_term = function
-  | Node mpt ->
-      let l = List.map (fun (k, e) -> k, convert_tree_to_term e)
-          (Mpr.bindings mpt) in
-      Trees l
-  | Leaf t ->
-      convert_tdef_to_term t
 
-and convert_tdef_to_term = function
-  | TFunction (_l, t) ->
-      convert_tterm_to_term t
-  | TTerm t ->
-      convert_tterm_to_term t
-  | TNoelement ->
-      (* TODO check which error can be raised here *)
-      Sval (Unparsed ("error"))
+(* In the following lf is the list of fields. It is used to differentiate
+   projections from fields so that projections cannot be reconstructed into a
+   record. *)
 
-and convert_tterm_to_term = function
-  | TSval v -> Sval v
-  | TApply (s, tl) -> Apply (s, List.map convert_tterm_to_term tl)
-  | TArray ta -> Array (convert_tarray_to_array ta)
-  | TProver_var (Tree_var v) -> Prover_var v
-  | TProver_var (Tree v) -> convert_tree_to_term v
-  | TFunction_var v -> Function_var v
-  | TVar v -> Var v
-  | TIte (t1, t2, t3, t4) ->
-      let t1 = convert_tterm_to_term t1 in
-      let t2 = convert_tterm_to_term t2 in
-      let t3 = convert_tterm_to_term t3 in
-      let t4 = convert_tterm_to_term t4 in
-      Ite (t1, t2, t3, t4)
-  | TRecord (s, ls) ->
-      Record (s, List.map (fun (s, t) -> (s, convert_tterm_to_term t)) ls)
-  | TTo_array t -> To_array (convert_tterm_to_term t)
+let rec model_value lf = function
+  | Tsval (Unparsed _) -> raise No_value
+  | Tsval v -> v
+  | Tapply (s, ts) -> Model_parser.Apply (s, List.map (model_value lf) ts)
+  | Tarray a -> Model_parser.Array (model_array lf a)
+  | Tto_array t -> Model_parser.Array (model_array lf (array_of_term t))
+  | Trecord (_n, l) -> Model_parser.Record (List.map (map_snd (model_value lf)) l)
+  | Tprover_var (Tree t) -> model_value_of_tree lf t
+  | Tprover_var (Tree_var _) -> raise No_value
+  | Tfunction_var _ -> raise No_value
+  | Tvar _ -> raise No_value
+  | Tite _ -> raise No_value
 
-and convert_tarray_to_array a =
-  match a with
-  | TArray_var v -> Avar v
-  | TConst t -> Aconst (convert_tterm_to_term t)
-  | TStore (a, t1, t2) ->
-      let a = convert_tarray_to_array a in
-      let t1 = convert_tterm_to_term t1 and t2 = convert_tterm_to_term t2 in
-      Astore (a, t1, t2)
+and array_of_term = function
+  (* This works for multidim array because, we call convert_to_model_value on
+     the new array generated (which will still contain a To_array).
+     Example of value for multidim array:
+     To_array (Ite (x, 1, (To_array t), To_array t')) -> call on complete term ->
+     Astore (1, To_array t, To_array t') -> call on subpart (To_array t) ->
+     Astore (1, Aconst t, To_array t') -> call on subpart (To_array t') ->
+     Astore (1, Aconst t, Aconst t') *)
+  | Tite (Tfunction_var _, x, t1, t2)
+  | Tite (x, Tfunction_var _, t1, t2) ->
+      (* if v = x then t1 else t2 --> t2[x <- t1]*)
+      TAstore (array_of_term t2, x, t1)
+  | Tprover_var (Tree (Leaf (Tfunction (_, t)))) ->
+      array_of_term t
+  | t -> TAconst t
+
+and model_array ?(arr_indices=[]) lf = function
+  | TAvar _ -> raise No_value
+  | TAconst t -> Model_parser.{ arr_indices; arr_others= model_value lf t }
+  | TAstore (a, t1, t2) ->
+      let arr_indices = Model_parser.{
+          arr_index_key= model_value lf t1;
+          arr_index_value= model_value lf t2;
+        } :: arr_indices in
+      model_array ~arr_indices lf a
+
+and model_value_of_def lf = function
+  | Tnoelement -> raise No_value
+  | Tfunction (_, t) | Tterm t ->
+      model_value lf t
+
+and model_value_of_tree lf = function
+  | Leaf t -> model_value_of_def lf t
+  | Node mpr ->
+      match Mpr.bindings mpr with
+      | [] -> raise No_value
+      | [f, t] ->
+          Model_parser.Proj (f, model_value_of_tree lf t)
+      | fs ->
+          if List.for_all (fun (x, _) -> Mstr.mem x lf) fs then
+            Model_parser.Record (List.map (map_snd (model_value_of_tree lf)) fs)
+          else
+            Model_parser.Proj (map_snd (model_value_of_tree lf) (List.hd fs))
+
+let model_element pm (name, tree)  =
+  match model_value_of_tree pm.list_fields tree with
+  | value ->
+      let attrs = Mstr.find_def Ident.Sattr.empty name pm.set_str in
+      Some (Model_parser.create_model_element ~name ~value ~attrs)
+  | exception No_value when not Debug.(test_flag debug_cntex && test_flag stack_trace) ->
+      None
 
 let create_list pm (table: definition Mstr.t) =
 
@@ -666,12 +610,5 @@ let create_list pm (table: definition Mstr.t) =
   Debug.dprintf debug_cntex "Var values were propagated@.";
   debug_table table;
 
-  let table : term Mstr.t = Mstr.map convert_tree_to_term table in
-
-  Lists.map_filter
-    (fun (name, term) ->
-       try Some (convert_to_model_element pm name term)
-       with Not_value when not Debug.(test_flag debug_cntex && test_flag stack_trace) ->
-         Debug.dprintf debug_cntex "Element creation failed: %s@." name;
-         None)
+  Lists.map_filter (model_element pm)
     (List.rev (Mstr.bindings table))
