@@ -25,10 +25,6 @@ let map_snd f (x, y) = x, f y
     counterexamples.
 *)
 
-type projection_name = string
-
-module Mpr: Extmap.S with type key = projection_name = Mstr
-
 type tterm =
   | Tsval of model_value
   | Tapply of (string * tterm list)
@@ -55,7 +51,7 @@ and tvariable =
   | Tree_var of string
 
 and tree =
-  | Node of tree Mpr.t
+  | Node of tree Mstr.t
   | Leaf of tdefinition
 
 let rec print_array fmt = function
@@ -85,7 +81,7 @@ and print_term fmt = let open Format in function
 
 and print_tree fmt =
   let open Format in function
-    | Node mpr -> fprintf fmt "@[<hv2>(Node %a)@]" Pp.(print_list space (print_pair string print_tree)) (Mpr.bindings mpr)
+    | Node mpr -> fprintf fmt "@[<hv2>(Node %a)@]" Pp.(print_list space (print_pair string print_tree)) (Mstr.bindings mpr)
     | Leaf td -> fprintf fmt "@[<hv2>(Leaf %a)@]" print_def td
 
 and print_def fmt =
@@ -172,6 +168,14 @@ let remove_end_num s =
     | _ -> s
   end
 
+let is_prover_var type_value name =
+  let open Re.Str in
+  let match_str_z3 = type_value^"!" in
+  let match_str_cvc4 = "_"^type_value^"_" in
+  let re = regexp ("\\("^quote match_str_z3^"\\|"^quote match_str_cvc4^"\\)") in
+  try ignore (search_forward re (remove_end_num name) 0); true
+  with Not_found -> false
+
 (* Used to handle case of badly formed table *)
 exception Incorrect_table
 
@@ -186,222 +190,157 @@ let rec simplify_value table = function
         | exception Not_found -> raise Incorrect_table in
       let vars = List.map fst vars in
       let args = List.map (simplify_value table) args' in
-      List.fold_right2 subst_local_var vars args body |>
       simplify_value table
-  | Tite (
-      Tite (Tfunction_var x,
-            Tprover_var cvc,
-            Tprover_var cvc1,
-            _),
-      Tprover_var cvc2,
-      tth,
-      tel) when cvc = cvc1 && cvc = cvc2 ->
+        (List.fold_right2 subst_local_var vars args body)
+  | Tite (Tite (Tfunction_var x, Tprover_var v, Tprover_var v1, _),
+          Tprover_var v2, tth, tel)
+  | Tite (Tite (Tprover_var v, Tfunction_var x, Tprover_var v1, _),
+          Tprover_var v2, tth, tel)
+    when v = v1 && v = v2 ->
+      (* ite (ite x = v then v else _) = v then tth else tel *)
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = Tite (Tfunction_var x, Tprover_var cvc, tth, tel) in
-      simplify_value table t
-  | Tite (
-      Tite (Tprover_var cvc,
-            Tfunction_var x,
-            Tprover_var cvc1,
-            _),
-      Tprover_var cvc2,
-      tth,
-      tel) when cvc = cvc1 && cvc = cvc2 (* Same as above *) ->
+      simplify_value table
+        (Tite (Tfunction_var x, Tprover_var v, tth, tel))
+  | Tite (Tite (Tfunction_var x, Tprover_var v, Tprover_var v1, Tprover_var v'),
+          Tprover_var v1', tth, tel)
+  | Tite (Tite (Tprover_var v, Tfunction_var x, Tprover_var v1, Tprover_var v1'),
+          Tprover_var v', tth, tel)
+    when v = v1 && v <> v' && v' = v1' ->
+      (* ite (ite x = v then v else v') = v' then tth else tel *)
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
-      let t = Tite (Tfunction_var x, Tprover_var cvc, tth, tel) in
-      simplify_value table t
-  | Tite (
-      Tite (Tfunction_var x,
-            Tprover_var cvc,
-            Tprover_var cvc1,
-            Tprover_var cvc3),
-      Tprover_var cvc2,
-      tth,
-      tel) when cvc = cvc1 && cvc <> cvc2 && cvc3 = cvc2 ->
-      (* Here we chose what we keep from the model. This case is not complete
-         but good enough. *)
-      let t = Tite (Tfunction_var x, Tprover_var cvc3, tth, tel) in
-      simplify_value table t
-  | Tite (
-      Tite (Tprover_var cvc,
-            Tfunction_var x,
-            Tprover_var cvc1,
-            Tprover_var cvc3),
-      Tprover_var cvc2,
-      tth,
-      tel) when cvc = cvc1 && cvc <> cvc2 && cvc3 = cvc2 (* Same as above *) ->
-      (* Here we chose what we keep from the model. This case is not complete
-         but good enough. *)
-      let t = Tite (Tfunction_var x, Tprover_var cvc3, tth, tel) in
-      simplify_value table t
+      simplify_value table
+        (Tite (Tfunction_var x, Tprover_var v', tth, tel))
   | Tite (eq1, eq2, tthen, telse) ->
       Tite (eq1, eq2, simplify_value table tthen, simplify_value table telse)
   | v -> v
 
 (* Add the variables that can be deduced from ITE to the table of variables *)
-let add_vars_to_table key value table  =
+let add_vars_to_table key value table =
 
-  let rec add_vars_to_table ~type_value table value =
-
-    let add_var_ite cvc t1 table =
-      let t1 = Leaf (Tterm t1) in
-      match Mstr.find cvc table with
+  let add_var_ite v t table =
+    let leaf = Leaf (Tterm t) in
+    let mpr = match Mstr.find v table with
       | Node tree ->
-          if Mpr.mem key tree then
-            raise Incorrect_table
-          else
-            let new_tree = Node (Mpr.add key t1 tree) in
-            Mstr.add cvc new_tree table
+          if Mstr.mem key tree then raise Incorrect_table;
+          Mstr.add key leaf tree
       | Leaf Tnoelement ->
-          Mstr.add cvc (Node (Mpr.add key t1 Mpr.empty)) table
+          Mstr.singleton key leaf
       | Leaf _ ->
           raise Incorrect_table
       | exception Not_found ->
-          Mstr.add cvc (Node (Mpr.add key t1 Mpr.empty)) table
-    in
+          Mstr.singleton key leaf in
+    Mstr.add v (Node mpr) table in
 
-    let value = simplify_value table value in
-    match value with
-    | Tite (Tprover_var (Tree_var cvc), Tfunction_var _x, t1, t2) ->
-        let table = add_var_ite cvc t1 table in
+  let rec add_vars_to_table ~type_value table value =
+    match simplify_value table value with
+    | Tite (Tfunction_var _, Tprover_var (Tree_var v), t1, t2)
+    | Tite (Tprover_var (Tree_var v), Tfunction_var _, t1, t2) ->
+        let table = add_var_ite v t1 table in
         add_vars_to_table ~type_value table t2
-    | Tite (Tfunction_var _x, Tprover_var (Tree_var cvc), t1, t2) ->
-        let table = add_var_ite cvc t1 table in
-        add_vars_to_table ~type_value table t2
-    | Tite (t, Tfunction_var _x, Tprover_var (Tree_var cvc), t2) ->
-        let table = add_var_ite cvc t table in
-        add_vars_to_table ~type_value table t2
-    | Tite (Tfunction_var _x, t, Tprover_var (Tree_var cvc), t2) ->
-        let table = add_var_ite cvc t table in
+    | Tite (Tfunction_var _, t, Tprover_var (Tree_var v), t2)
+    | Tite (t, Tfunction_var _, Tprover_var (Tree_var v), t2) ->
+        let table = add_var_ite v t table in
         add_vars_to_table ~type_value table t2
     | Tite _ -> table
-    | _ ->
-      begin
+    | value -> begin
         match type_value with
         | None -> table
         | Some type_value ->
-            Mstr.fold (fun key_val l_elt acc ->
-              let match_str_z3 = type_value ^ "!" in
-              let match_str_cvc4 = "_" ^ type_value ^ "_" in
-              let match_str = Re.Str.regexp ("\\(" ^ match_str_z3 ^ "\\|" ^ match_str_cvc4 ^ "\\)") in
-              match Re.Str.search_forward match_str (remove_end_num key_val) 0 with
-              | exception Not_found -> acc
-              | _ ->
-                  if l_elt = Leaf Tnoelement then
-                    Mstr.add key_val (Node (Mpr.add key (Leaf (Tterm value)) Mpr.empty)) acc
-                  else
-                    begin match l_elt with
-                      | Node mpt ->
-                          (* We always prefer explicit assignment to default
-                             type assignment. *)
-                          if Mpr.mem key mpt then
-                            acc
-                          else
-                            Mstr.add key_val (Node (Mpr.add key (Leaf (Tterm value)) mpt)) acc
-                      | _ -> acc
-                    end
-              )
+            Mstr.fold (fun name tree table ->
+                if is_prover_var type_value name then
+                  if tree = Leaf Tnoelement then
+                    Mstr.add name (Node (Mstr.singleton key (Leaf (Tterm value)))) table
+                  else match tree with
+                    | Node mpr ->
+                        (* We always prefer explicit assignment to default
+                           type assignment. *)
+                        if Mstr.mem key mpr then
+                          table
+                        else
+                          Mstr.add name (Node (Mstr.add key (Leaf (Tterm value)) mpr)) table
+                    | _ -> table
+                else
+                  table)
               table table
-      end
-  in
+      end in
 
-  let type_value, t = match value with
-  | Tterm t -> (None, t)
-  | Tfunction (cvc_var_list, t) ->
-    begin
-      match cvc_var_list with
-      | [(_, type_value)] -> (type_value, t)
-      | _ -> (None, t)
-    end
-  | Tnoelement -> raise Bad_variable in
+  let type_value, value = match value with
+    | Tterm t -> None, t
+    | Tfunction ([_, type_value], t) -> type_value, t
+    | Tfunction (_, t) -> None, t
+    | Tnoelement -> raise Bad_variable in
 
-  try add_vars_to_table ~type_value table t
+  try
+    add_vars_to_table ~type_value table value
   with Incorrect_table ->
     Debug.dprintf debug_cntex "Badly formed table@.";
     table
-
-let rec refine_definition ~enc table = function
-  | Tterm t -> Tterm (refine_function ~enc table t)
-  | Tfunction (vars, t) -> Tfunction (vars, refine_function ~enc table t)
-  | Tnoelement -> Tnoelement
-
-and refine_array ~enc table = function
-  | TAvar _ as a -> a
-  | TAconst t ->
-    let t = refine_function ~enc table t in
-    TAconst t
-  | TAstore (a, t1, t2) ->
-    let a = refine_array ~enc table a in
-    let t1 = refine_function ~enc table t1 in
-    let t2 = refine_function ~enc table t2 in
-    TAstore (a, t1, t2)
 
 (* This function takes the table of assigned variables and a term and replace
    the variables with the constant associated with them in the table. If their
    value is not a constant yet, recursively apply on these variables and update
    their value. *)
-and refine_function ~enc table = function
-  | Tsval _ as t -> t
-  | Tprover_var (Tree_var v) as t -> begin
-        try (
-          let tree = Mstr.find v table in
-          (* Here, it is very *important* to have [enc] so that we don't go in
-             circles: remember that we cannot make any assumptions on the result
-             prover.
-             There has been cases where projections were legitimately circularly
-             defined
-          *)
-          if Hstr.mem enc v then
-            Tprover_var (Tree tree)
-          else
-            let () = Hstr.add enc v () in
-            let table = refine_variable_value ~enc table v tree in
-            let tree = Mstr.find v table in
-            Tprover_var (Tree tree)
-        )
-      with
-      | Not_found -> t
-      | No_value -> t
-    end
+let rec refine_term ~enc table = function
+  | Tsval _ | Tfunction_var _ | Tvar _ as t -> t
+  | Tprover_var (Tree_var v) as t -> (
+      try
+        let tree = Mstr.find v table in
+        (* Here, it is very *important* to have [enc] so that we don't go in
+           circles: remember that we cannot make any assumptions on the result
+           prover.
+           There has been cases where projections were legitimately circularly
+           defined *)
+        let tree =
+          if Sstr.mem v !enc then
+            tree
+          else (
+            enc := Sstr.add v !enc;
+            refine_tree ~enc table tree ) in
+        Tprover_var (Tree tree)
+      with Not_found | No_value -> t )
   | Tprover_var (Tree t) ->
-      let t = refine_tree ~enc table t in
-      Tprover_var (Tree t)
-  | Tfunction_var _ as t -> t
-  | Tvar _ as t -> t
+      Tprover_var (Tree (refine_tree ~enc table t))
   | Tite (t1, t2, t3, t4) ->
-    let t1 = refine_function ~enc table t1 in
-    let t2 = refine_function ~enc table t2 in
-    let t3 = refine_function ~enc table t3 in
-    let t4 = refine_function ~enc table t4 in
-    Tite (t1, t2, t3, t4)
+      let t1 = refine_term ~enc table t1 in
+      let t2 = refine_term ~enc table t2 in
+      let t3 = refine_term ~enc table t3 in
+      let t4 = refine_term ~enc table t4 in
+      Tite (t1, t2, t3, t4)
   | Tarray a ->
-    Tarray (refine_array ~enc table a)
+      Tarray (refine_array ~enc table a)
   | Trecord (n, l) ->
-    Trecord (n, List.map (fun (f, v) -> f, refine_function ~enc table v) l)
+      Trecord (n, List.map (map_snd (refine_term ~enc table)) l)
   | Tto_array t ->
-    Tto_array (refine_function ~enc table t)
+      Tto_array (refine_term ~enc table t)
   | Tapply (s1, lt) ->
-    Tapply (s1, List.map (refine_function ~enc table) lt)
+      Tapply (s1, List.map (refine_term ~enc table) lt)
+
+and refine_array ~enc table = function
+  | TAvar _ as a -> a
+  | TAconst t ->
+      TAconst (refine_term ~enc table t)
+  | TAstore (a, t1, t2) ->
+      let a = refine_array ~enc table a in
+      let t1 = refine_term ~enc table t1 and t2 = refine_term ~enc table t2 in
+      TAstore (a, t1, t2)
+
+and refine_definition ~enc table = function
+  | Tterm t -> Tterm (refine_term ~enc table t)
+  | Tfunction (vars, t) -> Tfunction (vars, refine_term ~enc table t)
+  | Tnoelement -> Tnoelement
 
 and refine_tree ~enc table = function
   | Leaf t -> Leaf (refine_definition ~enc table t)
-  | Node mpr -> Node (Mpr.map (fun x -> refine_tree ~enc table x) mpr)
-
-and refine_variable_value ~enc table key (t: tree) =
-  let t = refine_tree ~enc table t in
-  Mstr.add key t table
+  | Node mpr -> Node (Mstr.map (refine_tree ~enc table) mpr)
 
 (* TODO in the future, we should keep the table that is built at each call of
    this to populate the acc where its called. Because what we do here is
    inefficient. ie we calculate the value of constants several time during
    propagation without saving it: this is currently ok as counterexamples
    parsing is *not* notably taking time/memory *)
-let refine_variable_value key t table =
-  let encountered_key = Hstr.create 16 in
-  refine_variable_value ~enc:encountered_key table key t
-
+let refine_tree table t = refine_tree ~enc:(ref Sstr.empty) table t
 
 let default_apply_to_record (list_records: (string list) Mstr.t)
     (noarg_constructors: string list) (t: term) =
@@ -547,8 +486,7 @@ and model_value_of_def lf = function
 
 and model_value_of_tree lf = function
   | Leaf t -> model_value_of_def lf t
-  | Node mpr ->
-      match Mpr.bindings mpr with
+  | Node mpr -> match Mstr.bindings mpr with
       | [] -> raise No_value
       | [f, t] ->
           Model_parser.Proj (f, model_value_of_tree lf t)
@@ -575,8 +513,8 @@ let create_list pm (table: definition Mstr.t) =
 
   (* Convert calls [r'mk v1 .. vn] to [{f1= v1; ...; fn= vn}] and unary calls
      to constructors where applicable *)
-  let table =
-    Mstr.mapi (fun _ -> definition_apply_to_record list_records pm.noarg_constructors)
+  let table : definition Mstr.t =
+    Mstr.map (definition_apply_to_record list_records pm.noarg_constructors)
       table in
 
   (* First populate the table with all references to prover variables *)
@@ -587,25 +525,26 @@ let create_list pm (table: definition Mstr.t) =
     Sstr.fold (fun v -> Mstr.add v Noelement) vars table in
 
   (* Convert from Smtv2_model_defs.definition to Collect_data_model.tdefinition *)
-  let table : tdefinition Mstr.t = Mstr.map convert_to_tree_def table in
+  let table : tdefinition Mstr.t =
+    Mstr.map convert_to_tree_def table in
 
   Debug.dprintf debug_cntex "After parsing@.";
   Mstr.iter (fun k -> Debug.dprintf debug_cntex "constant %s : %a@." k print_def) table;
 
-  (* First recover values stored in projections that were registered *)
+  (* Recover values stored in projections that were registered *)
   let table : tree Mstr.t =
     (* Convert the table to a table of tree *)
-    let table_leaves = Mstr.map (fun v -> Leaf v) table in
-    let table_projs_fields = Mstr.filter (fun key _ ->
+    let leaves = Mstr.map (fun v -> Leaf v) table in
+    let projs_fields = Mstr.filter (fun key _ ->
         Mstr.mem key pm.list_projections || Mstr.mem key pm.list_fields) table in
-    Mstr.fold add_vars_to_table table_projs_fields table_leaves in
+    Mstr.fold add_vars_to_table projs_fields leaves in
 
   (* Only printed in debug *)
   Debug.dprintf debug_cntex "Value were queried from projections@.";
   debug_table table;
 
-  (* Then substitute all variables with their values *)
-  let table = Mstr.fold refine_variable_value table table in
+  (* Substitute prover variables with their values *)
+  let table = Mstr.map (refine_tree table) table in
 
   Debug.dprintf debug_cntex "Var values were propagated@.";
   debug_table table;
