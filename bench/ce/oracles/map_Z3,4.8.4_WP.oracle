@@ -373,19 +373,15 @@ File map.mlw:
                  "value": {"type": "Boolean", "val": true}},
                 {"others": {"type": "Boolean", "val": false}}]}}]}}
 
-bench/ce/map.mlw ModelMap t1: Unknown (sat)
+bench/ce/map.mlw ModelMap t1: Timeout or Unknown
 Counter-example model:
 File map.mlw:
   Line 41:
     i, [[@introduced]] = {"type": "Integer", "val": "0"}
     t, [[@introduced]] =
-      {"type": "Array",
-       "val":
-        [{"indice": {"type": "Integer", "val": "0"},
-          "value": {"type": "Integer", "val": "1"}},
-         {"others": {"type": "Integer", "val": "1"}}]}
+      {"type": "Array", "val": [{"others": {"type": "Integer", "val": "2"}}]}
 
-bench/ce/map.mlw OtherIndices g: Unknown (sat)
+bench/ce/map.mlw OtherIndices g: Timeout or Unknown
 Counter-example model:
 File map.mlw:
   Line 50:
@@ -394,7 +390,5 @@ File map.mlw:
        "val":
         [{"indice": {"type": "Fraction", "val": "1\/5"},
           "value": {"type": "Decimal", "val": "2.0"}},
-         {"indice": {"type": "Fraction", "val": "1\/10"},
-          "value": {"type": "Decimal", "val": "1.0"}},
          {"others": {"type": "Decimal", "val": "1.0"}}]}
 

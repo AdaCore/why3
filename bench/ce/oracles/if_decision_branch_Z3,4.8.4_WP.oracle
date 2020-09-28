@@ -1,13 +1,13 @@
 Weakest Precondition
 bench/ce/if_decision_branch.mlw Other f'vc: Valid
-bench/ce/if_decision_branch.mlw Other f'vc: Unknown (sat)
+bench/ce/if_decision_branch.mlw Other f'vc: Timeout or Unknown
 Counter-example model:
 File int.mlw:
   Line 16:
-    a, [[@introduced]] = {"type": "Integer", "val": "0"}
+    a, [[@introduced]] = {"type": "Integer", "val": "2"}
 File if_decision_branch.mlw:
   Line 18:
-    a, [[@introduced]] = {"type": "Integer", "val": "0"}
+    a, [[@introduced]] = {"type": "Integer", "val": "2"}
   Line 19:
     result, [[@introduced]] = {"type": "Integer", "val": "22"}
   Line 22:

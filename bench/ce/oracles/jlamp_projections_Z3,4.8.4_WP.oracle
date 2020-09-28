@@ -1,6 +1,6 @@
 Weakest Precondition
 bench/ce/jlamp_projections.mlw AbstractAlone p3'vc: Valid
-bench/ce/jlamp_projections.mlw AbstractAlone p3'vc: Unknown (sat)
+bench/ce/jlamp_projections.mlw AbstractAlone p3'vc: Timeout or Unknown
 Counter-example model:
 File jlamp_projections.mlw:
   Line 18:
@@ -56,7 +56,7 @@ File jlamp_projections.mlw:
               "value": {"type": "Integer", "val": "127"}}}]}}
 
 bench/ce/jlamp_projections.mlw Record p4'vc: Valid
-bench/ce/jlamp_projections.mlw Record p4'vc: Unknown (sat)
+bench/ce/jlamp_projections.mlw Record p4'vc: Timeout or Unknown
 Counter-example model:
 File jlamp_projections.mlw:
   Line 53:
@@ -68,7 +68,7 @@ File jlamp_projections.mlw:
             "value":
              {"proj_name": "to_int",
               "type": "Proj",
-              "value": {"type": "Integer", "val": "127"}}},
+              "value": {"type": "Integer", "val": "0"}}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 54:
     b, [[@introduced], [@model_trace:b]] =
@@ -79,6 +79,6 @@ File jlamp_projections.mlw:
             "value":
              {"proj_name": "to_int",
               "type": "Proj",
-              "value": {"type": "Integer", "val": "127"}}},
+              "value": {"type": "Integer", "val": "0"}}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
 

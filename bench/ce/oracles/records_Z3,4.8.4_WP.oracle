@@ -23,16 +23,6 @@ File records.mlw:
 bench/ce/records.mlw M record_match_eval_test3'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
-  Line 18:
-    x, [[@field:0:contents], [@introduced]] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents",
-            "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
   Line 20:
     x, [[@field:0:contents], [@introduced]] =
       {"type": "Record",
@@ -40,20 +30,10 @@ File ref.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
+             {"proj_name": ".my_field_f",
               "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+              "value": {"type": "Integer", "val": "6"}}}]}}
 File records.mlw:
-  Line 27:
-    x, [[@field:0:contents], [@introduced]] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents",
-            "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
   Line 28:
     x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
       {"type": "Record",
@@ -61,9 +41,9 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
+             {"proj_name": ".my_field_f",
               "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+              "value": {"type": "Integer", "val": "6"}}}]}}
   Line 30:
     x, [[@field:0:contents], [@introduced]] =
       {"type": "Record",
@@ -71,23 +51,13 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
+             {"proj_name": ".my_field_f",
               "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+              "value": {"type": "Integer", "val": "6"}}}]}}
 
 bench/ce/records.mlw M record_match_eval_test4'vc: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
-  Line 18:
-    x, [[@field:0:contents], [@introduced]] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents",
-            "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
   Line 20:
     x, [[@field:0:contents], [@introduced]] =
       {"type": "Record",
@@ -95,20 +65,10 @@ File ref.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
+             {"proj_name": ".my_field_f",
               "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+              "value": {"type": "Integer", "val": "6"}}}]}}
 File records.mlw:
-  Line 32:
-    x, [[@field:0:contents], [@introduced]] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents",
-            "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
   Line 33:
     x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
       {"type": "Record",
@@ -116,9 +76,9 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
+             {"proj_name": ".my_field_f",
               "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+              "value": {"type": "Integer", "val": "6"}}}]}}
   Line 35:
     x, [[@field:0:contents], [@introduced]] =
       {"type": "Record",
@@ -126,9 +86,9 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
+             {"proj_name": ".my_field_f",
               "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+              "value": {"type": "Integer", "val": "6"}}}]}}
 
 bench/ce/records.mlw M record_match_eval_test44'vc: Timeout or Unknown
 Counter-example model:
@@ -275,39 +235,28 @@ File records.mlw:
               "type": "Proj",
               "value": {"type": "Boolean", "val": false}}}]}}
 
-bench/ce/records.mlw Mutable record_match_eval_test1'vc: Unknown (sat)
+bench/ce/records.mlw Mutable record_match_eval_test1'vc: Timeout or Unknown
 Counter-example model:
 File records.mlw:
-  Line 64:
-    x, [[@introduced]] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
-           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 65:
-    result, [[@introduced]] = {"type": "Integer", "val": "0"}
+    result, [[@introduced]] = {"type": "Integer", "val": "2"}
 
 bench/ce/records.mlw Mutable record_match_eval_test1'vc: Valid
-bench/ce/records.mlw Mutable record_match_eval_test2'vc: Unknown (sat)
+bench/ce/records.mlw Mutable record_match_eval_test2'vc: Timeout or Unknown
 Counter-example model:
 File records.mlw:
   Line 72:
     x, [[@introduced]] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
-           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+      {"proj_name": ".my_field_f",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
   Line 73:
     x, [[@introduced], [@model_trace:x]] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
-           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+      {"proj_name": ".my_field_f",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
 
-bench/ce/records.mlw Mutable record_match_eval_test3'vc: Unknown (sat)
+bench/ce/records.mlw Mutable record_match_eval_test3'vc: Timeout or Unknown
 Counter-example model:
 File records.mlw:
   Line 77:
@@ -315,7 +264,7 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 78:
     x, [[@introduced], [@model_trace:x]] =
@@ -332,7 +281,7 @@ File records.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-bench/ce/records.mlw Mutable record_match_eval_test4'vc: Unknown (sat)
+bench/ce/records.mlw Mutable record_match_eval_test4'vc: Timeout or Unknown
 Counter-example model:
 File records.mlw:
   Line 82:
@@ -340,7 +289,7 @@ File records.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 83:
     x, [[@introduced], [@model_trace:x]] =
