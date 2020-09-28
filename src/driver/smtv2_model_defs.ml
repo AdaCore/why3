@@ -30,8 +30,6 @@ and term =
   | Ite of term * term * term * term
   | Record of string * ((string * term) list)
   | To_array of term
-  (* TODO remove tree *)
-  | Trees of (string * term) list
 
 type definition =
   | Function of (variable * string option) list * term
@@ -62,19 +60,17 @@ and make_local vars_lists t =
   match t with
   | Var s ->
       begin
-        if (List.exists (fun x -> s = fst x) vars_lists) then
+        if List.exists (fun x -> s = fst x) vars_lists then
           Function_var s
         else
           try
           (* Check that s is a Cvc4 or z3 variable. Note that s is a variable
              name so it is of size > 0 *)
-            (if (String.get s 0 = '@' || String.contains s '!') then
+            if String.get s 0 = '@' || String.contains s '!' then
               Prover_var s
             else
-              Var s
-            ) (* should not happen *)
-          with
-            _ -> raise Bad_local_variable (* Should not happen. s = "" *)
+              Var s (* should not happen *)
+          with _ -> raise Bad_local_variable (* Should not happen. s = "" *)
       end
   | Array a ->
     begin
@@ -94,8 +90,6 @@ and make_local vars_lists t =
   | Function_var _ -> raise Bad_local_variable
   | Record (n, l) -> Record (n, List.map (fun (f, x) -> f, make_local vars_lists x) l)
   | To_array t -> To_array (make_local vars_lists t)
-  (* TODO tree does not exist yet *)
-  | Trees t -> Trees t
 
 let rec subst var value = function
   | Sval _ as t -> t
@@ -114,7 +108,6 @@ let rec subst var value = function
   | To_array t -> To_array (subst var value t)
   | Apply (s, lt) ->
     Apply (s, List.map (subst var value) lt)
-  | Trees _ as t -> t (* Tree does not exists yet *)
 
 and subst_array var value = function
   | Avar v ->

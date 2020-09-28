@@ -14,12 +14,7 @@ open Model_parser
 
 type variable = string
 
-type array =
-  | Avar of variable (* Used by let-bindings only *)
-  | Aconst of term
-  | Astore of array * term * term
-
-and term =
+type term =
   | Sval of model_value
   | Apply of (string * term list)
   | Array of array
@@ -29,8 +24,11 @@ and term =
   | Ite of term * term * term * term
   | Record of string * ((string * term) list)
   | To_array of term
-  (* TODO remove tree *)
-  | Trees of (string * term) list
+
+and array =
+  | Avar of variable (* Used by let-bindings only *)
+  | Aconst of term
+  | Astore of array * term * term
 
 type definition =
   | Function of (variable * string option) list * term

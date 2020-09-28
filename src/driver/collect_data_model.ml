@@ -54,6 +54,10 @@ and tree =
   | Node of tree Mstr.t
   | Leaf of tdefinition
 
+(************************************************************************)
+(*                              Printing                                *)
+(************************************************************************)
+
 let rec print_array fmt = function
   | TAvar v -> Format.fprintf fmt "@[<hv2>(Array_var %s)@]" v
   | TAconst t -> Format.fprintf fmt "@[<hv2>(Aconst %a)@]" print_term t
@@ -91,7 +95,151 @@ and print_def fmt =
     | Tterm t -> fprintf fmt "@[<hv2>(Term %a)@]" print_term t
     | Tnoelement -> fprintf fmt "Noelement"
 
-let subst_local_var var value t =
+(* Printing function for debugging *)
+let debug_table t =
+  Debug.dprintf debug_cntex "Correspondence table key and value@.";
+  Mstr.iter (fun key t ->
+      Debug.dprintf debug_cntex "%s %a@." key print_tree t)
+    t;
+  Debug.dprintf debug_cntex "End table@."
+
+(************************************************************************)
+(*             Convert calls to records and constructors                *)
+(************************************************************************)
+
+let default_apply_to_record (list_records: (string list) Mstr.t)
+    (noarg_constructors: string list) (t: term) =
+
+  let rec array_apply_to_record = function
+    | Avar _v -> raise No_value
+    | Aconst x ->
+        let x = apply_to_record x in
+        Aconst x
+    | Astore (a, t1, t2) ->
+        let a = array_apply_to_record a in
+        let t1 = apply_to_record t1 in
+        let t2 = apply_to_record t2 in
+        Astore (a, t1, t2)
+
+  and apply_to_record = function
+    | Sval _ as v -> v
+    (* Var with no arguments can actually be constructors. We check this
+       here and if it is the case we change the variable into a value. *)
+    | Var s when List.mem s noarg_constructors ->
+        Apply (s, [])
+    | Prover_var _ | Function_var _ | Var _ as v -> v
+    | Array a ->
+        Array (array_apply_to_record a)
+    | Record (s, l) ->
+        let l = List.map (fun (f,v) -> f, apply_to_record v) l in
+        Record (s, l)
+    | Apply (s, l) ->
+        let l = List.map apply_to_record l in
+        if Mstr.mem s list_records then
+          Record (s, List.combine (Mstr.find s list_records) l)
+        else
+          Apply (s, l)
+    | Ite (t1, t2, t3, t4) ->
+        let t1 = apply_to_record t1 in
+        let t2 = apply_to_record t2 in
+        let t3 = apply_to_record t3 in
+        let t4 = apply_to_record t4 in
+        Ite (t1, t2, t3, t4)
+    | To_array t1 ->
+        let t1 = apply_to_record t1 in
+        To_array t1
+  in
+  apply_to_record t
+
+let apply_to_records_ref = ref None
+
+let register_apply_to_records f =
+  apply_to_records_ref := Some f
+
+let apply_to_record list_records noarg_constructors t =
+  match !apply_to_records_ref with
+  | None -> default_apply_to_record list_records noarg_constructors t
+  | Some f -> f list_records noarg_constructors t
+
+let definition_apply_to_record list_records noarg_constructors = function
+    | Function (lt, t) ->
+        Function (lt, apply_to_record list_records noarg_constructors t)
+    | Term t -> Term (apply_to_record list_records noarg_constructors  t)
+    | Noelement -> Noelement
+
+(************************************************************************)
+(*              Import definitions from Smtv2_model_defs                *)
+(************************************************************************)
+
+let rec convert_to_tree_def = function
+  | Noelement -> Tnoelement
+  | Term t -> Tterm (convert_to_tree_term t)
+  | Function (l, t) -> Tfunction (l, convert_to_tree_term t)
+
+and convert_to_tree_term = function
+  | Sval v -> Tsval v
+  | Apply (s, tl) -> Tapply (s, List.map convert_to_tree_term tl)
+  | Array a -> Tarray (convert_to_tree_array a)
+  | Prover_var v -> Tprover_var (Tree_var v)
+  | Function_var v -> Tfunction_var v
+  | Var v -> Tvar v
+  | Ite (t1, t2, t3, t4) ->
+      let t1 = convert_to_tree_term t1 and t2 = convert_to_tree_term t2 in
+      let t3 = convert_to_tree_term t3 and t4 = convert_to_tree_term t4 in
+      Tite (t1, t2, t3, t4)
+  | Record (s, fs) ->
+      let fs = List.map (fun (s, t) -> s, convert_to_tree_term t) fs in
+      Trecord (s, fs)
+  | To_array t ->
+      Tto_array (convert_to_tree_term t)
+
+and convert_to_tree_array = function
+  | Avar v -> TAvar v
+  | Aconst t -> TAconst (convert_to_tree_term t)
+  | Astore (a, t1, t2) ->
+      let a = convert_to_tree_array a in
+      let t1 = convert_to_tree_term t1 and t2 = convert_to_tree_term t2 in
+      TAstore (a, t1, t2)
+
+(************************************************************************)
+(*                       Collect prover variables                       *)
+(************************************************************************)
+
+let rec collect_prover_vars_term = function
+  | Prover_var v -> Sstr.singleton v
+  | Sval _ | Var _ | Function_var _ -> Sstr.empty
+  | Array a -> collect_prover_vars_array a
+  | Ite (t1, t2, t3, t4) ->
+      let ss = List.map collect_prover_vars_term [t1; t2; t3; t4] in
+      List.fold_right Sstr.union ss Sstr.empty
+  | Record (_, fs) ->
+      let ss = List.map collect_prover_vars_term (List.map snd fs) in
+      List.fold_right Sstr.union ss Sstr.empty
+  | To_array t -> collect_prover_vars_term t
+  | Apply (_, ts) ->
+      let ss = List.map collect_prover_vars_term ts in
+      List.fold_right Sstr.union ss Sstr.empty
+
+and collect_prover_vars_array = function
+  | Avar _ -> Sstr.empty
+  | Aconst t -> collect_prover_vars_term t
+  | Astore (a, t1, t2) ->
+      List.fold_left Sstr.union (collect_prover_vars_array a)
+        (List.map collect_prover_vars_term [t1; t2])
+
+let collect_prover_vars = function
+  | Noelement -> Sstr.empty
+  | Function (_, t) | Term t ->
+      collect_prover_vars_term t
+
+(************************************************************************)
+(*                            Simplify ITEs                             *)
+(************************************************************************)
+
+(* Used to handle case of badly formed table *)
+exception Incorrect_table
+
+let subst_local_var var value =
   let rec aux = function
     | Tfunction_var var' when var' = var ->
         value
@@ -114,70 +262,7 @@ let subst_local_var var value t =
         TAconst (aux t)
     | TAstore (a, t1, t2) ->
         TAstore (aux_array a, aux t1, aux t2) in
-  aux t
-
-(* Printing function for debugging *)
-let debug_table t =
-  Debug.dprintf debug_cntex "Correspondence table key and value@.";
-  Mstr.iter (fun key t ->
-      Debug.dprintf debug_cntex "%s %a@." key print_tree t)
-    t;
-  Debug.dprintf debug_cntex "End table@."
-
-let rec collect_prover_vars_term = function
-  | Prover_var v -> Sstr.singleton v
-  | Sval _ | Var _ | Function_var _ -> Sstr.empty
-  | Array a -> collect_prover_vars_array a
-  | Ite (t1, t2, t3, t4) ->
-      let ss = List.map collect_prover_vars_term [t1; t2; t3; t4] in
-      List.fold_right Sstr.union ss Sstr.empty
-  | Record (_, fs) ->
-      let ss = List.map collect_prover_vars_term (List.map snd fs) in
-      List.fold_right Sstr.union ss Sstr.empty
-  | To_array t -> collect_prover_vars_term t
-  | Apply (_, ts) ->
-      let ss = List.map collect_prover_vars_term ts in
-      List.fold_right Sstr.union ss Sstr.empty
-  | Trees _ -> assert false (* Does not exist at this moment *)
-
-and collect_prover_vars_array = function
-  | Avar _ -> Sstr.empty
-  | Aconst t -> collect_prover_vars_term t
-  | Astore (a, t1, t2) ->
-      List.fold_left Sstr.union (collect_prover_vars_array a)
-        (List.map collect_prover_vars_term [t1; t2])
-
-let collect_prover_vars = function
-  | Noelement -> Sstr.empty
-  | Function (_, t) | Term t ->
-      collect_prover_vars_term t
-
-exception Bad_variable
-
-(* Get the "radical" of a variable *)
-let remove_end_num s =
-  let n = ref (String.length s - 1) in
-  if !n <= 0 then s else
-  begin
-    while String.get s !n <= '9' && String.get s !n >= '0' && !n >= 0 do
-      n := !n - 1
-    done;
-    try
-      String.sub s 0 (!n + 1)
-    with
-    | _ -> s
-  end
-
-let is_prover_var type_value name =
-  let open Re.Str in
-  let match_str_z3 = type_value^"!" in
-  let match_str_cvc4 = "_"^type_value^"_" in
-  let re = regexp ("\\("^quote match_str_z3^"\\|"^quote match_str_cvc4^"\\)") in
-  try ignore (search_forward re (remove_end_num name) 0); true
-  with Not_found -> false
-
-(* Used to handle case of badly formed table *)
-exception Incorrect_table
+  aux
 
 (* Simplify if-then-else in value so that it can be read by
    add_vars_to_table. *)
@@ -215,6 +300,34 @@ let rec simplify_value table = function
   | Tite (eq1, eq2, tthen, telse) ->
       Tite (eq1, eq2, simplify_value table tthen, simplify_value table telse)
   | v -> v
+
+(************************************************************************)
+(*                   Add variables from ITE to table                    *)
+(************************************************************************)
+
+(* Get the "radical" of a variable *)
+let remove_end_num s =
+  let n = ref (String.length s - 1) in
+  if !n <= 0 then s else
+    begin
+      while String.get s !n <= '9' && String.get s !n >= '0' && !n >= 0 do
+        n := !n - 1
+      done;
+      try
+        String.sub s 0 (!n + 1)
+      with
+      | _ -> s
+    end
+
+let is_prover_var type_value name =
+  let open Re.Str in
+  let match_str_z3 = type_value^"!" in
+  let match_str_cvc4 = "_"^type_value^"_" in
+  let re = regexp ("\\("^quote match_str_z3^"\\|"^quote match_str_cvc4^"\\)") in
+  try ignore (search_forward re (remove_end_num name) 0); true
+  with Not_found -> false
+
+exception Bad_variable
 
 (* Add the variables that can be deduced from ITE to the table of variables *)
 let add_vars_to_table key value table =
@@ -277,6 +390,10 @@ let add_vars_to_table key value table =
   with Incorrect_table ->
     Debug.dprintf debug_cntex "Badly formed table@.";
     table
+
+(************************************************************************)
+(*                       Refine prover variables                        *)
+(************************************************************************)
 
 (* This function takes the table of assigned variables and a term and replace
    the variables with the constant associated with them in the table. If their
@@ -342,99 +459,9 @@ and refine_tree ~enc table = function
    parsing is *not* notably taking time/memory *)
 let refine_tree table t = refine_tree ~enc:(ref Sstr.empty) table t
 
-let default_apply_to_record (list_records: (string list) Mstr.t)
-    (noarg_constructors: string list) (t: term) =
-
-  let rec array_apply_to_record = function
-    | Avar _v -> raise No_value
-    | Aconst x ->
-        let x = apply_to_record x in
-        Aconst x
-    | Astore (a, t1, t2) ->
-        let a = array_apply_to_record a in
-        let t1 = apply_to_record t1 in
-        let t2 = apply_to_record t2 in
-        Astore (a, t1, t2)
-
-  and apply_to_record = function
-    | Sval _ as v -> v
-    (* Var with no arguments can actually be constructors. We check this
-       here and if it is the case we change the variable into a value. *)
-    | Var s when List.mem s noarg_constructors ->
-        Apply (s, [])
-    | Prover_var _ | Function_var _ | Var _ as v -> v
-    | Array a ->
-        Array (array_apply_to_record a)
-    | Record (s, l) ->
-        let l = List.map (fun (f,v) -> f, apply_to_record v) l in
-        Record (s, l)
-    | Apply (s, l) ->
-        let l = List.map apply_to_record l in
-        if Mstr.mem s list_records then
-          Record (s, List.combine (Mstr.find s list_records) l)
-        else
-          Apply (s, l)
-    | Ite (t1, t2, t3, t4) ->
-        let t1 = apply_to_record t1 in
-        let t2 = apply_to_record t2 in
-        let t3 = apply_to_record t3 in
-        let t4 = apply_to_record t4 in
-        Ite (t1, t2, t3, t4)
-    | To_array t1 ->
-        let t1 = apply_to_record t1 in
-        To_array t1
-    (* TODO Does not exist yet *)
-    | Trees _ -> raise No_value
-  in
-  apply_to_record t
-
-let apply_to_records_ref = ref None
-
-let register_apply_to_records f =
-  apply_to_records_ref := Some f
-
-let apply_to_record list_records noarg_constructors t =
-  match !apply_to_records_ref with
-  | None -> default_apply_to_record list_records noarg_constructors t
-  | Some f -> f list_records noarg_constructors t
-
-let definition_apply_to_record list_records noarg_constructors = function
-    | Function (lt, t) ->
-        Function (lt, apply_to_record list_records noarg_constructors t)
-    | Term t -> Term (apply_to_record list_records noarg_constructors  t)
-    | Noelement -> Noelement
-
-let rec convert_to_tree_def = function
-  | Noelement -> Tnoelement
-  | Term t -> Tterm (convert_to_tree_term t)
-  | Function (l, t) -> Tfunction (l, convert_to_tree_term t)
-
-and convert_to_tree_term = function
-  | Sval v -> Tsval v
-  | Apply (s, tl) -> Tapply (s, List.map convert_to_tree_term tl)
-  | Array a -> Tarray (convert_to_tree_array a)
-  | Prover_var v -> Tprover_var (Tree_var v)
-  | Function_var v -> Tfunction_var v
-  | Var v -> Tvar v
-  | Ite (t1, t2, t3, t4) ->
-      let t1 = convert_to_tree_term t1 and t2 = convert_to_tree_term t2 in
-      let t3 = convert_to_tree_term t3 and t4 = convert_to_tree_term t4 in
-      Tite (t1, t2, t3, t4)
-  | Record (s, fs) ->
-      let fs = List.map (fun (s, t) -> s, convert_to_tree_term t) fs in
-      Trecord (s, fs)
-  | To_array t ->
-      Tto_array (convert_to_tree_term t)
-  | Trees _ -> raise No_value (* TODO should not appear here *)
-
-and convert_to_tree_array = function
-  | Avar v -> TAvar v
-  | Aconst t -> TAconst (convert_to_tree_term t)
-  | Astore (a, t1, t2) ->
-      let a = convert_to_tree_array a in
-      let t1 = convert_to_tree_term t1 and t2 = convert_to_tree_term t2 in
-      TAstore (a, t1, t2)
-
+(************************************************************************)
+(*                       Creation of model values                       *)
+(************************************************************************)
 
 (* In the following lf is the list of fields. It is used to differentiate
    projections from fields so that projections cannot be reconstructed into a
@@ -504,6 +531,10 @@ let model_element pm (name, tree)  =
   | exception No_value when not Debug.(test_flag debug_cntex && test_flag stack_trace) ->
       None
 
+(************************************************************************)
+(*            Import Smtv2_model_defs to model elements                 *)
+(************************************************************************)
+
 let create_list pm (table: definition Mstr.t) =
 
   (* Convert list_records to take replace fields with model_trace when necessary. *)
@@ -524,7 +555,7 @@ let create_list pm (table: definition Mstr.t) =
     let vars = Sstr.filter (fun v -> not (Mstr.mem v table)) vars in
     Sstr.fold (fun v -> Mstr.add v Noelement) vars table in
 
-  (* Convert from Smtv2_model_defs.definition to Collect_data_model.tdefinition *)
+  (* Import definitions from Smtv2_model_defs *)
   let table : tdefinition Mstr.t =
     Mstr.map convert_to_tree_def table in
 
