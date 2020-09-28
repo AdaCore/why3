@@ -45,3 +45,6 @@ val make_local: (variable * string option) list -> term -> term
 
 val substitute: (string * term) list -> term -> term
 (** Substitute variables by terms. Used for let bindings of z3 *)
+
+val print_term : term Pp.pp
+val print_definition : definition Pp.pp
