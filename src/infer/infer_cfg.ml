@@ -594,26 +594,26 @@ module Make(E: sig
     let sinit = PSette.singleton compare_no_closured 0 in
     let init_t = Unix.times () in
     (* standard strategy *)
-    (* let initial_strategy =
-     *   Fixpoint.make_strategy_default
-     *     ~vertex_dummy
-     *     ~hedge_dummy
-     *     cfg.psh_graph sinit in
-     * let output = Fixpoint.analysis_std manager
-     *                cfg.psh_graph sinit initial_strategy in *)
-
-    (* uses the technique of Gopan and Reps published in Static
-       Anlaysis Symposium, SAS'2007 *)
-    let make_strategy is_active =
+    let initial_strategy =
       Fixpoint.make_strategy_default
-        ~widening_start:E.widening
-        ~widening_descend:(max (E.widening/2) 2)
-        ~priority:(PSHGraph.Filter is_active)
         ~vertex_dummy
         ~hedge_dummy
         cfg.psh_graph sinit in
-    let output = Fixpoint.analysis_guided manager
-                   cfg.psh_graph sinit make_strategy in
+    let output = Fixpoint.analysis_std manager
+                   cfg.psh_graph sinit initial_strategy in
+
+    (* uses the technique of Gopan and Reps published in Static
+       Anlaysis Symposium, SAS'2007 *)
+    (* let make_strategy is_active =
+     *   Fixpoint.make_strategy_default
+     *     ~widening_start:E.widening
+     *     ~widening_descend:(max (E.widening/2) 2)
+     *     ~priority:(PSHGraph.Filter is_active)
+     *     ~vertex_dummy
+     *     ~hedge_dummy
+     *     cfg.psh_graph sinit in
+     * let output = Fixpoint.analysis_guided manager
+     *                cfg.psh_graph sinit make_strategy in *)
 
     let end_t = Unix.times () in
     Format.eprintf "Time elapsed %fs@."
