@@ -442,9 +442,7 @@ let create_list pm (table: definition Mstr.t) =
 
   (* Recover values stored in projections that were registered *)
   let table : tree Mstr.t =
-    let table_fields_projs =
-      Mstr.filter (fun key _ -> Mstr.mem key pm.list_projections || Mstr.mem key pm.list_fields)
-        table in
+    let table_fields_projs = Mstr.filter (fun key _ -> Mstr.mem key (list_projs pm)) table in
     let table = Mstr.map (fun v -> Leaf v) table in
     Mstr.fold set_fields_projs table_fields_projs table in
 

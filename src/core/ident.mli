@@ -234,7 +234,8 @@ val compute_model_trace_field: ident option -> int -> Sattr.t
     the built field attribute associated *)
 
 val extract_field: attribute -> (int * string) option
-(** Take an attribute and extract its depth, name if it was a field attribute *)
+(** Take an attribute and extract its depth, name if it was a field attribute
+    (["field:depth:field_name"]) *)
 
 val get_model_trace_attr : attrs:Sattr.t -> attribute
 (** Return an attribute of the form ["model_trace:*"].

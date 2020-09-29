@@ -249,12 +249,12 @@ let analyse_result exit_result res_parser printer_mapping out =
          | _,_ ->
             analyse saved_model saved_res tl1
        end
-    | Answer res :: Model model :: tl ->
+    | Answer res :: Model model_str :: tl ->
         if res = Valid then
           (Valid, None)
         else
           (* get model if possible *)
-          let m = res_parser.prp_model_parser model printer_mapping in
+          let m = res_parser.prp_model_parser printer_mapping model_str in
           Debug.dprintf debug "Call_provers: model:@.";
           debug_print_model ~print_attrs:false m;
           (* TODO remove this use_incremental_choice when choice of the model
@@ -299,7 +299,7 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
       with Not_found -> []
     in analyse_result exit_result res_parser printer_mapping out
   in
-  let model = match model with Some s -> s | None -> default_model in
+  let model = match model with Some s -> s | None -> empty_model in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
@@ -497,7 +497,7 @@ let editor_result ret = {
   pr_output = "";
   pr_time   = 0.0;
   pr_steps  = 0;
-  pr_model  = Model_parser.default_model;
+  pr_model  = Model_parser.empty_model;
 }
 
 let query_call = function

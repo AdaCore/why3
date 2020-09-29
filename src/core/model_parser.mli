@@ -81,15 +81,11 @@ val print_model_value : Format.formatter -> model_value -> unit
 *)
 
 type model_element_kind =
-| Result
-  (* Result of a function call (if the counter-example is for postcondition)  *)
-| Old
-  (* Old value of function argument (if the counter-example is for postcondition) *)
-| At of string
-(* Value at label *)
-| Error_message
-  (* The model element represents error message, not source-code element.
-     The error message is saved in the name of the model element.*)
+| Result (* Result of a function call (if the counter-example is for postcondition)  *)
+| Old (* Old value of function argument (if the counter-example is for postcondition) *)
+| At of string (* Value at label *)
+| Error_message (* The model element represents error message, not source-code element.
+                   The error message is saved in the name of the model element.*)
 | Loop_before
 | Loop_previous_iteration
 | Loop_current_iteration
@@ -137,7 +133,7 @@ val create_model_element :
 type model
 
 val is_model_empty : model -> bool
-val default_model : model
+val empty_model : model
 
 (** {2 Querying the model} *)
 
@@ -277,11 +273,11 @@ val model_for_positions_and_decls : model ->
 ** Registering model parser
 ***************************************************************
 *)
-type model_parser =  string -> Printer.printer_mapping -> model
+
+type model_parser = Printer.printer_mapping -> string -> model
 (** Parses the input string into model elements, estabilishes
     a mapping between these elements and mapping from printer
-    and builds model data structure.
-*)
+    and builds model data structure.*)
 
 type raw_model_parser = Printer.printer_mapping -> string -> model_element list
 

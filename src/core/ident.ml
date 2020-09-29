@@ -447,7 +447,7 @@ let compute_model_trace_field pj d =
 let extract_field attr =
   try
     match Strings.bounded_split ':' attr.attr_string 3 with
-    | "field" :: n :: [field_name] -> Some (int_of_string n, field_name)
+    | ["field"; n; field_name] -> Some (int_of_string n, field_name)
     | _ -> None
   with
   | _ -> None

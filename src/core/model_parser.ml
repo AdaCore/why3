@@ -28,15 +28,10 @@ let debug = Debug.register_info_flag "model_parser"
 *)
 
 type model_int = { int_value: BigInt.t; int_verbatim: string }
-
 type model_dec = { dec_int: BigInt.t; dec_frac: BigInt.t; dec_verbatim: string }
-
 type model_frac = { frac_nom: BigInt.t; frac_den: BigInt.t; frac_verbatim: string }
-
 type model_bv = { bv_value: BigInt.t; bv_length: int; bv_verbatim: string }
-
 type model_float_binary = { sign: model_bv; exp: model_bv; mant: model_bv }
-
 type model_float =
   | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
   | Float_number of {hex: string option; binary: model_float_binary}
@@ -366,93 +361,35 @@ type model_element_kind =
   | Loop_current_iteration
   | Other
 
-type model_element_name =
-  { men_name: string
-  ; men_kind: model_element_kind
-  ; (* Attributes associated to the id of the men *)
-    men_attrs: Sattr.t }
+type model_element_name = {
+  men_name: string;
+  men_kind: model_element_kind; (* Attributes associated to the id of the men *)
+  men_attrs: Sattr.t;
+}
 
-type model_element =
-  { me_name: model_element_name
-  ; me_value: model_value
-  ; me_location: Loc.position option
-  ; me_term: Term.term option }
+type model_element = {
+  me_name: model_element_name;
+  me_value: model_value;
+  me_location: Loc.position option;
+  me_term: Term.term option;
+}
 
 let split_model_trace_name mt_name =
-  (* Mt_name is of the form "name[@type[@*]]". Return (name, type) *)
+  (* Mt_name is of the form "name[@kind[@*]]". Return (name, kind) *)
   let splitted = Strings.bounded_split '@' mt_name 3 in
   match splitted with
   | [first] -> (first, "")
   | first :: second :: _ -> (first, second)
   | [] -> (mt_name, "")
 
-(* Elements that are of record with only one field in the source code, are
-   simplified by eval_match in wp generation. So, this allows to reconstruct
-   their value (using the "field" attribute that were added). *)
-let readd_one_fields ~attrs value =
-  (* Small function that insert in a sorted list *)
-  let rec insert_sorted (n, name) l =
-    match l with
-    | (n1, _) :: _ when n1 < n -> (n, name) :: l
-    | (n1, name1) :: tl -> (n1, name1) :: insert_sorted (n, name) tl
-    | [] -> [(n, name)] in
-  (* l is the list of ordered field_names *)
-  let l =
-    Sattr.fold
-      (fun x l ->
-        match Ident.extract_field x with
-        | None -> l
-        | Some (n, field_name) -> insert_sorted (n, field_name) l)
-      attrs [] in
-  match Ident.get_model_trace_attr ~attrs with
-  | mtrace ->
-      let attrs = Sattr.remove mtrace attrs in
-      (* Special cases for 'Last and 'First. TODO: Should be avoided here but
-         there is no simple way. *)
-      if Strings.ends_with mtrace.attr_string "'Last" then
-        let new_mtrace = Strings.remove_suffix "'Last" mtrace.attr_string in
-        let new_mtrace =
-          List.fold_left
-            (fun acc (_, field_name) -> acc ^ field_name)
-            new_mtrace l in
-        let new_mtrace = new_mtrace ^ "'Last" in
-        let attrs = Sattr.add (create_attribute new_mtrace) attrs in
-        (attrs, value)
-      else if Strings.ends_with mtrace.attr_string "'First" then
-        let new_mtrace = Strings.remove_suffix "'First" mtrace.attr_string in
-        let new_mtrace =
-          List.fold_left
-            (fun acc (_, field_name) -> acc ^ field_name)
-            new_mtrace l in
-        let new_mtrace = new_mtrace ^ "'First" in
-        let attrs = Sattr.add (create_attribute new_mtrace) attrs in
-        (attrs, value)
-      else
-        (* General case *)
-        ( Sattr.add mtrace attrs
-        , List.fold_left
-            (fun v (_, field_name) -> Record [(field_name, v)])
-            value l )
-  | exception Not_found ->
-      (* No model trace attribute present, same as general case *)
-      ( attrs
-      , List.fold_left
-          (fun v (_, field_name) -> Record [(field_name, v)])
-          value l )
-
 let create_model_element ~name ~value ~attrs =
-  let me_name = {men_name=name; men_kind=Other; men_attrs=attrs} in
-  {me_name; me_value=value; me_location=None; me_term=None}
+  let name, kind = split_model_trace_name name in
+  let me_name = {men_name= name; men_kind= kind; men_attrs= attrs} in
+  {me_name; me_value= value; me_location= None; me_term= None}
 
-let construct_name name attrs : model_element_name =
-  {men_name=name; men_kind=Other; men_attrs=attrs}
-
-(*
-let print_location fmt m_element =
-    match m_element.me_location with
-    | None -> fprintf fmt "\"no location\""
-    | Some loc -> Loc.report_position fmt loc
-*)
+let create_model_element_name name attrs : model_element_name =
+  let name, kind = split_model_trace_name name in
+  {men_name= name; men_kind= kind; men_attrs= attrs}
 
 (*
 ***************************************************************
@@ -468,19 +405,17 @@ type model =
   ; vc_term_loc: Loc.position option
   ; vc_term_attrs: Sattr.t }
 
-let empty_model = Mstr.empty
 let empty_model_file = Mint.empty
 let empty_model_files = Mstr.empty
 let is_model_empty m = Mstr.is_empty m.model_files
 
-let default_model =
-  {vc_term_loc=None; vc_term_attrs=Sattr.empty; model_files=empty_model}
+let empty_model =
+  {vc_term_loc=None; vc_term_attrs=Sattr.empty; model_files=empty_model_files}
 
 let get_model_elements m =
-  List.concat
-    (List.concat (List.map Mint.values (Mstr.values m.model_files)))
+  List.(concat (concat (map Mint.values (Mstr.values m.model_files))))
 
-type model_parser = string -> printer_mapping -> model
+type model_parser = printer_mapping -> string -> model
 type raw_model_parser = printer_mapping -> string -> model_element list
 
 (*
@@ -814,7 +749,7 @@ let fix_kind at_loc vc_attrs me =
             if type_s = "result" then Result else me.me_name.men_kind) in
   {me with me_name={me.me_name with men_kind}}
 
-let add_to_model ?vc_term_attrs model model_element =
+let add_to_model ?vc_term_attrs model_element model =
   match model_element.me_location with
   | None -> model
   | Some pos ->
@@ -849,7 +784,7 @@ let add_to_model ?vc_term_attrs model model_element =
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 
-let recover_name list_projs pm raw_name =
+let recover_name pm list_projs raw_name =
   let name, attrs =
     try
       let t = Mstr.find raw_name pm.queried_terms in
@@ -859,43 +794,64 @@ let recover_name list_projs pm raw_name =
     with Not_found ->
       let id = Mstr.find raw_name list_projs in
       (id.id_string, id.id_attrs) in
-  construct_name (get_model_trace_string ~name ~attrs) attrs
+  create_model_element_name (get_model_trace_string ~name ~attrs) attrs
 
-let rec replace_projection (const_function : string -> string) model_value =
-  match model_value with
+(** [replace_projection const_function mv] replaces record names, projections, and application callees
+   in [mv] using [const_function] *)
+let rec replace_projection (const_function : string -> string) =
+  let const_function s = try const_function s with Not_found -> s in
+  function
   | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
-   |String _ | Unparsed _ ->
-      model_value
+  | String _ | Unparsed _ as mv -> mv
+  | Record fs ->
+      let aux (f, mv) = const_function f, replace_projection const_function mv in
+      Record (List.map aux fs)
+  | Proj (f, mv) ->
+      Proj (const_function f, replace_projection const_function mv)
   | Array a -> Array (replace_projection_array const_function a)
-  | Record r ->
-      let r =
-        List.map
-          (fun (field_name, value) ->
-            let field_name =
-              try const_function field_name with Not_found -> field_name in
-            (field_name, replace_projection const_function value))
-          r in
-      Record r
-  | Proj p ->
-      let proj_name, value = p in
-      let proj_name =
-        try const_function proj_name with Not_found -> proj_name in
-      Proj (proj_name, replace_projection const_function value)
   | Apply (s, l) ->
-      let s = try const_function s with Not_found -> s in
-      Apply (s, List.map (fun v -> replace_projection const_function v) l)
+      Apply (const_function s, List.map (replace_projection const_function) l)
 
 and replace_projection_array const_function a =
-  let {arr_others= others; arr_indices= arr_index_list} = a in
-  let others = replace_projection const_function others in
-  let arr_index_list =
-    List.map
-      (fun ind ->
-        let {arr_index_key= key; arr_index_value= value} = ind in
-        let value = replace_projection const_function value in
-        {arr_index_key= key; arr_index_value= value})
-      arr_index_list in
-  {arr_others= others; arr_indices= arr_index_list}
+  let for_index a =
+    let arr_index_value = replace_projection const_function a.arr_index_value in
+    {a with arr_index_value} in
+  {arr_others= replace_projection const_function a.arr_others;
+   arr_indices= List.map for_index a.arr_indices}
+
+(* Elements that are of record with only one field in the source code, are
+   simplified by eval_match in wp generation. So, this allows to reconstruct
+   their value (using the "field" attribute that were added). *)
+let read_one_fields ~attrs value =
+  let field_names =
+    let fields = Lists.map_filter Ident.extract_field (Sattr.elements attrs) in
+    List.sort (fun (d1, _) (d2, _) -> d2 - d1) fields in
+  let add_record v (_, f) = Record [f, v] in
+  match Ident.get_model_trace_attr ~attrs with
+  | mtrace -> (
+      let attrs = Sattr.remove mtrace attrs in
+      (* Special cases for 'Last and 'First. TODO: Should be avoided here but
+         there is no simple way. *)
+      try
+        let new_mtrace =
+          Strings.remove_suffix "'Last" mtrace.attr_string ^
+          String.concat "" (List.map snd field_names) ^
+          "'Last" in
+        let new_attr = create_attribute new_mtrace in
+        Sattr.add new_attr attrs, value
+      with Not_found ->
+      try
+        let new_mtrace =
+          Strings.remove_suffix "'First" mtrace.attr_string ^
+          String.concat "" (List.map snd field_names) ^
+          "'First" in
+        let new_attr = create_attribute new_mtrace in
+        Sattr.add new_attr attrs, value
+      with Not_found -> (* General case *)
+        Sattr.add mtrace attrs, List.fold_left add_record value field_names )
+  | exception Not_found ->
+      (* No model trace attribute present, same as general case *)
+      attrs, List.fold_left add_record value field_names
 
 let internal_loc t =
   match t.t_node with
@@ -903,95 +859,80 @@ let internal_loc t =
   | Tapp (ls, []) -> ls.ls_name.id_loc
   | _ -> None
 
-let default_remove_field ((attrs, v) : Sattr.t * model_value) = (attrs, v)
-let remove_field_fun = ref None
-let register_remove_field f = remove_field_fun := Some f
+let remove_field : (Sattr.t * model_value -> Sattr.t * model_value) ref = ref (fun x -> x)
+let register_remove_field f = remove_field := f
 
-let build_model_rec raw_model pm list_projs =
-  List.fold_left
-    (fun model raw_element ->
-      let raw_element_name = raw_element.me_name.men_name in
-      try
-        let t = Mstr.find raw_element_name pm.queried_terms in
-        let attrs = Sattr.union raw_element.me_name.men_attrs t.t_attrs in
-        let name, attrs =
-          match t.t_node with
-          | Tapp (ls, []) ->
-              (ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs)
-          | _ -> ("", attrs) in
-        let raw_element_value = raw_element.me_value in
-        (* Replace projections with their real name *)
-        let raw_element_value =
-          replace_projection
-            (fun x -> (recover_name list_projs pm x).men_name)
-            raw_element_value in
-        (* Remove some specific record field related to the front-end language.
-           This function is registered. *)
-        let attrs, raw_element_value =
-          Opt.get_def default_remove_field !remove_field_fun
-            (attrs, raw_element_value) in
-        (* Transform value flattened by eval_match (one field record) back to
-           records *)
-        let attrs, raw_element_value =
-          readd_one_fields ~attrs raw_element_value in
-        let model_element =
-          { me_name= construct_name (get_model_trace_string ~name ~attrs) attrs
-          ; me_value= raw_element_value
-          ; me_location= t.t_loc
-          ; me_term= Some t } in
-        let model = add_to_model ~vc_term_attrs:pm.Printer.vc_term_attrs model model_element in
-        let model =
-          match internal_loc t with
-          | None -> model
-          | me_location -> add_to_model ~vc_term_attrs:pm.Printer.vc_term_attrs model {model_element with me_location} in
-        (* Here we create the same element for all its possible locations (given
-           by attribute vc:written).
-        *)
-        Sattr.fold
-          (fun attr model ->
-            let loc = Ident.extract_written_loc attr in
-            if loc = None then model
-            else add_to_model ~vc_term_attrs:pm.Printer.vc_term_attrs model {model_element with me_location=loc})
-          attrs model
-      with Not_found -> model)
-    Mstr.empty raw_model
+(** Build the model by replacing projections and restore single field records in the model
+   elements, and adding the element at all relevant locations *)
+let build_model_rec pm (elts: model_element list) : model_files =
+  let add_with_loc ~vc_term_attrs model_elt loc model =
+    match loc with
+    | None -> model
+    | me_location -> add_to_model ~vc_term_attrs {model_elt with me_location} model in
+  let list_projs = list_projs pm and vc_term_attrs = pm.Printer.vc_term_attrs in
+  let process_me me =
+    assert (me.me_location = None && me.me_term = None);
+    let aux t =
+      let attrs = Sattr.union me.me_name.men_attrs t.t_attrs in
+      let name, attrs = match t.t_node with
+        | Tapp (ls, []) -> ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
+        | _ -> "", attrs in
+      (* Replace projections with their real name *)
+      let me_value = replace_projection
+          (fun s -> (recover_name pm list_projs s).men_name)
+          me.me_value in
+      (* Remove some specific record field related to the front-end language.
+         This function is registered. *)
+      let attrs, me_value = !remove_field (attrs, me_value) in
+      (* Transform value flattened by eval_match (one field record) back to records *)
+      let attrs, me_value = read_one_fields ~attrs me_value in
+      let me_name = create_model_element_name (get_model_trace_string ~name ~attrs) attrs in
+      {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
+    Opt.map aux (Mstr.find_opt me.me_name.men_name pm.queried_terms) in
+  (** Add a model element at the relevant locations *)
+  let add_model_elt model me =
+    let model = add_to_model ~vc_term_attrs me model in
+    let model = add_with_loc ~vc_term_attrs me (internal_loc (Opt.get me.me_term)) model in
+    let add_written_loc a =
+      add_with_loc ~vc_term_attrs me (Ident.extract_written_loc a) in
+    Sattr.fold add_written_loc me.me_name.men_attrs model in
+  List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
 
-let handle_contradictory_vc model_files vc_term_loc =
+let handle_contradictory_vc pm model_files =
   (* The VC is contradictory if the location of the term that triggers VC
      was collected, model_files is not empty, and there are no model elements
      in this location.
      If this is the case, add model element saying that VC is contradictory
      to this location. *)
-  if model_files = empty_model then
+  if Mstr.is_empty model_files then
     (* If the counterexample model was not collected, then model_files
        is empty and this does not mean that VC is contradictory. *)
     model_files
-  else
-    match vc_term_loc with
+  else match pm.Printer.vc_term_loc with
     | None -> model_files
     | Some pos ->
         let filename, line_number, _, _ = Loc.get pos in
         let model_file = get_model_file model_files filename in
-        let model_elements = get_elements model_file line_number in
-        if model_elements = [] then
-          (* The vc is contradictory, add special model element  *)
-          let me_name =
-            { men_name= "the check fails with all inputs"
-            ; men_kind= Error_message
-            ; men_attrs= Sattr.empty } in
-          let me =
-            { me_name
-            ; me_value= Unparsed ""
-            ; me_location= Some pos
-            ; me_term= None } in
-          add_to_model model_files me
-        else model_files
+        match get_elements model_file line_number with
+        | [] ->
+            (* The vc is contradictory, add special model element  *)
+            let me = {
+              me_name= {
+                men_name= "the check fails with all inputs";
+                men_kind= Error_message;
+                men_attrs= Sattr.empty;
+              };
+              me_value= Unparsed "";
+              me_location= Some pos;
+              me_term= None;
+            } in
+            add_to_model me model_files
+        | _ -> model_files
 
-let build_model raw_model pm : model =
-  let list_projs = Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_projections pm.list_fields in
-  let model_files = build_model_rec raw_model pm list_projs in
-  let model_files = handle_contradictory_vc model_files pm.Printer.vc_term_loc in
-  { model_files; vc_term_loc = pm.Printer.vc_term_loc; vc_term_attrs = pm.Printer.vc_term_attrs }
+let build_model pm raw_model =
+  let model_files = build_model_rec pm raw_model in
+  let model_files = handle_contradictory_vc pm model_files in
+  { model_files; vc_term_loc= pm.Printer.vc_term_loc; vc_term_attrs= pm.Printer.vc_term_attrs }
 
 (*
 ***************************************************************
@@ -1026,7 +967,7 @@ let model_for_positions_and_decls model ~positions =
   (* Start with empty model and add locations from model that
      are in locations *)
   let model_filtered =
-    List.fold_left (add_loc model.model_files) empty_model positions in
+    List.fold_left (add_loc model.model_files) empty_model_files positions in
   (* For each file add mapping corresponding to the first line of the
      counter-example from model to model_filtered.
      This corresponds to function declarations *)
@@ -1051,10 +992,10 @@ let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s) ;
   Hstr.replace model_parsers s (desc, p)
 
-let lookup_model_parser s input pm =
+let lookup_model_parser s pm input =
   let _, raw_model_parser = Hstr.find_exn model_parsers (UnknownModelParser s) s in
-  let raw_model = raw_model_parser pm input in
-  build_model raw_model pm
+  let raw_model = raw_model_parser pm input in (* For example, Smtv2_model_parser.parse for "smtv2" *)
+  build_model pm raw_model
 
 let list_model_parsers () =
   Hstr.fold (fun k (desc, _) acc -> (k, desc) :: acc) model_parsers []
