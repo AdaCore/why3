@@ -23,51 +23,8 @@ let config : Whyconf.config =
 let main : Whyconf.main = Whyconf.get_main config
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 open Ptree
+open Ptree_helpers
 (* END{buildenv} *)
-
-(* BEGIN{helper1} *)
-let mk_ident s = { id_str = s; id_ats = []; id_loc = Loc.dummy_position }
-
-let mk_qualid l =
-  let rec aux l =
-    match l with
-      | [] -> assert false
-      | [x] -> Qident(mk_ident x)
-      | x::r -> Qdot(aux r,mk_ident x)
-  in
-  aux (List.rev l)
-
-let use_import l =
-  let qid_id_opt = (mk_qualid l, None) in
-  Duseimport(Loc.dummy_position,false,[qid_id_opt])
-
-let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
-
-let mk_term t = { term_desc = t; term_loc = Loc.dummy_position }
-
-let mk_pat p = { pat_desc = p; pat_loc = Loc.dummy_position }
-let pat_var id = mk_pat (Pvar id)
-
-let mk_var id = mk_term (Tident id)
-
-let param0 = [Loc.dummy_position, None, false, Some (PTtuple [])]
-let param1 id ty = [Loc.dummy_position, Some id, false, Some ty]
-
-let mk_const i =
-  Constant.(ConstInt Number.{ il_kind = ILitDec; il_int = BigInt.of_int i })
-
-let mk_tconst i = mk_term (Tconst (mk_const i))
-
-let mk_econst i = mk_expr (Econst (mk_const i))
-
-let mk_tapp f l = mk_term (Tidapp(f,l))
-
-let mk_eapp f l = mk_expr (Eidapp(f,l))
-
-let mk_eapply e1 e2 = mk_expr (Eapply(e1,e2))
-
-let mk_evar x = mk_expr(Eident x)
-(* END{helper1} *)
 
 (* declaration of
   BEGIN{source1}
@@ -81,19 +38,20 @@ end
 (* BEGIN{code1} *)
 let mod_M1 =
   (* use int.Int *)
-  let use_int_Int = use_import (["int";"Int"]) in
+  let use_int_Int = use ~import:false (["int";"Int"]) in
   (* goal g : 2 + 2 = 4 *)
   let g =
-    let two = mk_tconst 2 in
-    let four = mk_tconst 4 in
-    let add_int = mk_qualid ["Int";Ident.op_infix "+"] in
-    let two_plus_two = mk_tapp add_int [two ; two] in
-    let eq_int = mk_qualid ["Int";Ident.op_infix "="] in
-    let goal_term = mk_tapp eq_int  [four ; two_plus_two] in
-    Dprop(Decl.Pgoal,mk_ident "g",goal_term)
+    let two = tconst 2 in
+    let four = tconst 4 in
+    let add_int = qualid ["Int";Ident.op_infix "+"] in
+    let two_plus_two = tapp add_int [two ; two] in
+    let eq_int = qualid ["Int";Ident.op_infix "="] in
+    let goal_term = tapp eq_int  [four ; two_plus_two] in
+    Dprop(Decl.Pgoal, ident "g", goal_term)
   in
-  (mk_ident "M1",[use_int_Int ; g])
+  (ident "M1",[use_int_Int ; g])
 (* END{code1} *)
+
 
 (* declaration of
   BEGIN{source2}
@@ -107,20 +65,20 @@ end
  *)
 
 (* BEGIN{code2} *)
-let eq_symb = mk_qualid [Ident.op_infix "="]
-let int_type_id = mk_qualid ["int"]
+let eq_symb = qualid [Ident.op_infix "="]
+let int_type_id = qualid ["int"]
 let int_type = PTtyapp(int_type_id,[])
-let mul_int = mk_qualid ["Int";Ident.op_infix "*"]
+let mul_int = qualid ["Int";Ident.op_infix "*"]
 
 let mod_M2 =
   (* use int.Int *)
-  let use_int_Int = use_import (["int";"Int"]) in
+  let use_int_Int = use ~import:false (["int";"Int"]) in
   (* f *)
   let f =
-    let id_x = mk_ident "x" in
-    let pre = mk_tapp eq_symb [mk_var (Qident id_x); mk_tconst 6] in
-    let result = mk_ident "result" in
-    let post = mk_tapp eq_symb [mk_var (Qident result); mk_tconst 42] in
+    let id_x = ident "x" in
+    let pre = tapp eq_symb [tvar (Qident id_x); tconst 6] in
+    let result = ident "result" in
+    let post = tapp eq_symb [tvar (Qident result); tconst 42] in
     let spec = {
       sp_pre = [pre];
       sp_post = [Loc.dummy_position,[pat_var result,post]];
@@ -134,14 +92,14 @@ let mod_M2 =
       sp_partial = false;
     }
     in
-    let body = mk_eapp mul_int [mk_evar (Qident id_x); mk_econst 7] in
+    let body = eapp mul_int [evar (Qident id_x); econst 7] in
     let f =
-      Efun(param1 id_x int_type, None, mk_pat Pwild,
+      Efun(one_binder ~pty:int_type "x", None, pat Pwild,
            Ity.MaskVisible, spec, body)
     in
-    Dlet(mk_ident "f",false,Expr.RKnone, mk_expr f)
+    Dlet(ident "f",false,Expr.RKnone, expr f)
   in
-  (mk_ident "M2",[use_int_Int ; f])
+  (ident "M2",[use_int_Int ; f])
 (* END{code2} *)
 
 
@@ -157,17 +115,17 @@ end
  *)
 
 (* BEGIN{code3} *)
-let ge_int = mk_qualid ["Int";Ident.op_infix ">="]
+let ge_int = qualid ["Int";Ident.op_infix ">="]
 
 let mod_M3 =
   (* use int.Int *)
-  let use_int_Int = use_import (["int";"Int"]) in
+  let use_int_Int = use ~import:false (["int";"Int"]) in
   (* use ref.Ref *)
-  let use_ref_Ref = use_import (["ref";"Ref"]) in
+  let use_ref_Ref = use ~import:false (["ref";"Ref"]) in
   (* f *)
   let f =
-    let result = mk_ident "result" in
-    let post = mk_term(Tidapp(ge_int,[mk_var (Qident result);mk_tconst 0])) in
+    let result = ident "result" in
+    let post = term(Tidapp(ge_int,[tvar (Qident result);tconst 0])) in
     let spec = {
       sp_pre = [];
       sp_post = [Loc.dummy_position,[pat_var result,post]];
@@ -182,17 +140,17 @@ let mod_M3 =
     }
     in
     let body =
-      let e1 = mk_eapply (mk_evar (mk_qualid ["Ref";"ref"])) (mk_econst 42) in
-      let id_x = mk_ident "x" in
-      let qid = mk_qualid ["Ref";Ident.op_prefix "!"] in
-      let e2 = mk_eapply (mk_evar qid) (mk_evar (Qident id_x)) in
-      mk_expr(Elet(id_x,false,Expr.RKnone,e1,e2))
+      let e1 = eapply (evar (qualid ["Ref";"ref"])) (econst 42) in
+      let id_x = ident "x" in
+      let qid = qualid ["Ref";Ident.op_prefix "!"] in
+      let e2 = eapply (evar qid) (evar (Qident id_x)) in
+      expr(Elet(id_x,false,Expr.RKnone,e1,e2))
     in
-    let f = Efun(param0,None,mk_pat Pwild,Ity.MaskVisible,spec,body)
+    let f = Efun(unit_binder (),None,pat Pwild,Ity.MaskVisible,spec,body)
     in
-    Dlet(mk_ident "f",false,Expr.RKnone, mk_expr f)
+    Dlet(ident "f",false,Expr.RKnone, expr f)
   in
-  (mk_ident "M3",[use_int_Int ; use_ref_Ref ; f])
+  (ident "M3",[use_int_Int ; use_ref_Ref ; f])
 (* END{code3} *)
 
 (* declaration of
@@ -208,32 +166,32 @@ end
 
 (* BEGIN{code4} *)
 
-let array_int_type = PTtyapp(mk_qualid ["Array";"array"],[int_type])
+let array_int_type = PTtyapp(qualid ["Array";"array"],[int_type])
 
-let length = mk_qualid ["Array";"length"]
+let length = qualid ["Array";"length"]
 
-let array_get = mk_qualid ["Array"; Ident.op_get ""]
+let array_get = qualid ["Array"; Ident.op_get ""]
 
-let array_set = mk_qualid ["Array"; Ident.op_set ""]
+let array_set = qualid ["Array"; Ident.op_set ""]
 
 let mod_M4 =
   (* use int.Int *)
-  let use_int_Int = use_import (["int";"Int"]) in
+  let use_int_Int = use ~import:false (["int";"Int"]) in
   (* use array.Array *)
-  let use_array_Array = use_import (["array";"Array"]) in
+  let use_array_Array = use ~import:false (["array";"Array"]) in
   (* use f *)
   let f =
-    let id_a = mk_ident "a" in
+    let id_a = ident "a" in
     let pre =
-      mk_tapp ge_int [mk_tapp length [mk_var (Qident id_a)]; mk_tconst 1]
+      tapp ge_int [tapp length [tvar (Qident id_a)]; tconst 1]
     in
     let post =
-      mk_tapp eq_symb [mk_tapp array_get [mk_var (Qident id_a); mk_tconst 0];
-                       mk_tconst 42]
+      tapp eq_symb [tapp array_get [tvar (Qident id_a); tconst 0];
+                       tconst 42]
     in
     let spec = {
       sp_pre = [pre];
-      sp_post = [Loc.dummy_position,[mk_pat Pwild,post]];
+      sp_post = [Loc.dummy_position,[pat Pwild,post]];
       sp_xpost = [];
       sp_reads = [];
       sp_writes = [];
@@ -245,14 +203,14 @@ let mod_M4 =
     }
     in
     let body =
-      mk_eapp array_set [mk_evar (Qident id_a); mk_econst 0; mk_econst 42]
+      eapp array_set [evar (Qident id_a); econst 0; econst 42]
     in
-    let f = Efun(param1 id_a array_int_type,
-                 None,mk_pat Pwild,Ity.MaskVisible,spec,body)
+    let f = Efun(one_binder ~pty:array_int_type "a",
+                 None,pat Pwild,Ity.MaskVisible,spec,body)
     in
-    Dlet(mk_ident "f", false, Expr.RKnone, mk_expr f)
+    Dlet(ident "f", false, Expr.RKnone, expr f)
   in
-  (mk_ident "M4",[use_int_Int ; use_array_Array ; f])
+  (ident "M4",[use_int_Int ; use_array_Array ; f])
 (* END{code4} *)
 
 (* The following example is not in the manual
@@ -267,44 +225,92 @@ module M5
 end
 *)
 
-let mod_M5 =
+let mod_M45 =
   (* use int.Int *)
-  let use_int_Int = use_import (["int";"Int"]) in
+  let use_int_Int = use ~import:false (["int";"Int"]) in
   (* scope S *)
   let scope_S =
     (* f *)
     let f =
       let logic = {
         ld_loc = Loc.dummy_position;
-        ld_ident = mk_ident "f";
-        ld_params = [(Loc.dummy_position,Some (mk_ident "x"),false,int_type)] ;
+        ld_ident = ident "f";
+        ld_params = [(Loc.dummy_position,Some (ident "x"),false,int_type)] ;
         ld_type = Some int_type;
-        ld_def = Some (mk_var (Qident (mk_ident "x"))) ;
+        ld_def = Some (tvar (Qident (ident "x"))) ;
       } in
       Dlogic([logic])
     in
-    Dscope(Loc.dummy_position,false,mk_ident "S",[f])
+    Dscope(Loc.dummy_position,false,ident "S",[f])
   in
   (* import S *)
-  let import_S = Dimport (mk_qualid ["S"]) in
+  let import_S = Dimport (qualid ["S"]) in
   (* goal g : f 2 = 2 *)
   let g =
-    let two = mk_tconst 2 in
-    let eq_int = mk_qualid ["Int";Ident.op_infix "="] in
-    let f_of_two = mk_tapp (mk_qualid ["f"]) [two] in
-    let goal_term = mk_tapp eq_int [f_of_two ; two] in
-    Dprop(Decl.Pgoal,mk_ident "g",goal_term)
+    let two = tconst 2 in
+    let eq_int = qualid ["Int";Ident.op_infix "="] in
+    let f_of_two = tapp (qualid ["f"]) [two] in
+    let goal_term = tapp eq_int [f_of_two ; two] in
+    Dprop(Decl.Pgoal,ident "g",goal_term)
   in
-  (mk_ident "M5",[use_int_Int ; scope_S ; import_S ; g])
+  (ident "M45",[use_int_Int ; scope_S ; import_S ; g])
 
 (* BEGIN{getmodules} *)
 let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4]
 (* END{getmodules} *)
 
+open Format
+
+let () = printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+
+(* BEGIN{topdownf} *)
+let mlw_file =
+  let uc = F.create () in
+  let uc = F.begin_module uc "M5" in
+  let uc = F.use uc ~import:false ["int";"Int"] in
+  let uc = F.use uc ~import:false ["array";"Array"] in
+  let uc = F.begin_let uc "f" (one_binder ~pty:array_int_type "a") in
+  let id_a = Qident (ident "a") in
+  let pre = tapp ge_int [tapp length [tvar id_a]; tconst 1] in
+  let uc = F.add_pre uc pre in
+  let post =
+    tapp eq_symb [tapp array_get [tvar id_a; tconst 0];
+                  tconst 42]
+  in
+  let uc = F.add_post uc post in
+  let body = eapp array_set [evar id_a; econst 0; econst 42] in
+  let uc = F.add_body uc body in
+  let uc = F.end_module uc in
+  F.get_mlw_file uc
+(* END{topdownf} *)
+
+let () = printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+
+(* BEGIN{topdowni} *)
+let mlw_file =
+  I.begin_module "M6";
+  I.use ~import:false ["int";"Int"];
+  I.use ~import:false ["array";"Array"];
+  I.begin_let "f" (one_binder ~pty:array_int_type "a");
+  let id_a = Qident (ident "a") in
+  let pre = tapp ge_int [tapp length [tvar id_a]; tconst 1] in
+  I.add_pre pre;
+  let post =
+    tapp eq_symb [tapp array_get [tvar id_a; tconst 0];
+                  tconst 42]
+  in
+  I.add_post post;
+  let body = eapp array_set [evar id_a; econst 0; econst 42] in
+  I.add_body body;
+  I.end_module ();
+  I.get_mlw_file ()
+(* END{topdowni} *)
+
+
 (* Printing back the mlw file *)
 
 (* BEGIN{mlwprinter} *)
-let () = Format.printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+let () = printf "%a@." Mlw_printer.pp_mlw_file mlw_file
 (* END{mlwprinter} *)
 
 (* BEGIN{typemodules} *)
@@ -316,8 +322,8 @@ let _mods =
   try
     Typing.type_mlw_file env [] "myfile.mlw" mlw_file
   with Loc.Located (loc, e) -> (* A located exception [e] *)
-    let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
-    Format.printf "%a@."
+    let msg = asprintf "%a" Exn_printer.exn_printer e in
+    printf "%a@."
       (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
       mlw_file;
     exit 1
@@ -335,15 +341,7 @@ let my_tasks : Task.task list =
       mods []
   in List.rev mods
 
-open Format
 
-let () =
-  printf "Tasks are:@.";
-  let _ =
-    List.fold_left
-      (fun i t -> printf "Task %d: %a@." i Pretty.print_task t; i+1)
-      1 my_tasks
-  in ()
 
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
@@ -386,6 +384,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "ocamlfind ocaml ../../lib/why3/why3.cma mlw_tree.ml"
+compile-command: "make -C ../.. test-api-mlw_tree"
 End:
 *)

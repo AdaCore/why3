@@ -247,7 +247,8 @@ endif
 LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
               c ocaml cakeml
 
-LIB_PARSER = ptree glob typing parser_messages parser typing report lexer mlw_printer
+LIB_PARSER = ptree ptree_helpers glob typing \
+		parser_messages parser typing report lexer mlw_printer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper detect_polymorphism reduction_engine compute \
@@ -1976,7 +1977,7 @@ MODULESTODOC = \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task core/trans core/pretty core/printer \
 	core/model_parser \
-	parser/typing parser/mlw_printer \
+	parser/ptree_helpers parser/typing parser/mlw_printer \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
 	session/session_itp session/controller_itp \
