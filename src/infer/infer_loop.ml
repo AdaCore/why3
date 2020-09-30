@@ -52,6 +52,8 @@ let ai_ops a b b' c d e f g =
    put_expr_with_pre = d; eval_fixpoints = e; domain_to_term  = f;
    add_variable      = g}
 
+let apply_to_inv = ref (fun _ -> ())
+
 let infer_with_ops ai_ops e cty =
   let cfg = ai_ops.start_cfg () in
   let context = ai_ops.empty_context () in
@@ -67,6 +69,7 @@ let infer_with_ops ai_ops e cty =
     let t    = Term.t_attr_add (Ident.create_attribute expl) t in
     (e,t) in
   let invs = List.map domain2term fixp in
+  !apply_to_inv invs;
   if Debug.test_flag print_inferred_invs then begin
       Format.printf "### Debug: inferred invariants ###@\n";
       let print_i (_,t) = Format.printf "%a@\n" Pretty.print_term t in
@@ -142,5 +145,7 @@ let infer_loops attrs env tkn mkn e cty =
   else if Debug.test_flag infer_flag then
     infer_loops_for_dom env tkn mkn e cty
   else []
+
+let register_hook f = apply_to_inv := f
 
 let () = Vc.set_infer_invs infer_loops
