@@ -1863,6 +1863,9 @@ endif
 
 bench-api: $(addprefix test-api-, $(APITESTS))
 
+clean::
+	rm -rf bench/infer/*.out
+
 ###############
 # test targets
 ###############
