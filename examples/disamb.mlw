@@ -37,6 +37,9 @@ goal pep2 : pe' (Cons INT (Cons PLUS (Cons INT (Cons PLUS (Cons INT Nil)))))
 
 (** Show that the two predicates recognize the same expressions. *)
 
+(** Strengthen the disambiguation_included formula, making sure the pt predicate
+    appears. *)
+
 let rec lemma di_str (n : int)
     variant { n }
     ensures { forall e. (length e <= n /\ pt e) \/ (length e < n /\ pe' e) ->
@@ -52,22 +55,26 @@ let lemma disambiguation_included (e : list token)
     =
     di_str (length e + 1)
 
+(** Strengthen the original_included formula and prove it by using mutal
+    recursion (showing that we can decompose an expression w.r.t its last
+    toplevel PLUS symbol). *)
+
 let rec lemma oi_str (n : int) (ghost m : int)
     variant { n, m }
     requires { m > n }
     ensures { forall e. length e <= n -> pe e -> pe' e }
-    = if n > 0 then (destr_last_plus n (m-1); oi_str (n-1) m)
+    = if n > 0 then (decomp_last_plus n (m-1); oi_str (n-1) m)
 
-with ghost destr_last_plus (n : int) (ghost m : int)
+with ghost decomp_last_plus (n : int) (ghost m : int)
      variant { n, m }
      requires { m >= n }
      ensures { forall e. length e <= n -> pe e -> not pt e ->
      	       exists e1 e2. pe e1 /\ pt e2 /\ e = e1 ++ Cons PLUS e2 }
      =
-     if n>0 then (destr_last_plus (n-1) n; oi_str (n-1) n)
+     if n > 0 then (decomp_last_plus (n-1) n; oi_str (n-1) n)
 
 lemma original_included :
       forall e. pe e -> pe' e
 
 lemma original_equiv_disambiguation :
-	forall e. pe e <-> pe' e
+      forall e. pe e <-> pe' e
