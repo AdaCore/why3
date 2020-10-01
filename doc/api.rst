@@ -872,10 +872,11 @@ the JSON output as follows:
    :end-before: END{ce_callprover}
 
 
-%%% Local Variables:
-%%% mode: flyspell
-%%% ispell-local-dictionary: "american"
-%%% End:
-
-LocalWords:  prover untyped disjunction programmatically invariants
-LocalWords:  uncommented OCaml AST
+..
+   The following is supposed to be a comment for Sphinx
+   Local Variables:
+   mode: flyspell
+   ispell-local-dictionary: "american"
+   End:
+   LocalWords:  prover provers untyped disjunction programmatically invariants
+   LocalWords:  uncommented OCaml AST
