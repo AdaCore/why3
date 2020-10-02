@@ -114,7 +114,7 @@ let do_input f =
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
   with Contr (ctx, term) ->
-    printf "%a@." (report_cntr expr) (ctx, term) ;
+    printf "%a@." report_cntr_body (ctx, term) ;
     exit 1
 
 let () =

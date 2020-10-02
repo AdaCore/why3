@@ -945,14 +945,17 @@ let pp_vsenv pp_value fmt =
   let delims = Pp.(nothing, nothing) and sep = Pp.comma in
   fprintf fmt "%a" (pp_bindings ~delims ~sep print_vs pp_value)
 
-let report_cntr fmt (ctx, msg, term) =
+let report_cntr_body fmt (ctx, term) =
   let cmp_vs (vs1, _) (vs2, _) =
     String.compare vs1.vs_name.id_string vs2.vs_name.id_string in
   let mvs = t_freevars Mvs.empty term in
-  fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
   fprintf fmt "@[<hv2>- Term: %a@]@," print_term term ;
   fprintf fmt "@[<hv2>- Variables: %a@]" (pp_vsenv print_value)
-    (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_env.vsenv)));
+    (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_env.vsenv)))
+
+let report_cntr fmt (ctx, msg, term) =
+  fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
+  report_cntr_body fmt (ctx, term);
   fprintf fmt "@]"
 
 let cntr_ctx desc ?trigger_loc env =
@@ -1099,7 +1102,7 @@ let bind_univ_quant_vars_ce_model = false
 let bind_univ_quant_vars_default = false
 
 (* Get the value of a vsymbol from the CE-model, a default value *)
-let get_value env vs =
+let get_value_for_quant_var env vs =
   match vs.vs_name.id_loc with
   | None -> None
   | Some loc ->
@@ -1108,18 +1111,16 @@ let get_value env vs =
           match get_model_value env.rac.ce_model vs.vs_name.id_string loc with
           | Some mv ->
               let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) mv in
-              Debug.dprintf debug_rac "Bind value for all-quantified variable %a to %a@." print_vs vs print_value v;
+              Debug.dprintf debug_rac "Bind model value for all-quantified variable %a to %a@." print_vs vs print_value v;
               Some v
           | _ -> None
         else None in
       if value <> None then value else
       if bind_univ_quant_vars_default then (
         let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
-        Debug.dprintf debug_rac "Use default value for quantified variable %a: %a@." print_vs vs print_value v;
+        Debug.dprintf debug_rac "Use default value for all-quantified variable %a: %a@." print_vs vs print_value v;
         Some v
-      ) else (
-        Debug.dprintf debug_rac "No value for all-quantified variable %a@." print_vs vs;
-        None )
+      ) else None
 
 (** When the task goal is [forall vs* . t], add declarations to the task that bind the
    variables [vs*] to concrete values (from the CE-model or default values), and make [t]
@@ -1128,11 +1129,11 @@ let bind_univ_quant_vars env task =
   try match (Task.task_goal_fmla task).t_node with
     | Tquant (Tforall, tq) ->
         let vs, _, t = t_open_quant tq in
-        let values = List.map (fun vs -> Opt.get_exn Exit (get_value env vs)) vs in
+        let values = List.map (fun vs -> Opt.get_exn Exit (get_value_for_quant_var env vs)) vs in
         let _, task = Task.task_separate_goal task in
         let task, ls_mt, ls_mv = List.fold_right2 (bind_value env.env) vs values (task, Mtv.empty, Mvs.empty) in
-        let t = t_ty_subst ls_mt ls_mv t in
         let prs = Decl.create_prsymbol (id_fresh "goal") in
+        let t = t_ty_subst ls_mt ls_mv t in
         Task.add_prop_decl task Decl.Pgoal prs t
     | _ -> raise Exit
   with Exit -> task
@@ -2074,5 +2075,5 @@ let report_eval_result body fmt (res, final_env) =
       fprintf fmt "@[<hov2>Execution error: %a@]@," print_logic_result res ;
       fprintf fmt "@[globals:@ %a@]" (pp_vsenv print_value) (Mvs.bindings final_env)
 
-let report_cntr _body fmt (ctx, term) =
-  report_cntr fmt (ctx, "failed", term)
+let report_cntr fmt (ctx, term) =
+  report_cntr fmt (ctx, "has failed", term)

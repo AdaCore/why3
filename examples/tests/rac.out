@@ -3,9 +3,8 @@
 ** Local.test1
 Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 Assertion is ok at examples/tests/rac.mlw, line 7, characters 13-19
-<rac>Use default value for all-quantified y: 0
 Assertion is ok at examples/tests/rac.mlw, line 8, characters 13-37
-Assertion failed at examples/tests/rac.mlw, line 9, characters 13-18
+Assertion has failed at examples/tests/rac.mlw, line 9, characters 13-18
 - Term: x = 0
 - Variables: x -> 1
 ** Local.test2
@@ -21,7 +20,7 @@ Postcondition of Tuple0 is ok at command line expression to execute, line 1, cha
 Postcondition of ref'mk is ok
 Postcondition of ref is ok at examples/tests/rac.mlw, line 18, characters 16-17
 Assertion is ok at examples/tests/rac.mlw, line 19, characters 13-19
-Assertion failed at examples/tests/rac.mlw, line 20, characters 13-19
+Assertion has failed at examples/tests/rac.mlw, line 20, characters 13-19
 - Term: contents x > 10
 - Variables: x -> (ref'mk 1)
 ** Local.test4
@@ -51,7 +50,7 @@ globals: x -> (ref'mk 1), y -> (ref'mk 0)
 Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 Assertion is ok at examples/tests/rac.mlw, line 57, characters 13-27
 Assertion is ok at examples/tests/rac.mlw, line 58, characters 13-30
-Assertion failed at examples/tests/rac.mlw, line 59, characters 13-35
+Assertion has failed at examples/tests/rac.mlw, line 59, characters 13-35
 - Term: f1_aux 0 = ((f1_aux' @ 0) @ 1)
 - Variables: 
 ** Functions.test2
@@ -61,7 +60,7 @@ result: () = ()
 globals: x -> (ref'mk 0)
 ** Functions.test3a
 Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 7-9
-Precondition of test3_aux failed at examples/tests/rac.mlw, line 71, characters 4-15
+Precondition of test3_aux has failed at examples/tests/rac.mlw, line 71, characters 4-15
 - Defined at examples/tests/rac.mlw, line 66, characters 15-20
 - Term: y > 0
 - Variables: y -> 0
@@ -73,14 +72,14 @@ Postcondition of test3_aux is ok at examples/tests/rac.mlw, line 74, characters 
 - Defined at examples/tests/rac.mlw, line 67, characters 14-24
 Precondition of test3_aux is ok at examples/tests/rac.mlw, line 75, characters 4-15
 - Defined at examples/tests/rac.mlw, line 66, characters 15-20
-Postcondition of test3_aux failed at examples/tests/rac.mlw, line 75, characters 4-15
+Postcondition of test3_aux has failed at examples/tests/rac.mlw, line 75, characters 4-15
 - Defined at examples/tests/rac.mlw, line 67, characters 14-24
 - Term: result = 1
 - Variables: result -> 2
 ** Functions.test4
 Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 Postcondition of Tuple0 is ok at examples/tests/rac.mlw, line 85, characters 18-20
-Exceptional postcondition of test4_aux failed at examples/tests/rac.mlw, line 85, characters 8-20
+Exceptional postcondition of test4_aux has failed at examples/tests/rac.mlw, line 85, characters 8-20
 - Defined at examples/tests/rac.mlw, line 80, characters 20-25
 - Term: j = contents x
 - Variables: j -> 42, x -> (ref'mk 1)
@@ -92,7 +91,7 @@ Postcondition of test5_aux is ok at examples/tests/rac.mlw, line 93, characters 
 - Defined at examples/tests/rac.mlw, line 89, characters 14-27
 Postcondition of contents is ok at examples/tests/rac.mlw, line 90, characters 9-10
 Postcondition of (+) is ok at examples/tests/rac.mlw, line 90, characters 9-14
-Postcondition of test5_aux failed at examples/tests/rac.mlw, line 94, characters 4-15
+Postcondition of test5_aux has failed at examples/tests/rac.mlw, line 94, characters 4-15
 - Defined at examples/tests/rac.mlw, line 89, characters 14-27
 - Term: contents x = (contents x1 + 1)
 - Variables: x -> (ref'mk 3), x1 -> (ref'mk 1)
@@ -105,7 +104,7 @@ Precondition of test6_aux is ok at examples/tests/rac.mlw, line 104, characters 
 Postcondition of contents is ok at examples/tests/rac.mlw, line 100, characters 4-5
 Postcondition of test6_aux is ok at examples/tests/rac.mlw, line 104, characters 12-26
 - Defined at examples/tests/rac.mlw, line 98, characters 14-24
-Precondition of test6_aux failed at examples/tests/rac.mlw, line 105, characters 12-26
+Precondition of test6_aux has failed at examples/tests/rac.mlw, line 105, characters 12-26
 - Defined at examples/tests/rac.mlw, line 97, characters 15-21
 - Term: not contents x = y
 - Variables: x -> (ref'mk 42), y -> 42
@@ -148,7 +147,7 @@ Postcondition of (+) is ok at examples/tests/rac.mlw, line 122, characters 11-16
 Loop invariant preservation is ok at examples/tests/rac.mlw, line 121, characters 18-32
 Postcondition of contents is ok at examples/tests/rac.mlw, line 122, characters 11-12
 Postcondition of (+) is ok at examples/tests/rac.mlw, line 122, characters 11-16
-Loop invariant preservation failed at examples/tests/rac.mlw, line 121, characters 18-32
+Loop invariant preservation has failed at examples/tests/rac.mlw, line 121, characters 18-32
 - Term: contents x = 0 || contents x = 1
 - Variables: x -> (ref'mk 2)
 ** Loops.test3
@@ -188,7 +187,7 @@ Postcondition of contents is ok at examples/tests/rac.mlw, line 126, characters 
 Postcondition of (<) is ok at examples/tests/rac.mlw, line 126, characters 10-16
 Postcondition of contents is ok at examples/tests/rac.mlw, line 129, characters 11-12
 Postcondition of (+) is ok at examples/tests/rac.mlw, line 129, characters 11-16
-Loop invariant preservation failed at examples/tests/rac.mlw, line 128, characters 18-24
+Loop invariant preservation has failed at examples/tests/rac.mlw, line 128, characters 18-24
 - Term: 5 >= contents x
 - Variables: x -> (ref'mk 6)
 
@@ -282,7 +281,7 @@ result: int = 1
 globals: myref -> (ref'mk 1)
 ** PolyRefContracts.test2b
 Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 7-9
-Precondition of test2_aux failed at examples/tests/rac.mlw, line 259, characters 4-23
+Precondition of test2_aux has failed at examples/tests/rac.mlw, line 259, characters 4-23
 - Defined at examples/tests/rac.mlw, line 247, characters 15-29
 - Term: not contents argref = argx
 - Variables: argref -> (ref'mk 0), argx -> 0
@@ -293,7 +292,7 @@ Precondition of test2_aux is ok at examples/tests/rac.mlw, line 262, characters 
 Postcondition of contents is ok at examples/tests/rac.mlw, line 251, characters 4-10
 Postcondition of test2_aux is ok at examples/tests/rac.mlw, line 262, characters 4-23
 - Defined at examples/tests/rac.mlw, line 248, characters 14-27
-Postcondition of test2_aux failed at examples/tests/rac.mlw, line 262, characters 4-23
+Postcondition of test2_aux has failed at examples/tests/rac.mlw, line 262, characters 4-23
 - Defined at examples/tests/rac.mlw, line 249, characters 14-27
 - Term: result = argy
 - Variables: argy -> 2, result -> 1
@@ -324,19 +323,18 @@ Postcondition of False is ok at examples/tests/rac.mlw, line 297, characters 15-
 Precondition of update is ok at examples/tests/rac.mlw, line 297, characters 4-20
 - Defined at examples/tests/rac.mlw, line 287, characters 15-31
 Postcondition of elts is ok at examples/tests/rac.mlw, line 290, characters 22-28
-<rac>Use default value for all-quantified j: 0
 Postcondition of update is ok at examples/tests/rac.mlw, line 297, characters 4-20
 - Defined at examples/tests/rac.mlw, line 288, characters 14-77
 Postcondition of update is ok at examples/tests/rac.mlw, line 297, characters 4-20
 - Defined at examples/tests/rac.mlw, line 289, characters 14-26
 Assertion is ok at examples/tests/rac.mlw, line 298, characters 13-29
 Assertion is ok at examples/tests/rac.mlw, line 299, characters 13-28
-Assertion failed at examples/tests/rac.mlw, line 300, characters 13-29
+Assertion has failed at examples/tests/rac.mlw, line 300, characters 13-29
 - Term: (elts r @ 1) = False
 - Variables: r -> (t3'mk ({i -> 3;
                             x -> false;
-                            f -> (fun _ -> true)} fun j1 -> if j1 =' i then x
-                            else f j1)
+                            f -> (fun _ -> true)} fun j -> if j =' i then x
+                            else f j)
                    5)
 
 * PolyFunc
@@ -399,7 +397,6 @@ Postcondition of array'mk is ok at examples/tests/rac.mlw, line 336, characters 
 Postcondition of make is ok at examples/tests/rac.mlw, line 358, characters 12-21
 Postcondition of make is ok at examples/tests/rac.mlw, line 358, characters 12-21
 - Defined at examples/tests/rac.mlw, line 334, characters 14-31
-<rac>Use default value for all-quantified i: 0
 Postcondition of make is ok at examples/tests/rac.mlw, line 358, characters 12-21
 - Defined at examples/tests/rac.mlw, line 335, characters 14-55
 Postcondition of elts is ok at examples/tests/rac.mlw, line 346, characters 27-33
@@ -426,7 +423,6 @@ Postcondition of array'mk is ok at examples/tests/rac.mlw, line 336, characters 
 Postcondition of make is ok at examples/tests/rac.mlw, line 363, characters 12-21
 Postcondition of make is ok at examples/tests/rac.mlw, line 363, characters 12-21
 - Defined at examples/tests/rac.mlw, line 334, characters 14-31
-<rac>Use default value for all-quantified i: 0
 Postcondition of make is ok at examples/tests/rac.mlw, line 363, characters 12-21
 - Defined at examples/tests/rac.mlw, line 335, characters 14-55
 Assertion is ok at examples/tests/rac.mlw, line 364, characters 13-26
@@ -459,7 +455,7 @@ Postcondition of (@) is ok at examples/tests/rac.mlw, line 339, characters 41-44
 Postcondition of (@) is ok at examples/tests/rac.mlw, line 341, characters 41-49
 Postcondition of ([]) is ok at examples/tests/rac.mlw, line 372, characters 12-16
 - Defined at examples/tests/rac.mlw, line 341, characters 41-49
-Assertion failed at examples/tests/rac.mlw, line 373, characters 13-19
+Assertion has failed at examples/tests/rac.mlw, line 373, characters 13-19
 - Term: x = 11
 - Variables: x -> 0
 

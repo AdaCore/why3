@@ -130,11 +130,8 @@ val report_eval_result :
   unit
 (** Report an evaluation result *)
 
-val report_cntr :
-  Expr.expr ->
-  Format.formatter ->
-  cntr_ctx * Term.term ->
-  unit
+val report_cntr : Format.formatter -> cntr_ctx * Term.term -> unit
+val report_cntr_body : Format.formatter -> cntr_ctx * Term.term -> unit
 (** Report a contradiction context and term *)
 
 (**/**)
