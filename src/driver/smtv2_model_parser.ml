@@ -259,15 +259,16 @@ module FromSexp = struct
         Some (n, Function (al, make_local al t))
     | _ -> None
 
-  let rec search_model = function
+  let rec model = function
     | [] ->
-        Mstr.empty
+        None
     | List (Atom "model" :: decls) :: rest ->
         (* if rest <> [] then Warning.emit "Ignore trailing garbage following model"; *)
-        Mstr.of_list (Lists.map_filter decl decls)
-    | _ :: rest ->
-        (* Warning.emit "Ignore leading garbage before model"; *)
-        search_model rest
+        if rest <> [] then Warning.emit "Ignore trailing garbage following model: %a" pp_sexp (List rest);
+        Some (Mstr.of_list (Lists.map_filter decl decls))
+    | sexp :: rest ->
+        Warning.emit "Ignore leading garbage before model: %a" pp_sexp sexp;
+        model rest
 end
 
 (* Parses the model returned by CVC4 and Z3. *)
@@ -297,9 +298,8 @@ let parse_sexps str =
       (Lexing.lexeme_start lexbuf);
     raise Exit
 
-let search_model sexps =
-  try FromSexp.search_model sexps
-  with FromSexp.E (sexp', s) ->
+let model_of_sexps sexps =
+  try Opt.get_def Mstr.empty (FromSexp.model sexps) with FromSexp.E (sexp', s) ->
     Warning.emit "Error@ while@ reading@ %s@ from@ smtv2@ model:@ %a"
       s FromSexp.pp_sexp sexp';
     raise Exit
@@ -313,7 +313,7 @@ let parse pm input =
   try
     let model_string = get_model_string input in
     let sexps = parse_sexps model_string in
-    let defs = search_model sexps in
+    let defs = model_of_sexps sexps in
     Collect_data_model.create_list pm defs
   with Not_found -> []
 
