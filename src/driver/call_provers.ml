@@ -34,29 +34,35 @@ type prover_answer =
 (** See output of [ce_summary_title] for details *)
 type ce_summary = NCCE of values | SWCE of values | NCCE_SWCE of values | BAD_CE | UNKNOWN
 
-let ce_summary_title = function
+let print_ce_summary_title ?check_ce fmt = function
   | NCCE _ ->
-      "The following counterexample values reveal that the program does not "^
-      "comply with the verification goal"
+      Format.fprintf fmt
+        ("The following counterexample values reveal that the program does not "^^
+         "comply with the verification goal")
   | SWCE _ ->
-      "The following counterexample values reveal a subcontract weakness"
+      Format.fprintf fmt
+        "The following counterexample values reveal a subcontract weakness"
   | NCCE_SWCE _ ->
-      "The following counterexample values reveal a subcontract weakness "^
-      "or non-compliance between the program and the verification goal:@\n%a"
+      Format.fprintf fmt
+        ("The following counterexample values reveal a subcontract weakness "^^
+         "or non-compliance between the program and the verification goal")
   | BAD_CE ->
-      "The counterexample is bad"
+      Format.fprintf fmt
+        "The counterexample is bad"
   | UNKNOWN ->
-      "The following counterexample model has not been verified "^
-      "(missing option --check-ce, or RAC incompleteness)"
+      Format.fprintf fmt
+        "The following counterexample model has not been verified%t"
+        (fun fmt -> match check_ce with
+           | Some true -> Format.fprintf fmt " (RAC incompleteness)"
+           | Some false -> Format.fprintf fmt " (missing option --check-ce, or RAC incompleteness)"
+           | None -> ())
 
-let print_ce_summary_with_model m fmt s =
-  Pp.string fmt (ce_summary_title s);
-  match s with
+let print_ce_summary_values model fmt = function
   | NCCE vs | SWCE vs | NCCE_SWCE vs ->
       fprintf fmt (":@\n%a") print_values vs
   | UNKNOWN ->
       let me_name_trans = None and print_attrs = false in
-      fprintf fmt ":@\n%a" (print_model_human ?me_name_trans ~print_attrs) m
+      fprintf fmt ":@\n%a" (print_model_human ?me_name_trans ~print_attrs) model
   | BAD_CE -> ()
 
 let ce_summary v_concrete v_abstract = match v_concrete.verdict, v_abstract.verdict with
@@ -202,12 +208,14 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result fmt r =
+let print_prover_result ?check_ce fmt r =
   fprintf fmt "%a (%.2fs%a)." print_prover_answer r.pr_answer
     r.pr_time print_steps r.pr_steps;
   (match r.pr_model with
    | Some (m, s) when not (is_model_empty m) ->
-       fprintf fmt "@\n@[<v>%a@]" (print_ce_summary_with_model m) s
+       fprintf fmt "@\n@[<v>%a%a@]"
+         (print_ce_summary_title ?check_ce) s
+         (print_ce_summary_values m) s
    | _ -> ());
   if r.pr_answer == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s"

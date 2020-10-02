@@ -240,8 +240,9 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
                    limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
+        let check_ce = !opt_check_ce_model in
         let check_model =
-          if !opt_check_ce_model then
+          if check_ce then
             let open Pinterp in
             let trans = Compute.normalize_goal_transf_all env in
             let prover = Opt.map (rac_prover config env ~limit_time:2) !opt_rac_prover in
@@ -262,7 +263,7 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
             let expls = String.capitalize_ascii (String.concat ", " expls) in
             printf "%s from verification condition %s.@." expls goal_name );
         printf "Proover result is: %a@\n@."
-          Call_provers.(if !opt_json then print_prover_result_json else print_prover_result) res;
+          Call_provers.(if !opt_json then print_prover_result_json else print_prover_result ~check_ce) res;
         if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task

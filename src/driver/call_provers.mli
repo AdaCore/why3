@@ -36,7 +36,11 @@ type prover_answer =
 
 type ce_summary
 
-val print_ce_summary_with_model : model -> ce_summary Pp.pp
+val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
+(** Print a title for the summary of counteexamples checking. The argument [check_ce]
+   indicates if the checking counterexamples was requested. *)
+
+val print_ce_summary_values : model -> ce_summary Pp.pp
 (** Prints the summary with its values, if there is any, or the given
     model otherwise *)
 
@@ -58,10 +62,11 @@ type prover_result = {
 val print_prover_answer : Format.formatter -> prover_answer -> unit
 (** Pretty-print a {! prover_answer} *)
 
-val print_prover_result : Format.formatter -> prover_result -> unit
-(** Pretty-print a prover_result. The answer and the time are output.
-    The output of the prover is printed if and only if the answer is
-    a [HighFailure] *)
+val print_prover_result : ?check_ce:bool -> Format.formatter -> prover_result -> unit
+(** Pretty-print a prover_result. The answer and the time are output. The output of the
+   prover is printed if and only if the answer is a [HighFailure]. The argument [check_ce]
+   indicates if the checking counterexamples was requested or not, or None it cannot be
+   requested. *)
 
 val print_prover_result_json : Format.formatter -> prover_result -> unit
 
