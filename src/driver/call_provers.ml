@@ -29,7 +29,7 @@ type prover_answer =
 (* END{proveranswer} anchor for automatic documentation, do not remove *)
 
 (** See output of [ce_summary_title] for details *)
-type ce_summary = NCCE of values | SWCE of values | NCCE_SWCE of values | BAD_CE | UNKNOWN
+type ce_summary = NCCE of exec_log | SWCE of exec_log | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN
 
 let print_ce_summary_title ?check_ce fmt = function
   | NCCE _ ->
@@ -56,16 +56,16 @@ let print_ce_summary_title ?check_ce fmt = function
 
 let print_ce_summary_values model fmt = function
   | NCCE vs | SWCE vs | NCCE_SWCE vs ->
-      fprintf fmt (":@\n%a") print_values vs
+      fprintf fmt (":@\n%a") print_exec_log vs
   | UNKNOWN ->
       let me_name_trans = None and print_attrs = false in
       fprintf fmt ":@\n%a" (print_model_human ?me_name_trans ~print_attrs) model
   | BAD_CE -> ()
 
 let ce_summary v_concrete v_abstract = match v_concrete.verdict, v_abstract.verdict with
-  | Good_model, _ -> NCCE v_concrete.values
-  | Bad_model, Good_model -> SWCE v_abstract.values
-  | Dont_know, Good_model -> NCCE_SWCE v_abstract.values
+  | Good_model, _ -> NCCE v_concrete.exec_log
+  | Bad_model, Good_model -> SWCE v_abstract.exec_log
+  | Dont_know, Good_model -> NCCE_SWCE v_abstract.exec_log
   | Dont_know, Dont_know | Dont_know, Bad_model | Bad_model, Dont_know -> UNKNOWN
   | Bad_model, Bad_model -> BAD_CE
 

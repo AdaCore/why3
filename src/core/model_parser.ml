@@ -550,7 +550,7 @@ let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ?print_locs:None ~at_loc ~print_attrs ~print_model_value
+       (print_model_element ?print_locs:(Some true) ~at_loc ~print_attrs ~print_model_value
           ~me_name_trans))
     m_elements
 
@@ -1065,37 +1065,81 @@ let model_for_positions_and_decls model ~positions =
 
 type verdict = Good_model | Bad_model | Dont_know
 
-type values = (Loc.position * vsymbol * string) list
+type exec_kind = ExecAbstract | ExecConcrete | ExecPure
+
+type log_entry_desc =
+  | Val_from_model of (vsymbol * string)
+  | Exec_call of (Expr.rsymbol option * exec_kind)
+  | Failed of string
+
+type log_entry = {
+    log_desc : log_entry_desc;
+    log_loc  : Loc.position;
+}
+
+type exec_log = log_entry list
+(* new log elements are added to the head of the list *)
+
+let empty_log = []
+
+let add_log_entry log_desc log_loc exec_log = {log_desc; log_loc} :: exec_log
+
+let add_val_to_log vs v loc exec_log =
+  add_log_entry (Val_from_model (vs,v)) loc exec_log
+
+let add_call_to_log rs kind loc exec_log =
+  add_log_entry (Exec_call (rs,kind)) loc exec_log
+
+let add_failed_lo_log s loc exec_log =
+  add_log_entry (Failed s) loc exec_log
+
+let log_to_list exec_log = List.rev exec_log
+
+let exec_kind_to_string ?(cap=true) = function
+  | ExecAbstract -> if cap then "Abstract" else "abstract"
+  | ExecConcrete -> if cap then "Concrete" else "concrete"
+  | ExecPure -> if cap then "Pure" else "pure"
+
+let print_exec_log fmt entry_log =
+  let entry_log = List.rev entry_log in
+  let rec aux fmt file line = function
+    | [] -> fprintf fmt "@]@]"
+    | { log_desc; log_loc } :: rest ->
+        let f, l, _, _ = Loc.get log_loc in
+        if file <> f then (
+          if file <> "" then
+            fprintf fmt "@]@]@\n";
+          fprintf fmt "@[<v2>File %s:@\n" (Filename.basename f) );
+        if line <> l then (
+          if line <> -1 && (file = f || file = "") then
+            fprintf fmt "@]@\n";
+          fprintf fmt "@[<v2>Line %d:@\n" l )
+        else
+          fprintf fmt "@\n";
+        begin match log_desc with
+        | Val_from_model (vs, v) ->
+           fprintf fmt "%a = %s" Ident.print_decoded vs.vs_name.id_string v;
+        | Exec_call (None, k) ->
+           fprintf fmt "%s execution of lambda function"
+             (exec_kind_to_string k)
+        | Exec_call (Some rs, k) ->
+           fprintf fmt "%s execution of %s" (exec_kind_to_string k)
+             rs.rs_name.id_string
+        | _ -> failwith "not implemented yet"
+        end;
+        aux fmt f l rest in
+  fprintf fmt "@[<v>%t%t@]"
+    (fun fmt -> aux fmt "" (-1) entry_log)
+    (fun fmt ->
+       if entry_log <> [] then
+         fprintf fmt "@]")
 
 type full_verdict = {
     verdict  : verdict;
     reason   : string;
     warnings : string list;
-    values   : values; (* values taken from model during interpretation *)
+    exec_log : exec_log;
   }
-
-let print_values fmt vs =
-  let rec aux fmt file line = function
-    | [] -> ()
-    | (loc, vs, v) :: rest ->
-        let f, l, _, _ = Loc.get loc in
-        if file <> f then (
-          if file <> "" then
-            fprintf fmt "@]@\n";
-          fprintf fmt "@[<v2>File %s:@\n" (Filename.basename f) );
-        if line <> l then (
-          if line <> -1 then
-            fprintf fmt "@]@\n";
-          fprintf fmt "@[<v2>Line %d:@\n" l )
-        else
-          fprintf fmt "@\n";
-        fprintf fmt "%a = %s" Ident.print_decoded vs.vs_name.id_string v;
-        aux fmt f l rest in
-  fprintf fmt "@[<v>%t%t@]"
-    (fun fmt -> aux fmt "" (-1) vs)
-    (fun fmt ->
-       if vs <> [] then
-         fprintf fmt "@]")
 
 let print_full_verdict fmt v =
   let s = match v.verdict with
@@ -1104,7 +1148,7 @@ let print_full_verdict fmt v =
     | Dont_know -> "don't know" in
   fprintf fmt "@[<hv 2>%s (%s, %d warnings)@\n%a@]"
     s v.reason (List.length v.warnings)
-    print_values v.values
+    print_exec_log v.exec_log
 
 type check_model_result =
   | Cannot_check_model of {reason: string}

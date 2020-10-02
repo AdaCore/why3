@@ -258,15 +258,36 @@ val interleave_with_source :
 
 type verdict = Good_model | Bad_model | Dont_know
 
-type values = (Loc.position * Term.vsymbol * string) list
+type exec_kind = ExecAbstract | ExecConcrete | ExecPure
 
-val print_values : values Pp.pp
+type log_entry_desc =
+  | Val_from_model of (Term.vsymbol * string)
+  (** values taken from model during interpretation *)
+  | Exec_call of (Expr.rsymbol option * exec_kind)
+  (** executed function call, lambda if no rsymbol *)
+  | Failed of string
+  (** failed information *)
+
+type log_entry = {
+    log_desc : log_entry_desc;
+    log_loc  : Loc.position;
+}
+
+type exec_log
+
+val empty_log : exec_log
+val add_log_entry : log_entry_desc -> Loc.position -> exec_log -> exec_log
+val add_val_to_log : Term.vsymbol -> string -> Loc.position -> exec_log -> exec_log
+val add_call_to_log : Expr.rsymbol option -> exec_kind -> Loc.position -> exec_log -> exec_log
+val add_failed_lo_log : string -> Loc.position -> exec_log -> exec_log
+val log_to_list : exec_log -> log_entry list
+val print_exec_log : exec_log Pp.pp
 
 type full_verdict = {
     verdict  : verdict;
     reason   : string;
     warnings : string list;
-    values   : values;
+    exec_log : exec_log;
   }
 
 val print_full_verdict : full_verdict Pp.pp
