@@ -11,6 +11,15 @@ has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
 shopt -s nullglob
 
+if [ "$1" = "--help" ]; then
+    echo "Usage: $0 [suffix [category]]"
+    echo "where suffix is .opt or .byte or the empty string"
+    echo "and category is one of: badfiles drivers execution extraction goodfiles"
+    echo "  invalidgoals list mlwprinter rac realizations replay replay-without-shapes"
+    echo "  stdlib validgoals validsplitgoals"
+    exit 0
+fi
+
 suffix=$1
 only=${2:-"ALL"}
 
