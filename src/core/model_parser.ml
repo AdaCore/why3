@@ -21,6 +21,9 @@ let debug = Debug.register_info_flag "model_parser"
          the@ counter-example@ model."
 *)
 
+let debug_check_ce = Debug.register_info_flag "check-ce"
+    ~desc:"Debug@ info@ for@ --check-ce"
+
 (*
 ***************************************************************
 **  Counter-example model values

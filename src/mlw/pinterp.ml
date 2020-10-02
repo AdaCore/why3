@@ -1345,7 +1345,7 @@ let get_and_register_value env ?def ?ity vs loc =
   let value = match get_model_value env.rac.ce_model name loc with
     | Some v ->
        let v = import_model_value env.env env.mod_known ity v in
-       Debug.dprintf debug "@[<h>%tVALUE from ce-model: %a@]@."
+       Debug.dprintf debug_check_ce "@[<h>%tVALUE from ce-model: %a@]@."
          pp_indent print_value v;
        v
     | None ->
@@ -1353,7 +1353,7 @@ let get_and_register_value env ?def ?ity vs loc =
          | None ->
             default_value_of_type env.env env.mod_known ity
          | Some v -> v in
-       Debug.dprintf debug "@[<h>VALUE for %s %a not in ce-model, taking \
+       Debug.dprintf debug_check_ce "@[<h>VALUE for %s %a not in ce-model, taking \
                 default %a@]@." name print_loc loc print_value v;
        v
   in

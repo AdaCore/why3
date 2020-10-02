@@ -16,9 +16,6 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
-let debug_check_ce = Debug.register_info_flag "check-ce"
-    ~desc:"Debug@ info@ for@ --check-ce"
-
 (* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
   | Valid
@@ -48,7 +45,7 @@ let print_ce_summary_title ?check_ce fmt = function
          "or non-compliance between the program and the verification goal")
   | BAD_CE ->
       Format.fprintf fmt
-        "The counterexample is bad"
+        "Sorry, we don't have a good counterexample for you :("
   | UNKNOWN ->
       Format.fprintf fmt
         "The following counterexample model has not been verified%t"
@@ -265,29 +262,23 @@ let select_model check_model models =
       Debug.dprintf debug_check_ce "Check model %d (%a)@." i
         (Pp.print_option_or_default "NO LOC" Pretty.print_loc) (get_model_term_loc m);
       let mr = check_model m in
-      Debug.dprintf debug_check_ce "@[<hv 2>Model %d:@\n%a@\n@]@." i
+      Debug.dprintf debug_check_ce "@[<hv2>Model %d:@\n%a@\n@]@." i
         print_check_model_result mr;
       i,r,m,mr in
     let not_empty (i,_,m) =
       let empty = is_model_empty m in
       if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
       not empty in
-    let keep_model (_,_,_,mr) = match mr with
-      | Cannot_check_model _ -> true
-      | Check_model_result r ->
-          (* Discard models with both verdicts Bad_model *)
-          r.concrete.verdict <> Bad_model || r.abstract.verdict <> Bad_model in
     let add_ce_summary (i,r,m,mr) =
       let summary = match mr with
         | Cannot_check_model _ -> UNKNOWN
         | Check_model_result r -> ce_summary r.concrete r.abstract in
       i,r,m,mr,summary in
     List.map add_ce_summary
-      (List.filter keep_model
          (List.map check_model
             (List.filter not_empty
                (List.mapi (fun i (r,m) -> i,r,m)
-                  models)))) in
+                  models))) in
   let is_unknown (_,_,_,_,s) = s = UNKNOWN in
   let unknowns, knowns = List.partition is_unknown filtered_models in
   let model_infos =

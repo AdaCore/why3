@@ -9,6 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
+val debug_check_ce : Debug.flag
+
+
 (** {1 Counter-example model values} *)
 
 type float_type =

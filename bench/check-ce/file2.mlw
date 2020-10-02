@@ -1,0 +1,18 @@
+
+use file1.M
+
+use int.Int
+
+let f (x: int)
+  ensures { result = x + 1 }
+= incr x
+
+let g (x: int)
+  ensures { result = x + 2 }
+= incr x
+
+(* this is currently not working because there is no result at line 17
+in the model *)
+let h (x: int)
+  ensures { result = x + 2 }
+= incr_val x
