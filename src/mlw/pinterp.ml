@@ -32,17 +32,6 @@ let print_loc fmt loc =
   let f, l, b, e = Loc.get loc in
   fprintf fmt "%S, line %d, characters %d-%d" f l b e
 
-(** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
-    Relies on [get_multiline] and fails under the same conditions. *)
-let loc_contains loc1 loc2 =
-  if Loc.equal loc1 Loc.dummy_position || Loc.equal loc2 Loc.dummy_position then
-    false (* loc_contains doesn't make sense, and calling get_multiline is invalid *)
-  else
-    let f1, b1, e1 = Loc.get_multiline loc1 in
-    let f2, b2, e2 = Loc.get_multiline loc2 in
-    let le (l1, c1) (l2, c2) = l1 < l2 || (l1 = l2 && c1 <= c2) in
-    String.equal f1 f2 && le b1 b2 && le e2 e1
-
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
   let pp_binding fmt (k, v) =
@@ -350,8 +339,6 @@ type rac_reduce_config = {
 }
 
 let rac_reduce_config ?trans:rac_trans ?prover:rac_prover () = {rac_trans; rac_prover}
-
-type model_value = Loc.position * vsymbol * value
 
 type rac_config = {
   do_rac       : bool;
@@ -1956,11 +1943,6 @@ let warnings env model =
   if values_match env model then [] else
     ["Warning: RAC detected value divergence"]
 
-let loc_contains_opt oloc1 oloc2 =
-  match oloc1, oloc2 with
-  | Some loc1, Some loc2 -> loc_contains loc1 loc2
-  | _ -> false
-
 let check_model_rs rac env pm model rs =
   let open Pmodule in
   let abs_msg = if rac.rac_abstract then "abstract" else "concrete" in
@@ -1975,7 +1957,7 @@ let check_model_rs rac env pm model rs =
     {verdict= Bad_model; reason; warnings= warnings env model;
      exec_log= !(env.rac.exec_log)}
   with
-  | Contr (ctx, t) when loc_contains_opt (get_model_term_loc model) t.t_loc ->
+  | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc (get_model_term_loc model) ->
       let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
       {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
        exec_log= !(ctx.c_env.rac.exec_log)}
@@ -2003,41 +1985,80 @@ let check_model_rs rac env pm model rs =
           abs_Msg (Pp.print_option Pretty.print_loc) l in
       {verdict= Bad_model; reason; warnings= []; exec_log= !(env.rac.exec_log)}
 
-(** Identifies the rsymbol of the definition that contains the given position. Raises
-    [Not_found] if no such definition is found. **)
+(** Identifies the rsymbol of the definition that contains the given position. **)
 let find_rs pm loc =
   let open Pmodule in
   let open Pdecl in
-  let loc_of_exp e = Opt.get_def Loc.dummy_position e.e_loc in
-  let loc_of_cexp ce = match ce.c_node with
-    | Cfun e -> loc_of_exp e | _ -> Loc.dummy_position in
-  let cty_loc_contains cty loc =
-    let rec p = function
-      | {t_loc= Some loc'} -> loc_contains loc' loc
-      | {t_loc= None; t_node= Teps tb} ->
-          (* The Teps introduced for post conditions does not carry its location *)
-          p (snd (t_open_bound tb))
-      | _ -> false in
-    List.exists p (cty.cty_pre @ cty.cty_post @ List.concat (Mxs.values cty.cty_xpost)) in
-  let exception Found of Expr.rsymbol in
-  let find_pd_rec_defn rd =
-    if loc_contains (loc_of_cexp rd.rec_fun) loc || cty_loc_contains rd.rec_sym.rs_cty loc then
-      raise (Found rd.rec_sym) in
-  let find_pd_pdecl pd =
+  let rec find_in_list f = function
+    | [] -> None
+    | x :: xs -> match f x with
+      | None -> find_in_list f xs
+      | res -> res in
+  let in_t = t_any (fun t ->
+      Opt.equal Loc.equal t.t_loc (Some loc)) in
+  let in_cty cty =
+    List.exists in_t cty.cty_pre ||
+    List.exists in_t cty.cty_post ||
+    Mxs.exists (fun _ -> List.exists in_t) cty.cty_xpost in
+  let rec in_e e =
+    Opt.equal Loc.equal e.e_loc (Some loc) ||
+    match e.e_node with
+    | Evar _ | Econst _ | Eassign _ -> false
+    | Eexec (ce, cty) -> in_ce ce || in_cty cty
+    | Elet (d, e) ->
+        (match d with
+         | LDvar (_, e') -> in_e e'
+         | LDsym (rs, ce) -> in_cty rs.rs_cty || in_ce ce
+         | LDrec defs -> List.exists (fun d -> in_ce d.rec_fun) defs) ||
+        in_e e
+    | Eif (e1, e2, e3) ->
+        in_e e1 || in_e e2 || in_e e3
+    | Ematch (e, regs, exns) ->
+        in_e e || List.exists in_e (List.map snd regs) ||
+        List.exists in_e (List.map snd (Mxs.values exns))
+    | Ewhile (e1, invs, vars, e2) ->
+        in_e e1 || List.exists in_t invs ||
+        List.exists in_t (List.map fst vars) || in_e e2
+    | Efor (_, _, _, invs, e) ->
+        List.exists in_t invs || in_e e
+    | Eraise (_, e)
+    | Eexn (_, e) -> in_e e
+    | Eassert (_, t) -> in_t t
+    | Eghost e -> in_e e
+    | Epure t -> in_t t
+    | Eabsurd -> false
+  and in_ce ce = match ce.c_node with
+    | Cfun e -> in_e e
+    | Capp (rs, _) -> in_cty rs.rs_cty
+    | Cpur _ | Cany -> false in
+  let rec find_pdecl pd =
+    let maybe b r = if b then Some r else None in
     match pd.pd_node with
-    | PDlet (LDsym (rs, ce))
-      when loc_contains (loc_of_cexp ce) loc || cty_loc_contains rs.rs_cty loc ->
-        raise (Found rs)
-    | PDlet (LDrec rds) ->
-        List.iter find_pd_rec_defn rds
-    | _ -> () in
-  let rec find_pd_mod_unit = function
-    | Uuse _ | Uclone _ | Umeta _ -> ()
-    | Uscope (_, us) -> List.iter find_pd_mod_unit us
-    | Udecl pd -> find_pd_pdecl pd in
-  match List.iter find_pd_mod_unit pm.mod_units with
-  | () -> raise Not_found
-  | exception Found rs -> rs
+    | PDtype ds ->
+        let in_tdef td =
+          List.exists in_t td.itd_invariant ||
+          List.exists in_e td.itd_witness in
+        let find_td td = (* TODO *)
+          if in_tdef td then Warning.emit "Can't check CE for VC from type definitions :(";
+          None in
+        find_in_list find_td ds
+    | PDlet ld ->
+        (match ld with
+         | LDvar (_, e) -> (* TODO *)
+             if in_e e then Warning.emit "Can't check CE for VC from variable definitions :(";
+             None
+         | LDsym (rs, ce) ->
+             maybe (in_cty rs.rs_cty || in_ce ce) rs
+         | LDrec defs ->
+             let in_def d = in_cty d.rec_sym.rs_cty || in_ce d.rec_fun in
+             find_in_list (fun d -> maybe (in_def d) d.rec_sym) defs)
+    | PDexn _
+    | PDpure -> None
+  and find_mod_unit = function
+    | Uuse _ | Uclone _ | Umeta _ -> None
+    | Uscope (_, us) -> find_in_list find_mod_unit us
+    | Udecl pd -> find_pdecl pd in
+  find_in_list find_mod_unit pm.mod_units
 
 let check_model reduce env pm model =
   match get_model_term_loc model with
@@ -2045,19 +2066,21 @@ let check_model reduce env pm model =
       let reason = "No model term location" in
       Cannot_check_model {reason}
   | Some loc ->
-    (* TODO deal with VCs from variable declarations and type declarations *)
-    (* TODO deal with VCs from goal definitions *)
-    match find_rs pm loc with
-    | rs ->
-        let check_model_rs ~abstract =
-          let rac = rac_config ~do_rac:true ~abstract ~reduce ~model () in
-          check_model_rs rac env pm model rs in
-        let concrete = check_model_rs ~abstract:false in
-        let abstract = check_model_rs ~abstract:true in
-        Check_model_result {concrete; abstract}
-    | exception Not_found ->
-        let reason = "No corresponding routine symbol found" in
-        Cannot_check_model {reason}
+      (* TODO deal with VCs from goal definitions? *)
+      if Loc.equal loc Loc.dummy_position then
+        failwith ("Pinterp.find_rs: the term of the CE model has a dummy location, "^
+                  "it cannot be used to find the toplevel definition");
+      match find_rs pm loc with
+      | Some rs ->
+          let check_model_rs ~abstract =
+            let rac = rac_config ~do_rac:true ~abstract ~reduce ~model () in
+            check_model_rs rac env pm model rs in
+          let concrete = check_model_rs ~abstract:false in
+          let abstract = check_model_rs ~abstract:true in
+          Check_model_result {concrete; abstract}
+      | None ->
+          let reason = "No corresponding routine symbol found" in
+          Cannot_check_model {reason}
 
 let report_eval_result body fmt (res, final_env) =
   match res with
