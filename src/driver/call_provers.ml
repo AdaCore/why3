@@ -261,6 +261,8 @@ let select_model check_model models =
     let check_model (i,r,m) =
       Debug.dprintf debug_check_ce "Check model %d (%a)@." i
         (Pp.print_option_or_default "NO LOC" Pretty.print_loc) (get_model_term_loc m);
+      Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
+        (print_model ?me_name_trans:None ~print_attrs:false) m;
       let mr = check_model m in
       Debug.dprintf debug_check_ce "@[<hv2>Model %d:@\n%a@\n@]@." i
         print_check_model_result mr;
