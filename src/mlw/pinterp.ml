@@ -950,50 +950,6 @@ let cntr_ctx desc ?trigger_loc env =
     c_trigger_loc= trigger_loc;
     c_env= snapshot_env env}
 
-(* VISITED LOCATIONS *)
-
-(* A spurious model element has a location that has not been encountered during RAC.
-
-   TODO Models with spurious elements are considered invalid.
-
-   To identify spurious model elements, we collect initially the location of all variable
-   declarations, and during RAC the locations of all encountered expressions and function
-   parameters. Finally, we check for model elements with locations that have not been
-   recorded. *)
-
-let reset_visited_locs, visit_loc, visited_all_model_locs =
-  let visited = Hstr.create 7 in
-  let reset () =
-    Hstr.reset visited in
-  let visit loc =
-    let f, l, _, _ = Loc.get loc in
-    let lines =
-      try Hstr.find visited f
-      with Not_found -> Sint.empty in
-    Hstr.replace visited f (Sint.add l lines) in
-  let check model =
-    let pp_visited fmt =
-      let pp_f_ls f ls = fprintf fmt "%s:%a" f (Pp.print_list Pp.comma Pp.int) (Sint.elements ls) in
-      Hstr.iter pp_f_ls visited in
-    Debug.dprintf debug_rac "@[<hov2>Visited: %t@]@." pp_visited;
-    let not_visited =
-      List.filter (fun (f, l) -> let lines = Hstr.find_def visited Sint.empty f in not (Sint.mem l lines))
-        (List.map (fun loc -> let f, l, _, _ = Loc.get loc in f, l)
-           (Lists.map_filter (fun me -> me.me_location)
-              (get_model_elements model))) in
-    if not_visited <> [] then (
-      let pp_f_l fmt (f, l) = fprintf fmt "%s:%d" f l in
-      Debug.dprintf debug_rac "@[<hov2>Not visited %a@]@." (Pp.print_list Pp.space pp_f_l) not_visited );
-    not_visited = [] in
-  reset, visit, check
-
-(** Iterate the locations of variable declarations in [known] with function [f]. **)
-let iter_decl_locs f known =
-  let visit_decl d = let open Pdecl in match d.pd_node with
-    | PDlet (LDvar (pv, _)) -> Opt.iter f pv.pv_vs.vs_name.id_loc
-    | _ -> () in
-  Mid.iter (fun _ -> visit_decl) known
-
 (* TERM EVALUATION *)
 
 (* Add declarations for additional term bindings in [vsenv] *)
@@ -1200,7 +1156,6 @@ let check_term_dispatch (Rac_prover {command; driver; limit_time}) task =
   | _ -> None
 
 let check_term ?vsenv ctx t =
-  Opt.iter visit_loc t.t_loc;
   Debug.dprintf debug_rac_check "@[<hv2>Check term: %a@]@." print_term t;
   let task, _ = task_of_term ?vsenv ctx.c_env t in
   let res = (* Try checking the term using computation first ... *)
@@ -1384,7 +1339,6 @@ let rec eval_expr env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
     (if env.rac.rac_abstract then "Abs. " else "")
     (pp_limited print_expr) e;
-  Opt.iter visit_loc e.e_loc;
   let res = eval_expr' env e in
   Debug.dprintf debug "@[<h>%t -> %a@]@." pp_indent (print_result) res;
   res
@@ -1736,7 +1690,6 @@ and exec_match env t ebl =
   iter ebl
 
 and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
-  List.iter (Opt.iter visit_loc) (List.map (fun pv -> pv.pv_vs.vs_name.id_loc) arg_pvs);
   let arg_vs = List.map (get_pvs env) arg_pvs in
   Debug.dprintf debug "@[<h>%tExec call %a %a@]@."
     pp_indent print_rs rs Pp.(print_list space print_value) arg_vs;
@@ -1917,73 +1870,43 @@ let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   let res = exec_call ~main_function:true ~loc:e_loc env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   res, env
 
-let check_equals loc env exec_value model_value =
-  let ctx = cntr_ctx "Model value equality" ?trigger_loc:loc env in
-  let vsenv, t1 = term_of_value env.env [] exec_value in
-  let vsenv, t2 = term_of_value env.env vsenv model_value in
-  try check_term ~vsenv ctx (t_equ t1 t2); true
-  with Contr _ -> false
-
-(* TODO do we need it? *)
-let values_match env m =
-  let aux vs v1 =
-    match restore_pv vs with
-    | exception Not_found -> true
-    | pv -> match model_value m pv with
-      | None -> true
-      | Some mv2 ->
-          let v2 = import_model_value env.env env.mod_known pv.pv_ity mv2 in
-          check_equals pv.pv_vs.vs_name.id_loc env v1 v2 in
-  Mvs.for_all aux env.vsenv
-
-let warnings env model =
-  if visited_all_model_locs model then [] else
-    ["Warning: Model contains spurious values for \
-      locations that were not encountered during RAC"] @
-  if values_match env model then [] else
-    ["Warning: RAC detected value divergence"]
-
 let check_model_rs rac env pm model rs =
   let open Pmodule in
   let abs_msg = if rac.rac_abstract then "abstract" else "concrete" in
   let abs_Msg = String.capitalize_ascii abs_msg in
   Debug.dprintf debug_rac "Validating model %s:@\n%a@." (abs_msg ^ "ly")
     (print_model ?me_name_trans:None ~print_attrs:false) model;
-  reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
     let _, env = eval_rs rac env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason = sprintf "%s RAC does not confirm the counter-example, no \
                           contradiction during execution" abs_Msg in
-    {verdict= Bad_model; reason; warnings= warnings env model;
-     exec_log= !(env.rac.exec_log)}
+    {Model_parser.verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
   with
   | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc (get_model_term_loc model) ->
       let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
-      {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
-       exec_log= !(ctx.c_env.rac.exec_log)}
+      {Model_parser.verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | Contr (ctx, t) ->
       let reason = asprintf "%s RAC found a contradiction at different location %a"
           abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
-      {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
-       exec_log= !(ctx.c_env.rac.exec_log)}
+      {Model_parser.verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | CannotImportModelValue msg ->
       let reason = sprintf "%s RAC: Cannot import value from model: %s" abs_Msg msg in
-      {verdict= Dont_know; reason; warnings= []; exec_log= empty_log}
+      {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | CannotCompute ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
       let reason = sprintf "%s RAC execution got stuck" abs_Msg in
-      {verdict= Dont_know; reason; warnings= []; exec_log= empty_log}
+      {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
           term for constructor that is not a function *)
       let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
-      {verdict= Dont_know; reason; warnings= []; exec_log= empty_log}
+      {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | RACStuck (env,l) ->
       let reason =
         asprintf "%s RAC, with the counterexample model cannot continue after %a@."
           abs_Msg (Pp.print_option Pretty.print_loc) l in
-      {verdict= Bad_model; reason; warnings= []; exec_log= !(env.rac.exec_log)}
+      {Model_parser.verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
 
 (** Identifies the rsymbol of the definition that contains the given position. **)
 let find_rs pm loc =

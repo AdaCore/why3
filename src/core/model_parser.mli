@@ -286,7 +286,6 @@ val print_exec_log : exec_log Pp.pp
 type full_verdict = {
     verdict  : verdict;
     reason   : string;
-    warnings : string list;
     exec_log : exec_log;
   }
 

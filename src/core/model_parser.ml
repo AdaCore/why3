@@ -1124,7 +1124,7 @@ let print_exec_log fmt entry_log =
              (exec_kind_to_string k)
         | Exec_call (Some rs, k) ->
            fprintf fmt "%s execution of %s" (exec_kind_to_string k)
-             rs.rs_name.id_string
+             rs.Expr.rs_name.id_string
         | _ -> failwith "not implemented yet"
         end;
         aux fmt f l rest in
@@ -1137,7 +1137,6 @@ let print_exec_log fmt entry_log =
 type full_verdict = {
     verdict  : verdict;
     reason   : string;
-    warnings : string list;
     exec_log : exec_log;
   }
 
@@ -1146,9 +1145,8 @@ let print_full_verdict fmt v =
     | Good_model -> "good model"
     | Bad_model -> "bad model"
     | Dont_know -> "don't know" in
-  fprintf fmt "@[<hv 2>%s (%s, %d warnings)@\n%a@]"
-    s v.reason (List.length v.warnings)
-    print_exec_log v.exec_log
+  fprintf fmt "@[<hv 2>%s (%s)@\n%a@]"
+    s v.reason print_exec_log v.exec_log
 
 type check_model_result =
   | Cannot_check_model of {reason: string}
