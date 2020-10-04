@@ -32,7 +32,7 @@ type prover_answer =
 (* END{proveranswer} anchor for automatic documentation, do not remove *)
 
 (** See output of [ce_summary_title] for details *)
-type ce_summary = NCCE of exec_log | SWCE of exec_log | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN
+type ce_summary = NCCE of exec_log | SWCE of exec_log | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN of string
 
 let print_ce_summary_title ?check_ce fmt = function
   | NCCE _ ->
@@ -49,26 +49,33 @@ let print_ce_summary_title ?check_ce fmt = function
   | BAD_CE ->
       Format.fprintf fmt
         "Sorry, we don't have a good counterexample for you :("
-  | UNKNOWN ->
-      Format.fprintf fmt
-        "The following counterexample model has not been verified%t"
-        (fun fmt -> match check_ce with
-           | Some true -> Format.fprintf fmt " (RAC incompleteness)"
-           | Some false -> Format.fprintf fmt " (missing option --check-ce, or RAC incompleteness)"
-           | None -> ())
+  | UNKNOWN reason ->
+      match check_ce with
+      | Some true ->
+          fprintf fmt
+            ("The following counterexample model could not be verified (%s)")
+            reason
+      | Some false ->
+          fprintf fmt
+            ("The following counterexample model has not been verified "^^
+             "(missing option --check-ce)")
+      | None ->
+          fprintf fmt "The following counterexample model has not been verified"
 
 let print_ce_summary_values ~print_attrs model fmt = function
   | NCCE log | SWCE log | NCCE_SWCE log ->
       fprintf fmt (":@\n%a") print_exec_log log
-  | UNKNOWN ->
+  | UNKNOWN _ ->
       fprintf fmt ":@\n%a" (print_model_human ?me_name_trans:None ~print_attrs) model
-  | BAD_CE -> ()
+  | BAD_CE -> fprintf fmt "."
 
-let ce_summary v_concrete v_abstract = match v_concrete.verdict, v_abstract.verdict with
+let ce_summary v_concrete v_abstract =
+  match v_concrete.verdict, v_abstract.verdict with
   | Good_model, _ -> NCCE v_concrete.exec_log
   | Bad_model, Good_model -> SWCE v_abstract.exec_log
   | Dont_know, Good_model -> NCCE_SWCE v_abstract.exec_log
-  | Dont_know, Dont_know | Dont_know, Bad_model | Bad_model, Dont_know -> UNKNOWN
+  | Dont_know, Dont_know | Dont_know, Bad_model -> UNKNOWN v_concrete.reason
+  | Bad_model, Dont_know -> UNKNOWN v_abstract.reason
   | Bad_model, Bad_model -> BAD_CE
 
 (* BEGIN{proverresult} anchor for automatic documentation, do not remove *)
@@ -291,7 +298,7 @@ let select_model check_model models =
       not empty in
     let add_ce_summary (i,r,m,mr) =
       let summary = match mr with
-        | Cannot_check_model _ -> UNKNOWN
+        | Cannot_check_model {reason} -> UNKNOWN reason
         | Check_model_result r -> ce_summary r.concrete r.abstract in
       i,r,m,mr,summary in
     List.map add_ce_summary
@@ -299,13 +306,13 @@ let select_model check_model models =
             (List.filter not_empty
                (List.mapi (fun i (r,m) -> i,r,m)
                   models))) in
-  let is_unknown (_,_,_,_,s) = s = UNKNOWN in
+  let is_unknown (_,_,_,_,s) = match s with UNKNOWN _ -> true | _ -> false in
   let unknowns, knowns = List.partition is_unknown filtered_models in
   let model_infos =
     let open Util in
     if knowns <> [] then
       let ce_summary_index = function
-        | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2 | UNKNOWN -> 3 | BAD_CE -> 4 in
+        | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2 | UNKNOWN _ -> 3 | BAD_CE -> 4 in
       let compare = cmp [
           cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
           cmptr (fun (i,_,_,_,_) -> i) (-);

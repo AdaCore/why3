@@ -788,7 +788,7 @@ let rec import_model_value env known ity v =
   else
     let check_construction def =
       if def.Pdecl.itd_its.its_nonfree then
-        let msg = asprintf "Value of non-free type %a" print_ity ity in
+        let msg = asprintf "value of non-free type %a" print_ity ity in
         raise (CannotImportModelValue msg) in
     match v with
     | Integer s ->
@@ -1890,17 +1890,17 @@ let check_model_rs rac env pm model rs =
           abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
       {Model_parser.verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | CannotImportModelValue msg ->
-      let reason = sprintf "%s RAC: Cannot import value from model: %s" abs_Msg msg in
+      let reason = sprintf "cannot import value from model: %s" msg in
       {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | CannotCompute ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
-      let reason = sprintf "%s RAC execution got stuck" abs_Msg in
+      let reason = sprintf "RAC execution got stuck" in
       {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
           term for constructor that is not a function *)
-      let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
+      let reason = sprintf "failure: %s" msg in
       {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | RACStuck (env,l) ->
       let reason =
@@ -1986,7 +1986,7 @@ let find_rs pm loc =
 let check_model reduce env pm model =
   match get_model_term_loc model with
   | None ->
-      let reason = "No model term location" in
+      let reason = "no model term location" in
       Cannot_check_model {reason}
   | Some loc ->
       (* TODO deal with VCs from goal definitions? *)
@@ -2002,7 +2002,7 @@ let check_model reduce env pm model =
           let abstract = check_model_rs ~abstract:true in
           Check_model_result {concrete; abstract}
       | None ->
-          let reason = "No corresponding routine symbol found" in
+          let reason = "no corresponding routine symbol found" in
           Cannot_check_model {reason}
 
 let report_eval_result body fmt (res, final_env) =
