@@ -16,6 +16,9 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
+let debug_attrs = Debug.register_info_flag "print_model_attrs"
+    ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
+
 (* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
   | Valid
@@ -54,12 +57,11 @@ let print_ce_summary_title ?check_ce fmt = function
            | Some false -> Format.fprintf fmt " (missing option --check-ce, or RAC incompleteness)"
            | None -> ())
 
-let print_ce_summary_values model fmt = function
+let print_ce_summary_values ~print_attrs model fmt = function
   | NCCE vs | SWCE vs | NCCE_SWCE vs ->
       fprintf fmt (":@\n%a") print_exec_log vs
   | UNKNOWN ->
-      let me_name_trans = None and print_attrs = false in
-      fprintf fmt ":@\n%a" (print_model_human ?me_name_trans ~print_attrs) model
+      fprintf fmt ":@\n%a" (print_model_human ?me_name_trans:None ~print_attrs) model
   | BAD_CE -> ()
 
 let ce_summary v_concrete v_abstract = match v_concrete.verdict, v_abstract.verdict with
@@ -206,13 +208,14 @@ let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
 let print_prover_result ?check_ce fmt r =
+  let print_attrs = Debug.test_flag debug_attrs in
   fprintf fmt "%a (%.2fs%a)." print_prover_answer r.pr_answer
     r.pr_time print_steps r.pr_steps;
   (match r.pr_model with
    | Some (m, s) when not (is_model_empty m) ->
        fprintf fmt "@\n@[<v>%a%a@]"
          (print_ce_summary_title ?check_ce) s
-         (print_ce_summary_values m) s
+         (print_ce_summary_values m ~print_attrs) s
    | _ -> ());
   if r.pr_answer == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s"

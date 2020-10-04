@@ -40,7 +40,7 @@ val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 (** Print a title for the summary of counteexamples checking. The argument [check_ce]
    indicates if the checking counterexamples was requested. *)
 
-val print_ce_summary_values : model -> ce_summary Pp.pp
+val print_ce_summary_values : print_attrs:bool -> model -> ce_summary Pp.pp
 (** Prints the summary with its values, if there is any, or the given
     model otherwise *)
 
