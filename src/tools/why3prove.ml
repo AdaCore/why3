@@ -231,6 +231,39 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
+let print_result ~json ~check_ce fmt (fname, loc, goal_name, expls, res) =
+  if json then
+    let open Json_base in
+    let print_loc fmt (loc, fname) =
+      match loc with
+      | None -> fprintf fmt "{%a}" (print_json_field "filename" print_json) (String fname)
+      | Some loc ->
+          let f, l, b, e = Loc.get loc in
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]@,}@]"
+            (print_json_field "filename" print_json) (String f)
+            (print_json_field "line" print_json) (Int l)
+            (print_json_field "start-char" print_json) (Int b)
+            (print_json_field "end-char" print_json) (Int e) in
+    let print_term fmt (loc, fname, goal_name, expls) =
+      fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+        (print_json_field "loc" print_loc) (loc, fname)
+        (print_json_field "goal_name" print_json) (String goal_name)
+        (print_json_field "explanations" print_json) (List (List.map (fun s -> String s) expls)) in
+    fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+      (print_json_field "term" print_term) (loc, fname, goal_name, expls)
+      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:true ~check_ce)) res
+  else (
+    ( match loc with
+      | None -> fprintf fmt "File %s:@." fname
+      | Some loc -> Loc.report_position Format.std_formatter loc );
+    ( if expls = [] then
+        fprintf fmt "Verification condition %s.@\n" goal_name
+      else
+        let expls = String.capitalize_ascii (String.concat ", " expls) in
+        fprintf fmt "Formula `%s' from verification condition %s.@\n" expls goal_name );
+    fprintf fmt "Prover result is: %a"
+      Call_provers.(print_prover_result ~json:false ~check_ce) res )
+
 let unproved = ref false
 
 let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
@@ -254,16 +287,8 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
-        ( match t.Term.t_loc with
-          | Some loc -> Loc.report_position Format.std_formatter loc
-          | None -> printf "File %s:@." fname );
-        ( if expls = [] then
-            printf "Verification condition %s.@." goal_name
-          else
-            let expls = String.capitalize_ascii (String.concat ", " expls) in
-            printf "%s from verification condition %s.@." expls goal_name );
-        printf "Proover result is: %a@\n@."
-          Call_provers.(if !opt_json then print_prover_result_json else print_prover_result ~check_ce) res;
+        printf "%a@." (print_result ~json:!opt_json ~check_ce)
+          (fname, t.Term.t_loc, goal_name, expls, res);
         if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task

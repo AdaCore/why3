@@ -316,7 +316,7 @@ and print_record_human fmt r =
       (* Special pretty printing for record with only one element *)
       fprintf fmt "%a" print_model_value_human value
   | _ ->
-      fprintf fmt "@[%a@]"
+      fprintf fmt "@[<hv1>%a@]"
         (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
            (fun fmt (f, v) ->
              fprintf fmt "@[%s =@ %a@]" f print_model_value_human v))
@@ -550,7 +550,7 @@ let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ?print_locs:(Some true) ~at_loc ~print_attrs ~print_model_value
+       (print_model_element ?print_locs:None ~at_loc ~print_attrs ~print_model_value
           ~me_name_trans))
     m_elements
 
@@ -1128,7 +1128,7 @@ let print_exec_log fmt entry_log =
         | _ -> failwith "not implemented yet"
         end;
         aux fmt f l rest in
-  fprintf fmt "@[<v>%t%t@]"
+  fprintf fmt "@[<v>%t%t@]@\n"
     (fun fmt -> aux fmt "" (-1) entry_log)
     (fun fmt ->
        if entry_log <> [] then

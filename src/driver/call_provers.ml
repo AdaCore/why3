@@ -58,8 +58,8 @@ let print_ce_summary_title ?check_ce fmt = function
            | None -> ())
 
 let print_ce_summary_values ~print_attrs model fmt = function
-  | NCCE vs | SWCE vs | NCCE_SWCE vs ->
-      fprintf fmt (":@\n%a") print_exec_log vs
+  | NCCE log | SWCE log | NCCE_SWCE log ->
+      fprintf fmt (":@\n%a") print_exec_log log
   | UNKNOWN ->
       fprintf fmt ":@\n%a" (print_model_human ?me_name_trans:None ~print_attrs) model
   | BAD_CE -> ()
@@ -207,27 +207,42 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ?check_ce fmt r =
+let print_prover_result ~json ?check_ce fmt r =
   let print_attrs = Debug.test_flag debug_attrs in
-  fprintf fmt "%a (%.2fs%a)." print_prover_answer r.pr_answer
-    r.pr_time print_steps r.pr_steps;
-  (match r.pr_model with
-   | Some (m, s) when not (is_model_empty m) ->
-       fprintf fmt "@\n@[<v>%a%a@]"
-         (print_ce_summary_title ?check_ce) s
-         (print_ce_summary_values m ~print_attrs) s
-   | _ -> ());
-  if r.pr_answer == HighFailure then
-    fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s"
-      print_prover_status r.pr_status r.pr_output
-
-let print_prover_result_json fmt r =
-  fprintf fmt "%a (%.2fs%a)." print_prover_answer r.pr_answer
-    r.pr_time print_steps r.pr_steps;
-  print_model_json fmt (get_model r);
-  if r.pr_answer == HighFailure then
-    fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s"
-      print_prover_status r.pr_status r.pr_output
+  if json then
+    let open Json_base in
+    let print_model fmt = function
+      | Some (m, s) when not (is_model_empty m) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+            (print_json_field "verdict" print_json)
+            (String (match s with
+                 | NCCE _ -> "NCCE"
+                 | SWCE _ -> "SWCE"
+                 | NCCE_SWCE _ -> "NCCE_SWCE"
+                 | UNKNOWN _ -> "UNKNOWN"
+                 | BAD_CE -> "BAD_CE"))
+            (print_json_field "model" (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int))
+            m
+      | _ -> print_json fmt Null in
+    fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a;@ %a@]}@]"
+      (print_json_field "answer" print_json)
+      (String (asprintf "%a" print_prover_answer r.pr_answer))
+      (print_json_field "time" print_json) (Float r.pr_time)
+      (print_json_field "step" print_json) (Int r.pr_steps)
+      (print_json_field "ce-model" print_model) r.pr_model
+      (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
+  else (
+    fprintf fmt "%a (%.2fs%a).@\n" print_prover_answer r.pr_answer
+      r.pr_time print_steps r.pr_steps;
+    (match r.pr_model with
+     | Some (m, s) when not (is_model_empty m) ->
+         fprintf fmt "@[<v>%a%a@]"
+           (print_ce_summary_title ?check_ce) s
+           (print_ce_summary_values ~print_attrs m) s
+     | _ -> ());
+    if r.pr_answer == HighFailure then
+      fprintf fmt "Prover exit status: %a@\nProver output:@\n%s@\n"
+        print_prover_status r.pr_status r.pr_output )
 
 let rec grep out l = match l with
   | [] ->

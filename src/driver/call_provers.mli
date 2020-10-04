@@ -62,13 +62,11 @@ type prover_result = {
 val print_prover_answer : Format.formatter -> prover_answer -> unit
 (** Pretty-print a {! prover_answer} *)
 
-val print_prover_result : ?check_ce:bool -> Format.formatter -> prover_result -> unit
+val print_prover_result : json:bool -> ?check_ce:bool -> Format.formatter -> prover_result -> unit
 (** Pretty-print a prover_result. The answer and the time are output. The output of the
    prover is printed if and only if the answer is a [HighFailure]. The argument [check_ce]
    indicates if the checking counterexamples was requested or not, or None it cannot be
    requested. *)
-
-val print_prover_result_json : Format.formatter -> prover_result -> unit
 
 val get_model : prover_result -> model
 (** Get the CE model from the prover result if any, or the defaul_model
