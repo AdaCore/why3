@@ -1,20 +1,9 @@
 open Format
 open Sexplib.Sexp
 
-(* Check if a non-empty string contains only characters [a-zA-Z0-9_-] *)
-let is_simple_token s =
-  let rec loop i =
-    if i < 0 then
-      true
-    else match s.[i] with
-      | 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' | '-' ->
-          loop (i-1)
-      | _ -> false in
-  String.length s > 0 && loop (String.length s-1)
-
 let rec output fmt = function
   | Atom s ->
-      if is_simple_token s then
+      if Why3.Util.is_sexp_simple_token s then
         fprintf fmt "%s" s
       else
         fprintf fmt "%S" s
