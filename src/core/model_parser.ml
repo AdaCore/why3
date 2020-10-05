@@ -316,7 +316,7 @@ and print_record_human fmt r =
       (* Special pretty printing for record with only one element *)
       fprintf fmt "%a" print_model_value_human value
   | _ ->
-      fprintf fmt "@[%a@]"
+      fprintf fmt "@[<hv1>%a@]"
         (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
            (fun fmt (f, v) ->
              fprintf fmt "@[%s =@ %a@]" f print_model_value_human v))
@@ -550,7 +550,7 @@ let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ?print_locs:(Some true) ~at_loc ~print_attrs ~print_model_value
+       (print_model_element ?print_locs:None ~at_loc ~print_attrs ~print_model_value
           ~me_name_trans))
     m_elements
 
@@ -1102,7 +1102,7 @@ let exec_kind_to_string ?(cap=true) = function
 
 let print_exec_log fmt entry_log =
   let entry_log = List.rev entry_log in
-  let rec aux fmt file line = function
+  let rec loop file line fmt = function
     | [] -> fprintf fmt "@]@]"
     | { log_desc; log_loc } :: rest ->
         let f, l, _, _ = Loc.get log_loc in
@@ -1124,31 +1124,27 @@ let print_exec_log fmt entry_log =
              (exec_kind_to_string k)
         | Exec_call (Some rs, k) ->
            fprintf fmt "%s execution of %s" (exec_kind_to_string k)
-             rs.rs_name.id_string
+             rs.Expr.rs_name.id_string
         | _ -> failwith "not implemented yet"
         end;
-        aux fmt f l rest in
-  fprintf fmt "@[<v>%t%t@]"
-    (fun fmt -> aux fmt "" (-1) entry_log)
-    (fun fmt ->
-       if entry_log <> [] then
-         fprintf fmt "@]")
+        loop f l fmt rest in
+  if entry_log <> [] then
+    fprintf fmt "@[<v>%a@]@]" (loop "" (-1)) entry_log
 
 type full_verdict = {
     verdict  : verdict;
     reason   : string;
-    warnings : string list;
     exec_log : exec_log;
   }
 
+let print_verdict fmt = function
+  | Good_model -> fprintf fmt "good model"
+  | Bad_model -> fprintf fmt "bad model"
+  | Dont_know -> fprintf fmt "don't know"
+
 let print_full_verdict fmt v =
-  let s = match v.verdict with
-    | Good_model -> "good model"
-    | Bad_model -> "bad model"
-    | Dont_know -> "don't know" in
-  fprintf fmt "@[<hv 2>%s (%s, %d warnings)@\n%a@]"
-    s v.reason (List.length v.warnings)
-    print_exec_log v.exec_log
+  fprintf fmt "%a (%s)@,%a"
+    print_verdict v.verdict v.reason print_exec_log v.exec_log
 
 type check_model_result =
   | Cannot_check_model of {reason: string}
@@ -1156,9 +1152,9 @@ type check_model_result =
 
 let print_check_model_result fmt = function
   | Cannot_check_model r ->
-      fprintf fmt "Cannot check model (%s)" r.reason
+      fprintf fmt "@[Cannot check model (%s)@]" r.reason
   | Check_model_result r ->
-      fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@,@[<hv2>- Abstract: %a@]@]"
+      fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@\n@[<hv2>- Abstract: %a@]@]"
         print_full_verdict r.concrete print_full_verdict r.abstract
 
 type check_model = model -> check_model_result

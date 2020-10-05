@@ -286,10 +286,10 @@ val print_exec_log : exec_log Pp.pp
 type full_verdict = {
     verdict  : verdict;
     reason   : string;
-    warnings : string list;
     exec_log : exec_log;
   }
 
+val print_verdict : verdict Pp.pp
 val print_full_verdict : full_verdict Pp.pp
 
 (** Checking a model either results in a reason why it was not possible or a full

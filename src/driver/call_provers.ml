@@ -16,6 +16,9 @@ let debug = Debug.register_info_flag "call_prover"
   ~desc:"Print@ debugging@ messages@ about@ prover@ calls@ \
          and@ keep@ temporary@ files."
 
+let debug_attrs = Debug.register_info_flag "print_model_attrs"
+    ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
+
 (* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
   | Valid
@@ -29,7 +32,7 @@ type prover_answer =
 (* END{proveranswer} anchor for automatic documentation, do not remove *)
 
 (** See output of [ce_summary_title] for details *)
-type ce_summary = NCCE of exec_log | SWCE of exec_log | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN
+type ce_summary = NCCE of exec_log | SWCE of exec_log | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN of string
 
 let print_ce_summary_title ?check_ce fmt = function
   | NCCE _ ->
@@ -46,27 +49,34 @@ let print_ce_summary_title ?check_ce fmt = function
   | BAD_CE ->
       Format.fprintf fmt
         "Sorry, we don't have a good counterexample for you :("
-  | UNKNOWN ->
-      Format.fprintf fmt
-        "The following counterexample model has not been verified%t"
-        (fun fmt -> match check_ce with
-           | Some true -> Format.fprintf fmt " (RAC incompleteness)"
-           | Some false -> Format.fprintf fmt " (missing option --check-ce, or RAC incompleteness)"
-           | None -> ())
+  | UNKNOWN reason ->
+      match check_ce with
+      | Some true ->
+          fprintf fmt
+            ("The following counterexample model could not be verified (%s)")
+            reason
+      | Some false ->
+          fprintf fmt
+            ("The following counterexample model has not been verified "^^
+             "(missing option --check-ce)")
+      | None ->
+          fprintf fmt "The following counterexample model has not been verified"
 
-let print_ce_summary_values model fmt = function
-  | NCCE vs | SWCE vs | NCCE_SWCE vs ->
-      fprintf fmt (":@\n%a") print_exec_log vs
-  | UNKNOWN ->
-      let me_name_trans = None and print_attrs = false in
-      fprintf fmt ":@\n%a" (print_model_human ?me_name_trans ~print_attrs) model
-  | BAD_CE -> ()
+let print_ce_summary_values ~print_attrs model fmt = function
+  | NCCE log | SWCE log | NCCE_SWCE log ->
+      fprintf fmt (":@\n%a") print_exec_log log
+  | UNKNOWN _ ->
+      fprintf fmt ":@\n%a" (print_model_human ?me_name_trans:None ~print_attrs) model
+  | BAD_CE -> fprintf fmt "."
 
-let ce_summary v_concrete v_abstract = match v_concrete.verdict, v_abstract.verdict with
+let ce_summary v_concrete v_abstract =
+  match v_concrete.verdict, v_abstract.verdict with
   | Good_model, _ -> NCCE v_concrete.exec_log
   | Bad_model, Good_model -> SWCE v_abstract.exec_log
   | Dont_know, Good_model -> NCCE_SWCE v_abstract.exec_log
-  | Dont_know, Dont_know | Dont_know, Bad_model | Bad_model, Dont_know -> UNKNOWN
+  | Dont_know, Dont_know
+  | Dont_know, Bad_model -> UNKNOWN v_concrete.reason
+  | Bad_model, Dont_know -> UNKNOWN v_abstract.reason
   | Bad_model, Bad_model -> BAD_CE
 
 (* BEGIN{proverresult} anchor for automatic documentation, do not remove *)
@@ -205,26 +215,42 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ?check_ce fmt r =
-  fprintf fmt "%a (%.2fs%a)." print_prover_answer r.pr_answer
-    r.pr_time print_steps r.pr_steps;
-  (match r.pr_model with
-   | Some (m, s) when not (is_model_empty m) ->
-       fprintf fmt "@\n@[<v>%a%a@]"
-         (print_ce_summary_title ?check_ce) s
-         (print_ce_summary_values m) s
-   | _ -> ());
-  if r.pr_answer == HighFailure then
-    fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s"
-      print_prover_status r.pr_status r.pr_output
-
-let print_prover_result_json fmt r =
-  fprintf fmt "%a (%.2fs%a)." print_prover_answer r.pr_answer
-    r.pr_time print_steps r.pr_steps;
-  print_model_json fmt (get_model r);
-  if r.pr_answer == HighFailure then
-    fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s"
-      print_prover_status r.pr_status r.pr_output
+let print_prover_result ~json ?check_ce fmt r =
+  let print_attrs = Debug.test_flag debug_attrs in
+  if json then
+    let open Json_base in
+    let print_model fmt = function
+      | Some (m, s) when not (is_model_empty m) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+            (print_json_field "verdict" print_json)
+            (String (match s with
+                 | NCCE _ -> "NCCE"
+                 | SWCE _ -> "SWCE"
+                 | NCCE_SWCE _ -> "NCCE_SWCE"
+                 | UNKNOWN _ -> "UNKNOWN"
+                 | BAD_CE -> "BAD_CE"))
+            (print_json_field "model" (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int))
+            m
+      | _ -> print_json fmt Null in
+    fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a;@ %a@]}@]"
+      (print_json_field "answer" print_json)
+      (String (asprintf "%a" print_prover_answer r.pr_answer))
+      (print_json_field "time" print_json) (Float r.pr_time)
+      (print_json_field "step" print_json) (Int r.pr_steps)
+      (print_json_field "ce-model" print_model) r.pr_model
+      (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
+  else (
+    fprintf fmt "%a (%.2fs%a).@\n" print_prover_answer r.pr_answer
+      r.pr_time print_steps r.pr_steps;
+    (match r.pr_model with
+     | Some (m, s) when not (is_model_empty m) ->
+         fprintf fmt "@[<v>%a%a@]"
+           (print_ce_summary_title ?check_ce) s
+           (print_ce_summary_values ~print_attrs m) s
+     | _ -> ());
+    if r.pr_answer == HighFailure then
+      fprintf fmt "Prover exit status: %a@\nProver output:@\n%s@\n"
+        print_prover_status r.pr_status r.pr_output )
 
 let rec grep out l = match l with
   | [] ->
@@ -257,46 +283,61 @@ let debug_print_model ~print_attrs model =
 type answer_or_model = Answer of prover_answer | Model of string
 
 let select_model check_model models =
-  let filtered_models =
-    let check_model (i,r,m) =
-      Debug.dprintf debug_check_ce "Check model %d (%a)@." i
-        (Pp.print_option_or_default "NO LOC" Pretty.print_loc) (get_model_term_loc m);
-      Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
-        (print_model ?me_name_trans:None ~print_attrs:false) m;
-      let mr = check_model m in
-      Debug.dprintf debug_check_ce "@[<hv2>Model %d:@\n%a@\n@]@." i
-        print_check_model_result mr;
-      i,r,m,mr in
-    let not_empty (i,_,m) =
-      let empty = is_model_empty m in
-      if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
-      not empty in
-    let add_ce_summary (i,r,m,mr) =
-      let summary = match mr with
-        | Cannot_check_model _ -> UNKNOWN
-        | Check_model_result r -> ce_summary r.concrete r.abstract in
-      i,r,m,mr,summary in
+  let check_model (i,r,m) =
+    Debug.dprintf debug_check_ce "Check model %d (%a)@." i
+      (Pp.print_option_or_default "NO LOC" Pretty.print_loc') (get_model_term_loc m);
+    (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
+     *   (print_model ?me_name_trans:None ~print_attrs:false) m; *)
+    let mr = check_model m in
+    Debug.dprintf debug_check_ce "@[<v2>Model %d:@\n@[%a@]@]@." i
+      print_check_model_result mr;
+    i,r,m,mr in
+  let not_empty (i,_,m) =
+    let empty = is_model_empty m in
+    if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
+    not empty in
+  let add_ce_summary (i,r,m,mr) =
+    let summary = match mr with
+      | Cannot_check_model {reason} -> UNKNOWN reason
+      | Check_model_result r -> ce_summary r.concrete r.abstract in
+    i,r,m,mr,summary in
+  let models =
     List.map add_ce_summary
-         (List.map check_model
-            (List.filter not_empty
-               (List.mapi (fun i (r,m) -> i,r,m)
-                  models))) in
-  let is_unknown (_,_,_,_,s) = s = UNKNOWN in
-  let unknowns, knowns = List.partition is_unknown filtered_models in
+      (List.map check_model
+         (List.filter not_empty
+            (List.mapi (fun i (r,m) -> i,r,m)
+               models))) in
+  Debug.dprintf debug_check_ce "@[<v>Models:@ %a@]@."
+    Pp.(print_list space (fun fmt (i,_,_,mr,s) ->
+        match mr with
+        | Cannot_check_model {reason} -> fprintf fmt "- Couldn't check model: %s" reason
+        | Check_model_result r ->
+            eprintf "- Checked model %d: %a/%a -> %a" i
+              print_verdict r.concrete.verdict
+              print_verdict r.abstract.verdict
+              (print_ce_summary_title ?check_ce:None) s)) models;
+  let is_good (_,_,_,_,s) = match s with NCCE _ | SWCE _ | NCCE_SWCE _ -> true | BAD_CE | UNKNOWN _ -> false in
+  let good_models, other_models = List.partition is_good models in
   let model_infos =
     let open Util in
-    if knowns <> [] then
+    if good_models <> [] then
       let ce_summary_index = function
-        | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2 | UNKNOWN -> 3 | BAD_CE -> 4 in
+        | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2 | UNKNOWN _ | BAD_CE -> assert false in
       let compare = cmp [
           cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
           cmptr (fun (i,_,_,_,_) -> i) (-);
         ] in
-      List.sort compare knowns
+      List.sort compare good_models
     else
-      (* RAC didn't help, choose the most complex model (as it was done before 2020) *)
-      let compare = cmp [cmptr (fun (i,_,_,_,_) -> -i) (-)] in
-      List.sort compare unknowns in
+      (* No interesting models, so choose the most complex (later) model
+         as it was done before 2020, but penalize bad models. *)
+      let ce_summary_index = function
+        UNKNOWN _ -> 0 | BAD_CE -> 1 | NCCE _ | SWCE _ | NCCE_SWCE _ -> assert false in
+      let compare = cmp [
+          cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
+          cmptr (fun (i,_,_,_,_) -> -i) (-);
+        ] in
+      List.sort compare other_models in
   match model_infos with
   | [] -> None
   | (_,_,m,_,s) :: _ -> Some (m, s)

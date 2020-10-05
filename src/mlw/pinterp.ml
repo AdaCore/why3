@@ -28,21 +28,6 @@ let debug =
 let debug_rac = Debug.register_info_flag "rac" ~desc:"trace evaluation for RAC"
 let debug_rac_check = Debug.register_info_flag "rac-check" ~desc:"trace checking assertions in RAC"
 
-let print_loc fmt loc =
-  let f, l, b, e = Loc.get loc in
-  fprintf fmt "%S, line %d, characters %d-%d" f l b e
-
-(** [loc_contains loc1 loc2] if loc1 contains loc2, i.e., loc1:[   loc2:[   ]  ].
-    Relies on [get_multiline] and fails under the same conditions. *)
-let loc_contains loc1 loc2 =
-  if Loc.equal loc1 Loc.dummy_position || Loc.equal loc2 Loc.dummy_position then
-    false (* loc_contains doesn't make sense, and calling get_multiline is invalid *)
-  else
-    let f1, b1, e1 = Loc.get_multiline loc1 in
-    let f2, b2, e2 = Loc.get_multiline loc2 in
-    let le (l1, c1) (l2, c2) = l1 < l2 || (l1 = l2 && c1 <= c2) in
-    String.equal f1 f2 && le b1 b2 && le e2 e1
-
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
   let pp_binding fmt (k, v) =
@@ -350,8 +335,6 @@ type rac_reduce_config = {
 }
 
 let rac_reduce_config ?trans:rac_trans ?prover:rac_prover () = {rac_trans; rac_prover}
-
-type model_value = Loc.position * vsymbol * value
 
 type rac_config = {
   do_rac       : bool;
@@ -801,7 +784,7 @@ let rec import_model_value env known ity v =
   else
     let check_construction def =
       if def.Pdecl.itd_its.its_nonfree then
-        let msg = asprintf "Value of non-free type %a" print_ity ity in
+        let msg = asprintf "value of non-free type %a" print_ity ity in
         raise (CannotImportModelValue msg) in
     match v with
     | Integer s ->
@@ -962,50 +945,6 @@ let cntr_ctx desc ?trigger_loc env =
   { c_desc= desc;
     c_trigger_loc= trigger_loc;
     c_env= snapshot_env env}
-
-(* VISITED LOCATIONS *)
-
-(* A spurious model element has a location that has not been encountered during RAC.
-
-   TODO Models with spurious elements are considered invalid.
-
-   To identify spurious model elements, we collect initially the location of all variable
-   declarations, and during RAC the locations of all encountered expressions and function
-   parameters. Finally, we check for model elements with locations that have not been
-   recorded. *)
-
-let reset_visited_locs, visit_loc, visited_all_model_locs =
-  let visited = Hstr.create 7 in
-  let reset () =
-    Hstr.reset visited in
-  let visit loc =
-    let f, l, _, _ = Loc.get loc in
-    let lines =
-      try Hstr.find visited f
-      with Not_found -> Sint.empty in
-    Hstr.replace visited f (Sint.add l lines) in
-  let check model =
-    let pp_visited fmt =
-      let pp_f_ls f ls = fprintf fmt "%s:%a" f (Pp.print_list Pp.comma Pp.int) (Sint.elements ls) in
-      Hstr.iter pp_f_ls visited in
-    Debug.dprintf debug_rac "@[<hov2>Visited: %t@]@." pp_visited;
-    let not_visited =
-      List.filter (fun (f, l) -> let lines = Hstr.find_def visited Sint.empty f in not (Sint.mem l lines))
-        (List.map (fun loc -> let f, l, _, _ = Loc.get loc in f, l)
-           (Lists.map_filter (fun me -> me.me_location)
-              (get_model_elements model))) in
-    if not_visited <> [] then (
-      let pp_f_l fmt (f, l) = fprintf fmt "%s:%d" f l in
-      Debug.dprintf debug_rac "@[<hov2>Not visited %a@]@." (Pp.print_list Pp.space pp_f_l) not_visited );
-    not_visited = [] in
-  reset, visit, check
-
-(** Iterate the locations of variable declarations in [known] with function [f]. **)
-let iter_decl_locs f known =
-  let visit_decl d = let open Pdecl in match d.pd_node with
-    | PDlet (LDvar (pv, _)) -> Opt.iter f pv.pv_vs.vs_name.id_loc
-    | _ -> () in
-  Mid.iter (fun _ -> visit_decl) known
 
 (* TERM EVALUATION *)
 
@@ -1213,7 +1152,6 @@ let check_term_dispatch (Rac_prover {command; driver; limit_time}) task =
   | _ -> None
 
 let check_term ?vsenv ctx t =
-  Opt.iter visit_loc t.t_loc;
   Debug.dprintf debug_rac_check "@[<hv2>Check term: %a@]@." print_term t;
   let task, _ = task_of_term ?vsenv ctx.c_env t in
   let res = (* Try checking the term using computation first ... *)
@@ -1361,7 +1299,7 @@ let get_and_register_value env ?def ?ity vs loc =
             default_value_of_type env.env env.mod_known ity
          | Some v -> v in
        Debug.dprintf debug_check_ce "@[<h>VALUE for %s %a not in ce-model, taking \
-                default %a@]@." name print_loc loc print_value v;
+                default %a@]@." name print_loc' loc print_value v;
        v
   in
   register_used_value env loc vs value;
@@ -1388,7 +1326,7 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
   if pv_affected wrt pv then (
     Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
       pp_indent print_pv pv
-      (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
+      (Pp.print_option print_loc') pv.pv_vs.vs_name.id_loc;
     let pv = Mpv.find_def pv pv vars_map in
     let value = get_and_register_value ~ity:pv.pv_ity env pv.pv_vs loc in
     set_constr (get_vs env vs) value )
@@ -1397,7 +1335,6 @@ let rec eval_expr env e =
   Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
     (if env.rac.rac_abstract then "Abs. " else "")
     (pp_limited print_expr) e;
-  Opt.iter visit_loc e.e_loc;
   let res = eval_expr' env e in
   Debug.dprintf debug "@[<h>%t -> %a@]@." pp_indent (print_result) res;
   res
@@ -1536,7 +1473,7 @@ and eval_expr' env e =
       (try check_terms (cntr_ctx "Invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
-            (Pp.print_option Pretty.print_loc) t.t_loc;
+            (Pp.print_option print_loc') t.t_loc;
           raise (RACStuck (env, t.t_loc)));
       match eval_expr env cond with
       | Normal v ->
@@ -1636,7 +1573,7 @@ and eval_expr' env e =
       (try check_terms (cntr_ctx "Invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
-            (Pp.print_option Pretty.print_loc) t.t_loc;
+            (Pp.print_option print_loc') t.t_loc;
           raise (RACStuck (env,t.t_loc)));
       match eval_expr env e1 with
       | Normal _ ->
@@ -1654,7 +1591,7 @@ and eval_expr' env e =
       (try check_terms (cntr_ctx "invariant holds after loop" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant after \
-                  loop %a@." (Pp.print_option Pretty.print_loc) t.t_loc;
+                  loop %a@." (Pp.print_option print_loc') t.t_loc;
           raise (RACStuck (env,t.t_loc)));
       Normal (value ty_unit Vvoid)
       end
@@ -1749,7 +1686,6 @@ and exec_match env t ebl =
   iter ebl
 
 and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
-  List.iter (Opt.iter visit_loc) (List.map (fun pv -> pv.pv_vs.vs_name.id_loc) arg_pvs);
   let arg_vs = List.map (get_pvs env) arg_pvs in
   Debug.dprintf debug "@[<h>%tExec call %a %a@]@."
     pp_indent print_rs rs Pp.(print_list space print_value) arg_vs;
@@ -1930,134 +1866,140 @@ let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   let res = exec_call ~main_function:true ~loc:e_loc env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   res, env
 
-let check_equals loc env exec_value model_value =
-  let ctx = cntr_ctx "Model value equality" ?trigger_loc:loc env in
-  let vsenv, t1 = term_of_value env.env [] exec_value in
-  let vsenv, t2 = term_of_value env.env vsenv model_value in
-  try check_term ~vsenv ctx (t_equ t1 t2); true
-  with Contr _ -> false
-
-(* TODO do we need it? *)
-let values_match env m =
-  let aux vs v1 =
-    match restore_pv vs with
-    | exception Not_found -> true
-    | pv -> match model_value m pv with
-      | None -> true
-      | Some mv2 ->
-          let v2 = import_model_value env.env env.mod_known pv.pv_ity mv2 in
-          check_equals pv.pv_vs.vs_name.id_loc env v1 v2 in
-  Mvs.for_all aux env.vsenv
-
-let warnings env model =
-  if visited_all_model_locs model then [] else
-    ["Warning: Model contains spurious values for \
-      locations that were not encountered during RAC"] @
-  if values_match env model then [] else
-    ["Warning: RAC detected value divergence"]
-
-let loc_contains_opt oloc1 oloc2 =
-  match oloc1, oloc2 with
-  | Some loc1, Some loc2 -> loc_contains loc1 loc2
-  | _ -> false
-
 let check_model_rs rac env pm model rs =
   let open Pmodule in
   let abs_msg = if rac.rac_abstract then "abstract" else "concrete" in
   let abs_Msg = String.capitalize_ascii abs_msg in
   Debug.dprintf debug_rac "Validating model %s:@\n%a@." (abs_msg ^ "ly")
     (print_model ?me_name_trans:None ~print_attrs:false) model;
-  reset_visited_locs (); iter_decl_locs visit_loc pm.mod_known;
   try
     let _, env = eval_rs rac env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason = sprintf "%s RAC does not confirm the counter-example, no \
                           contradiction during execution" abs_Msg in
-    {verdict= Bad_model; reason; warnings= warnings env model;
-     exec_log= !(env.rac.exec_log)}
+    {Model_parser.verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
   with
-  | Contr (ctx, t) when loc_contains_opt (get_model_term_loc model) t.t_loc ->
+  | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc (get_model_term_loc model) ->
       let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
-      {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
-       exec_log= !(ctx.c_env.rac.exec_log)}
+      {Model_parser.verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | Contr (ctx, t) ->
       let reason = asprintf "%s RAC found a contradiction at different location %a"
-          abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
-      {verdict= Good_model; reason; warnings= warnings ctx.c_env model;
-       exec_log= !(ctx.c_env.rac.exec_log)}
+          abs_Msg (Pp.print_option_or_default "NO LOC" print_loc') t.Term.t_loc in
+      {Model_parser.verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | CannotImportModelValue msg ->
-      let reason = sprintf "%s RAC: Cannot import value from model: %s" abs_Msg msg in
-      {verdict= Dont_know; reason; warnings= []; exec_log= empty_log}
+      let reason = sprintf "cannot import value from model: %s" msg in
+      {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | CannotCompute ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
-      let reason = sprintf "%s RAC execution got stuck" abs_Msg in
-      {verdict= Dont_know; reason; warnings= []; exec_log= empty_log}
+      let reason = sprintf "RAC execution got stuck" in
+      {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
           term for constructor that is not a function *)
-      let reason = sprintf "%s RAC failure: %s" abs_Msg msg in
-      {verdict= Dont_know; reason; warnings= []; exec_log= empty_log}
+      let reason = sprintf "failure: %s" msg in
+      {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | RACStuck (env,l) ->
       let reason =
-        asprintf "%s RAC, with the counterexample model cannot continue after %a@."
-          abs_Msg (Pp.print_option Pretty.print_loc) l in
-      {verdict= Bad_model; reason; warnings= []; exec_log= !(env.rac.exec_log)}
+        asprintf "%s RAC, with the counterexample model cannot continue after %a"
+          abs_Msg (Pp.print_option print_loc') l in
+      {Model_parser.verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
 
-(** Identifies the rsymbol of the definition that contains the given position. Raises
-    [Not_found] if no such definition is found. **)
+(** Identifies the rsymbol of the definition that contains the given position. **)
 let find_rs pm loc =
   let open Pmodule in
   let open Pdecl in
-  let loc_of_exp e = Opt.get_def Loc.dummy_position e.e_loc in
-  let loc_of_cexp ce = match ce.c_node with
-    | Cfun e -> loc_of_exp e | _ -> Loc.dummy_position in
-  let cty_loc_contains cty loc =
-    let rec p = function
-      | {t_loc= Some loc'} -> loc_contains loc' loc
-      | {t_loc= None; t_node= Teps tb} ->
-          (* The Teps introduced for post conditions does not carry its location *)
-          p (snd (t_open_bound tb))
-      | _ -> false in
-    List.exists p (cty.cty_pre @ cty.cty_post @ List.concat (Mxs.values cty.cty_xpost)) in
-  let exception Found of Expr.rsymbol in
-  let find_pd_rec_defn rd =
-    if loc_contains (loc_of_cexp rd.rec_fun) loc || cty_loc_contains rd.rec_sym.rs_cty loc then
-      raise (Found rd.rec_sym) in
-  let find_pd_pdecl pd =
+  let rec find_in_list f = function
+    | [] -> None
+    | x :: xs -> match f x with
+      | None -> find_in_list f xs
+      | res -> res in
+  let in_t = t_any (fun t ->
+      Opt.equal Loc.equal t.t_loc (Some loc)) in
+  let in_cty cty =
+    List.exists in_t cty.cty_pre ||
+    List.exists in_t cty.cty_post ||
+    Mxs.exists (fun _ -> List.exists in_t) cty.cty_xpost in
+  let rec in_e e =
+    Opt.equal Loc.equal e.e_loc (Some loc) ||
+    match e.e_node with
+    | Evar _ | Econst _ | Eassign _ -> false
+    | Eexec (ce, cty) -> in_ce ce || in_cty cty
+    | Elet (d, e) ->
+        (match d with
+         | LDvar (_, e') -> in_e e'
+         | LDsym (rs, ce) -> in_cty rs.rs_cty || in_ce ce
+         | LDrec defs -> List.exists (fun d -> in_ce d.rec_fun) defs) ||
+        in_e e
+    | Eif (e1, e2, e3) ->
+        in_e e1 || in_e e2 || in_e e3
+    | Ematch (e, regs, exns) ->
+        in_e e || List.exists in_e (List.map snd regs) ||
+        List.exists in_e (List.map snd (Mxs.values exns))
+    | Ewhile (e1, invs, vars, e2) ->
+        in_e e1 || List.exists in_t invs ||
+        List.exists in_t (List.map fst vars) || in_e e2
+    | Efor (_, _, _, invs, e) ->
+        List.exists in_t invs || in_e e
+    | Eraise (_, e)
+    | Eexn (_, e) -> in_e e
+    | Eassert (_, t) -> in_t t
+    | Eghost e -> in_e e
+    | Epure t -> in_t t
+    | Eabsurd -> false
+  and in_ce ce = match ce.c_node with
+    | Cfun e -> in_e e
+    | Capp (rs, _) -> in_cty rs.rs_cty
+    | Cpur _ | Cany -> false in
+  let rec find_pdecl pd =
+    let maybe b r = if b then Some r else None in
     match pd.pd_node with
-    | PDlet (LDsym (rs, ce))
-      when loc_contains (loc_of_cexp ce) loc || cty_loc_contains rs.rs_cty loc ->
-        raise (Found rs)
-    | PDlet (LDrec rds) ->
-        List.iter find_pd_rec_defn rds
-    | _ -> () in
-  let rec find_pd_mod_unit = function
-    | Uuse _ | Uclone _ | Umeta _ -> ()
-    | Uscope (_, us) -> List.iter find_pd_mod_unit us
-    | Udecl pd -> find_pd_pdecl pd in
-  match List.iter find_pd_mod_unit pm.mod_units with
-  | () -> raise Not_found
-  | exception Found rs -> rs
+    | PDtype ds ->
+        let in_tdef td =
+          List.exists in_t td.itd_invariant ||
+          List.exists in_e td.itd_witness in
+        let find_td td = (* TODO *)
+          if in_tdef td then Warning.emit "Can't check CE for VC from type definitions :(";
+          None in
+        find_in_list find_td ds
+    | PDlet ld ->
+        (match ld with
+         | LDvar (_, e) -> (* TODO *)
+             if in_e e then Warning.emit "Can't check CE for VC from variable definitions :(";
+             None
+         | LDsym (rs, ce) ->
+             maybe (in_cty rs.rs_cty || in_ce ce) rs
+         | LDrec defs ->
+             let in_def d = in_cty d.rec_sym.rs_cty || in_ce d.rec_fun in
+             find_in_list (fun d -> maybe (in_def d) d.rec_sym) defs)
+    | PDexn _
+    | PDpure -> None
+  and find_mod_unit = function
+    | Uuse _ | Uclone _ | Umeta _ -> None
+    | Uscope (_, us) -> find_in_list find_mod_unit us
+    | Udecl pd -> find_pdecl pd in
+  find_in_list find_mod_unit pm.mod_units
 
 let check_model reduce env pm model =
   match get_model_term_loc model with
   | None ->
-      let reason = "No model term location" in
+      let reason = "model term has no location" in
       Cannot_check_model {reason}
   | Some loc ->
-    (* TODO deal with VCs from variable declarations and type declarations *)
-    (* TODO deal with VCs from goal definitions *)
-    match find_rs pm loc with
-    | rs ->
-        let check_model_rs ~abstract =
-          let rac = rac_config ~do_rac:true ~abstract ~reduce ~model () in
-          check_model_rs rac env pm model rs in
-        let concrete = check_model_rs ~abstract:false in
-        let abstract = check_model_rs ~abstract:true in
-        Check_model_result {concrete; abstract}
-    | exception Not_found ->
-        let reason = "No corresponding routine symbol found" in
-        Cannot_check_model {reason}
+      (* TODO deal with VCs from goal definitions? *)
+      if Loc.equal loc Loc.dummy_position then
+        failwith ("Pinterp.check_model: the term of the CE model has a dummy "^
+                  "location, it cannot be used to find the toplevel definition");
+      match find_rs pm loc with
+      | Some rs ->
+          let check_model_rs ~abstract =
+            let rac = rac_config ~do_rac:true ~abstract ~reduce ~model () in
+            check_model_rs rac env pm model rs in
+          let concrete = check_model_rs ~abstract:false in
+          let abstract = check_model_rs ~abstract:true in
+          Check_model_result {concrete; abstract}
+      | None ->
+          let reason = "no corresponding routine symbol found" in
+          Cannot_check_model {reason}
 
 let report_eval_result body fmt (res, final_env) =
   match res with
