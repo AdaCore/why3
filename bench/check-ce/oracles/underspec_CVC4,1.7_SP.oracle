@@ -1,10 +1,10 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
-Loop invariant init from verification condition f'vc.
-Proover result is: valid (0.05s, 1403 steps).
+Formula `Loop invariant init' from verification condition f'vc.
+Prover result is: valid (0.04s, 1403 steps).
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
-Loop invariant preservation from verification condition f'vc.
-Proover result is: unknown (unknown + incomplete) (0.04s, 6755 steps).
+Formula `Loop invariant preservation' from verification condition f'vc.
+Prover result is: unknown (unknown + incomplete) (0.07s, 6755 steps).
 The following counterexample values reveal a subcontract weakness:
 File underspec.mlw:
   Line 13:
@@ -25,18 +25,17 @@ File underspec.mlw:
   Line 19:
     Concrete execution of contents
     Concrete execution of infix +
-
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
-Loop invariant preservation from verification condition f'vc.
-Proover result is: valid (0.02s, 1643 steps).
+Formula `Loop invariant preservation' from verification condition f'vc.
+Prover result is: valid (0.03s, 1643 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
-Postcondition from verification condition g'vc.
-Proover result is: valid (0.03s, 1582 steps).
+Formula `Postcondition' from verification condition g'vc.
+Prover result is: valid (0.02s, 1582 steps).
 
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
-Assertion from verification condition f'vc.
-Proover result is: unknown (unknown + incomplete) (0.05s, 6620 steps).
+Formula `Assertion' from verification condition f'vc.
+Prover result is: unknown (unknown + incomplete) (0.06s, 6620 steps).
 The following counterexample values reveal a subcontract weakness:
 File underspec.mlw:
   Line 44:
@@ -48,4 +47,3 @@ File underspec.mlw:
     Abstract execution of g
     z = (ref'mk 2)
     result = ()
-
