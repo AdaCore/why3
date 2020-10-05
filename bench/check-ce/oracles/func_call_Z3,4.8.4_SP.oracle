@@ -1,0 +1,19 @@
+File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
+Postcondition from verification condition g'vc.
+Proover result is: valid (0.01s, 2283 steps).
+
+File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
+Assertion from verification condition f'vc.
+Proover result is: timeout (1.00s, 5385786 steps).
+The following counterexample values reveal a subcontract weakness:
+File func_call.mlw:
+  Line 10:
+    z = (ref'mk 0)
+    _ = ()
+    Concrete execution of f
+  Line 12:
+    Concrete execution of Tuple0
+    Abstract execution of g
+    z = (ref'mk 2)
+    result = ()
+

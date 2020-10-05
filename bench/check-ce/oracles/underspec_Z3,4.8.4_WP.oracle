@@ -1,0 +1,52 @@
+File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
+Loop invariant init from verification condition f'vc.
+Proover result is: valid (0.02s, 58 steps).
+
+ce model does not satisfy loop invariant after loop #"bench/check-ce/underspec.mlw" 17 18 33#
+File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
+Loop invariant preservation from verification condition f'vc.
+Proover result is: timeout (1.00s, 5339176 steps).
+The following counterexample values reveal a subcontract weakness:
+File underspec.mlw:
+  Line 13:
+    _ = ()
+    Concrete execution of f
+  Line 14:
+    Abstract execution of ref
+    result = (ref'mk 0)
+  Line 15:
+    Abstract execution of ref
+    result = (ref'mk 0)
+  Line 16:
+    x1 = (ref'mk (-401))
+    x2 = (ref'mk 0)
+    i = 0
+  Line 18:
+    Concrete execution of infix =
+  Line 19:
+    Concrete execution of contents
+    Concrete execution of infix +
+
+File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
+Loop invariant preservation from verification condition f'vc.
+Proover result is: valid (0.01s, 2384 steps).
+
+File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
+Postcondition from verification condition g'vc.
+Proover result is: valid (0.01s, 2283 steps).
+
+File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
+Assertion from verification condition f'vc.
+Proover result is: timeout (1.00s, 6029286 steps).
+The following counterexample values reveal a subcontract weakness:
+File underspec.mlw:
+  Line 44:
+    z = (ref'mk 0)
+    _ = ()
+    Concrete execution of f
+  Line 46:
+    Concrete execution of Tuple0
+    Abstract execution of g
+    z = (ref'mk 2)
+    result = ()
+

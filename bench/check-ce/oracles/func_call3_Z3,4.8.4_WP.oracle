@@ -1,0 +1,19 @@
+File "bench/check-ce/func_call3.mlw", line 7, characters 12-21:
+Postcondition from verification condition g'vc.
+Proover result is: valid (0.03s, 2343 steps).
+
+File "bench/check-ce/func_call3.mlw", line 8, characters 17-26:
+Postcondition from verification condition g'vc.
+Proover result is: timeout (1.00s, 6078349 steps).
+The following counterexample values reveal that the program does not comply with the verification goal:
+File func_call3.mlw:
+  Line 5:
+    z = (ref'mk 0)
+    x = 0
+    Concrete execution of g
+  Line 9:
+    Concrete execution of contents
+    Concrete execution of infix +
+  Line 10:
+    Concrete execution of infix +
+

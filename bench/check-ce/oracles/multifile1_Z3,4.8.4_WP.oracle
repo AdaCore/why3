@@ -1,0 +1,17 @@
+File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
+Postcondition from verification condition decr'vc.
+Proover result is: valid (0.03s, 434 steps).
+
+File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
+Postcondition from verification condition incr'vc.
+Proover result is: unknown (sat) (0.01s, 962 steps).
+The following counterexample values reveal a subcontract weakness:
+File multifile1.mlw:
+  Line 9:
+    x = 2
+    Concrete execution of incr
+  Line 11:
+    Abstract execution of decr
+    result = 0
+    Concrete execution of infix +
+

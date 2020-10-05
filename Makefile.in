@@ -1861,6 +1861,9 @@ APITESTS=logic transform clone mlw_tree mlw_tree1 mlw_expr create_session counte
 
 bench-api: $(addprefix test-api-, $(APITESTS))
 
+clean::
+	rm -rf bench/check-ce/*.out
+
 ###############
 # test targets
 ###############

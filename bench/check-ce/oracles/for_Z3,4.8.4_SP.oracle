@@ -1,0 +1,33 @@
+File "bench/check-ce/for.mlw", line 8, characters 25-31:
+Loop invariant init from verification condition f'vc.
+Proover result is: valid (0.03s, 58 steps).
+
+ce model does not satisfy loop invariant after loop #"bench/check-ce/for.mlw" 8 16 31#
+File "bench/check-ce/for.mlw", line 8, characters 25-31:
+Loop invariant preservation from verification condition f'vc.
+Proover result is: timeout (1.00s, 5682354 steps).
+The following counterexample values reveal a subcontract weakness:
+File for.mlw:
+  Line 4:
+    _ = ()
+    Concrete execution of f
+  Line 5:
+    Abstract execution of ref
+    result = (ref'mk 0)
+  Line 6:
+    Abstract execution of ref
+    result = (ref'mk 0)
+  Line 7:
+    x1 = (ref'mk (-401))
+    x2 = (ref'mk 0)
+    i = 0
+  Line 9:
+    Concrete execution of infix =
+  Line 10:
+    Concrete execution of contents
+    Concrete execution of infix +
+
+File "bench/check-ce/for.mlw", line 8, characters 25-31:
+Loop invariant preservation from verification condition f'vc.
+Proover result is: valid (0.01s, 2384 steps).
+
