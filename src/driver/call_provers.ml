@@ -312,7 +312,7 @@ let select_model check_model models =
         match mr with
         | Cannot_check_model {reason} -> fprintf fmt "- Couldn't check model: %s" reason
         | Check_model_result r ->
-            eprintf "- Checked model %d: %a/%a -> %a" i
+            fprintf fmt "- Checked model %d: %a/%a -> %a" i
               print_verdict r.concrete.verdict
               print_verdict r.abstract.verdict
               (print_ce_summary_title ?check_ce:None) s)) models;

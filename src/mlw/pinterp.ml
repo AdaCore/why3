@@ -48,9 +48,12 @@ let pp_indent fmt =
 
 exception NoMatch
 exception Undetermined
-exception CannotCompute
+exception CannotCompute of {reason: string}
 exception NotNum
 exception CannotFind of (Env.pathname * string * string)
+
+let cannot_compute f =
+  kasprintf (fun reason -> raise (CannotCompute {reason})) f
 
 (* VALUES *)
 
@@ -432,9 +435,7 @@ let use_float_format (float_format : int) =
   match float_format with
   | 32 -> initialize_float32 ()
   | 64 -> initialize_float64 ()
-  | _ ->
-      eprintf "Unknown float format: %d@." float_format;
-      raise CannotCompute
+  | _ -> cannot_compute "Unknown float format: %d" float_format
 
 let eval_float :
     type a.
@@ -458,8 +459,7 @@ let eval_float :
     {v_desc; v_ty= ty_result}
   with
   | Mlmpfr_wrapper.Not_Implemented ->
-      eprintf "Mlmpfr wrapper: not implemented@.";
-      raise CannotCompute
+      cannot_compute "Mlmpfr wrapper: not implemented"
   | _ -> assert false
 
 type 'a real_arity =
@@ -484,8 +484,7 @@ let eval_real : type a. a real_arity -> a -> Expr.rsymbol -> value list -> value
         (* Cannot decide interval comparison *)
         constr ls l
     | Mlmpfr_wrapper.Not_Implemented ->
-        eprintf "Mlmpfr wrapper: not implemented@.";
-        raise CannotCompute
+        cannot_compute "Mlmpfr wrapper: not implemented"
     | _ -> assert false in
   {v_desc; v_ty= ty_real}
 
@@ -503,8 +502,7 @@ let exec_array_make ts_array _ args =
         let ty = ty_app ts_array [def.v_ty] in
         value ty (Varray (Array.make n def))
       with e ->
-        eprintf "Error making array: %a@." Exn_printer.exn_printer e;
-        raise CannotCompute )
+        cannot_compute "Error making array: %a" Exn_printer.exn_printer e )
   | _ -> assert false
 
 let exec_array_empty ts_array _ args =
@@ -521,8 +519,7 @@ let exec_array_get _ args =
   | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
       try a.(BigInt.to_int i)
       with e ->
-        eprintf "Error getting array: %a@." Exn_printer.exn_printer e;
-        raise CannotCompute )
+        cannot_compute "Error getting array: %a" Exn_printer.exn_printer e )
   | _ -> assert false
 
 let exec_array_length _ args =
@@ -538,8 +535,7 @@ let exec_array_set _ args =
         a.(BigInt.to_int i) <- v;
         value ty_unit Vvoid
       with e ->
-        eprintf "Error setting array: %a@." Exn_printer.exn_printer e;
-        raise CannotCompute )
+        cannot_compute "Error setting array: %a" Exn_printer.exn_printer e )
 | _ -> assert false
 
 (* Described as a function so that this code is not executed outside of
@@ -707,7 +703,7 @@ let get_pvs env pvs =
 let rec default_value_of_type env known ity : value =
   let ty = ty_of_ity ity in
   match ity.ity_node with
-  | Ityvar _ -> value ty_int (Vnum BigInt.zero) (* assert false *) (* failwith "default_value_of_type: type variable" *)
+  | Ityvar _ -> failwith "default_value_of_type: type variable"
   | Ityapp (ts, _, _) when its_equal ts its_int -> value ty (Vnum BigInt.zero)
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
   | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
@@ -823,8 +819,7 @@ let rec import_model_value env known ity v =
         let rs = match def.Pdecl.itd_constructors with
           | [rs] -> rs
           | [] ->
-              eprintf "Cannot import projection to type without constructor@.";
-              raise CannotCompute
+              cannot_compute "Cannot import projection to type without constructor"
           | _ -> failwith "(Singleton) record constructor expected" in
         let import_or_default field_pv =
           let ity = ity_full_inst subst field_pv.pv_ity in
@@ -1176,9 +1171,10 @@ let check_term ?vsenv ctx t =
         eprintf "%a@." report_cntr_head (ctx, "has failed", t);
       raise (Contr (ctx, t))
   | None ->
-      eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t);
-      if not (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
-        raise CannotCompute
+      if (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
+        eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t)
+      else
+        cannot_compute "%a" report_cntr (ctx, "cannot be evaluated", t)
 
 let check_terms ctx = List.iter (check_term ctx)
 
@@ -1362,8 +1358,7 @@ and eval_expr' env e =
         let sp, sq = BigInt.to_string p, BigInt.to_string q in
         try Normal (value ty_real (Vreal (real_from_fraction sp sq)))
         with Mlmpfr_wrapper.Not_Implemented ->
-          eprintf "Mlmpfr wrapper: not implemented@.";
-          raise CannotCompute
+          cannot_compute "Mlmpfr wrapper: not implemented"
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
@@ -1377,7 +1372,7 @@ and eval_expr' env e =
           exec_pure ~loc:e_loc env ls pvs
       | Cfun e' ->
          if env.rac.rac_abstract then
-           (eprintf "Cannot compute: not yet implemented@."; raise CannotCompute);
+           cannot_compute "Cannot compute: not yet implemented";
         Debug.dprintf debug "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
         register_call env e_loc None ExecConcrete;
         let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
@@ -1391,11 +1386,9 @@ and eval_expr' env e =
         let ty = ty_inst mt (ty_of_ity e.e_ity) in
         Normal (value ty (Vfun (cl, arg.pv_vs, e')))
       | Cany ->
-          eprintf "Cannot compute the application of the any-function@.";
-          raise CannotCompute
+          cannot_compute "Cannot compute the application of the any-function"
     | Capp _ when cty.cty_args <> [] ->
-        eprintf "Cannot compute partial function application@.";
-        raise CannotCompute
+        cannot_compute "Cannot compute partial function application"
     | Capp (rs, pvsl) ->
         assert (ce.c_cty.cty_args = []) ;
         exec_call ?loc:e.e_loc env rs pvsl e.e_ity
@@ -1773,9 +1766,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                | Cany ->
                   Debug.dprintf debug  "@[<hv2>%tEXEC CALL %a: ANY@]@."
                     pp_indent print_rs rs;
-                  eprintf "Cannot compute application of local any-function %a@."
-                    print_rs rs;
-                  raise CannotCompute
+                  cannot_compute "Cannot compute application of local any-function %a"
+                    print_rs rs
                | Cpur _ -> assert false (* TODO ? *) end
           | Builtin f ->
              Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
@@ -1801,9 +1793,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                search cstr.rs_cty.cty_args args
             | _ -> assert false )
           | exception Not_found ->
-             eprintf "[interp] cannot find definition of routine %s@."
-               rs.rs_name.id_string ;
-             raise CannotCompute in
+             cannot_compute "[interp] cannot find definition of routine %s"
+               rs.rs_name.id_string in
       ( match res with
         | Normal v ->
            let desc = cntr_desc "Postcondition" rs.rs_name in
@@ -1890,10 +1881,10 @@ let check_model_rs rac env pm model rs =
   | CannotImportModelValue msg ->
       let reason = sprintf "cannot import value from model: %s" msg in
       {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
-  | CannotCompute ->
+  | CannotCompute r ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
-      let reason = sprintf "RAC execution got stuck" in
+      let reason = sprintf "RAC execution got stuck: %s" r.reason in
       {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
