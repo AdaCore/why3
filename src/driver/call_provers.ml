@@ -53,14 +53,15 @@ let print_ce_summary_title ?check_ce fmt = function
       match check_ce with
       | Some true ->
           fprintf fmt
-            ("The following counterexample model could not be verified (%s)")
+            "The following counterexample model could not be verified (%s)"
             reason
       | Some false ->
           fprintf fmt
             ("The following counterexample model has not been verified "^^
-             "(missing option --check-ce)")
+             "(%s, missing option --check-ce)") reason
       | None ->
-          fprintf fmt "The following counterexample model has not been verified"
+          fprintf fmt "The following counterexample model has not been verified (%s)"
+            reason
 
 let print_ce_summary_values ~print_attrs model fmt = function
   | NCCE log | SWCE log | NCCE_SWCE log ->
