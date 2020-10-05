@@ -1,14 +1,14 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
-Loop invariant init from verification condition f'vc.
-Proover result is: valid (0.12s, 15432438 steps).
+Formula `Loop invariant init' from verification condition f'vc.
+Prover result is: valid (0.04s, 1438 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
-Loop variant decrease from verification condition f'vc.
-Proover result is: valid (0.012313213s, 1911234 steps).
+Formula `Loop variant decrease' from verification condition f'vc.
+Prover result is: valid (0.03s, 1914 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
-Loop invariant preservation from verification condition f'vc.
-Proover result is: unknown (unknown + incomplete) (0.05s, 6915 steps).
+Formula `Loop invariant preservation' from verification condition f'vc.
+Prover result is: unknown (unknown + incomplete) (0.04s, 6915 steps).
 The following counterexample values reveal a subcontract weakness:
 File while.mlw:
   Line 4:
@@ -16,7 +16,7 @@ File while.mlw:
     Concrete execution of f
   Line 5:
     Abstract execution of ref
-    result = (ref'mk 1)
+    result = (ref'mk 0)
   Line 6:
     Abstract execution of ref
     result = (ref'mk 0)
@@ -38,12 +38,11 @@ File while.mlw:
   Line 15:
     Concrete execution of contents
     Concrete execution of infix +
-
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
-Loop variant decrease from verification condition f'vc.
-Proover result is: valid (0.02s, 1860 steps).
+Formula `Loop variant decrease' from verification condition f'vc.
+Prover result is: valid (0.02s, 1860 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
-Loop invariant preservation from verification condition f'vc.
-Proover result is: valid (0.02s, 1821 steps).
+Formula `Loop invariant preservation' from verification condition f'vc.
+Prover result is: valid (0.02s, 1821 steps).
 
