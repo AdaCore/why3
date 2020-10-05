@@ -28,10 +28,6 @@ let debug =
 let debug_rac = Debug.register_info_flag "rac" ~desc:"trace evaluation for RAC"
 let debug_rac_check = Debug.register_info_flag "rac-check" ~desc:"trace checking assertions in RAC"
 
-let print_loc fmt loc =
-  let f, l, b, e = Loc.get loc in
-  fprintf fmt "%S, line %d, characters %d-%d" f l b e
-
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
   let pp_binding fmt (k, v) =
@@ -1303,7 +1299,7 @@ let get_and_register_value env ?def ?ity vs loc =
             default_value_of_type env.env env.mod_known ity
          | Some v -> v in
        Debug.dprintf debug_check_ce "@[<h>VALUE for %s %a not in ce-model, taking \
-                default %a@]@." name print_loc loc print_value v;
+                default %a@]@." name print_loc' loc print_value v;
        v
   in
   register_used_value env loc vs value;
@@ -1330,7 +1326,7 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
   if pv_affected wrt pv then (
     Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
       pp_indent print_pv pv
-      (Pp.print_option print_loc) pv.pv_vs.vs_name.id_loc;
+      (Pp.print_option print_loc') pv.pv_vs.vs_name.id_loc;
     let pv = Mpv.find_def pv pv vars_map in
     let value = get_and_register_value ~ity:pv.pv_ity env pv.pv_vs loc in
     set_constr (get_vs env vs) value )
@@ -1477,7 +1473,7 @@ and eval_expr' env e =
       (try check_terms (cntr_ctx "Invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
-            (Pp.print_option Pretty.print_loc) t.t_loc;
+            (Pp.print_option print_loc') t.t_loc;
           raise (RACStuck (env, t.t_loc)));
       match eval_expr env cond with
       | Normal v ->
@@ -1577,7 +1573,7 @@ and eval_expr' env e =
       (try check_terms (cntr_ctx "Invariant" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant %a@."
-            (Pp.print_option Pretty.print_loc) t.t_loc;
+            (Pp.print_option print_loc') t.t_loc;
           raise (RACStuck (env,t.t_loc)));
       match eval_expr env e1 with
       | Normal _ ->
@@ -1595,7 +1591,7 @@ and eval_expr' env e =
       (try check_terms (cntr_ctx "invariant holds after loop" env) inv with
        | Contr (_,t) ->
           printf "ce model does not satisfy loop invariant after \
-                  loop %a@." (Pp.print_option Pretty.print_loc) t.t_loc;
+                  loop %a@." (Pp.print_option print_loc') t.t_loc;
           raise (RACStuck (env,t.t_loc)));
       Normal (value ty_unit Vvoid)
       end
@@ -1887,7 +1883,7 @@ let check_model_rs rac env pm model rs =
       {Model_parser.verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | Contr (ctx, t) ->
       let reason = asprintf "%s RAC found a contradiction at different location %a"
-          abs_Msg (Pp.print_option_or_default "NO LOC" print_loc) t.Term.t_loc in
+          abs_Msg (Pp.print_option_or_default "NO LOC" print_loc') t.Term.t_loc in
       {Model_parser.verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | CannotImportModelValue msg ->
       let reason = sprintf "cannot import value from model: %s" msg in
@@ -1904,8 +1900,8 @@ let check_model_rs rac env pm model rs =
       {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
   | RACStuck (env,l) ->
       let reason =
-        asprintf "%s RAC, with the counterexample model cannot continue after %a@."
-          abs_Msg (Pp.print_option Pretty.print_loc) l in
+        asprintf "%s RAC, with the counterexample model cannot continue after %a"
+          abs_Msg (Pp.print_option print_loc') l in
       {Model_parser.verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
 
 (** Identifies the rsymbol of the definition that contains the given position. **)
@@ -1986,13 +1982,13 @@ let find_rs pm loc =
 let check_model reduce env pm model =
   match get_model_term_loc model with
   | None ->
-      let reason = "no model term location" in
+      let reason = "model term has no location" in
       Cannot_check_model {reason}
   | Some loc ->
       (* TODO deal with VCs from goal definitions? *)
       if Loc.equal loc Loc.dummy_position then
-        failwith ("Pinterp.find_rs: the term of the CE model has a dummy location, "^
-                  "it cannot be used to find the toplevel definition");
+        failwith ("Pinterp.check_model: the term of the CE model has a dummy "^
+                  "location, it cannot be used to find the toplevel definition");
       match find_rs pm loc with
       | Some rs ->
           let check_model_rs ~abstract =

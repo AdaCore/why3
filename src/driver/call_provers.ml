@@ -74,7 +74,8 @@ let ce_summary v_concrete v_abstract =
   | Good_model, _ -> NCCE v_concrete.exec_log
   | Bad_model, Good_model -> SWCE v_abstract.exec_log
   | Dont_know, Good_model -> NCCE_SWCE v_abstract.exec_log
-  | Dont_know, Dont_know | Dont_know, Bad_model -> UNKNOWN v_concrete.reason
+  | Dont_know, Dont_know
+  | Dont_know, Bad_model -> UNKNOWN v_concrete.reason
   | Bad_model, Dont_know -> UNKNOWN v_abstract.reason
   | Bad_model, Bad_model -> BAD_CE
 
@@ -282,46 +283,61 @@ let debug_print_model ~print_attrs model =
 type answer_or_model = Answer of prover_answer | Model of string
 
 let select_model check_model models =
-  let filtered_models =
-    let check_model (i,r,m) =
-      Debug.dprintf debug_check_ce "Check model %d (%a)@." i
-        (Pp.print_option_or_default "NO LOC" Pretty.print_loc) (get_model_term_loc m);
-      Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
-        (print_model ?me_name_trans:None ~print_attrs:false) m;
-      let mr = check_model m in
-      Debug.dprintf debug_check_ce "@[<hv2>Model %d:@\n%a@\n@]@." i
-        print_check_model_result mr;
-      i,r,m,mr in
-    let not_empty (i,_,m) =
-      let empty = is_model_empty m in
-      if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
-      not empty in
-    let add_ce_summary (i,r,m,mr) =
-      let summary = match mr with
-        | Cannot_check_model {reason} -> UNKNOWN reason
-        | Check_model_result r -> ce_summary r.concrete r.abstract in
-      i,r,m,mr,summary in
+  let check_model (i,r,m) =
+    Debug.dprintf debug_check_ce "Check model %d (%a)@." i
+      (Pp.print_option_or_default "NO LOC" Pretty.print_loc') (get_model_term_loc m);
+    (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
+     *   (print_model ?me_name_trans:None ~print_attrs:false) m; *)
+    let mr = check_model m in
+    Debug.dprintf debug_check_ce "@[<v2>Model %d:@\n@[%a@]@]@." i
+      print_check_model_result mr;
+    i,r,m,mr in
+  let not_empty (i,_,m) =
+    let empty = is_model_empty m in
+    if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
+    not empty in
+  let add_ce_summary (i,r,m,mr) =
+    let summary = match mr with
+      | Cannot_check_model {reason} -> UNKNOWN reason
+      | Check_model_result r -> ce_summary r.concrete r.abstract in
+    i,r,m,mr,summary in
+  let models =
     List.map add_ce_summary
-         (List.map check_model
-            (List.filter not_empty
-               (List.mapi (fun i (r,m) -> i,r,m)
-                  models))) in
-  let is_unknown (_,_,_,_,s) = match s with UNKNOWN _ -> true | _ -> false in
-  let unknowns, knowns = List.partition is_unknown filtered_models in
+      (List.map check_model
+         (List.filter not_empty
+            (List.mapi (fun i (r,m) -> i,r,m)
+               models))) in
+  Debug.dprintf debug_check_ce "@[<v>Models:@ %a@]@."
+    Pp.(print_list space (fun fmt (i,_,_,mr,s) ->
+        match mr with
+        | Cannot_check_model {reason} -> fprintf fmt "- Couldn't check model: %s" reason
+        | Check_model_result r ->
+            eprintf "- Checked model %d: %a/%a -> %a" i
+              print_verdict r.concrete.verdict
+              print_verdict r.abstract.verdict
+              (print_ce_summary_title ?check_ce:None) s)) models;
+  let is_good (_,_,_,_,s) = match s with NCCE _ | SWCE _ | NCCE_SWCE _ -> true | BAD_CE | UNKNOWN _ -> false in
+  let good_models, other_models = List.partition is_good models in
   let model_infos =
     let open Util in
-    if knowns <> [] then
+    if good_models <> [] then
       let ce_summary_index = function
-        | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2 | UNKNOWN _ -> 3 | BAD_CE -> 4 in
+        | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2 | UNKNOWN _ | BAD_CE -> assert false in
       let compare = cmp [
           cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
           cmptr (fun (i,_,_,_,_) -> i) (-);
         ] in
-      List.sort compare knowns
+      List.sort compare good_models
     else
-      (* RAC didn't help, choose the most complex model (as it was done before 2020) *)
-      let compare = cmp [cmptr (fun (i,_,_,_,_) -> -i) (-)] in
-      List.sort compare unknowns in
+      (* No interesting models, so choose the most complex (later) model
+         as it was done before 2020, but penalize bad models. *)
+      let ce_summary_index = function
+        UNKNOWN _ -> 0 | BAD_CE -> 1 | NCCE _ | SWCE _ | NCCE_SWCE _ -> assert false in
+      let compare = cmp [
+          cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
+          cmptr (fun (i,_,_,_,_) -> -i) (-);
+        ] in
+      List.sort compare other_models in
   match model_infos with
   | [] -> None
   | (_,_,m,_,s) :: _ -> Some (m, s)
