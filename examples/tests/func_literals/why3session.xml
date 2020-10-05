@@ -4,6 +4,8 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="func_literals.mlw"/>
 <theory name="Top">
@@ -12,31 +14,79 @@
  <goal name="g2">
  <transf name="split_vc" >
   <goal name="g2.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="8925"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="8863"/></proof>
   </goal>
   <goal name="g2.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="9131"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="8891"/></proof>
   </goal>
   <goal name="g2.2">
+  </goal>
+  <goal name="g2.3">
+  </goal>
+  <goal name="g2.4">
   </goal>
  </transf>
  </goal>
  <goal name="g3">
  </goal>
- <goal name="zero2three_nok&#39;vc" expl="VC for zero2three_nok">
+ <goal name="seq_ok1&#39;vc" expl="VC for seq_ok1" proved="true">
+ <proof prover="1"><result status="valid" time="0.30" steps="848"/></proof>
  </goal>
- <goal name="zero2three_ok&#39;vc" expl="VC for zero2three_ok" proved="true">
+ <goal name="seq_ok2&#39;vc" expl="VC for seq_ok2" proved="true">
+ <proof prover="0"><result status="valid" time="0.12" steps="15836"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="38"/></proof>
+ <proof prover="2"><result status="valid" time="0.06" steps="64147"/></proof>
+ </goal>
+ <goal name="seq_ok3&#39;vc" expl="VC for seq_ok3" proved="true">
+ <proof prover="1"><result status="valid" time="0.23" steps="767"/></proof>
+ <proof prover="2"><result status="valid" time="0.04" steps="61154"/></proof>
+ </goal>
+ <goal name="seq_ok4&#39;vc" expl="VC for seq_ok4" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
+ <proof prover="2"><result status="valid" time="0.04" steps="61233"/></proof>
+ </goal>
+ <goal name="array_ok1&#39;vc" expl="VC for array_ok1" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="zero2three_ok&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="5750"/></proof>
+  <goal name="array_ok1&#39;vc.0" expl="array creation size" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="0"/></proof>
   </goal>
-  <goal name="zero2three_ok&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.13" steps="12885"/></proof>
+  <goal name="array_ok1&#39;vc.1" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="array_ok1&#39;vc.1.0" expl="postcondition" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="array_ok1&#39;vc.1.0.0" expl="postcondition" proved="true">
+    <proof prover="0" memlimit="2000"><result status="valid" time="1.42" steps="136208"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
- <goal name="zero2three_ok2&#39;vc" expl="VC for zero2three_ok2" proved="true">
- <proof prover="1"><result status="valid" time="0.19" steps="767"/></proof>
+ <goal name="array_ok2&#39;vc" expl="VC for array_ok2" proved="true">
+ <proof prover="1"><result status="valid" time="0.11" steps="346"/></proof>
+ </goal>
+ <goal name="array_ok3&#39;vc" expl="VC for array_ok3" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="array_ok3&#39;vc.0" expl="array creation size" proved="true">
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="7345"/></proof>
+  </goal>
+  <goal name="array_ok3&#39;vc.1" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="array_ok3&#39;vc.1.0" expl="postcondition" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="array_ok3&#39;vc.1.0.0" expl="postcondition" proved="true">
+    <proof prover="0" memlimit="2000"><result status="valid" time="1.22" steps="126188"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="array_ok4&#39;vc" expl="VC for array_ok4" proved="true">
+ <proof prover="1"><result status="valid" time="0.07" steps="309"/></proof>
+ <proof prover="2"><result status="valid" time="0.05" steps="127175"/></proof>
  </goal>
 </theory>
 </file>
