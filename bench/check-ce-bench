@@ -3,6 +3,7 @@
 dir=`dirname $0`
 
 updateoracle=false
+forceupdateoracle=false
 files=""
 success=true
 
@@ -10,6 +11,8 @@ while test $# != 0; do
 case "$1" in
   "-update-oracle")
       updateoracle=true;;
+  "-force-update-oracle")
+      forceupdateoracle=true;;
   "-"*)
       printf "unknown option: %s\n" "$1"
       printf "usage: check-ce-bench [-update-oracle] <files>\n"
@@ -47,18 +50,18 @@ run () {
     fi
     prover="$1,counterexamples"
     $dir/../bin/why3prove.opt --check-ce -P $prover --timelimit=1 -a split_vc "${file_path}.mlw" > "$f.out" 2>&1
-    if $updateoracle; then
-        echo "Updating oracle for ${file_path}, prover $1"
-        mv "$f.out" "${oracle_file}"
+    str_out=$(sed 's/[0-9]\+\.[0-9]\+s//g' "$f.out" | \
+              sed 's/[0-9]\+ steps//g' | \
+              sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
+    str_oracle=$(sed 's/[0-9]\+\.[0-9]\+s//g' "${oracle_file}" | \
+                 sed 's/[0-9]\+ steps//g' | \
+                 sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
+    if [ "$str_oracle" = "$str_out" ] ; then
+        echo "ok"
     else
-        str_out=$(sed 's/[0-9]\+\.[0-9]\+s//g' "$f.out" | \
-                  sed 's/[0-9]\+ steps//g' | \
-                  sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
-        str_oracle=$(sed 's/[0-9]\+\.[0-9]\+s//g' "${oracle_file}" | \
-                     sed 's/[0-9]\+ steps//g' | \
-                     sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
-        if [ "$str_oracle" = "$str_out" ] ; then
-            echo "ok"
+        if $updateoracle; then
+            echo "Updating oracle for ${file_path}, prover $1"
+            mv "$f.out" "${oracle_file}"
         else
             echo "FAILED!"
             echo "diff is the following:"
@@ -67,6 +70,10 @@ run () {
             failed="$failed$f\n"
             success=false
         fi
+    fi
+    if $forceupdateoracle; then
+        echo "Forcing update oracle for ${file_path}, prover $1"
+        mv "$f.out" "${oracle_file}"
     fi
 }
 
