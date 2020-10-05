@@ -1,12 +1,14 @@
 
-use file1.M
+use multifile1.M
 
 use int.Int
 
+(* underspec *)
 let f (x: int)
   ensures { result = x + 1 }
 = incr x
 
+(* wrong program w.r.t. postcondition *)
 let g (x: int)
   ensures { result = x + 2 }
 = incr x
