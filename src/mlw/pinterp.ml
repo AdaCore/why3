@@ -369,6 +369,9 @@ let register_used_value env loc vs value =
 let register_call env loc rs kind =
   env.rac.exec_log := add_call_to_log rs kind loc !(env.rac.exec_log)
 
+let register_pure_call env loc ls kind =
+  env.rac.exec_log := add_pure_call_to_log ls kind loc !(env.rac.exec_log)
+
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
 let add_local_funs locals env =
@@ -1247,8 +1250,7 @@ let fix_boolean_term t =
   if t_equal t t_false then t_bool_false else t
 
 let exec_pure ~loc env ls pvs =
-  let rs = restore_rs ls in
-  register_call env loc (Some rs) ExecPure;
+  register_pure_call env loc ls ExecConcrete;
   if ls_equal ls ps_equ then
     (* TODO (?) Add more builtin logical symbols *)
     let pv1, pv2 = match pvs with [pv1; pv2] -> pv1, pv2 | _ -> assert false in

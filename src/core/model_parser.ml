@@ -1065,11 +1065,12 @@ let model_for_positions_and_decls model ~positions =
 
 type verdict = Good_model | Bad_model | Dont_know
 
-type exec_kind = ExecAbstract | ExecConcrete | ExecPure
+type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
   | Val_from_model of (vsymbol * string)
   | Exec_call of (Expr.rsymbol option * exec_kind)
+  | Exec_pure of (Term.lsymbol * exec_kind)
   | Failed of string
 
 type log_entry = {
@@ -1090,6 +1091,9 @@ let add_val_to_log vs v loc exec_log =
 let add_call_to_log rs kind loc exec_log =
   add_log_entry (Exec_call (rs,kind)) loc exec_log
 
+let add_pure_call_to_log ls kind loc exec_log =
+  add_log_entry (Exec_pure (ls,kind)) loc exec_log
+
 let add_failed_lo_log s loc exec_log =
   add_log_entry (Failed s) loc exec_log
 
@@ -1098,7 +1102,6 @@ let log_to_list exec_log = List.rev exec_log
 let exec_kind_to_string ?(cap=true) = function
   | ExecAbstract -> if cap then "Abstract" else "abstract"
   | ExecConcrete -> if cap then "Concrete" else "concrete"
-  | ExecPure -> if cap then "Pure" else "pure"
 
 let print_exec_log fmt entry_log =
   let entry_log = List.rev entry_log in
@@ -1125,6 +1128,9 @@ let print_exec_log fmt entry_log =
         | Exec_call (Some rs, k) ->
            fprintf fmt "%s execution of %s" (exec_kind_to_string k)
              rs.Expr.rs_name.id_string
+        | Exec_pure (ls,k) ->
+           fprintf fmt "%s execution of %s" (exec_kind_to_string k)
+             ls.ls_name.id_string
         | _ -> failwith "not implemented yet"
         end;
         loop f l fmt rest in
