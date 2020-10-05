@@ -1915,14 +1915,15 @@ let find_rs pm loc =
     | x :: xs -> match f x with
       | None -> find_in_list f xs
       | res -> res in
-  let in_t = t_any (fun t ->
-      Opt.equal Loc.equal t.t_loc (Some loc)) in
+  let in_t t =
+    Opt.equal Loc.equal (Some loc) t.t_loc ||
+    t_any (fun t ->  Opt.equal Loc.equal (Some loc) t.t_loc) t in
   let in_cty cty =
     List.exists in_t cty.cty_pre ||
     List.exists in_t cty.cty_post ||
     Mxs.exists (fun _ -> List.exists in_t) cty.cty_xpost in
   let rec in_e e =
-    Opt.equal Loc.equal e.e_loc (Some loc) ||
+    Opt.equal Loc.equal (Some loc) e.e_loc ||
     match e.e_node with
     | Evar _ | Econst _ | Eassign _ -> false
     | Eexec (ce, cty) -> in_ce ce || in_cty cty
@@ -2000,7 +2001,7 @@ let check_model reduce env pm model =
           let abstract = check_model_rs ~abstract:true in
           Check_model_result {concrete; abstract}
       | None ->
-          let reason = "no corresponding routine symbol found" in
+          let reason = asprintf "no corresponding routine symbol found for %a" print_loc' loc in
           Cannot_check_model {reason}
 
 let report_eval_result body fmt (res, final_env) =
