@@ -12,6 +12,8 @@
 open Format
 open Ptree
 
+let debug_print_loc = Debug.register_flag ~desc:"Print@ locations@ in@ WhyML" "print-loc"
+
 type 'a printers = { marked: 'a Pp.pp; closed: 'a Pp.pp }
 
 let marker = ref None
@@ -122,11 +124,13 @@ let remove_id_attr s id =
     | _ -> true in
   {id with id_ats= List.filter p id.id_ats}
 
+let pp_loc fmt loc =
+  let filename, line, bchar, echar = Loc.get loc in
+  fprintf fmt "[#%S %d %d %d]" filename line bchar echar
+
 let pp_attr fmt = function
   | ATstr att -> fprintf fmt "[@%s]" att.Ident.attr_string
-  | ATpos loc ->
-      let filename, line, bchar, echar = Loc.get loc in
-      fprintf fmt "[#%S %d %d %d]" filename line bchar echar
+  | ATpos loc -> pp_loc fmt loc
 
 let pp_id fmt (id: ident) =
   let pp_decode fmt str =
@@ -536,6 +540,7 @@ and pp_fundef fmt (id, ghost, kind, binders, pty_opt, pat, mask, spec, e) =
 
 and pp_expr =
   let raw fmt e =
+    if Debug.test_flag debug_print_loc then pp_loc fmt (e.expr_loc);
     match e.expr_desc with
     | Eref ->
         pp_print_string fmt "ref"
@@ -699,6 +704,7 @@ and pp_expr =
 
 and pp_term =
   let raw fmt t =
+    if Debug.test_flag debug_print_loc then pp_loc fmt (t.term_loc);
     let pp_binop fmt op =
       pp_print_string fmt
         (match op with
@@ -842,6 +848,7 @@ and pp_spec result_pat fmt s =
 
 and pp_pattern =
   let pp_pattern_raw fmt p =
+    if Debug.test_flag debug_print_loc then pp_loc fmt (p.pat_loc);
     match p.pat_desc with
     | Pwild ->
         pp_print_string fmt "_"
