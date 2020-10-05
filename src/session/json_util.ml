@@ -645,7 +645,7 @@ let parse_prover_result j =
     pr_output = pr_output;
     pr_time = pr_time;
     pr_steps = pr_steps;
-    pr_model = Model_parser.default_model (* pr_model *)}
+    pr_model = Model_parser.empty_model (* pr_model *)}
     (* TODO pr_model is a string, should be model *)
 
 exception NotProofAttempt

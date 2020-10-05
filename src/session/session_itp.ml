@@ -1006,7 +1006,7 @@ let default_unknown_result =
        Call_provers.pr_output = "";
        Call_provers.pr_status = Unix.WEXITED 0;
        Call_provers.pr_steps = -1;
-       Call_provers.pr_model = Model_parser.default_model;
+       Call_provers.pr_model = Model_parser.empty_model;
      }
 
 let load_result a (path,acc) r =
@@ -1050,7 +1050,7 @@ let load_result a (path,acc) r =
        Call_provers.pr_output = "";
        Call_provers.pr_status = Unix.WEXITED 0;
        Call_provers.pr_steps = steps;
-       Call_provers.pr_model = Model_parser.default_model;
+       Call_provers.pr_model = Model_parser.empty_model;
        }
      in (path,Some res)
   | "undone" | "unedited" -> (path,acc)

@@ -70,3 +70,6 @@ val ffalse : 'a -> bool
 
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
+
+(** Check if a non-empty string contains only characters [a-zA-Z0-9_-] *)
+val is_sexp_simple_token : string -> bool

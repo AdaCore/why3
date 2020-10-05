@@ -1,0 +1,80 @@
+(** {1 Disambiguation of Plus Expressions }
+
+Author: Quentin Garchery (LRI, Université Paris-Sud)
+*)
+
+use int.Int
+use list.ListRich
+
+(** Consider the 'concrete' syntax of Plus Expressions containing only :
+    integers, the symbol PLUS and parentheses. *)
+
+type token = INT | PLUS | LPAREN | RPAREN
+
+(** Plus Expressions are lists of tokens that satisfy the original following
+    inductive predicate. *)
+
+inductive pe (e : list token) =
+    | Plus : forall e1 e2. pe e1 -> pe e2 -> pe (e1 ++ Cons PLUS e2)
+    | Paren : forall e. pe e -> pe (Cons LPAREN (e ++ (Cons RPAREN Nil)))
+    | Int : pe (Cons INT Nil)
+
+goal pe1 : pe (Cons INT Nil)
+goal pe2 : pe (Cons INT (Cons PLUS (Cons INT (Cons PLUS (Cons INT Nil)))))
+
+(** Define another predicate to recognize Plus Expressions but that removes the
+    ambiguity coming from the associativity of PLUS. *)
+
+inductive pe' (e : list token) =
+   | Plus' : forall e1 e2. pe' e1 -> pt e2 -> pe' (e1 ++ Cons PLUS e2)
+   | T' : forall t. pt t -> pe' t
+with pt (e : list token) =
+    | Paren' : forall e. pe' e -> pt (Cons LPAREN (e ++ (Cons RPAREN Nil)))
+    | Int' : pt (Cons INT Nil)
+
+goal pep1 : pe' (Cons INT Nil)
+goal pep2 : pe' (Cons INT (Cons PLUS (Cons INT (Cons PLUS (Cons INT Nil)))))
+
+(** Show that the two predicates recognize the same expressions. *)
+
+(** Strengthen the disambiguation_included formula, making sure the pt predicate
+    appears. *)
+
+let rec lemma di_str (n : int)
+    variant { n }
+    ensures { forall e. (length e <= n /\ pt e) \/ (length e < n /\ pe' e) ->
+    	      	     	pe e }
+    =
+    if n <= 0
+    then ()
+    else di_str (n-1)
+
+let lemma disambiguation_included (e : list token)
+    requires { pe' e }
+    ensures { pe e }
+    =
+    di_str (length e + 1)
+
+(** Strengthen the original_included formula and prove it by using mutal
+    recursion (showing that we can decompose an expression w.r.t its last
+    toplevel PLUS symbol). *)
+
+let rec lemma oi_str (n : int) (ghost m : int)
+    variant { n, m }
+    requires { m > n }
+    ensures { forall e. length e <= n -> pe e -> pe' e }
+    = if n > 0 then (decomp_last_plus n (m-1); oi_str (n-1) m)
+
+with ghost decomp_last_plus (n : int) (ghost m : int)
+     variant { n, m }
+     requires { m >= n }
+     ensures { forall e. length e <= n -> pe e -> not pt e ->
+     	       exists e1 e2. pe e1 /\ pt e2 /\ e = e1 ++ Cons PLUS e2 }
+     =
+     if n > 0 then (decomp_last_plus (n-1) n; oi_str (n-1) n)
+
+lemma original_included :
+      forall e. pe e -> pe' e
+
+lemma original_equiv_disambiguation :
+      forall e. pe e <-> pe' e
