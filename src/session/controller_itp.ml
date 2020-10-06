@@ -37,7 +37,7 @@ let print_status fmt st =
   | Undone            -> fprintf fmt "Undone"
   | Scheduled         -> fprintf fmt "Scheduled"
   | Running           -> fprintf fmt "Running"
-  | Done r            -> fprintf fmt "Done(%a)" (Call_provers.print_prover_result ~json:false ?check_ce:None) r
+  | Done r            -> fprintf fmt "Done(%a)" (Call_provers.print_prover_result ?json:None ?check_ce:None) r
   | Interrupted       -> fprintf fmt "Interrupted"
   | Detached          -> fprintf fmt "Detached"
   | InternalFailure e ->
@@ -430,8 +430,8 @@ let build_prover_call spa =
           let open Pinterp in
           let trans = Compute.normalize_goal_transf_all c.controller_env in
           (* TODO Don't hardcode the RAC prover! *)
-          let prover = rac_prover c.controller_config c.controller_env ~limit_time:2 "z3" in
-          Some (check_model (rac_reduce_config ~trans ~prover ()) c.controller_env pm)
+          (* let prover = rac_prover c.controller_config c.controller_env ~limit_time:2 "z3" in *)
+          Some (check_model (rac_reduce_config ~trans (* ~prover *) ()) c.controller_env pm)
         else None in
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
           ~limit ~interactive ?check_model driver task in
@@ -1092,8 +1092,8 @@ let print_report fmt (r: report) =
   match r with
   | Result (new_r, old_r) ->
     Format.fprintf fmt "new_result = %a, old_result = %a@."
-      (Call_provers.print_prover_result ~json:false ?check_ce:None) new_r
-      (Call_provers.print_prover_result ~json:false ?check_ce:None) old_r
+      (Call_provers.print_prover_result ?json:None ?check_ce:None) new_r
+      (Call_provers.print_prover_result ?json:None ?check_ce:None) old_r
   | CallFailed e ->
     Format.fprintf fmt "Callfailed %a@." Exn_printer.exn_printer e
   | Replay_interrupted ->
@@ -1104,7 +1104,7 @@ let print_report fmt (r: report) =
     Format.fprintf fmt "No edited file@."
   | No_former_result new_r ->
     Format.fprintf fmt "new_result = %a, no former result@."
-      (Call_provers.print_prover_result ~json:false ?check_ce:None) new_r
+      (Call_provers.print_prover_result ?json:None ?check_ce:None) new_r
 
 (* TODO to be removed when we have a better way to print *)
 let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
@@ -1290,7 +1290,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                   | Done res ->
                      assert (res.Call_provers.pr_answer = Call_provers.Valid);
                      Debug.dprintf debug "Bisecting: %a.@."
-                       (Call_provers.print_prover_result ~json:false ~check_ce:false) res
+                       (Call_provers.print_prover_result ?json:None ~check_ce:false) res
                   end
                 in
                 schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification

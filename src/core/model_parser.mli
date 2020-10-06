@@ -290,7 +290,7 @@ val add_failed_to_log : string -> Loc.position -> exec_log -> exec_log
 val add_stucked_to_log : string -> Loc.position -> exec_log -> exec_log
 val add_exec_ended_to_log : Loc.position -> exec_log -> exec_log
 val log_to_list : exec_log -> log_entry list
-val print_exec_log : exec_log Pp.pp
+val print_exec_log : json:bool -> exec_log Pp.pp
 
 type full_verdict = {
     verdict  : verdict;

@@ -85,6 +85,7 @@ module rec Value : sig
     | Vfun of value Mvs.t (* closure *) * vsymbol * expr
     | Vpurefun of ty (* keys *) * value Mv.t * value
     | Vterm of term (* ghost values *)
+    | Vundefined
   and field = Field of value ref
   val compare_values : value -> value -> int
 end = struct
@@ -102,11 +103,16 @@ end = struct
     | Vfun of value Mvs.t (* closure *) * vsymbol * expr
     | Vpurefun of ty (* keys *) * value Mv.t * value
     | Vterm of term
+    | Vundefined
   and field = Field of value ref
 
   open Util
 
   let rec compare_values v1 v2 =
+    if v1.v_desc = Vundefined then
+      cannot_compute "compare with undefined value of type %a" print_ty v1.v_ty;
+    if v2.v_desc = Vundefined then
+      cannot_compute "compare with undefined value of type %a" print_ty v2.v_ty;
     let v_ty v = v.v_ty and v_desc v = v.v_desc in
     cmp [cmptr v_ty ty_compare; cmptr v_desc compare_desc] v1 v2
   and compare_desc d1 d2 =
@@ -154,6 +160,7 @@ end = struct
           cmptr Array.length (-);
           cmptr Array.to_list (cmp_lists [cmptr (fun x -> x) compare_values]);
         ] a1 a2
+    | Vundefined, _ | _, Vundefined -> assert false
 end
 and Mv : Map.S with type key = Value.value =
   Map.Make (struct
@@ -211,6 +218,7 @@ let rec print_value fmt v =
         (Mv.bindings mv) print_value v
   | Vterm t ->
       fprintf fmt "(term:@ %a)" print_term t
+  | Vundefined -> fprintf fmt "UNDEFINED"
 
 and print_field fmt f = print_value fmt (field_get f)
 
@@ -223,16 +231,25 @@ let rec snapshot v =
         Vpurefun (ty, mv, snapshot v)
     | Varray a -> Varray (Array.map snapshot a)
     | Vfloat _ | Vstring _ | Vterm _ | Vbool _ | Vreal _
-    | Vfloat_mode _ | Vvoid | Vnum _ as vd -> vd in
+    | Vfloat_mode _ | Vvoid | Vnum _ | Vundefined as vd -> vd in
   {v with v_desc}
 
 and snapshot_field f =
   field (snapshot (field_get f))
 
-(** Convert a value into a term. The first component of the result are additional bindings
+let ls_undefined =
+  let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
+  create_fsymbol (id_fresh "undefined") [] ty_a
+
+     (** Convert a value into a term. The first component of the result are additional bindings
     from closures, (roughly) sorted by strongly connected components. *)
 let rec term_of_value env vsenv v : (vsymbol * term) list * term =
   match v.v_desc with
+  | Vundefined ->
+      (* TODO Replace ls_undefined by fs_any_function when branch
+       * fun-lits-noptree is merged:
+       * env, t_app fs_any_function [t_tuple []] v.v_ty *)
+      vsenv, t_app ls_undefined [] (Some v.v_ty)
   | Vnum i -> vsenv, t_const (Constant.int_const i) v.v_ty
   | Vstring s -> vsenv, t_const (Constant.ConstStr s) ty_str
   | Vbool b -> vsenv, if b then t_bool_true else t_bool_false
@@ -708,6 +725,11 @@ let get_pvs env pvs =
 
 (* DEFAULTS *)
 
+let is_array_its env its =
+  let pm = Pmodule.read_module env ["array"] "Array" in
+  let array_its = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
+  its_equal its array_its
+
 (* TODO Remove argument [env] after replacing Varray by model substitution *)
 let rec default_value_of_type env known ity : value =
   let ty = ty_of_ity ity in
@@ -720,31 +742,28 @@ let rec default_value_of_type env known ity : value =
   (* | Ityapp(ts,_,_) when is_its_tuple ts -> assert false (* TODO *) *)
   | Ityreg {reg_its= its; reg_args= l1; reg_regs= l2}
   | Ityapp (its, l1, l2) ->
-      let is_array_its env its =
-        let pm = Pmodule.read_module env ["array"] "Array" in
-        let array_its = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
-        its_equal its array_its in
       if is_array_its env its then
         value ty (Varray (Array.init 0 (fun _ -> assert false)))
       else
-      let itd = Pdecl.find_its_defn known its in
-      match itd.Pdecl.itd_its.its_def with
-      | Range r -> value ty (Vnum r.Number.ir_lower)
-      | _ ->
-      let cs =
-        match itd.Pdecl.itd_constructors with
-        | cs :: _ -> cs
-        | [] ->
-            if not its.its_nonfree then
-              kasprintf failwith "not non-free type without constructors: %a" print_its its;
-            (* TODO Axiomatize values of record fields by rules in the reduction engine?
-               Cf. bench/ce/records_inv.mlw *)
-            kasprintf failwith "Cannot create default value for non-free type %a" Ity.print_its its in
-      let subst = its_match_regs its l1 l2 in
-      let ityl = List.map (fun pv -> pv.pv_ity) cs.rs_cty.cty_args in
-      let tyl = List.map (ity_full_inst subst) ityl in
-      let fl = List.map (fun ity -> field (default_value_of_type env known ity)) tyl in
-      value ty (Vconstr (cs, fl))
+        let itd = Pdecl.find_its_defn known its in
+        match itd.Pdecl.itd_its.its_def with
+        | Range r -> value ty (Vnum r.Number.ir_lower)
+        | _ -> match itd.Pdecl.itd_constructors with
+          | rs :: _ ->
+              let subst = its_match_regs its l1 l2 in
+              let ityl = List.map (fun pv -> pv.pv_ity) rs.rs_cty.cty_args in
+              let tyl = List.map (ity_full_inst subst) ityl in
+              let fl = List.map (fun ity -> field (default_value_of_type env known ity)) tyl in
+              value ty (Vconstr (rs, fl))
+          | [] ->
+              (* if its.its_private then
+               *   (\* There is no constructor so we can just invent a Vconstr,
+               *      but we will have to axiomatize the corresponding term *\)
+               *   let itys = List.map (fun rs -> (Opt.get rs.rs_field).pv_ity) itd.Pdecl.itd_fields in
+               *   let fl = List.map (fun ity -> field (default_value_of_type env known ity)) itys in
+               *   value ty (Vconstr (None, fl))
+               * else *)
+              value ty Vundefined
 
 (* VALUE IMPORT *)
 
@@ -997,6 +1016,7 @@ let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
   let task = List.fold_left use_export task Theory.[builtin_theory; bool_theory; highord_theory] in
+  let task = add_param_decl task ls_undefined in
   (* Add known declarations *)
   let add_known _ decl task =
     match decl.d_node with

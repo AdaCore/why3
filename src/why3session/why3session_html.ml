@@ -236,7 +236,7 @@ struct
   let print_proof_status fmt = function
     | None -> fprintf fmt "No result"
     | Some res -> fprintf fmt "Done: %a"
-                    (Call_provers.print_prover_result ~json:true ?check_ce:None) res
+                    (Call_provers.print_prover_result ?json:None ?check_ce:None) res
 
   let print_proof_attempt s fmt pa =
     let pa = get_proof_attempt_node s pa in

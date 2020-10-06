@@ -28,7 +28,7 @@ let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
-let opt_json = ref false
+let opt_json = ref None
 let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
 
@@ -125,7 +125,9 @@ let option_list =
     " check the counter-examples using runtime assertion checking (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     " use prover in RAC when term reduction is insufficient";
-    KLong "json", Hnd0 (fun () -> opt_json := true),
+    KLong "all-json", Hnd0 (fun () -> opt_json := Some `All),
+    " print output in JSON format";
+    KLong "json", Hnd0 (fun () -> opt_json := Some `Model),
     " print counterexamples in JSON format";
     KLong "print-theory", Hnd0 (fun () -> opt_print_theory := true),
     " print selected theories";
@@ -231,19 +233,13 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
-let print_result ~json ~check_ce fmt (fname, loc, goal_name, expls, res) =
-  if json then
+let print_result ?json ~check_ce fmt (fname, loc, goal_name, expls, res) =
+  if json = Some `All then
     let open Json_base in
     let print_loc fmt (loc, fname) =
       match loc with
       | None -> fprintf fmt "{%a}" (print_json_field "filename" print_json) (String fname)
-      | Some loc ->
-          let f, l, b, e = Loc.get loc in
-          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]@,}@]"
-            (print_json_field "filename" print_json) (String f)
-            (print_json_field "line" print_json) (Int l)
-            (print_json_field "start-char" print_json) (Int b)
-            (print_json_field "end-char" print_json) (Int e) in
+      | Some loc -> Pretty.print_json_loc fmt loc in
     let print_term fmt (loc, fname, goal_name, expls) =
       fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
         (print_json_field "loc" print_loc) (loc, fname)
@@ -251,7 +247,7 @@ let print_result ~json ~check_ce fmt (fname, loc, goal_name, expls, res) =
         (print_json_field "explanations" print_json) (List (List.map (fun s -> String s) expls)) in
     fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
       (print_json_field "term" print_term) (loc, fname, goal_name, expls)
-      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:true ~check_ce)) res
+      (print_json_field "prover-result" (Call_provers.print_prover_result ?json ~check_ce)) res
   else (
     ( match loc with
       | None -> fprintf fmt "File %s:@." fname
@@ -262,7 +258,7 @@ let print_result ~json ~check_ce fmt (fname, loc, goal_name, expls, res) =
         let expls = String.capitalize_ascii (String.concat ", " expls) in
         fprintf fmt "Formula `%s' from verification condition %s.@\n" expls goal_name );
     fprintf fmt "Prover result is: %a"
-      Call_provers.(print_prover_result ~json:false ~check_ce) res )
+      Call_provers.(print_prover_result ?json ~check_ce) res )
 
 let unproved = ref false
 
@@ -287,7 +283,7 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
-        printf "%a@." (print_result ~json:!opt_json ~check_ce)
+        printf "%a@." (print_result ?json:!opt_json ~check_ce)
           (fname, t.Term.t_loc, goal_name, expls, res);
         if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
     | None, None ->
