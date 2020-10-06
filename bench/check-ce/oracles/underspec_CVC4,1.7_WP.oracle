@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.04s, 1403 steps).
+Prover result is: valid (0.03s, 1403 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -105,7 +105,7 @@ Prover result is: valid (0.04s, 1403 steps).
                   Concrete execution of contents
                   Concrete execution of infix +
                 Line 17:
-                  Execution failed: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation failed
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 15, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -157,7 +157,7 @@ Prover result is: valid (0.04s, 1403 steps).
                   Concrete execution of contents
                   Concrete execution of infix +
                 Line 17:
-                  Execution failed: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation failed
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -197,15 +197,15 @@ File underspec.mlw:
     Concrete execution of contents
     Concrete execution of infix +
   Line 17:
-    Execution failed: Loop invariant preservation failed
+    Property failure: Loop invariant preservation failed
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: valid (0.02s, 1643 steps).
+Prover result is: valid (0.03s, 1643 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.02s, 1582 steps).
+Prover result is: valid (0.03s, 1582 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                        VALUE from ce-model: (ref'mk 0)
@@ -237,7 +237,8 @@ Prover result is: valid (0.02s, 1582 steps).
                   z = (ref'mk 0)
                   result = ()
                 Line 41:
-                  Execution failed: Postcondition failed
+                  Property failure: Postcondition failed
+                  Execution got stucked: Assume postconition
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                          VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 46, characters 4-8 not in ce-model, taking default ()
@@ -268,7 +269,7 @@ Prover result is: valid (0.02s, 1582 steps).
                   z = (ref'mk 2)
                   result = ()
                 Line 47:
-                  Execution failed: Assertion failed
+                  Property failure: Assertion failed
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                            VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 46, characters 4-8 not in ce-model, taking default ()
@@ -299,7 +300,7 @@ Prover result is: valid (0.02s, 1582 steps).
                   z = (ref'mk 2)
                   result = ()
                 Line 47:
-                  Execution failed: Assertion failed
+                  Property failure: Assertion failed
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -330,5 +331,5 @@ File underspec.mlw:
     z = (ref'mk 2)
     result = ()
   Line 47:
-    Execution failed: Assertion failed
+    Property failure: Assertion failed
 

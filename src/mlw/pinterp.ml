@@ -1502,7 +1502,10 @@ and eval_expr' env e =
         (Mvs.keys env.vsenv);
       (* assert2 *)
       (try check_terms (cntr_ctx "Assume loop invariant" env) inv with
-       | Contr (_,t) -> raise (RACStuck (env, t.t_loc)));
+       | Contr (_,t) ->
+          let loc = Opt.get_def Loc.dummy_position t.t_loc in
+          register_stucked env loc "Assume invariant";
+          raise (RACStuck (env, t.t_loc)));
       match eval_expr env cond with
       | Normal v ->
          if is_true v then begin
@@ -1511,6 +1514,7 @@ and eval_expr' env e =
                 if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
                 (* the execution cannot continue from here *)
+                register_stucked env loc_or_dummy "Cannot continue after arbitrary iteration";
                 raise (RACStuck (env,e.e_loc))
              | r -> r
            end
@@ -1603,8 +1607,12 @@ and eval_expr' env e =
         raise (RACStuck (env,e.e_loc)) end;
     if le a i_val && le i_val b then begin
       (* assert2 *)
-      (try check_terms (cntr_ctx "Assume loop invariant" env) inv with
-       | Contr (_,t) -> raise (RACStuck (env,t.t_loc)));
+      (let msg = "Assume loop invariant" in
+       try check_terms (cntr_ctx msg env) inv with
+       | Contr (_,t) ->
+          let loc = Opt.get_def Loc.dummy_position t.t_loc in
+          register_stucked env loc msg;
+          raise (RACStuck (env,t.t_loc)));
       match eval_expr env e1 with
       | Normal _ ->
          let env = bind_vs i.pv_vs (value ty_int (Vnum (suc i_val))) env in
@@ -1737,7 +1745,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
     with Contr (ctx, t) when main_function ->
       (* Only in this case the pre-condition should be assumed.
          In all other cases, it should be proved. *)
-      Debug.dprintf debug_rac_check "Contradiction in preconditions of main function@.";
+      let loc = Opt.get_def Loc.dummy_position t.t_loc in
+      register_stucked env loc "Assume precondition";
       raise (RACStuck (ctx.c_env, t.t_loc)) );
   let can_interpret_abstractly =
     if rs_equal rs rs_func_app then false else
@@ -1773,7 +1782,10 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                     loc_or_dummy in
       (* assert2 *)
       (try check_posts "Postcondition" loc env res_v rs.rs_cty.cty_post with
-       | Contr (_,t) -> raise (RACStuck (env,t.t_loc)));
+       | Contr (_,t) ->
+          let loc = Opt.get_def Loc.dummy_position t.t_loc in
+          register_stucked env loc "Assume postconition";
+          raise (RACStuck (env,t.t_loc)));
       Normal res_v end
   else begin
       register_call env loc_or_dummy (Some rs) ExecConcrete;

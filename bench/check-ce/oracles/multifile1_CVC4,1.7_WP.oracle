@@ -1,6 +1,6 @@
 File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
 Formula `Postcondition' from verification condition decr'vc.
-Prover result is: valid (0.04s, 287 steps).
+Prover result is: valid (0.02s, 287 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 <check-ce>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 not in ce-model, taking default 0
@@ -33,7 +33,7 @@ Prover result is: valid (0.04s, 287 steps).
                   result = 0
                   Concrete execution of infix +
                 Line 10:
-                  Execution failed: Postcondition of incr failed
+                  Property failure: Postcondition of incr failed
 <check-ce>Check model 1 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 <check-ce>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -65,7 +65,7 @@ Prover result is: valid (0.04s, 287 steps).
                   result = 0
                   Concrete execution of infix +
                 Line 10:
-                  Execution failed: Postcondition of incr failed
+                  Property failure: Postcondition of incr failed
 <check-ce>Check model 2 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 <check-ce>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -97,7 +97,7 @@ Prover result is: valid (0.04s, 287 steps).
                   result = 0
                   Concrete execution of infix +
                 Line 10:
-                  Execution failed: Postcondition of incr failed
+                  Property failure: Postcondition of incr failed
 <check-ce>Models:
           - Checked model 0: bad model/good model -> The contracts of some
                                                      function or loop are
@@ -128,5 +128,5 @@ File multifile1.mlw:
     result = 0
     Concrete execution of infix +
   Line 10:
-    Execution failed: Postcondition of incr failed
+    Property failure: Postcondition of incr failed
 

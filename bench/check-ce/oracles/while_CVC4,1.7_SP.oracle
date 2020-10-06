@@ -1,6 +1,6 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.04s, 1438 steps).
+Prover result is: valid (0.05s, 1438 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Formula `Loop variant decrease' from verification condition f'vc.
@@ -86,6 +86,8 @@ Prover result is: valid (0.03s, 1914 steps).
                 Line 15:
                   Concrete execution of contents
                   Concrete execution of infix +
+                Line 8:
+                  Execution got stucked: Cannot continue after arbitrary iteration
 <check-ce>Check model 1 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -167,7 +169,7 @@ Prover result is: valid (0.03s, 1914 steps).
                   Concrete execution of contents
                   Concrete execution of infix +
                 Line 10:
-                  Execution failed: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation failed
 <check-ce>Check model 2 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -249,7 +251,7 @@ Prover result is: valid (0.03s, 1914 steps).
                   Concrete execution of contents
                   Concrete execution of infix +
                 Line 10:
-                  Execution failed: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation failed
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -298,7 +300,7 @@ File while.mlw:
     Concrete execution of contents
     Concrete execution of infix +
   Line 10:
-    Execution failed: Loop invariant preservation failed
+    Property failure: Loop invariant preservation failed
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Formula `Loop variant decrease' from verification condition f'vc.
@@ -306,5 +308,5 @@ Prover result is: valid (0.03s, 1860 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: valid (0.03s, 1821 steps).
+Prover result is: valid (0.02s, 1821 steps).
 

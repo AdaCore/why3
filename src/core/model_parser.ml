@@ -1177,7 +1177,7 @@ let print_exec_log ~json fmt entry_log =
                 fprintf fmt "%s execution of %s" (exec_kind_to_string k)
                   ls.ls_name.id_string
             | Exec_failed msg ->
-                fprintf fmt "Execution failed: %s" msg
+                fprintf fmt "Property failure: %s" msg
             | Exec_stucked msg ->
                 fprintf fmt "Execution got stucked: %s" msg
             | Exec_ended ->

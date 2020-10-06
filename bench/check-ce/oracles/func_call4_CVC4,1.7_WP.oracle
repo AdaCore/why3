@@ -15,7 +15,8 @@
                   z = (ref'mk 0)
                   result = ()
                 Line 7:
-                  Execution failed: Postcondition failed
+                  Property failure: Postcondition failed
+                  Execution got stucked: Assume postconition
 <check-ce>Check model 1 ("bench/check-ce/func_call4.mlw", line 9, characters 34-39)
 <check-ce>                          VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
@@ -32,7 +33,7 @@
                   Abstract execution of g
                   z = (ref'mk 2)
                   result = ()
-                  Execution failed: Assertion failed
+                  Property failure: Assertion failed
 <check-ce>Check model 2 ("bench/check-ce/func_call4.mlw", line 9, characters 34-39)
 <check-ce>                            VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
@@ -49,7 +50,7 @@
                   Abstract execution of g
                   z = (ref'mk 2)
                   result = ()
-                  Execution failed: Assertion failed
+                  Property failure: Assertion failed
 <check-ce>Models:
           - Checked model 0: don't know/bad model -> The following
                                                      counterexample model has
@@ -85,5 +86,5 @@ File func_call4.mlw:
     Abstract execution of g
     z = (ref'mk 2)
     result = ()
-    Execution failed: Assertion failed
+    Property failure: Assertion failed
 

@@ -48,7 +48,7 @@ Prover result is: valid (0.02s, 58 steps).
                   x2 = (ref'mk 0)
                   i = 2
                 Line 17:
-                  Execution failed: Invariant remains valid after loop failed
+                  Property failure: Invariant remains valid after loop failed
                   Execution got stucked: Variable i has value 2, but invariant does not hold
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -101,7 +101,7 @@ Prover result is: valid (0.02s, 58 steps).
                   Concrete execution of contents
                   Concrete execution of infix +
                 Line 17:
-                  Execution failed: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation failed
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 15, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -153,7 +153,7 @@ Prover result is: valid (0.02s, 58 steps).
                   Concrete execution of contents
                   Concrete execution of infix +
                 Line 17:
-                  Execution failed: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation failed
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -170,7 +170,7 @@ Prover result is: valid (0.02s, 58 steps).
                                                      following execution:
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5098832 steps).
+Prover result is: timeout (1.00s, 4927594 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:
@@ -193,7 +193,7 @@ File underspec.mlw:
     Concrete execution of contents
     Concrete execution of infix +
   Line 17:
-    Execution failed: Loop invariant preservation failed
+    Property failure: Loop invariant preservation failed
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
@@ -233,7 +233,8 @@ Prover result is: valid (0.01s, 2283 steps).
                   z = (ref'mk 0)
                   result = ()
                 Line 41:
-                  Execution failed: Postcondition failed
+                  Property failure: Postcondition failed
+                  Execution got stucked: Assume postconition
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                          VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 46, characters 4-8 not in ce-model, taking default ()
@@ -264,7 +265,7 @@ Prover result is: valid (0.01s, 2283 steps).
                   z = (ref'mk 2)
                   result = ()
                 Line 47:
-                  Execution failed: Assertion failed
+                  Property failure: Assertion failed
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                            VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 46, characters 4-8 not in ce-model, taking default ()
@@ -295,7 +296,7 @@ Prover result is: valid (0.01s, 2283 steps).
                   z = (ref'mk 2)
                   result = ()
                 Line 47:
-                  Execution failed: Assertion failed
+                  Property failure: Assertion failed
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -312,7 +313,7 @@ Prover result is: valid (0.01s, 2283 steps).
                                                      following execution:
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5443849 steps).
+Prover result is: timeout (1.00s, 5679116 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:
@@ -326,5 +327,5 @@ File underspec.mlw:
     z = (ref'mk 2)
     result = ()
   Line 47:
-    Execution failed: Assertion failed
+    Property failure: Assertion failed
 

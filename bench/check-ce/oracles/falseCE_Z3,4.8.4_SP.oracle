@@ -7,14 +7,16 @@
                   a = 0
                   b = 0
                 Line 13:
-                  Execution failed: Precondition of rsa failed
+                  Property failure: Precondition of rsa failed
+                  Execution got stucked: Assume precondition
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
               File falseCE.mlw:
                 Line 12:
                   a = 0
                   b = 0
                 Line 13:
-                  Execution failed: Precondition of rsa failed
+                  Property failure: Precondition of rsa failed
+                  Execution got stucked: Assume precondition
 <check-ce>Check model 2 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -40,7 +42,7 @@
                                                     you :(
 File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
 Formula `Assertion' from verification condition rsa'vc.
-Prover result is: timeout (1.00s, 3571491 steps).
+Prover result is: timeout (1.00s, 3947507 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.04s, 1403 steps).
+Prover result is: valid (0.05s, 1403 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -105,7 +105,7 @@ Prover result is: valid (0.04s, 1403 steps).
                   Concrete execution of contents
                   Concrete execution of infix +
                 Line 8:
-                  Execution failed: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation failed
 <check-ce>Check model 2 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -157,7 +157,7 @@ Prover result is: valid (0.04s, 1403 steps).
                   Concrete execution of contents
                   Concrete execution of infix +
                 Line 8:
-                  Execution failed: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation failed
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -197,7 +197,7 @@ File for.mlw:
     Concrete execution of contents
     Concrete execution of infix +
   Line 8:
-    Execution failed: Loop invariant preservation failed
+    Property failure: Loop invariant preservation failed
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant preservation' from verification condition f'vc.

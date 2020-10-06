@@ -1,6 +1,6 @@
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.05s, 1182 steps).
+Prover result is: valid (0.03s, 1182 steps).
 
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Formula `Loop invariant preservation' from verification condition f'vc.
@@ -42,7 +42,7 @@ Prover result is: valid (0.03s, 1654 steps).
                 Line 10:
                   Concrete execution of contents
                 Line 4:
-                  Execution failed: Postcondition of f failed
+                  Property failure: Postcondition of f failed
 <check-ce>Check model 1 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
 <check-ce>VALUE for result "bench/check-ce/for1.mlw", line 5, characters 16-17 not in ce-model, taking default (ref'mk 0)
 <check-ce>                            VALUE from ce-model: (ref'mk 0)
@@ -79,7 +79,7 @@ Prover result is: valid (0.03s, 1654 steps).
                 Line 10:
                   Concrete execution of contents
                 Line 4:
-                  Execution failed: Postcondition of f failed
+                  Property failure: Postcondition of f failed
 <check-ce>Check model 2 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
 <check-ce>VALUE for result "bench/check-ce/for1.mlw", line 5, characters 16-17 not in ce-model, taking default (ref'mk 0)
 <check-ce>                              VALUE from ce-model: (ref'mk 0)
@@ -116,7 +116,7 @@ Prover result is: valid (0.03s, 1654 steps).
                 Line 10:
                   Concrete execution of contents
                 Line 4:
-                  Execution failed: Postcondition of f failed
+                  Property failure: Postcondition of f failed
 <check-ce>Models:
           - Checked model 0: bad model/good model -> The contracts of some
                                                      function or loop are
@@ -151,7 +151,7 @@ File for1.mlw:
   Line 10:
     Concrete execution of contents
   Line 4:
-    Execution failed: Postcondition of f failed
+    Property failure: Postcondition of f failed
 
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Verification condition f'vc.
