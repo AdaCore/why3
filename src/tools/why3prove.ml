@@ -250,15 +250,16 @@ let print_result ?json ~check_ce fmt (fname, loc, goal_name, expls, res) =
       (print_json_field "prover-result" (Call_provers.print_prover_result ?json ~check_ce)) res
   else (
     ( match loc with
-      | None -> fprintf fmt "File %s:@." fname
+      | None -> fprintf fmt "File %s:@\n" fname
       | Some loc -> Loc.report_position Format.std_formatter loc );
     ( if expls = [] then
-        fprintf fmt "Verification condition %s.@\n" goal_name
+        fprintf fmt "@[<hov>Verification@ condition@ %s.@]" goal_name
       else
         let expls = String.capitalize_ascii (String.concat ", " expls) in
-        fprintf fmt "Formula `%s' from verification condition %s.@\n" expls goal_name );
-    fprintf fmt "Prover result is: %a"
-      Call_provers.(print_prover_result ?json ~check_ce) res )
+        fprintf fmt "@[<hov>Formula@ `%s'@ from@ verification@ condition@ %s.@]" expls goal_name );
+    fprintf fmt "@\n@[<v>Prover result is: %a@]"
+      Call_provers.(print_prover_result ?json ~check_ce) res;
+    fprintf fmt "@\n" )
 
 let unproved = ref false
 

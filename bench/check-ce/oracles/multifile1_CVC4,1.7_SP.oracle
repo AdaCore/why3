@@ -1,11 +1,12 @@
 File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
 Formula `Postcondition' from verification condition decr'vc.
-Prover result is: valid (0.04s, 287 steps).
+Prover result is: valid (0.01s, 287 steps).
 
 File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
 Formula `Postcondition' from verification condition incr'vc.
 Prover result is: unknown (sat) (0.03s, 4862 steps).
-The following counterexample values reveal a subcontract weakness:
+The contracts of some function or loop are underspecified, for example during
+the following execution:
 File multifile1.mlw:
   Line 9:
     x = 2

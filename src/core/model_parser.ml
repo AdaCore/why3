@@ -554,19 +554,16 @@ let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
           ~me_name_trans))
     m_elements
 
-let print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt filename model_file =
+let print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt (filename, model_file) =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths. *)
   let filename = Filename.basename filename in
-  fprintf fmt "@[<v 0>File %s:@\n" filename ;
-  Mint.iter
-    (fun line m_elements ->
-      fprintf fmt "  @[<v 2>Line %d:@\n" line ;
-      print_model_elements ~at_loc:(filename, line) ~print_attrs
-        ~print_model_value ~me_name_trans fmt m_elements ;
-      fprintf fmt "@]@\n")
-    model_file ;
-  fprintf fmt "@]"
+  let pp fmt (line, m_elements) =
+    fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
+      (print_model_elements ?sep:None ~at_loc:(filename, line) ~print_attrs
+         ~print_model_value ~me_name_trans) m_elements in
+  fprintf fmt "@[<v 0>File %s:@ %a@]" filename
+    Pp.(print_list space pp) (Mint.bindings model_file)
 
 let why_name_trans {men_kind; men_name} =
   match men_kind with
@@ -586,8 +583,8 @@ let json_name_trans {men_kind; men_name} =
 
 let print_model ~print_attrs ?(me_name_trans = why_name_trans)
     ~print_model_value fmt model =
-  Mstr.iter (print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt)
-    model.model_files
+  Pp.print_list Pp.newline (print_model_file ~print_attrs ~print_model_value ~me_name_trans)
+    fmt (Mstr.bindings model.model_files)
 
 let print_model_human ?(me_name_trans = why_name_trans) fmt model =
   print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model

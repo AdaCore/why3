@@ -1,15 +1,16 @@
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.02s, 32 steps).
+Prover result is: valid (0.00s, 32 steps).
 
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: valid (0.02s, 2379 steps).
+Prover result is: valid (0.00s, 2379 steps).
 
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Formula `Postcondition' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5902414 steps).
-The following counterexample values reveal a subcontract weakness:
+Prover result is: timeout (1.00s, 6987686 steps).
+The contracts of some function or loop are underspecified, for example during
+the following execution:
 File for1.mlw:
   Line 3:
     _ = ()
@@ -27,5 +28,5 @@ File for1.mlw:
 
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Verification condition f'vc.
-Prover result is: valid (0.00s, 104 steps).
+Prover result is: valid (0.01s, 104 steps).
 

@@ -1,11 +1,12 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.01s, 58 steps).
+Prover result is: valid (0.02s, 58 steps).
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5579501 steps).
-The following counterexample values reveal a subcontract weakness:
+Prover result is: timeout (1.00s, 7118149 steps).
+The contracts of some function or loop are underspecified, for example during
+the following execution:
 File underspec.mlw:
   Line 13:
     _ = ()
@@ -30,16 +31,17 @@ File underspec.mlw:
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: valid (0.00s, 2384 steps).
+Prover result is: valid (0.01s, 2384 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.00s, 2283 steps).
+Prover result is: valid (0.01s, 2283 steps).
 
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5943331 steps).
-The following counterexample values reveal a subcontract weakness:
+Prover result is: timeout (1.00s, 7171647 steps).
+The contracts of some function or loop are underspecified, for example during
+the following execution:
 File underspec.mlw:
   Line 44:
     z = (ref'mk 0)
