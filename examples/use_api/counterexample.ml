@@ -120,9 +120,12 @@ let result1 : Call_provers.prover_result =
 (* BEGIN{ce_callprover} *)
 (* prints Cvc4 answer *)
 let () = printf "@[On task 1, Cvc4 answers %a@."
-  (Call_provers.print_prover_result ~json_model:false) result1
+  (Call_provers.print_prover_result ?json:None ?check_ce:None) result1
 
-let () = printf "Model is %a@."
-    (Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None)
-    result1.Call_provers.pr_model
+let () = printf "Model is %t@."
+    (fun fmt ->
+       match result1.Call_provers.pr_model with
+       | Some (m, _) ->
+           Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None fmt m
+       | None -> fprintf fmt "unavailable")
 (* END{ce_callprover} *)

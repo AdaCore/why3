@@ -155,7 +155,7 @@ let () =
                               alt_ergo_driver t)
        in
        printf "@[On task %d, alt-ergo answers %a@."
-              i (Call_provers.print_prover_result ~json_model:false) r;
+              i (Call_provers.print_prover_result ?json:None ?check_ce:None) r;
        i+1
       )
       1 my_tasks

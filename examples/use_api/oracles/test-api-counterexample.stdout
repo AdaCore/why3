@@ -10,11 +10,9 @@ theory Task
   goal goal2 : A -> A /\ B
 end
 
-Model 0:
-  (check-ce disable by user)
-  
-On task 1, Cvc4 answers Unknown (sat) (0.0xs, 84 steps)
-Counter-example model for term at #"myfile.my_ext" 42 28 91#
+On task 1, Cvc4 answers unknown (sat) (0.0xs, 84 steps).
+The following counterexample model has not been verified
+(not checking CE model):
 File myfile.my_ext:
   Line 28:
     my_A = true
@@ -24,7 +22,6 @@ File myfile.my_ext:
 File myfile.my_ext2:
   Line 101:
     my_B = false
-
 Model is {"myfile.my_ext":
            {"28":
              [{"name": "my_A",
