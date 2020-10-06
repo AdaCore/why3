@@ -1,11 +1,10 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.03s, 58 steps).
+Prover result is: valid (0.02s, 58 steps).
 
-ce model does not satisfy loop invariant after loop "bench/check-ce/underspec.mlw", line 17, characters 18-33
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 3463841 steps).
+Prover result is: timeout (1.00s, 5205023 steps).
 The following counterexample values reveal a subcontract weakness:
 File underspec.mlw:
   Line 13:
@@ -26,6 +25,9 @@ File underspec.mlw:
   Line 19:
     Concrete execution of contents
     Concrete execution of infix +
+  Line 17:
+    Execution failed: Loop invariant preservation failed
+
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
 Prover result is: valid (0.01s, 2384 steps).
@@ -36,7 +38,7 @@ Prover result is: valid (0.01s, 2283 steps).
 
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 3750886 steps).
+Prover result is: timeout (1.00s, 6000003 steps).
 The following counterexample values reveal a subcontract weakness:
 File underspec.mlw:
   Line 44:
@@ -48,3 +50,6 @@ File underspec.mlw:
     Abstract execution of g
     z = (ref'mk 2)
     result = ()
+  Line 47:
+    Execution failed: Assertion failed
+

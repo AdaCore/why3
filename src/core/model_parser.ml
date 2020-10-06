@@ -1071,7 +1071,9 @@ type log_entry_desc =
   | Val_from_model of (vsymbol * string)
   | Exec_call of (Expr.rsymbol option * exec_kind)
   | Exec_pure of (Term.lsymbol * exec_kind)
-  | Failed of string
+  | Exec_stucked of string
+  | Exec_failed of string
+  | Exec_ended
 
 type log_entry = {
     log_desc : log_entry_desc;
@@ -1094,8 +1096,14 @@ let add_call_to_log rs kind loc exec_log =
 let add_pure_call_to_log ls kind loc exec_log =
   add_log_entry (Exec_pure (ls,kind)) loc exec_log
 
-let add_failed_lo_log s loc exec_log =
-  add_log_entry (Failed s) loc exec_log
+let add_failed_to_log s loc exec_log =
+  add_log_entry (Exec_failed s) loc exec_log
+
+let add_stucked_to_log s loc exec_log =
+  add_log_entry (Exec_stucked s) loc exec_log
+
+let add_exec_ended_to_log loc exec_log =
+  add_log_entry Exec_ended loc exec_log
 
 let log_to_list exec_log = List.rev exec_log
 
@@ -1131,7 +1139,12 @@ let print_exec_log fmt entry_log =
         | Exec_pure (ls,k) ->
            fprintf fmt "%s execution of %s" (exec_kind_to_string k)
              ls.ls_name.id_string
-        | _ -> failwith "not implemented yet"
+        | Exec_failed msg ->
+           fprintf fmt "Execution failed: %s" msg
+        | Exec_stucked msg ->
+           fprintf fmt "Execution got stucked: %s" msg
+        | Exec_ended ->
+           fprintf fmt "Execution of main function terminated normally"
         end;
         loop f l fmt rest in
   if entry_log <> [] then

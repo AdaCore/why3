@@ -267,8 +267,12 @@ type log_entry_desc =
   (** executed function call, lambda if no rsymbol *)
   | Exec_pure of (Term.lsymbol * exec_kind)
   (** executed pure function call *)
-  | Failed of string
-  (** failed information *)
+  | Exec_stucked of string
+  (** stucked execution information *)
+  | Exec_failed of string
+  (** failed execution information *)
+  | Exec_ended
+  (** execution terminated normally *)
 
 type log_entry = {
     log_desc : log_entry_desc;
@@ -282,7 +286,9 @@ val add_log_entry : log_entry_desc -> Loc.position -> exec_log -> exec_log
 val add_val_to_log : Term.vsymbol -> string -> Loc.position -> exec_log -> exec_log
 val add_call_to_log : Expr.rsymbol option -> exec_kind -> Loc.position -> exec_log -> exec_log
 val add_pure_call_to_log : Term.lsymbol -> exec_kind -> Loc.position -> exec_log -> exec_log
-val add_failed_lo_log : string -> Loc.position -> exec_log -> exec_log
+val add_failed_to_log : string -> Loc.position -> exec_log -> exec_log
+val add_stucked_to_log : string -> Loc.position -> exec_log -> exec_log
+val add_exec_ended_to_log : Loc.position -> exec_log -> exec_log
 val log_to_list : exec_log -> log_entry list
 val print_exec_log : exec_log Pp.pp
 

@@ -375,6 +375,15 @@ let register_call env loc rs kind =
 let register_pure_call env loc ls kind =
   env.rac.exec_log := add_pure_call_to_log ls kind loc !(env.rac.exec_log)
 
+let register_failure env loc reason =
+  env.rac.exec_log := add_failed_to_log reason loc !(env.rac.exec_log)
+
+let register_stucked env loc reason =
+  env.rac.exec_log := add_stucked_to_log reason loc !(env.rac.exec_log)
+
+let register_ended env loc =
+  env.rac.exec_log := add_exec_ended_to_log loc !(env.rac.exec_log)
+
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
 let add_local_funs locals env =
@@ -1169,6 +1178,9 @@ let check_term ?vsenv ctx t =
   | Some false ->
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "has failed", t);
+      let loc = Opt.get_def Loc.dummy_position t.t_loc in
+      let msg = asprintf "%s failed" ctx.c_desc in
+      register_failure ctx.c_env loc msg;
       raise (Contr (ctx, t))
   | None ->
       if (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
@@ -1281,6 +1293,10 @@ let print_result fmt = function
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
 
 exception RACStuck of env * Loc.position option
+(* The execution goes into RACStuck when a property that should be
+   assumed is not satisfied. E.g. when executing a function, if the
+   environment does not satisfy the precondition, the execution ends
+   with RACStuck. *)
 
 let get_and_register_value env ?def ?ity vs loc =
   let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
@@ -1340,7 +1356,7 @@ let rec eval_expr env e =
 (* abs = abstractly - do not execute loops and function calls - use
    instead invariants and function contracts to guide execution. *)
 and eval_expr' env e =
-  let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
+  let loc_or_dummy = Opt.get_def Loc.dummy_position e.e_loc in
   match e.e_node with
   | Evar pvs -> (
     try
@@ -1369,12 +1385,12 @@ and eval_expr' env e =
       | Cpur (ls, pvs) ->
           Debug.dprintf debug "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent print_ls ls
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
-          exec_pure ~loc:e_loc env ls pvs
+          exec_pure ~loc:loc_or_dummy env ls pvs
       | Cfun e' ->
          if env.rac.rac_abstract then
            cannot_compute "Cannot compute: not yet implemented";
         Debug.dprintf debug "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
-        register_call env e_loc None ExecConcrete;
+        register_call env loc_or_dummy None ExecConcrete;
         let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
         let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
         let arg =
@@ -1462,21 +1478,19 @@ and eval_expr' env e =
       (* assert1 *)
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
-      List.iter (assign_written_vars e.e_effect.eff_writes e_loc env)
+      List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
         (Mvs.keys env.vsenv);
       (* assert2 *)
-      (try check_terms (cntr_ctx "Invariant" env) inv with
-       | Contr (_,t) ->
-          printf "ce model does not satisfy loop invariant %a@."
-            (Pp.print_option print_loc') t.t_loc;
-          raise (RACStuck (env, t.t_loc)));
+      (try check_terms (cntr_ctx "Assume loop invariant" env) inv with
+       | Contr (_,t) -> raise (RACStuck (env, t.t_loc)));
       match eval_expr env cond with
       | Normal v ->
          if is_true v then begin
              match eval_expr env e1 with
              | Normal _ ->
-                 if env.rac.do_rac then
+                if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
+                (* the execution cannot continue from here *)
                 raise (RACStuck (env,e.e_loc))
              | r -> r
            end
@@ -1554,39 +1568,44 @@ and eval_expr' env e =
     if env.rac.do_rac then begin
       let env = bind_vs i.pv_vs (value ty_int (Vnum a)) env in
       check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
-    List.iter (assign_written_vars e.e_effect.eff_writes e_loc env)
+    List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
       (Mvs.keys env.vsenv);
     let def = value ty_int (Vnum (suc b)) in
     let i_val = get_and_register_value ~def ~ity:i.pv_ity env i.pv_vs
                   (Opt.get i.pv_vs.vs_name.id_loc) in
     let env = bind_vs i.pv_vs i_val env in
     let i_val = big_int_of_value i_val in
-    if not (le a i_val && le i_val (suc b)) then
-      raise (RACStuck (env,i.pv_vs.vs_name.id_loc)); (* FIXME loc *)
+    if not (le a i_val && le i_val (suc b)) then begin
+        let msg = asprintf
+          "Iterating variable %s has value %s: not in bounds"
+          i.pv_vs.vs_name.id_string (BigInt.to_string i_val) in
+        register_stucked env loc_or_dummy msg;
+        raise (RACStuck (env,e.e_loc)) end;
     if le a i_val && le i_val b then begin
       (* assert2 *)
-      (try check_terms (cntr_ctx "Invariant" env) inv with
-       | Contr (_,t) ->
-          printf "ce model does not satisfy loop invariant %a@."
-            (Pp.print_option print_loc') t.t_loc;
-          raise (RACStuck (env,t.t_loc)));
+      (try check_terms (cntr_ctx "Assume loop invariant" env) inv with
+       | Contr (_,t) -> raise (RACStuck (env,t.t_loc)));
       match eval_expr env e1 with
       | Normal _ ->
-         let env =
-           bind_vs i.pv_vs (value ty_int (Vnum (suc i_val))) env in
+         let env = bind_vs i.pv_vs (value ty_int (Vnum (suc i_val))) env in
          (* assert3 *)
          if env.rac.do_rac then
            check_terms (cntr_ctx "Loop invariant preservation" env) inv;
+         register_stucked env loc_or_dummy
+           "Cannot continue after arbitrary iteration";
          raise (RACStuck (env,e.e_loc))
       | r -> r
       end
     else begin
       (* assert4 *)
       (* i is already equal to b + 1 *)
-      (try check_terms (cntr_ctx "invariant holds after loop" env) inv with
+      (try check_terms (cntr_ctx "Invariant remains valid after loop" env) inv with
        | Contr (_,t) ->
-          printf "ce model does not satisfy loop invariant after \
-                  loop %a@." (Pp.print_option print_loc') t.t_loc;
+          let msg = asprintf
+            "Variable %s has value %s, but invariant does not hold"
+            i.pv_vs.vs_name.id_string (BigInt.to_string i_val) in
+          let loc = Opt.get_def Loc.dummy_position t.t_loc in
+          register_stucked env loc msg;
           raise (RACStuck (env,t.t_loc)));
       Normal (value ty_unit Vvoid)
       end
@@ -1651,7 +1670,8 @@ and eval_expr' env e =
           | Check -> "Check" in
         try check_term (cntr_ctx descr env) t
         with Contr (ctr, t) when kind = Assume ->
-          printf "contradiction in assume";
+          let loc = Opt.get_def Loc.dummy_position t.t_loc in
+          register_stucked env loc "Assume";
           raise (RACStuck (ctr.c_env, t.t_loc)) );
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
@@ -1695,6 +1715,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
     let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
     try check_terms ctx rs.rs_cty.cty_pre
     with Contr (ctx, t) when main_function ->
+      (* Only in this case the pre-condition should be assumed.
+         In all other cases, it should be proved. *)
       Debug.dprintf debug_rac_check "Contradiction in preconditions of main function@.";
       raise (RACStuck (ctx.c_env, t.t_loc)) );
   let can_interpret_abstractly =
@@ -1757,7 +1779,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                | Capp (rs', pvl) ->
                   Debug.dprintf debug "@[<h>%tEXEC CALL %a: Capp %a]@."
                     pp_indent print_rs rs print_rs rs';
-                  exec_call env rs' (pvl @ arg_pvs) ity_result
+                  exec_call ?loc env rs' (pvl @ arg_pvs) ity_result
                | Cfun body ->
                   Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: FUN %a@]@."
                     pp_indent print_rs rs (pp_limited print_expr) body;
@@ -1857,6 +1879,7 @@ let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
   Mvs.iter (fun vs v -> register_used_value env e_loc vs v) env.vsenv;
   let res = exec_call ~main_function:true ~loc:e_loc env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
+  register_ended env e_loc;
   res, env
 
 let check_model_rs rac env pm model rs =

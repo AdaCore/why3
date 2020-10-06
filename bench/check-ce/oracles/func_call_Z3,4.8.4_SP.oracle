@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.03s, 2283 steps).
+Prover result is: valid (0.02s, 2283 steps).
 
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 3609746 steps).
+Prover result is: timeout (1.00s, 5791618 steps).
 The following counterexample values reveal a subcontract weakness:
 File func_call.mlw:
   Line 10:
@@ -16,3 +16,6 @@ File func_call.mlw:
     Abstract execution of g
     z = (ref'mk 2)
     result = ()
+  Line 13:
+    Execution failed: Assertion failed
+

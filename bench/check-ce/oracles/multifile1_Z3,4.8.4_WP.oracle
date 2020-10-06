@@ -4,7 +4,7 @@ Prover result is: valid (0.03s, 434 steps).
 
 File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
 Formula `Postcondition' from verification condition incr'vc.
-Prover result is: unknown (sat) (0.02s, 962 steps).
+Prover result is: unknown (sat) (0.01s, 962 steps).
 The following counterexample values reveal a subcontract weakness:
 File multifile1.mlw:
   Line 9:
@@ -14,3 +14,6 @@ File multifile1.mlw:
     Abstract execution of decr
     result = 0
     Concrete execution of infix +
+  Line 10:
+    Execution failed: Postcondition of incr failed
+

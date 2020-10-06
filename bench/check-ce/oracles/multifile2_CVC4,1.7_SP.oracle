@@ -2,9 +2,10 @@ File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
 Formula `Postcondition' from verification condition f'vc.
 Prover result is: unknown (sat) (0.07s, 4933 steps).
 Sorry, we don't have a good counterexample for you :(.
+
 File "bench/check-ce/multifile2.mlw", line 13, characters 12-26:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: unknown (sat) (0.05s, 4862 steps).
+Prover result is: unknown (sat) (0.04s, 4862 steps).
 The following counterexample values reveal that the program does not comply with the verification goal:
 File multifile2.mlw:
   Line 12:
@@ -24,6 +25,10 @@ File int.mlw:
 File multifile1.mlw:
   Line 11:
     Concrete execution of infix +
+File multifile2.mlw:
+  Line 13:
+    Execution failed: Postcondition of g failed
+
 File "bench/check-ce/multifile2.mlw", line 19, characters 12-26:
 Formula `Postcondition' from verification condition h'vc.
 Prover result is: unknown (sat) (0.04s, 4862 steps).
@@ -38,4 +43,5 @@ File multifile2.mlw:
   Line 19:
     result = 1 (0x1)
     x = 0 (0x0)
+
 

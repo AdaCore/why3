@@ -244,7 +244,7 @@ let print_prover_result ~json ?check_ce fmt r =
       r.pr_time print_steps r.pr_steps;
     (match r.pr_model with
      | Some (m, s) when not (is_model_empty m) ->
-         fprintf fmt "@[<v>%a%a@]"
+         fprintf fmt "@[<v>%a%a@]@\n"
            (print_ce_summary_title ?check_ce) s
            (print_ce_summary_values ~print_attrs m) s
      | _ -> ());

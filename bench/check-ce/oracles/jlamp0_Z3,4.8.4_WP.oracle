@@ -1,6 +1,6 @@
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Formula `Assertion' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 3739337 steps).
+Prover result is: timeout (1.00s, 5947125 steps).
 The following counterexample values reveal that the program does not comply with the verification goal:
 File jlamp0.mlw:
   Line 8:
@@ -23,9 +23,12 @@ File jlamp0.mlw:
   Line 11:
     Concrete execution of infix +
     Concrete execution of infix :=
+  Line 12:
+    Execution failed: Assertion failed
+
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Formula `Postcondition' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 3736881 steps).
+Prover result is: timeout (1.00s, 6024841 steps).
 The following counterexample values reveal that the program does not comply with the verification goal:
 File jlamp0.mlw:
   Line 8:
@@ -70,9 +73,12 @@ File int.mlw:
 File jlamp0.mlw:
   Line 13:
     Concrete execution of infix :=
+  Line 10:
+    Execution failed: Postcondition of p1 failed
+
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Formula `Postcondition' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 3590701 steps).
+Prover result is: timeout (1.00s, 6452956 steps).
 The following counterexample values reveal that the program does not comply with the verification goal:
 File jlamp0.mlw:
   Line 8:
@@ -104,9 +110,12 @@ File jlamp0.mlw:
   Line 13:
     Concrete execution of infix >=
     Concrete execution of Tuple0
+  Line 10:
+    Execution failed: Postcondition of p1 failed
+
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Formula `Loop invariant init' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 4019238 steps).
+Prover result is: timeout (1.00s, 6281653 steps).
 The following counterexample values reveal that the program does not comply with the verification goal:
 File jlamp0.mlw:
   Line 17:
@@ -116,13 +125,16 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of infix :=
+  Line 22:
+    Execution failed: Loop invariant initialization failed
+
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Formula `Loop invariant init' from verification condition p2'vc.
-Prover result is: valid (0.00s, 295 steps).
+Prover result is: valid (0.01s, 295 steps).
 
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Formula `Loop variant decrease' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 4247409 steps).
+Prover result is: timeout (1.00s, 6634745 steps).
 The following counterexample values reveal that the program does not comply with the verification goal:
 File jlamp0.mlw:
   Line 17:
@@ -132,9 +144,12 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of infix :=
+  Line 22:
+    Execution failed: Loop invariant initialization failed
+
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Formula `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 4094644 steps).
+Prover result is: timeout (1.00s, 6734723 steps).
 The following counterexample values reveal that the program does not comply with the verification goal:
 File jlamp0.mlw:
   Line 17:
@@ -144,9 +159,12 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of infix :=
+  Line 22:
+    Execution failed: Loop invariant initialization failed
+
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Formula `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 4090412 steps).
+Prover result is: timeout (1.00s, 6555551 steps).
 The following counterexample values reveal that the program does not comply with the verification goal:
 File jlamp0.mlw:
   Line 17:
@@ -156,9 +174,12 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of infix :=
+  Line 22:
+    Execution failed: Loop invariant initialization failed
+
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Formula `Postcondition' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 3630926 steps).
+Prover result is: timeout (1.00s, 6451781 steps).
 The following counterexample values reveal that the program does not comply with the verification goal:
 File jlamp0.mlw:
   Line 17:
@@ -168,3 +189,6 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of infix :=
+  Line 22:
+    Execution failed: Loop invariant initialization failed
+
