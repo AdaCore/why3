@@ -1,6 +1,64 @@
+<check-ce>Check model 0 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<check-ce>Model 0:
+            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
+              File falseCE.mlw:
+                Line 12:
+                  a = (-2)
+                  b = (-2)
+                Line 13:
+                  Execution failed: Precondition of rsa failed
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
+              File falseCE.mlw:
+                Line 12:
+                  a = (-2)
+                  b = (-2)
+                Line 13:
+                  Execution failed: Precondition of rsa failed
+<check-ce>Check model 1 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<check-ce>Model 1:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File falseCE.mlw:
+                Line 12:
+                  a = 2
+                  b = 2
+                  Concrete execution of rsa
+                  Execution of main function terminated normally
+            - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
+              File falseCE.mlw:
+                Line 12:
+                  a = 2
+                  b = 2
+                  Concrete execution of rsa
+                  Execution of main function terminated normally
+<check-ce>Check model 2 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<check-ce>Model 2:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File falseCE.mlw:
+                Line 12:
+                  a = 2
+                  b = 2
+                  Concrete execution of rsa
+                  Execution of main function terminated normally
+            - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
+              File falseCE.mlw:
+                Line 12:
+                  a = 2
+                  b = 2
+                  Concrete execution of rsa
+                  Execution of main function terminated normally
+<check-ce>Models:
+          - Checked model 0: bad model/bad model -> Sorry, we don't have a
+                                                    good counterexample for
+                                                    you :(
+          - Checked model 1: bad model/bad model -> Sorry, we don't have a
+                                                    good counterexample for
+                                                    you :(
+          - Checked model 2: bad model/bad model -> Sorry, we don't have a
+                                                    good counterexample for
+                                                    you :(
 File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
 Formula `Assertion' from verification condition rsa'vc.
-Prover result is: unknown (unknown + incomplete) (0.06s, 15078 steps).
+Prover result is: unknown (unknown + incomplete) (0.09s, 15078 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

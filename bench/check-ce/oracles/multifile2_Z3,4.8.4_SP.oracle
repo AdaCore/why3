@@ -1,12 +1,254 @@
+<check-ce>Check model 0 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
+<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
+<check-ce>Model 0:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File multifile2.mlw:
+                Line 7:
+                  x = 0
+                  Concrete execution of f
+                Line 9:
+                  Concrete execution of incr
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of decr
+                Line 7:
+                  Concrete execution of infix -
+              File int.mlw:
+                Line 23:
+                  Concrete execution of prefix -
+                  Concrete execution of infix +
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of infix +
+              File multifile2.mlw:
+                Line 7:
+                  Execution of main function terminated normally
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File multifile2.mlw:
+                Line 7:
+                  x = 0
+                  Concrete execution of f
+                Line 9:
+                  Abstract execution of incr
+                  result = 0
+              File multifile1.mlw:
+                Line 10:
+                  Execution failed: Postcondition failed
+<check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
+<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
+<check-ce>Model 1:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File multifile2.mlw:
+                Line 7:
+                  x = 0
+                  Concrete execution of f
+                Line 9:
+                  Concrete execution of incr
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of decr
+                Line 7:
+                  Concrete execution of infix -
+              File int.mlw:
+                Line 23:
+                  Concrete execution of prefix -
+                  Concrete execution of infix +
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of infix +
+              File multifile2.mlw:
+                Line 7:
+                  Execution of main function terminated normally
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File multifile2.mlw:
+                Line 7:
+                  x = 0
+                  Concrete execution of f
+                Line 9:
+                  Abstract execution of incr
+                  result = 0
+              File multifile1.mlw:
+                Line 10:
+                  Execution failed: Postcondition failed
+<check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
+<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
+<check-ce>Model 2:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File multifile2.mlw:
+                Line 7:
+                  x = 0
+                  Concrete execution of f
+                Line 9:
+                  Concrete execution of incr
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of decr
+                Line 7:
+                  Concrete execution of infix -
+              File int.mlw:
+                Line 23:
+                  Concrete execution of prefix -
+                  Concrete execution of infix +
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of infix +
+              File multifile2.mlw:
+                Line 7:
+                  Execution of main function terminated normally
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File multifile2.mlw:
+                Line 7:
+                  x = 0
+                  Concrete execution of f
+                Line 9:
+                  Abstract execution of incr
+                  result = 0
+              File multifile1.mlw:
+                Line 10:
+                  Execution failed: Postcondition failed
+<check-ce>Models:
+          - Checked model 0: bad model/bad model -> Sorry, we don't have a
+                                                    good counterexample for
+                                                    you :(
+          - Checked model 1: bad model/bad model -> Sorry, we don't have a
+                                                    good counterexample for
+                                                    you :(
+          - Checked model 2: bad model/bad model -> Sorry, we don't have a
+                                                    good counterexample for
+                                                    you :(
 File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
 Formula `Postcondition' from verification condition f'vc.
-Prover result is: unknown (sat) (0.02s, 866 steps).
+Prover result is: unknown (sat) (0.03s, 866 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
+<check-ce>Check model 0 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
+<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
+<check-ce>Model 0:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File multifile2.mlw:
+                Line 12:
+                  x = 0
+                  Concrete execution of g
+                Line 14:
+                  Concrete execution of incr
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of decr
+                Line 7:
+                  Concrete execution of infix -
+              File int.mlw:
+                Line 23:
+                  Concrete execution of prefix -
+                  Concrete execution of infix +
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of infix +
+              File multifile2.mlw:
+                Line 13:
+                  Execution failed: Postcondition of g failed
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File multifile2.mlw:
+                Line 12:
+                  x = 0
+                  Concrete execution of g
+                Line 14:
+                  Abstract execution of incr
+                  result = 0
+              File multifile1.mlw:
+                Line 10:
+                  Execution failed: Postcondition failed
+<check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
+<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
+<check-ce>Model 1:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File multifile2.mlw:
+                Line 12:
+                  x = 0
+                  Concrete execution of g
+                Line 14:
+                  Concrete execution of incr
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of decr
+                Line 7:
+                  Concrete execution of infix -
+              File int.mlw:
+                Line 23:
+                  Concrete execution of prefix -
+                  Concrete execution of infix +
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of infix +
+              File multifile2.mlw:
+                Line 13:
+                  Execution failed: Postcondition of g failed
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File multifile2.mlw:
+                Line 12:
+                  x = 0
+                  Concrete execution of g
+                Line 14:
+                  Abstract execution of incr
+                  result = 0
+              File multifile1.mlw:
+                Line 10:
+                  Execution failed: Postcondition failed
+<check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
+<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
+<check-ce>Model 2:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File multifile2.mlw:
+                Line 12:
+                  x = 0
+                  Concrete execution of g
+                Line 14:
+                  Concrete execution of incr
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of decr
+                Line 7:
+                  Concrete execution of infix -
+              File int.mlw:
+                Line 23:
+                  Concrete execution of prefix -
+                  Concrete execution of infix +
+              File multifile1.mlw:
+                Line 11:
+                  Concrete execution of infix +
+              File multifile2.mlw:
+                Line 13:
+                  Execution failed: Postcondition of g failed
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File multifile2.mlw:
+                Line 12:
+                  x = 0
+                  Concrete execution of g
+                Line 14:
+                  Abstract execution of incr
+                  result = 0
+              File multifile1.mlw:
+                Line 10:
+                  Execution failed: Postcondition failed
+<check-ce>Models:
+          - Checked model 0: good model/bad model -> The program does not
+                                                     comply to the
+                                                     verification goal, for
+                                                     example during the
+                                                     following execution:
+          - Checked model 1: good model/bad model -> The program does not
+                                                     comply to the
+                                                     verification goal, for
+                                                     example during the
+                                                     following execution:
+          - Checked model 2: good model/bad model -> The program does not
+                                                     comply to the
+                                                     verification goal, for
+                                                     example during the
+                                                     following execution:
 File "bench/check-ce/multifile2.mlw", line 13, characters 12-26:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: unknown (sat) (0.01s, 878 steps).
+Prover result is: unknown (sat) (0.00s, 878 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File multifile2.mlw:
@@ -31,6 +273,67 @@ File multifile2.mlw:
   Line 13:
     Execution failed: Postcondition of g failed
 
+<check-ce>Check model 0 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
+<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
+<check-ce>Model 0:
+            - Concrete: don't know (RAC execution got stuck: Cannot compute application of local any-function incr_val)
+              
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File multifile2.mlw:
+                Line 18:
+                  x = 0
+                  Concrete execution of h
+                Line 20:
+                  Abstract execution of incr_val
+                  result = 0
+              File multifile1.mlw:
+                Line 14:
+                  Execution failed: Postcondition failed
+<check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
+<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
+<check-ce>Model 1:
+            - Concrete: don't know (RAC execution got stuck: Cannot compute application of local any-function incr_val)
+              
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File multifile2.mlw:
+                Line 18:
+                  x = 0
+                  Concrete execution of h
+                Line 20:
+                  Abstract execution of incr_val
+                  result = 0
+              File multifile1.mlw:
+                Line 14:
+                  Execution failed: Postcondition failed
+<check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
+<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
+<check-ce>Model 2:
+            - Concrete: don't know (RAC execution got stuck: Cannot compute application of local any-function incr_val)
+              
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File multifile2.mlw:
+                Line 18:
+                  x = 0
+                  Concrete execution of h
+                Line 20:
+                  Abstract execution of incr_val
+                  result = 0
+              File multifile1.mlw:
+                Line 14:
+                  Execution failed: Postcondition failed
+<check-ce>Models:
+          - Checked model 0: don't know/bad model -> The following
+                                                     counterexample model has
+                                                     not been verified
+                                                     (RAC execution got stuck: Cannot compute application of local any-function incr_val):
+          - Checked model 1: don't know/bad model -> The following
+                                                     counterexample model has
+                                                     not been verified
+                                                     (RAC execution got stuck: Cannot compute application of local any-function incr_val):
+          - Checked model 2: don't know/bad model -> The following
+                                                     counterexample model has
+                                                     not been verified
+                                                     (RAC execution got stuck: Cannot compute application of local any-function incr_val):
 File "bench/check-ce/multifile2.mlw", line 19, characters 12-26:
 Formula `Postcondition' from verification condition h'vc.
 Prover result is: unknown (sat) (0.01s, 878 steps).
