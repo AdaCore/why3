@@ -331,10 +331,15 @@ let why3_execute modules =
 
              let result =
                try
-                 let res = eval_global_fundef ~rac:false env m.Pmodule.mod_known m.Pmodule.mod_theory.th_known [] expr in
+                 let trans = Compute.normalize_goal_transf_all env in
+                 let reduce = rac_reduce_config ~trans () in
+                 let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
+                 let res = eval_global_fundef rac_config env m.Pmodule.mod_known m.Pmodule.mod_theory.Theory.th_known [] expr in
                  asprintf "%a@." (report_eval_result expr) res
-               with Contr (ctx, term) ->
-                 asprintf "%a@." (report_cntr expr) (ctx, term) in
+               with
+               | Contr (ctx, term) -> asprintf "%a@." report_cntr (ctx, term)
+               | CannotCompute r -> asprintf "Cannot compute (%s)" r.reason
+               | RACStuck (_, l) -> asprintf "Got stuck at %a" (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
              let loc = Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc in
              (loc, mod_name ^ ".main() returns " ^ result)
              :: acc

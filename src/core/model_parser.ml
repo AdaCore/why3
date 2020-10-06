@@ -1171,11 +1171,11 @@ let print_exec_log ~json fmt entry_log =
                 fprintf fmt "%s execution of lambda function"
                   (exec_kind_to_string k)
             | Exec_call (Some rs, k) ->
-                fprintf fmt "%s execution of %s" (exec_kind_to_string k)
-                  rs.Expr.rs_name.id_string
+                fprintf fmt "%s execution of %a" (exec_kind_to_string k)
+                  Ident.print_decoded rs.Expr.rs_name.id_string
             | Exec_pure (ls,k) ->
-                fprintf fmt "%s execution of %s" (exec_kind_to_string k)
-                  ls.ls_name.id_string
+                fprintf fmt "%s execution of %a" (exec_kind_to_string k)
+                  Ident.print_decoded ls.ls_name.id_string
             | Exec_failed msg ->
                 fprintf fmt "Property failure: %s" msg
             | Exec_stucked msg ->
@@ -1216,7 +1216,7 @@ let print_check_model_result fmt = function
 type check_model = model -> check_model_result
 
 let default_check_model (_: model) =
-  let reason = "No model checking" in
+  let reason = "not checking CE model" in
   Cannot_check_model {reason}
 
 (*
