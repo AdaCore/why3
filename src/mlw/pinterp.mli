@@ -36,8 +36,12 @@ type cntr_ctx =
     c_env: env }
 (** Context of a contradiction during RAC *)
 
+exception CannotCompute of {reason: string}
+
 exception Contr of cntr_ctx * Term.term
 (** Exception [Contr] is raised when a contradiction is detected during RAC. *)
+
+exception RACStuck of env * Loc.position option
 
 (** {1 Configuration} *)
 
