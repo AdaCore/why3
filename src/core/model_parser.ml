@@ -1103,39 +1103,72 @@ let exec_kind_to_string ?(cap=true) = function
   | ExecAbstract -> if cap then "Abstract" else "abstract"
   | ExecConcrete -> if cap then "Concrete" else "concrete"
 
-let print_exec_log fmt entry_log =
+let print_exec_log ~json fmt entry_log =
   let entry_log = List.rev entry_log in
-  let rec loop file line fmt = function
-    | [] -> fprintf fmt "@]@]"
-    | { log_desc; log_loc } :: rest ->
-        let f, l, _, _ = Loc.get log_loc in
-        if file <> f then (
-          if file <> "" then
-            fprintf fmt "@]@]@\n";
-          fprintf fmt "@[<v2>File %s:@\n" (Filename.basename f) );
-        if line <> l then (
-          if line <> -1 && (file = f || file = "") then
-            fprintf fmt "@]@\n";
-          fprintf fmt "@[<v2>Line %d:@\n" l )
-        else
-          fprintf fmt "@\n";
-        begin match log_desc with
-        | Val_from_model (vs, v) ->
-           fprintf fmt "%a = %s" Ident.print_decoded vs.vs_name.id_string v;
-        | Exec_call (None, k) ->
-           fprintf fmt "%s execution of lambda function"
-             (exec_kind_to_string k)
-        | Exec_call (Some rs, k) ->
-           fprintf fmt "%s execution of %s" (exec_kind_to_string k)
-             rs.Expr.rs_name.id_string
-        | Exec_pure (ls,k) ->
-           fprintf fmt "%s execution of %s" (exec_kind_to_string k)
-             ls.ls_name.id_string
-        | _ -> failwith "not implemented yet"
-        end;
-        loop f l fmt rest in
-  if entry_log <> [] then
-    fprintf fmt "@[<v>%a@]@]" (loop "" (-1)) entry_log
+  if json then
+    let open Json_base in
+    let string f = kasprintf (fun s -> String s) f in
+    let print_json_kind fmt = function
+      | ExecAbstract -> print_json fmt (string "ABSTRACT")
+      | ExecConcrete -> print_json fmt (string "CONCRETE") in
+    let print_log_entry fmt = function
+      | Val_from_model (vs, s) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "VAL_FROM_MODEL")
+            (print_json_field "vs" print_json) (string "%a" Pretty.print_vs vs)
+            (print_json_field "value" print_json) (String s)
+      | Exec_call (ors, kind) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "EXEC_CALL")
+            (print_json_field "rs" print_json) (match ors with Some rs -> string "%a" Ident.print_decoded rs.Expr.rs_name.id_string | None -> Null)
+            (print_json_field "kind" print_json_kind) kind
+      | Exec_pure (ls, kind) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "EXEC_PURE")
+            (print_json_field "ls" print_json) (string "%a" Pretty.print_ls ls)
+            (print_json_field "kind" print_json_kind) kind
+      | Failed reason ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "FAILED")
+            (print_json_field "reason" print_json) (String reason) in
+    let print_json_entry fmt e =
+      fprintf fmt "@[@[<hv1>{@[<hv2>%a@];@ @[<hv2>%a@]@]}@]"
+        (print_json_field "loc" Pretty.print_json_loc) e.log_loc
+        (print_json_field "entry" print_log_entry) e.log_desc in
+    fprintf fmt "@[@[<hv1>[%a@]@]"
+      Pp.(print_list comma print_json_entry) entry_log
+  else
+    let rec loop file line fmt = function
+      | [] -> fprintf fmt "@]@]"
+      | { log_desc; log_loc } :: rest ->
+          let f, l, _, _ = Loc.get log_loc in
+          if file <> f then (
+            if file <> "" then
+              fprintf fmt "@]@]@\n";
+            fprintf fmt "@[<v2>File %s:@\n" (Filename.basename f) );
+          if line <> l then (
+            if line <> -1 && (file = f || file = "") then
+              fprintf fmt "@]@\n";
+            fprintf fmt "@[<v2>Line %d:@\n" l )
+          else
+            fprintf fmt "@\n";
+          begin match log_desc with
+            | Val_from_model (vs, v) ->
+                fprintf fmt "%a = %s" Ident.print_decoded vs.vs_name.id_string v;
+            | Exec_call (None, k) ->
+                fprintf fmt "%s execution of lambda function"
+                  (exec_kind_to_string k)
+            | Exec_call (Some rs, k) ->
+                fprintf fmt "%s execution of %s" (exec_kind_to_string k)
+                  rs.Expr.rs_name.id_string
+            | Exec_pure (ls,k) ->
+                fprintf fmt "%s execution of %s" (exec_kind_to_string k)
+                  ls.ls_name.id_string
+            | _ -> failwith "not implemented yet"
+          end;
+          loop f l fmt rest in
+    if entry_log <> [] then
+      fprintf fmt "@[<v>%a@]@]" (loop "" (-1)) entry_log
 
 type full_verdict = {
     verdict  : verdict;
@@ -1150,7 +1183,7 @@ let print_verdict fmt = function
 
 let print_full_verdict fmt v =
   fprintf fmt "%a (%s)@,%a"
-    print_verdict v.verdict v.reason print_exec_log v.exec_log
+    print_verdict v.verdict v.reason (print_exec_log ~json:false) v.exec_log
 
 type check_model_result =
   | Cannot_check_model of {reason: string}

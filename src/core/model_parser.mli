@@ -284,7 +284,7 @@ val add_call_to_log : Expr.rsymbol option -> exec_kind -> Loc.position -> exec_l
 val add_pure_call_to_log : Term.lsymbol -> exec_kind -> Loc.position -> exec_log -> exec_log
 val add_failed_lo_log : string -> Loc.position -> exec_log -> exec_log
 val log_to_list : exec_log -> log_entry list
-val print_exec_log : exec_log Pp.pp
+val print_exec_log : json:bool -> exec_log Pp.pp
 
 type full_verdict = {
     verdict  : verdict;

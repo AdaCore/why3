@@ -63,11 +63,24 @@ let print_ce_summary_title ?check_ce fmt = function
           fprintf fmt "The following counterexample model has not been verified (%s)"
             reason
 
-let print_ce_summary_values ~print_attrs model fmt = function
+let print_ce_summary_values ~json ~print_attrs model fmt s =
+  let open Json_base in
+  let print_model_field =
+    print_json_field "model" (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
+  let print_log_field =
+    print_json_field "log" (print_exec_log ~json:true) in
+  match s with
   | NCCE log | SWCE log | NCCE_SWCE log ->
-      fprintf fmt (":@\n%a") print_exec_log log
+      if json then
+        fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+          print_model_field model print_log_field log
+      else
+        fprintf fmt (":@\n%a") (print_exec_log ~json:false) log
   | UNKNOWN _ ->
-      fprintf fmt ":@\n%a" (print_model_human ?me_name_trans:None ~print_attrs) model
+      if json then
+        fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
+      else
+        fprintf fmt ":@\n%a" (print_model_human ?me_name_trans:None ~print_attrs) model
   | BAD_CE -> fprintf fmt "."
 
 let ce_summary v_concrete v_abstract =
@@ -216,22 +229,24 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ~json ?check_ce fmt r =
+let print_prover_result ?(json: [<`All | `Model] option) ?check_ce fmt r =
+  let open Json_base in
   let print_attrs = Debug.test_flag debug_attrs in
-  if json then
-    let open Json_base in
+  let print_json_model fmt (m, s) =
+    fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+      (print_json_field "verdict" print_json)
+      (String (match s with
+           | NCCE _ -> "NCCE"
+           | SWCE _ -> "SWCE"
+           | NCCE_SWCE _ -> "NCCE_SWCE"
+           | UNKNOWN _ -> "UNKNOWN"
+           | BAD_CE -> "BAD_CE"))
+      (print_json_field "model" (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int))
+      m in
+  if json = Some `All then
     let print_model fmt = function
       | Some (m, s) when not (is_model_empty m) ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-            (print_json_field "verdict" print_json)
-            (String (match s with
-                 | NCCE _ -> "NCCE"
-                 | SWCE _ -> "SWCE"
-                 | NCCE_SWCE _ -> "NCCE_SWCE"
-                 | UNKNOWN _ -> "UNKNOWN"
-                 | BAD_CE -> "BAD_CE"))
-            (print_json_field "model" (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int))
-            m
+          print_json_model fmt (m, s)
       | _ -> print_json fmt Null in
     fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a;@ %a@]}@]"
       (print_json_field "answer" print_json)
@@ -245,9 +260,8 @@ let print_prover_result ~json ?check_ce fmt r =
       r.pr_time print_steps r.pr_steps;
     (match r.pr_model with
      | Some (m, s) when not (is_model_empty m) ->
-         fprintf fmt "@[<v>%a%a@]"
-           (print_ce_summary_title ?check_ce) s
-           (print_ce_summary_values ~print_attrs m) s
+         fprintf fmt "%a@\n" (print_ce_summary_title ?check_ce) s;
+         fprintf fmt "%a" (print_ce_summary_values ~print_attrs ~json:(json = Some `Model) m) s
      | _ -> ());
     if r.pr_answer == HighFailure then
       fprintf fmt "Prover exit status: %a@\nProver output:@\n%s@\n"
