@@ -632,20 +632,9 @@ bin:
 
 bin/why3.opt: $(WHY3CMXA) src/tools/main.cmx
 bin/why3.byte: $(WHY3CMA) src/tools/main.cmo
-bin/why3config.opt: $(WHY3CMXA) src/tools/why3config.cmx
-bin/why3config.byte: $(WHY3CMA) src/tools/why3config.cmo
-bin/why3execute.opt: $(WHY3CMXA) src/tools/why3execute.cmx
-bin/why3execute.byte: $(WHY3CMA) src/tools/why3execute.cmo
-bin/why3extract.opt: $(WHY3CMXA) src/tools/why3extract.cmx
-bin/why3extract.byte: $(WHY3CMA) src/tools/why3extract.cmo
-bin/why3prove.opt: $(WHY3CMXA) src/tools/why3prove.cmx
-bin/why3prove.byte: $(WHY3CMA) src/tools/why3prove.cmo
-bin/why3realize.opt: $(WHY3CMXA) src/tools/why3realize.cmx
-bin/why3realize.byte: $(WHY3CMA) src/tools/why3realize.cmo
-bin/why3replay.opt: $(WHY3CMXA) src/tools/why3replay.cmx
-bin/why3replay.byte: $(WHY3CMA) src/tools/why3replay.cmo
-bin/why3wc.opt: $(WHY3CMXA) src/tools/why3wc.cmx
-bin/why3wc.byte: $(WHY3CMA) src/tools/why3wc.cmo
+
+bin/why3%.opt: $(WHY3CMXA) src/tools/why3%.cmx
+bin/why3%.byte: $(WHY3CMA) src/tools/why3%.cmo
 
 uninstall-bin::
 	rm -f $(BINDIR)/why3$(EXE)
@@ -655,13 +644,9 @@ install-bin::
 	$(MKDIR_P) $(BINDIR)
 	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
-	$(INSTALL) bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
-	$(INSTALL) bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
-	$(INSTALL) bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
-	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
-	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
-	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
+	for f in $(TOOLS_BIN); do \
+	  $(INSTALL) bin/$$f.@OCAMLBEST@  $(TOOLDIR)/$$f$(EXE); \
+	done
 
 install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
 
