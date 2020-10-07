@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.05s, 1403 steps).
+Prover result is: valid (0.04s, 1403 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -21,15 +21,15 @@ Prover result is: valid (0.05s, 1403 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 9:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 10:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 9:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/for.mlw", line 7, characters 2-125)
@@ -48,10 +48,10 @@ Prover result is: valid (0.05s, 1403 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 9:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 10:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 7:
                   Execution got stucked: Cannot continue after arbitrary iteration
 <check-ce>Check model 1 ("bench/check-ce/for.mlw", line 8, characters 25-31)
@@ -73,15 +73,15 @@ Prover result is: valid (0.05s, 1403 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 9:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 10:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 9:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/for.mlw", line 8, characters 16-31)
@@ -100,12 +100,12 @@ Prover result is: valid (0.05s, 1403 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 9:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 10:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 8:
-                  Property failure: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation
 <check-ce>Check model 2 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -125,15 +125,15 @@ Prover result is: valid (0.05s, 1403 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 9:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 10:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 9:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/for.mlw", line 8, characters 16-31)
@@ -152,12 +152,12 @@ Prover result is: valid (0.05s, 1403 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 9:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 10:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 8:
-                  Property failure: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -192,12 +192,12 @@ File for.mlw:
     x2 = (ref'mk 0)
     i = 0
   Line 9:
-    Concrete execution of infix =
+    Concrete execution of (=)
   Line 10:
     Concrete execution of contents
-    Concrete execution of infix +
+    Concrete execution of (+)
   Line 8:
-    Property failure: Loop invariant preservation failed
+    Property failure: Loop invariant preservation
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant preservation' from verification condition f'vc.

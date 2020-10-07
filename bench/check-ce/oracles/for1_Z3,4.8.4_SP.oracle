@@ -4,7 +4,7 @@ Prover result is: valid (0.02s, 32 steps).
 
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: valid (0.01s, 2379 steps).
+Prover result is: valid (0.02s, 2379 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
 <check-ce>VALUE for result "bench/check-ce/for1.mlw", line 5, characters 16-17 not in ce-model, taking default (ref'mk 0)
@@ -21,9 +21,9 @@ Prover result is: valid (0.01s, 2379 steps).
                   Concrete execution of ref'mk
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 10:
                   Concrete execution of contents
                 Line 3:
@@ -42,7 +42,7 @@ Prover result is: valid (0.01s, 2379 steps).
                 Line 10:
                   Concrete execution of contents
                 Line 4:
-                  Property failure: Postcondition of f failed
+                  Property failure: Postcondition of f
 <check-ce>Check model 1 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
 <check-ce>VALUE for result "bench/check-ce/for1.mlw", line 5, characters 16-17 not in ce-model, taking default (ref'mk 0)
 <check-ce>                            VALUE from ce-model: (ref'mk 1)
@@ -58,9 +58,9 @@ Prover result is: valid (0.01s, 2379 steps).
                   Concrete execution of ref'mk
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 10:
                   Concrete execution of contents
                 Line 3:
@@ -79,7 +79,7 @@ Prover result is: valid (0.01s, 2379 steps).
                 Line 10:
                   Concrete execution of contents
                 Line 4:
-                  Property failure: Postcondition of f failed
+                  Property failure: Postcondition of f
 <check-ce>Check model 2 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
 <check-ce>VALUE for result "bench/check-ce/for1.mlw", line 5, characters 16-17 not in ce-model, taking default (ref'mk 0)
 <check-ce>                              VALUE from ce-model: (ref'mk 1)
@@ -95,9 +95,9 @@ Prover result is: valid (0.01s, 2379 steps).
                   Concrete execution of ref'mk
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 10:
                   Concrete execution of contents
                 Line 3:
@@ -116,7 +116,7 @@ Prover result is: valid (0.01s, 2379 steps).
                 Line 10:
                   Concrete execution of contents
                 Line 4:
-                  Property failure: Postcondition of f failed
+                  Property failure: Postcondition of f
 <check-ce>Models:
           - Checked model 0: bad model/good model -> The contracts of some
                                                      function or loop are
@@ -135,7 +135,7 @@ Prover result is: valid (0.01s, 2379 steps).
                                                      following execution:
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Formula `Postcondition' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5465316 steps).
+Prover result is: timeout (1.00s, 5291465 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File for1.mlw:
@@ -151,9 +151,9 @@ File for1.mlw:
   Line 10:
     Concrete execution of contents
   Line 4:
-    Property failure: Postcondition of f failed
+    Property failure: Postcondition of f
 
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Verification condition f'vc.
-Prover result is: valid (0.00s, 104 steps).
+Prover result is: valid (0.01s, 104 steps).
 

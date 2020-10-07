@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.03s, 1403 steps).
+Prover result is: valid (0.05s, 1403 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -21,15 +21,15 @@ Prover result is: valid (0.03s, 1403 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 18:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 19:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 18:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 21:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 13:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 16, characters 4-139)
@@ -48,10 +48,10 @@ Prover result is: valid (0.03s, 1403 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 18:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 19:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 16:
                   Execution got stucked: Cannot continue after arbitrary iteration
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
@@ -73,15 +73,15 @@ Prover result is: valid (0.03s, 1403 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 18:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 19:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 18:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 21:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 13:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/underspec.mlw", line 17, characters 18-33)
@@ -100,12 +100,12 @@ Prover result is: valid (0.03s, 1403 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 18:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 19:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 17:
-                  Property failure: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 15, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -125,15 +125,15 @@ Prover result is: valid (0.03s, 1403 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 18:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 19:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 18:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 21:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 13:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/underspec.mlw", line 17, characters 18-33)
@@ -152,12 +152,12 @@ Prover result is: valid (0.03s, 1403 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 18:
-                  Concrete execution of infix =
+                  Concrete execution of (=)
                 Line 19:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 17:
-                  Property failure: Loop invariant preservation failed
+                  Property failure: Loop invariant preservation
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -174,7 +174,7 @@ Prover result is: valid (0.03s, 1403 steps).
                                                      following execution:
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.04s, 6755 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 6755 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:
@@ -192,12 +192,12 @@ File underspec.mlw:
     x2 = (ref'mk 0)
     i = 0
   Line 18:
-    Concrete execution of infix =
+    Concrete execution of (=)
   Line 19:
     Concrete execution of contents
-    Concrete execution of infix +
+    Concrete execution of (+)
   Line 17:
-    Property failure: Loop invariant preservation failed
+    Property failure: Loop invariant preservation
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
@@ -222,7 +222,7 @@ Prover result is: valid (0.03s, 1582 steps).
                   Concrete execution of g
                 Line 42:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 44:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 41, characters 14-23)
@@ -237,8 +237,7 @@ Prover result is: valid (0.03s, 1582 steps).
                   z = (ref'mk 0)
                   result = ()
                 Line 41:
-                  Property failure: Postcondition failed
-                  Execution got stucked: Assume postconition
+                  Execution got stucked: Assume postcondition
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                          VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 46, characters 4-8 not in ce-model, taking default ()
@@ -254,7 +253,7 @@ Prover result is: valid (0.03s, 1582 steps).
                   Concrete execution of g
                 Line 42:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 44:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -269,7 +268,7 @@ Prover result is: valid (0.03s, 1582 steps).
                   z = (ref'mk 2)
                   result = ()
                 Line 47:
-                  Property failure: Assertion failed
+                  Property failure: Assertion
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                            VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 46, characters 4-8 not in ce-model, taking default ()
@@ -285,7 +284,7 @@ Prover result is: valid (0.03s, 1582 steps).
                   Concrete execution of g
                 Line 42:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 44:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -300,7 +299,7 @@ Prover result is: valid (0.03s, 1582 steps).
                   z = (ref'mk 2)
                   result = ()
                 Line 47:
-                  Property failure: Assertion failed
+                  Property failure: Assertion
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -331,5 +330,5 @@ File underspec.mlw:
     z = (ref'mk 2)
     result = ()
   Line 47:
-    Property failure: Assertion failed
+    Property failure: Assertion
 

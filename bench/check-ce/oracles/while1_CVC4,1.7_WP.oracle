@@ -4,7 +4,7 @@ Prover result is: valid (0.05s, 1177 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Formula `Loop variant decrease' from verification condition f'vc.
-Prover result is: valid (0.02s, 1830 steps).
+Prover result is: valid (0.03s, 1830 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Formula `Loop invariant preservation' from verification condition f'vc.
@@ -29,25 +29,25 @@ Prover result is: valid (0.02s, 1763 steps).
                   Concrete execution of ref'mk
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 11:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 11:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 14:
                   Concrete execution of contents
                 Line 4:
@@ -67,13 +67,13 @@ Prover result is: valid (0.02s, 1763 steps).
                   x = (ref'mk 0)
                   i = (ref'mk 0)
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 11:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 8:
                   Execution got stucked: Cannot continue after arbitrary iteration
 <check-ce>Check model 1 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
@@ -95,25 +95,25 @@ Prover result is: valid (0.02s, 1763 steps).
                   Concrete execution of ref'mk
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 11:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 11:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 14:
                   Concrete execution of contents
                 Line 4:
@@ -133,11 +133,11 @@ Prover result is: valid (0.02s, 1763 steps).
                   x = (ref'mk 0)
                   i = (ref'mk 2)
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 14:
                   Concrete execution of contents
                 Line 5:
-                  Property failure: Postcondition of f failed
+                  Property failure: Postcondition of f
 <check-ce>Check model 2 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce>VALUE for result "bench/check-ce/while1.mlw", line 6, characters 16-17 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/while1.mlw", line 7, characters 16-17 not in ce-model, taking default (ref'mk 0)
@@ -157,25 +157,25 @@ Prover result is: valid (0.02s, 1763 steps).
                   Concrete execution of ref'mk
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 11:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 11:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 12:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 14:
                   Concrete execution of contents
                 Line 4:
@@ -195,11 +195,11 @@ Prover result is: valid (0.02s, 1763 steps).
                   x = (ref'mk 0)
                   i = (ref'mk 2)
                   Concrete execution of contents
-                  Concrete execution of infix <
+                  Concrete execution of (<)
                 Line 14:
                   Concrete execution of contents
                 Line 5:
-                  Property failure: Postcondition of f failed
+                  Property failure: Postcondition of f
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -233,9 +233,9 @@ File while1.mlw:
     x = (ref'mk 0)
     i = (ref'mk 2)
     Concrete execution of contents
-    Concrete execution of infix <
+    Concrete execution of (<)
   Line 14:
     Concrete execution of contents
   Line 5:
-    Property failure: Postcondition of f failed
+    Property failure: Postcondition of f
 

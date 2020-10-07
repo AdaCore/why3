@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.02s, 1582 steps).
+Prover result is: valid (0.03s, 1582 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>                        VALUE from ce-model: (ref'mk 0)
@@ -17,7 +17,7 @@ Prover result is: valid (0.02s, 1582 steps).
                   Concrete execution of g
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 10:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call.mlw", line 7, characters 12-21)
@@ -32,8 +32,7 @@ Prover result is: valid (0.02s, 1582 steps).
                   z = (ref'mk 0)
                   result = ()
                 Line 7:
-                  Property failure: Postcondition failed
-                  Execution got stucked: Assume postconition
+                  Execution got stucked: Assume postcondition
 <check-ce>Check model 1 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>                          VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
@@ -49,7 +48,7 @@ Prover result is: valid (0.02s, 1582 steps).
                   Concrete execution of g
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 10:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -64,7 +63,7 @@ Prover result is: valid (0.02s, 1582 steps).
                   z = (ref'mk 2)
                   result = ()
                 Line 13:
-                  Property failure: Assertion failed
+                  Property failure: Assertion
 <check-ce>Check model 2 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>                            VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
@@ -80,7 +79,7 @@ Prover result is: valid (0.02s, 1582 steps).
                   Concrete execution of g
                 Line 8:
                   Concrete execution of contents
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 10:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -95,7 +94,7 @@ Prover result is: valid (0.02s, 1582 steps).
                   z = (ref'mk 2)
                   result = ()
                 Line 13:
-                  Property failure: Assertion failed
+                  Property failure: Assertion
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -126,5 +125,5 @@ File func_call.mlw:
     z = (ref'mk 2)
     result = ()
   Line 13:
-    Property failure: Assertion failed
+    Property failure: Assertion
 

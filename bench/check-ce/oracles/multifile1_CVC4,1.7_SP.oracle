@@ -1,6 +1,6 @@
 File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
 Formula `Postcondition' from verification condition decr'vc.
-Prover result is: valid (0.04s, 287 steps).
+Prover result is: valid (0.05s, 287 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 <check-ce>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 not in ce-model, taking default 0
@@ -13,14 +13,14 @@ Prover result is: valid (0.04s, 287 steps).
                 Line 11:
                   Concrete execution of decr
                 Line 7:
-                  Concrete execution of infix -
+                  Concrete execution of (-)
               File int.mlw:
                 Line 23:
-                  Concrete execution of prefix -
-                  Concrete execution of infix +
+                  Concrete execution of (-_)
+                  Concrete execution of (+)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 9:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -31,9 +31,9 @@ Prover result is: valid (0.04s, 287 steps).
                 Line 11:
                   Abstract execution of decr
                   result = 0
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 10:
-                  Property failure: Postcondition of incr failed
+                  Property failure: Postcondition of incr
 <check-ce>Check model 1 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 <check-ce>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -45,14 +45,14 @@ Prover result is: valid (0.04s, 287 steps).
                 Line 11:
                   Concrete execution of decr
                 Line 7:
-                  Concrete execution of infix -
+                  Concrete execution of (-)
               File int.mlw:
                 Line 23:
-                  Concrete execution of prefix -
-                  Concrete execution of infix +
+                  Concrete execution of (-_)
+                  Concrete execution of (+)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 9:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -63,9 +63,9 @@ Prover result is: valid (0.04s, 287 steps).
                 Line 11:
                   Abstract execution of decr
                   result = 0
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 10:
-                  Property failure: Postcondition of incr failed
+                  Property failure: Postcondition of incr
 <check-ce>Check model 2 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 <check-ce>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -77,14 +77,14 @@ Prover result is: valid (0.04s, 287 steps).
                 Line 11:
                   Concrete execution of decr
                 Line 7:
-                  Concrete execution of infix -
+                  Concrete execution of (-)
               File int.mlw:
                 Line 23:
-                  Concrete execution of prefix -
-                  Concrete execution of infix +
+                  Concrete execution of (-_)
+                  Concrete execution of (+)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 9:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -95,9 +95,9 @@ Prover result is: valid (0.04s, 287 steps).
                 Line 11:
                   Abstract execution of decr
                   result = 0
-                  Concrete execution of infix +
+                  Concrete execution of (+)
                 Line 10:
-                  Property failure: Postcondition of incr failed
+                  Property failure: Postcondition of incr
 <check-ce>Models:
           - Checked model 0: bad model/good model -> The contracts of some
                                                      function or loop are
@@ -116,7 +116,7 @@ Prover result is: valid (0.04s, 287 steps).
                                                      following execution:
 File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
 Formula `Postcondition' from verification condition incr'vc.
-Prover result is: unknown (sat) (0.03s, 4862 steps).
+Prover result is: unknown (sat) (0.04s, 4862 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File multifile1.mlw:
@@ -126,7 +126,7 @@ File multifile1.mlw:
   Line 11:
     Abstract execution of decr
     result = 0
-    Concrete execution of infix +
+    Concrete execution of (+)
   Line 10:
-    Property failure: Postcondition of incr failed
+    Property failure: Postcondition of incr
 

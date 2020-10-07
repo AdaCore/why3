@@ -1198,9 +1198,6 @@ let check_term ?vsenv ctx t =
   | Some false ->
       if Debug.test_flag debug_rac then
         eprintf "%a@." report_cntr_head (ctx, "has failed", t);
-      let loc = Opt.get_def Loc.dummy_position t.t_loc in
-      let msg = asprintf "%s failed" ctx.c_desc in
-      register_failure ctx.c_env loc msg;
       raise (Contr (ctx, t))
   | None ->
       if (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
@@ -1221,6 +1218,48 @@ let check_post ctx v post =
 let check_posts desc loc env v posts =
   let ctx = cntr_ctx desc ?trigger_loc:loc env in
   List.iter (check_post ctx v) posts
+
+exception RACStuck of env * Loc.position option
+(* The execution goes into RACStuck when a property that should be
+   assumed is not satisfied. E.g. when executing a function, if the
+   environment does not satisfy the precondition, the execution ends
+   with RACStuck. *)
+
+let check_assume_term ctx t =
+  try check_term ctx t with Contr (ctx,t) ->
+    let loc = Opt.get_def Loc.dummy_position t.t_loc in
+    register_stucked ctx.c_env loc ctx.c_desc;
+    raise (RACStuck (ctx.c_env, t.t_loc))
+
+let check_assume_terms ctx tl =
+  try check_terms ctx tl with Contr (ctx,t) ->
+    let loc = Opt.get_def Loc.dummy_position t.t_loc in
+    register_stucked ctx.c_env loc ctx.c_desc;
+    raise (RACStuck (ctx.c_env, t.t_loc))
+
+let check_assume_posts ctx v posts =
+  try check_posts ctx.c_desc ctx.c_trigger_loc ctx.c_env v posts with Contr (ctx,t) ->
+    let loc = Opt.get_def Loc.dummy_position t.t_loc in
+    register_stucked ctx.c_env loc ctx.c_desc;
+    raise (RACStuck (ctx.c_env,t.t_loc))
+
+let check_term ?vsenv ctx t =
+  try check_term ?vsenv ctx t with (Contr (ctx,t)) as e ->
+    let loc = Opt.get_def Loc.dummy_position t.t_loc in
+    register_failure ctx.c_env loc ctx.c_desc;
+    raise e
+
+let check_terms ctx tl =
+  try check_terms ctx tl with (Contr (ctx,t)) as e ->
+    let loc = Opt.get_def Loc.dummy_position t.t_loc in
+    register_failure ctx.c_env loc ctx.c_desc;
+    raise e
+
+let check_posts desc loc env v posts =
+  try check_posts desc loc env v posts with (Contr (ctx,t)) as e ->
+    let loc = Opt.get_def Loc.dummy_position t.t_loc in
+    register_failure ctx.c_env loc ctx.c_desc;
+    raise e
 
 (* EXPRESSION EVALUATION *)
 
@@ -1311,12 +1350,6 @@ let print_result fmt = function
   | Excep (xs, v) -> fprintf fmt "EXC %a: %a" print_xs xs print_value v
   | Fun (rs, _, _) -> fprintf fmt "FUN %a" print_rs rs
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
-
-exception RACStuck of env * Loc.position option
-(* The execution goes into RACStuck when a property that should be
-   assumed is not satisfied. E.g. when executing a function, if the
-   environment does not satisfy the precondition, the execution ends
-   with RACStuck. *)
 
 let get_and_register_value env ?def ?ity vs loc =
   let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
@@ -1501,11 +1534,7 @@ and eval_expr' env e =
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
         (Mvs.keys env.vsenv);
       (* assert2 *)
-      (try check_terms (cntr_ctx "Assume loop invariant" env) inv with
-       | Contr (_,t) ->
-          let loc = Opt.get_def Loc.dummy_position t.t_loc in
-          register_stucked env loc "Assume invariant";
-          raise (RACStuck (env, t.t_loc)));
+      check_assume_terms (cntr_ctx "Assume loop invariant" env) inv;
       match eval_expr env cond with
       | Normal v ->
          if is_true v then begin
@@ -1607,12 +1636,8 @@ and eval_expr' env e =
         raise (RACStuck (env,e.e_loc)) end;
     if le a i_val && le i_val b then begin
       (* assert2 *)
-      (let msg = "Assume loop invariant" in
-       try check_terms (cntr_ctx msg env) inv with
-       | Contr (_,t) ->
-          let loc = Opt.get_def Loc.dummy_position t.t_loc in
-          register_stucked env loc msg;
-          raise (RACStuck (env,t.t_loc)));
+      let ctx = cntr_ctx "Assume loop invariant" env in
+      check_assume_terms ctx inv;
       match eval_expr env e1 with
       | Normal _ ->
          let env = bind_vs i.pv_vs (value ty_int (Vnum (suc i_val))) env in
@@ -1627,14 +1652,8 @@ and eval_expr' env e =
     else begin
       (* assert4 *)
       (* i is already equal to b + 1 *)
-      (try check_terms (cntr_ctx "Invariant remains valid after loop" env) inv with
-       | Contr (_,t) ->
-          let msg = asprintf
-            "Variable %s has value %s, but invariant does not hold"
-            i.pv_vs.vs_name.id_string (BigInt.to_string i_val) in
-          let loc = Opt.get_def Loc.dummy_position t.t_loc in
-          register_stucked env loc msg;
-          raise (RACStuck (env,t.t_loc)));
+      let ctx = cntr_ctx "Invariant after last iteration" env in
+      check_assume_terms ctx inv;
       Normal (value ty_unit Vvoid)
       end
     end
@@ -1691,16 +1710,12 @@ and eval_expr' env e =
       match r with Normal t -> Excep (xs, t) | _ -> r )
   | Eexn (_, e1) -> eval_expr env e1
   | Eassert (kind, t) ->
-      if env.rac.do_rac then (
-        let descr = match kind with
-          | Assert -> "Assertion"
-          | Assume -> "Assumption"
-          | Check -> "Check" in
-        try check_term (cntr_ctx descr env) t
-        with Contr (ctr, t) when kind = Assume ->
-          let loc = Opt.get_def Loc.dummy_position t.t_loc in
-          register_stucked env loc "Assume";
-          raise (RACStuck (ctr.c_env, t.t_loc)) );
+      if env.rac.do_rac then begin
+          match kind with
+          | Assert -> check_term (cntr_ctx "Assertion" env) t
+          | Assume -> check_assume_term (cntr_ctx "Assumption" env) t
+          | Check -> check_term (cntr_ctx "Check" env) t
+        end;
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
       Debug.dprintf debug "@[<h>%tEVAL EXPR: GHOST %a@]@." pp_indent print_expr e1;
@@ -1739,15 +1754,10 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
     Mpv.fold snapshot_oldie rs.rs_cty.cty_oldies Mvs.empty in
   let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v)
                                env.vsenv oldies} in
-  if env.rac.do_rac then (
-    let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
-    try check_terms ctx rs.rs_cty.cty_pre
-    with Contr (ctx, t) when main_function ->
-      (* Only in this case the pre-condition should be assumed.
-         In all other cases, it should be proved. *)
-      let loc = Opt.get_def Loc.dummy_position t.t_loc in
-      register_stucked env loc "Assume precondition";
-      raise (RACStuck (ctx.c_env, t.t_loc)) );
+  if env.rac.do_rac then begin
+      let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
+      if main_function then check_assume_terms ctx rs.rs_cty.cty_pre
+      else check_terms ctx rs.rs_cty.cty_pre end;
   let can_interpret_abstractly =
     if rs_equal rs rs_func_app then false else
       match find_definition env rs with
@@ -1781,11 +1791,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
       let res_v = get_and_register_value ~ity:ity_result env res
                     loc_or_dummy in
       (* assert2 *)
-      (try check_posts "Postcondition" loc env res_v rs.rs_cty.cty_post with
-       | Contr (_,t) ->
-          let loc = Opt.get_def Loc.dummy_position t.t_loc in
-          register_stucked env loc "Assume postconition";
-          raise (RACStuck (env,t.t_loc)));
+      let ctx = cntr_ctx "Assume postcondition" ?trigger_loc:loc env in
+      check_assume_posts ctx res_v rs.rs_cty.cty_post;
       Normal res_v end
   else begin
       register_call env loc_or_dummy (Some rs) ExecConcrete;
