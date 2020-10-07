@@ -113,11 +113,17 @@ let command cur =
           exit 1 in
       Filename.concat command_path scmd
     end in
-  let scmd = "why3 " ^ sscmd in
-  let args = Array.of_list (scmd :: args) in
-  (* add double quotes to avoid splitting issues with execv in Windows *)
-  let args = if Sys.win32 then Array.map Filename.quote args else args in
-  Unix.execv cmd args
+  let args = Array.of_list args in
+  let argc = Array.length args in
+  let argi = Array.length Sys.argv - argc in
+  Array.blit args 0 Sys.argv argi argc;
+  Whyconf.Args.first_arg := argi;
+  try
+    Dynlink.loadfile cmd;
+    exit 0
+  with Dynlink.Error e ->
+    Printf.eprintf "Failed to load %s: %s\n%!" cmd (Dynlink.error_message e);
+    exit 1
 
 let () = try
   let i = Getopt.parse_many option_list Sys.argv 1 in

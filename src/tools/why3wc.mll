@@ -338,7 +338,7 @@ and skip_until_nl = parse
     end;
     Queue.add file files
 
-  let () = Why3.Getopt.parse_all spec add_file Sys.argv
+  let () = Why3.Getopt.parse_all ~i:!Why3.Whyconf.Args.first_arg spec add_file Sys.argv
 
   let () =
     let n = Queue.length files in
