@@ -633,9 +633,6 @@ $(TOOLSDEP): $(TOOLSGENERATED)
 byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.cma)
 opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.cmxs)
 
-bin:
-	mkdir bin
-
 bin/why3.opt: $(WHY3CMXA) src/tools/main.cmx
 bin/why3.byte: $(WHY3CMA) src/tools/main.cmo
 
@@ -2133,11 +2130,11 @@ plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: src/parser/parser_common.m
 	        echo '$*.cmx : $*.cmi'; \
 	        echo '$*.cmi : $*.cmo') $(TOTARGET)
 
-bin/%.opt: | bin
+bin/%.opt:
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/%.byte: | bin
+bin/%.byte:
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
