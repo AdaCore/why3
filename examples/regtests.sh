@@ -55,7 +55,7 @@ run_dir () {
     for f in $LIST; do
         d=`dirname $f`
         printf "Replaying $d ... "
-        if ../bin/why3replay.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP ; then
+        if ../bin/why3.opt replay -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP ; then
             printf "OK"
             cat $TMP $TMPERR
             success=`expr $success + 1`

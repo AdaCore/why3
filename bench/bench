@@ -15,7 +15,7 @@ suffix=$1
 
 # TODO: remove the hack about int.mlw once it has become builtin
 goods () {
-    pgm="bin/why3prove$suffix"
+    pgm="bin/why3$suffix prove"
     ERROR=
     test -d $1 || exit 1
     rm -f bench_errors
@@ -47,7 +47,7 @@ goods () {
 }
 
 plugins () {
-    pgm="bin/why3prove$suffix"
+    pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.$3 ; do
 	printf "  $f... "
@@ -61,7 +61,7 @@ plugins () {
 }
 
 bads () {
-    pgm="bin/why3prove$suffix"
+    pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.[wm][hl][yw] ; do
 	printf "  $f... "
@@ -76,7 +76,7 @@ bads () {
 }
 
 warns () {
-    pgm="bin/why3prove$suffix"
+    pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     rm -f bench_errors
     for f in $1/*.[wm][hl][yw] ; do
@@ -96,7 +96,7 @@ warns () {
 }
 
 drivers () {
-    pgm="bin/why3prove$suffix"
+    pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.drv; do
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
@@ -115,7 +115,7 @@ drivers () {
 
 valid_goals () {
     bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
-    pgm="bin/why3prove$suffix"
+    pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
 	printf "  $f... "
@@ -131,7 +131,7 @@ valid_goals () {
 
 invalid_goals () {
     bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
-    pgm="bin/why3prove$suffix"
+    pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
 	printf "  $f... "
@@ -147,7 +147,7 @@ invalid_goals () {
 }
 
 replay () {
-    pgm="bin/why3replay$suffix"
+    pgm="bin/why3$suffix replay"
     test -d $1 || exit 1
     for f in $1/*/; do
         printf "  $f... "
@@ -163,10 +163,10 @@ replay () {
 }
 
 replay_without_shape () {
-    pgm="bin/why3replay$suffix"; test=$1
+    pgm="bin/why3$suffix replay"; test=$1
     test -d "$test" || exit 1
     echo -n "Replay $test with shapes... "
-    if "$pgm" "$test" > /dev/null 2>&1; then
+    if $pgm "$test" > /dev/null 2>&1; then
         echo "OK."
     else
         echo "Failure!"
@@ -175,7 +175,7 @@ replay_without_shape () {
     echo -n "Replay $test without shapes... "
     noshapes=$(mktemp -d -p $(dirname "$test") "$(basename "$test")-without-shapes.XXXXXXXX")
     cp "$test/why3session.xml" "$noshapes"
-    if "$pgm" "$noshapes" > /dev/null 2>&1 ; then
+    if $pgm "$noshapes" > /dev/null 2>&1 ; then
         echo "OK."
         rm -rf "$noshapes"
     else
@@ -186,7 +186,7 @@ replay_without_shape () {
 }
 
 execute () {
-    pgm="bin/why3execute$suffix"
+    pgm="bin/why3$suffix execute"
     printf "  $1 $2... "
     if $pgm $1 $2 > /dev/null; then
         echo "ok"
@@ -199,7 +199,7 @@ execute () {
 }
 
 extract () {
-    pgm="bin/why3extract$suffix"
+    pgm="bin/why3$suffix extract"
     dir=$1
     shift
     for f in $dir/*.mlw; do
@@ -359,7 +359,7 @@ list_stuff () {
 }
 
 test_mlw_printer () {
-    why3pp="bin/why3pp$suffix"
+    why3pp="bin/why3$suffix pp"
     if ! python3 -m sexpdata 2> /dev/null; then
         echo "Skipping (Python module sexpdata not installed)" >&2
         return
