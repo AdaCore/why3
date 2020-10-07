@@ -75,6 +75,12 @@ ifeq (@OCAMLBEST@,opt)
 #DEPFLAGS += -native
 endif
 
+ifeq (@OCAMLBEST@,opt)
+SHAREDBEST=cmxs
+else
+SHAREDBEST=cma
+endif
+
 ifeq (@LATEX@,rubber)
    LATEXCOMP=rubber --warn all --pdf
    LATEXCLEAN=rubber --pdf --clean
@@ -624,8 +630,8 @@ $(TOOLSDEP) $(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
 
 $(TOOLSDEP): $(TOOLSGENERATED)
 
-byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.byte)
-opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.opt)
+byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.cma)
+opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.cmxs)
 
 bin:
 	mkdir bin
@@ -633,22 +639,20 @@ bin:
 bin/why3.opt: $(WHY3CMXA) src/tools/main.cmx
 bin/why3.byte: $(WHY3CMA) src/tools/main.cmo
 
-bin/why3%.opt: $(WHY3CMXA) src/tools/why3%.cmx
-bin/why3%.byte: $(WHY3CMA) src/tools/why3%.cmo
+$(TOOLS_BIN:%=bin/%.cma):  bin/%.cma:  src/tools/%.cmo
+$(TOOLS_BIN:%=bin/%.cmxs): bin/%.cmxs: src/tools/%.cmx
 
 uninstall-bin::
 	rm -f $(BINDIR)/why3$(EXE)
-	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE))
+	rm -f $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 
 install-bin::
 	$(MKDIR_P) $(BINDIR)
 	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 	$(MKDIR_P) $(TOOLDIR)
-	for f in $(TOOLS_BIN); do \
-	  $(INSTALL) bin/$$f.@OCAMLBEST@  $(TOOLDIR)/$$f$(EXE); \
-	done
+	$(INSTALL_DATA) $(TOOLS_BIN:%=bin/%.$(SHAREDBEST)) $(TOOLDIR)
 
-install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
+install_local:: bin/why3 $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 
 bin/%:	bin/%.@OCAMLBEST@
 	ln -sf $(notdir $<) $@
@@ -799,7 +803,7 @@ IDE_FILES = gtkcompat
 ifeq (@enable_statmemprof@,yes)
 IDE_FILES += statmemprof
 
-bin/why3ide.opt bin/why3ide.byte: EXTPKGS += @STATMEMPROFPKG@
+bin/why3ide.cmxs bin/why3ide.cma: EXTPKGS += @STATMEMPROFPKG@
 endif
 
 IDE_FILES += gconfig ide_utils why3ide
@@ -816,20 +820,20 @@ $(IDEDEP): $(IDEGENERATED)
 
 # build targets
 
-byte: bin/why3ide.byte
-opt:  bin/why3ide.opt
+byte: bin/why3ide.cma
+opt:  bin/why3ide.cmxs
 
-bin/why3ide.opt bin/why3ide.byte: EXTINCLUDES += @LABLGTKINCLUDE@
-bin/why3ide.opt bin/why3ide.byte: EXTLIBS += @LABLGTKLIB@
-bin/why3ide.opt bin/why3ide.byte: EXTPKGS += @LABLGTKPKG@
-bin/why3ide.byte: BLINKFLAGS += -custom
+bin/why3ide.cmxs bin/why3ide.cma: EXTINCLUDES += @LABLGTKINCLUDE@
+bin/why3ide.cmxs bin/why3ide.cma: EXTLIBS += @LABLGTKLIB@
+bin/why3ide.cmxs bin/why3ide.cma: EXTPKGS += @LABLGTKPKG@
+bin/why3ide.cma: BLINKFLAGS += -custom
 
 ifeq (@enable_ocamlfind@,yes)
-bin/why3ide.opt bin/why3ide.byte: FLAGS += -thread
+bin/why3ide.cmxs bin/why3ide.cma: FLAGS += -thread
 endif
 
-bin/why3ide.opt: $(WHY3CMXA) src/ide/resetgc.o $(IDECMX)
-bin/why3ide.byte: $(WHY3CMA) src/ide/resetgc.o $(IDECMO)
+bin/why3ide.cmxs: src/ide/resetgc.o $(IDECMX)
+bin/why3ide.cma:  src/ide/resetgc.o $(IDECMO)
 
 src/ide/resetgc.o: src/ide/resetgc.c
 	$(SHOW) 'Ocamlc   $<'
@@ -845,17 +849,17 @@ depend: $(IDEDEP)
 
 CLEANDIRS += src/ide
 
-ide: bin/why3ide.@OCAMLBEST@
+ide: bin/why3ide.$(SHAREDBEST)
 
 uninstall-ide:
-	rm -f $(TOOLDIR)/why3ide$(EXE)
+	rm -f $(TOOLDIR)/why3ide.$(SHAREDBEST)
 	rm -rf $(DATADIR)/why3/images
 
 uninstall:: uninstall-ide
 
 install-ide:
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3ide.@OCAMLBEST@ $(TOOLDIR)/why3ide$(EXE)
+	$(INSTALL_DATA) bin/why3ide.$(SHAREDBEST) $(TOOLDIR)
 	$(MKDIR_P) $(DATADIR)/why3/images
 	for i in share/images/*.rc; do \
 	     d=`basename $$i .rc`; \
@@ -867,7 +871,7 @@ install-ide:
 
 install:: install-ide
 
-install_local:: bin/why3ide
+install_local:: bin/why3ide.$(SHAREDBEST)
 
 ifeq (@GTKVERSION@,2)
 src/ide/gtkcompat.ml: src/ide/gtkcompat2.ml Makefile
@@ -897,11 +901,11 @@ $(WEBSERVDEP) $(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
 
 # build targets
 
-byte: bin/why3webserver.byte
-opt:  bin/why3webserver.opt
+byte: bin/why3webserver.cma
+opt:  bin/why3webserver.cmxs
 
-bin/why3webserver.opt: $(WHY3CMXA) $(WEBSERVCMX)
-bin/why3webserver.byte: $(WHY3CMA) $(WEBSERVCMO)
+bin/why3webserver.cmxs: $(WEBSERVCMX)
+bin/why3webserver.cma:  $(WEBSERVCMO)
 
 # depend and clean targets
 
@@ -914,13 +918,13 @@ depend: $(WEBSERVDEP)
 CLEANDIRS += src/ide
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3webserver$(EXE)
+	rm -f $(TOOLDIR)/why3webserver.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3webserver.@OCAMLBEST@ $(TOOLDIR)/why3webserver$(EXE)
+	$(INSTALL_DATA) bin/why3webserver.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3webserver
+install_local:: bin/why3webserver.$(SHAREDBEST)
 
 
 ###############
@@ -943,11 +947,11 @@ $(SESSIONDEP) $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
 
 # build targets
 
-byte: bin/why3session.byte
-opt:  bin/why3session.opt
+byte: bin/why3session.cma
+opt:  bin/why3session.cmxs
 
-bin/why3session.opt: $(WHY3CMXA) $(SESSIONCMX)
-bin/why3session.byte: $(WHY3CMA) $(SESSIONCMO)
+bin/why3session.cmxs: $(SESSIONCMX)
+bin/why3session.cma:  $(SESSIONCMO)
 
 # depend and clean targets
 
@@ -960,13 +964,13 @@ depend: $(SESSIONDEP)
 CLEANDIRS += src/why3session
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3session$(EXE)
+	rm -f $(TOOLDIR)/why3session.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3session.@OCAMLBEST@ $(TOOLDIR)/why3session$(EXE)
+	$(INSTALL_DATA) bin/why3session.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3session
+install_local:: bin/why3session.$(SHAREDBEST)
 
 ###############
 # Why3 Shell
@@ -984,11 +988,11 @@ $(SHELLDEP) $(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
 
 # build targets
 
-byte: bin/why3shell.byte
-opt:  bin/why3shell.opt
+byte: bin/why3shell.cma
+opt:  bin/why3shell.cmxs
 
-bin/why3shell.opt: $(WHY3CMXA) $(SHELLCMX)
-bin/why3shell.byte: $(WHY3CMA) $(SHELLCMO)
+bin/why3shell.cmxs: $(SHELLCMX)
+bin/why3shell.cma:  $(SHELLCMO)
 
 # depend and clean targets
 
@@ -999,13 +1003,13 @@ endif
 depend: $(SHELLDEP)
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3shell$(EXE)
+	rm -f $(TOOLDIR)/why3shell.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3shell.@OCAMLBEST@ $(TOOLDIR)/why3shell$(EXE)
+	$(INSTALL_DATA) bin/why3shell.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3shell
+install_local:: bin/why3shell.$(SHAREDBEST)
 
 ####################
 # Coq realizations
@@ -1567,11 +1571,11 @@ GENERATED += $(PRETTYPRINTGENERATED)
 
 # build targets
 
-byte: bin/why3pp.byte
-opt:  bin/why3pp.opt
+byte: bin/why3pp.cma
+opt:  bin/why3pp.cmxs
 
-bin/why3pp.opt: $(WHY3CMXA) $(PRETTYPRINTCMX)
-bin/why3pp.byte: $(WHY3CMA) $(PRETTYPRINTCMO)
+bin/why3pp.cmxs: $(PRETTYPRINTCMX)
+bin/why3pp.cma:  $(PRETTYPRINTCMO)
 
 # depend and clean targets
 
@@ -1582,13 +1586,13 @@ endif
 depend: $(PRETTYPRINTDEP)
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3pp(EXE)
+	rm -f $(TOOLDIR)/why3pp.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3pp.@OCAMLBEST@ $(TOOLDIR)/why3pp$(EXE)
+	$(INSTALL_DATA) bin/why3pp.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3pp
+install_local:: bin/why3pp.$(SHAREDBEST)
 
 #########
 # why3doc
@@ -1610,11 +1614,11 @@ $(WHY3DOCDEP): $(WHY3DOCGENERATED)
 
 # build targets
 
-byte: bin/why3doc.byte
-opt:  bin/why3doc.opt
+byte: bin/why3doc.cma
+opt:  bin/why3doc.cmxs
 
-bin/why3doc.opt: $(WHY3CMXA) $(WHY3DOCCMX)
-bin/why3doc.byte: $(WHY3CMA) $(WHY3DOCCMO)
+bin/why3doc.cmxs: $(WHY3DOCCMX)
+bin/why3doc.cma:  $(WHY3DOCCMO)
 
 # depend and clean targets
 
@@ -1628,13 +1632,13 @@ CLEANDIRS += src/why3doc
 GENERATED += $(WHY3DOCGENERATED)
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3doc$(EXE)
+	rm -f $(TOOLDIR)/why3doc.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3doc.@OCAMLBEST@ $(TOOLDIR)/why3doc$(EXE)
+	$(INSTALL_DATA) bin/why3doc.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3doc
+install_local:: bin/why3doc.$(SHAREDBEST)
 
 #########
 # trywhy3
@@ -1814,8 +1818,8 @@ src/ide/why3_js.js: src/ide/why3_js.byte
 
 web_ide: src/ide/why3_js.js
 
-opt: bin/why3webserver.opt
-byte: bin/why3webserver.byte src/ide/why3_js.cmo
+opt: bin/why3webserver.cmxs
+byte: bin/why3webserver.cma src/ide/why3_js.cmo
 
 endif
 
