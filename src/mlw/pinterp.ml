@@ -1792,7 +1792,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
       let res_v = get_and_register_value ~ity:ity_result env res
                     loc_or_dummy in
       (* assert2 *)
-      let ctx = cntr_ctx "Assume postcondition" ?trigger_loc:loc env in
+      let msg = cntr_desc "Assume postcondition" rs.rs_name in
+      let ctx = cntr_ctx msg ?trigger_loc:loc env in
       check_assume_posts ctx res_v rs.rs_cty.cty_post;
       Normal res_v end
   else begin
