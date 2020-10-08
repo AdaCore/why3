@@ -1145,7 +1145,7 @@ let print_log_entry_desc fmt e = match e.log_desc with
   | Exec_failed msg ->
       fprintf fmt "@[<h>Property failure: %s@]" msg
   | Exec_stucked msg ->
-      fprintf fmt "@[<h>Execution got stucked: %s@]" msg
+      fprintf fmt "@[<h>Execution got stuck: %s@]" msg
   | Exec_ended ->
       fprintf fmt "@[<h>Execution of main function terminated normally@]"
 
