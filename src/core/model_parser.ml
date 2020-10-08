@@ -1074,7 +1074,7 @@ type log_entry_desc =
 
 type log_entry = {
     log_desc : log_entry_desc;
-    log_loc  : Loc.position;
+    log_loc  : Loc.position option;
 }
 
 type exec_log = log_entry list
@@ -1145,7 +1145,8 @@ let print_exec_log ~json fmt entry_log =
             (print_json_field "kind" print_json) (string "ENDED") in
     let print_json_entry fmt e =
       fprintf fmt "@[@[<hv1>{@[<hv2>%a@];@ @[<hv2>%a@]@]}@]"
-        (print_json_field "loc" Pretty.print_json_loc) e.log_loc
+        (Pp.print_option_or_default "NOLOC"
+           (print_json_field "loc" Pretty.print_json_loc)) e.log_loc
         (print_json_field "entry" print_log_entry) e.log_desc in
     fprintf fmt "@[@[<hv1>[%a@]@]"
       Pp.(print_list comma print_json_entry) entry_log
@@ -1153,37 +1154,38 @@ let print_exec_log ~json fmt entry_log =
     let rec loop file line fmt = function
       | [] -> fprintf fmt "@]@]"
       | { log_desc; log_loc } :: rest ->
-          let f, l, _, _ = Loc.get log_loc in
-          if file <> f then (
-            if file <> "" then
-              fprintf fmt "@]@]@\n";
-            fprintf fmt "@[<v2>File %s:@\n" (Filename.basename f) );
-          if line <> l then (
-            if line <> -1 && (file = f || file = "") then
-              fprintf fmt "@]@\n";
-            fprintf fmt "@[<v2>Line %d:@\n" l )
-          else
-            fprintf fmt "@\n";
-          begin match log_desc with
-            | Val_from_model (vs, v) ->
-                fprintf fmt "%a = %s" Ident.print_decoded vs.vs_name.id_string v;
-            | Exec_call (None, k) ->
-                fprintf fmt "%s execution of lambda function"
-                  (exec_kind_to_string k)
-            | Exec_call (Some rs, k) ->
-                fprintf fmt "%s execution of %a" (exec_kind_to_string k)
-                  Ident.print_decoded rs.Expr.rs_name.id_string
-            | Exec_pure (ls,k) ->
-                fprintf fmt "%s execution of %a" (exec_kind_to_string k)
-                  Ident.print_decoded ls.ls_name.id_string
-            | Exec_failed msg ->
-                fprintf fmt "Property failure: %s" msg
-            | Exec_stucked msg ->
-                fprintf fmt "Execution got stucked: %s" msg
-            | Exec_ended ->
-                fprintf fmt "Execution of main function terminated normally"
-          end;
-          loop f l fmt rest in
+         let f, l, _, _ =
+           Loc.get (Opt.get_def Loc.dummy_position log_loc) in
+         if file <> f || log_loc = None then (
+           if file <> "" then
+             fprintf fmt "@]@]@\n";
+           fprintf fmt "@[<v2>File %s:@\n" (Filename.basename f) );
+         if line <> l || file <> f then (
+           if line <> -1 && (file = f || file = "") then
+             fprintf fmt "@]@\n";
+           fprintf fmt "@[<v2>Line %d:@\n" l )
+         else
+           fprintf fmt "@\n";
+         begin match log_desc with
+         | Val_from_model (vs, v) ->
+            fprintf fmt "%a = %s" Ident.print_decoded vs.vs_name.id_string v;
+         | Exec_call (None, k) ->
+            fprintf fmt "%s execution of lambda function"
+              (exec_kind_to_string k)
+         | Exec_call (Some rs, k) ->
+            fprintf fmt "%s execution of %a" (exec_kind_to_string k)
+              Ident.print_decoded rs.Expr.rs_name.id_string
+         | Exec_pure (ls,k) ->
+            fprintf fmt "%s execution of %a" (exec_kind_to_string k)
+              Ident.print_decoded ls.ls_name.id_string
+         | Exec_failed msg ->
+            fprintf fmt "Property failure: %s" msg
+         | Exec_stucked msg ->
+            fprintf fmt "Execution got stucked: %s" msg
+         | Exec_ended ->
+            fprintf fmt "Execution of main function terminated normally"
+         end;
+         loop f l fmt rest in
     if entry_log <> [] then
       fprintf fmt "@[<v>%a@]@]" (loop "" (-1)) entry_log
 

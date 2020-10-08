@@ -276,19 +276,22 @@ type log_entry_desc =
 
 type log_entry = {
     log_desc : log_entry_desc;
-    log_loc  : Loc.position;
+    log_loc  : Loc.position option;
 }
 
 type exec_log
 
 val empty_log : exec_log
-val add_log_entry : log_entry_desc -> Loc.position -> exec_log -> exec_log
-val add_val_to_log : Term.vsymbol -> string -> Loc.position -> exec_log -> exec_log
-val add_call_to_log : Expr.rsymbol option -> exec_kind -> Loc.position -> exec_log -> exec_log
-val add_pure_call_to_log : Term.lsymbol -> exec_kind -> Loc.position -> exec_log -> exec_log
-val add_failed_to_log : string -> Loc.position -> exec_log -> exec_log
-val add_stucked_to_log : string -> Loc.position -> exec_log -> exec_log
-val add_exec_ended_to_log : Loc.position -> exec_log -> exec_log
+val add_log_entry : log_entry_desc -> Loc.position option -> exec_log -> exec_log
+val add_val_to_log :
+  Term.vsymbol -> string -> Loc.position option -> exec_log -> exec_log
+val add_call_to_log :
+  Expr.rsymbol option -> exec_kind -> Loc.position option -> exec_log -> exec_log
+val add_pure_call_to_log :
+  Term.lsymbol -> exec_kind -> Loc.position option -> exec_log -> exec_log
+val add_failed_to_log : string -> Loc.position option -> exec_log -> exec_log
+val add_stucked_to_log : string -> Loc.position option -> exec_log -> exec_log
+val add_exec_ended_to_log : Loc.position option -> exec_log -> exec_log
 val log_to_list : exec_log -> log_entry list
 val print_exec_log : json:bool -> exec_log Pp.pp
 

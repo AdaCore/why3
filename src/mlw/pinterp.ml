@@ -1227,38 +1227,32 @@ exception RACStuck of env * Loc.position option
 
 let check_assume_term ctx t =
   try check_term ctx t with Contr (ctx,t) ->
-    let loc = Opt.get_def Loc.dummy_position t.t_loc in
-    register_stucked ctx.c_env loc ctx.c_desc;
+    register_stucked ctx.c_env t.t_loc ctx.c_desc;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
 let check_assume_terms ctx tl =
   try check_terms ctx tl with Contr (ctx,t) ->
-    let loc = Opt.get_def Loc.dummy_position t.t_loc in
-    register_stucked ctx.c_env loc ctx.c_desc;
+    register_stucked ctx.c_env t.t_loc ctx.c_desc;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
 let check_assume_posts ctx v posts =
   try check_posts ctx.c_desc ctx.c_trigger_loc ctx.c_env v posts with Contr (ctx,t) ->
-    let loc = Opt.get_def Loc.dummy_position t.t_loc in
-    register_stucked ctx.c_env loc ctx.c_desc;
+    register_stucked ctx.c_env t.t_loc ctx.c_desc;
     raise (RACStuck (ctx.c_env,t.t_loc))
 
 let check_term ?vsenv ctx t =
   try check_term ?vsenv ctx t with (Contr (ctx,t)) as e ->
-    let loc = Opt.get_def Loc.dummy_position t.t_loc in
-    register_failure ctx.c_env loc ctx.c_desc;
+    register_failure ctx.c_env t.t_loc ctx.c_desc;
     raise e
 
 let check_terms ctx tl =
   try check_terms ctx tl with (Contr (ctx,t)) as e ->
-    let loc = Opt.get_def Loc.dummy_position t.t_loc in
-    register_failure ctx.c_env loc ctx.c_desc;
+    register_failure ctx.c_env t.t_loc ctx.c_desc;
     raise e
 
 let check_posts desc loc env v posts =
   try check_posts desc loc env v posts with (Contr (ctx,t)) as e ->
-    let loc = Opt.get_def Loc.dummy_position t.t_loc in
-    register_failure ctx.c_env loc ctx.c_desc;
+    register_failure ctx.c_env t.t_loc ctx.c_desc;
     raise e
 
 (* EXPRESSION EVALUATION *)
@@ -1369,7 +1363,7 @@ let get_and_register_value env ?def ?ity vs loc =
                 default %a@]@." name print_loc' loc print_value v;
        v
   in
-  register_used_value env loc vs value;
+  register_used_value env (Some loc) vs value;
   value
 
 let rec set_fields fs1 fs2 =
@@ -1438,12 +1432,12 @@ and eval_expr' env e =
       | Cpur (ls, pvs) ->
           Debug.dprintf debug "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent print_ls ls
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
-          exec_pure ~loc:loc_or_dummy env ls pvs
+          exec_pure ~loc:e.e_loc env ls pvs
       | Cfun e' ->
          if env.rac.rac_abstract then
            cannot_compute "Cannot compute: not yet implemented";
         Debug.dprintf debug "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
-        register_call env loc_or_dummy None ExecConcrete;
+        register_call env e.e_loc None ExecConcrete;
         let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
         let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
         let arg =
@@ -1543,7 +1537,7 @@ and eval_expr' env e =
                 if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
                 (* the execution cannot continue from here *)
-                register_stucked env loc_or_dummy "Cannot continue after arbitrary iteration";
+                register_stucked env e.e_loc "Cannot continue after arbitrary iteration";
                 raise (RACStuck (env,e.e_loc))
              | r -> r
            end
@@ -1632,7 +1626,7 @@ and eval_expr' env e =
         let msg = asprintf
           "Iterating variable %s has value %s: not in bounds"
           i.pv_vs.vs_name.id_string (BigInt.to_string i_val) in
-        register_stucked env loc_or_dummy msg;
+        register_stucked env e.e_loc msg;
         raise (RACStuck (env,e.e_loc)) end;
     if le a i_val && le i_val b then begin
       (* assert2 *)
@@ -1644,7 +1638,7 @@ and eval_expr' env e =
          (* assert3 *)
          if env.rac.do_rac then
            check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-         register_stucked env loc_or_dummy
+         register_stucked env e.e_loc
            "Cannot continue after arbitrary iteration";
          raise (RACStuck (env,e.e_loc))
       | r -> r
@@ -1777,7 +1771,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
          (postcondition does not hold with the values obtained
          from the counterexample)
        *)
-      register_call env loc_or_dummy (Some rs) ExecAbstract;
+      register_call env loc (Some rs) ExecAbstract;
       (* assert1 is already done above *)
       let res = match rs.rs_cty.cty_post with
         | p :: _ -> let (vs,_) = open_post p in
@@ -1795,7 +1789,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
       check_assume_posts ctx res_v rs.rs_cty.cty_post;
       Normal res_v end
   else begin
-      register_call env loc_or_dummy (Some rs) ExecConcrete;
+      register_call env loc (Some rs) ExecConcrete;
       let res =
         if rs_equal rs rs_func_app then
           match arg_vs with
@@ -1889,8 +1883,7 @@ let eval_global_expr rac env mod_known th_known locals e =
   let vsenv = make_global_env env mod_known in
   let env = add_local_funs locals
       { (default_env env) with mod_known; th_known; vsenv; rac } in
-  let e_loc = Opt.get_def Loc.dummy_position e.e_loc in
-  Mvs.iter (fun vs v -> register_used_value env e_loc vs v) vsenv;
+  Mvs.iter (fun vs v -> register_used_value env e.e_loc vs v) vsenv;
   let res = eval_expr env e in
   res, vsenv
 
@@ -1916,9 +1909,9 @@ let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   let env = { (default_env env) with mod_known; th_known; vsenv; rac } in
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
-  Mvs.iter (fun vs v -> register_used_value env e_loc vs v) env.vsenv;
+  Mvs.iter (fun vs v -> register_used_value env rs.rs_name.id_loc vs v) env.vsenv;
   let res = exec_call ~main_function:true ~loc:e_loc env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
-  register_ended env e_loc;
+  register_ended env rs.rs_name.id_loc;
   res, env
 
 let check_model_rs rac env pm model rs =
