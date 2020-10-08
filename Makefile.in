@@ -803,11 +803,10 @@ opt:  bin/why3ide.cmxs
 
 bin/why3ide.cmxs bin/why3ide.cma: EXTINCLUDES += @LABLGTKINCLUDE@
 bin/why3ide.cmxs bin/why3ide.cma: EXTLIBS += @LABLGTKLIB@
-bin/why3ide.cmxs bin/why3ide.cma: EXTPKGS += @LABLGTKPKG@
 bin/why3ide.cma: BLINKFLAGS += -custom
 
 ifeq (@enable_ocamlfind@,yes)
-bin/why3ide.cmxs bin/why3ide.cma: FLAGS += -thread
+bin/why3ide.cmxs bin/why3ide.cma: FLAGS += -thread $(addprefix -package ,@LABLGTKPKG@) -dontlink "$(EXTPKGS)" -linkpkg
 endif
 
 bin/why3ide.cmxs: src/ide/resetgc.o $(IDECMX)
