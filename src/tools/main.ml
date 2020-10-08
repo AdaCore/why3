@@ -115,6 +115,7 @@ let command cur =
   Array.blit args 0 Sys.argv argi argc;
   Whyconf.Args.first_arg := argi;
   try
+    Dynlink.allow_unsafe_modules true;
     Dynlink.loadfile cmd;
     exit 0
   with Dynlink.Error e ->
