@@ -267,6 +267,8 @@ type log_entry_desc =
   (** executed function call, lambda if no rsymbol *)
   | Exec_pure of (Term.lsymbol * exec_kind)
   (** executed pure function call *)
+  | Exec_loop of exec_kind
+  (** execute loop *)
   | Exec_stucked of string
   (** stucked execution information *)
   | Exec_failed of string
@@ -292,6 +294,7 @@ val add_pure_call_to_log :
 val add_failed_to_log : string -> Loc.position option -> exec_log -> exec_log
 val add_stucked_to_log : string -> Loc.position option -> exec_log -> exec_log
 val add_exec_ended_to_log : Loc.position option -> exec_log -> exec_log
+val add_exec_loop_to_log : exec_kind -> Loc.position option -> exec_log -> exec_log
 val log_to_list : exec_log -> log_entry list
 val print_exec_log : json:bool -> exec_log Pp.pp
 

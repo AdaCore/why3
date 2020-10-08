@@ -1068,6 +1068,7 @@ type log_entry_desc =
   | Val_from_model of (vsymbol * string)
   | Exec_call of (Expr.rsymbol option * exec_kind)
   | Exec_pure of (Term.lsymbol * exec_kind)
+  | Exec_loop of exec_kind
   | Exec_stucked of string
   | Exec_failed of string
   | Exec_ended
@@ -1102,6 +1103,9 @@ let add_stucked_to_log s loc exec_log =
 let add_exec_ended_to_log loc exec_log =
   add_log_entry Exec_ended loc exec_log
 
+let add_exec_loop_to_log  kind loc exec_log =
+  add_log_entry (Exec_loop kind) loc exec_log
+
 let log_to_list exec_log = List.rev exec_log
 
 let exec_kind_to_string ?(cap=true) = function
@@ -1132,6 +1136,10 @@ let print_exec_log ~json fmt entry_log =
             (print_json_field "kind" print_json) (string "EXEC_PURE")
             (print_json_field "ls" print_json) (string "%a" Pretty.print_ls ls)
             (print_json_field "kind" print_json_kind) kind
+      | Exec_loop kind ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+        (print_json_field "kind" print_json) (string "EXEC_LOOP")
+        (print_json_field "kind" print_json_kind) kind
       | Exec_failed reason ->
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "FAILED")
@@ -1178,6 +1186,8 @@ let print_exec_log ~json fmt entry_log =
          | Exec_pure (ls,k) ->
             fprintf fmt "%s execution of %a" (exec_kind_to_string k)
               Ident.print_decoded ls.ls_name.id_string
+         | Exec_loop k ->
+            fprintf fmt "%s execution of loop" (exec_kind_to_string k)
          | Exec_failed msg ->
             fprintf fmt "Property failure: %s" msg
          | Exec_stucked msg ->

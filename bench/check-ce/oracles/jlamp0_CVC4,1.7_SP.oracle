@@ -112,7 +112,7 @@
                                                      following execution:
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Formula `Assertion' from verification condition p1'vc.
-Prover result is: unknown (unknown + incomplete) (0.09s, 6821 steps).
+Prover result is: unknown (unknown + incomplete) (0.07s, 6821 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -297,7 +297,7 @@ File jlamp0.mlw:
                                                      following execution:
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Formula `Postcondition' from verification condition p1'vc.
-Prover result is: unknown (unknown + incomplete) (0.07s, 7064 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 7064 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -478,7 +478,7 @@ File jlamp0.mlw:
                                                      following execution:
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Formula `Postcondition' from verification condition p1'vc.
-Prover result is: unknown (unknown + incomplete) (0.07s, 6963 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6963 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -527,6 +527,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
@@ -556,6 +558,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -569,6 +573,8 @@ File jlamp0.mlw:
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -584,6 +590,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -597,6 +605,8 @@ File jlamp0.mlw:
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Models:
@@ -617,7 +627,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Formula `Loop invariant init' from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.06s, 6612 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6612 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -628,12 +638,14 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of (:=)
+  Line 21:
+    Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Formula `Loop invariant init' from verification condition p2'vc.
-Prover result is: valid (0.03s, 1612 steps).
+Prover result is: valid (0.02s, 1612 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>                      VALUE from ce-model: (ref'mk 0)
@@ -648,6 +660,8 @@ Prover result is: valid (0.03s, 1612 steps).
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
@@ -677,6 +691,8 @@ Prover result is: valid (0.03s, 1612 steps).
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -690,6 +706,8 @@ Prover result is: valid (0.03s, 1612 steps).
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
@@ -705,6 +723,8 @@ Prover result is: valid (0.03s, 1612 steps).
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -718,6 +738,8 @@ Prover result is: valid (0.03s, 1612 steps).
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Models:
@@ -738,7 +760,7 @@ Prover result is: valid (0.03s, 1612 steps).
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Formula `Loop variant decrease' from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.07s, 7208 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 7208 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -749,6 +771,8 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of (:=)
+  Line 21:
+    Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
 
@@ -765,6 +789,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
@@ -794,6 +820,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -807,6 +835,8 @@ File jlamp0.mlw:
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -822,6 +852,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -835,6 +867,8 @@ File jlamp0.mlw:
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Models:
@@ -866,6 +900,8 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of (:=)
+  Line 21:
+    Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
 
@@ -882,6 +918,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
@@ -911,6 +949,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -924,6 +964,8 @@ File jlamp0.mlw:
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
@@ -939,6 +981,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -952,6 +996,8 @@ File jlamp0.mlw:
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Models:
@@ -972,7 +1018,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Formula `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.07s, 7230 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 7230 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -983,6 +1029,8 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of (:=)
+  Line 21:
+    Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
 
@@ -999,6 +1047,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
@@ -1028,6 +1078,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -1041,6 +1093,8 @@ File jlamp0.mlw:
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
@@ -1056,6 +1110,8 @@ File jlamp0.mlw:
                   Concrete execution of p2
                 Line 20:
                   Concrete execution of (:=)
+                Line 21:
+                  Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -1069,6 +1125,8 @@ File jlamp0.mlw:
                   Abstract execution of (:=)
                   c = (ref'mk 1)
                   result = ()
+                Line 21:
+                  Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
 <check-ce>Models:
@@ -1089,7 +1147,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Formula `Postcondition' from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.07s, 6936 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6936 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -1100,6 +1158,8 @@ File jlamp0.mlw:
     Concrete execution of p2
   Line 20:
     Concrete execution of (:=)
+  Line 21:
+    Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
 

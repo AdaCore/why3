@@ -20,6 +20,8 @@ Prover result is: valid (0.05s, 1403 steps).
                 Line 15:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 16:
+                  Concrete execution of loop
                 Line 18:
                   Concrete execution of (=)
                 Line 19:
@@ -44,6 +46,7 @@ Prover result is: valid (0.05s, 1403 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 16:
+                  Abstract execution of loop
                   x1 = (ref'mk 0)
                   x2 = (ref'mk 0)
                   i = 0
@@ -72,6 +75,8 @@ Prover result is: valid (0.05s, 1403 steps).
                 Line 15:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 16:
+                  Concrete execution of loop
                 Line 18:
                   Concrete execution of (=)
                 Line 19:
@@ -96,6 +101,7 @@ Prover result is: valid (0.05s, 1403 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 16:
+                  Abstract execution of loop
                   x1 = (ref'mk (-1))
                   x2 = (ref'mk 0)
                   i = 0
@@ -124,6 +130,8 @@ Prover result is: valid (0.05s, 1403 steps).
                 Line 15:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 16:
+                  Concrete execution of loop
                 Line 18:
                   Concrete execution of (=)
                 Line 19:
@@ -148,6 +156,7 @@ Prover result is: valid (0.05s, 1403 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 16:
+                  Abstract execution of loop
                   x1 = (ref'mk (-1))
                   x2 = (ref'mk 0)
                   i = 0
@@ -188,6 +197,7 @@ File underspec.mlw:
     Abstract execution of ref
     result = (ref'mk 0)
   Line 16:
+    Abstract execution of loop
     x1 = (ref'mk (-1))
     x2 = (ref'mk 0)
     i = 0
@@ -205,7 +215,7 @@ Prover result is: valid (0.03s, 1643 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.03s, 1582 steps).
+Prover result is: valid (0.02s, 1582 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                        VALUE from ce-model: (ref'mk 0)

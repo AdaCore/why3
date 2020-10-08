@@ -1,10 +1,10 @@
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.05s, 1182 steps).
+Prover result is: valid (0.03s, 1182 steps).
 
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: valid (0.03s, 1654 steps).
+Prover result is: valid (0.02s, 1654 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
 <check-ce>VALUE for result "bench/check-ce/for1.mlw", line 5, characters 16-17 not in ce-model, taking default (ref'mk 0)
@@ -19,6 +19,8 @@ Prover result is: valid (0.03s, 1654 steps).
                 Line 5:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 6:
+                  Concrete execution of loop
                 Line 8:
                   Concrete execution of contents
                   Concrete execution of (+)
@@ -37,6 +39,7 @@ Prover result is: valid (0.03s, 1654 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 6:
+                  Abstract execution of loop
                   x = (ref'mk 0)
                   i = 2
                 Line 10:
@@ -56,6 +59,8 @@ Prover result is: valid (0.03s, 1654 steps).
                 Line 5:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 6:
+                  Concrete execution of loop
                 Line 8:
                   Concrete execution of contents
                   Concrete execution of (+)
@@ -74,6 +79,7 @@ Prover result is: valid (0.03s, 1654 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 6:
+                  Abstract execution of loop
                   x = (ref'mk 0)
                   i = 2
                 Line 10:
@@ -93,6 +99,8 @@ Prover result is: valid (0.03s, 1654 steps).
                 Line 5:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 6:
+                  Concrete execution of loop
                 Line 8:
                   Concrete execution of contents
                   Concrete execution of (+)
@@ -111,6 +119,7 @@ Prover result is: valid (0.03s, 1654 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 6:
+                  Abstract execution of loop
                   x = (ref'mk 0)
                   i = 2
                 Line 10:
@@ -135,7 +144,7 @@ Prover result is: valid (0.03s, 1654 steps).
                                                      following execution:
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Formula `Postcondition' from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6492 steps).
+Prover result is: unknown (unknown + incomplete) (0.08s, 6492 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File for1.mlw:
@@ -146,6 +155,7 @@ File for1.mlw:
     Abstract execution of ref
     result = (ref'mk 0)
   Line 6:
+    Abstract execution of loop
     x = (ref'mk 0)
     i = 2
   Line 10:

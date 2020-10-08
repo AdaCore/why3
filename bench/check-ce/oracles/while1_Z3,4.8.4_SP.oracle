@@ -1,10 +1,10 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.02s, 32 steps).
+Prover result is: valid (0.03s, 32 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Formula `Loop variant decrease' from verification condition f'vc.
-Prover result is: valid (0.02s, 2805 steps).
+Prover result is: valid (0.00s, 2805 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Formula `Loop invariant preservation' from verification condition f'vc.
@@ -28,6 +28,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -37,6 +38,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -46,6 +48,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 14:
@@ -64,6 +67,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 8:
+                  Abstract execution of loop
                   x = (ref'mk 0)
                   i = (ref'mk 0)
                   Concrete execution of contents
@@ -94,6 +98,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -103,6 +108,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -112,6 +118,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 14:
@@ -130,6 +137,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 8:
+                  Abstract execution of loop
                   x = (ref'mk 1)
                   i = (ref'mk 2)
                   Concrete execution of contents
@@ -156,6 +164,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -165,6 +174,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -174,6 +184,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 14:
@@ -192,6 +203,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 8:
+                  Abstract execution of loop
                   x = (ref'mk 1)
                   i = (ref'mk 2)
                   Concrete execution of contents
@@ -216,7 +228,7 @@ Prover result is: valid (0.01s, 2706 steps).
                                                      following execution:
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Formula `Postcondition' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4838578 steps).
+Prover result is: timeout (1.00s, 4660537 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File while1.mlw:
@@ -230,6 +242,7 @@ File while1.mlw:
     Abstract execution of ref
     result = (ref'mk 0)
   Line 8:
+    Abstract execution of loop
     x = (ref'mk 1)
     i = (ref'mk 2)
     Concrete execution of contents

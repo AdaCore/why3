@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.04s, 1403 steps).
+Prover result is: valid (0.05s, 1403 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -20,6 +20,8 @@ Prover result is: valid (0.04s, 1403 steps).
                 Line 15:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 16:
+                  Concrete execution of loop
                 Line 18:
                   Concrete execution of (=)
                 Line 19:
@@ -44,6 +46,7 @@ Prover result is: valid (0.04s, 1403 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 16:
+                  Abstract execution of loop
                   x1 = (ref'mk 0)
                   x2 = (ref'mk 0)
                   i = 0
@@ -72,6 +75,8 @@ Prover result is: valid (0.04s, 1403 steps).
                 Line 15:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 16:
+                  Concrete execution of loop
                 Line 18:
                   Concrete execution of (=)
                 Line 19:
@@ -96,6 +101,7 @@ Prover result is: valid (0.04s, 1403 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 16:
+                  Abstract execution of loop
                   x1 = (ref'mk (-1))
                   x2 = (ref'mk 0)
                   i = 0
@@ -124,6 +130,8 @@ Prover result is: valid (0.04s, 1403 steps).
                 Line 15:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 16:
+                  Concrete execution of loop
                 Line 18:
                   Concrete execution of (=)
                 Line 19:
@@ -148,6 +156,7 @@ Prover result is: valid (0.04s, 1403 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 16:
+                  Abstract execution of loop
                   x1 = (ref'mk (-1))
                   x2 = (ref'mk 0)
                   i = 0
@@ -174,7 +183,7 @@ Prover result is: valid (0.04s, 1403 steps).
                                                      following execution:
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.04s, 6755 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6755 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:
@@ -188,6 +197,7 @@ File underspec.mlw:
     Abstract execution of ref
     result = (ref'mk 0)
   Line 16:
+    Abstract execution of loop
     x1 = (ref'mk (-1))
     x2 = (ref'mk 0)
     i = 0
@@ -316,7 +326,7 @@ Prover result is: valid (0.03s, 1582 steps).
                                                      following execution:
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.04s, 6620 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 6620 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:

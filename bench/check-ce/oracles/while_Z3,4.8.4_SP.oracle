@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.02s, 105 steps).
+Prover result is: valid (0.03s, 105 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Formula `Loop variant decrease' from verification condition f'vc.
-Prover result is: valid (0.02s, 2819 steps).
+Prover result is: valid (0.01s, 2819 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -29,6 +29,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -41,6 +42,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -53,6 +55,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 4:
@@ -72,6 +75,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 8:
+                  Abstract execution of loop
                   x1 = (ref'mk 0)
                   x2 = (ref'mk 0)
                   i = (ref'mk 0)
@@ -106,6 +110,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -118,6 +123,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -130,6 +136,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 4:
@@ -163,6 +170,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Concrete execution of ref
                   Concrete execution of ref'mk
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -175,6 +183,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 11:
@@ -187,6 +196,7 @@ Prover result is: valid (0.02s, 2819 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
+                  Concrete execution of loop
                   Concrete execution of contents
                   Concrete execution of (<)
                 Line 4:
@@ -214,13 +224,13 @@ Prover result is: valid (0.02s, 2819 steps).
                                                     you :(
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5881026 steps).
+Prover result is: timeout (1.00s, 4766916 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Formula `Loop variant decrease' from verification condition f'vc.
-Prover result is: valid (0.00s, 2817 steps).
+Prover result is: valid (0.01s, 2817 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant preservation' from verification condition f'vc.

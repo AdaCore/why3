@@ -401,6 +401,9 @@ let register_stucked env loc reason =
 let register_ended env loc =
   env.rac.exec_log := add_exec_ended_to_log loc !(env.rac.exec_log)
 
+let register_loop env loc kind =
+  env.rac.exec_log := add_exec_loop_to_log kind loc !(env.rac.exec_log)
+
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
 let add_local_funs locals env =
@@ -1523,6 +1526,7 @@ and eval_expr' env e =
             (invariant does not hold after iteration)
         * stop the interpretation here - raise RACStuck *)
       (* assert1 *)
+      register_loop env e.e_loc ExecAbstract;
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
@@ -1550,6 +1554,7 @@ and eval_expr' env e =
       | r -> r
     end
   | Ewhile (cond, inv, _var, e1) -> begin
+      register_loop env e.e_loc ExecConcrete;
       (* TODO variants *)
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
@@ -1604,6 +1609,7 @@ and eval_expr' env e =
             (value assigned to i is not compatible with loop range)
         6 - abort2: we have a false counterexample
             (the abstract rac cannot continue from this state) *)
+      register_loop env e.e_loc ExecAbstract;
       try
   let a = big_int_of_value (get_pvs env pvs1) in
   let b = big_int_of_value (get_pvs env pvs2) in
@@ -1655,6 +1661,7 @@ and eval_expr' env e =
       with NotNum -> Irred e
     end
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) -> (
+    register_loop env e.e_loc ExecConcrete;
     try
       let a = big_int_of_value (get_pvs env pvs1) in
       let b = big_int_of_value (get_pvs env pvs2) in

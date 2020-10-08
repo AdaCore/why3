@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.02s, 58 steps).
+Prover result is: valid (0.01s, 58 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -20,6 +20,8 @@ Prover result is: valid (0.02s, 58 steps).
                 Line 6:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 7:
+                  Concrete execution of loop
                 Line 9:
                   Concrete execution of (=)
                 Line 10:
@@ -44,6 +46,7 @@ Prover result is: valid (0.02s, 58 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 7:
+                  Abstract execution of loop
                   x1 = (ref'mk 0)
                   x2 = (ref'mk 0)
                   i = 2
@@ -67,6 +70,8 @@ Prover result is: valid (0.02s, 58 steps).
                 Line 6:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 7:
+                  Concrete execution of loop
                 Line 9:
                   Concrete execution of (=)
                 Line 10:
@@ -91,6 +96,7 @@ Prover result is: valid (0.02s, 58 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 7:
+                  Abstract execution of loop
                   x1 = (ref'mk (-401))
                   x2 = (ref'mk 0)
                   i = 0
@@ -119,6 +125,8 @@ Prover result is: valid (0.02s, 58 steps).
                 Line 6:
                   Concrete execution of ref
                   Concrete execution of ref'mk
+                Line 7:
+                  Concrete execution of loop
                 Line 9:
                   Concrete execution of (=)
                 Line 10:
@@ -143,6 +151,7 @@ Prover result is: valid (0.02s, 58 steps).
                   Abstract execution of ref
                   result = (ref'mk 0)
                 Line 7:
+                  Abstract execution of loop
                   x1 = (ref'mk (-7869))
                   x2 = (ref'mk 0)
                   i = 0
@@ -169,7 +178,7 @@ Prover result is: valid (0.02s, 58 steps).
                                                      following execution:
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5338131 steps).
+Prover result is: timeout (1.00s, 3933840 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File for.mlw:
@@ -183,6 +192,7 @@ File for.mlw:
     Abstract execution of ref
     result = (ref'mk 0)
   Line 7:
+    Abstract execution of loop
     x1 = (ref'mk (-401))
     x2 = (ref'mk 0)
     i = 0
