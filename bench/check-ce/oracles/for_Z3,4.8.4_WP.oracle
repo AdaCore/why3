@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.02s, 58 steps).
+Prover result is: valid (0.01s, 58 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -109,6 +109,8 @@ Prover result is: valid (0.02s, 58 steps).
                   Concrete execution of (+)
                 Line 8:
                   Property failure: Loop invariant preservation
+                    x1 is (ref'mk (-400))
+                    i is 1
 <check-ce>Check model 2 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -164,6 +166,8 @@ Prover result is: valid (0.02s, 58 steps).
                   Concrete execution of (+)
                 Line 8:
                   Property failure: Loop invariant preservation
+                    x1 is (ref'mk (-7868))
+                    i is 1
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -180,7 +184,7 @@ Prover result is: valid (0.02s, 58 steps).
                                                      following execution:
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4722823 steps).
+Prover result is: timeout (1.00s, 4797967 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File for.mlw:
@@ -205,8 +209,10 @@ File for.mlw:
     Concrete execution of (+)
   Line 8:
     Property failure: Loop invariant preservation
+      x1 is (ref'mk (-400))
+      i is 1
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: valid (0.01s, 2384 steps).
+Prover result is: valid (0.00s, 2384 steps).
 

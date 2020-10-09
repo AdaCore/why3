@@ -47,6 +47,7 @@
                   Concrete execution of (:=)
                 Line 12:
                   Property failure: Assertion
+                    a is (ref'mk 3)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
@@ -89,6 +90,7 @@
                   Concrete execution of (:=)
                 Line 12:
                   Property failure: Assertion
+                    a is (ref'mk 3)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
@@ -103,7 +105,7 @@
                 Line 0:
                   Execution got stucked: Assume postcondition of (!)
                     r is (ref'mk 3)
-                    result1 is 0
+                    result is 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -120,7 +122,7 @@
                                                      following execution:
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Formula `Assertion' from verification condition p1'vc.
-Prover result is: unknown (unknown + incomplete) (0.07s, 6821 steps).
+Prover result is: unknown (unknown + incomplete) (0.08s, 6821 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -146,6 +148,7 @@ File jlamp0.mlw:
     Concrete execution of (:=)
   Line 12:
     Property failure: Assertion
+      a is (ref'mk 3)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Model 0:
@@ -218,6 +221,7 @@ File jlamp0.mlw:
                   Concrete execution of (:=)
                 Line 10:
                   Property failure: Postcondition of p1
+                    a is (ref'mk 9)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
@@ -232,7 +236,7 @@ File jlamp0.mlw:
                 Line 0:
                   Execution got stucked: Assume postcondition of (!)
                     r is (ref'mk 3)
-                    result2 is 0
+                    result is 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -282,6 +286,7 @@ File jlamp0.mlw:
                   Concrete execution of (:=)
                 Line 10:
                   Property failure: Postcondition of p1
+                    a is (ref'mk 9)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
@@ -296,7 +301,7 @@ File jlamp0.mlw:
                 Line 0:
                   Execution got stucked: Assume postcondition of (!)
                     r is (ref'mk 3)
-                    result3 is 0
+                    result is 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -361,6 +366,7 @@ File jlamp0.mlw:
     Concrete execution of (:=)
   Line 10:
     Property failure: Postcondition of p1
+      a is (ref'mk 9)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Model 0:
@@ -420,6 +426,7 @@ File jlamp0.mlw:
                   Concrete execution of Tuple0
                 Line 10:
                   Property failure: Postcondition of p1
+                    a is (ref'mk 5)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
@@ -434,7 +441,7 @@ File jlamp0.mlw:
                 Line 0:
                   Execution got stucked: Assume postcondition of (!)
                     r is (ref'mk 3)
-                    result4 is 0
+                    result is 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -471,6 +478,7 @@ File jlamp0.mlw:
                   Concrete execution of Tuple0
                 Line 10:
                   Property failure: Postcondition of p1
+                    a is (ref'mk 5)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
@@ -485,7 +493,7 @@ File jlamp0.mlw:
                 Line 0:
                   Execution got stucked: Assume postcondition of (!)
                     r is (ref'mk 3)
-                    result5 is 0
+                    result is 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -502,7 +510,7 @@ File jlamp0.mlw:
                                                      following execution:
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Formula `Postcondition' from verification condition p1'vc.
-Prover result is: unknown (unknown + incomplete) (0.04s, 6963 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 6963 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -537,6 +545,7 @@ File jlamp0.mlw:
     Concrete execution of Tuple0
   Line 10:
     Property failure: Postcondition of p1
+      a is (ref'mk 5)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                      VALUE from ce-model: (ref'mk 0)
@@ -555,6 +564,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
@@ -569,7 +579,7 @@ File jlamp0.mlw:
               File ref.mlw:
                 Line 20:
                   Execution got stucked: Assume postcondition of (:=)
-                    r1 is (ref'mk 0)
+                    r is (ref'mk 0)
                     v is 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
@@ -588,6 +598,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 17:
@@ -603,6 +614,7 @@ File jlamp0.mlw:
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -620,6 +632,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 17:
@@ -635,6 +648,7 @@ File jlamp0.mlw:
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -668,10 +682,11 @@ File jlamp0.mlw:
     Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
+      c is (ref'mk 1)
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Formula `Loop invariant init' from verification condition p2'vc.
-Prover result is: valid (0.02s, 1612 steps).
+Prover result is: valid (0.03s, 1612 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>                      VALUE from ce-model: (ref'mk 0)
@@ -690,6 +705,7 @@ Prover result is: valid (0.02s, 1612 steps).
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
@@ -704,7 +720,7 @@ Prover result is: valid (0.02s, 1612 steps).
               File ref.mlw:
                 Line 20:
                   Execution got stucked: Assume postcondition of (:=)
-                    r1 is (ref'mk 0)
+                    r is (ref'mk 0)
                     v is 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
@@ -723,6 +739,7 @@ Prover result is: valid (0.02s, 1612 steps).
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
@@ -738,6 +755,7 @@ Prover result is: valid (0.02s, 1612 steps).
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -755,6 +773,7 @@ Prover result is: valid (0.02s, 1612 steps).
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
@@ -770,6 +789,7 @@ Prover result is: valid (0.02s, 1612 steps).
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -803,6 +823,7 @@ File jlamp0.mlw:
     Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
+      c is (ref'mk 1)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                      VALUE from ce-model: (ref'mk 0)
@@ -821,6 +842,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
@@ -835,7 +857,7 @@ File jlamp0.mlw:
               File ref.mlw:
                 Line 20:
                   Execution got stucked: Assume postcondition of (:=)
-                    r1 is (ref'mk 0)
+                    r is (ref'mk 0)
                     v is 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
@@ -854,6 +876,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 17:
@@ -869,6 +892,7 @@ File jlamp0.mlw:
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -886,6 +910,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 17:
@@ -901,6 +926,7 @@ File jlamp0.mlw:
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -919,7 +945,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Formula `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 7157 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 7157 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -934,6 +960,7 @@ File jlamp0.mlw:
     Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
+      c is (ref'mk 1)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>                      VALUE from ce-model: (ref'mk 0)
@@ -952,6 +979,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
@@ -966,7 +994,7 @@ File jlamp0.mlw:
               File ref.mlw:
                 Line 20:
                   Execution got stucked: Assume postcondition of (:=)
-                    r1 is (ref'mk 0)
+                    r is (ref'mk 0)
                     v is 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
@@ -985,6 +1013,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
@@ -1000,6 +1029,7 @@ File jlamp0.mlw:
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -1017,6 +1047,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
@@ -1032,6 +1063,7 @@ File jlamp0.mlw:
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -1050,7 +1082,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Formula `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.06s, 7230 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 7230 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -1065,6 +1097,7 @@ File jlamp0.mlw:
     Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
+      c is (ref'mk 1)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>                      VALUE from ce-model: (ref'mk 0)
@@ -1083,6 +1116,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "/home/claudio/why3/start-rac/share/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
@@ -1097,7 +1131,7 @@ File jlamp0.mlw:
               File ref.mlw:
                 Line 20:
                   Execution got stucked: Assume postcondition of (:=)
-                    r1 is (ref'mk 0)
+                    r is (ref'mk 0)
                     v is 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
@@ -1116,6 +1150,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
@@ -1131,6 +1166,7 @@ File jlamp0.mlw:
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -1148,6 +1184,7 @@ File jlamp0.mlw:
                   Concrete execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
@@ -1163,6 +1200,7 @@ File jlamp0.mlw:
                   Abstract execution of loop
                 Line 22:
                   Property failure: Loop invariant initialization
+                    c is (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -1181,7 +1219,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Formula `Postcondition' from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6936 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 6936 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -1196,4 +1234,5 @@ File jlamp0.mlw:
     Concrete execution of loop
   Line 22:
     Property failure: Loop invariant initialization
+      c is (ref'mk 1)
 

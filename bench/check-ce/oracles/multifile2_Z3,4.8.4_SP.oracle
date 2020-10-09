@@ -73,7 +73,7 @@
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
                     x is 0
-                    result1 is 0
+                    result is 0
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -111,7 +111,7 @@
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
                     x is 0
-                    result2 is 0
+                    result is 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -153,6 +153,8 @@ Sorry, we don't have a good counterexample for you :(
               File multifile2.mlw:
                 Line 13:
                   Property failure: Postcondition of g
+                    x is 0
+                    result is 1
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
               File multifile2.mlw:
                 Line 12:
@@ -165,7 +167,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
                     x is 0
-                    result3 is 0
+                    result is 0
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -191,6 +193,8 @@ Sorry, we don't have a good counterexample for you :(
               File multifile2.mlw:
                 Line 13:
                   Property failure: Postcondition of g
+                    x is 0
+                    result is 1
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
               File multifile2.mlw:
                 Line 12:
@@ -203,7 +207,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
                     x is 0
-                    result4 is 0
+                    result is 0
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -229,6 +233,8 @@ Sorry, we don't have a good counterexample for you :(
               File multifile2.mlw:
                 Line 13:
                   Property failure: Postcondition of g
+                    x is 0
+                    result is 1
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
               File multifile2.mlw:
                 Line 12:
@@ -241,7 +247,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
                     x is 0
-                    result5 is 0
+                    result is 0
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -284,6 +290,8 @@ File multifile1.mlw:
 File multifile2.mlw:
   Line 13:
     Property failure: Postcondition of g
+      x is 0
+      result is 1
 
 <check-ce>Check model 0 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
@@ -301,8 +309,8 @@ File multifile2.mlw:
               File multifile1.mlw:
                 Line 14:
                   Execution got stucked: Assume postcondition of incr_val
-                    x1 is 0
-                    result6 is 0
+                    x is 0
+                    result is 0
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -319,8 +327,8 @@ File multifile2.mlw:
               File multifile1.mlw:
                 Line 14:
                   Execution got stucked: Assume postcondition of incr_val
-                    x1 is 0
-                    result7 is 0
+                    x is 0
+                    result is 0
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -337,8 +345,8 @@ File multifile2.mlw:
               File multifile1.mlw:
                 Line 14:
                   Execution got stucked: Assume postcondition of incr_val
-                    x1 is 0
-                    result8 is 0
+                    x is 0
+                    result is 0
 <check-ce>Models:
           - Checked model 0: don't know/bad model -> The following
                                                      counterexample model has

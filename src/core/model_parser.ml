@@ -1070,7 +1070,7 @@ type log_entry_desc =
   | Exec_pure of (Term.lsymbol * exec_kind)
   | Exec_loop of exec_kind
   | Exec_stucked of (string * string Mvs.t)
-  | Exec_failed of string
+  | Exec_failed of (string * string Mvs.t)
   | Exec_ended
 
 type log_entry = {
@@ -1094,8 +1094,8 @@ let add_call_to_log rs kind loc exec_log =
 let add_pure_call_to_log ls kind loc exec_log =
   add_log_entry (Exec_pure (ls,kind)) loc exec_log
 
-let add_failed_to_log s loc exec_log =
-  add_log_entry (Exec_failed s) loc exec_log
+let add_failed_to_log s mvs loc exec_log =
+  add_log_entry (Exec_failed (s,mvs)) loc exec_log
 
 let add_stucked_to_log s mvs loc exec_log =
   add_log_entry (Exec_stucked (s,mvs)) loc exec_log
@@ -1140,11 +1140,11 @@ let print_exec_log ~json fmt entry_log =
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
         (print_json_field "kind" print_json) (string "EXEC_LOOP")
         (print_json_field "kind" print_json_kind) kind
-      | Exec_failed reason ->
+      | Exec_failed (reason,_) ->                                        (* TODO print mvs *)
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "FAILED")
             (print_json_field "reason" print_json) (String reason)
-      | Exec_stucked (reason,_) ->
+      | Exec_stucked (reason,_) ->                                        (* TODO print mvs *)
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "STUCKED")
             (print_json_field "reason" print_json) (String reason)
@@ -1174,6 +1174,12 @@ let print_exec_log ~json fmt entry_log =
            fprintf fmt "@[<v2>Line %d:@\n" l )
          else
            fprintf fmt "@\n";
+         let print_one fmt (vs,v) =
+           fprintf fmt "@[%a is %s@]"
+             Ident.print_decoded vs.vs_name.id_string v in
+         let print_mvs fmt mvs =
+           fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_one)
+             (Mvs.bindings mvs) in
          begin match log_desc with
          | Val_from_model (vs, v) ->
             fprintf fmt "%a = %s" Ident.print_decoded vs.vs_name.id_string v;
@@ -1188,14 +1194,9 @@ let print_exec_log ~json fmt entry_log =
               Ident.print_decoded ls.ls_name.id_string
          | Exec_loop k ->
             fprintf fmt "%s execution of loop" (exec_kind_to_string k)
-         | Exec_failed msg ->
-            fprintf fmt "Property failure: %s" msg
+         | Exec_failed (msg,mvs) ->
+            fprintf fmt "@[<hv2>Property failure: %s%a@]" msg print_mvs mvs
          | Exec_stucked (msg,mvs) ->
-            let print_one fmt (vs,v) =
-              fprintf fmt "@[%a is %s@]" Pretty.print_vs vs v in
-            let print_mvs fmt mvs =
-              fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_one)
-                (Mvs.bindings mvs) in
             fprintf fmt "@[<hv2>Execution got stucked: %s%a@]" msg print_mvs mvs
          | Exec_ended ->
             fprintf fmt "Execution of main function terminated normally"

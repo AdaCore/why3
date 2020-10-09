@@ -2,7 +2,7 @@ File "bench/check-ce/func_call1.mlw", line 14, characters 6-7:
 warning: unused variable w
 File "bench/check-ce/func_call1.mlw", line 7, characters 12-21:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.05s, 1608 steps).
+Prover result is: valid (0.02s, 1608 steps).
 
 File "bench/check-ce/func_call1.mlw", line 8, characters 12-26:
 Formula `Postcondition' from verification condition g'vc.
@@ -42,7 +42,7 @@ Prover result is: valid (0.02s, 1692 steps).
                 Line 7:
                   Execution got stucked: Assume postcondition of g
                     z is (ref'mk 0)
-                    z1 is (ref'mk 0)
+                    z is (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/func_call1.mlw", line 15, characters 11-16)
 <check-ce>                                VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call1.mlw", line 14, characters 10-15 not in ce-model, taking default 0
@@ -112,7 +112,7 @@ Prover result is: valid (0.02s, 1692 steps).
                 Line 8:
                   Execution got stucked: Assume postcondition of g
                     x is 2
-                    result1 is 0
+                    result is 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for

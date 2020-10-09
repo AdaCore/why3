@@ -271,7 +271,7 @@ type log_entry_desc =
   (** execute loop *)
   | Exec_stucked of (string * string Term.Mvs.t)
   (** stucked execution information *)
-  | Exec_failed of string
+  | Exec_failed of (string * string Term.Mvs.t)
   (** failed execution information *)
   | Exec_ended
   (** execution terminated normally *)
@@ -291,7 +291,8 @@ val add_call_to_log :
   Expr.rsymbol option -> exec_kind -> Loc.position option -> exec_log -> exec_log
 val add_pure_call_to_log :
   Term.lsymbol -> exec_kind -> Loc.position option -> exec_log -> exec_log
-val add_failed_to_log : string -> Loc.position option -> exec_log -> exec_log
+val add_failed_to_log :
+  string -> string Term.Mvs.t -> Loc.position option -> exec_log -> exec_log
 val add_stucked_to_log :
   string -> string Term.Mvs.t -> Loc.position option -> exec_log -> exec_log
 val add_exec_ended_to_log : Loc.position option -> exec_log -> exec_log

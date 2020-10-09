@@ -392,8 +392,8 @@ let register_call env loc rs kind =
 let register_pure_call env loc ls kind =
   env.rac.exec_log := add_pure_call_to_log ls kind loc !(env.rac.exec_log)
 
-let register_failure env loc reason =
-  env.rac.exec_log := add_failed_to_log reason loc !(env.rac.exec_log)
+let register_failure env loc reason mvs =
+  env.rac.exec_log := add_failed_to_log reason mvs loc !(env.rac.exec_log)
 
 let register_stucked env loc reason mvs =
   env.rac.exec_log := add_stucked_to_log reason mvs loc !(env.rac.exec_log)
@@ -1252,17 +1252,20 @@ let check_assume_posts ctx v posts =
 
 let check_term ?vsenv ctx t =
   try check_term ?vsenv ctx t with (Contr (ctx,t)) as e ->
-    register_failure ctx.c_env t.t_loc ctx.c_desc;
+    let mvs = value_of_free_vars ctx.c_env t in
+    register_failure ctx.c_env t.t_loc ctx.c_desc mvs;
     raise e
 
 let check_terms ctx tl =
   try check_terms ctx tl with (Contr (ctx,t)) as e ->
-    register_failure ctx.c_env t.t_loc ctx.c_desc;
+    let mvs = value_of_free_vars ctx.c_env t in
+    register_failure ctx.c_env t.t_loc ctx.c_desc mvs;
     raise e
 
 let check_posts desc loc env v posts =
   try check_posts desc loc env v posts with (Contr (ctx,t)) as e ->
-    register_failure ctx.c_env t.t_loc ctx.c_desc;
+    let mvs = value_of_free_vars ctx.c_env t in
+    register_failure ctx.c_env t.t_loc ctx.c_desc mvs;
     raise e
 
 (* EXPRESSION EVALUATION *)

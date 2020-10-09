@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call2.mlw", line 7, characters 12-21:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.03s, 2343 steps).
+Prover result is: valid (0.02s, 2343 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call2.mlw", line 8, characters 12-26)
 <check-ce>Model 0:
@@ -17,6 +17,8 @@ Prover result is: valid (0.03s, 2343 steps).
                   Concrete execution of (+)
                 Line 8:
                   Property failure: Postcondition of g
+                    x is 0
+                    result is 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call2.mlw:
                 Line 5:
@@ -30,6 +32,8 @@ Prover result is: valid (0.03s, 2343 steps).
                   Concrete execution of (+)
                 Line 8:
                   Property failure: Postcondition of g
+                    x is 0
+                    result is 1
 <check-ce>Check model 1 ("bench/check-ce/func_call2.mlw", line 8, characters 12-26)
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -45,6 +49,8 @@ Prover result is: valid (0.03s, 2343 steps).
                   Concrete execution of (+)
                 Line 8:
                   Property failure: Postcondition of g
+                    x is 0
+                    result is 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call2.mlw:
                 Line 5:
@@ -58,6 +64,8 @@ Prover result is: valid (0.03s, 2343 steps).
                   Concrete execution of (+)
                 Line 8:
                   Property failure: Postcondition of g
+                    x is 0
+                    result is 1
 <check-ce>Check model 2 ("bench/check-ce/func_call2.mlw", line 8, characters 12-26)
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -73,6 +81,8 @@ Prover result is: valid (0.03s, 2343 steps).
                   Concrete execution of (+)
                 Line 8:
                   Property failure: Postcondition of g
+                    x is 0
+                    result is 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call2.mlw:
                 Line 5:
@@ -86,6 +96,8 @@ Prover result is: valid (0.03s, 2343 steps).
                   Concrete execution of (+)
                 Line 8:
                   Property failure: Postcondition of g
+                    x is 0
+                    result is 1
 <check-ce>Models:
           - Checked model 0: good model/good model -> The program does not
                                                       comply to the
@@ -104,7 +116,7 @@ Prover result is: valid (0.03s, 2343 steps).
                                                       following execution:
 File "bench/check-ce/func_call2.mlw", line 8, characters 12-26:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: timeout (1.00s, 5717881 steps).
+Prover result is: timeout (1.00s, 5656275 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File func_call2.mlw:
@@ -119,4 +131,6 @@ File func_call2.mlw:
     Concrete execution of (+)
   Line 8:
     Property failure: Postcondition of g
+      x is 0
+      result is 1
 
