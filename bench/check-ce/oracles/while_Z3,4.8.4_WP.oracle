@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.02s, 105 steps).
+Prover result is: valid (0.03s, 105 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Formula `Loop variant decrease' from verification condition f'vc.
-Prover result is: valid (0.00s, 2819 steps).
+Prover result is: valid (0.01s, 2819 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -91,7 +91,7 @@ Prover result is: valid (0.00s, 2819 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
-                  Execution got stucked: Cannot continue after arbitrary iteration
+                  Execution got stuck: Cannot continue after arbitrary iteration
 <check-ce>Check model 1 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 1:
@@ -149,9 +149,8 @@ Prover result is: valid (0.00s, 2819 steps).
                 Line 5:
                   Abstract execution of ref
                   result = (ref'mk 0)
-              File .:
-                Line 0:
-                  Execution got stucked: Assume postcondition of ref
+              Unknown location:
+                  Execution got stuck: Assume postcondition of ref
                     contents is 3
                     result is (ref'mk 0)
 <check-ce>Check model 2 ("bench/check-ce/while.mlw", line 10, characters 25-32)
@@ -211,9 +210,8 @@ Prover result is: valid (0.00s, 2819 steps).
                 Line 5:
                   Abstract execution of ref
                   result = (ref'mk 0)
-              File .:
-                Line 0:
-                  Execution got stucked: Assume postcondition of ref
+              Unknown location:
+                  Execution got stuck: Assume postcondition of ref
                     contents is 3
                     result is (ref'mk 0)
 <check-ce>Models:
@@ -228,7 +226,7 @@ Prover result is: valid (0.00s, 2819 steps).
                                                     you :(
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5053008 steps).
+Prover result is: timeout (1.00s, 5220505 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.01s, 58 steps).
+Prover result is: valid (0.03s, 58 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -51,7 +51,7 @@ Prover result is: valid (0.01s, 58 steps).
                   x2 = (ref'mk 0)
                   i = 2
                 Line 8:
-                  Execution got stucked: Invariant after last iteration
+                  Execution got stuck: Invariant after last iteration
                     x1 is (ref'mk 0)
                     i is 2
 <check-ce>Check model 1 ("bench/check-ce/for.mlw", line 8, characters 25-31)
@@ -184,7 +184,7 @@ Prover result is: valid (0.01s, 58 steps).
                                                      following execution:
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4797967 steps).
+Prover result is: timeout (1.00s, 4327147 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File for.mlw:

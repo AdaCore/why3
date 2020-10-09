@@ -49,7 +49,10 @@ run () {
         printf "Strongest Postcondition  ${file_path} ($1)... "
     fi
     prover="$1,counterexamples"
-    $dir/../bin/why3prove.opt --check-ce -P $prover --timelimit=1 -a split_vc "${file_path}.mlw" -L $2 --debug=check-ce > "$f.out" 2>&1
+    $dir/../bin/why3prove.opt --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce 2>&1 \
+      | sed "s|$(bin/why3.opt --print-datadir)|WHY3DATA|g" \
+      | sed "s|$(bin/why3.opt --print-libdir)|WHY3LIB|g" \
+      > "$f.out"
     str_out=$(sed 's/[0-9]\+\.[0-9]\+s//g' "$f.out" | \
               sed 's/[0-9]\+ steps//g' | \
               sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')

@@ -1,10 +1,10 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.02s, 32 steps).
+Prover result is: valid (0.03s, 32 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Formula `Loop variant decrease' from verification condition f'vc.
-Prover result is: valid (0.02s, 2805 steps).
+Prover result is: valid (0.01s, 2805 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Formula `Loop invariant preservation' from verification condition f'vc.
@@ -79,7 +79,7 @@ Prover result is: valid (0.01s, 2706 steps).
                   Concrete execution of contents
                   Concrete execution of (+)
                 Line 8:
-                  Execution got stucked: Cannot continue after arbitrary iteration
+                  Execution got stuck: Cannot continue after arbitrary iteration
 <check-ce>Check model 1 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce>VALUE for result "bench/check-ce/while1.mlw", line 6, characters 16-17 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/while1.mlw", line 7, characters 16-17 not in ce-model, taking default (ref'mk 0)
@@ -230,7 +230,7 @@ Prover result is: valid (0.01s, 2706 steps).
                                                      following execution:
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Formula `Postcondition' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4860015 steps).
+Prover result is: timeout (1.00s, 5161037 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File while1.mlw:
