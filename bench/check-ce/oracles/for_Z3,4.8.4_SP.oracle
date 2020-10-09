@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.02s, 58 steps).
+Prover result is: valid (0.03s, 58 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -13,37 +13,55 @@ Prover result is: valid (0.02s, 58 steps).
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 5:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 6:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 7:
                   Concrete execution of loop
                 Line 9:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 10:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 9:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 1
+                    y = 0
                 Line 12:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/for.mlw", line 8, characters 16-31)
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 5:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 6:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 7:
                   Abstract execution of loop
@@ -51,9 +69,9 @@ Prover result is: valid (0.02s, 58 steps).
                   x2 = (ref'mk 0)
                   i = 2
                 Line 8:
-                  Execution got stuck: Invariant after last iteration
-                    x1 is (ref'mk 0)
-                    i is 2
+                  Execution got stuck, Invariant after last iteration with:
+                    x1 = (ref'mk 0)
+                    i = 2
 <check-ce>Check model 1 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -65,37 +83,55 @@ Prover result is: valid (0.02s, 58 steps).
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 5:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 6:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 7:
                   Concrete execution of loop
                 Line 9:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 10:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 9:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 1
+                    y = 0
                 Line 12:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/for.mlw", line 8, characters 16-31)
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 5:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 6:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 7:
                   Abstract execution of loop
@@ -103,14 +139,19 @@ Prover result is: valid (0.02s, 58 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 9:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 10:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-401))
+                  Concrete execution of (+) with args:
+                    _ = (-401)
+                    _ = 1
                 Line 8:
-                  Property failure: Loop invariant preservation
-                    x1 is (ref'mk (-400))
-                    i is 1
+                  Property failure, Loop invariant preservation with:
+                    x1 = (ref'mk (-400))
+                    i = 1
 <check-ce>Check model 2 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -122,37 +163,55 @@ Prover result is: valid (0.02s, 58 steps).
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 5:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 6:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 7:
                   Concrete execution of loop
                 Line 9:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 10:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 9:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 1
+                    y = 0
                 Line 12:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/for.mlw", line 8, characters 16-31)
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 5:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 6:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 7:
                   Abstract execution of loop
@@ -160,14 +219,19 @@ Prover result is: valid (0.02s, 58 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 9:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 10:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-7869))
+                  Concrete execution of (+) with args:
+                    _ = (-7869)
+                    _ = 1
                 Line 8:
-                  Property failure: Loop invariant preservation
-                    x1 is (ref'mk (-7868))
-                    i is 1
+                  Property failure, Loop invariant preservation with:
+                    x1 = (ref'mk (-7868))
+                    i = 1
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -184,18 +248,21 @@ Prover result is: valid (0.02s, 58 steps).
                                                      following execution:
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4880934 steps).
+Prover result is: timeout (1.00s, 4850986 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File for.mlw:
   Line 4:
     _ = ()
-    Concrete execution of f
+    Concrete execution of f with args:
+      _ = ()
   Line 5:
-    Abstract execution of ref
+    Abstract execution of ref with args:
+      contents = 0
     result = (ref'mk 0)
   Line 6:
-    Abstract execution of ref
+    Abstract execution of ref with args:
+      contents = 0
     result = (ref'mk 0)
   Line 7:
     Abstract execution of loop
@@ -203,14 +270,19 @@ File for.mlw:
     x2 = (ref'mk 0)
     i = 0
   Line 9:
-    Concrete execution of (=)
+    Concrete execution of (=) with args:
+      x = 0
+      y = 0
   Line 10:
-    Concrete execution of contents
-    Concrete execution of (+)
+    Concrete execution of contents with args:
+      arg = (ref'mk (-401))
+    Concrete execution of (+) with args:
+      _ = (-401)
+      _ = 1
   Line 8:
-    Property failure: Loop invariant preservation
-      x1 is (ref'mk (-400))
-      i is 1
+    Property failure, Loop invariant preservation with:
+      x1 = (ref'mk (-400))
+      i = 1
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Formula `Loop invariant preservation' from verification condition f'vc.

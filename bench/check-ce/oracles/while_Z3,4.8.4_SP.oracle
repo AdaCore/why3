@@ -1,6 +1,6 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.03s, 105 steps).
+Prover result is: valid (0.01s, 105 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Formula `Loop variant decrease' from verification condition f'vc.
@@ -18,80 +18,130 @@ Prover result is: valid (0.01s, 2819 steps).
               File while.mlw:
                 Line 4:
                   z = 0
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    z = 0
                 Line 5:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 6:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 7:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 8:
                   Concrete execution of loop
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (<) with args:
+                    _ = 0
+                    _ = 2
                 Line 11:
-                  Concrete execution of contents
-                  Concrete execution of (=)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 12:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 15:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
                   Concrete execution of loop
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
+                  Concrete execution of (<) with args:
+                    _ = 1
+                    _ = 2
                 Line 11:
-                  Concrete execution of contents
-                  Concrete execution of (=)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
+                  Concrete execution of (=) with args:
+                    x = 1
+                    y = 0
                 Line 14:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 15:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
+                  Concrete execution of (+) with args:
+                    _ = 1
+                    _ = 1
                 Line 8:
                   Concrete execution of loop
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 2)
+                  Concrete execution of (<) with args:
+                    _ = 2
+                    _ = 2
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/while.mlw", line 8, characters 2-161)
               File while.mlw:
                 Line 4:
                   z = 0
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    z = 0
                 Line 5:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 6:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 7:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 8:
                   Abstract execution of loop
                   x1 = (ref'mk 0)
                   x2 = (ref'mk 0)
                   i = (ref'mk 0)
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (<) with args:
+                    _ = 0
+                    _ = 2
                 Line 11:
-                  Concrete execution of contents
-                  Concrete execution of (=)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 12:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 15:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
-                  Execution got stuck: Cannot continue after arbitrary iteration
+                  Execution got stuck, Cannot continue after arbitrary iteration with:
 <check-ce>Check model 1 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 1:
@@ -99,60 +149,96 @@ Prover result is: valid (0.01s, 2819 steps).
               File while.mlw:
                 Line 4:
                   z = 3
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    z = 3
                 Line 5:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 3
+                  Concrete execution of ref'mk with args:
+                    contents = 3
                 Line 6:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 7:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 8:
                   Concrete execution of loop
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (<) with args:
+                    _ = 0
+                    _ = 2
                 Line 11:
-                  Concrete execution of contents
-                  Concrete execution of (=)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 12:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 3)
+                  Concrete execution of (+) with args:
+                    _ = 3
+                    _ = 1
                 Line 15:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
                   Concrete execution of loop
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
+                  Concrete execution of (<) with args:
+                    _ = 1
+                    _ = 2
                 Line 11:
-                  Concrete execution of contents
-                  Concrete execution of (=)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
+                  Concrete execution of (=) with args:
+                    x = 1
+                    y = 0
                 Line 14:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 15:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
+                  Concrete execution of (+) with args:
+                    _ = 1
+                    _ = 1
                 Line 8:
                   Concrete execution of loop
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 2)
+                  Concrete execution of (<) with args:
+                    _ = 2
+                    _ = 2
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File while.mlw:
                 Line 4:
                   z = 3
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    z = 3
                 Line 5:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 3
                   result = (ref'mk 0)
               Unknown location:
-                  Execution got stuck: Assume postcondition of ref
-                    contents is 3
-                    result is (ref'mk 0)
+                  Execution got stuck, Assume postcondition of ref with:
+                    contents = 3
+                    result = (ref'mk 0)
 <check-ce>Check model 2 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 2:
@@ -160,60 +246,96 @@ Prover result is: valid (0.01s, 2819 steps).
               File while.mlw:
                 Line 4:
                   z = 3
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    z = 3
                 Line 5:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 3
+                  Concrete execution of ref'mk with args:
+                    contents = 3
                 Line 6:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 7:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 8:
                   Concrete execution of loop
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (<) with args:
+                    _ = 0
+                    _ = 2
                 Line 11:
-                  Concrete execution of contents
-                  Concrete execution of (=)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 12:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 3)
+                  Concrete execution of (+) with args:
+                    _ = 3
+                    _ = 1
                 Line 15:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
                   Concrete execution of loop
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
+                  Concrete execution of (<) with args:
+                    _ = 1
+                    _ = 2
                 Line 11:
-                  Concrete execution of contents
-                  Concrete execution of (=)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
+                  Concrete execution of (=) with args:
+                    x = 1
+                    y = 0
                 Line 14:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 15:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
+                  Concrete execution of (+) with args:
+                    _ = 1
+                    _ = 1
                 Line 8:
                   Concrete execution of loop
-                  Concrete execution of contents
-                  Concrete execution of (<)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 2)
+                  Concrete execution of (<) with args:
+                    _ = 2
+                    _ = 2
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File while.mlw:
                 Line 4:
                   z = 3
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    z = 3
                 Line 5:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 3
                   result = (ref'mk 0)
               Unknown location:
-                  Execution got stuck: Assume postcondition of ref
-                    contents is 3
-                    result is (ref'mk 0)
+                  Execution got stuck, Assume postcondition of ref with:
+                    contents = 3
+                    result = (ref'mk 0)
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -226,7 +348,7 @@ Prover result is: valid (0.01s, 2819 steps).
                                                     you :(
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5221706 steps).
+Prover result is: timeout (1.00s, 5076561 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

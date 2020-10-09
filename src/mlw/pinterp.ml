@@ -386,8 +386,8 @@ let default_env env =
 let register_used_value env loc vs value =
   env.rac.exec_log := add_val_to_log vs (asprintf "%a" print_value value) loc !(env.rac.exec_log)
 
-let register_call env loc rs kind =
-  env.rac.exec_log := add_call_to_log rs kind loc !(env.rac.exec_log)
+let register_call env loc rs mvs kind =
+  env.rac.exec_log := add_call_to_log rs mvs kind loc !(env.rac.exec_log)
 
 let register_pure_call env loc ls kind =
   env.rac.exec_log := add_pure_call_to_log ls kind loc !(env.rac.exec_log)
@@ -1450,9 +1450,10 @@ and eval_expr' env e =
          if env.rac.rac_abstract then
            cannot_compute "Cannot compute: not yet implemented";
         Debug.dprintf debug "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
-        register_call env e.e_loc None ExecConcrete;
         let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
         let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
+        let mvs = Mvs.map (asprintf "%a" print_value) cl in
+        register_call env e.e_loc None mvs ExecConcrete;
         let arg =
           match ce.c_cty.cty_args with [arg] -> arg | _ -> assert false in
         let match_free pv mt =
@@ -1773,6 +1774,9 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
       match find_definition env rs with
       | LocalFunction _ -> true | _ -> false in
   let loc_or_dummy = Opt.get_def Loc.dummy_position loc in
+  let mvs = Mvs.of_list (List.combine
+     (List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args)
+     (List.map (asprintf "%a" print_value) arg_vs)) in
   if env.rac.rac_abstract && can_interpret_abstractly &&
        not main_function then begin
       (* let f (x1: ...) ... (xn: ...) = e
@@ -1787,7 +1791,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
          (postcondition does not hold with the values obtained
          from the counterexample)
        *)
-      register_call env loc (Some rs) ExecAbstract;
+      register_call env loc (Some rs) mvs ExecAbstract;
       (* assert1 is already done above *)
       let res = match rs.rs_cty.cty_post with
         | p :: _ -> let (vs,_) = open_post p in
@@ -1806,7 +1810,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
       check_assume_posts ctx res_v rs.rs_cty.cty_post;
       Normal res_v end
   else begin
-      register_call env loc (Some rs) ExecConcrete;
+      register_call env loc (Some rs) mvs ExecConcrete;
       let res =
         if rs_equal rs rs_func_app then
           match arg_vs with

@@ -17,16 +17,25 @@ Prover result is: valid (0.00s, 307 steps).
                 Line 12:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Concrete execution of g
+                  Concrete execution of g with args:
+                    x = 2
                 Line 9:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 10:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 2
+                    _ = 1
                 Line 14:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 3
+                    _ = 3
                 Line 12:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call1.mlw", line 7, characters 12-21)
@@ -34,15 +43,17 @@ Prover result is: valid (0.00s, 307 steps).
                 Line 12:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Abstract execution of g
+                  Abstract execution of g with args:
+                    x = 2
                   z = (ref'mk 0)
                   result = 0
                 Line 7:
-                  Execution got stuck: Assume postcondition of g
-                    z is (ref'mk 0)
-                    z is (ref'mk 0)
+                  Execution got stuck, Assume postcondition of g with:
+                    z = (ref'mk 0)
+                    z = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/func_call1.mlw", line 15, characters 11-16)
 <check-ce>                                VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call1.mlw", line 14, characters 10-15 not in ce-model, taking default 0
@@ -52,16 +63,25 @@ Prover result is: valid (0.00s, 307 steps).
                 Line 12:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Concrete execution of g
+                  Concrete execution of g with args:
+                    x = 2
                 Line 9:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 10:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 2
+                    _ = 1
                 Line 14:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 3
+                    _ = 3
                 Line 12:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call1.mlw", line 8, characters 12-26)
@@ -69,15 +89,17 @@ Prover result is: valid (0.00s, 307 steps).
                 Line 12:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Abstract execution of g
+                  Abstract execution of g with args:
+                    x = 2
                   z = (ref'mk 2)
                   result = 0
                 Line 8:
-                  Execution got stuck: Assume postcondition of g
-                    x is 2
-                    result is 0
+                  Execution got stuck, Assume postcondition of g with:
+                    x = 2
+                    result = 0
 <check-ce>Check model 2 ("bench/check-ce/func_call1.mlw", line 15, characters 11-16)
 <check-ce>                                  VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call1.mlw", line 14, characters 10-15 not in ce-model, taking default 0
@@ -87,16 +109,25 @@ Prover result is: valid (0.00s, 307 steps).
                 Line 12:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Concrete execution of g
+                  Concrete execution of g with args:
+                    x = 2
                 Line 9:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 10:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 2
+                    _ = 1
                 Line 14:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 3
+                    _ = 3
                 Line 12:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call1.mlw", line 8, characters 12-26)
@@ -104,15 +135,17 @@ Prover result is: valid (0.00s, 307 steps).
                 Line 12:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Abstract execution of g
+                  Abstract execution of g with args:
+                    x = 2
                   z = (ref'mk 2)
                   result = 0
                 Line 8:
-                  Execution got stuck: Assume postcondition of g
-                    x is 2
-                    result is 0
+                  Execution got stuck, Assume postcondition of g with:
+                    x = 2
+                    result = 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -125,7 +158,7 @@ Prover result is: valid (0.00s, 307 steps).
                                                     you :(
 File "bench/check-ce/func_call1.mlw", line 15, characters 11-16:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4808162 steps).
+Prover result is: timeout (1.00s, 5181800 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

@@ -7,9 +7,9 @@
                   b = (ref'mk 0)
                   c = (ref'mk 0)
                 Line 9:
-                  Execution got stuck: Precondition of p1
-                    a is (ref'mk 0)
-                    b is (ref'mk 0)
+                  Execution got stuck, Precondition of p1 with:
+                    a = (ref'mk 0)
+                    b = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
                 Line 8:
@@ -17,9 +17,9 @@
                   b = (ref'mk 0)
                   c = (ref'mk 0)
                 Line 9:
-                  Execution got stuck: Precondition of p1
-                    a is (ref'mk 0)
-                    b is (ref'mk 0)
+                  Execution got stuck, Precondition of p1 with:
+                    a = (ref'mk 0)
+                    b = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -29,39 +29,50 @@
                   a = (ref'mk 0)
                   b = (ref'mk 4)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 4)
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 4)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 4)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 0)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (+)
-                  Concrete execution of (:=)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 4
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 4
                 Line 12:
-                  Property failure: Assertion
-                    a is (ref'mk 4)
+                  Property failure, Assertion with:
+                    a = (ref'mk 4)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
                   a = (ref'mk 0)
                   b = (ref'mk 4)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 4)
                 Line 11:
-                  Abstract execution of (!)
+                  Abstract execution of (!) with args:
+                    r = (ref'mk 4)
                   result = 0
               Unknown location:
-                  Execution got stuck: Assume postcondition of (!)
-                    r is (ref'mk 4)
-                    result is 0
+                  Execution got stuck, Assume postcondition of (!) with:
+                    r = (ref'mk 4)
+                    result = 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -71,39 +82,50 @@
                   a = (ref'mk 1)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 3)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 3)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 1)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 1)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (+)
-                  Concrete execution of (:=)
+                  Concrete execution of (+) with args:
+                    _ = 1
+                    _ = 3
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 1)
+                    v = 4
                 Line 12:
-                  Property failure: Assertion
-                    a is (ref'mk 4)
+                  Property failure, Assertion with:
+                    a = (ref'mk 4)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
                   a = (ref'mk 1)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Abstract execution of (!)
+                  Abstract execution of (!) with args:
+                    r = (ref'mk 3)
                   result = 0
               Unknown location:
-                  Execution got stuck: Assume postcondition of (!)
-                    r is (ref'mk 3)
-                    result is 0
+                  Execution got stuck, Assume postcondition of (!) with:
+                    r = (ref'mk 3)
+                    result = 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -120,7 +142,7 @@
                                                      following execution:
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Formula `Assertion' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 4837792 steps).
+Prover result is: timeout (1.00s, 5260394 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -128,25 +150,34 @@ File jlamp0.mlw:
     a = (ref'mk 0)
     b = (ref'mk 4)
     c = (ref'mk 0)
-    Concrete execution of p1
+    Concrete execution of p1 with args:
+      b = (ref'mk 4)
   Line 11:
-    Concrete execution of (!)
+    Concrete execution of (!) with args:
+      r = (ref'mk 4)
 File ref.mlw:
   Line 18:
-    Concrete execution of contents
+    Concrete execution of contents with args:
+      arg = (ref'mk 4)
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (!)
+    Concrete execution of (!) with args:
+      r = (ref'mk 0)
 File ref.mlw:
   Line 18:
-    Concrete execution of contents
+    Concrete execution of contents with args:
+      arg = (ref'mk 0)
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (+)
-    Concrete execution of (:=)
+    Concrete execution of (+) with args:
+      _ = 0
+      _ = 4
+    Concrete execution of (:=) with args:
+      r = (ref'mk 0)
+      v = 4
   Line 12:
-    Property failure: Assertion
-      a is (ref'mk 4)
+    Property failure, Assertion with:
+      a = (ref'mk 4)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Model 0:
@@ -157,9 +188,9 @@ File jlamp0.mlw:
                   b = (ref'mk 0)
                   c = (ref'mk 0)
                 Line 9:
-                  Execution got stuck: Precondition of p1
-                    a is (ref'mk 0)
-                    b is (ref'mk 0)
+                  Execution got stuck, Precondition of p1 with:
+                    a = (ref'mk 0)
+                    b = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
                 Line 8:
@@ -167,9 +198,9 @@ File jlamp0.mlw:
                   b = (ref'mk 0)
                   c = (ref'mk 0)
                 Line 9:
-                  Execution got stuck: Precondition of p1
-                    a is (ref'mk 0)
-                    b is (ref'mk 0)
+                  Execution got stuck, Precondition of p1 with:
+                    a = (ref'mk 0)
+                    b = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -179,61 +210,85 @@ File jlamp0.mlw:
                   a = (ref'mk 7)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 3)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
-              File jlamp0.mlw:
-                Line 11:
-                  Concrete execution of (!)
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 3)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (+)
-                  Concrete execution of (:=)
-                Line 13:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 7)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 7)
               File jlamp0.mlw:
+                Line 11:
+                  Concrete execution of (+) with args:
+                    _ = 7
+                    _ = 3
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 7)
+                    v = 10
                 Line 13:
-                  Concrete execution of (>=)
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 10)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 10)
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (-)
+                  Concrete execution of (>=) with args:
+                    x = 10
+                    y = 10
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 10)
+              File ref.mlw:
+                Line 18:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 10)
+              File jlamp0.mlw:
+                Line 13:
+                  Concrete execution of (-) with args:
+                    x = 10
+                    y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_)
-                  Concrete execution of (+)
+                  Concrete execution of (-_) with args:
+                    _ = 1
+                  Concrete execution of (+) with args:
+                    _ = 10
+                    _ = (-1)
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 10)
+                    v = 9
                 Line 10:
-                  Property failure: Postcondition of p1
-                    a is (ref'mk 9)
+                  Property failure, Postcondition of p1 with:
+                    a = (ref'mk 9)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
                   a = (ref'mk 7)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Abstract execution of (!)
+                  Abstract execution of (!) with args:
+                    r = (ref'mk 3)
                   result = 0
               Unknown location:
-                  Execution got stuck: Assume postcondition of (!)
-                    r is (ref'mk 3)
-                    result is 0
+                  Execution got stuck, Assume postcondition of (!) with:
+                    r = (ref'mk 3)
+                    result = 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -243,61 +298,85 @@ File jlamp0.mlw:
                   a = (ref'mk 7)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 3)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
-              File jlamp0.mlw:
-                Line 11:
-                  Concrete execution of (!)
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 3)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (+)
-                  Concrete execution of (:=)
-                Line 13:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 7)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 7)
               File jlamp0.mlw:
+                Line 11:
+                  Concrete execution of (+) with args:
+                    _ = 7
+                    _ = 3
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 7)
+                    v = 10
                 Line 13:
-                  Concrete execution of (>=)
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 10)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 10)
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (-)
+                  Concrete execution of (>=) with args:
+                    x = 10
+                    y = 10
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 10)
+              File ref.mlw:
+                Line 18:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 10)
+              File jlamp0.mlw:
+                Line 13:
+                  Concrete execution of (-) with args:
+                    x = 10
+                    y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_)
-                  Concrete execution of (+)
+                  Concrete execution of (-_) with args:
+                    _ = 1
+                  Concrete execution of (+) with args:
+                    _ = 10
+                    _ = (-1)
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 10)
+                    v = 9
                 Line 10:
-                  Property failure: Postcondition of p1
-                    a is (ref'mk 9)
+                  Property failure, Postcondition of p1 with:
+                    a = (ref'mk 9)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
                   a = (ref'mk 7)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Abstract execution of (!)
+                  Abstract execution of (!) with args:
+                    r = (ref'mk 3)
                   result = 0
               Unknown location:
-                  Execution got stuck: Assume postcondition of (!)
-                    r is (ref'mk 3)
-                    result is 0
+                  Execution got stuck, Assume postcondition of (!) with:
+                    r = (ref'mk 3)
+                    result = 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -314,7 +393,7 @@ File jlamp0.mlw:
                                                      following execution:
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Formula `Postcondition' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 4829485 steps).
+Prover result is: timeout (1.00s, 5333305 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -322,47 +401,69 @@ File jlamp0.mlw:
     a = (ref'mk 7)
     b = (ref'mk 3)
     c = (ref'mk 0)
-    Concrete execution of p1
+    Concrete execution of p1 with args:
+      b = (ref'mk 3)
   Line 11:
-    Concrete execution of (!)
+    Concrete execution of (!) with args:
+      r = (ref'mk 3)
 File ref.mlw:
   Line 18:
-    Concrete execution of contents
-File jlamp0.mlw:
-  Line 11:
-    Concrete execution of (!)
-File ref.mlw:
-  Line 18:
-    Concrete execution of contents
+    Concrete execution of contents with args:
+      arg = (ref'mk 3)
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (+)
-    Concrete execution of (:=)
-  Line 13:
-    Concrete execution of (!)
+    Concrete execution of (!) with args:
+      r = (ref'mk 7)
 File ref.mlw:
   Line 18:
-    Concrete execution of contents
+    Concrete execution of contents with args:
+      arg = (ref'mk 7)
 File jlamp0.mlw:
+  Line 11:
+    Concrete execution of (+) with args:
+      _ = 7
+      _ = 3
+    Concrete execution of (:=) with args:
+      r = (ref'mk 7)
+      v = 10
   Line 13:
-    Concrete execution of (>=)
-    Concrete execution of (!)
+    Concrete execution of (!) with args:
+      r = (ref'mk 10)
 File ref.mlw:
   Line 18:
-    Concrete execution of contents
+    Concrete execution of contents with args:
+      arg = (ref'mk 10)
 File jlamp0.mlw:
   Line 13:
-    Concrete execution of (-)
+    Concrete execution of (>=) with args:
+      x = 10
+      y = 10
+    Concrete execution of (!) with args:
+      r = (ref'mk 10)
+File ref.mlw:
+  Line 18:
+    Concrete execution of contents with args:
+      arg = (ref'mk 10)
+File jlamp0.mlw:
+  Line 13:
+    Concrete execution of (-) with args:
+      x = 10
+      y = 1
 File int.mlw:
   Line 23:
-    Concrete execution of (-_)
-    Concrete execution of (+)
+    Concrete execution of (-_) with args:
+      _ = 1
+    Concrete execution of (+) with args:
+      _ = 10
+      _ = (-1)
 File jlamp0.mlw:
   Line 13:
-    Concrete execution of (:=)
+    Concrete execution of (:=) with args:
+      r = (ref'mk 10)
+      v = 9
   Line 10:
-    Property failure: Postcondition of p1
-      a is (ref'mk 9)
+    Property failure, Postcondition of p1 with:
+      a = (ref'mk 9)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Model 0:
@@ -373,9 +474,9 @@ File jlamp0.mlw:
                   b = (ref'mk 0)
                   c = (ref'mk 0)
                 Line 9:
-                  Execution got stuck: Precondition of p1
-                    a is (ref'mk 0)
-                    b is (ref'mk 0)
+                  Execution got stuck, Precondition of p1 with:
+                    a = (ref'mk 0)
+                    b = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
                 Line 8:
@@ -383,9 +484,9 @@ File jlamp0.mlw:
                   b = (ref'mk 0)
                   c = (ref'mk 0)
                 Line 9:
-                  Execution got stuck: Precondition of p1
-                    a is (ref'mk 0)
-                    b is (ref'mk 0)
+                  Execution got stuck, Precondition of p1 with:
+                    a = (ref'mk 0)
+                    b = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -395,48 +496,63 @@ File jlamp0.mlw:
                   a = (ref'mk 2)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 3)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 3)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 2)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 2)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (+)
-                  Concrete execution of (:=)
+                  Concrete execution of (+) with args:
+                    _ = 2
+                    _ = 3
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 2)
+                    v = 5
                 Line 13:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 5)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 5)
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (>=)
-                  Concrete execution of Tuple0
+                  Concrete execution of (>=) with args:
+                    x = 5
+                    y = 10
+                  Concrete execution of Tuple0 with args:
                 Line 10:
-                  Property failure: Postcondition of p1
-                    a is (ref'mk 5)
+                  Property failure, Postcondition of p1 with:
+                    a = (ref'mk 5)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
                   a = (ref'mk 2)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Abstract execution of (!)
+                  Abstract execution of (!) with args:
+                    r = (ref'mk 3)
                   result = 0
               Unknown location:
-                  Execution got stuck: Assume postcondition of (!)
-                    r is (ref'mk 3)
-                    result is 0
+                  Execution got stuck, Assume postcondition of (!) with:
+                    r = (ref'mk 3)
+                    result = 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -446,48 +562,63 @@ File jlamp0.mlw:
                   a = (ref'mk 2)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 3)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 3)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 2)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 2)
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (+)
-                  Concrete execution of (:=)
+                  Concrete execution of (+) with args:
+                    _ = 2
+                    _ = 3
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 2)
+                    v = 5
                 Line 13:
-                  Concrete execution of (!)
+                  Concrete execution of (!) with args:
+                    r = (ref'mk 5)
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 5)
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (>=)
-                  Concrete execution of Tuple0
+                  Concrete execution of (>=) with args:
+                    x = 5
+                    y = 10
+                  Concrete execution of Tuple0 with args:
                 Line 10:
-                  Property failure: Postcondition of p1
-                    a is (ref'mk 5)
+                  Property failure, Postcondition of p1 with:
+                    a = (ref'mk 5)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
                 Line 8:
                   a = (ref'mk 2)
                   b = (ref'mk 3)
                   c = (ref'mk 0)
-                  Concrete execution of p1
+                  Concrete execution of p1 with args:
+                    b = (ref'mk 3)
                 Line 11:
-                  Abstract execution of (!)
+                  Abstract execution of (!) with args:
+                    r = (ref'mk 3)
                   result = 0
               Unknown location:
-                  Execution got stuck: Assume postcondition of (!)
-                    r is (ref'mk 3)
-                    result is 0
+                  Execution got stuck, Assume postcondition of (!) with:
+                    r = (ref'mk 3)
+                    result = 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -504,7 +635,7 @@ File jlamp0.mlw:
                                                      following execution:
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Formula `Postcondition' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 5208647 steps).
+Prover result is: timeout (1.00s, 5588885 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -512,34 +643,47 @@ File jlamp0.mlw:
     a = (ref'mk 2)
     b = (ref'mk 3)
     c = (ref'mk 0)
-    Concrete execution of p1
+    Concrete execution of p1 with args:
+      b = (ref'mk 3)
   Line 11:
-    Concrete execution of (!)
+    Concrete execution of (!) with args:
+      r = (ref'mk 3)
 File ref.mlw:
   Line 18:
-    Concrete execution of contents
+    Concrete execution of contents with args:
+      arg = (ref'mk 3)
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (!)
+    Concrete execution of (!) with args:
+      r = (ref'mk 2)
 File ref.mlw:
   Line 18:
-    Concrete execution of contents
+    Concrete execution of contents with args:
+      arg = (ref'mk 2)
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (+)
-    Concrete execution of (:=)
+    Concrete execution of (+) with args:
+      _ = 2
+      _ = 3
+    Concrete execution of (:=) with args:
+      r = (ref'mk 2)
+      v = 5
   Line 13:
-    Concrete execution of (!)
+    Concrete execution of (!) with args:
+      r = (ref'mk 5)
 File ref.mlw:
   Line 18:
-    Concrete execution of contents
+    Concrete execution of contents with args:
+      arg = (ref'mk 5)
 File jlamp0.mlw:
   Line 13:
-    Concrete execution of (>=)
-    Concrete execution of Tuple0
+    Concrete execution of (>=) with args:
+      x = 5
+      y = 10
+    Concrete execution of Tuple0 with args:
   Line 10:
-    Property failure: Postcondition of p1
-      a is (ref'mk 5)
+    Property failure, Postcondition of p1 with:
+      a = (ref'mk 5)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                      VALUE from ce-model: (ref'mk 0)
@@ -551,30 +695,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 0)
                   result = ()
               File ref.mlw:
                 Line 20:
-                  Execution got stuck: Assume postcondition of (:=)
-                    r is (ref'mk 0)
-                    v is 1
+                  Execution got stuck, Assume postcondition of (:=) with:
+                    r = (ref'mk 0)
+                    v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -585,30 +735,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -619,30 +775,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -661,7 +823,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Formula `Loop invariant init' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5402786 steps).
+Prover result is: timeout (1.00s, 5744834 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -669,14 +831,17 @@ File jlamp0.mlw:
     a = (ref'mk 0)
     c = (ref'mk 0)
     _ = ()
-    Concrete execution of p2
+    Concrete execution of p2 with args:
+      _ = ()
   Line 20:
-    Concrete execution of (:=)
+    Concrete execution of (:=) with args:
+      r = (ref'mk 0)
+      v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
-    Property failure: Loop invariant initialization
-      c is (ref'mk 1)
+    Property failure, Loop invariant initialization with:
+      c = (ref'mk 1)
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Formula `Loop invariant init' from verification condition p2'vc.
@@ -692,30 +857,36 @@ Prover result is: valid (0.01s, 295 steps).
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 0)
                   result = ()
               File ref.mlw:
                 Line 20:
-                  Execution got stuck: Assume postcondition of (:=)
-                    r is (ref'mk 0)
-                    v is 1
+                  Execution got stuck, Assume postcondition of (:=) with:
+                    r = (ref'mk 0)
+                    v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -726,30 +897,36 @@ Prover result is: valid (0.01s, 295 steps).
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -760,30 +937,36 @@ Prover result is: valid (0.01s, 295 steps).
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -802,7 +985,7 @@ Prover result is: valid (0.01s, 295 steps).
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Formula `Loop variant decrease' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5284160 steps).
+Prover result is: timeout (1.00s, 5789405 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -810,14 +993,17 @@ File jlamp0.mlw:
     a = (ref'mk 0)
     c = (ref'mk 0)
     _ = ()
-    Concrete execution of p2
+    Concrete execution of p2 with args:
+      _ = ()
   Line 20:
-    Concrete execution of (:=)
+    Concrete execution of (:=) with args:
+      r = (ref'mk 0)
+      v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
-    Property failure: Loop invariant initialization
-      c is (ref'mk 1)
+    Property failure, Loop invariant initialization with:
+      c = (ref'mk 1)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>VALUE for c "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default (ref'mk 0)
@@ -829,30 +1015,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 0)
                   result = ()
               File ref.mlw:
                 Line 20:
-                  Execution got stuck: Assume postcondition of (:=)
-                    r is (ref'mk 0)
-                    v is 1
+                  Execution got stuck, Assume postcondition of (:=) with:
+                    r = (ref'mk 0)
+                    v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -863,30 +1055,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -897,30 +1095,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -939,7 +1143,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Formula `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5081414 steps).
+Prover result is: timeout (1.00s, 5940517 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -947,14 +1151,17 @@ File jlamp0.mlw:
     a = (ref'mk 0)
     c = (ref'mk 0)
     _ = ()
-    Concrete execution of p2
+    Concrete execution of p2 with args:
+      _ = ()
   Line 20:
-    Concrete execution of (:=)
+    Concrete execution of (:=) with args:
+      r = (ref'mk 0)
+      v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
-    Property failure: Loop invariant initialization
-      c is (ref'mk 1)
+    Property failure, Loop invariant initialization with:
+      c = (ref'mk 1)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>VALUE for c "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default (ref'mk 0)
@@ -966,30 +1173,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 0)
                   result = ()
               File ref.mlw:
                 Line 20:
-                  Execution got stuck: Assume postcondition of (:=)
-                    r is (ref'mk 0)
-                    v is 1
+                  Execution got stuck, Assume postcondition of (:=) with:
+                    r = (ref'mk 0)
+                    v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -1000,30 +1213,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -1034,30 +1253,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -1076,7 +1301,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Formula `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5233742 steps).
+Prover result is: timeout (1.00s, 5926861 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -1084,14 +1309,17 @@ File jlamp0.mlw:
     a = (ref'mk 0)
     c = (ref'mk 0)
     _ = ()
-    Concrete execution of p2
+    Concrete execution of p2 with args:
+      _ = ()
   Line 20:
-    Concrete execution of (:=)
+    Concrete execution of (:=) with args:
+      r = (ref'mk 0)
+      v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
-    Property failure: Loop invariant initialization
-      c is (ref'mk 1)
+    Property failure, Loop invariant initialization with:
+      c = (ref'mk 1)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>VALUE for c "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default (ref'mk 0)
@@ -1103,30 +1331,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 0)
                   result = ()
               File ref.mlw:
                 Line 20:
-                  Execution got stuck: Assume postcondition of (:=)
-                    r is (ref'mk 0)
-                    v is 1
+                  Execution got stuck, Assume postcondition of (:=) with:
+                    r = (ref'mk 0)
+                    v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>                        VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -1137,30 +1371,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>                          VALUE from ce-model: (ref'mk 1)
 <check-ce>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 not in ce-model, taking default ()
@@ -1171,30 +1411,36 @@ File jlamp0.mlw:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Concrete execution of (:=)
+                  Concrete execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 17:
                   a = (ref'mk 0)
                   c = (ref'mk 0)
                   _ = ()
-                  Concrete execution of p2
+                  Concrete execution of p2 with args:
+                    _ = ()
                 Line 20:
-                  Abstract execution of (:=)
+                  Abstract execution of (:=) with args:
+                    r = (ref'mk 0)
+                    v = 1
                   c = (ref'mk 1)
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
-                  Property failure: Loop invariant initialization
-                    c is (ref'mk 1)
+                  Property failure, Loop invariant initialization with:
+                    c = (ref'mk 1)
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -1213,7 +1459,7 @@ File jlamp0.mlw:
                                                       following execution:
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Formula `Postcondition' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5106841 steps).
+Prover result is: timeout (1.00s, 5391369 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -1221,12 +1467,15 @@ File jlamp0.mlw:
     a = (ref'mk 0)
     c = (ref'mk 0)
     _ = ()
-    Concrete execution of p2
+    Concrete execution of p2 with args:
+      _ = ()
   Line 20:
-    Concrete execution of (:=)
+    Concrete execution of (:=) with args:
+      r = (ref'mk 0)
+      v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
-    Property failure: Loop invariant initialization
-      c is (ref'mk 1)
+    Property failure, Loop invariant initialization with:
+      c = (ref'mk 1)
 

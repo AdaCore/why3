@@ -9,15 +9,17 @@
                 Line 9:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
-                  Concrete execution of Tuple0
-                  Abstract execution of g
+                  Concrete execution of f with args:
+                    _ = ()
+                  Concrete execution of Tuple0 with args:
+                  Abstract execution of g with args:
+                    _ = ()
                   z = (ref'mk 0)
                   result = ()
                 Line 7:
-                  Execution got stuck: Assume postcondition of g
-                    z is (ref'mk 0)
-                    z is (ref'mk 0)
+                  Execution got stuck, Assume postcondition of g with:
+                    z = (ref'mk 0)
+                    z = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/func_call4.mlw", line 9, characters 34-39)
 <check-ce>                          VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
@@ -29,13 +31,15 @@
                 Line 9:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
-                  Concrete execution of Tuple0
-                  Abstract execution of g
+                  Concrete execution of f with args:
+                    _ = ()
+                  Concrete execution of Tuple0 with args:
+                  Abstract execution of g with args:
+                    _ = ()
                   z = (ref'mk 2)
                   result = ()
-                  Property failure: Assertion
-                    z is (ref'mk 2)
+                  Property failure, Assertion with:
+                    z = (ref'mk 2)
 <check-ce>Check model 2 ("bench/check-ce/func_call4.mlw", line 9, characters 34-39)
 <check-ce>                            VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
@@ -47,13 +51,15 @@
                 Line 9:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
-                  Concrete execution of Tuple0
-                  Abstract execution of g
+                  Concrete execution of f with args:
+                    _ = ()
+                  Concrete execution of Tuple0 with args:
+                  Abstract execution of g with args:
+                    _ = ()
                   z = (ref'mk 2)
                   result = ()
-                  Property failure: Assertion
-                    z is (ref'mk 2)
+                  Property failure, Assertion with:
+                    z = (ref'mk 2)
 <check-ce>Models:
           - Checked model 0: don't know/bad model -> The following
                                                      counterexample model has
@@ -77,18 +83,20 @@
                                                       execution:
 File "bench/check-ce/func_call4.mlw", line 9, characters 34-39:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4706331 steps).
+Prover result is: timeout (1.00s, 4970464 steps).
 The program does not comply to the verification goal, orthe contracts of some
 loop or function are too weak, for example in the following execution:
 File func_call4.mlw:
   Line 9:
     z = (ref'mk 0)
     _ = ()
-    Concrete execution of f
-    Concrete execution of Tuple0
-    Abstract execution of g
+    Concrete execution of f with args:
+      _ = ()
+    Concrete execution of Tuple0 with args:
+    Abstract execution of g with args:
+      _ = ()
     z = (ref'mk 2)
     result = ()
-    Property failure: Assertion
-      z is (ref'mk 2)
+    Property failure, Assertion with:
+      z = (ref'mk 2)
 

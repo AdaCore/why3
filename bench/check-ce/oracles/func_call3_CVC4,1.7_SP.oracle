@@ -9,31 +9,43 @@ Prover result is: valid (0.05s, 1608 steps).
                 Line 5:
                   z = (ref'mk 0)
                   x = 0
-                  Concrete execution of g
+                  Concrete execution of g with args:
+                    x = 0
                 Line 9:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 10:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
-                  Property failure: Postcondition of g
-                    x is 0
-                    r is 1
+                  Property failure, Postcondition of g with:
+                    x = 0
+                    r = 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call3.mlw:
                 Line 5:
                   z = (ref'mk 0)
                   x = 0
-                  Concrete execution of g
+                  Concrete execution of g with args:
+                    x = 0
                 Line 9:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 10:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
-                  Property failure: Postcondition of g
-                    x is 0
-                    r is 1
+                  Property failure, Postcondition of g with:
+                    x = 0
+                    r = 1
 <check-ce>Check model 1 ("bench/check-ce/func_call3.mlw", line 8, characters 17-26)
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -41,31 +53,43 @@ Prover result is: valid (0.05s, 1608 steps).
                 Line 5:
                   z = (ref'mk (-1))
                   x = 0
-                  Concrete execution of g
+                  Concrete execution of g with args:
+                    x = 0
                 Line 9:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-1))
+                  Concrete execution of (+) with args:
+                    _ = (-1)
+                    _ = 1
                 Line 10:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
-                  Property failure: Postcondition of g
-                    x is 0
-                    r is 1
+                  Property failure, Postcondition of g with:
+                    x = 0
+                    r = 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call3.mlw:
                 Line 5:
                   z = (ref'mk (-1))
                   x = 0
-                  Concrete execution of g
+                  Concrete execution of g with args:
+                    x = 0
                 Line 9:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-1))
+                  Concrete execution of (+) with args:
+                    _ = (-1)
+                    _ = 1
                 Line 10:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
-                  Property failure: Postcondition of g
-                    x is 0
-                    r is 1
+                  Property failure, Postcondition of g with:
+                    x = 0
+                    r = 1
 <check-ce>Check model 2 ("bench/check-ce/func_call3.mlw", line 8, characters 17-26)
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -73,31 +97,43 @@ Prover result is: valid (0.05s, 1608 steps).
                 Line 5:
                   z = (ref'mk (-1))
                   x = 0
-                  Concrete execution of g
+                  Concrete execution of g with args:
+                    x = 0
                 Line 9:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-1))
+                  Concrete execution of (+) with args:
+                    _ = (-1)
+                    _ = 1
                 Line 10:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
-                  Property failure: Postcondition of g
-                    x is 0
-                    r is 1
+                  Property failure, Postcondition of g with:
+                    x = 0
+                    r = 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call3.mlw:
                 Line 5:
                   z = (ref'mk (-1))
                   x = 0
-                  Concrete execution of g
+                  Concrete execution of g with args:
+                    x = 0
                 Line 9:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-1))
+                  Concrete execution of (+) with args:
+                    _ = (-1)
+                    _ = 1
                 Line 10:
-                  Concrete execution of (+)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 8:
-                  Property failure: Postcondition of g
-                    x is 0
-                    r is 1
+                  Property failure, Postcondition of g with:
+                    x = 0
+                    r = 1
 <check-ce>Models:
           - Checked model 0: good model/good model -> The program does not
                                                       comply to the
@@ -116,21 +152,27 @@ Prover result is: valid (0.05s, 1608 steps).
                                                       following execution:
 File "bench/check-ce/func_call3.mlw", line 8, characters 17-26:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: unknown (unknown + incomplete) (0.04s, 6726 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 6726 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File func_call3.mlw:
   Line 5:
     z = (ref'mk 0)
     x = 0
-    Concrete execution of g
+    Concrete execution of g with args:
+      x = 0
   Line 9:
-    Concrete execution of contents
-    Concrete execution of (+)
+    Concrete execution of contents with args:
+      arg = (ref'mk 0)
+    Concrete execution of (+) with args:
+      _ = 0
+      _ = 1
   Line 10:
-    Concrete execution of (+)
+    Concrete execution of (+) with args:
+      _ = 0
+      _ = 1
   Line 8:
-    Property failure: Postcondition of g
-      x is 0
-      r is 1
+    Property failure, Postcondition of g with:
+      x = 0
+      r = 1
 

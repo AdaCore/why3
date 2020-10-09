@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.03s, 58 steps).
+Prover result is: valid (0.02s, 58 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -13,37 +13,55 @@ Prover result is: valid (0.03s, 58 steps).
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 15:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 16:
                   Concrete execution of loop
                 Line 18:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 19:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 18:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 1
+                    y = 0
                 Line 21:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 13:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 17, characters 18-33)
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 15:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 16:
                   Abstract execution of loop
@@ -51,9 +69,9 @@ Prover result is: valid (0.03s, 58 steps).
                   x2 = (ref'mk 0)
                   i = 2
                 Line 17:
-                  Execution got stuck: Invariant after last iteration
-                    x1 is (ref'mk 0)
-                    i is 2
+                  Execution got stuck, Invariant after last iteration with:
+                    x1 = (ref'mk 0)
+                    i = 2
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 15, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -65,37 +83,55 @@ Prover result is: valid (0.03s, 58 steps).
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 15:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 16:
                   Concrete execution of loop
                 Line 18:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 19:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 18:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 1
+                    y = 0
                 Line 21:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 13:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/underspec.mlw", line 17, characters 18-33)
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 15:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 16:
                   Abstract execution of loop
@@ -103,14 +139,19 @@ Prover result is: valid (0.03s, 58 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 18:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 19:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-401))
+                  Concrete execution of (+) with args:
+                    _ = (-401)
+                    _ = 1
                 Line 17:
-                  Property failure: Loop invariant preservation
-                    x1 is (ref'mk (-400))
-                    i is 1
+                  Property failure, Loop invariant preservation with:
+                    x1 = (ref'mk (-400))
+                    i = 1
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 15, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -122,37 +163,55 @@ Prover result is: valid (0.03s, 58 steps).
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 15:
-                  Concrete execution of ref
-                  Concrete execution of ref'mk
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 16:
                   Concrete execution of loop
                 Line 18:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 19:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 18:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 1
+                    y = 0
                 Line 21:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 13:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/underspec.mlw", line 17, characters 18-33)
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 14:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 15:
-                  Abstract execution of ref
+                  Abstract execution of ref with args:
+                    contents = 0
                   result = (ref'mk 0)
                 Line 16:
                   Abstract execution of loop
@@ -160,14 +219,19 @@ Prover result is: valid (0.03s, 58 steps).
                   x2 = (ref'mk 0)
                   i = 0
                 Line 18:
-                  Concrete execution of (=)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
                 Line 19:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-7869))
+                  Concrete execution of (+) with args:
+                    _ = (-7869)
+                    _ = 1
                 Line 17:
-                  Property failure: Loop invariant preservation
-                    x1 is (ref'mk (-7868))
-                    i is 1
+                  Property failure, Loop invariant preservation with:
+                    x1 = (ref'mk (-7868))
+                    i = 1
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -184,18 +248,21 @@ Prover result is: valid (0.03s, 58 steps).
                                                      following execution:
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5149003 steps).
+Prover result is: timeout (1.00s, 4796267 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:
   Line 13:
     _ = ()
-    Concrete execution of f
+    Concrete execution of f with args:
+      _ = ()
   Line 14:
-    Abstract execution of ref
+    Abstract execution of ref with args:
+      contents = 0
     result = (ref'mk 0)
   Line 15:
-    Abstract execution of ref
+    Abstract execution of ref with args:
+      contents = 0
     result = (ref'mk 0)
   Line 16:
     Abstract execution of loop
@@ -203,14 +270,19 @@ File underspec.mlw:
     x2 = (ref'mk 0)
     i = 0
   Line 18:
-    Concrete execution of (=)
+    Concrete execution of (=) with args:
+      x = 0
+      y = 0
   Line 19:
-    Concrete execution of contents
-    Concrete execution of (+)
+    Concrete execution of contents with args:
+      arg = (ref'mk (-401))
+    Concrete execution of (+) with args:
+      _ = (-401)
+      _ = 1
   Line 17:
-    Property failure: Loop invariant preservation
-      x1 is (ref'mk (-400))
-      i is 1
+    Property failure, Loop invariant preservation with:
+      x1 = (ref'mk (-400))
+      i = 1
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
@@ -229,13 +301,18 @@ Prover result is: valid (0.01s, 2283 steps).
                 Line 44:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 46:
-                  Concrete execution of Tuple0
-                  Concrete execution of g
+                  Concrete execution of Tuple0 with args:
+                  Concrete execution of g with args:
+                    _ = ()
                 Line 42:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 44:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 41, characters 14-23)
@@ -243,16 +320,18 @@ Prover result is: valid (0.01s, 2283 steps).
                 Line 44:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 46:
-                  Concrete execution of Tuple0
-                  Abstract execution of g
+                  Concrete execution of Tuple0 with args:
+                  Abstract execution of g with args:
+                    _ = ()
                   z = (ref'mk 0)
                   result = ()
                 Line 41:
-                  Execution got stuck: Assume postcondition of g
-                    z is (ref'mk 0)
-                    z is (ref'mk 0)
+                  Execution got stuck, Assume postcondition of g with:
+                    z = (ref'mk 0)
+                    z = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                          VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 46, characters 4-8 not in ce-model, taking default ()
@@ -262,13 +341,18 @@ Prover result is: valid (0.01s, 2283 steps).
                 Line 44:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 46:
-                  Concrete execution of Tuple0
-                  Concrete execution of g
+                  Concrete execution of Tuple0 with args:
+                  Concrete execution of g with args:
+                    _ = ()
                 Line 42:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 44:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -276,15 +360,17 @@ Prover result is: valid (0.01s, 2283 steps).
                 Line 44:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 46:
-                  Concrete execution of Tuple0
-                  Abstract execution of g
+                  Concrete execution of Tuple0 with args:
+                  Abstract execution of g with args:
+                    _ = ()
                   z = (ref'mk 2)
                   result = ()
                 Line 47:
-                  Property failure: Assertion
-                    z is (ref'mk 2)
+                  Property failure, Assertion with:
+                    z = (ref'mk 2)
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                            VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 46, characters 4-8 not in ce-model, taking default ()
@@ -294,13 +380,18 @@ Prover result is: valid (0.01s, 2283 steps).
                 Line 44:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 46:
-                  Concrete execution of Tuple0
-                  Concrete execution of g
+                  Concrete execution of Tuple0 with args:
+                  Concrete execution of g with args:
+                    _ = ()
                 Line 42:
-                  Concrete execution of contents
-                  Concrete execution of (+)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
                 Line 44:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -308,15 +399,17 @@ Prover result is: valid (0.01s, 2283 steps).
                 Line 44:
                   z = (ref'mk 0)
                   _ = ()
-                  Concrete execution of f
+                  Concrete execution of f with args:
+                    _ = ()
                 Line 46:
-                  Concrete execution of Tuple0
-                  Abstract execution of g
+                  Concrete execution of Tuple0 with args:
+                  Abstract execution of g with args:
+                    _ = ()
                   z = (ref'mk 2)
                   result = ()
                 Line 47:
-                  Property failure: Assertion
-                    z is (ref'mk 2)
+                  Property failure, Assertion with:
+                    z = (ref'mk 2)
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -333,20 +426,22 @@ Prover result is: valid (0.01s, 2283 steps).
                                                      following execution:
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5200553 steps).
+Prover result is: timeout (1.00s, 5032562 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:
   Line 44:
     z = (ref'mk 0)
     _ = ()
-    Concrete execution of f
+    Concrete execution of f with args:
+      _ = ()
   Line 46:
-    Concrete execution of Tuple0
-    Abstract execution of g
+    Concrete execution of Tuple0 with args:
+    Abstract execution of g with args:
+      _ = ()
     z = (ref'mk 2)
     result = ()
   Line 47:
-    Property failure: Assertion
-      z is (ref'mk 2)
+    Property failure, Assertion with:
+      z = (ref'mk 2)
 
