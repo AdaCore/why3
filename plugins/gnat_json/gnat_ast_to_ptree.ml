@@ -371,10 +371,10 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
   let open E_or_T in
   let mk_of_expr (node : expr_id) = (* Shortcut for direct recursive call *)
     mk_of_expr (module E_or_T: E_or_T with type t = t) node in
-  let expr_only expr = (* Shortcut for nodes that can only translated to a expression *)
-    expr_or_term ~expr:(fun () -> expr) () in
-  let term_only term = (* Shortcut for nodes that can only translated to a expression *)
-    expr_or_term ~term:(fun () -> term) () in
+  let expr_only cat expr = (* Shortcut for nodes that can only translated to a expression *)
+    expr_or_term ~info:(Format.sprintf "(%s with ID %d)" cat node.info.id) ~expr:(fun () -> expr) () in
+  let term_only cat term = (* Shortcut for nodes that can only translated to a expression *)
+    expr_or_term ~info:(Format.sprintf "(%s with ID %d)" cat node.info.id) ~term:(fun () -> term) () in
   let mk_field_association (node: field_association_id) =
     let Field_association r = node.desc in
     mk_qualid (mk_idents_of_name ~notation:None [] (name_of_identifier r.field)),
@@ -441,7 +441,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
     (* Preds, Expr *)
 
     | Universal_quantif r ->
-        term_only
+        term_only "universal quantif"
           (let for_trigger (node : trigger_id) =
              let Trigger r = node.desc in
              List.map mk_term_of_expr (list_of_nonempty r.terms) in
@@ -457,7 +457,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
            T.mk_quant Dterm.DTforall binders triggers body)
 
     | Existential_quantif r ->
-        term_only
+        term_only "existential quantif"
           (let binders =
              List.map
                (mk_binder_of_identifier (List.filter_map mk_label r.labels)
@@ -545,7 +545,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
       end
 
     | Identifier {name={desc=Name {symb=Symbol "absurd"}}} ->
-        expr_only
+        expr_only "identifier"
           E.(mk_absurd ())
 
     | Identifier {name={desc=Name {symb=Symbol "()"}}} ->
@@ -555,11 +555,11 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         mk_var (mk_qualid (mk_idents_of_name ~notation:None [] r.name))
 
     | Tagged ({tag=No_symbol} as r) ->
-        term_only
+        term_only "tagged"
           (mk_term_of_expr r.def)
 
     | Tagged ({tag=Symbol s} as r) ->
-        term_only
+        term_only "tagged"
           (let body = mk_term_of_expr r.def in
            let id =
              let s = if s = "old" then "'Old" else s in
@@ -597,7 +597,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         conversion_error node.info.id "unexpected elsif" ()
 
     | Epsilon r ->
-        term_only
+        term_only "epsilon"
           (let id =
              force_one (conversion_error r.name.info.id "qualified or empty idenfitier")
                (mk_idents_of_identifier ~notation:None [] r.name) in
@@ -681,7 +681,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
 
     | Comment r ->
         (* Using [()] won't play well in terms *)
-        expr_only
+        expr_only "comment"
           (let body = E.mk_tuple [] in
            mk_comment r.comment body)
 
@@ -708,7 +708,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
     (* Progs, Expr *)
 
     | Any_expr r ->
-        expr_only
+        expr_only "any expr"
           (let open E in
            let id = mk_ident [] "_f" in
            let value =
@@ -734,7 +734,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
            mk_let id value body)
 
     | Assignment r ->
-        expr_only
+        expr_only "assignment"
           (let open E in
            let left = mk_attrs (List.filter_map mk_label r.labels)
                (mk_var (mk_qualid (mk_idents_of_identifier ~notation:None [] r.name))) in
@@ -743,7 +743,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
            mk_assign left (Some field) value)
 
     | Binding_ref r ->
-        expr_only
+        expr_only "binding ref"
           (let open E in
            let id =
              force_one (conversion_error r.name.info.id "quantified or empty name")
@@ -780,7 +780,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
             end
 
         *)
-        expr_only
+        expr_only "loop"
           (let true_expr = E.mk_var (mk_qualid [(mk_ident [] "True")]) in
            let false_pred = T.mk_var (mk_qualid [mk_ident [] "False"]) in
            let invariants = List.(map (T.name_term "LoopInvariant") (map mk_term_of_pred r.invariants)) in
@@ -846,7 +846,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
            E.mk_seq code_before loop)
 
     | Statement_sequence r ->
-        expr_only
+        expr_only "statement sequence"
           (let rec flatten_seq (node: prog_id) =
                match node.desc with
                | Statement_sequence r ->
@@ -858,7 +858,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
 
     | Abstract_expr r ->
         (* begin ensures { <r.post> } let _ = <r.expr> in () end *)
-        expr_only
+        expr_only "abstract expr"
           E.(let post = mk_term_of_pred r.post in
              let expr = mk_expr_of_prog r.expr in
              if is_true post && no_vcs_no_side_effects expr then
@@ -875,7 +875,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
                mk_fun [] None pat Ity.MaskVisible spec body)
 
     | Assert r ->
-        expr_only
+        expr_only "assert"
           (let assert_kind, str =
              match r.assert_kind with
              | Assert -> Expr.Assert, "Assert"
@@ -887,7 +887,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
            E.(mk_assert assert_kind body))
 
     | Raise r ->
-        expr_only
+        expr_only "raise"
           (let e = E.mk_raise (mk_qualid (mk_idents_of_name ~notation:None [] r.name)) None in
            match r.typ with
            | None -> e
@@ -896,7 +896,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
                E.mk_cast e pty)
 
     | Try_block r ->
-        expr_only
+        expr_only "try block"
           (let expr = mk_expr_of_prog r.prog in
            let exn_handlers =
              let aux (node: handler_id) =

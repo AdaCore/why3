@@ -75,6 +75,7 @@ module type E_or_T =
 
     (** Specialize constructor *)
     val expr_or_term :
+      ?info:string ->
       ?expr:(unit -> Why3.Ptree.expr) ->
       ?term:(unit -> Why3.Ptree.term) -> unit -> t
   end
@@ -123,9 +124,6 @@ module E :
       Why3.Ptree.expr ->
       Why3.Ptree.qualid option -> Why3.Ptree.expr -> Why3.Ptree.expr
     val mk_absurd : ?loc:Why3.Loc.position -> unit -> Why3.Ptree.expr
-    val expr_or_term :
-      ?expr:(unit -> Why3.Ptree.expr) ->
-      ?term:(unit -> Why3.Ptree.term) -> unit -> Why3.Ptree.expr
   end
 
 (** {2 Smart constructors for [Ptree.term]} *)
@@ -160,9 +158,6 @@ module T :
       Why3.Ptree.pty ->
       Why3.Ptree.term -> Why3.Ptree.term
     val name_term : string -> Why3.Ptree.term -> Why3.Ptree.term
-    val expr_or_term :
-      ?expr:(unit -> Why3.Ptree.expr) ->
-      ?term:(unit -> Why3.Ptree.term) -> unit -> Why3.Ptree.term
   end
 
 (** {2 Smart constructors for [Ptree.pattern]} TODO complete *)

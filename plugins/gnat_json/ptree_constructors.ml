@@ -75,7 +75,7 @@ module type E_or_T = sig
   val mk_truth : ?loc:Loc.position -> bool -> t
   val mk_attr : ?loc:Loc.position -> attr -> t -> t
   val mk_attrs : ?loc:Loc.position -> attr list -> t -> t
-  val expr_or_term : ?expr:(unit -> expr) -> ?term:(unit -> term) -> unit -> t
+  val expr_or_term : ?info:string -> ?expr:(unit -> expr) -> ?term:(unit -> term) -> unit -> t
 end
 
 module P = struct
@@ -130,10 +130,12 @@ module E = struct
     mk ?loc (Eassign [e1, qid_opt, e2])
   let mk_absurd ?loc () =
     mk ?loc Eabsurd
-  let expr_or_term ?(expr:(unit -> expr) option) ?term:(_:(unit -> term) option) () : expr =
+  let expr_or_term ?info ?(expr:(unit -> expr) option) ?term:(_:(unit -> term) option) () : expr =
     match expr with
     | Some e -> e ()
-    | None -> failwith "expr_or_term: no expr"
+    | None ->
+        let pp_info fmt = Opt.iter (Format.fprintf fmt " %s") info in
+        Format.kasprintf failwith "No translation from Gnat JSON node%t to Why3 expression" pp_info
 end
 
 module T = struct
@@ -187,10 +189,12 @@ module T = struct
     mk_attr
       (ATstr (Ident.create_attribute ("hyp_name:"^name)))
       t
-  let expr_or_term ?expr:(_:(unit -> expr) option) ?(term:(unit -> term) option) () : term =
+  let expr_or_term ?info ?expr:(_:(unit -> expr) option) ?(term:(unit -> term) option) () : term =
     match term with
     | Some t -> t ()
-    | None -> failwith "expr_or_term: no term"
+    | None ->
+        let pp_info fmt = Opt.iter (Format.fprintf fmt " %s") info in
+        Format.kasprintf failwith "No translation from Gnat JSON node%t to Why3 term" pp_info
 end
 
 module D = struct
