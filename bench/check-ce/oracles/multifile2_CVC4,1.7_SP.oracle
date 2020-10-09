@@ -34,6 +34,8 @@
               File multifile1.mlw:
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
+                    x is 0
+                    result is 0
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -70,6 +72,8 @@
               File multifile1.mlw:
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
+                    x is 0
+                    result1 is 0
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -106,6 +110,8 @@
               File multifile1.mlw:
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
+                    x is 0
+                    result2 is 0
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -118,7 +124,7 @@
                                                     you :(
 File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
 Formula `Postcondition' from verification condition f'vc.
-Prover result is: unknown (sat) (0.07s, 4933 steps).
+Prover result is: unknown (sat) (0.06s, 4933 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -158,6 +164,8 @@ Sorry, we don't have a good counterexample for you :(
               File multifile1.mlw:
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
+                    x is 0
+                    result3 is 0
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -194,6 +202,8 @@ Sorry, we don't have a good counterexample for you :(
               File multifile1.mlw:
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
+                    x is 0
+                    result4 is 0
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -230,6 +240,8 @@ Sorry, we don't have a good counterexample for you :(
               File multifile1.mlw:
                 Line 10:
                   Execution got stucked: Assume postcondition of incr
+                    x is 0
+                    result5 is 0
 <check-ce>Models:
           - Checked model 0: good model/bad model -> The program does not
                                                      comply to the
@@ -289,6 +301,8 @@ File multifile2.mlw:
               File multifile1.mlw:
                 Line 14:
                   Execution got stucked: Assume postcondition of incr_val
+                    x1 is 0
+                    result6 is 0
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
 <check-ce>Model 1:
@@ -305,6 +319,8 @@ File multifile2.mlw:
               File multifile1.mlw:
                 Line 14:
                   Execution got stucked: Assume postcondition of incr_val
+                    x1 is 0
+                    result7 is 0
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
 <check-ce>Model 2:
@@ -321,6 +337,8 @@ File multifile2.mlw:
               File multifile1.mlw:
                 Line 14:
                   Execution got stucked: Assume postcondition of incr_val
+                    x1 is 0
+                    result8 is 0
 <check-ce>Models:
           - Checked model 0: don't know/bad model -> The following
                                                      counterexample model has
@@ -336,7 +354,7 @@ File multifile2.mlw:
                                                      (RAC execution got stuck: Cannot compute application of local any-function incr_val):
 File "bench/check-ce/multifile2.mlw", line 19, characters 12-26:
 Formula `Postcondition' from verification condition h'vc.
-Prover result is: unknown (sat) (0.04s, 4862 steps).
+Prover result is: unknown (sat) (0.05s, 4862 steps).
 The following counterexample model could not be verified
 (RAC execution got stuck: Cannot compute application of local any-function incr_val):
 File multifile1.mlw:

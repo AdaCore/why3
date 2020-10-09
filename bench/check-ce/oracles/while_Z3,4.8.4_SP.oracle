@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.03s, 105 steps).
+Prover result is: valid (0.02s, 105 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Formula `Loop variant decrease' from verification condition f'vc.
-Prover result is: valid (0.01s, 2819 steps).
+Prover result is: valid (0.02s, 2819 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
@@ -152,6 +152,8 @@ Prover result is: valid (0.01s, 2819 steps).
               File .:
                 Line 0:
                   Execution got stucked: Assume postcondition of ref
+                    contents is 3
+                    result is (ref'mk 0)
 <check-ce>Check model 2 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 2:
@@ -212,6 +214,8 @@ Prover result is: valid (0.01s, 2819 steps).
               File .:
                 Line 0:
                   Execution got stucked: Assume postcondition of ref
+                    contents is 3
+                    result1 is (ref'mk 0)
 <check-ce>Models:
           - Checked model 0: bad model/bad model -> Sorry, we don't have a
                                                     good counterexample for
@@ -224,15 +228,15 @@ Prover result is: valid (0.01s, 2819 steps).
                                                     you :(
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5106798 steps).
+Prover result is: timeout (1.00s, 5046460 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Formula `Loop variant decrease' from verification condition f'vc.
-Prover result is: valid (0.00s, 2817 steps).
+Prover result is: valid (0.01s, 2817 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: valid (0.01s, 2745 steps).
+Prover result is: valid (0.00s, 2745 steps).
 

@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant init' from verification condition f'vc.
-Prover result is: valid (0.04s, 1403 steps).
+Prover result is: valid (0.05s, 1403 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -211,11 +211,11 @@ File underspec.mlw:
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: valid (0.02s, 1643 steps).
+Prover result is: valid (0.03s, 1643 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Formula `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.03s, 1582 steps).
+Prover result is: valid (0.02s, 1582 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                        VALUE from ce-model: (ref'mk 0)
@@ -248,6 +248,8 @@ Prover result is: valid (0.03s, 1582 steps).
                   result = ()
                 Line 41:
                   Execution got stucked: Assume postcondition of g
+                    z is (ref'mk 0)
+                    z1 is (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>                          VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 46, characters 4-8 not in ce-model, taking default ()
@@ -326,7 +328,7 @@ Prover result is: valid (0.03s, 1582 steps).
                                                      following execution:
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.04s, 6620 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 6620 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:

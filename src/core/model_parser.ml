@@ -1069,7 +1069,7 @@ type log_entry_desc =
   | Exec_call of (Expr.rsymbol option * exec_kind)
   | Exec_pure of (Term.lsymbol * exec_kind)
   | Exec_loop of exec_kind
-  | Exec_stucked of string
+  | Exec_stucked of (string * string Mvs.t)
   | Exec_failed of string
   | Exec_ended
 
@@ -1097,8 +1097,8 @@ let add_pure_call_to_log ls kind loc exec_log =
 let add_failed_to_log s loc exec_log =
   add_log_entry (Exec_failed s) loc exec_log
 
-let add_stucked_to_log s loc exec_log =
-  add_log_entry (Exec_stucked s) loc exec_log
+let add_stucked_to_log s mvs loc exec_log =
+  add_log_entry (Exec_stucked (s,mvs)) loc exec_log
 
 let add_exec_ended_to_log loc exec_log =
   add_log_entry Exec_ended loc exec_log
@@ -1144,7 +1144,7 @@ let print_exec_log ~json fmt entry_log =
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "FAILED")
             (print_json_field "reason" print_json) (String reason)
-      | Exec_stucked reason ->
+      | Exec_stucked (reason,_) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "STUCKED")
             (print_json_field "reason" print_json) (String reason)
@@ -1190,8 +1190,13 @@ let print_exec_log ~json fmt entry_log =
             fprintf fmt "%s execution of loop" (exec_kind_to_string k)
          | Exec_failed msg ->
             fprintf fmt "Property failure: %s" msg
-         | Exec_stucked msg ->
-            fprintf fmt "Execution got stucked: %s" msg
+         | Exec_stucked (msg,mvs) ->
+            let print_one fmt (vs,v) =
+              fprintf fmt "@[%a is %s@]" Pretty.print_vs vs v in
+            let print_mvs fmt mvs =
+              fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_one)
+                (Mvs.bindings mvs) in
+            fprintf fmt "@[<hv2>Execution got stucked: %s%a@]" msg print_mvs mvs
          | Exec_ended ->
             fprintf fmt "Execution of main function terminated normally"
          end;

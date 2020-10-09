@@ -16,6 +16,8 @@
                   result = ()
                 Line 7:
                   Execution got stucked: Assume postcondition of g
+                    z is (ref'mk 0)
+                    z1 is (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/func_call4.mlw", line 9, characters 34-39)
 <check-ce>                          VALUE from ce-model: (ref'mk 2)
 <check-ce>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
@@ -73,7 +75,7 @@
                                                       execution:
 File "bench/check-ce/func_call4.mlw", line 9, characters 34-39:
 Formula `Assertion' from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.08s, 6512 steps).
+Prover result is: unknown (unknown + incomplete) (0.07s, 6512 steps).
 The program does not comply to the verification goal, orthe contracts of some
 loop or function are too weak, for example in the following execution:
 File func_call4.mlw:

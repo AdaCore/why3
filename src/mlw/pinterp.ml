@@ -395,8 +395,8 @@ let register_pure_call env loc ls kind =
 let register_failure env loc reason =
   env.rac.exec_log := add_failed_to_log reason loc !(env.rac.exec_log)
 
-let register_stucked env loc reason =
-  env.rac.exec_log := add_stucked_to_log reason loc !(env.rac.exec_log)
+let register_stucked env loc reason mvs =
+  env.rac.exec_log := add_stucked_to_log reason mvs loc !(env.rac.exec_log)
 
 let register_ended env loc =
   env.rac.exec_log := add_exec_ended_to_log loc !(env.rac.exec_log)
@@ -1228,19 +1228,26 @@ exception RACStuck of env * Loc.position option
    environment does not satisfy the precondition, the execution ends
    with RACStuck. *)
 
+let value_of_free_vars env t =
+  let get env vs = asprintf "%a" print_value (get_vs env vs) in
+  t_v_fold (fun mvs vs -> Mvs.add vs (get env vs) mvs) Mvs.empty t
+
 let check_assume_term ctx t =
   try check_term ctx t with Contr (ctx,t) ->
-    register_stucked ctx.c_env t.t_loc ctx.c_desc;
+    let mvs = value_of_free_vars ctx.c_env t in
+    register_stucked ctx.c_env t.t_loc ctx.c_desc mvs;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
 let check_assume_terms ctx tl =
   try check_terms ctx tl with Contr (ctx,t) ->
-    register_stucked ctx.c_env t.t_loc ctx.c_desc;
+    let mvs = value_of_free_vars ctx.c_env t in
+    register_stucked ctx.c_env t.t_loc ctx.c_desc mvs;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
 let check_assume_posts ctx v posts =
   try check_posts ctx.c_desc ctx.c_trigger_loc ctx.c_env v posts with Contr (ctx,t) ->
-    register_stucked ctx.c_env t.t_loc ctx.c_desc;
+    let mvs = value_of_free_vars ctx.c_env t in
+    register_stucked ctx.c_env t.t_loc ctx.c_desc mvs;
     raise (RACStuck (ctx.c_env,t.t_loc))
 
 let check_term ?vsenv ctx t =
@@ -1541,7 +1548,7 @@ and eval_expr' env e =
                 if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
                 (* the execution cannot continue from here *)
-                register_stucked env e.e_loc "Cannot continue after arbitrary iteration";
+                register_stucked env e.e_loc "Cannot continue after arbitrary iteration" Mvs.empty;
                 raise (RACStuck (env,e.e_loc))
              | r -> r
            end
@@ -1629,10 +1636,9 @@ and eval_expr' env e =
     let env = bind_vs i.pv_vs i_val env in
     let i_val = big_int_of_value i_val in
     if not (le a i_val && le i_val (suc b)) then begin
-        let msg = asprintf
-          "Iterating variable %s has value %s: not in bounds"
-          i.pv_vs.vs_name.id_string (BigInt.to_string i_val) in
-        register_stucked env e.e_loc msg;
+        let msg = asprintf "Iterating variable not in bounds" in
+        let mvs = Mvs.singleton i.pv_vs (BigInt.to_string i_val) in
+        register_stucked env e.e_loc msg mvs;
         raise (RACStuck (env,e.e_loc)) end;
     if le a i_val && le i_val b then begin
       (* assert2 *)
@@ -1645,7 +1651,7 @@ and eval_expr' env e =
          if env.rac.do_rac then
            check_terms (cntr_ctx "Loop invariant preservation" env) inv;
          register_stucked env e.e_loc
-           "Cannot continue after arbitrary iteration";
+           "Cannot continue after arbitrary iteration" Mvs.empty;
          raise (RACStuck (env,e.e_loc))
       | r -> r
       end
