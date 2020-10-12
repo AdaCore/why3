@@ -126,7 +126,7 @@ EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE
 
 WARNINGS = A-4-9-41-44-45-50-52@5@8@48
 
-FLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
+FLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -thread $(INCLUDES)
 OFLAGS = $(FLAGS)
 BFLAGS = $(FLAGS)
 
@@ -801,7 +801,7 @@ $(IDEDEP): $(IDEGENERATED)
 byte: bin/why3ide.cma
 opt:  bin/why3ide.cmxs
 
-bin/why3ide.cmxs bin/why3ide.cma: FLAGS += -thread $(addprefix -package ,@LABLGTKPKG@) -dontlink "$(EXTPKGS)" -linkpkg
+bin/why3ide.cmxs bin/why3ide.cma: FLAGS += $(addprefix -package ,@LABLGTKPKG@) -dontlink "$(EXTPKGS)" -linkpkg
 
 bin/why3ide.cmxs: $(IDECMX)
 bin/why3ide.cma:  $(IDECMO)
