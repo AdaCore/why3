@@ -801,16 +801,10 @@ $(IDEDEP): $(IDEGENERATED)
 byte: bin/why3ide.cma
 opt:  bin/why3ide.cmxs
 
-bin/why3ide.cma: BLINKFLAGS += -custom
-
 bin/why3ide.cmxs bin/why3ide.cma: FLAGS += -thread $(addprefix -package ,@LABLGTKPKG@) -dontlink "$(EXTPKGS)" -linkpkg
 
-bin/why3ide.cmxs: src/ide/resetgc.o $(IDECMX)
-bin/why3ide.cma:  src/ide/resetgc.o $(IDECMO)
-
-src/ide/resetgc.o: src/ide/resetgc.c
-	$(SHOW) 'Ocamlc   $<'
-	$(HIDE)$(OCAMLC) -c -ccopt "-Wall -o $@" $<
+bin/why3ide.cmxs: $(IDECMX)
+bin/why3ide.cma:  $(IDECMO)
 
 # depend and clean targets
 
