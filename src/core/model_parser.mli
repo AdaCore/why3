@@ -263,7 +263,7 @@ type verdict = Good_model | Bad_model | Dont_know
 type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
-  | Val_from_model of (vsymbol * string)
+  | Val_from_model of (Ident.ident * string)
   (** values taken from model during interpretation *)
   | Exec_call of (Expr.rsymbol option * string Mvs.t  * exec_kind)
   (** executed function call or lambda if no rsymbol,
@@ -289,7 +289,7 @@ type exec_log
 val empty_log : exec_log
 val add_log_entry : log_entry_desc -> Loc.position option -> exec_log -> exec_log
 val add_val_to_log :
-  vsymbol -> string -> Loc.position option -> exec_log -> exec_log
+  Ident.ident -> string -> Loc.position option -> exec_log -> exec_log
 val add_call_to_log :
   Expr.rsymbol option -> string Mvs.t -> exec_kind -> Loc.position option -> exec_log -> exec_log
 val add_pure_call_to_log :

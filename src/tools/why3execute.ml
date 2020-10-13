@@ -112,8 +112,9 @@ let do_input f =
     let res = eval_global_fundef rac env
         muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
     printf "%a@." (report_eval_result expr) res;
-    exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
+    exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
   with Contr (ctx, term) ->
+    Pretty.forget_all ();
     printf "%a@." report_cntr_body (ctx, term) ;
     exit 1
 

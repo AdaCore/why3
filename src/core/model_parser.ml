@@ -1065,8 +1065,8 @@ type verdict = Good_model | Bad_model | Dont_know
 type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
-  | Val_from_model of (vsymbol * string)
-  | Exec_call of (Expr.rsymbol option * string Mvs.t * exec_kind)
+  | Val_from_model of (ident * string)
+  | Exec_call of (Expr.rsymbol option * string Mvs.t  * exec_kind)
   | Exec_pure of (Term.lsymbol * exec_kind)
   | Exec_loop of exec_kind
   | Exec_stucked of (string * string Mvs.t)
@@ -1085,8 +1085,8 @@ let empty_log = []
 
 let add_log_entry log_desc log_loc exec_log = {log_desc; log_loc} :: exec_log
 
-let add_val_to_log vs v loc exec_log =
-  add_log_entry (Val_from_model (vs,v)) loc exec_log
+let add_val_to_log id v loc exec_log =
+  add_log_entry (Val_from_model (id,v)) loc exec_log
 
 let add_call_to_log rs mvs kind loc exec_log =
   add_log_entry (Exec_call (rs,mvs,kind)) loc exec_log
@@ -1134,8 +1134,8 @@ let print_log_entry_desc fmt e =
   let print_mvs fmt mvs =
     fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_one) (Mvs.bindings mvs) in
   match e.log_desc with
-  | Val_from_model (vs, v) ->
-      fprintf fmt "@[<h>%a = %s@]" Ident.print_decoded vs.vs_name.id_string v;
+  | Val_from_model (id, v) ->
+      fprintf fmt "@[<h>%a = %s@]" Ident.print_decoded id.id_string v;
   | Exec_call (None, mvs, k) ->
       fprintf fmt "@[<h>%s execution of lambda function@]"
         (exec_kind_to_string k)
@@ -1165,10 +1165,11 @@ let print_exec_log ~json fmt entry_log =
       | ExecAbstract -> print_json fmt (string "ABSTRACT")
       | ExecConcrete -> print_json fmt (string "CONCRETE") in
     let print_log_entry fmt = function
-      | Val_from_model (vs, s) ->
+      | Val_from_model (id, s) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "VAL_FROM_MODEL")
-            (print_json_field "vs" print_json) (string "%a" Pretty.print_vs vs)
+            (print_json_field "vs" print_json)
+            (string "%a" Ident.print_decoded id.id_string)
             (print_json_field "value" print_json) (String s)
       | Exec_call (ors, mvs, kind) ->                                     (* TODO print mvs *)
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"

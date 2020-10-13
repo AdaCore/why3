@@ -30,10 +30,11 @@ type result =
 
 (** {1 Contradiction context} *)
 
-type cntr_ctx =
-  { c_desc: string;
-    c_trigger_loc: Loc.position option;
-    c_env: env }
+type cntr_ctx = {
+  c_desc: string;
+  c_trigger_loc: Loc.position option;
+  c_env: env
+}
 (** Context of a contradiction during RAC *)
 
 exception CannotCompute of {reason: string}
@@ -84,7 +85,7 @@ val eval_global_fundef :
   Decl.known_map ->
   (Expr.rsymbol * Expr.cexp) list ->
   Expr.expr ->
-  result * value Term.Mvs.t
+  result * value Term.Mvs.t * value Expr.Mrs.t
 (** [eval_global_fundef ~rac env disp_ctx known def] evaluates a function definition and
    returns an evaluation result and a final variable environment.
 
@@ -127,16 +128,16 @@ val check_model :
 
 (** {1 Reporting results} *)
 
-val report_eval_result :
-  Expr.expr ->
-  Format.formatter ->
-  result * value Term.Mvs.t ->
-  unit
-(** Report an evaluation result *)
-
 val report_cntr : Format.formatter -> cntr_ctx * Term.term -> unit
 val report_cntr_body : Format.formatter -> cntr_ctx * Term.term -> unit
 (** Report a contradiction context and term *)
+
+val report_eval_result :
+  Expr.expr ->
+  Format.formatter ->
+  result * value Term.Mvs.t * value Expr.Mrs.t ->
+  unit
+(** Report an evaluation result *)
 
 (**/**)
 

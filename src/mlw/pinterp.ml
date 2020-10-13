@@ -44,6 +44,14 @@ let pp_indent fmt =
       let s = String.make (2 * n) ' ' in
       pp_print_string fmt s
 
+(* Test for declarations program constants with logical counterparts. These values are
+   kept in the [rsenv] environment *)
+let is_prog_constant d =
+  let open Pdecl in
+  match d.pd_node with
+  | PDlet (LDsym (_, {c_cty= {Ity.cty_args= []}})) -> true
+  | _ -> false
+
 (* EXCEPTIONS *)
 
 exception NoMatch
@@ -217,7 +225,7 @@ let rec print_value fmt v =
       fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
         (Mv.bindings mv) print_value v
   | Vterm t ->
-      fprintf fmt "(term:@ %a)" print_term t
+      print_term fmt t
   | Vundefined -> fprintf fmt "UNDEFINED"
 
 and print_field fmt f = print_value fmt (field_get f)
@@ -375,16 +383,16 @@ type env =
     th_known    : Decl.known_map;
     funenv      : Expr.cexp Mrs.t;
     vsenv       : value Mvs.t;
+    rsenv       : value Mrs.t; (* global constants *)
     env         : Env.env;
     rac         : rac_config;
   }
 
-let default_env env =
-  { mod_known= Mid.empty; th_known= Mid.empty; funenv= Mrs.empty;
-    vsenv= Mvs.empty; rac= rac_config ~do_rac:false ~abstract:false (); env }
+let default_env env rac mod_known th_known =
+  { mod_known; th_known; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty }
 
-let register_used_value env loc vs value =
-  env.rac.exec_log := add_val_to_log vs (asprintf "%a" print_value value) loc !(env.rac.exec_log)
+let register_used_value env loc id value =
+  env.rac.exec_log := add_val_to_log id (asprintf "%a" print_value value) loc !(env.rac.exec_log)
 
 let register_call env loc rs mvs kind =
   env.rac.exec_log := add_call_to_log rs mvs kind loc !(env.rac.exec_log)
@@ -412,8 +420,13 @@ let add_local_funs locals env =
   {env with funenv}
 
 let bind_vs vs v env = {env with vsenv= Mvs.add vs v env.vsenv}
-let bind_pvs pv v_t env = bind_vs pv.pv_vs v_t env
-let multibind_pvs l tl env = List.fold_right2 bind_pvs l tl env
+let bind_rs rs v env = {env with rsenv= Mrs.add rs v env.rsenv}
+let bind_pvs ?register pv v_t env =
+  let env = bind_vs pv.pv_vs v_t env in
+  Opt.iter (fun r -> r pv.pv_vs.vs_name v_t) register;
+  env
+let multibind_pvs ?register l tl env =
+  List.fold_left2 (fun env pv v -> bind_pvs ?register pv v env) env l tl
 
 (* BUILTINS *)
 
@@ -720,7 +733,7 @@ let get_builtin_progs env =
 let get_vs env vs =
   try Mvs.find vs env.vsenv
   with Not_found ->
-    ksprintf failwith "program variable %s not found in env@."
+    ksprintf failwith "program variable %s not found in env"
       vs.vs_name.id_string
 
 let get_pvs env pvs =
@@ -769,6 +782,10 @@ let rec default_value_of_type env known ity : value =
               value ty Vundefined
 
 (* VALUE IMPORT *)
+
+let get_model_value_by_loc model loc =
+  let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
 
 let get_model_value model name loc =
   let aux me =
@@ -932,11 +949,11 @@ let find_definition env (rs: rsymbol) =
 
 (* CONTRADICTION CONTEXT *)
 
-type cntr_ctx =
-  { c_desc: string;
-    c_trigger_loc: Loc.position option;
-    c_env: env;
-  }
+type cntr_ctx = {
+  c_desc: string;
+  c_trigger_loc: Loc.position option;
+  c_env: env;
+}
 
 exception Contr of cntr_ctx * term
 
@@ -956,17 +973,21 @@ let report_cntr_head fmt (ctx, msg, term) =
     | None, None -> () );
   fprintf fmt "@]"
 
-let pp_vsenv pp_value fmt =
-  let delims = Pp.(nothing, nothing) and sep = Pp.comma in
-  fprintf fmt "%a" (pp_bindings ~delims ~sep print_vs pp_value)
+let env_sep = Pp.comma
+
+let pp_env pp_key pp_value fmt =
+  let delims = Pp.nothing, Pp.nothing in
+  fprintf fmt "%a" (pp_bindings ~delims ~sep:env_sep pp_key pp_value)
 
 let report_cntr_body fmt (ctx, term) =
   let cmp_vs (vs1, _) (vs2, _) =
     String.compare vs1.vs_name.id_string vs2.vs_name.id_string in
   let mvs = t_freevars Mvs.empty term in
   fprintf fmt "@[<hv2>- Term: %a@]@," print_term term ;
-  fprintf fmt "@[<hv2>- Variables: %a@]" (pp_vsenv print_value)
-    (List.sort cmp_vs (Mvs.bindings (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_env.vsenv)))
+  fprintf fmt "@[<hv2>- Variables: %a@]" (pp_env print_vs print_value)
+    (List.sort cmp_vs
+       (Mvs.bindings
+          (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_env.vsenv)))
 
 let report_cntr fmt (ctx, msg, term) =
   fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
@@ -1018,43 +1039,57 @@ let p = object
     | _ -> failwith "p#open_app"
 end
 
+(* Add declarations from local functions in [env.funenv] *)
+let bind_fun rs cexp (task, ls_mv) =
+  try
+    let t = match cexp.c_node with
+      | Cfun e -> Opt.get_exn Exit (term_of_expr ~prop:false e)
+      | _ -> raise Exit in
+    let ty_args = List.map (fun pv -> Ity.ty_of_ity pv.pv_ity) rs.rs_cty.cty_args in
+    let ty_res = Ity.ty_of_ity rs.rs_cty.cty_result in
+    let ls, ls_mv = match rs.rs_logic with
+      | RLlemma | RLnone -> raise Exit
+      | RLls ls -> ls, ls_mv
+      | RLpv {pv_vs= vs} ->
+          let ls = create_fsymbol (id_clone rs.rs_name) ty_args ty_res in
+          let vss = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
+          let ts = List.map t_var vss in
+          let t0 = fs_app ls ts ty_res in
+          let t = t_lambda vss [] t0 in
+          let ls_mv = Mvs.add vs t ls_mv in
+          ls, ls_mv in
+    let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
+    let decl = Decl.make_ls_defn ls vs_args t in
+    let task = Task.add_logic_decl task [decl] in
+    task, ls_mv
+  with Exit -> task, ls_mv
+
 let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
   let task = List.fold_left use_export task Theory.[builtin_theory; bool_theory; highord_theory] in
   let task = add_param_decl task ls_undefined in
+  let lsenv =
+    let aux1 rs v mls =
+      match rs.rs_logic with
+      | RLls ls -> Mls.add ls v mls
+      | _ -> mls in
+    Mrs.fold aux1 env.rsenv Mls.empty in
   (* Add known declarations *)
-  let add_known _ decl task =
+  let add_known _id decl task =
     match decl.d_node with
     | Dprop (Pgoal, _, _) -> task
     | Dprop (Plemma, prs, t) ->
         add_decl task (create_prop_decl Paxiom prs t)
+    | Dparam ls when Mls.contains lsenv ls ->
+        (* Take value from lsenv (i.e. env.rsenv) for declaration *)
+        let vsenv, t = term_of_value env.env [] (Mls.find ls lsenv) in
+        let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
+        let t = t_ty_subst ls_mt ls_mv t in
+        let decl = Decl.make_ls_defn ls [] t in
+        add_decl task (create_logic_decl [decl])
     | _ -> add_decl task decl in
   let task = Mid.fold add_known env.th_known task in
-  (* Add declarations from local functions in [env.funenv] *)
-  let bind_fun rs cexp (task, ls_mv) =
-    try
-      let t = match cexp.c_node with
-        | Cfun e -> Opt.get_exn Exit (term_of_expr ~prop:false e)
-        | _ -> raise Exit in
-      let ty_args = List.map (fun pv -> Ity.ty_of_ity pv.pv_ity) rs.rs_cty.cty_args in
-      let ty_res = Ity.ty_of_ity rs.rs_cty.cty_result in
-      let ls, ls_mv = match rs.rs_logic with
-        | RLlemma | RLnone -> raise Exit
-        | RLls ls -> ls, ls_mv
-        | RLpv {pv_vs= vs} ->
-            let ls = create_fsymbol (id_clone rs.rs_name) ty_args ty_res in
-            let vss = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
-            let ts = List.map t_var vss in
-            let t0 = fs_app ls ts ty_res in
-            let t = t_lambda vss [] t0 in
-            let ls_mv = Mvs.add vs t ls_mv in
-            ls, ls_mv in
-      let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
-      let decl = make_ls_defn ls vs_args t in
-      let task = add_logic_decl task [decl] in
-      task, ls_mv
-    with Exit -> task, ls_mv in
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env.env) env.vsenv (task, ls_mt, ls_mv) in
@@ -1231,7 +1266,7 @@ exception RACStuck of env * Loc.position option
    with RACStuck. *)
 
 let value_of_free_vars env t =
-  let get env vs = asprintf "%a" print_value (get_vs env vs) in
+  let get env vs = asprintf "%a" (Pp.print_option_or_default "(??)" print_value) (Mvs.find_opt vs env.vsenv) in
   t_v_fold (fun mvs vs -> Mvs.add vs (get env vs) mvs) Mvs.empty t
 
 let check_assume_term ctx t =
@@ -1366,8 +1401,10 @@ let get_and_register_value env ?def ?ity vs loc =
   let value = match get_model_value env.rac.ce_model name loc with
     | Some v ->
        let v = import_model_value env.env env.mod_known ity v in
-       Debug.dprintf debug_check_ce "@[<h>%tVALUE from ce-model: %a@]@."
-         pp_indent print_value v;
+       Debug.dprintf debug_check_ce "@[<h>VALUE from ce-model for %a at %a: %a@]@."
+         Ident.print_decoded name
+         Pretty.print_loc' loc
+         print_value v;
        v
     | None ->
        let v = match def with
@@ -1378,7 +1415,7 @@ let get_and_register_value env ?def ?ity vs loc =
                 default %a@]@." name print_loc' loc print_value v;
        v
   in
-  register_used_value env (Some loc) vs value;
+  register_used_value env (Some loc) vs.vs_name value;
   value
 
 let rec set_fields fs1 fs2 =
@@ -1420,13 +1457,11 @@ let rec eval_expr env e =
 and eval_expr' env e =
   let loc_or_dummy = Opt.get_def Loc.dummy_position e.e_loc in
   match e.e_node with
-  | Evar pvs -> (
-    try
+  | Evar pvs ->
       let v = get_pvs env pvs in
       Debug.dprintf debug "[interp] reading var %s from env -> %a@\n"
         pvs.pv_vs.vs_name.id_string print_value v ;
       Normal v
-    with Not_found -> assert false (* Irred e ? *) )
   | Econst (Constant.ConstInt c) ->
       Normal (value (ty_of_ity e.e_ity) (Vnum (big_int_of_const c)))
   | Econst (Constant.ConstReal r) ->
@@ -1443,7 +1478,9 @@ and eval_expr' env e =
         Normal (value ty_real (Vfloat (make_from_str s)))
   | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
   | Eexec (ce, cty) -> begin
-    match ce.c_node with
+      (* TODO (When) do we have to check the contracts in cty? When ce <> Capp? *)
+      (* check_terms (cntr_ctx "Exec precondition" env) cty.cty_pre; *)
+      match ce.c_node with
       | Cpur (ls, pvs) ->
           Debug.dprintf debug "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent print_ls ls
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
@@ -1468,11 +1505,28 @@ and eval_expr' env e =
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
           | _ -> failwith "many args for exec fun" )
       | Cany ->
-          cannot_compute "Cannot compute the application of the any-function"
-    | Capp _ when cty.cty_args <> [] ->
-        cannot_compute "Cannot compute partial function application"
-    | Capp (rs, pvsl) ->
-        assert (ce.c_cty.cty_args = []) ;
+          let v =
+            try match get_model_value_by_loc env.rac.ce_model (Opt.get_exn Exit e.e_loc) with
+              | Some me -> import_model_value env.env env.mod_known e.e_ity me.me_value
+              | None -> raise Exit
+            with Exit ->
+              let v = default_value_of_type env.env env.mod_known e.e_ity in
+              let pp_loc fmt = function
+                | Some loc -> fprintf fmt " at %a" Pretty.print_loc' loc
+                | None -> () in
+              Debug.dprintf debug "Take default value %a for any expression%a"
+                print_value v pp_loc e.e_loc;
+              v in
+          register_used_value env e.e_loc Ident.(id_register (id_fresh ?loc:e.e_loc "ANY")) v;
+          (* check_posts "Exec postcondition" e.e_loc env v cty.cty_post; *)
+          Normal v
+      | Capp (rs, pvsl) when Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.mod_known) = Some true ->
+          assert (cty.cty_args = [] && pvsl = []);
+          let v = Mrs.find rs env.rsenv in
+          (* check_posts "Exec postcondition" e.e_loc env v cty.cty_post; *)
+          Normal v
+      | Capp (rs, pvsl) ->
+        if cty.cty_args <> [] then cannot_compute "Cannot compute partial function application";
         exec_call ?loc:e.e_loc env rs pvsl e.e_ity
     end
   | Eassign l ->
@@ -1839,8 +1893,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                     pp_indent print_rs rs print_rs rs';
                   exec_call ?loc env rs' (pvl @ arg_pvs) ity_result
                | Cfun body ->
-                  Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: FUN %a@]@."
-                    pp_indent print_rs rs (pp_limited print_expr) body;
+                  Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: FUN/%d %a@]@."
+                    pp_indent print_rs rs (List.length ce.c_cty.cty_args) (pp_limited print_expr) body;
                   let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
                   eval_expr env' body
                | Cany ->
@@ -1891,53 +1945,80 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
-let make_global_env ?(model=default_model) env known =
-  let add_glob _id d acc =
-    match d.Pdecl.pd_node with
-    | Pdecl.PDlet (LDvar (pv, _e)) ->
-        (* TODO evaluate _e! *)
-        let v = match model_value model pv with
-          | Some v -> import_model_value env known pv.pv_ity  v
-          | None -> default_value_of_type env known pv.pv_ity in
-        Mvs.add pv.pv_vs v acc
-    | _ -> acc in
-  Mid.fold add_glob known Mvs.empty
+let bind_globals ?(model=default_model) ?rs_main mod_known env =
+  let get_value register id opt_e ity =
+    match model_value model id with
+    | Some mv ->
+        let v = import_model_value env.env mod_known ity mv in
+        register v; v
+    | None -> match opt_e with
+      | None ->
+          let v = default_value_of_type env.env mod_known ity in
+          register v; v
+      | Some e ->
+          let env = {env with rac= {env.rac with rac_abstract= false}} in
+          match eval_expr env e with
+          | Normal v -> v
+          | Fun _ -> failwith "bind_globals: should be program constant, is function"
+          | Excep _ -> cannot_compute "exception in initialization of global variable %a"
+                         Ident.print_decoded id.id_string
+          | Irred _ -> cannot_compute "initialization of global variable %a irreducible"
+                         Ident.print_decoded id.id_string in
+  let open Pdecl in
+  let eval_global _ d env =
+    match d.pd_node with
+    | PDlet (LDvar (pv, e)) ->
+        let register = register_used_value env pv.pv_vs.vs_name.id_loc pv.pv_vs.vs_name in
+        let v = get_value register pv.pv_vs.vs_name (Some e) e.e_ity in
+        bind_vs pv.pv_vs v env
+    | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
+        assert (ce.c_cty.cty_args = []);
+        let register = register_used_value env rs.rs_name.id_loc rs.rs_name in
+        let v = match ce.c_node with
+          | Cany -> get_value register rs.rs_name None ce.c_cty.cty_result
+          | Cfun e -> get_value register rs.rs_name (Some e) ce.c_cty.cty_result
+          | _ -> failwith "eval_globals: program constant cexp" in
+        check_assume_posts (cntr_ctx "Any postcondition" env) v ce.c_cty.cty_post;
+        bind_rs rs v env )
+    | _ -> env in
+  let is_before id d (env, found_rs) =
+    let found_rs_here = match d.pd_node with
+      | PDlet (LDsym (rs, _)) -> Opt.equal rs_equal (Some rs) rs_main
+      | PDlet (LDrec ds) -> List.exists (fun d -> Opt.equal rs_equal (Some d.rec_sym) rs_main) ds
+      | _ -> false in
+    let found_rs = found_rs || found_rs_here in
+    let env = if found_rs then env else Mid.add id d env in
+    env, found_rs in
+  let mod_known, _ = Mid.fold is_before mod_known (Mid.empty, false) in
+  Mid.fold eval_global mod_known env
 
-let eval_global_expr rac env mod_known th_known locals e =
+let eval_global_fundef rac env mod_known th_known locals e =
   get_builtin_progs env ;
-  let vsenv = make_global_env env mod_known in
-  let env = add_local_funs locals
-      { (default_env env) with mod_known; th_known; vsenv; rac } in
-  Mvs.iter (fun vs v -> register_used_value env e.e_loc vs v) vsenv;
+  let env = default_env env rac mod_known th_known in
+  let env = bind_globals mod_known env in
+  let env = add_local_funs locals env in
   let res = eval_expr env e in
-  res, vsenv
-
-let eval_global_fundef rac env mod_known mod_theory locals body =
-  try eval_global_expr rac env mod_known mod_theory locals body
-  with CannotFind (l, s, n) ->
-    eprintf "Cannot find %a.%s.%s@." (Pp.print_list Pp.dot pp_print_string) l s n ;
-    assert false
+  res, env.vsenv, env.rsenv
 
 let eval_rs rac env mod_known th_known model (rs: rsymbol) =
-  let get_value pv =
-    match model_value model pv with
-    | Some mv ->
-        import_model_value env mod_known pv.pv_ity mv
+  let get_value (pv: pvsymbol) =
+    match model_value model pv.pv_vs.vs_name with
+    | Some mv -> import_model_value env mod_known pv.pv_ity mv
     | None ->
         let v = default_value_of_type env mod_known pv.pv_ity in
         Debug.dprintf debug_rac "Missing value for parameter %a, continue with default value %a@."
           print_pv pv print_value v;
         v in
-  let arg_vs = List.map get_value rs.rs_cty.cty_args in
   get_builtin_progs env ;
-  let vsenv = make_global_env env ~model mod_known in
-  let env = { (default_env env) with mod_known; th_known; vsenv; rac } in
-  let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
+  let env = default_env env rac mod_known th_known in
+  let env = bind_globals ~model ~rs_main:rs mod_known env in
+  let env = multibind_pvs ~register:(register_used_value env rs.rs_name.id_loc)
+      rs.rs_cty.cty_args (List.map get_value rs.rs_cty.cty_args) env in
   let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
-  Mvs.iter (fun vs v -> register_used_value env rs.rs_name.id_loc vs v) env.vsenv;
   let res = exec_call ~main_function:true ~loc:e_loc env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   register_ended env rs.rs_name.id_loc;
   res, env
+
 
 let check_model_rs rac env pm model rs =
   let open Pmodule in
@@ -2075,21 +2156,26 @@ let check_model reduce env pm model =
           let reason = asprintf "no corresponding routine symbol found for %a" print_loc' loc in
           Cannot_check_model {reason}
 
-let report_eval_result body fmt (res, final_env) =
+let report_eval_result body fmt (res, vsenv, rsenv) =
+  let print_envs fmt =
+    pp_env print_vs print_value fmt (Mvs.bindings vsenv);
+    (* if not (Mvs.is_empty vsenv) && not (Mrs.is_empty rsenv) then
+     *   fprintf fmt "%a" env_sep ();
+     * pp_env print_rs print_value fmt (Mrs.bindings rsenv) *)
+    ignore rsenv
+  in
   match res with
   | Normal _ ->
       fprintf fmt "@[<hov2>result:@ %a@ =@ %a@]@,"
         print_ity body.e_ity print_logic_result res;
-      fprintf fmt "@[<hov2>globals:@ %a@]"
-        (pp_vsenv print_value) (Mvs.bindings final_env)
+      fprintf fmt "@[<hov2>globals:@ %t@]" print_envs
   | Excep _ ->
       fprintf fmt "@[<hov2>exceptional result:@ %a@]@,"
         print_logic_result res;
-      fprintf fmt "@[<hov2>globals:@ %a@]"
-        (pp_vsenv print_value) (Mvs.bindings final_env)
+      fprintf fmt "@[<hov2>globals:@ %t@]" print_envs
   | Irred _ | Fun _ ->
       fprintf fmt "@[<hov2>Execution error: %a@]@," print_logic_result res ;
-      fprintf fmt "@[globals:@ %a@]" (pp_vsenv print_value) (Mvs.bindings final_env)
+      fprintf fmt "@[globals:@ %t@]" print_envs
 
 let report_cntr fmt (ctx, term) =
   report_cntr fmt (ctx, "has failed", term)
