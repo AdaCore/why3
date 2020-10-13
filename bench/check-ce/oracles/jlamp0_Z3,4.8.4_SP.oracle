@@ -127,22 +127,17 @@
                     r = (ref'mk 3)
                     result = 0
 <check-ce>Models:
-          - Checked model 0: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
-          - Checked model 1: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 2: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 1 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
-Formula `Assertion' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 5260394 steps).
+Goal `Assertion' from verification condition p1'vc.
+Prover result is: timeout (1.00s, 7761955 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -378,22 +373,17 @@ File jlamp0.mlw:
                     r = (ref'mk 3)
                     result = 0
 <check-ce>Models:
-          - Checked model 0: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
-          - Checked model 1: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 2: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 1 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
-Formula `Postcondition' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 5333305 steps).
+Goal `Postcondition' from verification condition p1'vc.
+Prover result is: timeout (1.00s, 7470726 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -620,22 +610,17 @@ File jlamp0.mlw:
                     r = (ref'mk 3)
                     result = 0
 <check-ce>Models:
-          - Checked model 0: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
-          - Checked model 1: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 2: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 1 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
-Formula `Postcondition' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 5588885 steps).
+Goal `Postcondition' from verification condition p1'vc.
+Prover result is: timeout (1.00s, 7670028 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -806,24 +791,18 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Models:
-          - Checked model 0: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 1: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
-          - Checked model 2: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
+- Selected model 0 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
-Formula `Loop invariant init' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5744834 steps).
+Goal `Loop invariant init' from verification condition p2'vc.
+Prover result is: timeout (1.00s, 7681471 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -844,7 +823,7 @@ File jlamp0.mlw:
       c = (ref'mk 1)
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
-Formula `Loop invariant init' from verification condition p2'vc.
+Goal `Loop invariant init' from verification condition p2'vc.
 Prover result is: valid (0.01s, 295 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
@@ -968,24 +947,18 @@ Prover result is: valid (0.01s, 295 steps).
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Models:
-          - Checked model 0: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 1: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
-          - Checked model 2: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
+- Selected model 0 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
-Formula `Loop variant decrease' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5789405 steps).
+Goal `Loop variant decrease' from verification condition p2'vc.
+Prover result is: timeout (1.00s, 8060548 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -1126,24 +1099,18 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Models:
-          - Checked model 0: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 1: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
-          - Checked model 2: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
+- Selected model 0 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
-Formula `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5940517 steps).
+Goal `Loop invariant preservation' from verification condition p2'vc.
+Prover result is: timeout (1.00s, 7882977 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -1284,24 +1251,18 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Models:
-          - Checked model 0: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 1: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
-          - Checked model 2: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
+- Selected model 0 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
-Formula `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5926861 steps).
+Goal `Loop invariant preservation' from verification condition p2'vc.
+Prover result is: timeout (1.00s, 7956405 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
@@ -1442,24 +1403,18 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Models:
-          - Checked model 0: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 1: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
-          - Checked model 2: good model/good model -> The program does not
-                                                      comply to the
-                                                      verification goal, for
-                                                      example during the
-                                                      following execution:
+- Selected model 0 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
-Formula `Postcondition' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 5391369 steps).
+Goal `Postcondition' from verification condition p2'vc.
+Prover result is: timeout (1.00s, 7907377 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:

@@ -1,6 +1,6 @@
 File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
-Formula `Postcondition' from verification condition decr'vc.
-Prover result is: valid (0.03s, 287 steps).
+Goal `Postcondition' from verification condition decr'vc.
+Prover result is: valid (0.05s, 287 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 <check-ce>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 not in ce-model, taking default 0
@@ -144,24 +144,18 @@ Prover result is: valid (0.03s, 287 steps).
                     x = 2
                     result = 2
 <check-ce>Models:
-          - Checked model 0: bad model/good model -> The contracts of some
-                                                     function or loop are
-                                                     underspecified, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 1: bad model/good model -> The contracts of some
-                                                     function or loop are
-                                                     underspecified, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 2: bad model/good model -> The contracts of some
-                                                     function or loop are
-                                                     underspecified, for
-                                                     example during the
-                                                     following execution:
+- Selected model 0 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified, for
+    example during the following execution:
+- Checked model 1 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified, for
+    example during the following execution:
+- Checked model 2 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified, for
+    example during the following execution:
 File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
-Formula `Postcondition' from verification condition incr'vc.
-Prover result is: unknown (sat) (0.04s, 4862 steps).
+Goal `Postcondition' from verification condition incr'vc.
+Prover result is: unknown (sat) (0.03s, 4862 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File multifile1.mlw:

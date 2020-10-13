@@ -1,5 +1,5 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
-Formula `Loop invariant init' from verification condition f'vc.
+Goal `Loop invariant init' from verification condition f'vc.
 Prover result is: valid (0.03s, 58 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
@@ -233,22 +233,17 @@ Prover result is: valid (0.03s, 58 steps).
                     x1 = (ref'mk (-7868))
                     i = 1
 <check-ce>Models:
-          - Checked model 0: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
-          - Checked model 1: bad model/good model -> The contracts of some
-                                                     function or loop are
-                                                     underspecified, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 2: bad model/good model -> The contracts of some
-                                                     function or loop are
-                                                     underspecified, for
-                                                     example during the
-                                                     following execution:
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 1 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified, for
+    example during the following execution:
+- Checked model 2 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified, for
+    example during the following execution:
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
-Formula `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4850986 steps).
+Goal `Loop invariant preservation' from verification condition f'vc.
+Prover result is: timeout (1.00s, 7658282 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File for.mlw:
@@ -285,6 +280,6 @@ File for.mlw:
       i = 1
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
-Formula `Loop invariant preservation' from verification condition f'vc.
+Goal `Loop invariant preservation' from verification condition f'vc.
 Prover result is: valid (0.01s, 2384 steps).
 

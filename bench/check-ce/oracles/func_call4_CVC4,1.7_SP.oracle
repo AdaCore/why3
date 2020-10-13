@@ -61,28 +61,19 @@
                   Property failure, Assertion with:
                     z = (ref'mk 2)
 <check-ce>Models:
-          - Checked model 0: don't know/bad model -> The following
-                                                     counterexample model has
-                                                     not been verified
-                                                     (RAC execution got stuck: Cannot compute application of local any-function g):
-          - Checked model 1: don't know/good model -> The program does not
-                                                      comply to the
-                                                      verification goal,
-                                                      orthe contracts of some
-                                                      loop or function are
-                                                      too weak, for example
-                                                      in the following
-                                                      execution:
-          - Checked model 2: don't know/good model -> The program does not
-                                                      comply to the
-                                                      verification goal,
-                                                      orthe contracts of some
-                                                      loop or function are
-                                                      too weak, for example
-                                                      in the following
-                                                      execution:
+- Checked model 0 (Concrete: don't know, Abstract: bad model)
+    Summary: The following counterexample model has not been verified
+    (RAC execution got stuck: Cannot compute application of local any-function g):
+- Selected model 1 (Concrete: don't know, Abstract: good model)
+    Summary: The program does not comply to the verification goal, orthe
+    contracts of some loop or function are too weak, for example in the
+    following execution:
+- Checked model 2 (Concrete: don't know, Abstract: good model)
+    Summary: The program does not comply to the verification goal, orthe
+    contracts of some loop or function are too weak, for example in the
+    following execution:
 File "bench/check-ce/func_call4.mlw", line 9, characters 34-39:
-Formula `Assertion' from verification condition f'vc.
+Goal `Assertion' from verification condition f'vc.
 Prover result is: unknown (unknown + incomplete) (0.06s, 6512 steps).
 The program does not comply to the verification goal, orthe contracts of some
 loop or function are too weak, for example in the following execution:

@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
-Formula `Postcondition' from verification condition g1'vc.
+Goal `Postcondition' from verification condition g1'vc.
 Prover result is: valid (0.02s, 33 steps).
 
 File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
-Formula `Precondition' from verification condition f1'vc.
-Prover result is: valid (0.02s, 83 steps).
+Goal `Precondition' from verification condition f1'vc.
+Prover result is: valid (0.01s, 83 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>VALUE for result "bench/check-ce/func_call5.mlw", line 13, characters 10-14 not in ce-model, taking default (ref'mk 0)
@@ -106,18 +106,15 @@ Prover result is: valid (0.02s, 83 steps).
                     y = 1
                     result = (ref'mk 0)
 <check-ce>Models:
-          - Checked model 0: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
-          - Checked model 1: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
-          - Checked model 2: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Checked model 1 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 2 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
-Formula `Assertion' from verification condition f1'vc.
-Prover result is: timeout (1.00s, 5540963 steps).
+Goal `Assertion' from verification condition f1'vc.
+Prover result is: timeout (1.00s, 7005241 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -199,19 +196,15 @@ Sorry, we don't have a good counterexample for you :(
                     y = 0
                     result = (ref'mk 0)
 <check-ce>Models:
-          - Checked model 1: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 2: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
+- Selected model 1 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
-Formula `Assertion' from verification condition f2'vc.
-Prover result is: timeout (1.00s, 5984241 steps).
+Goal `Assertion' from verification condition f2'vc.
+Prover result is: timeout (1.00s, 7722510 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File func_call5.mlw:

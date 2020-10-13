@@ -149,17 +149,14 @@
                     x = 0
                     result = 0
 <check-ce>Models:
-          - Checked model 0: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
-          - Checked model 1: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
-          - Checked model 2: bad model/bad model -> Sorry, we don't have a
-                                                    good counterexample for
-                                                    you :(
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Checked model 1 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 2 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
-Formula `Postcondition' from verification condition f'vc.
+Goal `Postcondition' from verification condition f'vc.
 Prover result is: unknown (sat) (0.02s, 866 steps).
 Sorry, we don't have a good counterexample for you :(
 
@@ -321,23 +318,17 @@ Sorry, we don't have a good counterexample for you :(
                     x = 0
                     result = 0
 <check-ce>Models:
-          - Checked model 0: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 1: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
-          - Checked model 2: good model/bad model -> The program does not
-                                                     comply to the
-                                                     verification goal, for
-                                                     example during the
-                                                     following execution:
+- Selected model 0 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 1 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
 File "bench/check-ce/multifile2.mlw", line 13, characters 12-26:
-Formula `Postcondition' from verification condition g'vc.
+Goal `Postcondition' from verification condition g'vc.
 Prover result is: unknown (sat) (0.00s, 878 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
@@ -436,20 +427,17 @@ File multifile2.mlw:
                     x = 0
                     result = 0
 <check-ce>Models:
-          - Checked model 0: don't know/bad model -> The following
-                                                     counterexample model has
-                                                     not been verified
-                                                     (RAC execution got stuck: Cannot compute application of local any-function incr_val):
-          - Checked model 1: don't know/bad model -> The following
-                                                     counterexample model has
-                                                     not been verified
-                                                     (RAC execution got stuck: Cannot compute application of local any-function incr_val):
-          - Checked model 2: don't know/bad model -> The following
-                                                     counterexample model has
-                                                     not been verified
-                                                     (RAC execution got stuck: Cannot compute application of local any-function incr_val):
+- Checked model 0 (Concrete: don't know, Abstract: bad model)
+    Summary: The following counterexample model has not been verified
+    (RAC execution got stuck: Cannot compute application of local any-function incr_val):
+- Checked model 1 (Concrete: don't know, Abstract: bad model)
+    Summary: The following counterexample model has not been verified
+    (RAC execution got stuck: Cannot compute application of local any-function incr_val):
+- Selected model 2 (Concrete: don't know, Abstract: bad model)
+    Summary: The following counterexample model has not been verified
+    (RAC execution got stuck: Cannot compute application of local any-function incr_val):
 File "bench/check-ce/multifile2.mlw", line 19, characters 12-26:
-Formula `Postcondition' from verification condition h'vc.
+Goal `Postcondition' from verification condition h'vc.
 Prover result is: unknown (sat) (0.00s, 878 steps).
 The following counterexample model could not be verified
 (RAC execution got stuck: Cannot compute application of local any-function incr_val):
