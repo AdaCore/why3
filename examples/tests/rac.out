@@ -37,33 +37,46 @@ globals:
 
 * Global
 ** Global.test1
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 34, characters 12-17
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 34, characters 12-17
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 41, characters 14-16
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 41, characters 14-16
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Assertion is ok at examples/tests/rac.mlw, line 37, characters 13-18
 <rac>Postcondition of contents is ok at examples/tests/rac.mlw, line 38, characters 9-10
 <rac>Postcondition of (+) is ok at examples/tests/rac.mlw, line 38, characters 9-14
 <rac>Assertion is ok at examples/tests/rac.mlw, line 39, characters 13-18
 result: () = ()
-globals: x -> (ref'mk 1), y -> (ref'mk 0)
+globals: x -> (ref'mk 1), y -> (ref'mk 42)
 
 * Functions
 ** Functions.test1
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 53, characters 14-15
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 53, characters 14-15
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Assertion is ok at examples/tests/rac.mlw, line 57, characters 13-27
 <rac>Assertion is ok at examples/tests/rac.mlw, line 58, characters 13-30
 <rac>Assertion has failed at examples/tests/rac.mlw, line 59, characters 13-35
-anomaly: (Failure "program variable f1_aux' not found in env\n")
+- Term: f1_aux 0 = ((f1_aux' @ 0) @ 1)
+- Variables: 
 ** Functions.test2
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 53, characters 14-15
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 53, characters 14-15
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Assertion is ok at examples/tests/rac.mlw, line 63, characters 13-29
 result: () = ()
 globals: x -> (ref'mk 0)
 ** Functions.test3a
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 53, characters 14-15
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 53, characters 14-15
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 7-9
 <rac>Precondition of test3_aux has failed at examples/tests/rac.mlw, line 71, characters 4-15
      - Defined at examples/tests/rac.mlw, line 66, characters 15-20
 - Term: y > 0
 - Variables: y -> 0
 ** Functions.test3b
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 53, characters 14-15
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 53, characters 14-15
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 7-9
 <rac>Precondition of test3_aux is ok at examples/tests/rac.mlw, line 74, characters 12-23
      - Defined at examples/tests/rac.mlw, line 66, characters 15-20
@@ -76,6 +89,8 @@ globals: x -> (ref'mk 0)
 - Term: result = 1
 - Variables: result -> 2
 ** Functions.test4
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 53, characters 14-15
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 53, characters 14-15
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Postcondition of Tuple0 is ok at examples/tests/rac.mlw, line 85, characters 18-20
 <rac>Exceptional postcondition of test4_aux has failed at examples/tests/rac.mlw, line 85, characters 8-20
@@ -83,6 +98,8 @@ globals: x -> (ref'mk 0)
 - Term: j = contents x
 - Variables: j -> 42, x -> (ref'mk 1)
 ** Functions.test5
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 53, characters 14-15
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 53, characters 14-15
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Postcondition of contents is ok at examples/tests/rac.mlw, line 90, characters 9-10
 <rac>Postcondition of (+) is ok at examples/tests/rac.mlw, line 90, characters 9-14
@@ -95,6 +112,8 @@ globals: x -> (ref'mk 0)
 - Term: contents x = (contents x1 + 1)
 - Variables: x -> (ref'mk 3), x1 -> (ref'mk 1)
 ** Functions.test6
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 53, characters 14-15
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 53, characters 14-15
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 103, characters 16-17
 <rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 103, characters 16-17
@@ -110,6 +129,8 @@ globals: x -> (ref'mk 0)
 
 * Loops
 ** Loops.test1
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 112, characters 12-17
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 112, characters 12-17
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Precondition of test1 is ok at command line expression to execute, line 1, characters 0-8
      - Defined at examples/tests/rac.mlw, line 114, characters 26-31
@@ -137,6 +158,8 @@ globals: x -> (ref'mk 0)
 result: () = ()
 globals: x -> (ref'mk 0)
 ** Loops.test2
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 112, characters 12-17
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 112, characters 12-17
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Precondition of test2 is ok at command line expression to execute, line 1, characters 0-8
      - Defined at examples/tests/rac.mlw, line 119, characters 26-31
@@ -150,6 +173,8 @@ globals: x -> (ref'mk 0)
 - Term: contents x = 0 || contents x = 1
 - Variables: x -> (ref'mk 2)
 ** Loops.test3
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 112, characters 12-17
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 112, characters 12-17
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Loop invariant initialization is ok at examples/tests/rac.mlw, line 128, characters 18-24
 <rac>Postcondition of contents is ok at examples/tests/rac.mlw, line 126, characters 10-11
@@ -257,6 +282,8 @@ globals:
 
 * PolyRefContracts
 ** PolyRefContracts.test1
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 253, characters 18-19
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 253, characters 18-19
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 6-8
 <rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 243, characters 12-17
 <rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 243, characters 12-17
@@ -268,6 +295,8 @@ globals:
 result: () = ()
 globals: myref -> (ref'mk 0)
 ** PolyRefContracts.test2a
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 253, characters 18-19
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 253, characters 18-19
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 7-9
 <rac>Precondition of test2_aux is ok at examples/tests/rac.mlw, line 256, characters 4-23
      - Defined at examples/tests/rac.mlw, line 247, characters 15-29
@@ -279,12 +308,16 @@ globals: myref -> (ref'mk 0)
 result: int = 1
 globals: myref -> (ref'mk 1)
 ** PolyRefContracts.test2b
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 253, characters 18-19
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 253, characters 18-19
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 7-9
 <rac>Precondition of test2_aux has failed at examples/tests/rac.mlw, line 259, characters 4-23
      - Defined at examples/tests/rac.mlw, line 247, characters 15-29
 - Term: not contents argref = argx
 - Variables: argref -> (ref'mk 0), argx -> 0
 ** PolyRefContracts.test2c
+<rac>Postcondition of ref'mk is ok at examples/tests/rac.mlw, line 253, characters 18-19
+<rac>Postcondition of ref is ok at examples/tests/rac.mlw, line 253, characters 18-19
 <rac>Postcondition of Tuple0 is ok at command line expression to execute, line 1, characters 7-9
 <rac>Precondition of test2_aux is ok at examples/tests/rac.mlw, line 262, characters 4-23
      - Defined at examples/tests/rac.mlw, line 247, characters 15-29
@@ -329,10 +362,10 @@ globals:
 <rac>Assertion is ok at examples/tests/rac.mlw, line 298, characters 13-29
 <rac>Assertion is ok at examples/tests/rac.mlw, line 299, characters 13-28
 <rac>Assertion has failed at examples/tests/rac.mlw, line 300, characters 13-29
-- Term: (elts r @ 1) =' False
+- Term: (elts r @ 1) = False
 - Variables: r -> (t3'mk ({i -> 3;
                             x -> false;
-                            f -> (fun _ -> true)} fun j -> if j = i then x
+                            f -> (fun _ -> true)} fun j -> if j =' i then x
                             else f j)
                    5)
 
@@ -455,8 +488,8 @@ globals:
 <rac>Postcondition of ([]) is ok at examples/tests/rac.mlw, line 372, characters 12-16
      - Defined at examples/tests/rac.mlw, line 341, characters 41-49
 <rac>Assertion has failed at examples/tests/rac.mlw, line 373, characters 13-19
-- Term: x1 =' 11
-- Variables: x1 -> 0
+- Term: x = 11
+- Variables: x -> 0
 
 * Ghost
 ** Ghost.test1
@@ -500,5 +533,5 @@ globals:
 <rac>Postcondition of Tuple3 is ok at examples/tests/rac.mlw, line 443, characters 4-15
 <rac>Postcondition of test2 is ok at command line expression to execute, line 1, characters 0-8
      - Defined at examples/tests/rac.mlw, line 437, characters 4-163
-result: (bool, int, bool) = ((term: True), 0, (term: True))
+result: (bool, int, bool) = (True, 0, True)
 globals: 
