@@ -1137,7 +1137,7 @@ let print_log_entry_desc fmt e =
   | Val_from_model (id, v) ->
       fprintf fmt "@[<h>%a = %s@]" Ident.print_decoded id.id_string v;
   | Exec_call (None, mvs, k) ->
-      fprintf fmt "@[<h>%s execution of lambda function@]"
+      fprintf fmt "@[<h>%s execution of anonymous function@]"
         (exec_kind_to_string k)
   | Exec_call (Some rs, mvs, k) ->
       fprintf fmt "@[<hv2>%s execution of %a with args:%a@]"

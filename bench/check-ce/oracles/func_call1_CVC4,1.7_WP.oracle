@@ -2,11 +2,11 @@ File "bench/check-ce/func_call1.mlw", line 14, characters 6-7:
 warning: unused variable w
 File "bench/check-ce/func_call1.mlw", line 7, characters 12-21:
 Goal `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.06s, 1608 steps).
+Prover result is: valid (0.04s, 1608 steps).
 
 File "bench/check-ce/func_call1.mlw", line 8, characters 12-26:
 Goal `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.02s, 1692 steps).
+Prover result is: valid (0.04s, 1692 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call1.mlw", line 15, characters 11-16)
 <check-ce>VALUE from ce-model for z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: (ref'mk 0)
@@ -14,8 +14,13 @@ Prover result is: valid (0.02s, 1692 steps).
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call1.mlw:
+                Line 3:
+                  ANY = 0
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 12:
-                  z = (ref'mk 0)
                   _ = ()
                   Concrete execution of f with args:
                     _ = ()
@@ -40,8 +45,13 @@ Prover result is: valid (0.02s, 1692 steps).
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call1.mlw", line 7, characters 12-21)
               File func_call1.mlw:
+                Line 3:
+                  ANY = 0
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 12:
-                  z = (ref'mk 0)
                   _ = ()
                   Concrete execution of f with args:
                     _ = ()
@@ -60,8 +70,13 @@ Prover result is: valid (0.02s, 1692 steps).
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call1.mlw:
+                Line 3:
+                  ANY = 0
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 12:
-                  z = (ref'mk 0)
                   _ = ()
                   Concrete execution of f with args:
                     _ = ()
@@ -86,8 +101,13 @@ Prover result is: valid (0.02s, 1692 steps).
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call1.mlw", line 8, characters 12-26)
               File func_call1.mlw:
+                Line 3:
+                  ANY = 0
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 12:
-                  z = (ref'mk 0)
                   _ = ()
                   Concrete execution of f with args:
                     _ = ()
@@ -106,8 +126,13 @@ Prover result is: valid (0.02s, 1692 steps).
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call1.mlw:
+                Line 3:
+                  ANY = 0
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 12:
-                  z = (ref'mk 0)
                   _ = ()
                   Concrete execution of f with args:
                     _ = ()
@@ -132,8 +157,13 @@ Prover result is: valid (0.02s, 1692 steps).
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call1.mlw", line 8, characters 12-26)
               File func_call1.mlw:
+                Line 3:
+                  ANY = 0
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
                 Line 12:
-                  z = (ref'mk 0)
                   _ = ()
                   Concrete execution of f with args:
                     _ = ()
@@ -155,7 +185,7 @@ Prover result is: valid (0.02s, 1692 steps).
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/func_call1.mlw", line 15, characters 11-16:
 Goal `Assertion' from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.04s, 6652 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 6652 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

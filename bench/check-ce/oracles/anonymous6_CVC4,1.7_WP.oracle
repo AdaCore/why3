@@ -1,0 +1,145 @@
+File "bench/check-ce/anonymous6.mlw", line 6, characters 18-27:
+Goal `Postcondition' from verification condition f'vc.
+Prover result is: valid (0.05s, 1516 steps).
+
+<check-ce>Check model 0 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
+<check-ce>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
+<check-ce>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 0)
+<check-ce>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
+<check-ce>Model 0:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File anonymous6.mlw:
+                Line 4:
+                  _ = ()
+                  Concrete execution of f with args:
+                    _ = ()
+                Line 5:
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
+                Line 6:
+                  Concrete execution of anonymous function
+                Line 4:
+                  Execution of main function terminated normally
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous6.mlw", line 6, characters 18-27)
+              File anonymous6.mlw:
+                Line 4:
+                  _ = ()
+                  Concrete execution of f with args:
+                    _ = ()
+                Line 5:
+                  Abstract execution of ref with args:
+                    contents = 0
+                  result = (ref'mk 0)
+                Line 6:
+                  Abstract execution of anonymous function
+                  z = (ref'mk 0)
+                  result = ()
+                  Execution got stuck, Assume postcondition of anonymous function with:
+                    z = (ref'mk 0)
+<check-ce>Check model 1 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
+<check-ce>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
+<check-ce>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
+<check-ce>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
+<check-ce>Model 1:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File anonymous6.mlw:
+                Line 4:
+                  _ = ()
+                  Concrete execution of f with args:
+                    _ = ()
+                Line 5:
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
+                Line 6:
+                  Concrete execution of anonymous function
+                Line 4:
+                  Execution of main function terminated normally
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File anonymous6.mlw:
+                Line 4:
+                  _ = ()
+                  Concrete execution of f with args:
+                    _ = ()
+                Line 5:
+                  Abstract execution of ref with args:
+                    contents = 0
+                  result = (ref'mk 0)
+                Line 6:
+                  Abstract execution of anonymous function
+                  z = (ref'mk 3)
+                  result = ()
+                Line 7:
+                  Property failure, Assertion with:
+                    z = (ref'mk 3)
+<check-ce>Check model 2 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
+<check-ce>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
+<check-ce>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
+<check-ce>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
+<check-ce>Model 2:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File anonymous6.mlw:
+                Line 4:
+                  _ = ()
+                  Concrete execution of f with args:
+                    _ = ()
+                Line 5:
+                  Concrete execution of ref with args:
+                    contents = 0
+                  Concrete execution of ref'mk with args:
+                    contents = 0
+                Line 6:
+                  Concrete execution of anonymous function
+                Line 4:
+                  Execution of main function terminated normally
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File anonymous6.mlw:
+                Line 4:
+                  _ = ()
+                  Concrete execution of f with args:
+                    _ = ()
+                Line 5:
+                  Abstract execution of ref with args:
+                    contents = 0
+                  result = (ref'mk 0)
+                Line 6:
+                  Abstract execution of anonymous function
+                  z = (ref'mk 3)
+                  result = ()
+                Line 7:
+                  Property failure, Assertion with:
+                    z = (ref'mk 3)
+<check-ce>Models:
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 1 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified, for
+    example during the following execution:
+- Checked model 2 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified, for
+    example during the following execution:
+File "bench/check-ce/anonymous6.mlw", line 7, characters 10-15:
+Goal `Assertion' from verification condition f'vc.
+Prover result is: unknown (unknown + incomplete) (0.05s, 6611 steps).
+The contracts of some function or loop are underspecified, for example during
+the following execution:
+File anonymous6.mlw:
+  Line 4:
+    _ = ()
+    Concrete execution of f with args:
+      _ = ()
+  Line 5:
+    Abstract execution of ref with args:
+      contents = 0
+    result = (ref'mk 0)
+  Line 6:
+    Abstract execution of anonymous function
+    z = (ref'mk 3)
+    result = ()
+  Line 7:
+    Property failure, Assertion with:
+      z = (ref'mk 3)
+

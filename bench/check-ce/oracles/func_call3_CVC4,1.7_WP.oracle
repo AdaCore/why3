@@ -1,13 +1,14 @@
 File "bench/check-ce/func_call3.mlw", line 7, characters 12-21:
 Goal `Postcondition' from verification condition g'vc.
-Prover result is: valid (0.03s, 1608 steps).
+Prover result is: valid (0.04s, 1608 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call3.mlw", line 8, characters 17-26)
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call3.mlw:
-                Line 5:
+                Line 3:
                   z = (ref'mk 0)
+                Line 5:
                   x = 0
                   Concrete execution of g with args:
                     x = 0
@@ -27,8 +28,9 @@ Prover result is: valid (0.03s, 1608 steps).
                     r = 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call3.mlw:
-                Line 5:
+                Line 3:
                   z = (ref'mk 0)
+                Line 5:
                   x = 0
                   Concrete execution of g with args:
                     x = 0
@@ -50,8 +52,9 @@ Prover result is: valid (0.03s, 1608 steps).
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call3.mlw:
-                Line 5:
+                Line 3:
                   z = (ref'mk (-1))
+                Line 5:
                   x = 0
                   Concrete execution of g with args:
                     x = 0
@@ -71,8 +74,9 @@ Prover result is: valid (0.03s, 1608 steps).
                     r = 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call3.mlw:
-                Line 5:
+                Line 3:
                   z = (ref'mk (-1))
+                Line 5:
                   x = 0
                   Concrete execution of g with args:
                     x = 0
@@ -94,8 +98,9 @@ Prover result is: valid (0.03s, 1608 steps).
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call3.mlw:
-                Line 5:
+                Line 3:
                   z = (ref'mk (-1))
+                Line 5:
                   x = 0
                   Concrete execution of g with args:
                     x = 0
@@ -115,8 +120,9 @@ Prover result is: valid (0.03s, 1608 steps).
                     r = 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call3.mlw:
-                Line 5:
+                Line 3:
                   z = (ref'mk (-1))
+                Line 5:
                   x = 0
                   Concrete execution of g with args:
                     x = 0
@@ -146,12 +152,13 @@ Prover result is: valid (0.03s, 1608 steps).
     example during the following execution:
 File "bench/check-ce/func_call3.mlw", line 8, characters 17-26:
 Goal `Postcondition' from verification condition g'vc.
-Prover result is: unknown (unknown + incomplete) (0.02s, 6726 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6726 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File func_call3.mlw:
-  Line 5:
+  Line 3:
     z = (ref'mk 0)
+  Line 5:
     x = 0
     Concrete execution of g with args:
       x = 0

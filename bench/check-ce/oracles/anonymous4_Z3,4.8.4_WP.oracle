@@ -10,9 +10,6 @@
                 Line 9:
                   Concrete execution of f with args:
                     x = 0
-                Line 4:
-                  Concrete execution of lambda function
-                Line 9:
                   Concrete execution of (@) with args:
                     u = ({x -> 0} fun y -> assume { y > 0 };
    y + x)
@@ -35,9 +32,6 @@ forall y1:int. (result @ y1) = (y1 + x))
                 Line 9:
                   Concrete execution of f with args:
                     x = 0
-                Line 4:
-                  Concrete execution of lambda function
-                Line 9:
                   Concrete execution of (@) with args:
                     u = ({x -> 0} fun y -> assume { y > 0 };
    y + x)
@@ -60,9 +54,6 @@ forall y1:int. (result1 @ y1) = (y1 + x))
                 Line 9:
                   Concrete execution of f with args:
                     x = 0
-                Line 4:
-                  Concrete execution of lambda function
-                Line 9:
                   Concrete execution of (@) with args:
                     u = ({x -> 0} fun y -> assume { y > 0 };
    y + x)
@@ -88,7 +79,7 @@ forall y1:int. (result1 @ y1) = (y1 + x)):
 forall y1:int. (result2 @ y1) = (y1 + x)):
 File "bench/check-ce/anonymous4.mlw", line 8, characters 13-23:
 Goal `Postcondition' from verification condition g'vc.
-Prover result is: timeout (1.00s, 3565710 steps).
+Prover result is: timeout (1.00s, 2526814 steps).
 The following counterexample model could not be verified
 (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous4.mlw, line 9, characters 2-5: 
 forall y1:int. (result2 @ y1) = (y1 + x)):

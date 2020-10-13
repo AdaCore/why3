@@ -957,6 +957,8 @@ type cntr_ctx = {
 
 exception Contr of cntr_ctx * term
 
+let cntr_desc_str str1 str2 = str1 ^ " of " ^ str2
+
 let cntr_desc str id =
   asprintf "%s of %a" str print_decoded id.id_string
 
@@ -1486,16 +1488,20 @@ and eval_expr' env e =
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
           exec_pure ~loc:e.e_loc env ls pvs
       | Cfun e' ->
-         if env.rac.rac_abstract then
-           cannot_compute "Cannot compute: not yet implemented";
         Debug.dprintf debug "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
         let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
         let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
         let mvs = Mvs.map (asprintf "%a" print_value) cl in
-        register_call env e.e_loc None mvs ExecConcrete;
         ( match ce.c_cty.cty_args with
           | [] ->
-              eval_expr env e'
+             if env.rac.rac_abstract then begin
+                 register_call env e.e_loc None mvs ExecAbstract;
+                 exec_call_abstract ?loc:e.e_loc env ce.c_cty [] e.e_ity
+               end
+             else begin
+                 register_call env e.e_loc None mvs ExecConcrete;
+                 eval_expr env e'
+               end
           | [arg] ->
               let match_free pv mt =
                 let v = Mvs.find pv.pv_vs env.vsenv in
@@ -1832,42 +1838,15 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
     if rs_equal rs rs_func_app then false else
       match find_definition env rs with
       | LocalFunction _ -> true | _ -> false in
-  let loc_or_dummy = Opt.get_def Loc.dummy_position loc in
   let mvs = Mvs.of_list (List.combine
      (List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args)
      (List.map (asprintf "%a" print_value) arg_vs)) in
   if env.rac.rac_abstract && can_interpret_abstractly &&
        not main_function then begin
-      (* let f (x1: ...) ... (xn: ...) = e
-         ~>
-         assert1 {f_pre};
-         assign_written_vars_with_ce;
-         assert2* {f_post};
-
-         1 - if assert1 fails, then we have a real counterexample
-         (precondition doesn't hold)
-         2 - if assert2 fails, then we have a false counterexample
-         (postcondition does not hold with the values obtained
-         from the counterexample)
-       *)
       register_call env loc (Some rs) mvs ExecAbstract;
-      (* assert1 is already done above *)
-      let res = match rs.rs_cty.cty_post with
-        | p :: _ -> let (vs,_) = open_post p in
-                    id_clone vs.vs_name
-        | _ -> id_fresh "result" in
-      let res = create_vsymbol res (ty_of_ity ity_result) in
-      let vars_map = Mpv.of_list (List.combine rs.rs_cty.cty_args arg_pvs) in
-      let asgn_wrt = assign_written_vars ~vars_map
-        rs.rs_cty.cty_effect.eff_writes loc_or_dummy env in
-      List.iter asgn_wrt (Mvs.keys env.vsenv);
-      let res_v = get_and_register_value ~ity:ity_result env res
-                    loc_or_dummy in
-      (* assert2 *)
-      let msg = cntr_desc "Assume postcondition" rs.rs_name in
-      let ctx = cntr_ctx msg ?trigger_loc:loc env in
-      check_assume_posts ctx res_v rs.rs_cty.cty_post;
-      Normal res_v end
+      let rs_name,cty = rs.rs_name, rs.rs_cty in
+      exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
+    end
   else begin
       register_call env loc (Some rs) mvs ExecConcrete;
       let res =
@@ -1940,6 +1919,41 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
         | _ -> () );
       res
     end
+
+and exec_call_abstract ?loc ?rs_name env cty arg_pvs ity_result =
+  (* let f (x1: ...) ... (xn: ...) = e
+     ~>
+     assert1 {f_pre};
+     assign_written_vars_with_ce;
+     assert2* {f_post};
+
+     1 - if assert1 fails, then we have a real counterexample
+     (precondition doesn't hold)
+     2 - if assert2 fails, then we have a false counterexample
+     (postcondition does not hold with the values obtained
+     from the counterexample)
+   *)
+  let loc_or_dummy = Opt.get_def Loc.dummy_position loc in
+  (* assert1 is already done above *)
+  let res = match cty.cty_post with
+    | p :: _ -> let (vs,_) = open_post p in
+                id_clone vs.vs_name
+    | _ -> id_fresh "result" in
+  let res = create_vsymbol res (ty_of_ity ity_result) in
+  let vars_map = Mpv.of_list (List.combine cty.cty_args arg_pvs) in
+  let asgn_wrt = assign_written_vars ~vars_map
+                   cty.cty_effect.eff_writes loc_or_dummy env in
+  List.iter asgn_wrt (Mvs.keys env.vsenv);
+  let res_v = get_and_register_value ~ity:ity_result env res
+                loc_or_dummy in
+  (* assert2 *)
+  let msg = "Assume postcondition" in
+  let msg = match rs_name with
+    | None -> cntr_desc_str msg "anonymous function"
+    | Some name -> cntr_desc msg name in
+  let ctx = cntr_ctx msg ?trigger_loc:loc env in
+  check_assume_posts ctx res_v cty.cty_post;
+  Normal res_v
 
 (* GLOBAL EVALUATION *)
 

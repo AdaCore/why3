@@ -2,20 +2,20 @@
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
                 Line 8:
-                  a = (ref'mk 0)
                   b = (ref'mk 0)
-                  c = (ref'mk 0)
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
                     b = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
                 Line 8:
-                  a = (ref'mk 0)
                   b = (ref'mk 0)
-                  c = (ref'mk 0)
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
@@ -25,10 +25,10 @@
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 0)
+                Line 8:
                   b = (ref'mk 4)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 4)
                 Line 11:
@@ -59,10 +59,10 @@
                     a = (ref'mk 4)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 0)
+                Line 8:
                   b = (ref'mk 4)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 4)
                 Line 11:
@@ -78,10 +78,10 @@
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 1)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -112,10 +112,10 @@
                     a = (ref'mk 4)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 1)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -137,14 +137,14 @@
     example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Goal `Assertion' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 7761955 steps).
+Prover result is: timeout (1.00s, 5640469 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
-  Line 8:
+  Line 6:
     a = (ref'mk 0)
+  Line 8:
     b = (ref'mk 4)
-    c = (ref'mk 0)
     Concrete execution of p1 with args:
       b = (ref'mk 4)
   Line 11:
@@ -178,20 +178,20 @@ File jlamp0.mlw:
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
                 Line 8:
-                  a = (ref'mk 0)
                   b = (ref'mk 0)
-                  c = (ref'mk 0)
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
                     b = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
                 Line 8:
-                  a = (ref'mk 0)
                   b = (ref'mk 0)
-                  c = (ref'mk 0)
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
@@ -201,10 +201,10 @@ File jlamp0.mlw:
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 7)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -270,10 +270,10 @@ File jlamp0.mlw:
                     a = (ref'mk 9)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 7)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -289,10 +289,10 @@ File jlamp0.mlw:
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 7)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -358,10 +358,10 @@ File jlamp0.mlw:
                     a = (ref'mk 9)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 7)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -383,14 +383,14 @@ File jlamp0.mlw:
     example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal `Postcondition' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 7470726 steps).
+Prover result is: timeout (1.00s, 6006338 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
-  Line 8:
+  Line 6:
     a = (ref'mk 7)
+  Line 8:
     b = (ref'mk 3)
-    c = (ref'mk 0)
     Concrete execution of p1 with args:
       b = (ref'mk 3)
   Line 11:
@@ -459,20 +459,20 @@ File jlamp0.mlw:
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
                 Line 8:
-                  a = (ref'mk 0)
                   b = (ref'mk 0)
-                  c = (ref'mk 0)
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
                     b = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
                 Line 8:
-                  a = (ref'mk 0)
                   b = (ref'mk 0)
-                  c = (ref'mk 0)
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
@@ -482,10 +482,10 @@ File jlamp0.mlw:
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 2)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -529,10 +529,10 @@ File jlamp0.mlw:
                     a = (ref'mk 5)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 2)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -548,10 +548,10 @@ File jlamp0.mlw:
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 2)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -595,10 +595,10 @@ File jlamp0.mlw:
                     a = (ref'mk 5)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File jlamp0.mlw:
-                Line 8:
+                Line 6:
                   a = (ref'mk 2)
+                Line 8:
                   b = (ref'mk 3)
-                  c = (ref'mk 0)
                   Concrete execution of p1 with args:
                     b = (ref'mk 3)
                 Line 11:
@@ -620,14 +620,14 @@ File jlamp0.mlw:
     example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal `Postcondition' from verification condition p1'vc.
-Prover result is: timeout (1.00s, 7670028 steps).
+Prover result is: timeout (1.00s, 5882625 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
-  Line 8:
+  Line 6:
     a = (ref'mk 2)
+  Line 8:
     b = (ref'mk 3)
-    c = (ref'mk 0)
     Concrete execution of p1 with args:
       b = (ref'mk 3)
   Line 11:
@@ -676,9 +676,11 @@ File jlamp0.mlw:
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -693,9 +695,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -716,9 +720,11 @@ File jlamp0.mlw:
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -733,9 +739,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -756,9 +764,11 @@ File jlamp0.mlw:
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -773,9 +783,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -802,13 +814,15 @@ File jlamp0.mlw:
     example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal `Loop invariant init' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 7681471 steps).
+Prover result is: timeout (1.00s, 5930330 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
+  Line 6:
+    ANY = (ref'mk 0)
+  Line 15:
+    ANY = (ref'mk 0)
   Line 17:
-    a = (ref'mk 0)
-    c = (ref'mk 0)
     _ = ()
     Concrete execution of p2 with args:
       _ = ()
@@ -832,9 +846,11 @@ Prover result is: valid (0.01s, 295 steps).
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -849,9 +865,11 @@ Prover result is: valid (0.01s, 295 steps).
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -872,9 +890,11 @@ Prover result is: valid (0.01s, 295 steps).
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -889,9 +909,11 @@ Prover result is: valid (0.01s, 295 steps).
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -912,9 +934,11 @@ Prover result is: valid (0.01s, 295 steps).
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -929,9 +953,11 @@ Prover result is: valid (0.01s, 295 steps).
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -958,13 +984,15 @@ Prover result is: valid (0.01s, 295 steps).
     example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Goal `Loop variant decrease' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 8060548 steps).
+Prover result is: timeout (1.00s, 6238907 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
+  Line 6:
+    ANY = (ref'mk 0)
+  Line 15:
+    ANY = (ref'mk 0)
   Line 17:
-    a = (ref'mk 0)
-    c = (ref'mk 0)
     _ = ()
     Concrete execution of p2 with args:
       _ = ()
@@ -984,9 +1012,11 @@ File jlamp0.mlw:
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1001,9 +1031,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1024,9 +1056,11 @@ File jlamp0.mlw:
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1041,9 +1075,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1064,9 +1100,11 @@ File jlamp0.mlw:
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1081,9 +1119,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1110,13 +1150,15 @@ File jlamp0.mlw:
     example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 7882977 steps).
+Prover result is: timeout (1.00s, 6527544 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
+  Line 6:
+    ANY = (ref'mk 0)
+  Line 15:
+    ANY = (ref'mk 0)
   Line 17:
-    a = (ref'mk 0)
-    c = (ref'mk 0)
     _ = ()
     Concrete execution of p2 with args:
       _ = ()
@@ -1136,9 +1178,11 @@ File jlamp0.mlw:
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1153,9 +1197,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1176,9 +1222,11 @@ File jlamp0.mlw:
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1193,9 +1241,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1216,9 +1266,11 @@ File jlamp0.mlw:
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1233,9 +1285,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1262,13 +1316,15 @@ File jlamp0.mlw:
     example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal `Loop invariant preservation' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 7956405 steps).
+Prover result is: timeout (1.00s, 6350112 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
+  Line 6:
+    ANY = (ref'mk 0)
+  Line 15:
+    ANY = (ref'mk 0)
   Line 17:
-    a = (ref'mk 0)
-    c = (ref'mk 0)
     _ = ()
     Concrete execution of p2 with args:
       _ = ()
@@ -1288,9 +1344,11 @@ File jlamp0.mlw:
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1305,9 +1363,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File jlamp0.mlw:
+                Line 6:
+                  ANY = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
                 Line 17:
-                  a = (ref'mk 0)
-                  c = (ref'mk 0)
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1328,9 +1388,11 @@ File jlamp0.mlw:
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1345,9 +1407,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1368,9 +1432,11 @@ File jlamp0.mlw:
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1385,9 +1451,11 @@ File jlamp0.mlw:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
-                Line 17:
+                Line 6:
                   a = (ref'mk 0)
-                  c = (ref'mk 0)
+                Line 15:
+                  ANY = (ref'mk 0)
+                Line 17:
                   _ = ()
                   Concrete execution of p2 with args:
                     _ = ()
@@ -1414,13 +1482,15 @@ File jlamp0.mlw:
     example during the following execution:
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Goal `Postcondition' from verification condition p2'vc.
-Prover result is: timeout (1.00s, 7907377 steps).
+Prover result is: timeout (1.00s, 6120631 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File jlamp0.mlw:
+  Line 6:
+    ANY = (ref'mk 0)
+  Line 15:
+    ANY = (ref'mk 0)
   Line 17:
-    a = (ref'mk 0)
-    c = (ref'mk 0)
     _ = ()
     Concrete execution of p2 with args:
       _ = ()
