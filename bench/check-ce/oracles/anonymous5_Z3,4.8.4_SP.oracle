@@ -1,0 +1,43 @@
+<check-ce>Check model 0 ("bench/check-ce/anonymous5.mlw", line 7, characters 12-22)
+<check-ce>VALUE for result "bench/check-ce/anonymous5.mlw", line 8, characters 2-5 not in ce-model, taking default UNDEFINED
+<check-ce>Model 0:
+            - Concrete: don't know (failure: many args for exec fun)
+            - Abstract: don't know (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous5.mlw, line 8, characters 2-5: 
+forall y:int, z:int. ((result @ y) @ z) = ((z + y) + x))
+              
+<check-ce>Check model 1 ("bench/check-ce/anonymous5.mlw", line 7, characters 12-22)
+<check-ce>VALUE for result "bench/check-ce/anonymous5.mlw", line 8, characters 2-5 not in ce-model, taking default UNDEFINED
+<check-ce>Model 1:
+            - Concrete: don't know (failure: many args for exec fun)
+            - Abstract: don't know (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous5.mlw, line 8, characters 2-5: 
+forall y:int, z:int. ((result1 @ y) @ z) = ((z + y) + x))
+              
+<check-ce>Check model 2 ("bench/check-ce/anonymous5.mlw", line 7, characters 12-22)
+<check-ce>VALUE for result "bench/check-ce/anonymous5.mlw", line 8, characters 2-5 not in ce-model, taking default UNDEFINED
+<check-ce>Model 2:
+            - Concrete: don't know (failure: many args for exec fun)
+            - Abstract: don't know (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous5.mlw, line 8, characters 2-5: 
+forall y:int, z:int. ((result2 @ y) @ z) = ((z + y) + x))
+              
+<check-ce>Models:
+- Checked model 0 (Concrete: don't know, Abstract: don't know)
+    Summary: The following counterexample model has not been verified
+    (failure: many args for exec fun):
+- Checked model 1 (Concrete: don't know, Abstract: don't know)
+    Summary: The following counterexample model has not been verified
+    (failure: many args for exec fun):
+- Selected model 2 (Concrete: don't know, Abstract: don't know)
+    Summary: The following counterexample model has not been verified
+    (failure: many args for exec fun):
+File "bench/check-ce/anonymous5.mlw", line 7, characters 12-22:
+Goal `Postcondition' from verification condition g'vc.
+Prover result is: timeout (1.00s, 2372351 steps).
+The following counterexample model could not be verified
+(failure: many args for exec fun):
+File anonymous5.mlw:
+  Line 6:
+    y = -7644 (-0x1DDC)
+  Line 7:
+    result = -22932 (-0x5994)
+    y = -7644 (-0x1DDC)
+
