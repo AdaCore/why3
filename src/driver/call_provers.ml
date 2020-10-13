@@ -324,15 +324,6 @@ let select_model check_model models =
          (List.filter not_empty
             (List.mapi (fun i (r,m) -> i,r,m)
                models))) in
-  Debug.dprintf debug_check_ce "@[<v>Models:@ %a@]@."
-    Pp.(print_list space (fun fmt (i,_,_,mr,s) ->
-        match mr with
-        | Cannot_check_model {reason} -> fprintf fmt "- Couldn't check model: %s" reason
-        | Check_model_result r ->
-            fprintf fmt "- Checked model %d: %a/%a -> @[%a@]" i
-              print_verdict r.concrete.verdict
-              print_verdict r.abstract.verdict
-              (print_ce_summary_title ?check_ce:None) s)) models;
   let is_good (_,_,_,_,s) = match s with NCCE _ | SWCE _ | NCCE_SWCE _ -> true | BAD_CE | UNKNOWN _ -> false in
   let good_models, other_models = List.partition is_good models in
   let model_infos =
@@ -355,9 +346,21 @@ let select_model check_model models =
           cmptr (fun (i,_,_,_,_) -> -i) (-);
         ] in
       List.sort compare other_models in
-  match model_infos with
-  | [] -> None
-  | (_,_,m,_,s) :: _ -> Some (m, s)
+  let selected_ix, selected = match model_infos with
+    | [] -> None, None
+    | (i,_,m,_,s) :: _ -> Some i, Some (m, s) in
+  Debug.dprintf debug_check_ce "Models:@\n%a@."
+    Pp.(print_list space (fun fmt (i,_,_,mr,s) ->
+        let mark_selected fmt =
+          let s = if selected_ix = Some i then "Selected" else "Checked" in
+          pp_print_string fmt s in
+        match mr with
+        | Cannot_check_model {reason} -> fprintf fmt "- Couldn't check model: %s" reason
+        | Check_model_result r ->
+            fprintf fmt "- @[<v2>%t model %d (Concrete: %a, Abstract: %a)@ @[Summary: %a@]@]"
+              mark_selected i print_verdict r.concrete.verdict print_verdict r.abstract.verdict
+              (print_ce_summary_title ?check_ce:None) s)) models;
+  selected
 
 let analyse_result ?(check_model=default_check_model) exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
