@@ -256,7 +256,7 @@ let print_result ?json ~check_ce fmt (fname, loc, goal_name, expls, res) =
         fprintf fmt "@[<hov>Verification@ condition@ %s.@]" goal_name
       else
         let expls = String.capitalize_ascii (String.concat ", " expls) in
-        fprintf fmt "@[<hov>Formula@ `%s'@ from@ verification@ condition@ %s.@]" expls goal_name );
+        fprintf fmt "@[<hov>Goal@ `%s'@ from@ verification@ condition@ %s.@]" expls goal_name );
     fprintf fmt "@\n@[<v>Prover result is: %a@]"
       Call_provers.(print_prover_result ?json ~check_ce) res;
     fprintf fmt "@\n" )
