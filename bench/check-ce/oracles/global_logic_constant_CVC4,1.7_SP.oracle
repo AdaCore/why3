@@ -1,0 +1,228 @@
+<check-ce>Check model 0 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
+<check-ce>Model 0:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = (-1)
+                Line 7:
+                  _ = ()
+                  Concrete execution of f1 with args:
+                    _ = ()
+                Line 8:
+                  Property failure, Postcondition of f1 with:
+                    result = (-1)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = (-1)
+                Line 7:
+                  _ = ()
+                  Concrete execution of f1 with args:
+                    _ = ()
+                Line 8:
+                  Property failure, Postcondition of f1 with:
+                    result = (-1)
+<check-ce>Check model 1 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
+<check-ce>Model 1:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = (-1)
+                Line 7:
+                  _ = ()
+                  Concrete execution of f1 with args:
+                    _ = ()
+                Line 8:
+                  Property failure, Postcondition of f1 with:
+                    result = (-1)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = (-1)
+                Line 7:
+                  _ = ()
+                  Concrete execution of f1 with args:
+                    _ = ()
+                Line 8:
+                  Property failure, Postcondition of f1 with:
+                    result = (-1)
+<check-ce>Check model 2 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
+<check-ce>Model 2:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = (-1)
+                Line 7:
+                  _ = ()
+                  Concrete execution of f1 with args:
+                    _ = ()
+                Line 8:
+                  Property failure, Postcondition of f1 with:
+                    result = (-1)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = (-1)
+                Line 7:
+                  _ = ()
+                  Concrete execution of f1 with args:
+                    _ = ()
+                Line 8:
+                  Property failure, Postcondition of f1 with:
+                    result = (-1)
+<check-ce>Models:
+- Selected model 0 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+File "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24:
+Goal `Postcondition' from verification condition f1'vc.
+Prover result is: unknown (sat) (0.04s, 4758 steps).
+The program does not comply to the verification goal, for example during the
+following execution:
+File global_logic_constant.mlw:
+  Line 5:
+    v1 = (-1)
+  Line 7:
+    _ = ()
+    Concrete execution of f1 with args:
+      _ = ()
+  Line 8:
+    Property failure, Postcondition of f1 with:
+      result = (-1)
+
+<check-ce>Check model 0 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
+<check-ce>Model 0:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = 0
+                Line 11:
+                  v2 = (ref'mk 0)
+                Line 13:
+                  _ = ()
+                  Concrete execution of f2 with args:
+                    _ = ()
+                Line 15:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                Line 13:
+                  Execution of main function terminated normally
+            - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = 0
+                Line 11:
+                  v2 = (ref'mk 0)
+                Line 13:
+                  _ = ()
+                  Concrete execution of f2 with args:
+                    _ = ()
+                Line 15:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                Line 13:
+                  Execution of main function terminated normally
+<check-ce>Check model 1 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
+<check-ce>Model 1:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = 0
+                Line 11:
+                  v2 = (ref'mk (-1))
+                Line 13:
+                  _ = ()
+                  Concrete execution of f2 with args:
+                    _ = ()
+                Line 15:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-1))
+                Line 14:
+                  Property failure, Postcondition of f2 with:
+                    result = (-1)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = 0
+                Line 11:
+                  v2 = (ref'mk (-1))
+                Line 13:
+                  _ = ()
+                  Concrete execution of f2 with args:
+                    _ = ()
+                Line 15:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-1))
+                Line 14:
+                  Property failure, Postcondition of f2 with:
+                    result = (-1)
+<check-ce>Check model 2 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
+<check-ce>Model 2:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = 0
+                Line 11:
+                  v2 = (ref'mk (-1))
+                Line 13:
+                  _ = ()
+                  Concrete execution of f2 with args:
+                    _ = ()
+                Line 15:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-1))
+                Line 14:
+                  Property failure, Postcondition of f2 with:
+                    result = (-1)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File global_logic_constant.mlw:
+                Line 5:
+                  v1 = 0
+                Line 11:
+                  v2 = (ref'mk (-1))
+                Line 13:
+                  _ = ()
+                  Concrete execution of f2 with args:
+                    _ = ()
+                Line 15:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-1))
+                Line 14:
+                  Property failure, Postcondition of f2 with:
+                    result = (-1)
+<check-ce>Models:
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal, for
+    example during the following execution:
+File "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24:
+Goal `Postcondition' from verification condition f2'vc.
+Prover result is: unknown (unknown + incomplete) (0.03s, 6015 steps).
+The program does not comply to the verification goal, for example during the
+following execution:
+File global_logic_constant.mlw:
+  Line 5:
+    v1 = 0
+  Line 11:
+    v2 = (ref'mk (-1))
+  Line 13:
+    _ = ()
+    Concrete execution of f2 with args:
+      _ = ()
+  Line 15:
+    Concrete execution of contents with args:
+      arg = (ref'mk (-1))
+  Line 14:
+    Property failure, Postcondition of f2 with:
+      result = (-1)
+
