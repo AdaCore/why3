@@ -1,0 +1,96 @@
+<check-ce>Check model 0 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
+<check-ce>VALUE for result "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 not in ce-model, taking default UNDEFINED
+<check-ce>Model 0:
+            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+              File anonymous4.mlw:
+                Line 6:
+                  y = 0
+                  Concrete execution of g with args:
+                    y = 0
+                Line 9:
+                  Concrete execution of f with args:
+                    x = 0
+                Line 4:
+                  Concrete execution of lambda function
+                Line 9:
+                  Concrete execution of (@) with args:
+                    u = ({x -> 0} fun y -> assume { y > 0 };
+   y + x)
+                    u = 0
+                Line 4:
+                  Execution got stuck, Assumption with:
+                    y = 0
+            - Abstract: don't know (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous4.mlw, line 9, characters 2-5)
+              
+<check-ce>Check model 1 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
+<check-ce>VALUE for result "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 not in ce-model, taking default UNDEFINED
+<check-ce>Model 1:
+            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+              File anonymous4.mlw:
+                Line 6:
+                  y = 0
+                  Concrete execution of g with args:
+                    y = 0
+                Line 9:
+                  Concrete execution of f with args:
+                    x = 0
+                Line 4:
+                  Concrete execution of lambda function
+                Line 9:
+                  Concrete execution of (@) with args:
+                    u = ({x -> 0} fun y -> assume { y > 0 };
+   y + x)
+                    u = 0
+                Line 4:
+                  Execution got stuck, Assumption with:
+                    y = 0
+            - Abstract: don't know (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous4.mlw, line 9, characters 2-5)
+              
+<check-ce>Check model 2 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
+<check-ce>VALUE for result "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 not in ce-model, taking default UNDEFINED
+<check-ce>Model 2:
+            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+              File anonymous4.mlw:
+                Line 6:
+                  y = 0
+                  Concrete execution of g with args:
+                    y = 0
+                Line 9:
+                  Concrete execution of f with args:
+                    x = 0
+                Line 4:
+                  Concrete execution of lambda function
+                Line 9:
+                  Concrete execution of (@) with args:
+                    u = ({x -> 0} fun y -> assume { y > 0 };
+   y + x)
+                    u = 0
+                Line 4:
+                  Execution got stuck, Assumption with:
+                    y = 0
+            - Abstract: don't know (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous4.mlw, line 9, characters 2-5)
+              
+<check-ce>Models:
+          - Checked model 0: bad model/don't know -> The following
+                                                     counterexample model has
+                                                     not been verified
+                                                     (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous4.mlw, line 9, characters 2-5):
+          - Checked model 1: bad model/don't know -> The following
+                                                     counterexample model has
+                                                     not been verified
+                                                     (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous4.mlw, line 9, characters 2-5):
+          - Checked model 2: bad model/don't know -> The following
+                                                     counterexample model has
+                                                     not been verified
+                                                     (RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous4.mlw, line 9, characters 2-5):
+File "bench/check-ce/anonymous4.mlw", line 8, characters 13-23:
+Formula `Postcondition' from verification condition g'vc.
+Prover result is: unknown (unknown + incomplete) (0.05s, 5043 steps).
+The following counterexample model could not be verified
+(RAC execution got stuck: Assume postcondition of f cannot be evaluated at bench/check-ce/anonymous4.mlw, line 9, characters 2-5):
+File anonymous4.mlw:
+  Line 6:
+    y = 0 (0x0)
+  Line 8:
+    y = 0 (0x0)
+

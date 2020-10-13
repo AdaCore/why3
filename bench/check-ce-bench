@@ -56,7 +56,7 @@ run () {
     str_out=$(sed 's/[0-9]\+\.[0-9]\+s//g' "$f.out" | \
               sed 's/[0-9]\+ steps//g' | \
               sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
-    str_oracle=$(sed 's/[0-9]\+\.[0-9]\+s//g' "${oracle_file}" | \
+    str_oracle=$(sed 's/[0-9]\+\.[0-9]\+s//g' "${oracle_file}" 2> /dev/null | \
                  sed 's/[0-9]\+ steps//g' | \
                  sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
     if [ "$str_oracle" = "$str_out" ] ; then
