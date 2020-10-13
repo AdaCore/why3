@@ -777,9 +777,12 @@ let get_model_value model name loc =
   Opt.map (fun me -> me.me_value)
     (List.find_opt aux (get_model_elements model))
 
-let model_value model pv =
-  Opt.bind pv.pv_vs.vs_name.id_loc
-    (get_model_value model pv.pv_vs.vs_name.id_string)
+let model_value model id =
+  match id.id_loc with
+  | None -> None
+  | Some loc ->
+      let name = Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs in
+      get_model_value model name loc
 
 exception CannotImportModelValue of string
 
