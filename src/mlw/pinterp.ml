@@ -1199,17 +1199,16 @@ let check_term ?vsenv ctx t =
     else res in
   match res with
   | Some true ->
-      if Debug.test_flag debug_rac then
-        eprintf "%a@." report_cntr_head (ctx, "is ok", t)
+      Debug.dprintf debug_rac "%a@." report_cntr_head (ctx, "is ok", t)
   | Some false ->
-      if Debug.test_flag debug_rac then
-        eprintf "%a@." report_cntr_head (ctx, "has failed", t);
+      Debug.dprintf debug_rac "%a@." report_cntr_head (ctx, "has failed", t);
       raise (Contr (ctx, t))
   | None ->
       if (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
-        eprintf "%a@." report_cntr (ctx, "cannot be evaluated", t)
+        Debug.dprintf debug_rac "%a@." report_cntr (ctx, "cannot be evaluated", t)
       else
-        cannot_compute "%a" report_cntr_head (ctx, "cannot be evaluated", t)
+        cannot_compute "%a: %a" report_cntr_head (ctx, "cannot be evaluated", t)
+          print_term t
 
 let check_terms ctx = List.iter (check_term ctx)
 
