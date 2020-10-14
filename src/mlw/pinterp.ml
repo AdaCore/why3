@@ -965,18 +965,18 @@ let cntr_desc_str str1 str2 = str1 ^ " of " ^ str2
 let cntr_desc str id =
   asprintf "%s of %a" str print_decoded id.id_string
 
+let cntr_title fmt (ctx, msg) =
+  fprintf fmt "%s %s" ctx.c_desc msg
+
 let report_cntr_head fmt (ctx, msg, term) =
-  let pp_pos fmt loc =
-    let f, l, b, e = Loc.get loc in
-    fprintf fmt "%s, line %d, characters %d-%d" f l b e in
-  fprintf fmt "@[<v>%s %s" ctx.c_desc msg;
-  ( match ctx.c_trigger_loc, term.t_loc with
-    | Some t1, Some t2 ->
-        fprintf fmt " at %a@,- Defined at %a" pp_pos t1 pp_pos t2
-    | Some t, None | None, Some t ->
-        fprintf fmt " at %a" pp_pos t
-    | None, None -> () );
-  fprintf fmt "@]"
+  fprintf fmt "@[<v>%a%t@]" cntr_title (ctx, msg)
+    (fun fmt ->
+       match ctx.c_trigger_loc, term.t_loc with
+       | Some t1, Some t2 ->
+           fprintf fmt " at %a@,- Defined at %a" Pretty.print_loc' t1 Pretty.print_loc' t2
+       | Some t, None | None, Some t ->
+           fprintf fmt " at %a" Pretty.print_loc' t
+       | None, None -> () )
 
 let env_sep = Pp.comma
 
@@ -1244,11 +1244,11 @@ let check_term ?vsenv ctx t =
       Debug.dprintf debug_rac "%a@." report_cntr_head (ctx, "has failed", t);
       raise (Contr (ctx, t))
   | None ->
+      let msg = "cannot be evaluated" in
       if (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
-        Debug.dprintf debug_rac "%a@." report_cntr (ctx, "cannot be evaluated", t)
+        Debug.dprintf debug_rac "%a@." report_cntr (ctx, msg, t)
       else
-        cannot_compute "%a: %a" report_cntr_head (ctx, "cannot be evaluated", t)
-          print_term t
+        cannot_compute "%a" cntr_title (ctx, msg)
 
 let check_terms ctx = List.iter (check_term ctx)
 
@@ -1512,7 +1512,7 @@ and eval_expr' env e =
               let mt = Spv.fold match_free cty.cty_effect.eff_reads Mtv.empty in
               let ty = ty_inst mt (ty_of_ity e.e_ity) in
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
-          | _ -> failwith "many args for exec fun" )
+          | _ -> failwith "many args for exec fun" (* TODO *) )
       | Cany ->
           let v =
             try match get_model_value_by_loc env.rac.ce_model (Opt.get_exn Exit e.e_loc) with

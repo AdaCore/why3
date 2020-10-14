@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
-Goal `Postcondition' from verification condition g1'vc.
-Prover result is: valid (0.02s, 33 steps).
+Goal Postcondition from verification condition g1'vc.
+Prover result is: valid (0.03s, 33 steps).
 
 File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
-Goal `Precondition' from verification condition f1'vc.
-Prover result is: valid (0.01s, 83 steps).
+Goal Precondition from verification condition f1'vc.
+Prover result is: valid (0.02s, 83 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>VALUE for result "bench/check-ce/func_call5.mlw", line 13, characters 10-14 not in ce-model, taking default (ref'mk 0)
@@ -113,8 +113,8 @@ Prover result is: valid (0.01s, 83 steps).
 - Selected model 2 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
-Goal `Assertion' from verification condition f1'vc.
-Prover result is: timeout (1.00s, 7005241 steps).
+Goal Assertion from verification condition f1'vc.
+Prover result is: timeout (1.00s, 7549714 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -197,14 +197,12 @@ Sorry, we don't have a good counterexample for you :(
                     result = (ref'mk 0)
 <check-ce>Models:
 - Selected model 1 (Concrete: good model, Abstract: bad model)
-    Summary: The program does not comply to the verification goal, for
-    example during the following execution:
+    Summary: The program does not comply to the verification goal
 - Checked model 2 (Concrete: good model, Abstract: bad model)
-    Summary: The program does not comply to the verification goal, for
-    example during the following execution:
+    Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
-Goal `Assertion' from verification condition f2'vc.
-Prover result is: timeout (1.00s, 7722510 steps).
+Goal Assertion from verification condition f2'vc.
+Prover result is: timeout (1.00s, 6649653 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File func_call5.mlw:

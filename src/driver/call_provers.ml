@@ -37,17 +37,14 @@ type ce_summary = NCCE of exec_log | SWCE of exec_log | NCCE_SWCE of exec_log | 
 let print_ce_summary_title ?check_ce fmt = function
   | NCCE _ ->
       Format.fprintf fmt
-        ("The@ program@ does@ not@ comply@ to@ the@ verification@ goal,@ "^^
-         "for@ example@ during@ the@ following@ execution:")
+        "The@ program@ does@ not@ comply@ to@ the@ verification@ goal"
   | SWCE _ ->
       Format.fprintf fmt
-        ("The@ contracts@ of@ some@ function@ or@ loop@ are@ underspecified,@ "^^
-         "for@ example@ during@ the@ following@ execution:")
+        "The@ contracts@ of@ some@ function@ or@ loop@ are@ underspecified"
   | NCCE_SWCE _ ->
       Format.fprintf fmt
         ("The@ program@ does@ not@ comply@ to@ the@ verification@ goal,@ or"^^
-         "the@ contracts@ of@ some@ loop@ or@ function@ are@ too@ weak,@ "^^
-         "for@ example@ in@ the@ following@ execution:")
+         "the@ contracts@ of@ some@ loop@ or@ function@ are@ too@ weak")
   | BAD_CE ->
       Format.fprintf fmt
         "Sorry,@ we@ don't@ have@ a@ good@ counterexample@ for@ you@ :("
@@ -55,14 +52,14 @@ let print_ce_summary_title ?check_ce fmt = function
       match check_ce with
       | Some true ->
           fprintf fmt
-            "The@ following@ counterexample@ model@ could@ not@ be@ verified@ (%s):"
+            "The@ following@ counterexample@ model@ could@ not@ be@ verified@ (%s)"
             reason
       | Some false ->
           fprintf fmt
             ("The@ following@ counterexample@ model@ has@ not@ been@ verified@ "^^
              "(%s,@ missing@ option@ --check-ce):") reason
       | None ->
-          fprintf fmt "The@ following@ counterexample@ model@ has@ not@ been@ verified@ (%s):"
+          fprintf fmt "The@ following@ counterexample@ model@ has@ not@ been@ verified@ (%s)"
             reason
 
 let print_ce_summary_values ~json ~print_attrs model fmt s =
@@ -263,7 +260,11 @@ let print_prover_result ?(json: [<`All | `Model] option) ?check_ce fmt r =
       r.pr_time print_steps r.pr_steps;
     (match r.pr_model with
      | Some (m, s) when not (is_model_empty m) ->
-         fprintf fmt "@ @[<hov>%a@]" (print_ce_summary_title ?check_ce) s;
+         fprintf fmt "@ @[<hov>%a%t@]" (print_ce_summary_title ?check_ce) s
+           (fun fmt -> match s with
+              | NCCE _ | SWCE _ | NCCE_SWCE _ ->
+                  fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
+              | _ -> ());
          fprintf fmt "@ %a" (print_ce_summary_values ~print_attrs ~json:(json = Some `Model) m) s
      | _ -> ());
     if r.pr_answer == HighFailure then
