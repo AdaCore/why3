@@ -7,7 +7,7 @@
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call4.mlw", line 7, characters 12-21)
               File func_call4.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -34,7 +34,7 @@
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call4.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -59,7 +59,7 @@
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call4.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -89,12 +89,12 @@
     following execution:
 File "bench/check-ce/func_call4.mlw", line 9, characters 34-39:
 Goal `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4177575 steps).
+Prover result is: timeout (1.00s, 5361645 steps).
 The program does not comply to the verification goal, orthe contracts of some
 loop or function are too weak, for example in the following execution:
 File func_call4.mlw:
   Line 3:
-    ANY = 0
+    execution of any, result: 0
     Concrete execution of ref with args:
       contents = 0
     Concrete execution of ref'mk with args:

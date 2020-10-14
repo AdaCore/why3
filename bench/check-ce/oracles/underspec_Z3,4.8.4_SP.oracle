@@ -243,7 +243,7 @@ Prover result is: valid (0.02s, 58 steps).
     example during the following execution:
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal `Loop invariant preservation' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5507851 steps).
+Prover result is: timeout (1.00s, 5052268 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:
@@ -294,7 +294,7 @@ Prover result is: valid (0.01s, 2283 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File underspec.mlw:
                 Line 37:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -318,7 +318,7 @@ Prover result is: valid (0.01s, 2283 steps).
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 41, characters 14-23)
               File underspec.mlw:
                 Line 37:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -344,7 +344,7 @@ Prover result is: valid (0.01s, 2283 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File underspec.mlw:
                 Line 37:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -368,7 +368,7 @@ Prover result is: valid (0.01s, 2283 steps).
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File underspec.mlw:
                 Line 37:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -393,7 +393,7 @@ Prover result is: valid (0.01s, 2283 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File underspec.mlw:
                 Line 37:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -417,7 +417,7 @@ Prover result is: valid (0.01s, 2283 steps).
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File underspec.mlw:
                 Line 37:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -446,12 +446,12 @@ Prover result is: valid (0.01s, 2283 steps).
     example during the following execution:
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Goal `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 5770882 steps).
+Prover result is: timeout (1.00s, 5382573 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File underspec.mlw:
   Line 37:
-    ANY = 0
+    execution of any, result: 0
     Concrete execution of ref with args:
       contents = 0
     Concrete execution of ref'mk with args:

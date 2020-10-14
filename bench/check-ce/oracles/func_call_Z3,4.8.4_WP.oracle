@@ -9,7 +9,7 @@ Prover result is: valid (0.03s, 2283 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -33,7 +33,7 @@ Prover result is: valid (0.03s, 2283 steps).
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call.mlw", line 7, characters 12-21)
               File func_call.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -59,7 +59,7 @@ Prover result is: valid (0.03s, 2283 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -83,7 +83,7 @@ Prover result is: valid (0.03s, 2283 steps).
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -108,7 +108,7 @@ Prover result is: valid (0.03s, 2283 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -132,7 +132,7 @@ Prover result is: valid (0.03s, 2283 steps).
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -161,12 +161,12 @@ Prover result is: valid (0.03s, 2283 steps).
     example during the following execution:
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Goal `Assertion' from verification condition f'vc.
-Prover result is: timeout (1.00s, 4706361 steps).
+Prover result is: timeout (1.00s, 5526976 steps).
 The contracts of some function or loop are underspecified, for example during
 the following execution:
 File func_call.mlw:
   Line 3:
-    ANY = 0
+    execution of any, result: 0
     Concrete execution of ref with args:
       contents = 0
     Concrete execution of ref'mk with args:

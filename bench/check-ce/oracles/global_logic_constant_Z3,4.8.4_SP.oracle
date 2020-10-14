@@ -3,7 +3,7 @@
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File global_logic_constant.mlw:
                 Line 5:
-                  ANY = 0
+                  execution of any, result: 0
                 Line 7:
                   _ = ()
                   Concrete execution of f1 with args:
@@ -12,7 +12,7 @@
             - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
               File global_logic_constant.mlw:
                 Line 5:
-                  ANY = 0
+                  execution of any, result: 0
                 Line 7:
                   _ = ()
                   Concrete execution of f1 with args:
@@ -77,7 +77,7 @@
     example during the following execution:
 File "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24:
 Goal `Postcondition' from verification condition f1'vc.
-Prover result is: unknown (sat) (0.03s, 696 steps).
+Prover result is: unknown (sat) (0.02s, 696 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File global_logic_constant.mlw:
@@ -96,9 +96,9 @@ File global_logic_constant.mlw:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File global_logic_constant.mlw:
                 Line 5:
-                  ANY = 0
+                  execution of any, result: 0
                 Line 11:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -115,9 +115,9 @@ File global_logic_constant.mlw:
             - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
               File global_logic_constant.mlw:
                 Line 5:
-                  ANY = 0
+                  execution of any, result: 0
                 Line 11:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -136,7 +136,7 @@ File global_logic_constant.mlw:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File global_logic_constant.mlw:
                 Line 5:
-                  ANY = 0
+                  execution of any, result: 0
                 Line 11:
                   v2 = (ref'mk 2)
                 Line 13:
@@ -152,7 +152,7 @@ File global_logic_constant.mlw:
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File global_logic_constant.mlw:
                 Line 5:
-                  ANY = 0
+                  execution of any, result: 0
                 Line 11:
                   v2 = (ref'mk 2)
                 Line 13:
@@ -170,7 +170,7 @@ File global_logic_constant.mlw:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File global_logic_constant.mlw:
                 Line 5:
-                  ANY = 0
+                  execution of any, result: 0
                 Line 11:
                   v2 = (ref'mk 2)
                 Line 13:
@@ -186,7 +186,7 @@ File global_logic_constant.mlw:
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File global_logic_constant.mlw:
                 Line 5:
-                  ANY = 0
+                  execution of any, result: 0
                 Line 11:
                   v2 = (ref'mk 2)
                 Line 13:
@@ -210,12 +210,12 @@ File global_logic_constant.mlw:
     example during the following execution:
 File "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24:
 Goal `Postcondition' from verification condition f2'vc.
-Prover result is: timeout (1.00s, 7999080 steps).
+Prover result is: timeout (1.00s, 5697720 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File global_logic_constant.mlw:
   Line 5:
-    ANY = 0
+    execution of any, result: 0
   Line 11:
     v2 = (ref'mk 2)
   Line 13:

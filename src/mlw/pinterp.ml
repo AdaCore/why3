@@ -399,6 +399,9 @@ let register_call env loc rs mvs kind =
 
 let register_pure_call env loc ls kind =
   env.rac.exec_log := add_pure_call_to_log ls kind loc !(env.rac.exec_log)
+let register_any_call env loc value =
+    let v = (asprintf "%a" print_value value) in
+    env.rac.exec_log := add_any_call_to_log v loc !(env.rac.exec_log)
 
 let register_failure env loc reason mvs =
   env.rac.exec_log := add_failed_to_log reason mvs loc !(env.rac.exec_log)
@@ -1523,7 +1526,8 @@ and eval_expr' env e =
               Debug.dprintf debug "Take default value %a for any expression%a"
                 print_value v pp_loc e.e_loc;
               v in
-          register_used_value env e.e_loc Ident.(id_register (id_fresh ?loc:e.e_loc "ANY")) v;
+          register_any_call env e.e_loc v;
+          (* register_used_value env e.e_loc Ident.(id_register (id_fresh ?loc:e.e_loc "ANY")) v; *)
           (* check_posts "Exec postcondition" e.e_loc env v cty.cty_post; *)
           Normal v
       | Capp (rs, pvsl) when Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.mod_known) = Some true ->

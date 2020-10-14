@@ -7,7 +7,7 @@ Prover result is: valid (0.02s, 2343 steps).
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call3.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -33,7 +33,7 @@ Prover result is: valid (0.02s, 2343 steps).
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call3.mlw:
                 Line 3:
-                  ANY = 0
+                  execution of any, result: 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -160,12 +160,12 @@ Prover result is: valid (0.02s, 2343 steps).
     example during the following execution:
 File "bench/check-ce/func_call3.mlw", line 8, characters 17-26:
 Goal `Postcondition' from verification condition g'vc.
-Prover result is: timeout (1.00s, 5236396 steps).
+Prover result is: timeout (1.00s, 5760185 steps).
 The program does not comply to the verification goal, for example during the
 following execution:
 File func_call3.mlw:
   Line 3:
-    ANY = 0
+    execution of any, result: 0
     Concrete execution of ref with args:
       contents = 0
     Concrete execution of ref'mk with args:

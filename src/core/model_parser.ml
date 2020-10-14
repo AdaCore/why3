@@ -1068,6 +1068,7 @@ type log_entry_desc =
   | Val_from_model of (ident * string)
   | Exec_call of (Expr.rsymbol option * string Mvs.t  * exec_kind)
   | Exec_pure of (Term.lsymbol * exec_kind)
+  | Exec_any of string
   | Exec_loop of exec_kind
   | Exec_stucked of (string * string Mvs.t)
   | Exec_failed of (string * string Mvs.t)
@@ -1093,6 +1094,9 @@ let add_call_to_log rs mvs kind loc exec_log =
 
 let add_pure_call_to_log ls kind loc exec_log =
   add_log_entry (Exec_pure (ls,kind)) loc exec_log
+
+let add_any_call_to_log s loc exec_log =
+  add_log_entry (Exec_any s) loc exec_log
 
 let add_failed_to_log s mvs loc exec_log =
   add_log_entry (Exec_failed (s,mvs)) loc exec_log
@@ -1147,6 +1151,8 @@ let print_log_entry_desc fmt e =
   | Exec_pure (ls,k) ->
       fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
         Ident.print_decoded ls.ls_name.id_string
+  | Exec_any v ->
+     fprintf fmt "@[<h>execution of any, result: %s@]" v
   | Exec_loop k ->
       fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
   | Exec_failed (msg,mvs) ->
@@ -1181,6 +1187,10 @@ let print_exec_log ~json fmt entry_log =
             (print_json_field "kind" print_json) (string "EXEC_PURE")
             (print_json_field "ls" print_json) (string "%a" Pretty.print_ls ls)
             (print_json_field "kind" print_json_kind) kind
+      | Exec_any s ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "EXEC_ANY")
+            (print_json_field "value" print_json) (String s)
       | Exec_loop kind ->
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
         (print_json_field "kind" print_json) (string "EXEC_LOOP")
