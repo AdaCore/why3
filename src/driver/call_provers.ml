@@ -258,7 +258,8 @@ let print_prover_result ?(json: [<`All | `Model] option) ?check_ce fmt r =
       (print_json_field "ce-model" print_model) r.pr_model
       (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
   else (
-    fprintf fmt "@[<hov>%a@ (%.2fs%a).@]" print_prover_answer r.pr_answer
+    let color = match r.pr_answer with | Valid -> 32 | Invalid -> 31 | _ -> 33 in
+    fprintf fmt "@[<hov>%a@ (%.2fs%a).@]" (Util.ansi_color ~bold:true ~color print_prover_answer) r.pr_answer
       r.pr_time print_steps r.pr_steps;
     (match r.pr_model with
      | Some (m, s) when not (is_model_empty m) ->

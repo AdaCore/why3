@@ -79,3 +79,12 @@ let rec cmp_lists ls l1 l2 = match l1, l2 with
       let ls = [cmptr fst (cmp ls); cmptr snd (cmp_lists ls)] in
       cmp ls (h1, t1) (h2, t2)
   | [], _ -> -1 | _, [] -> 1
+
+let ansi_color ?color ?(bold=false) p fmt x =
+  if Unix.isatty Unix.stdout then
+    Format.fprintf fmt "\027[%t%t%tm%a\027[0m"
+      (fun fmt -> match color with Some c -> Format.fprintf fmt "%d" c | None -> ())
+      (fun fmt -> if color <> None && bold then Format.fprintf fmt ";")
+      (fun fmt -> if bold then Format.fprintf fmt "1")
+      p x
+  else p fmt x

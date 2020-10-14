@@ -88,3 +88,5 @@ val cmp : 'a cmptr list -> 'a -> 'a -> int
 
 val cmp_lists : 'a cmptr list -> 'a list -> 'a list -> int
 (** Create a comparison function for lists using lexical order defined by a list of comparators *)
+
+val ansi_color : ?color:int -> ?bold:bool -> (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'a -> unit)

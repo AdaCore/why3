@@ -253,10 +253,13 @@ let print_result ?json ~check_ce fmt (fname, loc, goal_name, expls, res) =
       | None -> fprintf fmt "File %s:@\n" fname
       | Some loc -> Loc.report_position Format.std_formatter loc );
     ( if expls = [] then
-        fprintf fmt "@[<hov>Verification@ condition@ %s.@]" goal_name
+        fprintf fmt "@[<hov>Verification@ condition@ %a.@]"
+          (Util.ansi_color ~bold:true ?color:None Pp.string) goal_name
       else
         let expls = String.capitalize_ascii (String.concat ", " expls) in
-        fprintf fmt "@[<hov>Goal@ `%s'@ from@ verification@ condition@ %s.@]" expls goal_name );
+        fprintf fmt "@[<hov>Goal@ %a@ from@ verification@ condition@ %a.@]"
+          (Util.ansi_color ~bold:true ?color:None Pp.string) expls
+          (Util.ansi_color ~bold:true ?color:None Pp.string) goal_name );
     fprintf fmt "@\n@[<v>Prover result is: %a@]"
       Call_provers.(print_prover_result ?json ~check_ce) res;
     fprintf fmt "@\n" )
