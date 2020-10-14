@@ -7,16 +7,3 @@ val g (): unit
   ensures { z > old z }
 
 let f () = z <- 0; g (); assert { z = 1 }
-
-(*
-DESIRED OUTPUT:
-
-examples/tests/ce-rac/func_call4.mlw Top f'vc at LOC: EXPLANATION
-Unknown (unknown + incomplete) (0.07s, 6083 steps)
-The following counterexample exposes either a subcontract weakness or non-compliance.
-  LINE 9:
-    z = 0
-  LINE 11:
-    z = 2
-    result = ()
-*)
