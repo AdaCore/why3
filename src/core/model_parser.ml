@@ -739,11 +739,11 @@ let print_model_element_json me_name_to_str fmt me =
     | Old -> fprintf fmt "%a" Json_base.string "old"
     | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
     | Other -> fprintf fmt "%a" Json_base.string "other"
-    | Loop_before -> fprintf fmt "%a" Json_base.string "before-loop"
+    | Loop_before -> fprintf fmt "%a" Json_base.string "before_loop"
     | Loop_previous_iteration ->
-        fprintf fmt "%a" Json_base.string "before-iteration"
+        fprintf fmt "%a" Json_base.string "before_iteration"
     | Loop_current_iteration ->
-        fprintf fmt "%a" Json_base.string "current-iteration" in
+        fprintf fmt "%a" Json_base.string "current_iteration" in
   let print_name fmt = Json_base.string fmt (me_name_to_str me.me_name) in
   let print_json_attrs fmt = print_attrs_json me.me_name fmt in
   let print_value_or_kind_or_name fmt printer = printer fmt in
