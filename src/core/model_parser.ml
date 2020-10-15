@@ -1170,6 +1170,10 @@ let print_exec_log ~json fmt entry_log =
     let print_json_kind fmt = function
       | ExecAbstract -> print_json fmt (string "ABSTRACT")
       | ExecConcrete -> print_json fmt (string "CONCRETE") in
+    let print_vs_value fmt (vs,v) =
+      fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+        (print_json_field "name" print_json) (String vs.vs_name.id_string)
+        (print_json_field "value" print_json) (String v) in
     let print_log_entry fmt = function
       | Val_from_model (id, s) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
@@ -1177,16 +1181,19 @@ let print_exec_log ~json fmt entry_log =
             (print_json_field "vs" print_json)
             (string "%a" Ident.print_decoded id.id_string)
             (print_json_field "value" print_json) (String s)
-      | Exec_call (ors, mvs, kind) ->                                     (* TODO print mvs *)
-          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+      | Exec_call (ors, mvs, kind) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "EXEC_CALL")
-            (print_json_field "rs" print_json) (match ors with Some rs -> string "%a" Ident.print_decoded rs.Expr.rs_name.id_string | None -> Null)
-            (print_json_field "kind" print_json_kind) kind
+            (print_json_field "rs" print_json) (match ors with
+                | Some rs -> string "%a" Ident.print_decoded rs.Expr.rs_name.id_string
+                | None -> Null)
+            (print_json_field "exec" print_json_kind) kind
+            (print_json_field "args" (list print_vs_value)) (Mvs.bindings mvs)
       | Exec_pure (ls, kind) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "EXEC_PURE")
             (print_json_field "ls" print_json) (string "%a" Pretty.print_ls ls)
-            (print_json_field "kind" print_json_kind) kind
+            (print_json_field "exec" print_json_kind) kind
       | Exec_any s ->
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "EXEC_ANY")
@@ -1194,15 +1201,17 @@ let print_exec_log ~json fmt entry_log =
       | Exec_loop kind ->
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
         (print_json_field "kind" print_json) (string "EXEC_LOOP")
-        (print_json_field "kind" print_json_kind) kind
-      | Exec_failed (reason,_) ->                                        (* TODO print mvs *)
-          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+        (print_json_field "exec" print_json_kind) kind
+      | Exec_failed (reason,mvs) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "FAILED")
             (print_json_field "reason" print_json) (String reason)
-      | Exec_stucked (reason,_) ->                                        (* TODO print mvs *)
-          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+            (print_json_field "state" (list print_vs_value)) (Mvs.bindings mvs)
+      | Exec_stucked (reason,mvs) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "STUCKED")
             (print_json_field "reason" print_json) (String reason)
+            (print_json_field "state" (list print_vs_value)) (Mvs.bindings mvs)
       | Exec_ended ->
           fprintf fmt "@[@[<hv1>{%a@]}@]"
             (print_json_field "kind" print_json) (string "ENDED") in
