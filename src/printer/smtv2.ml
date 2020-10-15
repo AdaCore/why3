@@ -145,7 +145,7 @@ let ident_printer () =
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 
-type version = V20 | V26
+type version = V20 | V26 | V26Par
 
 type info = {
   info_syn        : syntax_map;
@@ -186,11 +186,29 @@ let print_ident info fmt id =
 
 (** type *)
 
+let print_tv info fmt tv =
+  fprintf fmt "%s" (id_unique info.info_printer tv.tv_name)
+
+(** print `(par ...)` around the given body to print *)
+let print_par info (* body *) =
+  (* Format.kdprintf *) (fun print_body ->
+      (fun fmt tvs ->
+         if Ty.Stv.is_empty tvs
+         then print_body fmt
+         else if info.info_version = V26Par
+         then
+           Format.fprintf fmt "(par (%a)@ %t)"
+             (print_iter1 Ty.Stv.iter pp_print_space (print_tv info)) tvs
+             print_body
+         else
+           unsupported "smt: polymorphism must be encoded"
+      ) ) (* body *)
+
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar s ->
       begin match info.info_version with
       | V20 -> unsupported "smtv2: you must encode type polymorphism"
-      | V26 -> fprintf fmt "%s" (id_unique info.info_printer s.tv_name)
+      | V26 | V26Par -> print_tv info fmt s
       end
   | Tyapp (ts, l) ->
       begin match query_syntax info.info_syn ts.ts_name, l with
@@ -470,10 +488,16 @@ and print_branches info subject pr fmt bl = match bl with
           let args = List.map (function
             | {pat_node = Pvar v} -> v | _ -> error ()) args in
           if bl = [] then print_branch info subject pr fmt (cs,args,t)
-          else fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
-            (print_ident info) cs.ls_name (print_var info) subject
-            (print_branch info subject pr) (cs,args,t)
-            (print_branches info subject pr) bl
+          else
+            begin match info.info_version with
+              | V20 | V26 (* It should be the same than V26Par but it was different *) ->
+                  fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
+              | V26Par ->
+                  fprintf fmt "@[(ite ((_ is %a) %a) %a %a)@]"
+            end
+              (print_ident info) cs.ls_name (print_var info) subject
+              (print_branch info subject pr) (cs,args,t)
+              (print_branches info subject pr) bl
       | _ -> error ()
 
 and print_branch info subject pr fmt (cs,vars,t) =
@@ -513,20 +537,26 @@ let print_param_decl info fmt ls =
               (print_type_value info) ls.ls_value
      *)
     | _  ->
-        fprintf fmt "@[<hov 2>(declare-fun %a (%a) %a)@]@\n@\n"
-                    (print_ident info) ls.ls_name
-                    (print_list space (print_type info)) ls.ls_args
-                    (print_type_value info) ls.ls_value
+        let tvs = Term.ls_ty_freevars ls in
+        fprintf fmt "@[<hov 2>(declare-fun %a %a)@]@\n@\n"
+          (print_ident info) ls.ls_name
+          (print_par info
+             (fun fmt -> Format.fprintf fmt "(%a) %a"
+                 (print_list space (print_type info)) ls.ls_args
+                 (print_type_value info) ls.ls_value)) tvs
 
 let print_logic_decl info fmt (ls,def) =
   if Mid.mem ls.ls_name info.info_syn then () else begin
     collect_model_ls info ls;
     let vsl,expr = Decl.open_ls_defn def in
-    fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
+    let tvs = Term.ls_ty_freevars ls in
+    fprintf fmt "@[<hov 2>(define-fun %a %a)@]@\n@\n"
       (print_ident info) ls.ls_name
-      (print_var_list info) vsl
-      (print_type_value info) ls.ls_value
-      (print_expr info) expr;
+      (print_par info
+         (fun fmt -> Format.fprintf fmt "(%a) %a %a"
+             (print_var_list info) vsl
+             (print_type_value info) ls.ls_value
+             (print_expr info) expr)) tvs;
     List.iter (forget_var info) vsl
   end
 
@@ -550,11 +580,13 @@ let print_info_model info =
   else
     Mstr.empty
 
+
 (* TODO factor out print_prop ? *)
 let print_prop info fmt pr f =
+  let tvs = Term.t_ty_freevars Ty.Stv.empty f in
   fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
     pr.pr_name.id_string (* FIXME? collisions *)
-    (print_fmla info) f
+    (print_par info (fun fmt -> Format.fprintf fmt "%a" (print_fmla info) f)) tvs
 
 let add_check_sat info fmt =
   if info.info_cntexample && info.info_cntexample_need_push then
@@ -596,6 +628,8 @@ let print_prop_decl vc_loc vc_attrs args info fmt k pr f = match k with
       else
         print_prop info fmt pr f
   | Pgoal ->
+      let tvs = Term.t_ty_freevars Ty.Stv.empty f in
+      if not (Ty.Stv.is_empty tvs) then unsupported "smt: monomorphise goal must be applied";
       fprintf fmt "@[(assert@\n";
       fprintf fmt "@[;; %a@]@\n" (print_ident info) pr.pr_name;
       (match pr.pr_name.id_loc with
@@ -699,7 +733,7 @@ let print_decl vc_loc vc_attrs args info fmt d =
       | V20 ->
           fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
             (print_list space (print_data_decl info)) dl
-      | V26 ->
+      | V26 | V26Par ->
           fprintf fmt "@[<v>(declare-datatypes (%a)@ (%a))@,@]"
             (print_list space (print_sort_decl info)) dl
             (print_list space (print_data_def info)) dl
@@ -800,3 +834,5 @@ let () = register_printer "smtv2" (print_task V20)
   ~desc:"Printer@ for@ the@ SMTlib@ version@ 2@ format."
 let () = register_printer "smtv2.6" (print_task V26)
   ~desc:"Printer@ for@ the@ SMTlib@ version@ 2.6@ format."
+let () = register_printer "smtv2.6par" (print_task V26Par)
+  ~desc:"Printer@ for@ the@ SMTlib@ version@ 2.6@ format with (par construct from version 3."
