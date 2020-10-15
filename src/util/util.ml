@@ -80,8 +80,12 @@ let rec cmp_lists ls l1 l2 = match l1, l2 with
       cmp ls (h1, t1) (h2, t2)
   | [], _ -> -1 | _, [] -> 1
 
-let ansi_color ?color ?(bold=false) p fmt x =
-  if Unix.isatty Unix.stdout then
+let has_color =
+  let term = try Sys.getenv "TERM" with Not_found -> "" in
+  term <> "" && term <> "dumb" && Unix.isatty Unix.stdout
+
+let ansi_color ?(really=true) ?color ?(bold=false) p fmt x =
+  if has_color && really then
     Format.fprintf fmt "\027[%t%t%tm%a\027[0m"
       (fun fmt -> match color with Some c -> Format.fprintf fmt "%d" c | None -> ())
       (fun fmt -> if color <> None && bold then Format.fprintf fmt ";")

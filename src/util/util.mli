@@ -89,4 +89,9 @@ val cmp : 'a cmptr list -> 'a -> 'a -> int
 val cmp_lists : 'a cmptr list -> 'a list -> 'a list -> int
 (** Create a comparison function for lists using lexical order defined by a list of comparators *)
 
-val ansi_color : ?color:int -> ?bold:bool -> (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'a -> unit)
+(** {3 ANSI colors} *)
+
+val ansi_color : ?really:bool -> ?color:int -> ?bold:bool ->
+  (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'a -> unit)
+(** [ansi_color p] adds ANSI color formatting to the printer [p]. It just forwards to [p]
+   without adding color formatting when [~really:false]. *)
