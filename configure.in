@@ -990,7 +990,7 @@ else
         PVSVERSION=[`$PVS -version | sed -n -e 's|.*Version *\([^ ]*\)$|\1|p'`]
 
         case $PVSVERSION in
-          6.*)
+          6.*|7.*)
 	        enable_pvs_support=yes
                 AC_MSG_RESULT($PVSVERSION)
                 ;;

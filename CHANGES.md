@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Provers
+  * support for PVS 7.1 (released Apr 30, 2020)
+
 Version 1.3.3, September 11, 2020
 ---------------------------------
 
