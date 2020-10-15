@@ -348,14 +348,10 @@ let print_logic_result fmt r =
 
 (* ENV *)
 
-type rac_prover = Rac_prover of {command: string; driver: Driver.driver; limit_time: int}
+type rac_prover = Rac_prover of {command: string; driver: Driver.driver; limit: Call_provers.resource_limit}
 
-let rac_prover config env ~limit_time s =
-  let open Whyconf in
-  let prover = filter_one_prover config (parse_filter_prover s) in
-  let command = String.concat " " (prover.command :: prover.extra_options) in
-  let driver = load_driver (get_main config) env prover.driver prover.extra_drivers in
-  Rac_prover {command; driver; limit_time}
+let rac_prover ~command driver limit =
+  Rac_prover {command; driver; limit}
 
 type rac_reduce_config = {
   rac_trans: Task.task Trans.tlist option;
@@ -363,6 +359,29 @@ type rac_reduce_config = {
 }
 
 let rac_reduce_config ?trans:rac_trans ?prover:rac_prover () = {rac_trans; rac_prover}
+
+let rac_reduce_config_lit config env lit_conf =
+  let trans =
+    let aux s = Trans.lookup_transform_l s env in
+    Opt.map aux lit_conf.Call_provers.lit_trans in
+  let prover =
+    let aux s =
+      let name, limit_time, limit_mem =
+        match Strings.split ' ' s with
+        | [name; limit_time; limit_mem] ->
+            name, int_of_string limit_time, int_of_string limit_mem
+        | [name; limit_time] ->
+            name, int_of_string limit_time, 1000
+        | [name] -> name, 1, 1000
+        | _ -> failwith "RAC reduce prover config must have format <prover shortcut> [<time limit> [<mem limit>]]" in
+      let prover = Whyconf.filter_one_prover config (Whyconf.parse_filter_prover name) in
+      let command = String.concat " " (prover.Whyconf.command :: prover.Whyconf.extra_options) in
+      let driver = Whyconf.load_driver (Whyconf.get_main config)
+          env prover.Whyconf.driver prover.Whyconf.extra_drivers in
+      let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
+      rac_prover ~command driver limit in
+    Opt.map aux lit_conf.Call_provers.lit_prover in
+  rac_reduce_config ?trans ?prover ()
 
 type rac_config = {
   do_rac       : bool;
@@ -1212,9 +1231,8 @@ let check_term_compute env trans task =
         None )
 
 (** Check the validiy of a term that has been encoded in a task by dispatching it to a prover *)
-let check_term_dispatch (Rac_prover {command; driver; limit_time}) task =
+let check_term_dispatch (Rac_prover {command; driver; limit}) task =
   let open Call_provers in
-  let limit = {empty_limit with limit_time} in
   let call = Driver.prove_task ~command ~limit driver task in
   let res = wait_on_call call in
   Debug.dprintf debug_rac_check "Check term dispatch answer: %a@."

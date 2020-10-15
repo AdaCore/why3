@@ -1194,7 +1194,7 @@ end
       Format.eprintf "Fatal anomaly in Itp_server.notify_change_proved@.";
       exit 1
 
-  let schedule_proof_attempt nid (p: Whyconf.config_prover) limit =
+  let schedule_proof_attempt ?check_model nid (p: Whyconf.config_prover) limit =
     let d = get_server_data () in
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
@@ -1203,7 +1203,7 @@ end
     | None -> P.notify (Message (Error "Please select a node id"))
     | Some any ->
         let unproven_goals = unproven_goals_below_id d.cont any in
-        List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id
+        List.iter (fun id -> C.schedule_proof_attempt ?save_to:None ?check_model d.cont id
             prover ~limit ~callback ~notification:(notify_change_proved d.cont))
           unproven_goals
 
@@ -1485,7 +1485,8 @@ end
         let parent_pn = Session_itp.get_proof_attempt_parent session panid in
         let nid' = node_ID_from_pn parent_pn in
         remove_node nid;
-        schedule_proof_attempt nid' config_prover pan.limit
+        let check_model = Some (Call_provers.rac_reduce_config_lit ~trans:"compute_in_goal" (* ~prover:"cvc4" *) ()) in
+        schedule_proof_attempt ?check_model nid' config_prover pan.limit
       | exception Whyconf.ProverNotFound (_, fp) ->
         let msg = Format.asprintf "Counterexamples alternative for prover does \
                                    not exists: %a"

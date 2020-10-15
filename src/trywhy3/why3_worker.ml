@@ -331,8 +331,8 @@ let why3_execute modules =
 
              let result =
                try
-                 let trans = Compute.normalize_goal_transf_all env in
-                 let reduce = rac_reduce_config ~trans () in
+                 let reduce_lit = Call_provers.rac_reduce_config_lit ~trans:"compute_in_goal" () in
+                 let reduce = rac_reduce_config_lit config env reduce_lit in
                  let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
                  let res = eval_global_fundef rac_config env m.Pmodule.mod_known m.Pmodule.mod_theory.Theory.th_known [] expr in
                  asprintf "%a@." (report_eval_result expr) res

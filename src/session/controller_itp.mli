@@ -222,6 +222,7 @@ val schedule_proof_attempt :
   proofNodeID ->
   Whyconf.prover ->
   ?save_to:string ->
+  ?check_model:Call_provers.rac_reduce_config_lit ->
   limit:Call_provers.resource_limit ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
   notification:notifier -> unit
@@ -233,6 +234,7 @@ val schedule_proof_attempt :
    is updated.
    [save_to] is used to give a location for the file generated for the prover
    ( *.smt2). With debug flag keep_vcs, the file are saved at this location.
+   When the RAC reduce configuration is given as [check_model], counterexamples are checked.
 *)
 
 val schedule_edition :
@@ -309,6 +311,7 @@ exception BadCopyPaste
 
 (* [copy_paste c a b] try to copy subtree originating at node a to node b *)
 val copy_paste:
+    ?check_model:Call_provers.rac_reduce_config_lit ->
     notification:notifier ->
     callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
     callback_tr:(string -> string list -> transformation_status -> unit) ->
@@ -333,6 +336,7 @@ val replay_print:
         unit
 
 val replay:
+    ?check_model:Call_provers.rac_reduce_config_lit ->
     valid_only:bool ->
     obsolete_only:bool ->
     ?use_steps:bool ->
@@ -366,6 +370,8 @@ val replay:
 
     When [filter] is set, only the proof attempts on which the filter
     returns true are replayed
+
+    When the RAC reduce configuration is given as [check_model], counterexamples are checked.
 
  *)
 

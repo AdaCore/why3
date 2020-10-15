@@ -31,6 +31,14 @@ type prover_answer =
   | HighFailure
 (* END{proveranswer} anchor for automatic documentation, do not remove *)
 
+type rac_reduce_config_lit = {
+  lit_trans: string option;
+  lit_prover: string option;
+}
+
+let rac_reduce_config_lit ?trans ?prover () =
+  { lit_trans= trans; lit_prover= prover }
+
 (** See output of [ce_summary_title] for details *)
 type ce_summary = NCCE of exec_log | SWCE of exec_log | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN of string
 

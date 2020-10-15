@@ -52,9 +52,7 @@ val init_real : int * int * int -> unit
 type rac_prover
 (** The configuration of the prover used for reducing terms in RAC *)
 
-val rac_prover : Whyconf.config -> Env.env -> limit_time:int -> string -> rac_prover
-(** [rac_prover cnf env limit prover s] creates a RAC prover configuration for a Why3
-   prover string [s] *)
+val rac_prover : command:string -> Driver.driver -> Call_provers.resource_limit -> rac_prover
 
 type rac_reduce_config
 (** The configuration for RAC, including (optionally) a transformation for reducing terms
@@ -66,6 +64,12 @@ val rac_reduce_config :
   ?trans:Task.task Trans.tlist ->
   ?prover:rac_prover ->
   unit -> rac_reduce_config
+
+val rac_reduce_config_lit :
+  Whyconf.config ->
+  Env.env ->
+  Call_provers.rac_reduce_config_lit ->
+  rac_reduce_config
 
 type rac_config
 
@@ -112,12 +116,7 @@ val check_model_rs :
 
     Optional arguments [rac_trans] and [rac_prover] as in [eval_global_fundef]. *)
 
-val check_model :
-  rac_reduce_config ->
-  Env.env ->
-  Pmodule.pmodule ->
-  Model_parser.model ->
-  Model_parser.check_model_result
+val check_model : rac_reduce_config -> Env.env -> Pmodule.pmodule -> Model_parser.check_model
 (** [check_model env pm m] checks if model [m] is valid, i.e. the abstract
     execution using the model values triggers a RAC contradiction in the
     corresponding location. The function returns true if the corresponding

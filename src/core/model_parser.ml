@@ -1265,7 +1265,8 @@ let print_check_model_result fmt = function
 
 type check_model = model -> check_model_result
 
-let default_check_model (_: model) =
+let default_check_model : check_model =
+  fun _ ->
   let reason = "not checking CE model" in
   Cannot_check_model {reason}
 
