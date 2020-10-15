@@ -43,8 +43,8 @@ let print_ce_summary_title ?check_ce fmt = function
         "The@ contracts@ of@ some@ function@ or@ loop@ are@ underspecified"
   | NCCE_SWCE _ ->
       Format.fprintf fmt
-        ("The@ program@ does@ not@ comply@ to@ the@ verification@ goal,@ or"^^
-         "the@ contracts@ of@ some@ loop@ or@ function@ are@ too@ weak")
+        ("The@ program@ does@ not@ comply@ to@ the@ verification@ goal,@ "^^
+         "or@ the@ contracts@ of@ some@ loop@ or@ function@ are@ too@ weak")
   | BAD_CE ->
       Format.fprintf fmt
         "Sorry,@ we@ don't@ have@ a@ good@ counterexample@ for@ you@ :("
@@ -57,7 +57,7 @@ let print_ce_summary_title ?check_ce fmt = function
       | Some false ->
           fprintf fmt
             ("The@ following@ counterexample@ model@ has@ not@ been@ verified@ "^^
-             "(%s,@ missing@ option@ --check-ce):") reason
+             "(%s,@ missing@ option@ --check-ce)") reason
       | None ->
           fprintf fmt "The@ following@ counterexample@ model@ has@ not@ been@ verified@ (%s)"
             reason
