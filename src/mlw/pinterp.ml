@@ -503,9 +503,10 @@ let use_float_format (float_format : int) =
 
 let eval_float :
     type a.
-    ty -> int -> a float_arity -> a -> Expr.rsymbol -> value list -> value =
- fun ty_result float_format ty op ls l ->
+    tysymbol -> int -> a float_arity -> a -> Expr.rsymbol -> value list -> value =
+ fun tys_result float_format ty op ls l ->
   (* Set the exponent depending on Float type that are used: 32 or 64 *)
+ let ty_result = ty_app tys_result [] in
   use_float_format float_format ;
   try
     let v_desc =
@@ -602,152 +603,172 @@ let exec_array_set _ args =
         cannot_compute "Error setting array: %a" Exn_printer.exn_printer e )
 | _ -> assert false
 
+type builtin = Builtin_module of {
+  path: string list;
+  name: string;
+  types: (string * (Pdecl.known_map -> itysymbol -> unit)) list;
+  values: Pmodule.pmodule -> (string * (rsymbol -> value list -> value)) list;
+}
+
+let dummy_type (_:Pdecl.known_map) (_:itysymbol) = ()
+
+let builtin path name values =
+  Builtin_module {path; name; types=[]; values= fun _ -> values}
+
+let builtin1t path name (type_name, type_def) values =
+  let values = fun pm ->
+    let its = Pmodule.(ns_find_its pm.mod_export [type_name]) in
+    values its.its_ts in
+  Builtin_module {path; name; types= [type_name, type_def]; values}
+
 (* Described as a function so that this code is not executed outside of
    why3execute. *)
 
 (** Description of modules *)
 let built_in_modules env =
-  let bool_module =
-    ["bool"], "Bool", [], ["True", eval_true; "False", eval_false] in
-  let int_ops =
-    [ op_infix "+", eval_int_op BigInt.add;
-      (* defined as x+(-y)
-         op_infix "-", eval_int_op BigInt.sub; *)
-      op_infix "*", eval_int_op BigInt.mul;
-      op_prefix "-", eval_int_uop BigInt.minus;
-      op_infix "=", eval_int_rel BigInt.eq;
-      op_infix "<", eval_int_rel BigInt.lt;
-      op_infix "<=", eval_int_rel BigInt.le;
-      op_infix ">", eval_int_rel BigInt.gt;
-      op_infix ">=", eval_int_rel BigInt.ge ] in
-  let bounded_int_ops =
-    ("of_int", eval_int_uop (fun x -> x)) ::
-    ("to_int", eval_int_uop (fun x -> x)) ::
-    (op_infix "-", eval_int_op BigInt.sub) ::
-    (op_infix "/", eval_int_op BigInt.computer_div) ::
-    (op_infix "%", eval_int_op BigInt.computer_mod) ::
-    int_ops in
-  let int_modules =
-    [ ( ["int"],
-        "Int",
-        [],
-        int_ops );
-      ( ["int"],
-        "MinMax",
-        [],
-        ["min", eval_int_op BigInt.min; "max", eval_int_op BigInt.max] );
-      ( ["int"],
-        "ComputerDivision",
-        [],
-        [ "div", eval_int_op BigInt.computer_div;
-          "mod", eval_int_op BigInt.computer_mod ] );
-      ( ["int"],
-        "EuclideanDivision",
-        [],
-        [ "div", eval_int_op BigInt.euclidean_div;
-          "mod", eval_int_op BigInt.euclidean_mod ] ) ] in
-  let int63_module = (["mach";"int"],"Int63",[],bounded_int_ops) in
-  let int31_module = (["mach";"int"],"Int31",[],bounded_int_ops) in
-  let byte_module  = (["mach";"int"],"Byte",[],bounded_int_ops) in
-  let array_module =
-    let pm = Pmodule.read_module env ["array"] "Array" in
-    let {its_ts= ts_array} = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
-    ["array"],"Array",
-    ["array", builtin_array_type],
-    ["make", exec_array_make ts_array;
-     "empty", exec_array_empty ts_array;
-     Ident.op_get "", exec_array_get ;
-     "length", exec_array_length ;
-     Ident.op_set "", exec_array_set ;
-    ] in
-  let mode_module =
-    let pm = Pmodule.read_module env ["ieee_float"] "RoundingMode" in
-    let its = Pmodule.ns_find_its pm.Pmodule.mod_export ["mode"] in
-    let v_ty = ty_app its.its_ts [] in
-    let aux m _ _ = value v_ty (Vfloat_mode m) in
-    ( ["ieee_float"],
-      "RoundingMode",
-      ["mode", builtin_mode],
-      [ "RNE", aux To_Nearest; "RNA", aux Away_From_Zero;
-        "RTP", aux Toward_Plus_Infinity; "RTN", aux Toward_Minus_Infinity;
-        "RTZ", aux Toward_Zero ] ) in
-  let float_modules tyb ~prec m =
-    let pm = Pmodule.read_module env ["ieee_float"] m in
-    let its = Pmodule.ns_find_its pm.Pmodule.mod_export ["t"] in
-    let ty = ty_app its.its_ts [] in
-    ( ["ieee_float"],
-      m,
-      ["t", builtin_float_type],
-      [ ("zeroF", fun _rs _l -> value ty (Vfloat (make_zero ~prec Positive)));
-        "add", eval_float ty tyb Mode2 (fun rnd -> add ~rnd ~prec);
-        "sub", eval_float ty tyb Mode2 (fun rnd -> sub ~rnd ~prec);
-        "mul", eval_float ty tyb Mode2 (fun rnd -> mul ~rnd ~prec);
-        "div", eval_float ty tyb Mode2 (fun rnd -> div ~rnd ~prec);
-        "abs", eval_float ty tyb Mode1 (fun rnd -> abs ~rnd ~prec);
-        "neg", eval_float ty tyb Mode1 (fun rnd -> neg ~rnd ~prec);
-        "fma", eval_float ty tyb Mode3 (fun rnd -> fma ~rnd ~prec);
-        "sqrt", eval_float ty tyb Mode1 (fun rnd -> sqrt ~rnd ~prec);
-        "roundToIntegral", eval_float ty tyb Mode1 (fun rnd -> rint ~rnd ~prec);
-        (* Intentionnally removed from programs
-           "min", eval_float_minmax min;
-           "max", eval_float_minmax max; *)
-        "le", eval_float ty_bool tyb Mode_rel lessequal_p;
-        "lt", eval_float ty_bool tyb Mode_rel less_p;
-        "eq", eval_float ty_bool tyb Mode_rel equal_p;
-        "is_zero", eval_float ty_bool tyb Mode_rel1 zero_p;
-        "is_infinite", eval_float ty_bool tyb Mode_rel1 inf_p;
-        "is_nan", eval_float ty_bool tyb Mode_rel1 nan_p;
-        ( "is_positive",
-          eval_float ty_bool tyb Mode_rel1 (fun s -> signbit s = Positive) );
-        ( "is_negative",
-          eval_float ty_bool tyb Mode_rel1 (fun s -> signbit s = Negative) ) ] )
-  in
-  let real_module =
-    ( ["real"],
-      "Real",
-      [],
-      [ op_infix "=", eval_real Mode_relr Big_real.eq;
-        op_infix "<", eval_real Mode_relr Big_real.lt;
-        op_infix "<=", eval_real Mode_relr Big_real.le;
-        op_prefix "-", eval_real Mode1r Big_real.neg;
-        op_infix "+", eval_real Mode2r Big_real.add;
-        op_infix "*", eval_real Mode2r Big_real.mul;
-        op_infix "/", eval_real Mode2r Big_real.div ] ) in
-  let real_square_module =
-    ["real"], "Square", [], ["sqrt", eval_real Mode1r Big_real.sqrt] in
-  let real_trigo_module =
-    ["real"], "Trigonometry", [], ["pi", eval_real Modeconst (Big_real.pi ())]
-  in
-  let real_exp_log =
-    ( ["real"],
-      "ExpLog",
-      [],
-      [ "exp", eval_real Mode1r Big_real.exp;
-        "log", eval_real Mode1r Big_real.log ] ) in
-  (bool_module :: int_modules)
-  @ [ real_module; real_square_module; real_trigo_module; real_exp_log;
-      mode_module; float_modules 32 ~prec:24 "Float32";
-      float_modules 64 ~prec:53 "Float64"; int63_module;
-      int31_module; byte_module; array_module ]
+  let int_ops = [
+    op_infix "+",      eval_int_op BigInt.add;
+    (* defined as x+(-y)
+       op_infix "-",   eval_int_op BigInt.sub; *)
+    op_infix "*",      eval_int_op BigInt.mul;
+    op_prefix "-",     eval_int_uop BigInt.minus;
+    op_infix "=",      eval_int_rel BigInt.eq;
+    op_infix "<",      eval_int_rel BigInt.lt;
+    op_infix "<=",     eval_int_rel BigInt.le;
+    op_infix ">",      eval_int_rel BigInt.gt;
+    op_infix ">=",     eval_int_rel BigInt.ge;
+  ] in
+  let bounded_int_ops = int_ops @ [
+    "of_int",          eval_int_uop (fun x -> x);
+    "to_int",          eval_int_uop (fun x -> x);
+    op_infix "-",      eval_int_op BigInt.sub;
+    op_infix "/",      eval_int_op BigInt.computer_div;
+    op_infix "%",      eval_int_op BigInt.computer_mod;
+  ] in
+  let float_module tyb ~prec m = builtin1t ["ieee_float"] m ("t", builtin_float_type) (fun ts -> [
+    "zeroF",           (fun _ _ -> value (ty_app ts []) (Vfloat (make_zero ~prec Positive)));
+    "add",             eval_float ts tyb Mode2 (fun rnd -> add ~rnd ~prec);
+    "sub",             eval_float ts tyb Mode2 (fun rnd -> sub ~rnd ~prec);
+    "mul",             eval_float ts tyb Mode2 (fun rnd -> mul ~rnd ~prec);
+    "div",             eval_float ts tyb Mode2 (fun rnd -> div ~rnd ~prec);
+    "abs",             eval_float ts tyb Mode1 (fun rnd -> abs ~rnd ~prec);
+    "neg",             eval_float ts tyb Mode1 (fun rnd -> neg ~rnd ~prec);
+    "fma",             eval_float ts tyb Mode3 (fun rnd -> fma ~rnd ~prec);
+    "sqrt",            eval_float ts tyb Mode1 (fun rnd -> sqrt ~rnd ~prec);
+    "roundToIntegral", eval_float ts tyb Mode1 (fun rnd -> rint ~rnd ~prec);
+    (* Intentionnally removed from programs
+       "min",          eval_float_minmax min;
+       "max",          eval_float_minmax max; *)
+    "le",              eval_float ts_bool tyb Mode_rel lessequal_p;
+    "lt",              eval_float ts_bool tyb Mode_rel less_p;
+    "eq",              eval_float ts_bool tyb Mode_rel equal_p;
+    "is_zero",         eval_float ts_bool tyb Mode_rel1 zero_p;
+    "is_infinite",     eval_float ts_bool tyb Mode_rel1 inf_p;
+    "is_nan",          eval_float ts_bool tyb Mode_rel1 nan_p;
+    "is_positive",     eval_float ts_bool tyb Mode_rel1 (fun s -> signbit s = Positive);
+    "is_negative",     eval_float ts_bool tyb Mode_rel1 (fun s -> signbit s = Negative);
+  ]) in
+  [
+    builtin ["bool"] "Bool" [
+      "True",          (fun _ _ -> value ty_bool (Vbool true));
+      "False",         (fun _ _ -> value ty_bool (Vbool false));
+    ];
+    builtin ["int"] "Int" int_ops;
+    builtin ["int"] "MinMax" [
+      "min",           eval_int_op BigInt.min;
+      "max",           eval_int_op BigInt.max
+    ];
+    builtin ["int"] "ComputerDivision" [
+      "div",           eval_int_op BigInt.computer_div;
+      "mod",           eval_int_op BigInt.computer_mod
+    ];
+    builtin ["int"] "EuclideanDivision" [
+      "div",           eval_int_op BigInt.euclidean_div;
+      "mod",           eval_int_op BigInt.euclidean_mod
+    ];
+    builtin ["mach"; "int"] "Byte" bounded_int_ops;
+    builtin ["mach"; "int"] "Int31" bounded_int_ops;
+    builtin ["mach"; "int"] "Int63" bounded_int_ops;
+    builtin1t ["ieee_float"] "RoundingMode" ("mode", dummy_type) (fun ts -> [
+      "RNE",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode To_Nearest));
+      "RNA",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode Away_From_Zero));
+      "RTP",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode Toward_Plus_Infinity));
+      "RTN",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode Toward_Minus_Infinity));
+      "RTZ",           (fun _ _ -> value (ty_app ts []) (Vfloat_mode Toward_Zero));
+    ]);
+    builtin ["real"] "Real" [
+      op_infix "=",    eval_real Mode_relr Big_real.eq;
+      op_infix "<",    eval_real Mode_relr Big_real.lt;
+      op_infix "<=",   eval_real Mode_relr Big_real.le;
+      op_prefix "-",   eval_real Mode1r Big_real.neg;
+      op_infix "+",    eval_real Mode2r Big_real.add;
+      op_infix "*",    eval_real Mode2r Big_real.mul;
+      op_infix "/",    eval_real Mode2r Big_real.div
+    ];
+    builtin ["real"] "Square" [
+      "sqrt",          eval_real Mode1r Big_real.sqrt
+    ];
+    builtin ["real"] "Trigonometry" [
+      "pi",            eval_real Modeconst (Big_real.pi ())
+    ];
+    builtin ["real"] "ExpLog" [
+      "exp",           eval_real Mode1r Big_real.exp;
+      "log",           eval_real Mode1r Big_real.log;
+    ];
+    builtin1t ["array"] "Array" ("array", builtin_array_type) (fun ts -> [
+      "make", (fun ts_array args -> match args with
+          | [{v_desc= Vnum n}; def] -> (
+              try
+                let n = BigInt.to_int n in
+                let ty = ty_app ts [def.v_ty] in
+                value ty (Varray (Array.make n def))
+              with e -> cannot_compute "Error making array: %a" Exn_printer.exn_printer e )
+          | _ -> assert false);
+      "empty", (fun ts_array args -> match args with
+          | [{v_desc= Vconstr(_, [])}] ->
+              (* we know by typing that the constructor
+                  will be the Tuple0 constructor *)
+              let ty = ty_app ts [ty_var (tv_of_string "a")] in
+              value ty (Varray [||])
+          | _ -> assert false);
+      "length", (fun _ args -> match args with
+          | [{v_desc= Varray a}] ->
+              value ty_int (Vnum (BigInt.of_int (Array.length a)))
+          | _ -> assert false) ;
+      op_get "", (fun _ args -> match args with
+          | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
+              try a.(BigInt.to_int i)
+              with e -> cannot_compute "Error getting array: %a" Exn_printer.exn_printer e )
+          | _ -> assert false);
+      op_set "", (fun _ args -> match args with
+          | [{v_desc= Varray a}; {v_desc= Vnum i}; v] -> (
+              try
+                a.(BigInt.to_int i) <- v;
+                value ty_unit Vvoid
+              with e -> cannot_compute "Error setting array: %a" Exn_printer.exn_printer e )
+          | _ -> assert false) ;
+        ]);
+    float_module 32 ~prec:24 "Float32";
+    float_module 64 ~prec:53 "Float64";
+  ]
 
-let add_builtin_mo env (l, n, t, d) =
-  let mo = Pmodule.read_module env l n in
-  let exp = mo.Pmodule.mod_export in
-  let kn = mo.Pmodule.mod_known in
+let add_builtin_mo env (Builtin_module {path; name; types; values}) =
+  let open Pmodule in
+  let pm = read_module env path name in
   List.iter
     (fun (id, r) ->
       let its =
-        try Pmodule.ns_find_its exp [id]
-        with Not_found -> raise (CannotFind (l, n, id)) in
-      r kn its)
-    t ;
+        try Pmodule.ns_find_its pm.mod_export [id]
+        with Not_found -> raise (CannotFind (path, name, id)) in
+      r pm.mod_known its)
+    types ;
   List.iter
     (fun (id, f) ->
       let ps =
-        try Pmodule.ns_find_rs exp [id]
-        with Not_found -> raise (CannotFind (l, n, id)) in
+        try Pmodule.ns_find_rs pm.mod_export [id]
+        with Not_found -> raise (CannotFind (path, name, id)) in
       Hrs.add builtin_progs ps f)
-    d
+    (values pm)
 
 let get_builtin_progs env =
   List.iter (add_builtin_mo env) (built_in_modules env)
