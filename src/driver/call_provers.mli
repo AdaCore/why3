@@ -47,6 +47,8 @@ val rac_reduce_config_lit : ?trans:string -> ?prover:string -> unit -> rac_reduc
 
 type ce_summary
 
+val print_ce_summary_kind : ce_summary Pp.pp
+
 val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 (** Print a title for the summary of counteexamples checking. The argument [check_ce]
    indicates if the checking counterexamples was requested. *)
@@ -73,7 +75,7 @@ type prover_result = {
 val print_prover_answer : Format.formatter -> prover_answer -> unit
 (** Pretty-print a {! prover_answer} *)
 
-val print_prover_result : ?json:[`All|`Model] -> ?check_ce:bool -> Format.formatter -> prover_result -> unit
+val print_prover_result : ?colorize:bool -> ?json:[`All|`Model] -> ?check_ce:bool -> Format.formatter -> prover_result -> unit
 (** Pretty-print a prover_result. The answer and the time are output. The output of the
    prover is printed if and only if the answer is a [HighFailure]. The argument [check_ce]
    indicates if the checking counterexamples was requested or not, or None it cannot be

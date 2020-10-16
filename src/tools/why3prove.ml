@@ -247,21 +247,21 @@ let print_result ?json ~check_ce fmt (fname, loc, goal_name, expls, res) =
         (print_json_field "explanations" print_json) (List (List.map (fun s -> String s) expls)) in
     fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
       (print_json_field "term" print_term) (loc, fname, goal_name, expls)
-      (print_json_field "prover-result" (Call_provers.print_prover_result ?json ~check_ce)) res
+      (print_json_field "prover-result" (Call_provers.print_prover_result ~colorize:false ~json:`All ~check_ce)) res
   else (
     ( match loc with
       | None -> fprintf fmt "File %s:@\n" fname
       | Some loc -> Loc.report_position Format.std_formatter loc );
     ( if expls = [] then
         fprintf fmt "@[<hov>Verification@ condition@ %a.@]"
-          (Util.ansi_color ~bold:true ?color:None Pp.string) goal_name
+          (Util.ansi_color ~bold:true Pp.string) goal_name
       else
         let expls = String.capitalize_ascii (String.concat ", " expls) in
         fprintf fmt "@[<hov>Goal@ %a@ from@ verification@ condition@ %a.@]"
-          (Util.ansi_color ~bold:true ?color:None Pp.string) expls
-          (Util.ansi_color ~bold:true ?color:None Pp.string) goal_name );
-    fprintf fmt "@\n@[<v>Prover result is: %a@]"
-      Call_provers.(print_prover_result ?json ~check_ce) res;
+          (Util.ansi_color ~bold:true Pp.string) expls
+          (Util.ansi_color ~bold:true Pp.string) goal_name );
+    if json <> Some `All then fprintf fmt "@\n";
+    Call_provers.print_prover_result ~colorize:true ?json ~check_ce fmt res;
     fprintf fmt "@\n" )
 
 let unproved = ref false

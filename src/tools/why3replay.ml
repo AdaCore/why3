@@ -100,7 +100,7 @@ let () =
       if Debug.test_flag debug then
         Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r)
 
-let print_result = Call_provers.print_prover_result ?check_ce:None
+let print_result = Call_provers.print_prover_result ~colorize:false ?json:None ?check_ce:None
 
 module S = Session_itp
 
@@ -147,14 +147,13 @@ let print_report ses (id,p,l,r) =
        match r with
        | C.Result(new_res,old_res) ->
           printf "%a instead of %a (timelimit=%d, memlimit=%d, steplimit=%d)@."
-                 (print_result ?json:None) new_res
-                 (print_result ?json:None) old_res
+                 print_result new_res print_result old_res
                  l.Call_provers.limit_time
                  l.Call_provers.limit_mem
                  l.Call_provers.limit_steps
        | C.No_former_result new_res ->
           printf "no former result available, new result is: %a@."
-                 (print_result ?json:None) new_res
+                 print_result new_res
        | C.CallFailed msg ->
           printf "internal failure '%a'@." Exn_printer.exn_printer msg;
        | C.Replay_interrupted ->
@@ -171,8 +170,7 @@ let print_report ses (id,p,l,r) =
        | C.No_former_result new_res -> new_res
        | _ -> assert false
      in
-     printf "result is: %a -> Smoke detected!@."
-                 (print_result ?json:None) res
+     printf "result is: %a -> Smoke detected!@." print_result res
 
 
 let same_result r1 r2 =

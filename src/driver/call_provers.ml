@@ -42,6 +42,15 @@ let rac_reduce_config_lit ?trans ?prover () =
 (** See output of [ce_summary_title] for details *)
 type ce_summary = NCCE of exec_log | SWCE of exec_log | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN of string
 
+let print_ce_summary_kind fmt s =
+  let str = match s with
+    | NCCE _ -> "NCCE"
+    | SWCE _ -> "SWCE"
+    | NCCE_SWCE _ -> "NCCE_SWCE"
+    | UNKNOWN _ -> "UNKNOWN"
+    | BAD_CE -> "BAD_CE" in
+  pp_print_string fmt str
+
 let print_ce_summary_title ?check_ce fmt = function
   | NCCE _ ->
       Format.fprintf fmt
@@ -82,7 +91,7 @@ let print_ce_summary_values ~json ~print_attrs model fmt s =
         fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
           print_model_field model print_log_field log
       else
-        fprintf fmt "%a" (print_exec_log ~json:false) log
+        fprintf fmt "@[%a@]" (print_exec_log ~json:false) log
   | UNKNOWN _ ->
       if json then
         fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
@@ -236,18 +245,13 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ?(json: [<`All | `Model] option) ?check_ce fmt r =
+let print_prover_result ?(colorize=false) ?(json: [<`All | `Model] option) ?check_ce fmt r =
   let open Json_base in
   let print_attrs = Debug.test_flag debug_attrs in
   let print_json_model fmt (m, s) =
     fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
       (print_json_field "verdict" print_json)
-      (String (match s with
-           | NCCE _ -> "NCCE"
-           | SWCE _ -> "SWCE"
-           | NCCE_SWCE _ -> "NCCE_SWCE"
-           | UNKNOWN _ -> "UNKNOWN"
-           | BAD_CE -> "BAD_CE"))
+      (String (asprintf "%a" print_ce_summary_kind s))
       (print_json_field "model" (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int))
       m in
   if json = Some `All then
@@ -264,20 +268,24 @@ let print_prover_result ?(json: [<`All | `Model] option) ?check_ce fmt r =
       (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
   else (
     let color = match r.pr_answer with | Valid -> 32 | Invalid -> 31 | _ -> 33 in
-    fprintf fmt "@[<hov>%a@ (%.2fs%a).@]" (Util.ansi_color ~bold:true ~color print_prover_answer) r.pr_answer
+    fprintf fmt "@[<v>@[<hov2>Prover@ result@ is:@ %a@ (%.2fs%a).@]"
+      (Util.ansi_color ~really:colorize ~color ~bold:true print_prover_answer) r.pr_answer
       r.pr_time print_steps r.pr_steps;
     (match r.pr_model with
      | Some (m, s) when not (is_model_empty m) ->
-         fprintf fmt "@ @[<hov>%a%t@]" (print_ce_summary_title ?check_ce) s
+         fprintf fmt "@ @[<hov2>%a%t@]" (print_ce_summary_title ?check_ce) s
            (fun fmt -> match s with
               | NCCE _ | SWCE _ | NCCE_SWCE _ ->
                   fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
+              | UNKNOWN _ ->
+                  fprintf fmt ":"
               | _ -> ());
          fprintf fmt "@ %a" (print_ce_summary_values ~print_attrs ~json:(json = Some `Model) m) s
      | _ -> ());
     if r.pr_answer == HighFailure then
       fprintf fmt "@ Prover exit status: %a@\nProver output:@\n%s@\n"
-        print_prover_status r.pr_status r.pr_output )
+        print_prover_status r.pr_status r.pr_output;
+    fprintf fmt "@]" )
 
 let rec grep out l = match l with
   | [] ->
