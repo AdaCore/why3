@@ -1,23 +1,26 @@
 CFG size: 41 nodes, 41 hyperedges
-Time elapsed 0.056293s
+Time elapsed 0.035769s
 ### Debug: inferred invariants ###
 (0 < contents i /\ contents i <= 10) /\ (2 * contents i) = (2 + contents j)
 ###
 CFG size: 41 nodes, 41 hyperedges
-Time elapsed 10.336107s
+Time elapsed 8.094463s
 ### Debug: inferred invariants ###
 ((((((((((((contents i1 <= 1 /\ (contents i1 + contents j1) <= 1) /\
            contents j1 < contents i1) /\
           contents j1 <= 0) /\
          contents j1 = 0) /\
         contents i1 = 1 \/
-        ((((((6 <= contents i1 /\ contents i1 <= 6) /\
-             (contents i1 + 4) <= contents j1) /\
-            16 <= (contents i1 + contents j1)) /\
-           10 <= contents j1) /\
-          (contents i1 + contents j1) <= 16) /\
-         contents j1 <= (4 + contents i1)) /\
-        contents j1 <= 10 \/
+        ((((((9 <= contents i1 /\ contents i1 <= 9) /\
+             (contents i1 + 7) <= contents j1) /\
+            25 <= (contents i1 + contents j1)) /\
+           16 <= contents j1) /\
+          (contents i1 + contents j1) <= 25) /\
+         contents j1 <= (7 + contents i1)) /\
+        contents j1 <= 16 \/
+        ((10 <= contents i1 /\ (contents i1 + 8) <= contents j1) /\
+         28 <= (contents i1 + contents j1)) /\
+        18 <= contents j1 \/
         ((((((7 <= contents i1 /\ contents i1 <= 7) /\
              (contents i1 + 5) <= contents j1) /\
             19 <= (contents i1 + contents j1)) /\
@@ -25,9 +28,6 @@ Time elapsed 10.336107s
           (contents i1 + contents j1) <= 19) /\
          contents j1 <= (5 + contents i1)) /\
         contents j1 <= 12 \/
-        ((10 <= contents i1 /\ (contents i1 + 8) <= contents j1) /\
-         28 <= (contents i1 + contents j1)) /\
-        18 <= contents j1 \/
         ((((((5 <= contents i1 /\ contents i1 <= 5) /\
              (contents i1 + 3) <= contents j1) /\
             13 <= (contents i1 + contents j1)) /\
@@ -57,20 +57,20 @@ Time elapsed 10.336107s
           (contents i1 + contents j1) <= 10) /\
          contents j1 <= (2 + contents i1)) /\
         contents j1 <= 6 \/
-        ((((((9 <= contents i1 /\ contents i1 <= 9) /\
-             (contents i1 + 7) <= contents j1) /\
-            25 <= (contents i1 + contents j1)) /\
-           16 <= contents j1) /\
-          (contents i1 + contents j1) <= 25) /\
-         contents j1 <= (7 + contents i1)) /\
-        contents j1 <= 16 \/
         ((((((8 <= contents i1 /\ contents i1 <= 8) /\
              (contents i1 + 6) <= contents j1) /\
             22 <= (contents i1 + contents j1)) /\
            14 <= contents j1) /\
           (contents i1 + contents j1) <= 22) /\
          contents j1 <= (6 + contents i1)) /\
-        contents j1 <= 14) /\
+        contents j1 <= 14 \/
+        ((((((6 <= contents i1 /\ contents i1 <= 6) /\
+             (contents i1 + 4) <= contents j1) /\
+            16 <= (contents i1 + contents j1)) /\
+           10 <= contents j1) /\
+          (contents i1 + contents j1) <= 16) /\
+         contents j1 <= (4 + contents i1)) /\
+        contents j1 <= 10) /\
        contents j1 <= 18) /\
       contents j1 <= (8 + contents i1)) /\
      (contents i1 + contents j1) <= 28) /\
@@ -81,16 +81,14 @@ Time elapsed 10.336107s
 0 < contents i1
 ###
 CFG size: 41 nodes, 41 hyperedges
-Time elapsed 7.209345s
+Time elapsed 6.951624s
 ### Debug: inferred invariants ###
 (((((1 = contents i2 /\ 0 = contents j2) /\ contents j2 = 0) /\
-   contents i2 = 1 \/
-   ((2 = contents i2 /\ 2 = contents j2) /\ contents j2 = contents i2) /\
-   2 = contents i2 \/ 3 <= contents i2 /\ 4 <= contents j2) /\
+   contents i2 = 1 \/ 2 <= contents i2 /\ 2 <= contents j2) /\
   0 <= contents j2) /\
  contents i2 <= 10) /\
 0 < contents i2
 ###
 bench/infer/while1.mlw While1 b'vc: Valid (0.01s, 10 steps)
 bench/infer/while1.mlw While1 b2'vc: Valid (0.05s, 110 steps)
-bench/infer/while1.mlw While1 b3'vc: Unknown () (0.07s)
+bench/infer/while1.mlw While1 b3'vc: Unknown () (0.04s)

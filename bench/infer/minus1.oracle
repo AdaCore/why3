@@ -1,10 +1,10 @@
 CFG size: 53 nodes, 53 hyperedges
-Time elapsed 0.073794s
+Time elapsed 0.042864s
 ### Debug: inferred invariants ###
 (0 < contents i /\ contents i <= 10) /\ 20 = ((2 * contents i) + contents j)
 ###
 CFG size: 53 nodes, 53 hyperedges
-Time elapsed 11.493837s
+Time elapsed 10.832923s
 ### Debug: inferred invariants ###
 ((((((((((((contents i1 <= 1 /\ (contents i1 + 17) <= contents j1) /\
            19 <= (contents i1 + contents j1)) /\
@@ -25,9 +25,13 @@ Time elapsed 11.493837s
           (contents i1 + contents j1) <= 13) /\
          contents j1 < contents i1) /\
         contents j1 <= 6 \/
-        ((10 <= contents i1 /\ (contents i1 + contents j1) <= 10) /\
-         (contents j1 + 10) <= contents i1) /\
-        contents j1 <= 0 \/
+        ((((((9 <= contents i1 /\ contents i1 <= 9) /\
+             contents i1 <= (7 + contents j1)) /\
+            11 <= (contents i1 + contents j1)) /\
+           2 <= contents j1) /\
+          (contents i1 + contents j1) <= 11) /\
+         (contents j1 + 7) <= contents i1) /\
+        contents j1 <= 2 \/
         ((((((6 <= contents i1 /\ contents i1 <= 6) /\
              (contents i1 + 2) <= contents j1) /\
             14 <= (contents i1 + contents j1)) /\
@@ -63,13 +67,9 @@ Time elapsed 11.493837s
           (contents i1 + contents j1) <= 12) /\
          (contents j1 + 4) <= contents i1) /\
         contents j1 <= 4 \/
-        ((((((9 <= contents i1 /\ contents i1 <= 9) /\
-             contents i1 <= (7 + contents j1)) /\
-            11 <= (contents i1 + contents j1)) /\
-           2 <= contents j1) /\
-          (contents i1 + contents j1) <= 11) /\
-         (contents j1 + 7) <= contents i1) /\
-        contents j1 <= 2) /\
+        ((10 <= contents i1 /\ (contents i1 + contents j1) <= 10) /\
+         (contents j1 + 10) <= contents i1) /\
+        contents j1 <= 0) /\
        contents j1 <= 18) /\
       contents j1 <= (17 + contents i1)) /\
      (contents i1 + contents j1) <= 19) /\
@@ -80,16 +80,14 @@ Time elapsed 11.493837s
 0 < contents i1
 ###
 CFG size: 53 nodes, 53 hyperedges
-Time elapsed 7.342879s
+Time elapsed 7.076171s
 ### Debug: inferred invariants ###
 (((((1 = contents i2 /\ 18 = contents j2) /\ 1 = contents i2) /\
-   18 = contents j2 \/
-   ((2 = contents i2 /\ 16 = contents j2) /\ 16 = contents j2) /\
-   2 = contents i2 \/ 3 <= contents i2 /\ contents j2 <= 14) /\
+   18 = contents j2 \/ 2 <= contents i2 /\ contents j2 <= 16) /\
   contents j2 <= 18) /\
  contents i2 <= 10) /\
 0 < contents i2
 ###
 bench/infer/minus1.mlw Minus1 b'vc: Valid (0.01s, 14 steps)
-bench/infer/minus1.mlw Minus1 b2'vc: Valid (0.07s, 112 steps)
-bench/infer/minus1.mlw Minus1 b3'vc: Unknown () (0.06s)
+bench/infer/minus1.mlw Minus1 b2'vc: Valid (0.05s, 112 steps)
+bench/infer/minus1.mlw Minus1 b3'vc: Unknown () (0.04s)

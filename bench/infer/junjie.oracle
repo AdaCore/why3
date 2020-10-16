@@ -1,10 +1,8 @@
 CFG size: 54 nodes, 55 hyperedges
-Time elapsed 0.323594s
+Time elapsed 26.722454s
 ### Debug: inferred invariants ###
-((((contents x = contents y /\ contents x <= 51) /\ 0 <= contents x \/
-   (102 = (contents x + contents y) /\ contents x <= 103) /\ 52 <= contents x) /\
-  0 <= (contents x + (103 * contents y))) /\
- contents y <= contents x) /\
-(contents x + contents y) <= 102
+(((0 = contents y /\ 0 = contents x) /\ contents x = 0) /\ contents y = 0 \/
+ 52 <= contents x \/ contents x <= 51 /\ 0 < contents y) /\
+0 <= (1 + contents y)
 ###
-bench/infer/junjie.mlw Junjie b'vc: Unknown () (0.00s)
+bench/infer/junjie.mlw Junjie b'vc: Unknown () (0.02s)

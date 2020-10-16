@@ -5,18 +5,16 @@ Couldn't understand entirely the post condition:
 le (elts a @ (contents i + (- 1))) (elts a @ contents i)
 Couldn't understand entirely the post condition:
 le (elts a @ (contents i + (- 1))) (elts a @ contents i)
-Couldn't understand entirely the post condition:
-le (elts a @ (contents i + (- 1))) (elts a @ contents i)
-Couldn't understand entirely the post condition:
-le (elts a @ (contents i + (- 1))) (elts a @ contents i)
-Time elapsed 0.020805s
+Time elapsed 0.004123s
 ### Debug: inferred invariants ###
 (0 <= lo /\ contents i <= length a) /\ lo < contents i
 ###
 CFG size: 17 nodes, 17 hyperedges
 Couldn't understand entirely the post condition:
 le (elts a1 @ (contents i1 + (- 1))) (elts a1 @ contents i1)
-Time elapsed 0.000803s
+Couldn't understand entirely the post condition:
+le (elts a1 @ (contents i1 + (- 1))) (elts a1 @ contents i1)
+Time elapsed 0.001141s
 ### Debug: inferred invariants ###
 (0 < contents i1 /\ 0 < length a1) /\ 0 <= lo1
 ###
@@ -24,14 +22,6 @@ Multiple constructors exception, not handled by AI.Multiple constructors excepti
 Couldn't understand entirely the post condition:
 sorted_sub a3 o6 mid
 Couldn't understand entirely the post condition:
-sorted_sub a3 o6 mid
-Couldn't understand entirely the post condition:
-sorted_sub a3 o6 mid
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
-Couldn't understand entirely the post condition:
 not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
 Couldn't understand entirely the post condition:
 sorted_sub a3 mid hi
@@ -80,56 +70,6 @@ sorted_sub a3 o6 mid
 Couldn't understand entirely the post condition:
 sorted_sub a3 o6 mid
 Couldn't understand entirely the post condition:
-not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
-Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o6 mid
-Couldn't understand entirely the post condition:
-sorted_sub a3 o6 mid
-Couldn't understand entirely the post condition:
 sorted_sub a3 o6 mid
 Couldn't understand entirely the post condition:
 not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
@@ -138,56 +78,6 @@ not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
 Couldn't understand entirely the post condition:
 not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
 Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 mid hi
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-permut a2 a3 o7 hi
-Couldn't understand entirely the post condition:
-sorted_sub a3 o6 mid
-Couldn't understand entirely the post condition:
-sorted_sub a3 o6 mid
-Couldn't understand entirely the post condition:
-sorted_sub a3 o6 mid
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
-Couldn't understand entirely the post condition:
-not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
-Couldn't understand entirely the post condition:
 not le (elts a3 @ (mid + (- 1))) (elts a3 @ mid)
 Couldn't understand entirely the post condition:
 sorted_sub a3 mid hi
@@ -200,6 +90,14 @@ sorted_sub a3 mid hi
 Couldn't understand entirely the post condition:
 sorted_sub a3 mid hi
 Couldn't understand entirely the post condition:
+sorted_sub a3 mid hi
+Couldn't understand entirely the post condition:
+sorted_sub a3 mid hi
+Couldn't understand entirely the post condition:
+not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
+Couldn't understand entirely the post condition:
+not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
+Couldn't understand entirely the post condition:
 not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
 Couldn't understand entirely the post condition:
 not le (elts a3 @ (hi + (- 1))) (elts a3 @ hi)
@@ -219,6 +117,14 @@ Couldn't understand entirely the post condition:
 sorted_sub a3 o7 hi
 Couldn't understand entirely the post condition:
 sorted_sub a3 o7 hi
+Couldn't understand entirely the post condition:
+sorted_sub a3 o7 hi
+Couldn't understand entirely the post condition:
+sorted_sub a3 o7 hi
+Couldn't understand entirely the post condition:
+permut a2 a3 o7 hi
+Couldn't understand entirely the post condition:
+permut a2 a3 o7 hi
 Couldn't understand entirely the post condition:
 permut a2 a3 o7 hi
 Couldn't understand entirely the post condition:
@@ -373,12 +279,9 @@ Couldn't understand entirely the post condition:
 permut a2 a3 o7 hi
 Couldn't understand entirely the post condition:
 permut a2 a3 o7 hi
-Time elapsed 10.164182s
+Time elapsed 9.401997s
 ### Debug: inferred invariants ###
-(((0 = contents lo2 /\ 2 <= contents first_run) /\ contents lo2 = 0 \/
-  ((contents first_run = contents lo2 /\ 2 <= contents first_run) /\ 2 <= n) /\
-  contents lo2 = contents first_run \/
-  (((((((n = length tmp /\ n = length a3) /\ 0 = contents lo2) /\
+(((((((((n = length tmp /\ n = length a3) /\ 0 = contents lo2) /\
        0 = contents first_run) /\
       2 <= n) /\
      contents first_run = 0) /\
@@ -386,19 +289,21 @@ Time elapsed 10.164182s
    length a3 = n) /\
   length tmp = n \/
   ((contents first_run + 2) <= contents lo2 /\ 2 <= contents first_run) /\
-  (contents first_run + 2) <= n) /\
+  (contents first_run + 2) <= n \/
+  (0 = contents lo2 /\ 2 <= contents first_run) /\ contents lo2 = 0 \/
+  ((contents first_run = contents lo2 /\ 2 <= contents first_run) /\ 2 <= n) /\
+  contents lo2 = contents first_run) /\
  0 <= contents first_run) /\
 0 <= contents lo2
-(2 <= contents first_run \/
- (((((n = length tmp /\ n = length a3) /\ 0 = contents first_run) /\ 2 <= n) /\
+((((((n = length tmp /\ n = length a3) /\ 0 = contents first_run) /\ 2 <= n) /\
    contents first_run = 0) /\
   length a3 = n) /\
- length tmp = n) /\
+ length tmp = n \/ 2 <= contents first_run) /\
 0 <= contents first_run
 ###
-bench/infer/merge_sort.mlw Elt Refl: Unknown () (0.00s)
-bench/infer/merge_sort.mlw Elt Trans: Unknown () (0.00s)
-bench/infer/merge_sort.mlw Elt Total: Unknown () (0.02s)
+bench/infer/merge_sort.mlw Elt Refl: Unknown () (0.02s)
+bench/infer/merge_sort.mlw Elt Trans: Unknown () (0.02s)
+bench/infer/merge_sort.mlw Elt Total: Unknown () (0.00s)
 bench/infer/merge_sort.mlw Merge merge'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw Merge merge_using'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw TopDownMergesort mergesort_rec'vc: Timeout (1.00s)
@@ -408,4 +313,4 @@ bench/infer/merge_sort.mlw NaturalMergesort find_run'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw NaturalMergesort find_run2'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw NaturalMergesort natural_mergesort'vc: Timeout (1.00s)
 bench/infer/merge_sort.mlw NaturalMergesort naturalrec'vc: Timeout (1.00s)
-bench/infer/merge_sort.mlw NaturalMergesort natural_mergesort2'vc: Valid (0.02s, 60 steps)
+bench/infer/merge_sort.mlw NaturalMergesort natural_mergesort2'vc: Valid (0.03s, 60 steps)

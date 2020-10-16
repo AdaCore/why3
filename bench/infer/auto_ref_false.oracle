@@ -1,40 +1,36 @@
 CFG size: 17 nodes, 17 hyperedges
-Time elapsed 0.044977s
+Time elapsed 0.008625s
 ### Debug: inferred invariants ###
 (0 < x /\ contents k <= x) /\ 0 <= contents k
 ###
 CFG size: 17 nodes, 17 hyperedges
-Time elapsed 3.861273s
+Time elapsed 2.660925s
 ### Debug: inferred invariants ###
-((0 = contents k1 /\ contents k1 = 0 \/
-  1 = contents k1 \/ 2 <= x1 /\ 2 <= contents k1) /\
- 0 <= contents k1) /\
+((0 = contents k1 /\ contents k1 = 0 \/ 0 < contents k1) /\ 0 <= contents k1) /\
 0 < x1
 ###
 CFG size: 35 nodes, 35 hyperedges
-Time elapsed 0.053218s
+Time elapsed 0.022252s
 ### Debug: inferred invariants ###
 ((2 <= x2 /\ contents k2 <= x2) /\ 0 <= contents k2) /\
 (2 * contents k2) = contents j
 ###
 CFG size: 35 nodes, 35 hyperedges
-Time elapsed 206.524013s
+Time elapsed 144.841948s
 ### Debug: inferred invariants ###
 contents k3 <= x3 /\ 2 <= x3
 ###
 CFG size: 35 nodes, 35 hyperedges
-Time elapsed 7.269964s
+Time elapsed 6.871813s
 ### Debug: inferred invariants ###
 (((((0 = contents k4 /\ 0 = contents j2) /\ contents k4 = 0) /\
-   contents j2 = 0 \/
-   (1 = contents k4 /\ 2 = contents j2) /\ 2 = contents j2 \/
-   2 <= contents k4 /\ 4 <= contents j2) /\
+   contents j2 = 0 \/ 0 < contents k4 /\ 2 <= contents j2) /\
   0 <= contents j2) /\
  0 <= contents k4) /\
 2 <= x4
 ###
-bench/infer/auto_ref_false.mlw Test b'vc: Unknown () (0.00s)
+bench/infer/auto_ref_false.mlw Test b'vc: Unknown () (0.03s)
 bench/infer/auto_ref_false.mlw Test b3'vc: Unknown () (0.02s)
-bench/infer/auto_ref_false.mlw Test c'vc: Unknown () (0.39s)
+bench/infer/auto_ref_false.mlw Test c'vc: Unknown () (0.31s)
 bench/infer/auto_ref_false.mlw Test c2'vc: Unknown () (0.04s)
-bench/infer/auto_ref_false.mlw Test c3'vc: Unknown () (0.05s)
+bench/infer/auto_ref_false.mlw Test c3'vc: Unknown () (0.06s)

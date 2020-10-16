@@ -1,57 +1,57 @@
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.020426s
+Time elapsed 0.037289s
 ### Debug: inferred invariants ###
 ((forall w1:int.
    ((length (make x 2) = length a /\ length (make x 2) = x) /\ w1 < 0) /\
    length (make x 2) = length a \/
-   (2 = (elts a @ w1) /\ length (make x (elts a @ w1)) = length a) /\
-   (elts a @ w1) = 2 \/
    ((length (make x 2) = length a /\ length (make x 2) = x) /\
     length (make x 2) <= w1) /\
-   length (make x 2) = length a) /\
+   length (make x 2) = length a \/
+   (2 = (elts a @ w1) /\ length (make x (elts a @ w1)) = length a) /\
+   (elts a @ w1) = 2) /\
  x = length a) /\
 x = length a
 ###
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.070510s
+Time elapsed 0.114423s
 ### Debug: inferred invariants ###
 (((forall w2:int.
     ((((w2 < 0 /\ length (make x1 2) <= x1) /\ x1 <= length (make x1 2)) /\
       length (make x1 2) <= length a1) /\
      length a1 <= length (make x1 2)) /\
     length (make x1 2) = length a1 \/
-    ((((2 <= (elts a1 @ w2) /\ (elts a1 @ w2) <= 2) /\ x1 <= x1) /\ x1 <= x1) /\
-     length (make x1 (elts a1 @ w2)) = length a1) /\
-    (elts a1 @ w2) = 2 \/
     ((((((length (make x1 2) <= w2 /\ length (make x1 2) <= x1) /\
          x1 <= length (make x1 2)) /\
         x1 <= w2) /\
        length (make x1 2) <= length a1) /\
       length a1 <= length (make x1 2)) /\
      length a1 <= w2) /\
-    length (make x1 2) = length a1) /\
+    length (make x1 2) = length a1 \/
+    ((((2 <= (elts a1 @ w2) /\ (elts a1 @ w2) <= 2) /\ x1 <= x1) /\ x1 <= x1) /\
+     length (make x1 (elts a1 @ w2)) = length a1) /\
+    (elts a1 @ w2) = 2) /\
   x1 = length a1) /\
  length a1 <= x1) /\
 x1 <= length a1
 ###
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.001055s
+Time elapsed 0.001065s
 ### Debug: inferred invariants ###
 length (make x2 2) = length a2 /\ x2 = length a2
 ###
 CFG size: 20 nodes, 20 hyperedges
-Time elapsed 0.037483s
+Time elapsed 0.087426s
 ### Debug: inferred invariants ###
 (((((forall w4:int.
       (((length (make n 10) = length a3 /\ length (make n 10) = n) /\ w4 < 0) /\
        0 <= length (make n 10)) /\
       length (make n 10) = length a3 \/
-      (10 = (elts a3 @ w4) /\ length (make n (elts a3 @ w4)) = length a3) /\
-      (elts a3 @ w4) = 10 \/
       (((length (make n 10) = length a3 /\ length (make n 10) = n) /\
         length (make n 10) <= w4) /\
        0 <= length (make n 10)) /\
-      length (make n 10) = length a3) /\
+      length (make n 10) = length a3 \/
+      (10 = (elts a3 @ w4) /\ length (make n (elts a3 @ w4)) = length a3) /\
+      (elts a3 @ w4) = 10) /\
     (elts a3 @ 5) = b) /\
    n = length a3) /\
   0 <= n) /\
@@ -59,7 +59,7 @@ Time elapsed 0.037483s
 (elts a3 @ 5) = b
 ###
 CFG size: 20 nodes, 20 hyperedges
-Time elapsed 0.125136s
+Time elapsed 0.213440s
 ### Debug: inferred invariants ###
 (((((((((forall w5:int.
           ((((((((((0 <= length (make n1 10) /\ w5 < length (make n1 10)) /\
@@ -73,18 +73,6 @@ Time elapsed 0.125136s
             w5 < length a4) /\
            length a4 <= length (make n1 10)) /\
           length (make n1 10) = length a4 \/
-          (((((((((((10 <= (n1 + (elts a4 @ w5)) /\ 10 <= (elts a4 @ w5)) /\
-                    (elts a4 @ w5) <= (10 + n1)) /\
-                   (elts a4 @ w5) <= 10) /\
-                  n1 <= n1) /\
-                 0 <= (n1 + n1)) /\
-                (elts a4 @ w5) <= (10 + n1)) /\
-               10 <= ((elts a4 @ w5) + n1)) /\
-              n1 <= n1) /\
-             (elts a4 @ w5) <= (10 + length a4)) /\
-            10 <= ((elts a4 @ w5) + length a4)) /\
-           length (make n1 (elts a4 @ w5)) = length a4) /\
-          (elts a4 @ w5) = 10 \/
           (((((((((((((0 <= length (make n1 10) /\ length (make n1 10) <= w5) /\
                       0 <= (length (make n1 10) + w5)) /\
                      0 <= w5) /\
@@ -98,7 +86,19 @@ Time elapsed 0.125136s
              0 <= (w5 + length a4)) /\
             length a4 <= length (make n1 10)) /\
            length a4 <= w5) /\
-          length (make n1 10) = length a4) /\
+          length (make n1 10) = length a4 \/
+          (((((((((((10 <= (n1 + (elts a4 @ w5)) /\ 10 <= (elts a4 @ w5)) /\
+                    (elts a4 @ w5) <= (10 + n1)) /\
+                   (elts a4 @ w5) <= 10) /\
+                  n1 <= n1) /\
+                 0 <= (n1 + n1)) /\
+                (elts a4 @ w5) <= (10 + n1)) /\
+               10 <= ((elts a4 @ w5) + n1)) /\
+              n1 <= n1) /\
+             (elts a4 @ w5) <= (10 + length a4)) /\
+            10 <= ((elts a4 @ w5) + length a4)) /\
+           length (make n1 (elts a4 @ w5)) = length a4) /\
+          (elts a4 @ w5) = 10) /\
         (elts a4 @ 5) = b1) /\
        n1 = length a4) /\
       length a4 <= n1) /\
@@ -110,21 +110,22 @@ Time elapsed 0.125136s
 0 <= n1
 ###
 CFG size: 20 nodes, 20 hyperedges
-Time elapsed 0.005571s
+Time elapsed 0.008959s
 ### Debug: inferred invariants ###
 ((((forall w6:int.
      w6 < 0 /\ length (make n2 10) = length a5 \/
+     0 <= w6 /\ length (make n2 10) = length a5 \/
      (10 = (elts a5 @ w6) /\ length (make n2 (elts a5 @ w6)) = length a5) /\
-     (elts a5 @ w6) = 10 \/ 0 <= w6 /\ length (make n2 10) = length a5) /\
+     (elts a5 @ w6) = 10) /\
    (elts a5 @ 5) = b2) /\
   n2 = length a5) /\
  0 <= length a5) /\
 0 <= n2
 ###
 bench/infer/auto_array1.mlw Test basic'vc: Unknown () (0.02s)
-bench/infer/auto_array1.mlw Test basic1'vc: Unknown () (0.02s)
-bench/infer/auto_array1.mlw Test basic2'vc: Unknown () (0.02s)
-bench/infer/auto_array1.mlw Test b'vc: Unknown () (0.02s)
+bench/infer/auto_array1.mlw Test basic1'vc: Unknown () (0.03s)
+bench/infer/auto_array1.mlw Test basic2'vc: Unknown () (0.00s)
+bench/infer/auto_array1.mlw Test b'vc: Unknown () (0.00s)
 bench/infer/auto_array1.mlw Test b2'vc: Unknown () (0.00s)
 bench/infer/auto_array1.mlw Test c'vc: Timeout (1.00s)
 bench/infer/auto_array1.mlw Test d_basic'vc: Timeout (1.00s)
