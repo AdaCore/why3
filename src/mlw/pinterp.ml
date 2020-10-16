@@ -984,11 +984,11 @@ let cntr_desc_str str1 str2 = str1 ^ " of " ^ str2
 let cntr_desc str id =
   asprintf "%s of %a" str print_decoded id.id_string
 
-let cntr_title fmt (ctx, msg) =
+let report_cntr_title fmt (ctx, msg) =
   fprintf fmt "%s %s" ctx.c_desc msg
 
 let report_cntr_head fmt (ctx, msg, term) =
-  fprintf fmt "@[<v>%a%t@]" cntr_title (ctx, msg)
+  fprintf fmt "@[<v>%a%t@]" report_cntr_title (ctx, msg)
     (fun fmt ->
        match ctx.c_trigger_loc, term.t_loc with
        | Some t1, Some t2 ->
@@ -1014,9 +1014,9 @@ let report_cntr_body fmt (ctx, term) =
           (Mvs.filter (fun vs _ -> Mvs.contains mvs vs) ctx.c_env.vsenv)))
 
 let report_cntr fmt (ctx, msg, term) =
-  fprintf fmt "@[<v>%a@," report_cntr_head (ctx, msg, term);
-  report_cntr_body fmt (ctx, term);
-  fprintf fmt "@]"
+  fprintf fmt "@[<v>%a@,%a@]"
+    report_cntr_head (ctx, msg, term)
+    report_cntr_body (ctx, term)
 
 let cntr_ctx desc ?trigger_loc env =
   { c_desc= desc;
@@ -1246,12 +1246,12 @@ let check_term ?vsenv ctx t =
   Debug.dprintf debug_rac_check "@[<hv2>Check term: %a@]@." print_term t;
   let task, _ = task_of_term ?vsenv ctx.c_env t in
   let res = (* Try checking the term using computation first ... *)
-    Opt.map (fun b -> Debug.dprintf debug_rac_check "Computed.@."; b)
+    Opt.map (fun b -> Debug.dprintf debug_rac_check "Computed %b.@." b; b)
       (Opt.bind ctx.c_env.rac.rac_reduce.rac_trans
          (fun trans -> check_term_compute ctx.c_env trans task)) in
   let res =
     if res = None then (* ... then try solving using a prover *)
-      Opt.map (fun b -> Debug.dprintf debug_rac_check "Dispatched.@."; b)
+      Opt.map (fun b -> Debug.dprintf debug_rac_check "Dispatched: %b.@." b; b)
         (Opt.bind ctx.c_env.rac.rac_reduce.rac_prover
            (fun rp -> check_term_dispatch rp task))
     else res in
@@ -1263,10 +1263,9 @@ let check_term ?vsenv ctx t =
       raise (Contr (ctx, t))
   | None ->
       let msg = "cannot be evaluated" in
-      if (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
-        Debug.dprintf debug_rac "%a@." report_cntr (ctx, msg, t)
-      else
-        cannot_compute "%a" cntr_title (ctx, msg)
+      Debug.dprintf debug_rac "%a: %a@." report_cntr_title (ctx, msg) print_term t;
+      if not (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
+        cannot_compute "%a" report_cntr_title (ctx, msg)
 
 let check_terms ctx = List.iter (check_term ctx)
 
