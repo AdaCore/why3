@@ -89,9 +89,20 @@ val cmp : 'a cmptr list -> 'a -> 'a -> int
 val cmp_lists : 'a cmptr list -> 'a list -> 'a list -> int
 (** Create a comparison function for lists using lexical order defined by a list of comparators *)
 
-(** {3 ANSI colors} *)
+(** {3 ANSI terminal colors} *)
 
-val ansi_color : ?really:bool -> ?color:int -> ?bold:bool ->
-  (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'a -> unit)
-(** [ansi_color p] adds ANSI color formatting to the printer [p]. It just forwards to [p]
-   without adding color formatting when [~really:false]. *)
+val has_terminal_color : bool
+(** Indicates if standard output supports ANSI terminal color codes (i.e. that the
+   ["TERM"] environment variables is set, and not to ["dump"], and that standard output is
+   a terminal. *)
+
+val ansi_color_tags : Format.formatter_tag_functions
+(** Functions to interpret tags as ANSI terminal color codes. The format of the tag is
+   [[bold] [<color>] [on <bg-color>]].
+
+    Possible colors are [black], [red], [green], [yellow], [blue], [magenta], [cyan], and
+   [white].
+
+    Valid formatting tags are for example ["@{<red>red text@}"], ["@{<bold>bold text@}"],
+   ["@{<on green>text on green background@}"], or ["@{<bold red on green>unreadable@}"].
+   *)

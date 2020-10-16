@@ -247,21 +247,20 @@ let print_result ?json ~check_ce fmt (fname, loc, goal_name, expls, res) =
         (print_json_field "explanations" print_json) (List (List.map (fun s -> String s) expls)) in
     fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
       (print_json_field "term" print_term) (loc, fname, goal_name, expls)
-      (print_json_field "prover-result" (Call_provers.print_prover_result ~colorize:false ~json:`All ~check_ce)) res
+      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:`All ~check_ce)) res
   else (
     ( match loc with
       | None -> fprintf fmt "File %s:@\n" fname
-      | Some loc -> Loc.report_position Format.std_formatter loc );
+      | Some loc -> Loc.report_position fmt loc );
     ( if expls = [] then
-        fprintf fmt "@[<hov>Verification@ condition@ %a.@]"
-          (Util.ansi_color ~bold:true Pp.string) goal_name
+        fprintf fmt "@[<hov>Verification@ condition@ @{<bold>%s@}.@]" goal_name
       else
         let expls = String.capitalize_ascii (String.concat ", " expls) in
-        fprintf fmt "@[<hov>Goal@ %a@ from@ verification@ condition@ %a.@]"
-          (Util.ansi_color ~bold:true Pp.string) expls
-          (Util.ansi_color ~bold:true Pp.string) goal_name );
+        fprintf fmt
+          "@[<hov>Goal@ @{<bold>%s@}@ from@ verification@ condition@ @{<bold>%s@}.@]"
+          expls goal_name );
     if json <> Some `All then fprintf fmt "@\n";
-    Call_provers.print_prover_result ~colorize:true ?json ~check_ce fmt res;
+    Call_provers.print_prover_result ?json ~check_ce fmt res;
     fprintf fmt "@\n" )
 
 let unproved = ref false
@@ -389,6 +388,9 @@ let do_input env drv = function
 
 let () =
   try
+    if Util.has_color then (
+      set_formatter_tag_functions Util.ansi_color_tags;
+      set_mark_tags true );
     let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue;

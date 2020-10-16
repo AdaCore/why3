@@ -84,11 +84,29 @@ let has_color =
   let term = try Sys.getenv "TERM" with Not_found -> "" in
   term <> "" && term <> "dumb" && Unix.isatty Unix.stdout
 
-let ansi_color ?(really=true) ?color ?(bold=false) p fmt x =
-  if has_color && really then
-    Format.fprintf fmt "\027[%t%t%tm%a\027[0m"
-      (fun fmt -> match color with Some c -> Format.fprintf fmt "%d" c | None -> ())
-      (fun fmt -> if color <> None && bold then Format.fprintf fmt ";")
-      (fun fmt -> if bold then Format.fprintf fmt "1")
-      p x
-  else p fmt x
+let esc_seq_of_tag str =
+  let tokens = String.split_on_char ' ' (String.lowercase_ascii str) in
+  let bold, tokens = match tokens with
+    | "bold" :: tokens -> true, tokens
+    | tokens -> false, tokens in
+  let fg, bg = match tokens with
+    | [] -> None, None
+    | [fg] -> Some fg, None
+    | ["on"; bg] -> None, Some bg
+    | [fg; "on"; bg] -> Some fg, Some bg
+    | _ -> Format.ksprintf failwith
+             "ANSI format tag must be <[bold] [<color>] [on <bg-color>]>, not %s" str in
+  let code = function
+    | "black" -> 0 | "red"     -> 1 | "green" -> 2 | "yellow" -> 3
+    | "blue"  -> 4 | "magenta" -> 5 | "cyan"  -> 6 | "white"  -> 7
+    | s -> Format.ksprintf failwith "Unknown color in ANSI format tag: %s" s in
+  let aux offset = function Some s -> [string_of_int (code s + offset)] | None -> [] in
+  let bold = if bold then ["1"] else [] in
+  String.concat ";" (aux 30 fg @ aux 40 bg @ bold)
+
+let ansi_color_tags = Format.{
+  mark_open_tag= (fun tag -> sprintf "\027[%sm" (esc_seq_of_tag tag));
+  mark_close_tag= (fun _ -> "\027[0m");
+  print_open_tag= ignore;
+  print_close_tag= ignore;
+}

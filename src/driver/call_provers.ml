@@ -245,7 +245,7 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ?(colorize=false) ?(json: [<`All | `Model] option) ?check_ce fmt r =
+let print_prover_result ?(json: [<`All | `Model] option) ?check_ce fmt r =
   let open Json_base in
   let print_attrs = Debug.test_flag debug_attrs in
   let print_json_model fmt (m, s) =
@@ -267,10 +267,9 @@ let print_prover_result ?(colorize=false) ?(json: [<`All | `Model] option) ?chec
       (print_json_field "ce-model" print_model) r.pr_model
       (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
   else (
-    let color = match r.pr_answer with | Valid -> 32 | Invalid -> 31 | _ -> 33 in
-    fprintf fmt "@[<v>@[<hov2>Prover@ result@ is:@ %a@ (%.2fs%a).@]"
-      (Util.ansi_color ~really:colorize ~color ~bold:true print_prover_answer) r.pr_answer
-      r.pr_time print_steps r.pr_steps;
+    let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
+    fprintf fmt "@[<v>@[<hov2>Prover@ result@ is:@ @{<bold %s>%a@}@ (%.2fs%a).@]"
+      color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
     (match r.pr_model with
      | Some (m, s) when not (is_model_empty m) ->
          fprintf fmt "@ @[<hov2>%a%t@]" (print_ce_summary_title ?check_ce) s
