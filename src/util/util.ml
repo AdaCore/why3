@@ -80,7 +80,7 @@ let rec cmp_lists ls l1 l2 = match l1, l2 with
       cmp ls (h1, t1) (h2, t2)
   | [], _ -> -1 | _, [] -> 1
 
-let has_color =
+let has_terminal_color =
   let term = try Sys.getenv "TERM" with Not_found -> "" in
   term <> "" && term <> "dumb" && Unix.isatty Unix.stdout
 
