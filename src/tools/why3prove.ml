@@ -388,7 +388,7 @@ let do_input env drv = function
 
 let () =
   try
-    if Util.has_color then (
+    if Util.terminal_has_color then (
       set_formatter_tag_functions Util.ansi_color_tags;
       set_mark_tags true );
     let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in

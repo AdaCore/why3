@@ -91,7 +91,7 @@ val cmp_lists : 'a cmptr list -> 'a list -> 'a list -> int
 
 (** {3 ANSI terminal colors} *)
 
-val has_terminal_color : bool
+val terminal_has_color : bool
 (** Indicates if standard output supports ANSI terminal color codes (i.e. that the
    ["TERM"] environment variables is set, and not to ["dump"], and that standard output is
    a terminal. *)
