@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.03s, 58 steps).
+Prover result is: valid (0.01s, 58 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>VALUE for result "bench/check-ce/underspec.mlw", line 14, characters 17-18 not in ce-model, taking default (ref'mk 0)
@@ -241,9 +241,9 @@ Prover result is: valid (0.03s, 58 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 7294834 steps).
+Prover result is: timeout (1.00s, 4300615 steps).
 The contracts of some function or loop are underspecified, for example during
-the following execution:
+  the following execution:
 File underspec.mlw:
   Line 13:
     _ = ()
@@ -279,7 +279,7 @@ File underspec.mlw:
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.00s, 2384 steps).
+Prover result is: valid (0.01s, 2384 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Goal Postcondition from verification condition g'vc.
@@ -442,9 +442,9 @@ Prover result is: valid (0.01s, 2283 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 7444398 steps).
+Prover result is: timeout (1.00s, 5106198 steps).
 The contracts of some function or loop are underspecified, for example during
-the following execution:
+  the following execution:
 File underspec.mlw:
   Line 37:
     execution of any, result: 0
