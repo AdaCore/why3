@@ -463,10 +463,16 @@ and print_branches info subject pr fmt bl = match bl with
           let args = List.map (function
             | {pat_node = Pvar v} -> v | _ -> error ()) args in
           if bl = [] then print_branch info subject pr fmt (cs,args,t)
-          else fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
-            (print_ident info) cs.ls_name (print_var info) subject
-            (print_branch info subject pr) (cs,args,t)
-            (print_branches info subject pr) bl
+          else
+            begin match info.info_version with
+              | V20 | V26 (* It should be the same than V26Par but it was different *) ->
+                  fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
+              | V26Par ->
+                  fprintf fmt "@[(ite ((_ is %a) %a) %a %a)@]"
+            end
+              (print_ident info) cs.ls_name (print_var info) subject
+              (print_branch info subject pr) (cs,args,t)
+              (print_branches info subject pr) bl
       | _ -> error ()
 
 and print_branch info subject pr fmt (cs,vars,t) =

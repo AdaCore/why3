@@ -35,6 +35,11 @@ theory bool.Ite
    meta "inline:no" function ite
 end
 
+theory int.Int
+  remove prop CompatOrderMult
+end
+
+transformation "compile_match"
 transformation "inline_trivial"
 transformation "simplify_trivial_quantification"
 transformation "simplify_formula"
