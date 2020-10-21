@@ -361,17 +361,17 @@ The extension of syntax is described by the following rules.
 
 .. productionlist:: CFG
     file: `module`*
-    module: "module" `ident` `decl`* "end"
+    module: "module" `:ident` `decl`* "end"
     decl: "let" "cfg" `cfg_fundef` ("with" `cfg_fundef`)*
-    cfg_fundef: `ident` `binder`+ : `type` `spec` "=" `vardecl`* "{" `block` "}" `labelblock`*
-    vardecl: "var" `ident`* ":" `type` ";" | "ghost" "var" `ident`* ":" `type` ";"
+    cfg_fundef: `:ident` `:binder`+ : `:type` `:spec` "=" `vardecl`* "{" `block` "}" `labelblock`*
+    vardecl: "var" `:ident`* ":" `:type` ";" | "ghost" "var" `:ident`* ":" `:type` ";"
     block: `instruction` (";" `instruction`)*
-    labelblock: `ident` "{" `block` "}"
-    instruction: `expr`
-    : | "goto" `ident`
-    : | "invariant" `ident` "{" `term` "}"
-    : | "switch" "(" `expr` ")" `switch_case`* "end"
-    switch_case: "|" `pattern` "->" `block`
+    labelblock: `:ident` "{" `block` "}"
+    instruction: `:expr`
+    : | "goto" `:ident`
+    : | "invariant" `:ident` "{" `:term` "}"
+    : | "switch" "(" `:expr` ")" `switch_case`* "end"
+    switch_case: "|" `:pattern` "->" `block`
 
 
 
