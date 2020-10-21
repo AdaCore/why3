@@ -1288,43 +1288,53 @@ exception RACStuck of env * Loc.position option
    with RACStuck. *)
 
 let value_of_free_vars env t =
-  let get env vs = asprintf "%a" (Pp.print_option_or_default "(??)" print_value) (Mvs.find_opt vs env.vsenv) in
-  t_v_fold (fun mvs vs -> Mvs.add vs (get env vs) mvs) Mvs.empty t
+  let get_value get env x =
+    asprintf "%a" (Pp.print_option_or_default "(??)" print_value)
+      (get x env) in
+  let mid = t_v_fold (fun mvs vs ->
+    Mid.add vs.vs_name (get_value Mvs.find_opt env.vsenv vs) mvs) Mid.empty t in
+  t_app_fold (fun mrs ls tyl ty ->
+      if tyl = [] && ty <> None then
+        try let rs = restore_rs ls in
+            Mid.add rs.rs_name (get_value Mrs.find_opt env.rsenv rs) mrs
+        with Not_found -> mrs
+      else mrs
+    ) mid t
 
 let check_assume_term ctx t =
   try check_term ctx t with Contr (ctx,t) ->
-    let mvs = value_of_free_vars ctx.c_env t in
-    register_stucked ctx.c_env t.t_loc ctx.c_desc mvs;
+    let mid = value_of_free_vars ctx.c_env t in
+    register_stucked ctx.c_env t.t_loc ctx.c_desc mid;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
 let check_assume_terms ctx tl =
   try check_terms ctx tl with Contr (ctx,t) ->
-    let mvs = value_of_free_vars ctx.c_env t in
-    register_stucked ctx.c_env t.t_loc ctx.c_desc mvs;
+    let mid = value_of_free_vars ctx.c_env t in
+    register_stucked ctx.c_env t.t_loc ctx.c_desc mid;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
 let check_assume_posts ctx v posts =
   try check_posts ctx.c_desc ctx.c_trigger_loc ctx.c_env v posts with Contr (ctx,t) ->
-    let mvs = value_of_free_vars ctx.c_env t in
-    register_stucked ctx.c_env t.t_loc ctx.c_desc mvs;
+    let mid = value_of_free_vars ctx.c_env t in
+    register_stucked ctx.c_env t.t_loc ctx.c_desc mid;
     raise (RACStuck (ctx.c_env,t.t_loc))
 
 let check_term ?vsenv ctx t =
   try check_term ?vsenv ctx t with (Contr (ctx,t)) as e ->
-    let mvs = value_of_free_vars ctx.c_env t in
-    register_failure ctx.c_env t.t_loc ctx.c_desc mvs;
+    let mid = value_of_free_vars ctx.c_env t in
+    register_failure ctx.c_env t.t_loc ctx.c_desc mid;
     raise e
 
 let check_terms ctx tl =
   try check_terms ctx tl with (Contr (ctx,t)) as e ->
-    let mvs = value_of_free_vars ctx.c_env t in
-    register_failure ctx.c_env t.t_loc ctx.c_desc mvs;
+    let mid = value_of_free_vars ctx.c_env t in
+    register_failure ctx.c_env t.t_loc ctx.c_desc mid;
     raise e
 
 let check_posts desc loc env v posts =
   try check_posts desc loc env v posts with (Contr (ctx,t)) as e ->
-    let mvs = value_of_free_vars ctx.c_env t in
-    register_failure ctx.c_env t.t_loc ctx.c_desc mvs;
+    let mid = value_of_free_vars ctx.c_env t in
+    register_failure ctx.c_env t.t_loc ctx.c_desc mid;
     raise e
 
 (* EXPRESSION EVALUATION *)
@@ -1638,7 +1648,7 @@ and eval_expr' env e =
                 if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
                 (* the execution cannot continue from here *)
-                register_stucked env e.e_loc "Cannot continue after arbitrary iteration" Mvs.empty;
+                register_stucked env e.e_loc "Cannot continue after arbitrary iteration" Mid.empty;
                 raise (RACStuck (env,e.e_loc))
              | r -> r
            end
@@ -1727,8 +1737,8 @@ and eval_expr' env e =
     let i_val = big_int_of_value i_val in
     if not (le a i_val && le i_val (suc b)) then begin
         let msg = asprintf "Iterating variable not in bounds" in
-        let mvs = Mvs.singleton i.pv_vs (BigInt.to_string i_val) in
-        register_stucked env e.e_loc msg mvs;
+        let mid = Mid.singleton i.pv_vs.vs_name (BigInt.to_string i_val) in
+        register_stucked env e.e_loc msg mid;
         raise (RACStuck (env,e.e_loc)) end;
     if le a i_val && le i_val b then begin
       (* assert2 *)
@@ -1741,7 +1751,7 @@ and eval_expr' env e =
          if env.rac.do_rac then
            check_terms (cntr_ctx "Loop invariant preservation" env) inv;
          register_stucked env e.e_loc
-           "Cannot continue after arbitrary iteration" Mvs.empty;
+           "Cannot continue after arbitrary iteration" Mid.empty;
          raise (RACStuck (env,e.e_loc))
       | r -> r
       end

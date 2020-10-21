@@ -1070,8 +1070,8 @@ type log_entry_desc =
   | Exec_pure of (Term.lsymbol * exec_kind)
   | Exec_any of string
   | Exec_loop of exec_kind
-  | Exec_stucked of (string * string Mvs.t)
-  | Exec_failed of (string * string Mvs.t)
+  | Exec_stucked of (string * string Mid.t)
+  | Exec_failed of (string * string Mid.t)
   | Exec_ended
 
 type log_entry = {
@@ -1133,16 +1133,21 @@ let rec consecutives key ?(sofar=[]) ?current xs =
           consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
 
 let print_log_entry_desc fmt e =
-  let print_one fmt (vs,v) =
+  let print_vs_v fmt (vs,v) =
     fprintf fmt "@[%a = %s@]" Ident.print_decoded vs.vs_name.id_string v in
   let print_mvs fmt mvs =
-    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_one) (Mvs.bindings mvs) in
+    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_vs_v) (Mvs.bindings mvs) in
+  let print_id_v fmt (id,v) =
+    fprintf fmt "@[%a = %s@]" Ident.print_decoded id.id_string v in
+  let print_mid fmt mid =
+    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_id_v) (Mid.bindings mid) in
   match e.log_desc with
   | Val_from_model (id, v) ->
       fprintf fmt "@[<h>%a = %s@]" Ident.print_decoded id.id_string v;
   | Exec_call (None, mvs, k) ->
-      fprintf fmt "@[<h>%s execution of anonymous function@]"
+      fprintf fmt "@[<h>%s execution of anonymous function with args:%a@]"
         (exec_kind_to_string k)
+        print_mvs mvs
   | Exec_call (Some rs, mvs, k) ->
       fprintf fmt "@[<hv2>%s execution of %a with args:%a@]"
         (exec_kind_to_string k)
@@ -1155,10 +1160,10 @@ let print_log_entry_desc fmt e =
      fprintf fmt "@[<h>execution of any, result: %s@]" v
   | Exec_loop k ->
       fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
-  | Exec_failed (msg,mvs) ->
-     fprintf fmt "@[<hv2>Property failure, %s with:%a@]" msg print_mvs mvs
-  | Exec_stucked (msg,mvs) ->
-     fprintf fmt "@[<hv2>Execution got stuck, %s with:%a@]" msg print_mvs mvs
+  | Exec_failed (msg,mid) ->
+     fprintf fmt "@[<hv2>Property failure, %s with:%a@]" msg print_mid mid
+  | Exec_stucked (msg,mid) ->
+     fprintf fmt "@[<hv2>Execution got stuck, %s with:%a@]" msg print_mid mid
   | Exec_ended ->
       fprintf fmt "@[<h>Execution of main function terminated normally@]"
 
@@ -1173,6 +1178,10 @@ let print_exec_log ~json fmt entry_log =
     let print_vs_value fmt (vs,v) =
       fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
         (print_json_field "name" print_json) (String vs.vs_name.id_string)
+        (print_json_field "value" print_json) (String v) in
+    let print_id_value fmt (id,v) =
+      fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+        (print_json_field "name" print_json) (String id.id_string)
         (print_json_field "value" print_json) (String v) in
     let print_log_entry fmt = function
       | Val_from_model (id, s) ->
@@ -1202,16 +1211,16 @@ let print_exec_log ~json fmt entry_log =
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
         (print_json_field "kind" print_json) (string "EXEC_LOOP")
         (print_json_field "exec" print_json_kind) kind
-      | Exec_failed (reason,mvs) ->
+      | Exec_failed (reason,mid) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "FAILED")
             (print_json_field "reason" print_json) (String reason)
-            (print_json_field "state" (list print_vs_value)) (Mvs.bindings mvs)
-      | Exec_stucked (reason,mvs) ->
+            (print_json_field "state" (list print_id_value)) (Mid.bindings mid)
+      | Exec_stucked (reason,mid) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "STUCKED")
             (print_json_field "reason" print_json) (String reason)
-            (print_json_field "state" (list print_vs_value)) (Mvs.bindings mvs)
+            (print_json_field "state" (list print_id_value)) (Mid.bindings mid)
       | Exec_ended ->
           fprintf fmt "@[@[<hv1>{%a@]}@]"
             (print_json_field "kind" print_json) (string "ENDED") in

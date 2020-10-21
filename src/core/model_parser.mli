@@ -257,13 +257,14 @@ val interleave_with_source :
 (** Result when checking a CE model *)
 
 open Term
+open Ident
 
 type verdict = Good_model | Bad_model | Dont_know
 
 type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
-  | Val_from_model of (Ident.ident * string)
+  | Val_from_model of (ident * string)
   (** values taken from model during interpretation *)
   | Exec_call of (Expr.rsymbol option * string Mvs.t  * exec_kind)
   (** executed function call or lambda if no rsymbol,
@@ -274,9 +275,9 @@ type log_entry_desc =
   (** execute any function call *)
   | Exec_loop of exec_kind
   (** execute loop *)
-  | Exec_stucked of (string * string Mvs.t)
+  | Exec_stucked of (string * string Mid.t)
   (** stucked execution information *)
-  | Exec_failed of (string * string Mvs.t)
+  | Exec_failed of (string * string Mid.t)
   (** failed execution information *)
   | Exec_ended
   (** execution terminated normally *)
@@ -298,9 +299,9 @@ val add_pure_call_to_log :
   lsymbol -> exec_kind -> Loc.position option -> exec_log -> exec_log
 val add_any_call_to_log : string -> Loc.position option -> exec_log -> exec_log
 val add_failed_to_log :
-  string -> string Mvs.t -> Loc.position option -> exec_log -> exec_log
+  string -> string Mid.t -> Loc.position option -> exec_log -> exec_log
 val add_stucked_to_log :
-  string -> string Mvs.t -> Loc.position option -> exec_log -> exec_log
+  string -> string Mid.t -> Loc.position option -> exec_log -> exec_log
 val add_exec_ended_to_log : Loc.position option -> exec_log -> exec_log
 val add_exec_loop_to_log : exec_kind -> Loc.position option -> exec_log -> exec_log
 val log_to_list : exec_log -> log_entry list
