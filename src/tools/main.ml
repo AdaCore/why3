@@ -51,18 +51,19 @@ let command_path = match Config.localdir with
 
 let extra_help fmt commands =
   fprintf fmt "Available commands:@\n";
-  List.iter (fun (v,_) -> fprintf fmt "  %s@\n" v) commands
+  List.iter (fprintf fmt "  %s@\n") commands
+
+let tools_ext =
+  if Dynlink.is_native then ".cmxs" else ".cma"
 
 let available_commands () =
   let commands = Sys.readdir command_path in
   Array.sort String.compare commands;
-  let re = Re.Str.regexp "^why3\\([^.]+\\)\\([.].*\\)?" in
+  let re = Re.Str.regexp "^why3\\([^.]+\\)\\([.].*\\)" in
   let commands = Array.fold_left (fun acc v ->
     if Re.Str.string_match re v 0 then
       let w = Re.Str.matched_group 1 v in
-      match acc with
-      | (h,_)::_ when h = w -> acc
-      | _ -> (w, v) :: acc
+      if Re.Str.matched_group 2 v = tools_ext then w :: acc else acc
     else acc) [] commands in
   List.rev commands
 
@@ -99,25 +100,27 @@ let command cur =
       sscmd, List.rev !args
     end in
   let cmd =
-    let scmd = "why3" ^ sscmd in
+    let scmd = "why3" ^ sscmd ^ tools_ext in
     let cmd = Filename.concat command_path scmd in
-    if cmd <> "" && Sys.file_exists cmd
-    then cmd
-    else begin
-      let commands = available_commands () in
-      let scmd =
-        try List.assoc sscmd commands
-        with Not_found ->
-          eprintf "'%s' is not a Why3 command.@\n@\n%a"
-            sscmd extra_help commands;
-          exit 1 in
-      Filename.concat command_path scmd
-    end in
-  let scmd = "why3 " ^ sscmd in
-  let args = Array.of_list (scmd :: args) in
-  (* add double quotes to avoid splitting issues with execv in Windows *)
-  let args = if Sys.win32 then Array.map Filename.quote args else args in
-  Unix.execv cmd args
+    if not (Sys.file_exists cmd) then
+      begin
+        eprintf "'%s' is not a Why3 command.@\n@\n%a"
+          sscmd extra_help (available_commands ());
+        exit 1;
+      end;
+      cmd in
+  let args = Array.of_list args in
+  let argc = Array.length args in
+  let argi = Array.length Sys.argv - argc in
+  Array.blit args 0 Sys.argv argi argc;
+  Whyconf.Args.first_arg := argi;
+  try
+    Dynlink.allow_unsafe_modules true;
+    Dynlink.loadfile cmd;
+    exit 0
+  with Dynlink.Error e ->
+    Printf.eprintf "Failed to load %s: %s\n%!" cmd (Dynlink.error_message e);
+    exit 1
 
 let () = try
   let i = Getopt.parse_many option_list Sys.argv 1 in

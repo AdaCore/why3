@@ -115,7 +115,7 @@ let auto_fallback () =
 
 let main () =
   (* Parse the command line *)
-  Getopt.parse_all spec anon_file Sys.argv;
+  Getopt.parse_all ~i:!Whyconf.Args.first_arg spec anon_file Sys.argv;
 
   let opt_list = ref false in
   Autodetection.is_config_command := true;

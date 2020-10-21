@@ -18,8 +18,6 @@ open History
 open Itp_communication
 open Gtkcompat
 
-external reset_gc : unit -> unit = "ml_reset_gc"
-
 let debug = Debug.lookup_flag "ide_info"
 let debug_stack_trace = Debug.lookup_flag "stack_trace"
 
@@ -1039,7 +1037,6 @@ let fan =
 let update_monitor =
   let c = ref 0 in
   fun t s r ->
-  reset_gc ();
   incr c;
   let f = if r = 0 then " " else fan !c in
   let text = Printf.sprintf "%s %d/%d/%d" f t s r in
