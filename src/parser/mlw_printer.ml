@@ -453,10 +453,11 @@ let is_ref_expr = function
 
 let is_ref_pattern _ = None
 
-let term_hyp_name = function
-  | {term_desc= Tattr (ATstr {Ident.attr_string= attr}, t)}
-    when Strings.has_prefix "hyp_name:" attr ->
-      " " ^ Strings.remove_prefix "hyp_name:" attr, t
+let term_hyp_name ignored = function
+  | {term_desc= Tattr (ATstr a, t)}
+    when Strings.has_prefix "hyp_name:" a.Ident.attr_string ->
+      let s = Strings.remove_prefix "hyp_name:" a.Ident.attr_string in
+      (if String.equal s ignored then "" else " "^s), t
   | t -> "", t
 
 let attr_equals at1 at2 =
@@ -683,7 +684,7 @@ and pp_expr =
           | Expr.Assert -> "assert"
           | Expr.Assume -> "assume"
           | Expr.Check -> "check" in
-        let s, t = term_hyp_name t in
+        let s, t = term_hyp_name (String.capitalize_ascii kind) t in
         fprintf fmt "@[<hv 2>%s%s {@ %a }@]" kind s pp_term.marked t
     | Escope (qid, e) ->
         pp_scope pp_expr fmt qid e
@@ -795,7 +796,7 @@ and pp_variants fmt vs =
 
 and pp_invariants fmt =
   let pp_invariant fmt t =
-    let s, t = term_hyp_name t in
+    let s, t = term_hyp_name "Invariant" t in
     fprintf fmt "@[<hv 2>invariant%s {@ %a@] }" s pp_term.marked
       (remove_term_attr "hyp_name:LoopInvariant"
         (remove_term_attr "hyp_name:TypeInvariant" t)) in
@@ -803,7 +804,7 @@ and pp_invariants fmt =
 
 and pp_spec result_pat fmt s =
   let pp_requires fmt t =
-    let s, t = term_hyp_name t in
+    let s, t = term_hyp_name "Requires" t in
     fprintf fmt "@[<hv>@[<hv2>requires%s { %a@]@ }@]"
       s pp_term.marked (remove_term_attr "hyp_name:Requires" t) in
   let is_ensures pat =
@@ -815,7 +816,7 @@ and pp_spec result_pat fmt s =
     | _ -> true in
   let pp_post fmt = function
     | loc, [pat, t] when is_ensures pat && is_not_marked pat ->
-        let s, t = term_hyp_name t in
+        let s, t = term_hyp_name "Ensures" t in
         fprintf fmt "@ @[<hv 2>%aensures%s { %a@] }" pp_maybe_marker loc
           s pp_term.marked (remove_term_attr "hyp_name:Ensures" t)
     | loc, cases ->
