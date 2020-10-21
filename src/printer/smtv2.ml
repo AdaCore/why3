@@ -165,8 +165,8 @@ let print_tv info fmt tv =
   fprintf fmt "%s" (id_unique info.info_printer tv.tv_name)
 
 (** print `(par ...)` around the given body to print *)
-let print_par info body =
-  Format.kdprintf (fun print_body ->
+let print_par info (* body *) =
+  (* Format.kdprintf *) (fun print_body ->
       (fun fmt tvs ->
          if Ty.Stv.is_empty tvs
          then print_body fmt
@@ -177,7 +177,7 @@ let print_par info body =
              print_body
          else
            unsupported "smt: polymorphism must be encoded"
-      )) body
+      ) ) (* body *)
 
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar s ->
@@ -515,9 +515,10 @@ let print_param_decl info fmt ls =
         let tvs = Term.ls_ty_freevars ls in
         fprintf fmt "@[<hov 2>(declare-fun %a %a)@]@\n@\n"
           (print_ident info) ls.ls_name
-          (print_par info "(%a) %a"
-             (print_list space (print_type info)) ls.ls_args
-             (print_type_value info) ls.ls_value) tvs
+          (print_par info
+             (fun fmt -> Format.fprintf fmt "(%a) %a"
+                 (print_list space (print_type info)) ls.ls_args
+                 (print_type_value info) ls.ls_value)) tvs
 
 let print_logic_decl info fmt (ls,def) =
   if Mid.mem ls.ls_name info.info_syn then () else begin
@@ -526,10 +527,11 @@ let print_logic_decl info fmt (ls,def) =
     let tvs = Term.ls_ty_freevars ls in
     fprintf fmt "@[<hov 2>(define-fun %a %a)@]@\n@\n"
       (print_ident info) ls.ls_name
-      (print_par info "(%a) %a %a"
-         (print_var_list info) vsl
-         (print_type_value info) ls.ls_value
-         (print_expr info) expr) tvs;
+      (print_par info
+         (fun fmt -> Format.fprintf fmt "(%a) %a %a"
+             (print_var_list info) vsl
+             (print_type_value info) ls.ls_value
+             (print_expr info) expr)) tvs;
     List.iter (forget_var info) vsl
   end
 
@@ -559,7 +561,7 @@ let print_prop info fmt pr f =
   let tvs = Term.t_ty_freevars Ty.Stv.empty f in
   fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
     pr.pr_name.id_string (* FIXME? collisions *)
-    (print_par info "%a" (print_fmla info) f) tvs
+    (print_par info (fun fmt -> Format.fprintf fmt "%a" (print_fmla info) f)) tvs
 
 let add_check_sat info fmt =
   if info.info_cntexample && info.info_cntexample_need_push then
