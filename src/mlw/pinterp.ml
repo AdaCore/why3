@@ -826,24 +826,6 @@ let rec default_value_of_type env known ity : value =
 
 (* VALUE IMPORT *)
 
-let get_model_value_by_loc model loc =
-  let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
-  List.find_opt aux (get_model_elements model)
-
-let get_model_value model name loc =
-  let aux me =
-    me.me_name.men_name = name &&
-    Opt.equal Loc.equal me.me_location (Some loc) in
-  Opt.map (fun me -> me.me_value)
-    (List.find_opt aux (get_model_elements model))
-
-let model_value model id =
-  match id.id_loc with
-  | None -> None
-  | Some loc ->
-      let name = Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs in
-      get_model_value model name loc
-
 exception CannotImportModelValue of string
 
 (* TODO Remove argument [env] after replacing Varray by model substitution *)
@@ -1160,9 +1142,9 @@ let get_value_for_quant_var env vs =
   | Some loc ->
       let value =
         if bind_univ_quant_vars_ce_model then
-          match get_model_value env.rac.ce_model vs.vs_name.id_string loc with
-          | Some mv ->
-              let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) mv in
+          match get_model_element env.rac.ce_model vs.vs_name.id_string loc with
+          | Some me ->
+              let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) me.me_value in
               Debug.dprintf debug_rac "Bind model value for all-quantified variable %a to %a@." print_vs vs print_value v;
               Some v
           | _ -> None
@@ -1451,9 +1433,9 @@ let print_result fmt = function
 let get_and_register_value env ?def ?ity vs loc =
   let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
   let name = vs.vs_name.id_string in
-  let value = match get_model_value env.rac.ce_model name loc with
-    | Some v ->
-       let v = import_model_value env.env env.mod_known ity v in
+  let value = match get_model_element env.rac.ce_model name loc with
+    | Some me ->
+       let v = import_model_value env.env env.mod_known ity me.me_value in
        Debug.dprintf debug_check_ce "@[<h>VALUE from ce-model for %a at %a: %a@]@."
          Ident.print_decoded name
          Pretty.print_loc' loc
@@ -1563,9 +1545,9 @@ and eval_expr' env e =
           | _ -> failwith "many args for exec fun" (* TODO *) )
       | Cany ->
           let v =
-            try match get_model_value_by_loc env.rac.ce_model (Opt.get_exn Exit e.e_loc) with
-              | Some me -> import_model_value env.env env.mod_known e.e_ity me.me_value
-              | None -> raise Exit
+            try
+              let me = get_model_element_by_loc env.rac.ce_model (Opt.get_exn Exit e.e_loc) in
+              import_model_value env.env env.mod_known e.e_ity (Opt.get_exn Exit me).me_value
             with Exit ->
               let v = default_value_of_type env.env env.mod_known e.e_ity in
               let pp_loc fmt = function
@@ -2013,9 +1995,9 @@ let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 let bind_globals ?(model=default_model) ?rs_main mod_known env =
   let get_value register id opt_e ity =
-    match model_value model id with
-    | Some mv ->
-        let v = import_model_value env.env mod_known ity mv in
+    match get_model_element_by_id model id with
+    | Some me ->
+        let v = import_model_value env.env mod_known ity me.me_value in
         register v; v
     | None -> match opt_e with
       | None ->
@@ -2068,8 +2050,8 @@ let eval_global_fundef rac env mod_known th_known locals e =
 
 let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   let get_value (pv: pvsymbol) =
-    match model_value model pv.pv_vs.vs_name with
-    | Some mv -> import_model_value env mod_known pv.pv_ity mv
+    match get_model_element_by_id model pv.pv_vs.vs_name with
+    | Some me -> import_model_value env mod_known pv.pv_ity me.me_value
     | None ->
         let v = default_value_of_type env mod_known pv.pv_ity in
         Debug.dprintf debug_rac "Missing value for parameter %a, continue with default value %a@."

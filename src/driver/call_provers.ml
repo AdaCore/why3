@@ -99,6 +99,11 @@ let print_ce_summary_values ~json ~print_attrs model fmt s =
         fprintf fmt "@[%a@]" (print_model_human ?me_name_trans:None ~print_attrs) model
   | BAD_CE -> ()
 
+let model_of_ce_summary ~original_model ?valid_loc = function
+  | NCCE log | SWCE log | NCCE_SWCE log ->
+      model_of_exec_log ~original_model ?valid_loc log
+  | UNKNOWN _ | BAD_CE -> original_model
+
 let ce_summary v_concrete v_abstract =
   match v_concrete.verdict, v_abstract.verdict with
   | Good_model, _ -> NCCE v_concrete.exec_log
@@ -349,7 +354,9 @@ let select_model check_model models =
       let ce_summary_index = function
         | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2 | UNKNOWN _ | BAD_CE -> assert false in
       let compare = cmp [
+          (* prefer NCCE > SWCE > NCCE_SWCE > UNKNOWN > BAD *)
           cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
+          (* prefer simpler models *)
           cmptr (fun (i,_,_,_,_) -> i) (-);
         ] in
       List.sort compare good_models

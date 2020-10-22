@@ -57,6 +57,12 @@ val print_ce_summary_values : json:bool -> print_attrs:bool -> model -> ce_summa
 (** Prints the summary with its values, if there is any, or the given
     model otherwise *)
 
+val model_of_ce_summary :
+  original_model:model -> ?valid_loc:(Loc.position -> bool) ->
+  ce_summary -> model
+(** Convert the exec log of a successfull validation to a model, or return the
+   default model for unsuccessful validations. *)
+
 type prover_result = {
   pr_answer : prover_answer;
   (** The answer of the prover on the given task *)

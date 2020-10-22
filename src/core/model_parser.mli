@@ -144,6 +144,12 @@ val get_model_elements : model -> model_element list
 val get_model_term_loc : model -> Loc.position option
 val get_model_term_attrs : model -> Ident.Sattr.t
 
+val get_model_element : model -> string -> Loc.position -> model_element option
+val get_model_element_by_id : model -> Ident.ident -> model_element option
+val get_model_element_by_loc : model -> Loc.position -> model_element option
+
+(** {2 Printing the model} *)
+
 val print_model :
   ?me_name_trans:(model_element_name -> string) ->
   print_attrs:bool ->
@@ -306,6 +312,12 @@ val add_exec_ended_to_log : Loc.position option -> exec_log -> exec_log
 val add_exec_loop_to_log : exec_kind -> Loc.position option -> exec_log -> exec_log
 val log_to_list : exec_log -> log_entry list
 val print_exec_log : json:bool -> exec_log Pp.pp
+
+val model_of_exec_log :
+  original_model:model -> ?valid_loc:(Loc.position -> bool) ->
+  exec_log -> model
+
+val sort_exec_log : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
 
 type full_verdict = {
     verdict  : verdict;

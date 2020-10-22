@@ -505,6 +505,30 @@ let get_model_elements m =
 let get_model_term_loc m = m.vc_term_loc
 let get_model_term_attrs m = m.vc_term_attrs
 
+let get_model_element model name loc =
+  let aux me =
+    me.me_name.men_name = name &&
+    Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
+
+let get_model_element_value model name loc =
+  let aux me =
+    me.me_name.men_name = name &&
+    Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
+
+let get_model_element_by_id model id =
+  match id.id_loc with
+  | None -> None
+  | Some loc ->
+      let name = id.id_string in
+      let name = Ident.get_model_trace_string ~name ~attrs:id.id_attrs in
+      get_model_element_value model name loc
+
+let get_model_element_by_loc model loc =
+  let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
+
 type model_parser = string -> printer_mapping -> model
 type raw_model_parser = printer_mapping -> string -> model_element list
 
@@ -1245,6 +1269,50 @@ let print_exec_log ~json fmt entry_log =
       | Some file -> fprintf fmt "@[<v2>File %s:@\n%a@]" (Filename.basename file) Pp.(print_list newline pp_lines) l
       | None -> fprintf fmt "@[<v4>Unknown location:@\n%a@]" Pp.(print_list newline pp_lines) l in
     Pp.(print_list newline pp_files) fmt entry_log
+
+let sort_exec_log log =
+  let insert f l e sofar =
+    let insert_line opt_l =
+      let l = Opt.get_def [] opt_l in
+      Some (e :: l) in
+    let insert_file opt_mf =
+      let mf = Opt.get_def Mint.empty opt_mf in
+      let res = Mint.change insert_line l mf in
+      Some res in
+    Mstr.change insert_file f sofar in
+  let aux entry sofar = match entry.log_loc with
+    | Some loc when not (Loc.equal loc Loc.dummy_position) ->
+        let f, l, _, _ = Loc.get loc in
+        insert f l entry sofar
+    | _ -> sofar in
+  Mstr.map (Mint.map List.rev)
+    (List.fold_right aux log Mstr.empty)
+
+let model_of_exec_log ~original_model ?(valid_loc=(fun loc -> not (Loc.equal loc Loc.dummy_position))) log =
+  let me loc id v =
+    let name = asprintf "%a" Ident.print_decoded id.id_string in
+    let men_name = Ident.get_model_trace_string ~name ~attrs:id.Ident.id_attrs in
+    let men_kind = match get_model_element_by_id original_model id with
+      | Some me -> me.me_name.men_kind
+      | None -> Other in
+    let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
+    let me_value = Integer v in (* TODO Type me_value correctly when the exec log is typed *)
+    {me_name; me_value; me_location= Some loc; me_term= None} in
+  let aux e = match e.log_loc with
+    | Some loc when valid_loc loc -> (
+        match e.log_desc with
+        | Val_from_model (id, v) ->
+            [me loc id v]
+        | Exec_failed (_, mid) ->
+            Mid.fold (fun id v l -> me loc id v :: l) mid []
+        | _ -> [] )
+    | _ -> [] in
+  let aux_l e = match List.concat (List.map aux e) with [] -> None | l -> Some l in
+  let aux_mint mint =
+    let res = Mint.map_filter aux_l mint in
+    if Mint.is_empty res then None else Some res in
+  let model_files = (Mstr.map_filter aux_mint (sort_exec_log log)) in
+  { original_model with model_files }
 
 type full_verdict = {
     verdict  : verdict;
