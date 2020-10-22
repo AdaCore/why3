@@ -39,81 +39,6 @@ type rac_reduce_config_lit = {
 let rac_reduce_config_lit ?trans ?prover () =
   { lit_trans= trans; lit_prover= prover }
 
-(** See output of [ce_summary_title] for details *)
-type ce_summary = NCCE of exec_log | SWCE of exec_log | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN of string
-
-let print_ce_summary_kind fmt s =
-  let str = match s with
-    | NCCE _ -> "NCCE"
-    | SWCE _ -> "SWCE"
-    | NCCE_SWCE _ -> "NCCE_SWCE"
-    | UNKNOWN _ -> "UNKNOWN"
-    | BAD_CE -> "BAD_CE" in
-  pp_print_string fmt str
-
-let print_ce_summary_title ?check_ce fmt = function
-  | NCCE _ ->
-      Format.fprintf fmt
-        "The@ program@ does@ not@ comply@ to@ the@ verification@ goal"
-  | SWCE _ ->
-      Format.fprintf fmt
-        "The@ contracts@ of@ some@ function@ or@ loop@ are@ underspecified"
-  | NCCE_SWCE _ ->
-      Format.fprintf fmt
-        ("The@ program@ does@ not@ comply@ to@ the@ verification@ goal,@ "^^
-         "or@ the@ contracts@ of@ some@ loop@ or@ function@ are@ too@ weak")
-  | BAD_CE ->
-      Format.fprintf fmt
-        "Sorry,@ we@ don't@ have@ a@ good@ counterexample@ for@ you@ :("
-  | UNKNOWN reason ->
-      match check_ce with
-      | Some true ->
-          fprintf fmt
-            "The@ following@ counterexample@ model@ could@ not@ be@ verified@ (%s)"
-            reason
-      | Some false ->
-          fprintf fmt
-            ("The@ following@ counterexample@ model@ has@ not@ been@ verified@ "^^
-             "(%s,@ missing@ option@ --check-ce)") reason
-      | None ->
-          fprintf fmt "The@ following@ counterexample@ model@ has@ not@ been@ verified@ (%s)"
-            reason
-
-let print_ce_summary_values ~json ~print_attrs model fmt s =
-  let open Json_base in
-  let print_model_field =
-    print_json_field "model" (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
-  let print_log_field =
-    print_json_field "log" (print_exec_log ~json:true) in
-  match s with
-  | NCCE log | SWCE log | NCCE_SWCE log ->
-      if json then
-        fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-          print_model_field model print_log_field log
-      else
-        fprintf fmt "@[%a@]" (print_exec_log ~json:false) log
-  | UNKNOWN _ ->
-      if json then
-        fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
-      else
-        fprintf fmt "@[%a@]" (print_model_human ?me_name_trans:None ~print_attrs) model
-  | BAD_CE -> ()
-
-let model_of_ce_summary ~original_model ?valid_loc = function
-  | NCCE log | SWCE log | NCCE_SWCE log ->
-      model_of_exec_log ~original_model ?valid_loc log
-  | UNKNOWN _ | BAD_CE -> original_model
-
-let ce_summary v_concrete v_abstract =
-  match v_concrete.verdict, v_abstract.verdict with
-  | Good_model, _ -> NCCE v_concrete.exec_log
-  | Bad_model, Good_model -> SWCE v_abstract.exec_log
-  | Dont_know, Good_model -> NCCE_SWCE v_abstract.exec_log
-  | Dont_know, Dont_know
-  | Dont_know, Bad_model -> UNKNOWN v_concrete.reason
-  | Bad_model, Dont_know -> UNKNOWN v_abstract.reason
-  | Bad_model, Bad_model -> BAD_CE
-
 (* BEGIN{proverresult} anchor for automatic documentation, do not remove *)
 type prover_result = {
   pr_answer : prover_answer;
@@ -121,7 +46,7 @@ type prover_result = {
   pr_output : string;
   pr_time   : float;
   pr_steps  : int;		(* -1 if unknown *)
-  pr_model  : (model * ce_summary) option;
+  pr_models : (prover_answer * model) list;
 }
 (* END{proverresult} anchor for automatic documentation, do not remove *)
 
@@ -141,11 +66,6 @@ let limit_max =
     { limit_time = single_limit_max a.limit_time b.limit_time;
       limit_steps = single_limit_max a.limit_steps b.limit_steps;
       limit_mem = single_limit_max a.limit_mem b.limit_mem; }
-
-let get_model r =
-  match r.pr_model with
-  | Some (m, _) -> m
-  | None -> default_model
 
 type timeunit =
   | Hour
@@ -250,42 +170,44 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ?(json: [<`All | `Model] option) ?check_ce fmt r =
+let print_prover_result ?(json: [<`All | `Model] option) fmt r =
   let open Json_base in
-  let print_attrs = Debug.test_flag debug_attrs in
-  let print_json_model fmt (m, s) =
-    fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-      (print_json_field "verdict" print_json)
-      (String (asprintf "%a" print_ce_summary_kind s))
-      (print_json_field "model" (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int))
-      m in
+  (* let print_attrs = Debug.test_flag debug_attrs in *)
+  let print_json_model fmt (a,m) =
+    fprintf fmt "@[@[<hv1>{%a;@ %a}@]}@]"
+      (print_json_field "model"
+         (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int)) m
+      (print_json_field "answer" print_prover_answer) a
+  in
   if json = Some `All then
-    let print_model fmt = function
-      | Some (m, s) when not (is_model_empty m) ->
-          print_json_model fmt (m, s)
-      | _ -> print_json fmt Null in
+    let print_model fmt (a,m) =
+      if not (is_model_empty m) then
+          print_json_model fmt (a,m)
+      else print_json fmt Null in
     fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a;@ %a@]}@]"
       (print_json_field "answer" print_json)
       (String (asprintf "%a" print_prover_answer r.pr_answer))
       (print_json_field "time" print_json) (Float r.pr_time)
       (print_json_field "step" print_json) (Int r.pr_steps)
-      (print_json_field "ce-model" print_model) r.pr_model
+      (* TODO not sure if models should be printed here *)
+      (print_json_field "ce-models" (list print_model)) r.pr_models
       (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
   else (
     let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
     fprintf fmt "@[<v>@[<hov2>Prover@ result@ is:@ @{<bold %s>%a@}@ (%.2fs%a).@]"
       color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
-    (match r.pr_model with
-     | Some (m, s) when not (is_model_empty m) ->
-         fprintf fmt "@ @[<hov2>%a%t@]" (print_ce_summary_title ?check_ce) s
-           (fun fmt -> match s with
-              | NCCE _ | SWCE _ | NCCE_SWCE _ ->
-                  fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
-              | UNKNOWN _ ->
-                  fprintf fmt ":"
-              | _ -> ());
-         fprintf fmt "@ %a" (print_ce_summary_values ~print_attrs ~json:(json = Some `Model) m) s
-     | _ -> ());
+    (* This should be done somwhere else *)
+    (* (match r.pr_model with
+     *  | Some (m, s) when not (is_model_empty m) ->
+     *      fprintf fmt "@ @[<hov2>%a%t@]" (print_ce_summary_title ?check_ce) s
+     *        (fun fmt -> match s with
+     *           | NCCE _ | SWCE _ | NCCE_SWCE _ ->
+     *               fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
+     *           | UNKNOWN _ ->
+     *               fprintf fmt ":"
+     *           | _ -> ());
+     *      fprintf fmt "@ %a" (print_ce_summary_values ~print_attrs ~json:(json = Some `Model) m) s
+     *  | _ -> ()); *)
     if r.pr_answer == HighFailure then
       fprintf fmt "@ Prover exit status: %a@\nProver output:@\n%s@\n"
         print_prover_status r.pr_status r.pr_output;
@@ -321,72 +243,7 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-let select_model check_model models =
-  let check_model (i,r,m) =
-    Debug.dprintf debug_check_ce "Check model %d (%a)@." i
-      (Pp.print_option_or_default "NO LOC" Pretty.print_loc') (get_model_term_loc m);
-    (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
-     *   (print_model ?me_name_trans:None ~print_attrs:false) m; *)
-    let mr = check_model m in
-    Debug.dprintf debug_check_ce "@[<v2>Model %d:@\n@[%a@]@]@." i
-      print_check_model_result mr;
-    i,r,m,mr in
-  let not_empty (i,_,m) =
-    let empty = is_model_empty m in
-    if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
-    not empty in
-  let add_ce_summary (i,r,m,mr) =
-    let summary = match mr with
-      | Cannot_check_model {reason} -> UNKNOWN reason
-      | Check_model_result r -> ce_summary r.concrete r.abstract in
-    i,r,m,mr,summary in
-  let models =
-    List.map add_ce_summary
-      (List.map check_model
-         (List.filter not_empty
-            (List.mapi (fun i (r,m) -> i,r,m)
-               models))) in
-  let is_good (_,_,_,_,s) = match s with NCCE _ | SWCE _ | NCCE_SWCE _ -> true | BAD_CE | UNKNOWN _ -> false in
-  let good_models, other_models = List.partition is_good models in
-  let model_infos =
-    let open Util in
-    if good_models <> [] then
-      let ce_summary_index = function
-        | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2 | UNKNOWN _ | BAD_CE -> assert false in
-      let compare = cmp [
-          (* prefer NCCE > SWCE > NCCE_SWCE > UNKNOWN > BAD *)
-          cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
-          (* prefer simpler models *)
-          cmptr (fun (i,_,_,_,_) -> i) (-);
-        ] in
-      List.sort compare good_models
-    else
-      (* No interesting models, so choose the most complex (later) model
-         as it was done before 2020, but penalize bad models. *)
-      let ce_summary_index = function
-        UNKNOWN _ -> 0 | BAD_CE -> 1 | NCCE _ | SWCE _ | NCCE_SWCE _ -> assert false in
-      let compare = cmp [
-          cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
-          cmptr (fun (i,_,_,_,_) -> -i) (-);
-        ] in
-      List.sort compare other_models in
-  let selected_ix, selected = match model_infos with
-    | [] -> None, None
-    | (i,_,m,_,s) :: _ -> Some i, Some (m, s) in
-  Debug.dprintf debug_check_ce "Models:@\n%a@."
-    Pp.(print_list space (fun fmt (i,_,_,mr,s) ->
-        let mark_selected fmt =
-          let s = if selected_ix = Some i then "Selected" else "Checked" in
-          pp_print_string fmt s in
-        match mr with
-        | Cannot_check_model {reason} -> fprintf fmt "- Couldn't check model: %s" reason
-        | Check_model_result r ->
-            fprintf fmt "- @[<v2>%t model %d (Concrete: %a, Abstract: %a)@ @[Summary: %a@]@]"
-              mark_selected i print_verdict r.concrete.verdict print_verdict r.abstract.verdict
-              (print_ce_summary_title ?check_ce:None) s)) models;
-  selected
-
-let analyse_result ?(check_model=default_check_model) exit_result res_parser printer_mapping out =
+let analyse_result exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
   let list_re = List.map (fun (a, b) -> Re.Str.regexp a, b) list_re in
@@ -405,7 +262,7 @@ let analyse_result ?(check_model=default_check_model) exit_result res_parser pri
   let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        let model = select_model check_model (List.rev saved_models) in
+        let model = List.rev saved_models in
         Opt.get_def HighFailure saved_res, model
     | Answer res1 :: (Answer res2 :: tl as tl1) ->
        Debug.dprintf debug "Call_provers: two consecutive answers: %a %a@."
@@ -427,7 +284,7 @@ let analyse_result ?(check_model=default_check_model) exit_result res_parser pri
        end
     | Answer res :: Model model :: tl ->
         if res = Valid then
-          (Valid, None)
+          (Valid, [])
         else
           (* get model if possible *)
           let m = res_parser.prp_model_parser model printer_mapping in
@@ -436,7 +293,7 @@ let analyse_result ?(check_model=default_check_model) exit_result res_parser pri
           analyse ((res, m) :: saved_models) (Some res) tl
     | Answer res :: tl ->
         if res = Valid then
-          (Valid, None)
+          (Valid, [])
         else
           analyse saved_models (Some res) tl
     | Model _fail :: tl -> analyse saved_models saved_res tl
@@ -446,20 +303,19 @@ let analyse_result ?(check_model=default_check_model) exit_result res_parser pri
 
 let backup_file f = f ^ ".save"
 
-
-let parse_prover_run res_parser signaled time out exitcode limit check_model ~printer_mapping =
+let parse_prover_run res_parser signaled time out exitcode limit ~printer_mapping =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
   (* the following conversion is incorrect (but does not fail) on 32bit, but if
      the incoming exitcode was really outside the bounds of [int], its exact
      value is meaningless for Why3 anyway (e.g. some windows status codes). If
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
-  let ans, model =
+  let ans, models =
     let exit_result =
       if signaled then [Answer HighFailure] else
       try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
       with Not_found -> []
-    in analyse_result ?check_model exit_result res_parser printer_mapping out
+    in analyse_result exit_result res_parser printer_mapping out
   in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
@@ -481,7 +337,7 @@ let parse_prover_run res_parser signaled time out exitcode limit check_model ~pr
     pr_output = out;
     pr_time   = time;
     pr_steps  = steps;
-    pr_model  = model;
+    pr_models = models;
   }
 
 let actualcommand command limit file =
@@ -552,7 +408,6 @@ type save_data = {
   limit      : resource_limit;
   res_parser : prover_result_parser;
   printer_mapping : Printer.printer_mapping;
-  check_model : check_model option;
 }
 
 let saved_data : (int, save_data) Hashtbl.t = Hashtbl.create 17
@@ -583,7 +438,7 @@ let handle_answer answer =
       let ret = exit_code in
       let printer_mapping = save.printer_mapping in
       let ans = parse_prover_run save.res_parser timeout time out ret
-          save.limit save.check_model ~printer_mapping in
+          save.limit ~printer_mapping in
       id, Some ans
   | Started id ->
       id, None
@@ -595,8 +450,7 @@ type prover_call =
   | ServerCall of server_id
   | EditorCall of int
 
-let call_on_file ~command ~limit ~res_parser ~printer_mapping
-    ?check_model ?(inplace=false) fin =
+let call_on_file ~command ~limit ~res_parser ~printer_mapping ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
     actualcommand ~cleanup:true ~inplace command limit fin in
@@ -605,8 +459,7 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
     inplace    = inplace;
     limit      = limit;
     res_parser = res_parser;
-    printer_mapping = printer_mapping;
-    check_model = check_model } in
+    printer_mapping = printer_mapping } in
   Hashtbl.add saved_data id save;
   let limit = adapt_limits limit on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
@@ -660,7 +513,7 @@ let editor_result ret = {
   pr_output = "";
   pr_time   = 0.0;
   pr_steps  = 0;
-  pr_model  = None;
+  pr_models = [];
 }
 
 let query_call = function
@@ -691,7 +544,7 @@ let rec wait_on_call = function
       editor_result ret
 
 let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
-    ~gen_new_file ?check_model ?(inplace=false) buffer =
+    ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
       Filename.open_temp_file "why_" ("_" ^ filename)
@@ -704,7 +557,7 @@ let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
       end
   in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace ?check_model fin
+  call_on_file ~command ~limit ~res_parser ~printer_mapping ~inplace fin
 
 let call_editor ~command fin =
   let command, use_stdin, _ =

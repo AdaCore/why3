@@ -100,7 +100,7 @@ let () =
       if Debug.test_flag debug then
         Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r)
 
-let print_result = Call_provers.print_prover_result ?json:None ?check_ce:None
+let print_result = Call_provers.print_prover_result ?json:None
 
 module S = Session_itp
 

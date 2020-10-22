@@ -57,7 +57,6 @@ val print_theory :
 val prove_task :
   command      : string ->
   limit        : Call_provers.resource_limit ->
-  ?check_model : Model_parser.check_model ->
   ?old         : string ->
   ?inplace     : bool ->
   ?interactive : bool ->
@@ -75,7 +74,6 @@ val print_task_prepared :
 val prove_task_prepared :
   command      : string ->
   limit        : Call_provers.resource_limit ->
-  ?check_model : Model_parser.check_model ->
   ?old         : string ->
   ?inplace     : bool ->
   ?interactive : bool ->

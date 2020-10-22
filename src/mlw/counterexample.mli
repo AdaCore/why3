@@ -1,4 +1,5 @@
 
+open Format
 open Pinterp
 
 val check_model : rac_reduce_config -> Env.env -> Pmodule.pmodule -> Model_parser.check_model
@@ -9,3 +10,11 @@ val check_model : rac_reduce_config -> Env.env -> Pmodule.pmodule -> Model_parse
     RAC execution.
 
     Optional arguments [rac_trans] and [rac_prover] as in [eval_global_fundef]. *)
+
+type ce_summary
+
+val print_counterexample : ?check_ce:bool -> formatter ->
+                           Model_parser.model * ce_summary -> unit
+
+val select_model : rac_reduce_config -> Env.env -> Pmodule.pmodule ->
+('a * Model_parser.model) list -> (Model_parser.model * ce_summary) option

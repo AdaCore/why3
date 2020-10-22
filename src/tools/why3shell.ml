@@ -145,7 +145,7 @@ let print_proof_attempt fmt pa_id =
   | Some _pr ->
     fprintf fmt "%s %a"
       pa.node_name
-      (Pp.print_option (Call_provers.print_prover_result ?json:None ?check_ce:None))
+      (Pp.print_option (Call_provers.print_prover_result ?json:None))
       (get_result pa.node_proof)
 
 let rec print_proof_node (fmt: formatter) goal_id =

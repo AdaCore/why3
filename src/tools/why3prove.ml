@@ -233,7 +233,7 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
-let print_result ?json ~check_ce fmt (fname, loc, goal_name, expls, res) =
+let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
   if json = Some `All then
     let open Json_base in
     let print_loc fmt (loc, fname) =
@@ -247,7 +247,7 @@ let print_result ?json ~check_ce fmt (fname, loc, goal_name, expls, res) =
         (print_json_field "explanations" print_json) (List (List.map (fun s -> String s) expls)) in
     fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
       (print_json_field "term" print_term) (loc, fname, goal_name, expls)
-      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:`All ~check_ce)) res
+      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:`All)) res
   else (
     ( match loc with
       | None -> fprintf fmt "File %s:@\n" fname
@@ -260,7 +260,10 @@ let print_result ?json ~check_ce fmt (fname, loc, goal_name, expls, res) =
           "@[<hov>Goal@ @{<bold>%s@}@ from@ verification@ condition@ @{<bold>%s@}.@]"
           expls goal_name );
     if json <> Some `All then fprintf fmt "@\n";
-    Call_provers.print_prover_result ?json ~check_ce fmt res;
+    Call_provers.print_prover_result ?json fmt res;
+    (match ce with
+     | Some ce -> Counterexample.print_counterexample ~check_ce:!opt_check_ce_model fmt ce
+     | None -> ());
     fprintf fmt "@\n" )
 
 let unproved = ref false
@@ -272,20 +275,21 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
                    limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
-        let check_ce = !opt_check_ce_model in
-        let check_model =
-          if check_ce then
-            let reduce_lit = Call_provers.rac_reduce_config_lit ~trans:"compute_in_goal" ?prover:!opt_rac_prover () in
-            let reduce = Pinterp.rac_reduce_config_lit config env reduce_lit in
-            Some (Counterexample.check_model reduce env (Pmodule.restore_module th))
-          else None in
-        let call = Driver.prove_task ~command ~limit ?check_model drv task in
+        let call = Driver.prove_task ~command ~limit drv task in
         let res = Call_provers.wait_on_call call in
+        let ce =
+          if !opt_check_ce_model then
+            let reduce_lit =
+              Call_provers.rac_reduce_config_lit
+                ~trans:"compute_in_goal" ?prover:!opt_rac_prover () in
+            let reduce = Pinterp.rac_reduce_config_lit config env reduce_lit in
+            Counterexample.select_model reduce env (Pmodule.restore_module th) res.pr_models
+          else None in
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
-        printf "%a@." (print_result ?json:!opt_json ~check_ce)
-          (fname, t.Term.t_loc, goal_name, expls, res);
+        printf "%a@." (print_result ?json:!opt_json)
+          (fname, t.Term.t_loc, goal_name, expls, res, ce);
         if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task

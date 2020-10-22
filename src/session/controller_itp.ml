@@ -37,7 +37,7 @@ let print_status fmt st =
   | Undone            -> fprintf fmt "Undone"
   | Scheduled         -> fprintf fmt "Scheduled"
   | Running           -> fprintf fmt "Running"
-  | Done r            -> fprintf fmt "Done(%a)" (Call_provers.print_prover_result ?json:None ?check_ce:None) r
+  | Done r            -> fprintf fmt "Done(%a)" (Call_provers.print_prover_result ?json:None) r
   | Interrupted       -> fprintf fmt "Interrupted"
   | Detached          -> fprintf fmt "Detached"
   | InternalFailure e ->
@@ -295,8 +295,7 @@ type sched_pa_rec =
     spa_limit    : Call_provers.resource_limit;
     spa_pr_scr   : string option;
     spa_callback : (proof_attempt_status -> unit);
-    spa_ores     : Call_provers.prover_result option;
-    spa_check_model : Call_provers.rac_reduce_config_lit option;
+    spa_ores     : Call_provers.prover_result option
   }
 
 let scheduled_proof_attempts : sched_pa_rec Queue.t = Queue.create ()
@@ -421,18 +420,18 @@ let build_prover_call spa =
     let inplace = config_pr.Whyconf.in_place in
     let interactive = config_pr.Whyconf.interactive in
     try
-      let rec find_th s id = match get_proof_parent s id with
-        | Theory th -> th
-        | Trans id -> find_th s (get_trans_parent s id) in
-      let th = find_th c.controller_session spa.spa_id in
-      let pm = Pmodule.restore_module (Theory.restore_theory (Session_itp.theory_name th)) in
-      let check_model =
-        let aux lit_conf =
-          let reduce_conf = Pinterp.rac_reduce_config_lit c.controller_config c.controller_env lit_conf in
-          Counterexample.check_model reduce_conf c.controller_env pm in
-        Opt.map aux spa.spa_check_model in
+      (* let rec find_th s id = match get_proof_parent s id with
+       *   | Theory th -> th
+       *   | Trans id -> find_th s (get_trans_parent s id) in
+       * let th = find_th c.controller_session spa.spa_id in
+       * let pm = Pmodule.restore_module (Theory.restore_theory (Session_itp.theory_name th)) in
+       * let check_model =
+       *   let aux lit_conf =
+       *     let reduce_conf = Pinterp.rac_reduce_config_lit c.controller_config c.controller_env lit_conf in
+       *     Counterexample.check_model reduce_conf c.controller_env pm in
+       *   Opt.map aux spa.spa_check_model in *)
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
-          ~limit ~interactive ?check_model driver task in
+          ~limit ~interactive driver task in
       let pa =
         { tp_session  = c.controller_session;
           tp_id       = spa.spa_id;
@@ -574,7 +573,7 @@ let run_idle_handler () =
       S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
-let schedule_proof_attempt c id pr ?save_to ?check_model ~limit ~callback ~notification =
+let schedule_proof_attempt c id pr ?save_to ~limit ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
     begin
@@ -631,8 +630,7 @@ let schedule_proof_attempt c id pr ?save_to ?check_model ~limit ~callback ~notif
       spa_limit    = adaptlimit;
       spa_pr_scr   = proof_script;
       spa_callback = callback panid;
-      spa_ores     = ores;
-      spa_check_model = check_model } in
+      spa_ores     = ores } in
   Queue.add spa scheduled_proof_attempts;
   callback panid Scheduled;
   run_idle_handler ()
@@ -837,7 +835,7 @@ let run_strategy_on_goal
          let limit = { Call_provers.empty_limit with
                        Call_provers.limit_time = timelimit;
                        limit_mem  = memlimit} in
-         schedule_proof_attempt c g p ?save_to:None ?check_model:None ~limit ~callback ~notification
+         schedule_proof_attempt c g p ?save_to:None ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
            callback_tr trname [] ntr;
@@ -963,7 +961,7 @@ let mark_as_obsolete ~notification c any =
 exception BadCopyPaste
 
 (* Reproduce the transformation made on node on an other one *)
-let rec copy_rec ?check_model ~notification ~callback_pa ~callback_tr c from_any to_any =
+let rec copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any =
   let s = c.controller_session in
   match from_any, to_any with
 (*
@@ -974,13 +972,13 @@ let rec copy_rec ?check_model ~notification ~callback_pa ~callback_tr c from_any
  *)
     | APn from_pn, APn to_pn ->
       let from_pa_list = get_proof_attempts s from_pn in
-      List.iter (fun x -> schedule_pa_with_same_arguments ?save_to:None ?check_model c x to_pn
+      List.iter (fun x -> schedule_pa_with_same_arguments ?save_to:None c x to_pn
           ~callback:callback_pa ~notification) from_pa_list;
       let from_tr_list = get_transformations s from_pn in
       let callback x tr args st = callback_tr tr args st;
         match st with
         | TSdone tid ->
-          copy_rec ?check_model c (ATn x) (ATn tid) ~notification ~callback_pa ~callback_tr
+          copy_rec c (ATn x) (ATn tid) ~notification ~callback_pa ~callback_tr
         | _ -> ()
       in
       List.iter (fun x -> schedule_tr_with_same_arguments c x to_pn
@@ -991,7 +989,7 @@ let rec copy_rec ?check_model ~notification ~callback_pa ~callback_tr c from_any
         let rec iter_copy l1 l2 =
           match l1,l2 with
           | x::r1, y::r2 ->
-             copy_rec ?check_model c (APn x) (APn y)
+             copy_rec c (APn x) (APn y)
                       ~notification ~callback_pa ~callback_tr;
              iter_copy r1 r2
           | _ -> ()
@@ -999,19 +997,19 @@ let rec copy_rec ?check_model ~notification ~callback_pa ~callback_tr c from_any
     | _ -> raise BadCopyPaste
 
 
-let copy_paste ?check_model ~notification ~callback_pa ~callback_tr c from_any to_any =
+let copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
   let s = c.controller_session in
   if is_below s to_any from_any then
     raise BadCopyPaste;
   match from_any, to_any with
   | APn _, APn _ ->
-     copy_rec ?check_model ~notification ~callback_pa ~callback_tr c from_any to_any
+     copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any
   | ATn from_tn, APn to_pn ->
      let callback tr args st =
        callback_tr tr args st;
        match st with
        | TSdone tid ->
-          copy_rec ?check_model c (ATn from_tn) (ATn tid) ~notification ~callback_pa ~callback_tr
+          copy_rec c (ATn from_tn) (ATn tid) ~notification ~callback_pa ~callback_tr
        | _ -> ()
      in
      schedule_tr_with_same_arguments c from_tn to_pn ~callback ~notification
@@ -1058,7 +1056,7 @@ let find_prover notification c goal_id pr =
         end
 
 
-let replay_proof_attempt ?check_model c pr limit (parid: proofNodeID) id ~callback ~notification =
+let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
   (* The replay can be done on a different machine so we need
      to check more things before giving the attempt to the scheduler *)
   match find_prover notification c parid pr with
@@ -1071,7 +1069,7 @@ let replay_proof_attempt ?check_model c pr limit (parid: proofNodeID) id ~callba
      try
        if pr' <> pr then callback id (UpgradeProver pr');
        let _ = get_task c.controller_session parid in
-       schedule_proof_attempt ?save_to:None ?check_model c parid pr' ~limit ~callback ~notification
+       schedule_proof_attempt ?save_to:None c parid pr' ~limit ~callback ~notification
      with Not_found ->
        callback id Detached
 
@@ -1091,8 +1089,8 @@ let print_report fmt (r: report) =
   match r with
   | Result (new_r, old_r) ->
     Format.fprintf fmt "new_result = %a, old_result = %a@."
-      (Call_provers.print_prover_result ?json:None ?check_ce:None) new_r
-      (Call_provers.print_prover_result ?json:None ?check_ce:None) old_r
+      (Call_provers.print_prover_result ?json:None) new_r
+      (Call_provers.print_prover_result ?json:None) old_r
   | CallFailed e ->
     Format.fprintf fmt "Callfailed %a@." Exn_printer.exn_printer e
   | Replay_interrupted ->
@@ -1103,7 +1101,7 @@ let print_report fmt (r: report) =
     Format.fprintf fmt "No edited file@."
   | No_former_result new_r ->
     Format.fprintf fmt "new_result = %a, no former result@."
-      (Call_provers.print_prover_result ?json:None ?check_ce:None) new_r
+      (Call_provers.print_prover_result ?json:None) new_r
 
 (* TODO to be removed when we have a better way to print *)
 let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
@@ -1114,7 +1112,7 @@ let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_
   in
   Format.fprintf fmt "%a@." (Pp.print_list Pp.newline pp_elem) lr
 
-let replay ?check_model ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
+let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
            c ~callback ~notification ~final_callback ~any =
 
   let session = c.controller_session in
@@ -1191,7 +1189,7 @@ let replay ?check_model ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=f
           else step_limit
         in
         let limit = Call_provers.{pa.limit with limit_steps = step_limit } in
-        replay_proof_attempt ?check_model c pr limit parid id
+        replay_proof_attempt c pr limit parid id
                              ~callback:(fun id s ->
                                         craft_report s parid limit pa;
                                         callback id s;
@@ -1289,10 +1287,10 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                   | Done res ->
                      assert (res.Call_provers.pr_answer = Call_provers.Valid);
                      Debug.dprintf debug "Bisecting: %a.@."
-                       (Call_provers.print_prover_result ?json:None ~check_ce:false) res
+                       (Call_provers.print_prover_result ?json:None) res
                   end
                 in
-                schedule_proof_attempt ?save_to:None ?check_model:None c pn prover ~limit ~callback ~notification
+                schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification
              | _ -> assert false
           end
         in
@@ -1374,7 +1372,7 @@ later on. We do has if proof fails. *)
             in
             Debug.dprintf
               debug "[Bisect] running the prover on subtask@.";
-            schedule_proof_attempt ?save_to:None ?check_model:None c pn prover ~limit ~callback ~notification
+            schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification
          | _ -> assert false
       end
     in
