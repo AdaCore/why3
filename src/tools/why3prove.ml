@@ -275,10 +275,9 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let check_ce = !opt_check_ce_model in
         let check_model =
           if check_ce then
-            let open Pinterp in
             let reduce_lit = Call_provers.rac_reduce_config_lit ~trans:"compute_in_goal" ?prover:!opt_rac_prover () in
-            let reduce = rac_reduce_config_lit config env reduce_lit in
-            Some (check_model reduce env (Pmodule.restore_module th))
+            let reduce = Pinterp.rac_reduce_config_lit config env reduce_lit in
+            Some (Counterexample.check_model reduce env (Pmodule.restore_module th))
           else None in
         let call = Driver.prove_task ~command ~limit ?check_model drv task in
         let res = Call_provers.wait_on_call call in

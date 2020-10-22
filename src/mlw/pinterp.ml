@@ -19,7 +19,6 @@ open Ity
 open Expr
 open Big_real
 open Mlmpfr_wrapper
-open Model_parser
 
 let debug =
   Debug.register_info_flag "trace_exec"
@@ -387,15 +386,15 @@ type rac_config = {
   do_rac       : bool;
   rac_abstract : bool;
   rac_reduce   : rac_reduce_config;
-  ce_model     : model;
-  exec_log     : exec_log ref (* execution log, it includes values
+  ce_model     : Model_parser.model;
+  exec_log     : Model_parser.exec_log ref (* execution log, it includes values
                                  taken from the ce model *)
 }
 
 let rac_config ~do_rac ~abstract:rac_abstract ?reduce:rac_reduce
     ?model:(ce_model=Model_parser.default_model) () =
   let rac_reduce = match rac_reduce with Some r -> r | None -> rac_reduce_config () in
-  {do_rac; rac_abstract; rac_reduce; ce_model; exec_log= ref empty_log}
+  {do_rac; rac_abstract; rac_reduce; ce_model; exec_log= ref Model_parser.empty_log}
 
 type env =
   { mod_known   : Pdecl.known_map;
@@ -411,28 +410,28 @@ let default_env env rac mod_known th_known =
   { mod_known; th_known; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty }
 
 let register_used_value env loc id value =
-  env.rac.exec_log := add_val_to_log id (asprintf "%a" print_value value) loc !(env.rac.exec_log)
+  env.rac.exec_log := Model_parser.add_val_to_log id (asprintf "%a" print_value value) loc !(env.rac.exec_log)
 
 let register_call env loc rs mvs kind =
-  env.rac.exec_log := add_call_to_log rs mvs kind loc !(env.rac.exec_log)
+  env.rac.exec_log := Model_parser.add_call_to_log rs mvs kind loc !(env.rac.exec_log)
 
 let register_pure_call env loc ls kind =
-  env.rac.exec_log := add_pure_call_to_log ls kind loc !(env.rac.exec_log)
+  env.rac.exec_log := Model_parser.add_pure_call_to_log ls kind loc !(env.rac.exec_log)
 let register_any_call env loc value =
     let v = (asprintf "%a" print_value value) in
-    env.rac.exec_log := add_any_call_to_log v loc !(env.rac.exec_log)
+    env.rac.exec_log := Model_parser.add_any_call_to_log v loc !(env.rac.exec_log)
 
 let register_failure env loc reason mvs =
-  env.rac.exec_log := add_failed_to_log reason mvs loc !(env.rac.exec_log)
+  env.rac.exec_log := Model_parser.add_failed_to_log reason mvs loc !(env.rac.exec_log)
 
 let register_stucked env loc reason mvs =
-  env.rac.exec_log := add_stucked_to_log reason mvs loc !(env.rac.exec_log)
+  env.rac.exec_log := Model_parser.add_stucked_to_log reason mvs loc !(env.rac.exec_log)
 
 let register_ended env loc =
-  env.rac.exec_log := add_exec_ended_to_log loc !(env.rac.exec_log)
+  env.rac.exec_log := Model_parser.add_exec_ended_to_log loc !(env.rac.exec_log)
 
 let register_loop env loc kind =
-  env.rac.exec_log := add_exec_loop_to_log kind loc !(env.rac.exec_log)
+  env.rac.exec_log := Model_parser.add_exec_loop_to_log kind loc !(env.rac.exec_log)
 
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
@@ -853,7 +852,7 @@ let rec import_model_value env known ity v =
    * else *)
   if is_range_type_def def.Pdecl.itd_its.its_def then
     match v with
-    | Proj (_, Integer s)
+    | Model_parser.Proj (_, Integer s)
     | Integer s -> value (ty_of_ity ity) (Vnum (BigInt.of_string s))
     | _ -> assert false
   else
@@ -911,14 +910,14 @@ let rec import_model_value env known ity v =
           | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
           | _ -> assert false in
         let add_index mv ix =
-          let key = import_model_value env known key_ity ix.arr_index_key in
+          let key = import_model_value env known key_ity ix.Model_parser.arr_index_key in
           let value = import_model_value env known value_ity ix.arr_index_value in
           Mv.add key value mv in
         let mv = List.fold_left add_index Mv.empty a.arr_indices in
         let v0 = import_model_value env known value_ity a.arr_others in
         value (ty_of_ity ity) (Vpurefun (ty_of_ity key_ity, mv, v0))
     | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
-        kasprintf failwith "import_model_value (not implemented): %a" print_model_value v
+        kasprintf failwith "import_model_value (not implemented): %a" Model_parser.print_model_value v
 
 (* ROUTINE DEFINITIONS *)
 
@@ -1142,9 +1141,9 @@ let get_value_for_quant_var env vs =
   | Some loc ->
       let value =
         if bind_univ_quant_vars_ce_model then
-          match get_model_element env.rac.ce_model vs.vs_name.id_string loc with
+          match Model_parser.get_model_element env.rac.ce_model vs.vs_name.id_string loc with
           | Some me ->
-              let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) me.me_value in
+              let v = import_model_value env.env env.mod_known (ity_of_ty vs.vs_ty) me.Model_parser.me_value in
               Debug.dprintf debug_rac "Bind model value for all-quantified variable %a to %a@." print_vs vs print_value v;
               Some v
           | _ -> None
@@ -1433,10 +1432,10 @@ let print_result fmt = function
 let get_and_register_value env ?def ?ity vs loc =
   let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
   let name = vs.vs_name.id_string in
-  let value = match get_model_element env.rac.ce_model name loc with
+  let value = match Model_parser.get_model_element env.rac.ce_model name loc with
     | Some me ->
        let v = import_model_value env.env env.mod_known ity me.me_value in
-       Debug.dprintf debug_check_ce "@[<h>VALUE from ce-model for %a at %a: %a@]@."
+       Debug.dprintf Model_parser.debug_check_ce "@[<h>VALUE from ce-model for %a at %a: %a@]@."
          Ident.print_decoded name
          Pretty.print_loc' loc
          print_value v;
@@ -1446,7 +1445,7 @@ let get_and_register_value env ?def ?ity vs loc =
          | None ->
             default_value_of_type env.env env.mod_known ity
          | Some v -> v in
-       Debug.dprintf debug_check_ce "@[<h>VALUE for %s %a not in ce-model, taking \
+       Debug.dprintf Model_parser.debug_check_ce "@[<h>VALUE for %s %a not in ce-model, taking \
                 default %a@]@." name print_loc' loc print_value v;
        v
   in
@@ -1546,7 +1545,7 @@ and eval_expr' env e =
       | Cany ->
           let v =
             try
-              let me = get_model_element_by_loc env.rac.ce_model (Opt.get_exn Exit e.e_loc) in
+              let me = Model_parser.get_model_element_by_loc env.rac.ce_model (Opt.get_exn Exit e.e_loc) in
               import_model_value env.env env.mod_known e.e_ity (Opt.get_exn Exit me).me_value
             with Exit ->
               let v = default_value_of_type env.env env.mod_known e.e_ity in
@@ -1993,9 +1992,9 @@ and exec_call_abstract ?loc ?rs_name env cty arg_pvs ity_result =
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
-let bind_globals ?(model=default_model) ?rs_main mod_known env =
+let bind_globals ?(model=Model_parser.default_model) ?rs_main mod_known env =
   let get_value register id opt_e ity =
-    match get_model_element_by_id model id with
+    match Model_parser.get_model_element_by_id model id with
     | Some me ->
         let v = import_model_value env.env mod_known ity me.me_value in
         register v; v
@@ -2050,7 +2049,7 @@ let eval_global_fundef rac env mod_known th_known locals e =
 
 let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   let get_value (pv: pvsymbol) =
-    match get_model_element_by_id model pv.pv_vs.vs_name with
+    match Model_parser.get_model_element_by_id model pv.pv_vs.vs_name with
     | Some me -> import_model_value env mod_known pv.pv_ity me.me_value
     | None ->
         let v = default_value_of_type env mod_known pv.pv_ity in
@@ -2067,20 +2066,19 @@ let eval_rs rac env mod_known th_known model (rs: rsymbol) =
   register_ended env rs.rs_name.id_loc;
   res, env
 
-
 let check_model_rs rac env pm model rs =
   let open Pmodule in
   let abs_msg = if rac.rac_abstract then "abstract" else "concrete" in
   let abs_Msg = String.capitalize_ascii abs_msg in
   Debug.dprintf debug_rac "Validating model %s:@\n%a@." (abs_msg ^ "ly")
-    (print_model ?me_name_trans:None ~print_attrs:false) model;
+    (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) model;
   try
     let _, env = eval_rs rac env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason = sprintf "%s RAC does not confirm the counter-example, no \
                           contradiction during execution" abs_Msg in
     {Model_parser.verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
   with
-  | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc (get_model_term_loc model) ->
+  | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc (Model_parser.get_model_term_loc model) ->
       let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
       {Model_parser.verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | Contr (ctx, t) ->
@@ -2089,120 +2087,22 @@ let check_model_rs rac env pm model rs =
       {Model_parser.verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | CannotImportModelValue msg ->
       let reason = sprintf "cannot import value from model: %s" msg in
-      {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
+      {Model_parser.verdict= Dont_know; reason; exec_log= Model_parser.empty_log}
   | CannotCompute r ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
       let reason = sprintf "RAC execution got stuck: %s" r.reason in
-      {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
+      {Model_parser.verdict= Dont_know; reason; exec_log= Model_parser.empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
           term for constructor that is not a function *)
       let reason = sprintf "failure: %s" msg in
-      {Model_parser.verdict= Dont_know; reason; exec_log= empty_log}
+      {Model_parser.verdict= Dont_know; reason; exec_log= Model_parser.empty_log}
   | RACStuck (env,l) ->
       let reason =
         asprintf "%s RAC, with the counterexample model cannot continue after %a"
           abs_Msg (Pp.print_option print_loc') l in
       {Model_parser.verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
-
-(** Identifies the rsymbol of the definition that contains the given position. **)
-let find_rs pm loc =
-  let open Pmodule in
-  let open Pdecl in
-  let rec find_in_list f = function
-    | [] -> None
-    | x :: xs -> match f x with
-      | None -> find_in_list f xs
-      | res -> res in
-  let in_t t =
-    Opt.equal Loc.equal (Some loc) t.t_loc ||
-    t_any (fun t ->  Opt.equal Loc.equal (Some loc) t.t_loc) t in
-  let in_cty cty =
-    List.exists in_t cty.cty_pre ||
-    List.exists in_t cty.cty_post ||
-    Mxs.exists (fun _ -> List.exists in_t) cty.cty_xpost in
-  let rec in_e e =
-    Opt.equal Loc.equal (Some loc) e.e_loc ||
-    match e.e_node with
-    | Evar _ | Econst _ | Eassign _ -> false
-    | Eexec (ce, cty) -> in_ce ce || in_cty cty
-    | Elet (d, e) ->
-        (match d with
-         | LDvar (_, e') -> in_e e'
-         | LDsym (rs, ce) -> in_cty rs.rs_cty || in_ce ce
-         | LDrec defs -> List.exists (fun d -> in_ce d.rec_fun) defs) ||
-        in_e e
-    | Eif (e1, e2, e3) ->
-        in_e e1 || in_e e2 || in_e e3
-    | Ematch (e, regs, exns) ->
-        in_e e || List.exists in_e (List.map snd regs) ||
-        List.exists in_e (List.map snd (Mxs.values exns))
-    | Ewhile (e1, invs, vars, e2) ->
-        in_e e1 || List.exists in_t invs ||
-        List.exists in_t (List.map fst vars) || in_e e2
-    | Efor (_, _, _, invs, e) ->
-        List.exists in_t invs || in_e e
-    | Eraise (_, e)
-    | Eexn (_, e) -> in_e e
-    | Eassert (_, t) -> in_t t
-    | Eghost e -> in_e e
-    | Epure t -> in_t t
-    | Eabsurd -> false
-  and in_ce ce = match ce.c_node with
-    | Cfun e -> in_e e
-    | Capp (rs, _) -> in_cty rs.rs_cty
-    | Cpur _ | Cany -> false in
-  let rec find_pdecl pd =
-    let maybe b r = if b then Some r else None in
-    match pd.pd_node with
-    | PDtype ds ->
-        let in_tdef td =
-          List.exists in_t td.itd_invariant ||
-          List.exists in_e td.itd_witness in
-        let find_td td = (* TODO *)
-          if in_tdef td then Warning.emit "Can't check CE for VC from type definitions :(";
-          None in
-        find_in_list find_td ds
-    | PDlet ld ->
-        (match ld with
-         | LDvar (_, e) -> (* TODO *)
-             if in_e e then Warning.emit "Can't check CE for VC from variable definitions :(";
-             None
-         | LDsym (rs, ce) ->
-             maybe (in_cty rs.rs_cty || in_ce ce) rs
-         | LDrec defs ->
-             let in_def d = in_cty d.rec_sym.rs_cty || in_ce d.rec_fun in
-             find_in_list (fun d -> maybe (in_def d) d.rec_sym) defs)
-    | PDexn _
-    | PDpure -> None
-  and find_mod_unit = function
-    | Uuse _ | Uclone _ | Umeta _ -> None
-    | Uscope (_, us) -> find_in_list find_mod_unit us
-    | Udecl pd -> find_pdecl pd in
-  find_in_list find_mod_unit pm.mod_units
-
-let check_model reduce env pm model =
-  match get_model_term_loc model with
-  | None ->
-      let reason = "model term has no location" in
-      Cannot_check_model {reason}
-  | Some loc ->
-      (* TODO deal with VCs from goal definitions? *)
-      if Loc.equal loc Loc.dummy_position then
-        failwith ("Pinterp.check_model: the term of the CE model has a dummy "^
-                  "location, it cannot be used to find the toplevel definition");
-      match find_rs pm loc with
-      | Some rs ->
-          let check_model_rs ~abstract =
-            let rac = rac_config ~do_rac:true ~abstract ~reduce ~model () in
-            check_model_rs rac env pm model rs in
-          let concrete = check_model_rs ~abstract:false in
-          let abstract = check_model_rs ~abstract:true in
-          Check_model_result {concrete; abstract}
-      | None ->
-          let reason = asprintf "no corresponding routine symbol found for %a" print_loc' loc in
-          Cannot_check_model {reason}
 
 let report_eval_result body fmt (res, vsenv, rsenv) =
   let print_envs fmt =

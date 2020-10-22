@@ -429,7 +429,7 @@ let build_prover_call spa =
       let check_model =
         let aux lit_conf =
           let reduce_conf = Pinterp.rac_reduce_config_lit c.controller_config c.controller_env lit_conf in
-          Pinterp.check_model reduce_conf c.controller_env pm in
+          Counterexample.check_model reduce_conf c.controller_env pm in
         Opt.map aux spa.spa_check_model in
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
           ~limit ~interactive ?check_model driver task in
