@@ -1,136 +1,156 @@
 Weakest Precondition
-bench/ce/loop_ce.mlw M1 f'vc: Valid
-bench/ce/loop_ce.mlw M1 f'vc: Valid
-Model 0:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    a -> (ref'mk 1), #"bench/ce/loop_ce.mlw" 7 4 5#
-    b -> (ref'mk 6), #"bench/ce/loop_ce.mlw" 7 4 5#
-    _ -> (), #"bench/ce/loop_ce.mlw" 7 4 5#
-  Abstract RAC:  don't know (Abstract RAC, with the counterexample model cannot continue after #"bench/ce/loop_ce.mlw" 11 2 91#
-, 0 warnings)
-    
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    a -> (ref'mk 1), #"bench/ce/loop_ce.mlw" 7 4 5#
-    b -> (ref'mk 6), #"bench/ce/loop_ce.mlw" 7 4 5#
-    _ -> (), #"bench/ce/loop_ce.mlw" 7 4 5#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    a -> (ref'mk 1), #"bench/ce/loop_ce.mlw" 7 4 5#
-    b -> (ref'mk 2), #"bench/ce/loop_ce.mlw" 7 4 5#
-    _ -> (), #"bench/ce/loop_ce.mlw" 7 4 5#
-    b -> (ref'mk 6), #"bench/ce/loop_ce.mlw" 11 2 91#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    a -> (ref'mk 1), #"bench/ce/loop_ce.mlw" 7 4 5#
-    b -> (ref'mk 6), #"bench/ce/loop_ce.mlw" 7 4 5#
-    _ -> (), #"bench/ce/loop_ce.mlw" 7 4 5#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    a -> (ref'mk 1), #"bench/ce/loop_ce.mlw" 7 4 5#
-    b -> (ref'mk 2), #"bench/ce/loop_ce.mlw" 7 4 5#
-    _ -> (), #"bench/ce/loop_ce.mlw" 7 4 5#
-    b -> (ref'mk 6), #"bench/ce/loop_ce.mlw" 11 2 91#
-bench/ce/loop_ce.mlw M1 f'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/loop_ce.mlw" 13 16 25#
-File loop_ce.mlw:
-  Line 9:
-    a [@field:0:contents] [@introduced] [@mlw:reference_var] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } }] } }
-  Line 10:
-    b [@field:0:contents] [@introduced] [@mlw:reference_var] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }] } }
-  Line 11:
-    [previous iteration] b [@field:0:contents] [@introduced]
-      [@mlw:reference_var] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "5" } }] } }
-  Line 13:
-    [current iteration] a [@field:0:contents] [@introduced]
-      [@mlw:reference_var] [@model_trace:a] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } }] } }
-    [current iteration] b [@field:0:contents] [@introduced]
-      [@mlw:reference_var] [@model_trace:b] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "6" } }] } }
-  Line 14:
-    [current iteration] b [@field:0:contents] [@introduced]
-      [@mlw:reference_var] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "6" } }] } }
+File "bench/ce/loop_ce.mlw", line 13, characters 16-25:
+Goal Loop invariant init from verification condition f'vc.
+Prover result is: valid WHY3DATA.
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    a1 -> (ref'mk 2), #"bench/ce/loop_ce.mlw" 20 6 7#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    a1 -> (ref'mk 2), #"bench/ce/loop_ce.mlw" 20 6 7#
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    a1 -> (ref'mk 1), #"bench/ce/loop_ce.mlw" 20 6 7#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    a1 -> (ref'mk 1), #"bench/ce/loop_ce.mlw" 20 6 7#
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    a1 -> (ref'mk 1), #"bench/ce/loop_ce.mlw" 20 6 7#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    a1 -> (ref'mk 1), #"bench/ce/loop_ce.mlw" 20 6 7#
-bench/ce/loop_ce.mlw M2 g'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/loop_ce.mlw" 23 13 23#
-File loop_ce.mlw:
-  Line 20:
-    a [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents] [@introduced]
-      [@mlw:reference_var] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }] } }
-  Line 22:
-    a [@field:0:contents] [@introduced] [@mlw:reference_var] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } }] } }
-  Line 23:
-    a at X [@at:X] [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents]
-      [@introduced] [@mlw:reference_var] [@model_trace:a] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }] } }
+File "bench/ce/loop_ce.mlw", line 12, characters 14-20:
+Goal Loop variant decrease from verification condition f'vc.
+Prover result is: valid WHY3DATA.
 
-bench/ce/loop_ce.mlw M2 g'vc: Valid
-bench/ce/loop_ce.mlw M2 g'vc: Valid
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    a1 -> (ref'mk 10), #"bench/ce/loop_ce.mlw" 20 6 7#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    a1 -> (ref'mk 10), #"bench/ce/loop_ce.mlw" 20 6 7#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    a1 -> (ref'mk 10), #"bench/ce/loop_ce.mlw" 20 6 7#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    a1 -> (ref'mk 10), #"bench/ce/loop_ce.mlw" 20 6 7#
-bench/ce/loop_ce.mlw M2 g'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/loop_ce.mlw" 20 31 44#
-File loop_ce.mlw:
-  Line 20:
-    old a [@at:'Old:loc:bench/ce/loop_ce.mlw:20] [@field:0:contents]
-      [@introduced] [@mlw:reference_var] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "10" } }] } }
+File "bench/ce/loop_ce.mlw", line 13, characters 16-25:
+Goal Loop invariant preservation from verification condition f'vc.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/loop_ce.mlw":
+    {"9":
+      [{"name": "a",
+        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}},
+        "kind": "before_loop"}],
+     "10":
+      [{"name": "b",
+        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}},
+        "kind": "before_loop"}],
+     "11":
+      [{"name": "b",
+        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}},
+        "kind": "before_iteration"}],
+     "13":
+      [{"name": "a",
+        "attrs":
+         ["field:0:contents",
+          "introduced",
+          "mlw:reference_var",
+          "model_trace:a"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}},
+        "kind": "current_iteration"},
+       {"name": "b",
+        "attrs":
+         ["field:0:contents",
+          "introduced",
+          "mlw:reference_var",
+          "model_trace:b"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}},
+        "kind": "current_iteration"}],
+     "14":
+      [{"name": "b",
+        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}},
+        "kind": "current_iteration"}]}}}
+
+File "bench/ce/loop_ce.mlw", line 23, characters 13-23:
+Goal Assertion from verification condition g'vc.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/loop_ce.mlw":
+    {"20":
+      [{"name": "a",
+        "attrs":
+         ["at:X:loc:bench\/ce\/loop_ce.mlw:23",
+          "field:0:contents",
+          "introduced",
+          "mlw:reference_var"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value": {"type": "Integer", "val": "-391"}}]}},
+        "kind": "other"}],
+     "22":
+      [{"name": "a",
+        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value": {"type": "Integer", "val": "-390"}}]}},
+        "kind": "other"}],
+     "23":
+      [{"name": "a",
+        "attrs":
+         ["at:X",
+          "at:X:loc:bench\/ce\/loop_ce.mlw:23",
+          "field:0:contents",
+          "introduced",
+          "mlw:reference_var",
+          "model_trace:a"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value": {"type": "Integer", "val": "-391"}}]}},
+        "kind": at X}]}}}
+
+File "bench/ce/loop_ce.mlw", line 20, characters 31-44:
+Goal Postcondition from verification condition g'vc.
+Prover result is: valid WHY3DATA.
+
+File "bench/ce/loop_ce.mlw", line 23, characters 13-23:
+Goal Assertion from verification condition g'vc.
+Prover result is: valid WHY3DATA.
+
+File "bench/ce/loop_ce.mlw", line 20, characters 31-44:
+Goal Postcondition from verification condition g'vc.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/loop_ce.mlw":
+    {"20":
+      [{"name": "old a",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/loop_ce.mlw:20",
+          "field:0:contents",
+          "introduced",
+          "mlw:reference_var"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value": {"type": "Integer", "val": "10"}}]}},
+        "kind": "old"}]}}}
 

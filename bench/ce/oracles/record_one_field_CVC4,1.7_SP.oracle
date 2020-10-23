@@ -1,398 +1,535 @@
 Strongest Postcondition
-bench/ce/record_one_field.mlw Ref ref1'vc: Valid
-bench/ce/record_one_field.mlw Ref ref11'vc: Valid
-bench/ce/record_one_field.mlw Ref ref11'vc: Valid
-bench/ce/record_one_field.mlw Ref prefix !'vc: Valid
-bench/ce/record_one_field.mlw Ref infix :='vc: Valid
-bench/ce/record_one_field.mlw Ref infix :='vc: Valid
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-bench/ce/record_one_field.mlw M test_post'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/record_one_field.mlw" 25 14 25#
-File record_one_field.mlw:
-  Line 13:
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:25] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 15:
-    y [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 24:
-    x [@introduced] = {"type" : "Integer" , "val" : "1" }
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:25] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 25:
-    x [@introduced] [@model_trace:x] = {"type" : "Integer" , "val" : "1" }
-    old y [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:25]
-      [@introduced] [@model_trace:y] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 27:
-    y [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
+File bench/ce/record_one_field.mlw:
+Verification condition ref1'vc.
+Prover result is: valid WHY3DATA.
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-bench/ce/record_one_field.mlw M test_post2'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/record_one_field.mlw" 31 14 29#
-File record_one_field.mlw:
-  Line 13:
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:31] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 15:
-    y [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "42" } }
-  Line 29:
-    x [@introduced] = {"type" : "Integer" , "val" : "43" }
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:31] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 31:
-    x [@introduced] [@model_trace:x] = {"type" : "Integer" , "val" : "43" }
-    old y [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:31]
-      [@introduced] [@model_trace:y] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 33:
-    y [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "42" } }
+File "bench/ce/record_one_field.mlw", line 11, characters 55-71:
+Goal Precondition from verification condition ref11'vc.
+Prover result is: valid WHY3DATA.
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-bench/ce/record_one_field.mlw M incr'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/record_one_field.mlw" 42 12 36#
-File record_one_field.mlw:
-  Line 13:
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:42] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } }
-  Line 15:
-    y [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 39:
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:42] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } }
-  Line 41:
-    x23 [@at:'Old:loc:bench/ce/record_one_field.mlw:42] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 42:
-    x23 [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-    old x23 [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
-      [@introduced] [@model_trace:x23] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-    old y [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
-      [@introduced] [@model_trace:y] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } }
-  Line 45:
-    y [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 46:
-    x23 [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } }
-  Line 47:
-    x23 [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
+File "bench/ce/record_one_field.mlw", line 11, characters 31-50:
+Goal Postcondition from verification condition ref11'vc.
+Prover result is: valid WHY3DATA.
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/record_one_field.mlw" 56 14 36#
-File record_one_field.mlw:
-  Line 39:
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:42] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 42:
-    old x [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
-      [@at:L:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-    x [@at:M:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 49:
-    x [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
-      [@at:L:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 53:
-    x [@at:M:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 56:
-    x [@introduced] [@model_trace:x] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
+File "bench/ce/record_one_field.mlw", line 13, characters 29-40:
+Goal Postcondition from verification condition prefix !'vc.
+Prover result is: valid WHY3DATA.
 
-bench/ce/record_one_field.mlw M test_loop'vc: Valid
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/record_one_field.mlw" 56 14 36#
-File record_one_field.mlw:
-  Line 13:
-    x [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } }
-  Line 15:
-    x [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 39:
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:42] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 42:
-    old x [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
-      [@at:L:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-    x [@at:M:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 49:
-    x [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
-      [@at:L:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 53:
-    x [@at:M:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 55:
-    [previous iteration] x [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } }
-  Line 56:
-    [current iteration] x [@introduced] [@model_trace:x] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 58:
-    [current iteration] x [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
+File "bench/ce/record_one_field.mlw", line 15, characters 49-64:
+Goal Type invariant from verification condition infix :='vc.
+Prover result is: valid WHY3DATA.
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type ref1, 0 warnings)
-    
-bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/record_one_field.mlw" 50 12 23#
-File record_one_field.mlw:
-  Line 13:
-    x [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 39:
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:42] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 42:
-    old x [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
-      [@at:'Old:loc:bench/ce/record_one_field.mlw:50]
-      [@at:L:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "-2" } }
-    x [@at:M:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 49:
-    x [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
-      [@at:'Old:loc:bench/ce/record_one_field.mlw:50]
-      [@at:L:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "-2" } }
-  Line 50:
-    old x [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:50]
-      [@introduced] [@model_trace:x] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "-2" } }
-  Line 53:
-    x [@at:M:loc:bench/ce/record_one_field.mlw:56] [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
-  Line 55:
-    x [@introduced] =
-      {"proj_name" : "contents" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }
+File "bench/ce/record_one_field.mlw", line 15, characters 38-44:
+Goal Postcondition from verification condition infix :='vc.
+Prover result is: valid WHY3DATA.
+
+File "bench/ce/record_one_field.mlw", line 25, characters 14-25:
+Goal Postcondition from verification condition test_post'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_one_field.mlw":
+    {"13":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "15":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "24":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "1"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:25", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "25":
+      [{"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value": {"type": "Integer", "val": "1"},
+        "kind": "other"},
+       {"name": "old y",
+        "attrs":
+         ["at:'Old",
+          "at:'Old:loc:bench\/ce\/record_one_field.mlw:25",
+          "introduced",
+          "model_trace:y"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "old"}],
+     "27":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}]}}}
+
+File "bench/ce/record_one_field.mlw", line 31, characters 14-29:
+Goal Postcondition from verification condition test_post2'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_one_field.mlw":
+    {"13":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "15":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "42"}},
+        "kind": "other"}],
+     "29":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "43"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:31", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "31":
+      [{"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value": {"type": "Integer", "val": "43"},
+        "kind": "other"},
+       {"name": "old y",
+        "attrs":
+         ["at:'Old",
+          "at:'Old:loc:bench\/ce\/record_one_field.mlw:31",
+          "introduced",
+          "model_trace:y"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "old"}],
+     "33":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "42"}},
+        "kind": "other"}]}}}
+
+File "bench/ce/record_one_field.mlw", line 42, characters 12-36:
+Goal Postcondition from verification condition incr'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_one_field.mlw":
+    {"13":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "1"}},
+        "kind": "other"}],
+     "15":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}],
+     "39":
+      [{"name": "y",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:42", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "1"}},
+        "kind": "other"}],
+     "41":
+      [{"name": "x23",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:42", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "42":
+      [{"name": "x23",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"},
+       {"name": "old x23",
+        "attrs":
+         ["at:'Old",
+          "at:'Old:loc:bench\/ce\/record_one_field.mlw:42",
+          "introduced",
+          "model_trace:x23"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "old"},
+       {"name": "old y",
+        "attrs":
+         ["at:'Old",
+          "at:'Old:loc:bench\/ce\/record_one_field.mlw:42",
+          "introduced",
+          "model_trace:y"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "1"}},
+        "kind": "old"}],
+     "45":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}],
+     "46":
+      [{"name": "x23",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "1"}},
+        "kind": "other"}],
+     "47":
+      [{"name": "x23",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}]}}}
+
+File "bench/ce/record_one_field.mlw", line 56, characters 14-36:
+Goal Loop invariant init from verification condition test_loop'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_one_field.mlw":
+    {"39":
+      [{"name": "y",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:42", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "41":
+      [{"name": "x23",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:42", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "42":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}],
+     "49":
+      [{"name": "x",
+        "attrs":
+         ["at:M:loc:bench\/ce\/record_one_field.mlw:56", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}],
+     "53":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}],
+     "56":
+      [{"name": "x",
+        "attrs":
+         ["at:L",
+          "at:L:loc:bench\/ce\/record_one_field.mlw:56",
+          "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": at L},
+       {"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}]}}}
+
+File "bench/ce/record_one_field.mlw", line 57, characters 12-14:
+Goal Loop variant decrease from verification condition test_loop'vc.
+Prover result is: valid WHY3DATA.
+
+File "bench/ce/record_one_field.mlw", line 56, characters 14-36:
+Goal Loop invariant preservation from verification condition test_loop'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_one_field.mlw":
+    {"13":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "before_loop"}],
+     "15":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "before_loop"}],
+     "39":
+      [{"name": "y",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:42", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "before_loop"}],
+     "41":
+      [{"name": "x23",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:42", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "before_loop"}],
+     "42":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "before_loop"}],
+     "49":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "before_loop"}],
+     "53":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "before_loop"}],
+     "55":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "before_iteration"}],
+     "56":
+      [{"name": "x",
+        "attrs":
+         ["at:L",
+          "at:L:loc:bench\/ce\/record_one_field.mlw:56",
+          "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": at L},
+       {"name": "x",
+        "attrs":
+         ["at:M",
+          "at:M:loc:bench\/ce\/record_one_field.mlw:56",
+          "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": at M},
+       {"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "current_iteration"}],
+     "58":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "current_iteration"}]}}}
+
+File "bench/ce/record_one_field.mlw", line 50, characters 12-23:
+Goal Postcondition from verification condition test_loop'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_one_field.mlw":
+    {"13":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "39":
+      [{"name": "y",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:42", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "-3"}},
+        "kind": "other"}],
+     "41":
+      [{"name": "x23",
+        "attrs":
+         ["at:'Old:loc:bench\/ce\/record_one_field.mlw:42", "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "42":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "-1"}},
+        "kind": "other"}],
+     "49":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "50":
+      [{"name": "old x",
+        "attrs":
+         ["at:'Old",
+          "at:'Old:loc:bench\/ce\/record_one_field.mlw:50",
+          "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "old"},
+       {"name": "old x",
+        "attrs":
+         ["at:'Old",
+          "at:'Old:loc:bench\/ce\/record_one_field.mlw:50",
+          "introduced",
+          "model_trace:x"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "old"}],
+     "53":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "-1"}},
+        "kind": "other"}],
+     "55":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": "other"}],
+     "56":
+      [{"name": "x",
+        "attrs":
+         ["at:L",
+          "at:L:loc:bench\/ce\/record_one_field.mlw:56",
+          "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "0"}},
+        "kind": at L},
+       {"name": "x",
+        "attrs":
+         ["at:M",
+          "at:M:loc:bench\/ce\/record_one_field.mlw:56",
+          "introduced"],
+        "value":
+         {"proj_name": "contents",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "-1"}},
+        "kind": at M}]}}}
 

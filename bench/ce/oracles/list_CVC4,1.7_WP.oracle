@@ -1,43 +1,41 @@
 Weakest Precondition
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/list.mlw List_int g1: Timeout or Unknown
-Counter-example model for term at NO LOC
-File list.mlw:
-  Line 14:
-    l [@introduced] =
-      {"type" : "Apply" ,
-      "val" : {"apply" : "Nil" ,
-      "list" : [] } }
+File "bench/ce/list.mlw", line 14, characters 26-39:
+Verification condition g1.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/list.mlw":
+    {"14":
+      [{"name": "l",
+        "attrs": ["introduced"],
+        "value": {"type": "Apply", "val": {"apply": "Nil", "list": []}},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/list.mlw List_int g2: Timeout or Unknown
-Counter-example model for term at NO LOC
-File list.mlw:
-  Line 16:
-    l [@introduced] =
-      {"type" : "Apply" ,
-      "val" : {"apply" : "Cons" ,
-      "list" : [{"type" : "Integer" ,
-      "val" : "3" },
-      {"type" : "Apply" ,
-      "val" : {"apply" : "Nil" ,
-      "list" : [] } }] } }
+File "bench/ce/list.mlw", line 16, characters 26-39:
+Verification condition g2.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/list.mlw":
+    {"16":
+      [{"name": "l",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Apply",
+          "val":
+           {"apply": "Cons",
+            "list":
+             [{"type": "Integer", "val": "3"},
+              {"type": "Apply", "val": {"apply": "Nil", "list": []}}]}},
+        "kind": "other"}]}}}
 
-bench/ce/list.mlw List_poly g1: Timeout or Unknown
-bench/ce/list.mlw List_poly g2: Timeout or Unknown
+File "bench/ce/list.mlw", line 25, characters 30-43:
+Verification condition g1.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+
+File "bench/ce/list.mlw", line 27, characters 30-43:
+Verification condition g2.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+

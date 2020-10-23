@@ -1,194 +1,209 @@
 Weakest Precondition
-bench/ce/int_overflow.mlw ModelInt test0: Valid
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test1: Unknown (sat)
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 9:
-    x [@introduced] = {"type" : "Integer" , "val" : "0" }
+File "bench/ce/int_overflow.mlw", line 6, characters 27-42:
+Verification condition test0.
+Prover result is: valid WHY3DATA.
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test2: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 14:
-    x [@introduced] = {"type" : "Integer" , "val" : "0" }
+File "bench/ce/int_overflow.mlw", line 9, characters 27-44:
+Verification condition test1.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"9":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "0"},
+        "kind": "other"}]}}}
 
-bench/ce/int_overflow.mlw ModelInt test_overflow: Valid
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 18:
-    x [@introduced] = {"type" : "Integer" , "val" : "65535" }
-    y [@introduced] = {"type" : "Integer" , "val" : "1" }
+File "bench/ce/int_overflow.mlw", line 14, characters 27-38:
+Verification condition test2.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"14":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "0"},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow2: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 23:
-    x [@introduced] = {"type" : "Integer" , "val" : "-2" }
-    y [@introduced] = {"type" : "Integer" , "val" : "-1" }
+File "bench/ce/int_overflow.mlw", line 19, characters 43-53:
+Verification condition test_overflow.
+Prover result is: valid WHY3DATA.
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow2: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 23:
-    x [@introduced] = {"type" : "Integer" , "val" : "65535" }
-    y [@introduced] = {"type" : "Integer" , "val" : "1" }
+File "bench/ce/int_overflow.mlw", line 19, characters 48-62:
+Verification condition test_overflow.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"18":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "65535"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "1"},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow_int16: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 30:
-    x [@introduced] = {"type" : "Integer" , "val" : "65361" }
-    y [@introduced] = {"type" : "Integer" , "val" : "175" }
+File "bench/ce/int_overflow.mlw", line 24, characters 45-56:
+Verification condition test_overflow2.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"23":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "-2"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "-1"},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow_int16_alt: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 35:
-    x [@introduced] = {"type" : "Integer" , "val" : "-65536" }
-    y [@introduced] = {"type" : "Integer" , "val" : "-1" }
+File "bench/ce/int_overflow.mlw", line 24, characters 51-65:
+Verification condition test_overflow2.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"23":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "65535"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "1"},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow_int16_alt: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 35:
-    x [@introduced] = {"type" : "Integer" , "val" : "65535" }
-    y [@introduced] = {"type" : "Integer" , "val" : "1" }
+File "bench/ce/int_overflow.mlw", line 31, characters 33-49:
+Verification condition test_overflow_int16.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"30":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "65361"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "175"},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow_int16_bis: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 40:
-    x [@introduced] = {"type" : "Integer" , "val" : "54" }
-    y [@introduced] = {"type" : "Integer" , "val" : "65482" }
+File "bench/ce/int_overflow.mlw", line 36, characters 54-67:
+Verification condition test_overflow_int16_alt.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"35":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "-65536"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "-1"},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow_int32: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 48:
-    x [@introduced] = {"type" : "Integer" , "val" : "2147483473" }
-    y [@introduced] = {"type" : "Integer" , "val" : "175" }
+File "bench/ce/int_overflow.mlw", line 36, characters 64-76:
+Verification condition test_overflow_int16_alt.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"35":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "65535"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "1"},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 53:
-    x [@introduced] = {"type" : "Integer" , "val" : "54" }
-    y [@introduced] = {"type" : "Integer" , "val" : "2147483594" }
+File "bench/ce/int_overflow.mlw", line 42, characters 29-45:
+Verification condition test_overflow_int16_bis.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"40":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "54"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "65482"},
+        "kind": "other"}]}}}
 
-bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline: Valid
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline: Timeout or Unknown
-Counter-example model for term at NO LOC
-File int_overflow.mlw:
-  Line 58:
-    x [@introduced] = {"type" : "Integer" , "val" : "1073741824" }
-    y [@introduced] = {"type" : "Integer" , "val" : "1073741824" }
+File "bench/ce/int_overflow.mlw", line 49, characters 33-49:
+Verification condition test_overflow_int32.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"48":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "2147483473"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "175"},
+        "kind": "other"}]}}}
+
+File "bench/ce/int_overflow.mlw", line 54, characters 48-64:
+Verification condition test_overflow_int32_bis.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"53":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "54"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "2147483594"},
+        "kind": "other"}]}}}
+
+File "bench/ce/int_overflow.mlw", line 59, characters 88-108:
+Verification condition test_overflow_int32_bis_inline.
+Prover result is: valid WHY3DATA.
+
+File "bench/ce/int_overflow.mlw", line 59, characters 103-122:
+Verification condition test_overflow_int32_bis_inline.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/int_overflow.mlw":
+    {"58":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "1073741824"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "1073741824"},
+        "kind": "other"}]}}}
 

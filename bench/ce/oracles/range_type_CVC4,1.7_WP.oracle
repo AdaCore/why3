@@ -1,63 +1,49 @@
 Weakest Precondition
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x -> 5, #"bench/ce/range_type.mlw" 7 6 7#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x -> 5, #"bench/ce/range_type.mlw" 7 6 7#
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x -> 5, #"bench/ce/range_type.mlw" 7 6 7#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x -> 5, #"bench/ce/range_type.mlw" 7 6 7#
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x -> 5, #"bench/ce/range_type.mlw" 7 6 7#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x -> 5, #"bench/ce/range_type.mlw" 7 6 7#
-bench/ce/range_type.mlw Range_int f'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/range_type.mlw" 9 12 27#
-File range_type.mlw:
-  Line 7:
-    x [@introduced] =
-      {"proj_name" : "int32'int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "5" } }
-  Line 9:
-    x [@introduced] [@model_trace:x] =
-      {"proj_name" : "int32'int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "5" } }
+File "bench/ce/range_type.mlw", line 9, characters 12-27:
+Goal Assertion from verification condition f'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/range_type.mlw":
+    {"7":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "int32'int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "5"}},
+        "kind": "other"}],
+     "9":
+      [{"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value":
+         {"proj_name": "int32'int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "5"}},
+        "kind": "other"}]}}}
 
-Model 0:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-bench/ce/range_type.mlw Range_float f'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/range_type.mlw" 22 12 26#
-File range_type.mlw:
-  Line 20:
-    x [@introduced] =
-      {"proj_name" : "t'real" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Decimal" ,
-      "val" : "10.0" } }
-  Line 22:
-    x [@introduced] [@model_trace:x] =
-      {"proj_name" : "t'real" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Decimal" ,
-      "val" : "10.0" } }
+File "bench/ce/range_type.mlw", line 22, characters 12-26:
+Goal Assertion from verification condition f'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/range_type.mlw":
+    {"20":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "t'real",
+          "type": "Proj",
+          "value": {"type": "Decimal", "val": "10.0"}},
+        "kind": "other"}],
+     "22":
+      [{"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value":
+         {"proj_name": "t'real",
+          "type": "Proj",
+          "value": {"type": "Decimal", "val": "10.0"}},
+        "kind": "other"}]}}}
 

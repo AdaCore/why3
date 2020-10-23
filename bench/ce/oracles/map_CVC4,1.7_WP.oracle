@@ -1,601 +1,539 @@
 Weakest Precondition
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x1 -> (ref'mk ({f -> [|; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 7 12 20#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x1 -> (ref'mk ({f -> [|; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 7 12 20#
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x1 -> (ref'mk ({f -> [|1 -> 3; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 7 12 20#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x1 -> (ref'mk ({f -> [|1 -> 3; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 7 12 20#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x1 -> (ref'mk ({f -> [|1 -> 3; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 7 12 20#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x1 -> (ref'mk ({f -> [|1 -> 3; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 7 12 20#
-bench/ce/map.mlw M test_map'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/map.mlw" 8 14 28#
-File map.mlw:
-  Line 7:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }
-  Line 8:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }
-    x [@field:0:contents] [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }
-  Line 10:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }
+File "bench/ce/map.mlw", line 8, characters 14-28:
+Goal Postcondition from verification condition test_map'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/map.mlw":
+    {"7":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"others": {"type": "Integer", "val": "0"}}]}}]}},
+        "kind": "other"}],
+     "8":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"others": {"type": "Integer", "val": "0"}}]}}]}},
+        "kind": "other"},
+       {"name": "x",
+        "attrs": ["field:0:contents", "introduced", "model_trace:x"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"others": {"type": "Integer", "val": "0"}}]}}]}},
+        "kind": "other"}],
+     "10":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"others": {"type": "Integer", "val": "0"}}]}}]}},
+        "kind": "other"}]}}}
 
-Model 0:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x2 -> (ref'mk ({f -> [|; _ -> [|; _ -> 0|]|];
-           x -> 0;
-           v -> [|; _ -> 0|]} fun y -> if pure { if y = x then True
-                                                 else False } then v
-           else f y)), #"bench/ce/map.mlw" 13 12 30#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x2 -> (ref'mk ({f -> [|; _ -> [|; _ -> 0|]|];
-           x -> 0;
-           v -> [|; _ -> 0|]} fun y -> if pure { if y = x then True
-                                                 else False } then v
-           else f y)), #"bench/ce/map.mlw" 13 12 30#
-bench/ce/map.mlw M test_map_multidim1'vc: Unknown (sat)
-Counter-example model for term at #"bench/ce/map.mlw" 14 14 34#
-File map.mlw:
-  Line 13:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }] } }
-  Line 14:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"others" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }] } }
-    x [@field:0:contents] [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }] } }
-  Line 16:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"others" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }] } }
+File "bench/ce/map.mlw", line 14, characters 14-34:
+Goal Postcondition from verification condition test_map_multidim1'vc.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/map.mlw":
+    {"13":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"others":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}},
+        "kind": "other"}],
+     "14":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "0"},
+                         "value": {"type": "Integer", "val": "0"}},
+                        {"others": {"type": "Integer", "val": "1"}}]}},
+                   {"others":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}},
+        "kind": "other"},
+       {"name": "x",
+        "attrs": ["field:0:contents", "introduced", "model_trace:x"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"others":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}},
+        "kind": "other"}],
+     "16":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "0"},
+                         "value": {"type": "Integer", "val": "0"}},
+                        {"others": {"type": "Integer", "val": "1"}}]}},
+                   {"others":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}},
+        "kind": "other"}]}}}
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x3 -> (ref'mk ({f -> [|; _ -> [|; _ -> 0|]|];
-           x -> 0;
-           v -> ({f -> [|; _ -> 0|];
-                   x -> 0;
-                   v -> 3} fun y -> if pure { if y = x then True else False } then v
-                   else f y)} fun y -> if pure { if y = x then True
-                                                 else False } then v
-           else f y)), #"bench/ce/map.mlw" 18 12 30#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x3 -> (ref'mk ({f -> [|; _ -> [|; _ -> 0|]|];
-           x -> 0;
-           v -> ({f -> [|; _ -> 0|];
-                   x -> 0;
-                   v -> 3} fun y -> if pure { if y = x then True else False } then v
-                   else f y)} fun y -> if pure { if y = x then True
-                                                 else False } then v
-           else f y)), #"bench/ce/map.mlw" 18 12 30#
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x3 -> (ref'mk ({f -> [|0 -> [|; _ -> 1|];
-               1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|];
-           x -> 0;
-           v -> ({f -> [|; _ -> 1|];
-                   x -> 0;
-                   v -> 3} fun y -> if pure { if y = x then True else False } then v
-                   else f y)} fun y -> if pure { if y = x then True
-                                                 else False } then v
-           else f y)), #"bench/ce/map.mlw" 18 12 30#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x3 -> (ref'mk ({f -> [|0 -> [|; _ -> 1|];
-               1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|];
-           x -> 0;
-           v -> ({f -> [|; _ -> 1|];
-                   x -> 0;
-                   v -> 3} fun y -> if pure { if y = x then True else False } then v
-                   else f y)} fun y -> if pure { if y = x then True
-                                                 else False } then v
-           else f y)), #"bench/ce/map.mlw" 18 12 30#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x3 -> (ref'mk ({f -> [|0 -> [|; _ -> 1|];
-               1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|];
-           x -> 0;
-           v -> ({f -> [|; _ -> 1|];
-                   x -> 0;
-                   v -> 3} fun y -> if pure { if y = x then True else False } then v
-                   else f y)} fun y -> if pure { if y = x then True
-                                                 else False } then v
-           else f y)), #"bench/ce/map.mlw" 18 12 30#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x3 -> (ref'mk ({f -> [|0 -> [|; _ -> 1|];
-               1 -> [|1 -> 3; _ -> 0|]; _ -> [|; _ -> 0|]|];
-           x -> 0;
-           v -> ({f -> [|; _ -> 1|];
-                   x -> 0;
-                   v -> 3} fun y -> if pure { if y = x then True else False } then v
-                   else f y)} fun y -> if pure { if y = x then True
-                                                 else False } then v
-           else f y)), #"bench/ce/map.mlw" 18 12 30#
-bench/ce/map.mlw M test_map_multidim2'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/map.mlw" 19 14 34#
-File ref.mlw:
-  Line 18:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } },
-      {"others" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }] } }
-File map.mlw:
-  Line 18:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } },
-      {"others" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }] } }
-  Line 19:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } },
-      {"others" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }] } }
-    x [@field:0:contents] [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } },
-      {"others" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }] } }
-  Line 23:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } },
-      {"others" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }] } }
+File "bench/ce/map.mlw", line 19, characters 14-34:
+Goal Postcondition from verification condition test_map_multidim2'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
+    {"18":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "1"},
+                         "value": {"type": "Integer", "val": "3"}},
+                        {"others": {"type": "Integer", "val": "0"}}]}},
+                   {"others":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}},
+        "kind": "other"}]},
+   "bench\/ce\/map.mlw":
+    {"18":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "1"},
+                         "value": {"type": "Integer", "val": "3"}},
+                        {"others": {"type": "Integer", "val": "0"}}]}},
+                   {"others":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}},
+        "kind": "other"}],
+     "19":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "0"},
+                         "value": {"type": "Integer", "val": "3"}},
+                        {"others": {"type": "Integer", "val": "1"}}]}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "1"},
+                         "value": {"type": "Integer", "val": "3"}},
+                        {"others": {"type": "Integer", "val": "0"}}]}},
+                   {"others":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}},
+        "kind": "other"},
+       {"name": "x",
+        "attrs": ["field:0:contents", "introduced", "model_trace:x"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "0"},
+                         "value": {"type": "Integer", "val": "3"}},
+                        {"others": {"type": "Integer", "val": "1"}}]}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "1"},
+                         "value": {"type": "Integer", "val": "3"}},
+                        {"others": {"type": "Integer", "val": "0"}}]}},
+                   {"others":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}},
+        "kind": "other"}],
+     "21":
+      [{"name": "x0",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Array",
+          "val": [{"others": {"type": "Integer", "val": "1"}}]},
+        "kind": "other"}],
+     "22":
+      [{"name": "x0",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Array",
+          "val":
+           [{"indice": {"type": "Integer", "val": "0"},
+             "value": {"type": "Integer", "val": "3"}},
+            {"others": {"type": "Integer", "val": "1"}}]},
+        "kind": "other"}],
+     "23":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "0"},
+                         "value": {"type": "Integer", "val": "3"}},
+                        {"others": {"type": "Integer", "val": "1"}}]}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value":
+                     {"type": "Array",
+                      "val":
+                       [{"indice": {"type": "Integer", "val": "1"},
+                         "value": {"type": "Integer", "val": "3"}},
+                        {"others": {"type": "Integer", "val": "0"}}]}},
+                   {"others":
+                     {"type": "Array",
+                      "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}},
+        "kind": "other"}]}}}
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x4 -> (ref'mk ({f -> [|; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 25 12 26#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x4 -> (ref'mk ({f -> [|; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 25 12 26#
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x4 -> (ref'mk ({f -> [|1 -> 3; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 25 12 26#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x4 -> (ref'mk ({f -> [|1 -> 3; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 25 12 26#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x4 -> (ref'mk ({f -> [|1 -> 3; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 25 12 26#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x4 -> (ref'mk ({f -> [|1 -> 3; _ -> 0|];
-           x -> 0;
-           v -> 3} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 25 12 26#
-bench/ce/map.mlw M proj_map_test1'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/map.mlw" 26 14 28#
-File ref.mlw:
-  Line 18:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }
-  Line 20:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }
-File map.mlw:
-  Line 25:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }
-  Line 26:
-    x [@field:0:contents] [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }
-  Line 28:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } }] } }
+File "bench/ce/map.mlw", line 26, characters 14-28:
+Goal Postcondition from verification condition proj_map_test1'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
+    {"18":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"others": {"type": "Integer", "val": "0"}}]}}]}},
+        "kind": "other"}],
+     "20":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"others": {"type": "Integer", "val": "0"}}]}}]}},
+        "kind": "other"}]},
+   "bench\/ce\/map.mlw":
+    {"25":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"others": {"type": "Integer", "val": "0"}}]}}]}},
+        "kind": "other"}],
+     "26":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced", "model_trace:x"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"others": {"type": "Integer", "val": "0"}}]}}]}},
+        "kind": "other"}],
+     "28":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Integer", "val": "3"}},
+                   {"others": {"type": "Integer", "val": "0"}}]}}]}},
+        "kind": "other"}]}}}
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x5 -> (ref'mk ({f -> [|; _ -> false|];
-           x -> 0;
-           v -> true} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 30 12 26#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    x5 -> (ref'mk ({f -> [|; _ -> false|];
-           x -> 0;
-           v -> true} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 30 12 26#
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x5 -> (ref'mk ({f -> [|1 -> true; _ -> false|];
-           x -> 0;
-           v -> true} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 30 12 26#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x5 -> (ref'mk ({f -> [|1 -> true; _ -> false|];
-           x -> 0;
-           v -> true} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 30 12 26#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x5 -> (ref'mk ({f -> [|1 -> true; _ -> false|];
-           x -> 0;
-           v -> true} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 30 12 26#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x5 -> (ref'mk ({f -> [|1 -> true; _ -> false|];
-           x -> 0;
-           v -> true} fun y -> if pure { if y = x then True else False } then v
-           else f y)), #"bench/ce/map.mlw" 30 12 26#
-bench/ce/map.mlw M proj_map_test2'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/map.mlw" 31 14 28#
-File ref.mlw:
-  Line 18:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Boolean" ,
-      "val" : true } },
-      {"others" : {"type" : "Boolean" ,
-      "val" : false } }] } }] } }
-  Line 20:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Boolean" ,
-      "val" : true } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Boolean" ,
-      "val" : true } },
-      {"others" : {"type" : "Boolean" ,
-      "val" : false } }] } }] } }
-File map.mlw:
-  Line 30:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Boolean" ,
-      "val" : true } },
-      {"others" : {"type" : "Boolean" ,
-      "val" : false } }] } }] } }
-  Line 31:
-    x [@field:0:contents] [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Boolean" ,
-      "val" : true } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Boolean" ,
-      "val" : true } },
-      {"others" : {"type" : "Boolean" ,
-      "val" : false } }] } }] } }
-  Line 33:
-    x [@field:0:contents] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Boolean" ,
-      "val" : true } },
-      {"indice" : {"type" : "Integer" ,
-      "val" : "1" } ,
-      "value" : {"type" : "Boolean" ,
-      "val" : true } },
-      {"others" : {"type" : "Boolean" ,
-      "val" : false } }] } }] } }
+File "bench/ce/map.mlw", line 31, characters 14-28:
+Goal Postcondition from verification condition proj_map_test2'vc.
+Prover result is: unknown (unknown + incomplete) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
+    {"18":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Boolean", "val": true}},
+                   {"others": {"type": "Boolean", "val": false}}]}}]}},
+        "kind": "other"}],
+     "20":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value": {"type": "Boolean", "val": true}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Boolean", "val": true}},
+                   {"others": {"type": "Boolean", "val": false}}]}}]}},
+        "kind": "other"}]},
+   "bench\/ce\/map.mlw":
+    {"30":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Boolean", "val": true}},
+                   {"others": {"type": "Boolean", "val": false}}]}}]}},
+        "kind": "other"}],
+     "31":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced", "model_trace:x"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value": {"type": "Boolean", "val": true}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Boolean", "val": true}},
+                   {"others": {"type": "Boolean", "val": false}}]}}]}},
+        "kind": "other"}],
+     "33":
+      [{"name": "x",
+        "attrs": ["field:0:contents", "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "contents",
+               "value":
+                {"type": "Array",
+                 "val":
+                  [{"indice": {"type": "Integer", "val": "0"},
+                    "value": {"type": "Boolean", "val": true}},
+                   {"indice": {"type": "Integer", "val": "1"},
+                    "value": {"type": "Boolean", "val": true}},
+                   {"others": {"type": "Boolean", "val": false}}]}}]}},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/map.mlw ModelMap t1: Unknown (sat)
-Counter-example model for term at NO LOC
-File map.mlw:
-  Line 41:
-    i [@introduced] = {"type" : "Integer" , "val" : "0" }
-    t [@introduced] =
-      {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "43" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] }
+File "bench/ce/map.mlw", line 42, characters 3-31:
+Verification condition t1.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/map.mlw":
+    {"41":
+      [{"name": "i",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "0"},
+        "kind": "other"},
+       {"name": "t",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Array",
+          "val":
+           [{"indice": {"type": "Integer", "val": "0"},
+             "value": {"type": "Integer", "val": "43"}},
+            {"others": {"type": "Integer", "val": "0"}}]},
+        "kind": "other"}]}}}
 
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/map.mlw OtherIndices g: Unknown (sat)
-Counter-example model for term at NO LOC
-File map.mlw:
-  Line 50:
-    m [@introduced] =
-      {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Fraction" ,
-      "val" : "1\/10" } ,
-      "value" : {"type" : "Decimal" ,
-      "val" : "-1.0" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] }
+File "bench/ce/map.mlw", line 50, characters 36-64:
+Verification condition g.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/map.mlw":
+    {"50":
+      [{"name": "m",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Array",
+          "val":
+           [{"indice": {"type": "Fraction", "val": "1\/10"},
+             "value": {"type": "Decimal", "val": "-1.0"}},
+            {"others": {"type": "Integer", "val": "0"}}]},
+        "kind": "other"}]}}}
 

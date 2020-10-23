@@ -1,32 +1,25 @@
 Weakest Precondition
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type t, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type t, 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type t, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type t, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC: Cannot import value from model: Value of non-free type t, 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC: Cannot import value from model: Value of non-free type t, 0 warnings)
-    
-bench/ce/double_projection.mlw Test f'vc: Unknown (sat)
-Counter-example model for term at #"bench/ce/double_projection.mlw" 19 15 22#
-File double_projection.mlw:
-  Line 17:
-    x [@introduced] =
-      {"proj_name" : "c" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } }
-  Line 19:
-    x [@introduced] [@model_trace:x] =
-      {"proj_name" : "c" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } }
+File "bench/ce/double_projection.mlw", line 19, characters 15-22:
+Goal Postcondition from verification condition f'vc.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/double_projection.mlw":
+    {"17":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"proj_name": "c",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "1"}},
+        "kind": "other"}],
+     "19":
+      [{"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value":
+         {"proj_name": "c",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "1"}},
+        "kind": "other"}]}}}
 

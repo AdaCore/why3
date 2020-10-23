@@ -1,143 +1,113 @@
 Weakest Precondition
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-bench/ce/record_map.mlw M map_record_proj_test1'vc: Unknown (sat)
-Counter-example model for term at #"bench/ce/record_map.mlw" 42 12 22#
-File record_map.mlw:
-  Line 41:
-    map_rec [@introduced] [@model_projected] =
-      {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : ".field_f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } } }] }
-  Line 42:
-    map_rec [@introduced] [@model_projected] [@model_trace:map_rec] =
-      {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : ".field_f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "1" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } } }] }
+File "bench/ce/record_map.mlw", line 42, characters 12-22:
+Goal Postcondition from verification condition map_record_proj_test1'vc.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_map.mlw":
+    {"41":
+      [{"name": "map_rec",
+        "attrs": ["introduced", "model_projected"],
+        "value":
+         {"type": "Array",
+          "val":
+           [{"others":
+              {"type": "Record",
+               "val":
+                {"Field":
+                  [{"field": ".field_f",
+                    "value": {"type": "Integer", "val": "1"}},
+                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]},
+        "kind": "other"}],
+     "42":
+      [{"name": "result",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "1"},
+        "kind": "other"}]}}}
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-  Abstract RAC:  don't know (Abstract RAC failure: Cannot create default value for non-free type (->), 0 warnings)
-    
-bench/ce/record_map.mlw M record_map_proj_test2'vc: Unknown (sat)
-Counter-example model for term at #"bench/ce/record_map.mlw" 47 12 22#
-File record_map.mlw:
-  Line 46:
-    rec_map [@introduced] [@model_projected] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f_map" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"field" : "g_bool" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 47:
-    rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f_map" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"field" : "g_bool" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
+File "bench/ce/record_map.mlw", line 47, characters 12-22:
+Goal Postcondition from verification condition record_map_proj_test2'vc.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_map.mlw":
+    {"46":
+      [{"name": "rec_map",
+        "attrs": ["introduced", "model_projected"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f_map",
+               "value":
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+              {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"}],
+     "47":
+      [{"name": "result",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "1"},
+        "kind": "other"}]}}}
 
-Model 0:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    re_rec_map -> (r_map'mk [|; _ -> 1|] false), #"bench/ce/record_map.mlw" 53 6 27#
-    rec_map -> (r_map'mk [|; _ -> 0|] false), #"bench/ce/record_map.mlw" 53 6 27#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    re_rec_map -> (r_map'mk [|; _ -> 1|] false), #"bench/ce/record_map.mlw" 53 6 27#
-    rec_map -> (r_map'mk [|; _ -> 0|] false), #"bench/ce/record_map.mlw" 53 6 27#
-Model 1:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    re_rec_map -> (r_map'mk [|; _ -> 1|] false), #"bench/ce/record_map.mlw" 53 6 27#
-    rec_map -> (r_map'mk [|; _ -> 0|] false), #"bench/ce/record_map.mlw" 53 6 27#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    re_rec_map -> (r_map'mk [|; _ -> 1|] false), #"bench/ce/record_map.mlw" 53 6 27#
-    rec_map -> (r_map'mk [|; _ -> 0|] false), #"bench/ce/record_map.mlw" 53 6 27#
-Model 2:
-  Concrete RAC:  don't know (Concrete RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    re_rec_map -> (r_map'mk [|; _ -> 1|] false), #"bench/ce/record_map.mlw" 53 6 27#
-    rec_map -> (r_map'mk [|; _ -> 0|] false), #"bench/ce/record_map.mlw" 53 6 27#
-  Abstract RAC:  don't know (Abstract RAC does not confirm the counter-example, no contradiction during execution, 0 warnings)
-    re_rec_map -> (r_map'mk [|; _ -> 1|] false), #"bench/ce/record_map.mlw" 53 6 27#
-    rec_map -> (r_map'mk [|; _ -> 0|] false), #"bench/ce/record_map.mlw" 53 6 27#
-bench/ce/record_map.mlw M record_map_proj_test3'vc: Unknown (sat)
-Counter-example model for term at #"bench/ce/record_map.mlw" 54 12 31#
-File record_map.mlw:
-  Line 51:
-    re_rec_map [@introduced] [@model_projected] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f_map" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"field" : "g_bool" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 53:
-    rec_map [@introduced] [@model_projected] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f_map" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } },
-      {"field" : "g_bool" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 54:
-    re_rec_map [@introduced] [@model_projected] [@model_trace:re_rec_map] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f_map" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "1" } }] } },
-      {"field" : "g_bool" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-    rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f_map" ,
-      "value" : {"type" : "Array" ,
-      "val" : [{"others" : {"type" : "Integer" ,
-      "val" : "0" } }] } },
-      {"field" : "g_bool" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
+File "bench/ce/record_map.mlw", line 54, characters 12-31:
+Goal Postcondition from verification condition record_map_proj_test3'vc.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_map.mlw":
+    {"51":
+      [{"name": "re_rec_map",
+        "attrs": ["introduced", "model_projected"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f_map",
+               "value":
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+              {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"}],
+     "53":
+      [{"name": "rec_map",
+        "attrs": ["introduced", "model_projected"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f_map",
+               "value":
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+              {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"}],
+     "54":
+      [{"name": "re_rec_map",
+        "attrs": ["introduced", "model_projected", "model_trace:re_rec_map"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f_map",
+               "value":
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+              {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"},
+       {"name": "result",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f_map",
+               "value":
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+              {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"}]}}}
 

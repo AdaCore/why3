@@ -1,79 +1,140 @@
 Strongest Postcondition
-Model 0:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x -> 1, #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-    y -> (ref_four'mk (ref'mk (ref_two'mk (ref_one'mk 0)))), #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x -> 1, #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-    y -> (ref_four'mk (ref'mk (ref_two'mk (ref_one'mk 0)))), #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x -> 1, #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-    y -> (ref_four'mk (ref'mk (ref_two'mk (ref_one'mk 0)))), #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x -> 1, #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-    y -> (ref_four'mk (ref'mk (ref_two'mk (ref_one'mk 0)))), #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    x -> 1, #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-    y -> (ref_four'mk (ref'mk (ref_two'mk (ref_one'mk 0)))), #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    x -> 1, #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-    y -> (ref_four'mk (ref'mk (ref_two'mk (ref_one'mk 0)))), #"bench/ce/record_nested_one_field.mlw" 13 6 15#
-bench/ce/record_nested_one_field.mlw Nested test_post'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/record_nested_one_field.mlw" 14 14 51#
-File record_nested_one_field.mlw:
-  Line 13:
-    x [@introduced] = {"type" : "Integer" , "val" : "1" }
-    y [@field:0:cont_four_attr] [@field:1:contents] [@field:2:cont_two]
-      [@field:3:cont_one_attr] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_four_attr" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_two" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_one_attr" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }] } } }] } } }] } } }] } }
-  Line 14:
-    x [@introduced] [@model_trace:x] = {"type" : "Integer" , "val" : "1" }
-    y [@field:0:cont_four_attr] [@field:1:contents] [@field:2:cont_two]
-      [@field:3:cont_one_attr] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_four_attr" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_two" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_one_attr" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }] } } }] } } }] } } }] } }
-    y [@field:0:cont_four_attr] [@field:1:contents] [@field:2:cont_two]
-      [@field:3:cont_one_attr] [@introduced] [@model_trace:y] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_four_attr" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_two" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_one_attr" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }] } } }] } } }] } } }] } }
-  Line 16:
-    y [@field:0:cont_four_attr] [@field:1:contents] [@field:2:cont_two]
-      [@field:3:cont_one_attr] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_four_attr" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "contents" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_two" ,
-      "value" : {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "cont_one_attr" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } }] } } }] } } }] } } }] } }
+File "bench/ce/record_nested_one_field.mlw", line 14, characters 14-51:
+Goal Postcondition from verification condition test_post'vc.
+Prover result is: timeout WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/record_nested_one_field.mlw":
+    {"13":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "-2877"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs":
+         ["field:0:cont_four_attr",
+          "field:1:contents",
+          "field:2:cont_two",
+          "field:3:cont_one_attr",
+          "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "cont_four_attr",
+               "value":
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value":
+                       {"type": "Record",
+                        "val":
+                         {"Field":
+                           [{"field": "cont_two",
+                             "value":
+                              {"type": "Record",
+                               "val":
+                                {"Field":
+                                  [{"field": "cont_one_attr",
+                                    "value": {"type": "Integer", "val": "0"}}]}}}]}}}]}}}]}},
+        "kind": "other"}],
+     "14":
+      [{"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value": {"type": "Integer", "val": "-2877"},
+        "kind": "other"},
+       {"name": "y",
+        "attrs":
+         ["field:0:cont_four_attr",
+          "field:1:contents",
+          "field:2:cont_two",
+          "field:3:cont_one_attr",
+          "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "cont_four_attr",
+               "value":
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value":
+                       {"type": "Record",
+                        "val":
+                         {"Field":
+                           [{"field": "cont_two",
+                             "value":
+                              {"type": "Record",
+                               "val":
+                                {"Field":
+                                  [{"field": "cont_one_attr",
+                                    "value":
+                                     {"type": "Integer", "val": "-2878"}}]}}}]}}}]}}}]}},
+        "kind": "other"},
+       {"name": "y",
+        "attrs":
+         ["field:0:cont_four_attr",
+          "field:1:contents",
+          "field:2:cont_two",
+          "field:3:cont_one_attr",
+          "introduced",
+          "model_trace:y"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "cont_four_attr",
+               "value":
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value":
+                       {"type": "Record",
+                        "val":
+                         {"Field":
+                           [{"field": "cont_two",
+                             "value":
+                              {"type": "Record",
+                               "val":
+                                {"Field":
+                                  [{"field": "cont_one_attr",
+                                    "value":
+                                     {"type": "Integer", "val": "-2878"}}]}}}]}}}]}}}]}},
+        "kind": "other"}],
+     "16":
+      [{"name": "y",
+        "attrs":
+         ["field:0:cont_four_attr",
+          "field:1:contents",
+          "field:2:cont_two",
+          "field:3:cont_one_attr",
+          "introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "cont_four_attr",
+               "value":
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value":
+                       {"type": "Record",
+                        "val":
+                         {"Field":
+                           [{"field": "cont_two",
+                             "value":
+                              {"type": "Record",
+                               "val":
+                                {"Field":
+                                  [{"field": "cont_one_attr",
+                                    "value":
+                                     {"type": "Integer", "val": "-2878"}}]}}}]}}}]}}}]}},
+        "kind": "other"}]}}}
 

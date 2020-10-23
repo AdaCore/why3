@@ -1,24 +1,23 @@
 Strongest Postcondition
-Model 0:
-   don't know (No model term location, 0 warnings)
-    
-Model 1:
-   don't know (No model term location, 0 warnings)
-    
-Model 2:
-   don't know (No model term location, 0 warnings)
-    
-bench/ce/simple_array.mlw ModelArray t1: Unknown (sat)
-Counter-example model for term at NO LOC
-File simple_array.mlw:
-  Line 5:
-    i [@introduced] = {"type" : "Integer" , "val" : "0" }
-    t [@introduced] =
-      {"type" : "Array" ,
-      "val" : [{"indice" : {"type" : "Integer" ,
-      "val" : "0" } ,
-      "value" : {"type" : "Integer" ,
-      "val" : "43" } },
-      {"others" : {"type" : "Integer" ,
-      "val" : "0" } }] }
+File "bench/ce/simple_array.mlw", line 6, characters 3-31:
+Verification condition t1.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/simple_array.mlw":
+    {"5":
+      [{"name": "i",
+        "attrs": ["introduced"],
+        "value": {"type": "Integer", "val": "0"},
+        "kind": "other"},
+       {"name": "t",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Array",
+          "val":
+           [{"indice": {"type": "Integer", "val": "0"},
+             "value": {"type": "Integer", "val": "43"}},
+            {"others": {"type": "Integer", "val": "0"}}]},
+        "kind": "other"}]}}}
 

@@ -1,24 +1,23 @@
 Weakest Precondition
-Model 0:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    _ -> (), #"bench/ce/let_constant.mlw" 5 6 11#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    _ -> (), #"bench/ce/let_constant.mlw" 5 6 11#
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    _ -> (), #"bench/ce/let_constant.mlw" 5 6 11#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    _ -> (), #"bench/ce/let_constant.mlw" 5 6 11#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    _ -> (), #"bench/ce/let_constant.mlw" 5 6 11#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    _ -> (), #"bench/ce/let_constant.mlw" 5 6 11#
-bench/ce/let_constant.mlw Let_constant dummy'vc: Unknown (sat)
-Counter-example model for term at #"bench/ce/let_constant.mlw" 9 13 24#
-File let_constant.mlw:
-  Line 7:
-    T [@introduced] [@model_trace:T] = {"type" : "Integer" , "val" : "25" }
-  Line 9:
-    T [@introduced] [@model_trace:T] = {"type" : "Integer" , "val" : "25" }
+File "bench/ce/let_constant.mlw", line 9, characters 13-24:
+Goal Assertion from verification condition dummy'vc.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/let_constant.mlw":
+    {"7":
+      [{"name": "T",
+        "attrs": ["introduced", "model_trace:T"],
+        "value": {"type": "Integer", "val": "25"},
+        "kind": "other"}],
+     "9":
+      [{"name": "T",
+        "attrs": ["introduced", "model_trace:T"],
+        "value": {"type": "Integer", "val": "25"},
+        "kind": "other"},
+       {"name": "b",
+        "attrs": ["introduced", "model_trace:b"],
+        "value": {"type": "Integer", "val": "65"},
+        "kind": "other"}]}}}
 

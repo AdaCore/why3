@@ -1,202 +1,130 @@
 Strongest Postcondition
-Model 0:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 11 6 22#
-    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 11 6 22#
-    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 4 false), #"bench/ce/records_label.mlw" 11 6 22#
-    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 4 false), #"bench/ce/records_label.mlw" 11 6 22#
-    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 4 false), #"bench/ce/records_label.mlw" 11 6 22#
-    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 4 false), #"bench/ce/records_label.mlw" 11 6 22#
-    x -> (r'mk 6 false), #"bench/ce/records_label.mlw" 11 6 22#
-bench/ce/records_label.mlw Old record_old_test1'vc: Unknown (sat)
-Counter-example model for term at #"bench/ce/records_label.mlw" 12 14 35#
-File records_label.mlw:
-  Line 9:
-    y [@at:'Old:loc:bench/ce/records_label.mlw:12] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "4" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 11:
-    x [@at:'Old:loc:bench/ce/records_label.mlw:12] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "4" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 12:
-    x [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "6" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-    x [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "6" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-    old y [@at:'Old] [@at:'Old:loc:bench/ce/records_label.mlw:12]
-      [@introduced] [@model_trace:y] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "4" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 14:
-    x [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "6" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
+File "bench/ce/records_label.mlw", line 12, characters 14-35:
+Goal Postcondition from verification condition record_old_test1'vc.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/records_label.mlw":
+    {"12":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "6"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"},
+       {"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "6"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"},
+       {"name": "old y",
+        "attrs":
+         ["at:'Old",
+          "at:'Old:loc:bench\/ce\/records_label.mlw:12",
+          "introduced",
+          "model_trace:y"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "4"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "old"}],
+     "14":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "6"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"}]}}}
 
-Model 0:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 16 6 21#
-    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 16 6 21#
-    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-    x1 -> (r'mk 12 false), #"bench/ce/records_label.mlw" 16 6 21#
-bench/ce/records_label.mlw Old record_at_test2'vc: Unknown (sat)
-Counter-example model for term at #"bench/ce/records_label.mlw" 22 13 58#
-File records_label.mlw:
-  Line 9:
-    y [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "12" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 16:
-    x [@at:L:loc:bench/ce/records_label.mlw:22] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "12" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 19:
-    x [@at:M:loc:bench/ce/records_label.mlw:22] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "6" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 21:
-    x [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "12" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 22:
-    x [@introduced] [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "12" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-    y [@introduced] [@model_trace:y] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "12" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
+File "bench/ce/records_label.mlw", line 22, characters 13-58:
+Goal Assertion from verification condition record_at_test2'vc.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/records_label.mlw":
+    {"9":
+      [{"name": "y",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "12"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"}],
+     "19":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "6"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"}],
+     "21":
+      [{"name": "x",
+        "attrs": ["introduced"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "12"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"}],
+     "22":
+      [{"name": "x",
+        "attrs": ["introduced", "model_trace:x"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "12"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"},
+       {"name": "y",
+        "attrs": ["introduced", "model_trace:y"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "12"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": "other"}]}}}
 
-Model 0:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
-    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
-    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
-Model 1:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
-    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
-    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
-Model 2:
-  Concrete RAC:  good model (Concrete RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
-    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
-  Abstract RAC:  good model (Abstract RAC confirms the counter-example, 0 warnings)
-    y -> (r'mk 0 false), #"bench/ce/records_label.mlw" 24 6 18#
-    x2 -> (r'mk 6 false), #"bench/ce/records_label.mlw" 24 6 18#
-bench/ce/records_label.mlw Old several_hats'vc: Unknown (sat)
-Counter-example model for term at #"bench/ce/records_label.mlw" 30 13 37#
-File records_label.mlw:
-  Line 24:
-    x [@at:L:loc:bench/ce/records_label.mlw:30]
-      [@at:M:loc:bench/ce/records_label.mlw:30] [@introduced] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
-  Line 30:
-    x at M [@at:M] [@at:M:loc:bench/ce/records_label.mlw:30] [@introduced]
-      [@model_trace:x] =
-      {"type" : "Record" ,
-      "val" : {"Field" : [{"field" : "f" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "0" } },
-      {"field" : "g" ,
-      "value" : {"type" : "Boolean" ,
-      "val" : false } }] } }
+File "bench/ce/records_label.mlw", line 30, characters 13-37:
+Goal Assertion from verification condition several_hats'vc.
+Prover result is: unknown (sat) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/records_label.mlw":
+    {"30":
+      [{"name": "x",
+        "attrs":
+         ["at:M",
+          "at:M:loc:bench\/ce\/records_label.mlw:30",
+          "introduced",
+          "model_trace:x"],
+        "value":
+         {"type": "Record",
+          "val":
+           {"Field":
+             [{"field": "f", "value": {"type": "Integer", "val": "0"}},
+              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
+        "kind": at M}]}}}
 

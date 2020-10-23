@@ -1,127 +1,134 @@
 Strongest Postcondition
-Model 1:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-bench/ce/jlamp_array.mlw Array f'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/jlamp_array.mlw" 22 4 16#
-File jlamp_array.mlw:
-  Line 11:
-    two  =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 14:
-    three  =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } }
-  Line 22:
-    the check fails with all inputs
+File "bench/ce/jlamp_array.mlw", line 22, characters 4-16:
+Goal Index in array bounds from verification condition f'vc.
+Prover result is: unknown (unknown) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/jlamp_array.mlw":
+    {"11":
+      [{"name": "two",
+        "attrs": [],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}],
+     "14":
+      [{"name": "three",
+        "attrs": [],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "other"}],
+     "22":
+      [{"name": "the check fails with all inputs",
+        "attrs": [],
+        "value": {"type": "Unparsed", "val": ""},
+        "kind": "error_message"}]}}}
 
-Model 1:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-bench/ce/jlamp_array.mlw Array f'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/jlamp_array.mlw" 21 14 27#
-File jlamp_array.mlw:
-  Line 11:
-    two  =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 14:
-    three  =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } }
-  Line 21:
-    three [@model_trace:three] =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } }
+File "bench/ce/jlamp_array.mlw", line 21, characters 14-27:
+Goal Postcondition from verification condition f'vc.
+Prover result is: unknown (unknown) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/jlamp_array.mlw":
+    {"11":
+      [{"name": "two",
+        "attrs": [],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}],
+     "14":
+      [{"name": "three",
+        "attrs": [],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "other"}],
+     "21":
+      [{"name": "three",
+        "attrs": ["model_trace:three"],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "other"}]}}}
 
-bench/ce/jlamp_array.mlw Array g'vc: Valid
-Model 1:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-bench/ce/jlamp_array.mlw Array g'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/jlamp_array.mlw" 27 14 27#
-File jlamp_array.mlw:
-  Line 11:
-    two  =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 14:
-    three  =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } }
-  Line 27:
-    three [@model_trace:three] =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } }
+File "bench/ce/jlamp_array.mlw", line 28, characters 4-16:
+Goal Index in array bounds from verification condition g'vc.
+Prover result is: valid WHY3DATA.
 
-bench/ce/jlamp_array.mlw Array h'vc: Valid
-Model 1:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-Model 2:
-  Concrete RAC:  don't know (ConcreteRAC execution got stuck, 0 warnings)
-    
-  Abstract RAC:  don't know (AbstractRAC execution got stuck, 0 warnings)
-    
-bench/ce/jlamp_array.mlw Array h'vc: Timeout or Unknown
-Counter-example model for term at #"bench/ce/jlamp_array.mlw" 33 14 27#
-File jlamp_array.mlw:
-  Line 11:
-    two  =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "2" } }
-  Line 14:
-    three  =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } }
-  Line 33:
-    three [@model_trace:three] =
-      {"proj_name" : "to_int" ,
-      "type" : "Proj" ,
-      "value" : {"type" : "Integer" ,
-      "val" : "3" } }
+File "bench/ce/jlamp_array.mlw", line 27, characters 14-27:
+Goal Postcondition from verification condition g'vc.
+Prover result is: unknown (unknown) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/jlamp_array.mlw":
+    {"11":
+      [{"name": "two",
+        "attrs": [],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}],
+     "14":
+      [{"name": "three",
+        "attrs": [],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "other"}],
+     "27":
+      [{"name": "three",
+        "attrs": ["model_trace:three"],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "other"}]}}}
+
+File "bench/ce/jlamp_array.mlw", line 34, characters 4-16:
+Goal Index in array bounds from verification condition h'vc.
+Prover result is: valid WHY3DATA.
+
+File "bench/ce/jlamp_array.mlw", line 33, characters 14-27:
+Goal Postcondition from verification condition h'vc.
+Prover result is: unknown (unknown) WHY3DATA.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+{"model":
+  {"bench\/ce\/jlamp_array.mlw":
+    {"11":
+      [{"name": "two",
+        "attrs": [],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "2"}},
+        "kind": "other"}],
+     "14":
+      [{"name": "three",
+        "attrs": [],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "other"}],
+     "33":
+      [{"name": "three",
+        "attrs": ["model_trace:three"],
+        "value":
+         {"proj_name": "to_int",
+          "type": "Proj",
+          "value": {"type": "Integer", "val": "3"}},
+        "kind": "other"}]}}}
 
