@@ -336,12 +336,6 @@ type check_model_result =
 
 val print_check_model_result : check_model_result Pp.pp
 
-type check_model = model -> check_model_result
-(** Check the validity of a CE model. *)
-
-val default_check_model : check_model
-(** Completely incomplete model check *)
-
 (*
 ***************************************************************
 **  Filtering the model

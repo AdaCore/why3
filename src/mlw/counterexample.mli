@@ -2,7 +2,7 @@
 open Format
 open Pinterp
 
-val check_model : rac_reduce_config -> Env.env -> Pmodule.pmodule -> Model_parser.check_model
+val check_model : rac_reduce_config -> Env.env -> Pmodule.pmodule -> Model_parser.model -> Model_parser.check_model_result
 (** [check_model env pm m] checks if model [m] is valid, i.e. the abstract
     execution using the model values triggers a RAC contradiction in the
     corresponding location. The function returns true if the corresponding
@@ -16,5 +16,5 @@ type ce_summary
 val print_counterexample : ?check_ce:bool -> formatter ->
                            Model_parser.model * ce_summary -> unit
 
-val select_model : rac_reduce_config -> Env.env -> Pmodule.pmodule ->
+val select_model : ?check:bool -> rac_reduce_config -> Env.env -> Pmodule.pmodule ->
 ('a * Model_parser.model) list -> (Model_parser.model * ce_summary) option

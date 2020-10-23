@@ -1340,13 +1340,6 @@ let print_check_model_result fmt = function
       fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@\n@[<hv2>- Abstract: %a@]@]"
         print_full_verdict r.concrete print_full_verdict r.abstract
 
-type check_model = model -> check_model_result
-
-let default_check_model : check_model =
-  fun _ ->
-  let reason = "not checking CE model" in
-  Cannot_check_model {reason}
-
 (*
 ***************************************************************
 ** Registering model parser

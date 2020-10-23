@@ -1017,7 +1017,7 @@ match pa.proof_state with
        let reduce_config =
          Pinterp.rac_reduce_config_lit cont.controller_config env reduce_lit in
        let sel =
-         Counterexample.select_model reduce_config env pm res.pr_models in
+         Counterexample.select_model ~check:true reduce_config env pm res.pr_models in
        match sel with None -> Model_parser.default_model | Some (m,_) -> m in
      let ce_result =
        Pp.string_of (Model_parser.print_model_human ~print_attrs ?me_name_trans:None)

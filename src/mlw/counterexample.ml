@@ -205,8 +205,13 @@ let print_counterexample ?check_ce fmt (model,ce_summary) =
   fprintf fmt "@ %a" (print_ce_summary_values ~print_attrs:false ~json:false model)
     ce_summary
 
-let select_model rac_reduce_config env pmodule models =
-  let check_model = check_model rac_reduce_config env pmodule in
+let select_model ?(check=false) rac_reduce_config env pmodule models =
+  let default_check_model _ =
+    let reason = "not checking CE model" in
+    Model_parser.Cannot_check_model {reason} in
+  let check_model =
+    if check then check_model rac_reduce_config env pmodule
+    else default_check_model in
   let check_model (i,r,m) =
     Debug.dprintf Model_parser.debug_check_ce "Check model %d (%a)@." i
       (Pp.print_option_or_default "NO LOC" Pretty.print_loc') (Model_parser.get_model_term_loc m);
