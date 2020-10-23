@@ -196,18 +196,6 @@ let print_prover_result ?(json: [<`All | `Model] option) fmt r =
     let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
     fprintf fmt "@[<v>@[<hov2>Prover@ result@ is:@ @{<bold %s>%a@}@ (%.2fs%a).@]"
       color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
-    (* This should be done somwhere else *)
-    (* (match r.pr_model with
-     *  | Some (m, s) when not (is_model_empty m) ->
-     *      fprintf fmt "@ @[<hov2>%a%t@]" (print_ce_summary_title ?check_ce) s
-     *        (fun fmt -> match s with
-     *           | NCCE _ | SWCE _ | NCCE_SWCE _ ->
-     *               fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
-     *           | UNKNOWN _ ->
-     *               fprintf fmt ":"
-     *           | _ -> ());
-     *      fprintf fmt "@ %a" (print_ce_summary_values ~print_attrs ~json:(json = Some `Model) m) s
-     *  | _ -> ()); *)
     if r.pr_answer == HighFailure then
       fprintf fmt "@ Prover exit status: %a@\nProver output:@\n%s@\n"
         print_prover_status r.pr_status r.pr_output;

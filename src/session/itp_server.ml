@@ -1494,7 +1494,6 @@ match pa.proof_state with
         let parent_pn = Session_itp.get_proof_attempt_parent session panid in
         let nid' = node_ID_from_pn parent_pn in
         remove_node nid;
-        (* let check_model = Some (Call_provers.rac_reduce_config_lit ~trans:"compute_in_goal" (\* ~prover:"cvc4" *\) ()) in *)
         schedule_proof_attempt nid' config_prover pan.limit
       | exception Whyconf.ProverNotFound (_, fp) ->
         let msg = Format.asprintf "Counterexamples alternative for prover does \
