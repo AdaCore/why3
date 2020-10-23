@@ -269,18 +269,18 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
 let unproved = ref false
 
 let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
+  let open Call_provers in
   let limit =
-    { Call_provers.empty_limit with
-      Call_provers.limit_time = timelimit;
-                   limit_mem = memlimit } in
+    { empty_limit with
+      limit_time = timelimit;
+      limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
         let call = Driver.prove_task ~command ~limit drv task in
-        let res = Call_provers.wait_on_call call in
+        let res = wait_on_call call in
         let ce =
           if !opt_check_ce_model then
-            let reduce_lit =
-              Call_provers.rac_reduce_config_lit
+            let reduce_lit = rac_reduce_config_lit
                 ~trans:"compute_in_goal" ?prover:!opt_rac_prover () in
             let reduce = Pinterp.rac_reduce_config_lit config env reduce_lit in
             Counterexample.select_model reduce env (Pmodule.restore_module th) res.pr_models
@@ -290,7 +290,7 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
         printf "%a@." (print_result ?json:!opt_json)
           (fname, t.Term.t_loc, goal_name, expls, res, ce);
-        if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
+        if res.pr_answer <> Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task
     | Some dir, _ -> output_task drv fname tname th task dir

@@ -86,7 +86,8 @@ let find_rs pm loc =
   find_in_list find_mod_unit pm.mod_units
 
 let check_model reduce env pm model =
-  match Model_parser.get_model_term_loc model with
+  let open Model_parser in
+  match get_model_term_loc model with
   | None ->
       let reason = "model term has no location" in
       Model_parser.Cannot_check_model {reason}
@@ -222,7 +223,7 @@ let select_model rac_reduce_config env pmodule models =
   let add_ce_summary (i,r,m,mr) =
     let summary = match mr with
       | Model_parser.Cannot_check_model {reason} -> UNKNOWN reason
-      | Check_model_result r -> ce_summary r.concrete r.abstract in
+      | Model_parser.Check_model_result r -> ce_summary r.concrete r.abstract in
     i,r,m,mr,summary in
   let models =
     List.map add_ce_summary
@@ -264,11 +265,11 @@ let select_model rac_reduce_config env pmodule models =
     match mr with
     | Model_parser.Cannot_check_model {reason} ->
        fprintf fmt "- Couldn't check model: %s" reason
-    | Check_model_result r ->
+    | Model_parser.Check_model_result r ->
        fprintf fmt
          "- @[<v2>%t model %d (Concrete: %a, Abstract: %a)@ @[Summary: %a@]@]"
-         mark_selected i Model_parser.print_verdict r.concrete.verdict
-         Model_parser.print_verdict r.abstract.verdict
+         mark_selected i Model_parser.print_verdict r.concrete.Model_parser.verdict
+         Model_parser.print_verdict r.abstract.Model_parser.verdict
          (print_ce_summary_title ?check_ce:None) s in
   if models <> [] then
     Debug.dprintf Model_parser.debug_check_ce "Models:@\n%a@."
