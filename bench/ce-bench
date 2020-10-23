@@ -113,7 +113,7 @@ run () {
         sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
-        sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
+        sed 's/([0-9]\+\.[0-9]\+s, [0-9]\+ steps)/WHY3DATA/g' | \
         # This ad hoc sed removes diff between Timeout and Unknown (unknown)
         # when running from platform with different speed.
         sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/' | \
