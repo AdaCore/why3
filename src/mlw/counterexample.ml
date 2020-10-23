@@ -241,7 +241,7 @@ let ce_summary v_concrete v_abstract =
   | Bad_model, Dont_know -> UNKNOWN v_abstract.reason
   | Bad_model, Bad_model -> BAD_CE
 
-let print_counterexample ?check_ce fmt (model,ce_summary) =
+let print_counterexample ?check_ce ?(json=false) fmt (model,ce_summary) =
   if not (Model_parser.is_model_empty model) then
     fprintf fmt "@ @[<hov2>%a%t@]" (print_ce_summary_title ?check_ce) ce_summary
       (fun fmt -> match ce_summary with
@@ -250,7 +250,7 @@ let print_counterexample ?check_ce fmt (model,ce_summary) =
                   | UNKNOWN _ ->
                      fprintf fmt ":"
                   | _ -> ());
-  fprintf fmt "@ %a" (print_ce_summary_values ~print_attrs:false ~json:false model)
+  fprintf fmt "@ %a" (print_ce_summary_values ~print_attrs:false ~json model)
     ce_summary
 
 let select_model ?(check=false) rac_reduce_config env pmodule models =

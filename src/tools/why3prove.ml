@@ -262,7 +262,9 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
     if json <> Some `All then fprintf fmt "@\n";
     Call_provers.print_prover_result ?json fmt res;
     (match ce with
-     | Some ce -> Counterexample.print_counterexample ~check_ce:!opt_check_ce_model fmt ce
+     | Some ce ->
+        Counterexample.print_counterexample
+          ~check_ce:!opt_check_ce_model ~json:(json = Some `Model) fmt ce
      | None -> ());
     fprintf fmt "@\n" )
 

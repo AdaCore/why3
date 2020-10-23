@@ -13,7 +13,7 @@ val check_model : rac_reduce_config -> Env.env -> Pmodule.pmodule -> Model_parse
 
 type ce_summary
 
-val print_counterexample : ?check_ce:bool -> formatter ->
+val print_counterexample : ?check_ce:bool -> ?json:bool -> formatter ->
                            Model_parser.model * ce_summary -> unit
 
 val select_model : ?check:bool -> rac_reduce_config -> Env.env -> Pmodule.pmodule ->
