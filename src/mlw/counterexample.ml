@@ -90,7 +90,7 @@ let check_model reduce env pm model =
   match get_model_term_loc model with
   | None ->
       let reason = "model term has no location" in
-      Model_parser.Cannot_check_model {reason}
+      Cannot_check_model {reason}
   | Some loc ->
       (* TODO deal with VCs from goal definitions? *)
       if Loc.equal loc Loc.dummy_position then
@@ -117,8 +117,8 @@ let check_model reduce env pm model =
 
 (** See output of [ce_summary_title] for details *)
 
-type ce_summary = NCCE of Model_parser.exec_log | SWCE of Model_parser.exec_log
-                  | NCCE_SWCE of Model_parser.exec_log | BAD_CE | UNKNOWN of string
+type ce_summary = NCCE of exec_log | SWCE of exec_log
+                  | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN of string
 
 let print_ce_summary_kind fmt s =
   let str = match s with
@@ -162,14 +162,14 @@ let print_ce_summary_values ~json ~print_attrs model fmt s =
   let print_model_field =
     print_json_field "model" (Model_parser.print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
   let print_log_field =
-    print_json_field "log" (Model_parser.print_exec_log ~json:true) in
+    print_json_field "log" (print_exec_log ~json:true) in
   match s with
   | NCCE log | SWCE log | NCCE_SWCE log ->
       if json then
         fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
           print_model_field model print_log_field log
       else
-        fprintf fmt "@[%a@]" (Model_parser.print_exec_log ~json:false) log
+        fprintf fmt "@[%a@]" (print_exec_log ~json:false) log
   | UNKNOWN _ ->
       if json then
         fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
@@ -177,9 +177,57 @@ let print_ce_summary_values ~json ~print_attrs model fmt s =
         fprintf fmt "@[%a@]" (Model_parser.print_model_human ?me_name_trans:None ~print_attrs) model
   | BAD_CE -> ()
 
+let sort_exec_log log =
+  let open Wstdlib in
+  let insert f l e sofar =
+    let insert_line opt_l =
+      let l = Opt.get_def [] opt_l in
+      Some (e :: l) in
+    let insert_file opt_mf =
+      let mf = Opt.get_def Mint.empty opt_mf in
+      let res = Mint.change insert_line l mf in
+      Some res in
+    Mstr.change insert_file f sofar in
+  let aux entry sofar = match entry.log_loc with
+    | Some loc when not (Loc.equal loc Loc.dummy_position) ->
+        let f, l, _, _ = Loc.get loc in
+        insert f l entry sofar
+    | _ -> sofar in
+  Mstr.map (Mint.map List.rev)
+    (List.fold_right aux log Mstr.empty)
+
+let model_of_exec_log ~original_model ?(valid_loc=(fun loc -> not (Loc.equal loc Loc.dummy_position))) log =
+  let open Model_parser in
+  let open Ident in
+  let open Wstdlib in
+  let me loc id v =
+    let name = asprintf "%a" Ident.print_decoded id.id_string in
+    let men_name = Ident.get_model_trace_string ~name ~attrs:id.Ident.id_attrs in
+    let men_kind = match get_model_element_by_id original_model id with
+      | Some me -> me.me_name.men_kind
+      | None -> Other in
+    let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
+    let me_value = Integer v in (* TODO Type me_value correctly when the exec log is typed *)
+    {me_name; me_value; me_location= Some loc; me_term= None} in
+  let aux e = match e.log_loc with
+    | Some loc when valid_loc loc -> (
+        match e.log_desc with
+        | Val_from_model (id, v) ->
+            [me loc id v]
+        | Exec_failed (_, mid) ->
+            Mid.fold (fun id v l -> me loc id v :: l) mid []
+        | _ -> [] )
+    | _ -> [] in
+  let aux_l e = match List.concat (List.map aux e) with [] -> None | l -> Some l in
+  let aux_mint mint =
+    let res = Mint.map_filter aux_l mint in
+    if Mint.is_empty res then None else Some res in
+  let model_files = (Mstr.map_filter aux_mint (sort_exec_log log)) in
+  set_model_files original_model model_files
+
 let model_of_ce_summary ~original_model ?valid_loc = function
   | NCCE log | SWCE log | NCCE_SWCE log ->
-      Model_parser.model_of_exec_log ~original_model ?valid_loc log
+      model_of_exec_log ~original_model ?valid_loc (log_to_list log)
   | UNKNOWN _ | BAD_CE -> original_model
 
 let ce_summary v_concrete v_abstract =
@@ -208,27 +256,27 @@ let print_counterexample ?check_ce fmt (model,ce_summary) =
 let select_model ?(check=false) rac_reduce_config env pmodule models =
   let default_check_model _ =
     let reason = "not checking CE model" in
-    Model_parser.Cannot_check_model {reason} in
+    Cannot_check_model {reason} in
   let check_model =
     if check then check_model rac_reduce_config env pmodule
     else default_check_model in
   let check_model (i,r,m) =
-    Debug.dprintf Model_parser.debug_check_ce "Check model %d (%a)@." i
+    Debug.dprintf debug_check_ce "Check model %d (%a)@." i
       (Pp.print_option_or_default "NO LOC" Pretty.print_loc') (Model_parser.get_model_term_loc m);
     (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
      *   (print_model ?me_name_trans:None ~print_attrs:false) m; *)
     let mr = check_model m in
-    Debug.dprintf Model_parser.debug_check_ce "@[<v2>Model %d:@\n@[%a@]@]@." i
-      Model_parser.print_check_model_result mr;
+    Debug.dprintf debug_check_ce "@[<v2>Model %d:@\n@[%a@]@]@." i
+      print_check_model_result mr;
     i,r,m,mr in
   let not_empty (i,_,m) =
     let empty = Model_parser.is_model_empty m in
-    if empty then Debug.dprintf Model_parser.debug_check_ce "Model %d is empty@." i;
+    if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
     not empty in
   let add_ce_summary (i,r,m,mr) =
     let summary = match mr with
-      | Model_parser.Cannot_check_model {reason} -> UNKNOWN reason
-      | Model_parser.Check_model_result r -> ce_summary r.concrete r.abstract in
+      | Cannot_check_model {reason} -> UNKNOWN reason
+      | Check_model_result r -> ce_summary r.concrete r.abstract in
     i,r,m,mr,summary in
   let models =
     List.map add_ce_summary
@@ -268,15 +316,15 @@ let select_model ?(check=false) rac_reduce_config env pmodule models =
       let s = if selected_ix = Some i then "Selected" else "Checked" in
       pp_print_string fmt s in
     match mr with
-    | Model_parser.Cannot_check_model {reason} ->
+    | Cannot_check_model {reason} ->
        fprintf fmt "- Couldn't check model: %s" reason
-    | Model_parser.Check_model_result r ->
+    | Check_model_result r ->
        fprintf fmt
          "- @[<v2>%t model %d (Concrete: %a, Abstract: %a)@ @[Summary: %a@]@]"
-         mark_selected i Model_parser.print_verdict r.concrete.Model_parser.verdict
-         Model_parser.print_verdict r.abstract.Model_parser.verdict
+         mark_selected i print_verdict r.concrete.verdict
+         print_verdict r.abstract.verdict
          (print_ce_summary_title ?check_ce:None) s in
   if models <> [] then
-    Debug.dprintf Model_parser.debug_check_ce "Models:@\n%a@."
+    Debug.dprintf debug_check_ce "Models:@\n%a@."
       Pp.(print_list space print_dbg_model) models;
   selected

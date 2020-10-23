@@ -20,9 +20,235 @@ open Expr
 open Big_real
 open Mlmpfr_wrapper
 
+(*********************)
+(* WORK IN PROGRESS  *)
+(* FROM Model_parser *)
+(*********************)
+
+
+type verdict = Good_model | Bad_model | Dont_know
+
+type exec_kind = ExecAbstract | ExecConcrete
+
+type log_entry_desc =
+  | Val_from_model of (ident * string)
+  | Exec_call of (Expr.rsymbol option * string Mvs.t  * exec_kind)
+  | Exec_pure of (Term.lsymbol * exec_kind)
+  | Exec_any of string
+  | Exec_loop of exec_kind
+  | Exec_stucked of (string * string Mid.t)
+  | Exec_failed of (string * string Mid.t)
+  | Exec_ended
+
+type log_entry = {
+    log_desc : log_entry_desc;
+    log_loc  : Loc.position option;
+}
+
+type exec_log = log_entry list
+(* new log elements are added to the head of the list *)
+
+let empty_log = []
+
+let add_log_entry log_desc log_loc exec_log = {log_desc; log_loc} :: exec_log
+
+let add_val_to_log id v loc exec_log =
+  add_log_entry (Val_from_model (id,v)) loc exec_log
+
+let add_call_to_log rs mvs kind loc exec_log =
+  add_log_entry (Exec_call (rs,mvs,kind)) loc exec_log
+
+let add_pure_call_to_log ls kind loc exec_log =
+  add_log_entry (Exec_pure (ls,kind)) loc exec_log
+
+let add_any_call_to_log s loc exec_log =
+  add_log_entry (Exec_any s) loc exec_log
+
+let add_failed_to_log s mvs loc exec_log =
+  add_log_entry (Exec_failed (s,mvs)) loc exec_log
+
+let add_stucked_to_log s mvs loc exec_log =
+  add_log_entry (Exec_stucked (s,mvs)) loc exec_log
+
+let add_exec_ended_to_log loc exec_log =
+  add_log_entry Exec_ended loc exec_log
+
+let add_exec_loop_to_log  kind loc exec_log =
+  add_log_entry (Exec_loop kind) loc exec_log
+
+let log_to_list exec_log = List.rev exec_log
+
+let exec_kind_to_string ?(cap=true) = function
+  | ExecAbstract -> if cap then "Abstract" else "abstract"
+  | ExecConcrete -> if cap then "Concrete" else "concrete"
+
+(** Partition a list of elements into lists of pairs, of consecutive
+    elements with the same value for f *)
+let rec consecutives key ?(sofar=[]) ?current xs =
+  let to_list = function Some (k, xs) -> [Some k, List.rev xs] | None -> [] in
+  match xs with
+  | [] -> List.rev (to_list current @ sofar)
+  | x :: xs -> match key x with
+    | None -> consecutives key ~sofar:((None, [x]) :: to_list current @ sofar) xs
+    | Some k -> match current with
+      | None ->
+          consecutives key ~sofar ~current:(k, [x]) xs
+      | Some (k', xs') when k' = k ->
+          consecutives key ~sofar ~current:(k, x::xs') xs
+      | Some _ ->
+          consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
+
+let print_log_entry_desc fmt e =
+  let print_vs_v fmt (vs,v) =
+    fprintf fmt "@[%a = %s@]" Ident.print_decoded vs.vs_name.id_string v in
+  let print_mvs fmt mvs =
+    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_vs_v) (Mvs.bindings mvs) in
+  let print_id_v fmt (id,v) =
+    fprintf fmt "@[%a = %s@]" Ident.print_decoded id.id_string v in
+  let print_mid fmt mid =
+    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_id_v) (Mid.bindings mid) in
+  match e.log_desc with
+  | Val_from_model (id, v) ->
+      fprintf fmt "@[<h>%a = %s@]" Ident.print_decoded id.id_string v;
+  | Exec_call (None, mvs, k) ->
+      fprintf fmt "@[<h>%s execution of anonymous function with args:%a@]"
+        (exec_kind_to_string k)
+        print_mvs mvs
+  | Exec_call (Some rs, mvs, k) ->
+      fprintf fmt "@[<hv2>%s execution of %a with args:%a@]"
+        (exec_kind_to_string k)
+        Ident.print_decoded rs.Expr.rs_name.id_string
+        print_mvs mvs
+  | Exec_pure (ls,k) ->
+      fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
+        Ident.print_decoded ls.ls_name.id_string
+  | Exec_any v ->
+     fprintf fmt "@[<h>execution of any, result: %s@]" v
+  | Exec_loop k ->
+      fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
+  | Exec_failed (msg,mid) ->
+     fprintf fmt "@[<hv2>Property failure, %s with:%a@]" msg print_mid mid
+  | Exec_stucked (msg,mid) ->
+     fprintf fmt "@[<hv2>Execution got stuck, %s with:%a@]" msg print_mid mid
+  | Exec_ended ->
+      fprintf fmt "@[<h>Execution of main function terminated normally@]"
+
+let print_exec_log ~json fmt entry_log =
+  let entry_log = List.rev entry_log in
+  if json then
+    let open Json_base in
+    let string f = kasprintf (fun s -> String s) f in
+    let print_json_kind fmt = function
+      | ExecAbstract -> print_json fmt (string "ABSTRACT")
+      | ExecConcrete -> print_json fmt (string "CONCRETE") in
+    let print_vs_value fmt (vs,v) =
+      fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+        (print_json_field "name" print_json) (String vs.vs_name.id_string)
+        (print_json_field "value" print_json) (String v) in
+    let print_id_value fmt (id,v) =
+      fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+        (print_json_field "name" print_json) (String id.id_string)
+        (print_json_field "value" print_json) (String v) in
+    let print_log_entry fmt = function
+      | Val_from_model (id, s) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "VAL_FROM_MODEL")
+            (print_json_field "vs" print_json)
+            (string "%a" Ident.print_decoded id.id_string)
+            (print_json_field "value" print_json) (String s)
+      | Exec_call (ors, mvs, kind) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "EXEC_CALL")
+            (print_json_field "rs" print_json) (match ors with
+                | Some rs -> string "%a" Ident.print_decoded rs.Expr.rs_name.id_string
+                | None -> Null)
+            (print_json_field "exec" print_json_kind) kind
+            (print_json_field "args" (list print_vs_value)) (Mvs.bindings mvs)
+      | Exec_pure (ls, kind) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "EXEC_PURE")
+            (print_json_field "ls" print_json) (string "%a" Pretty.print_ls ls)
+            (print_json_field "exec" print_json_kind) kind
+      | Exec_any s ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "EXEC_ANY")
+            (print_json_field "value" print_json) (String s)
+      | Exec_loop kind ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+        (print_json_field "kind" print_json) (string "EXEC_LOOP")
+        (print_json_field "exec" print_json_kind) kind
+      | Exec_failed (reason,mid) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "FAILED")
+            (print_json_field "reason" print_json) (String reason)
+            (print_json_field "state" (list print_id_value)) (Mid.bindings mid)
+      | Exec_stucked (reason,mid) ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+            (print_json_field "kind" print_json) (string "STUCKED")
+            (print_json_field "reason" print_json) (String reason)
+            (print_json_field "state" (list print_id_value)) (Mid.bindings mid)
+      | Exec_ended ->
+          fprintf fmt "@[@[<hv1>{%a@]}@]"
+            (print_json_field "kind" print_json) (string "ENDED") in
+    let print_json_entry fmt e =
+      fprintf fmt "@[@[<hv1>{@[<hv2>%a@];@ @[<hv2>%a@]@]}@]"
+        (Pp.print_option_or_default "NOLOC"
+           (print_json_field "loc" Pretty.print_json_loc)) e.log_loc
+        (print_json_field "entry" print_log_entry) e.log_desc in
+    fprintf fmt "@[@[<hv1>[%a@]@]"
+      Pp.(print_list comma print_json_entry) entry_log
+  else
+    let entry_log =
+      let on_file e = Opt.map (fun (f,_,_,_) -> f) (Opt.map Loc.get e.log_loc) in
+      let on_line e = Opt.map (fun (_,l,_,_) -> l) (Opt.map Loc.get e.log_loc) in
+      List.map (fun (f, es) -> f, consecutives on_line es)
+        (consecutives on_file entry_log) in
+    let pp_entries = Pp.(print_list newline print_log_entry_desc) in
+    let pp_lines fmt (opt_line, entries) = match opt_line with
+      | Some line -> fprintf fmt "@[<v2>Line %d:@\n%a@]" line pp_entries entries
+      | None -> pp_entries fmt entries in
+    let pp_files fmt (opt_file, l) = match opt_file with
+      | Some file -> fprintf fmt "@[<v2>File %s:@\n%a@]" (Filename.basename file) Pp.(print_list newline pp_lines) l
+      | None -> fprintf fmt "@[<v4>Unknown location:@\n%a@]" Pp.(print_list newline pp_lines) l in
+    Pp.(print_list newline pp_files) fmt entry_log
+
+type full_verdict = {
+    verdict  : verdict;
+    reason   : string;
+    exec_log : exec_log;
+  }
+
+let print_verdict fmt = function
+  | Good_model -> fprintf fmt "good model"
+  | Bad_model -> fprintf fmt "bad model"
+  | Dont_know -> fprintf fmt "don't know"
+
+let print_full_verdict fmt v =
+  fprintf fmt "%a (%s)@,%a"
+    print_verdict v.verdict v.reason (print_exec_log ~json:false) v.exec_log
+
+type check_model_result =
+  | Cannot_check_model of {reason: string}
+  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
+
+let print_check_model_result fmt = function
+  | Cannot_check_model r ->
+      fprintf fmt "@[Cannot check model (%s)@]" r.reason
+  | Check_model_result r ->
+      fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@\n@[<hv2>- Abstract: %a@]@]"
+        print_full_verdict r.concrete print_full_verdict r.abstract
+
+(*********************)
+(* end Model_parser  *)
+(*********************)
+
 let debug =
   Debug.register_info_flag "trace_exec"
     ~desc:"trace execution of code given by --exec or --eval"
+
+(* TODO move to counterexample *)
+let debug_check_ce = Debug.register_info_flag "check-ce"
+    ~desc:"Debug@ info@ for@ --check-ce"
 
 let debug_rac = Debug.register_info_flag "rac" ~desc:"trace evaluation for RAC"
 let debug_rac_check = Debug.register_info_flag "rac-check" ~desc:"trace checking assertions in RAC"
@@ -387,14 +613,14 @@ type rac_config = {
   rac_abstract : bool;
   rac_reduce   : rac_reduce_config;
   ce_model     : Model_parser.model;
-  exec_log     : Model_parser.exec_log ref (* execution log, it includes values
+  exec_log     : exec_log ref (* execution log, it includes values
                                  taken from the ce model *)
 }
 
 let rac_config ~do_rac ~abstract:rac_abstract ?reduce:rac_reduce
     ?model:(ce_model=Model_parser.default_model) () =
   let rac_reduce = match rac_reduce with Some r -> r | None -> rac_reduce_config () in
-  {do_rac; rac_abstract; rac_reduce; ce_model; exec_log= ref Model_parser.empty_log}
+  {do_rac; rac_abstract; rac_reduce; ce_model; exec_log= ref empty_log}
 
 type env =
   { mod_known   : Pdecl.known_map;
@@ -410,28 +636,28 @@ let default_env env rac mod_known th_known =
   { mod_known; th_known; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty }
 
 let register_used_value env loc id value =
-  env.rac.exec_log := Model_parser.add_val_to_log id (asprintf "%a" print_value value) loc !(env.rac.exec_log)
+  env.rac.exec_log := add_val_to_log id (asprintf "%a" print_value value) loc !(env.rac.exec_log)
 
 let register_call env loc rs mvs kind =
-  env.rac.exec_log := Model_parser.add_call_to_log rs mvs kind loc !(env.rac.exec_log)
+  env.rac.exec_log := add_call_to_log rs mvs kind loc !(env.rac.exec_log)
 
 let register_pure_call env loc ls kind =
-  env.rac.exec_log := Model_parser.add_pure_call_to_log ls kind loc !(env.rac.exec_log)
+  env.rac.exec_log := add_pure_call_to_log ls kind loc !(env.rac.exec_log)
 let register_any_call env loc value =
     let v = (asprintf "%a" print_value value) in
-    env.rac.exec_log := Model_parser.add_any_call_to_log v loc !(env.rac.exec_log)
+    env.rac.exec_log := add_any_call_to_log v loc !(env.rac.exec_log)
 
 let register_failure env loc reason mvs =
-  env.rac.exec_log := Model_parser.add_failed_to_log reason mvs loc !(env.rac.exec_log)
+  env.rac.exec_log := add_failed_to_log reason mvs loc !(env.rac.exec_log)
 
 let register_stucked env loc reason mvs =
-  env.rac.exec_log := Model_parser.add_stucked_to_log reason mvs loc !(env.rac.exec_log)
+  env.rac.exec_log := add_stucked_to_log reason mvs loc !(env.rac.exec_log)
 
 let register_ended env loc =
-  env.rac.exec_log := Model_parser.add_exec_ended_to_log loc !(env.rac.exec_log)
+  env.rac.exec_log := add_exec_ended_to_log loc !(env.rac.exec_log)
 
 let register_loop env loc kind =
-  env.rac.exec_log := Model_parser.add_exec_loop_to_log kind loc !(env.rac.exec_log)
+  env.rac.exec_log := add_exec_loop_to_log kind loc !(env.rac.exec_log)
 
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
@@ -1396,7 +1622,7 @@ let fix_boolean_term t =
   if t_equal t t_false then t_bool_false else t
 
 let exec_pure ~loc env ls pvs =
-  register_pure_call env loc ls Model_parser.ExecConcrete;
+  register_pure_call env loc ls ExecConcrete;
   if ls_equal ls ps_equ then
     (* TODO (?) Add more builtin logical symbols *)
     let pv1, pv2 = match pvs with [pv1; pv2] -> pv1, pv2 | _ -> assert false in
@@ -1436,7 +1662,7 @@ let get_and_register_value env ?def ?ity vs loc =
   let value = match Model_parser.get_model_element env.rac.ce_model name loc with
     | Some me ->
        let v = import_model_value env.env env.mod_known ity me.Model_parser.me_value in
-       Debug.dprintf Model_parser.debug_check_ce "@[<h>VALUE from ce-model for %a at %a: %a@]@."
+       Debug.dprintf debug_check_ce "@[<h>VALUE from ce-model for %a at %a: %a@]@."
          Ident.print_decoded name
          Pretty.print_loc' loc
          print_value v;
@@ -1446,7 +1672,7 @@ let get_and_register_value env ?def ?ity vs loc =
          | None ->
             default_value_of_type env.env env.mod_known ity
          | Some v -> v in
-       Debug.dprintf Model_parser.debug_check_ce "@[<h>VALUE for %s %a not in ce-model, taking \
+       Debug.dprintf debug_check_ce "@[<h>VALUE for %s %a not in ce-model, taking \
                 default %a@]@." name print_loc' loc print_value v;
        v
   in
@@ -1528,11 +1754,11 @@ and eval_expr' env e =
         ( match ce.c_cty.cty_args with
           | [] ->
              if env.rac.rac_abstract then begin
-                 register_call env e.e_loc None mvs Model_parser.ExecAbstract;
+                 register_call env e.e_loc None mvs ExecAbstract;
                  exec_call_abstract ?loc:e.e_loc env ce.c_cty [] e.e_ity
                end
              else begin
-                 register_call env e.e_loc None mvs Model_parser.ExecConcrete;
+                 register_call env e.e_loc None mvs ExecConcrete;
                  eval_expr env e'
                end
           | [arg] ->
@@ -1636,7 +1862,7 @@ and eval_expr' env e =
             (invariant does not hold after iteration)
         * stop the interpretation here - raise RACStuck *)
       (* assert1 *)
-      register_loop env e.e_loc Model_parser.ExecAbstract;
+      register_loop env e.e_loc ExecAbstract;
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
@@ -1664,7 +1890,7 @@ and eval_expr' env e =
       | r -> r
     end
   | Ewhile (cond, inv, _var, e1) -> begin
-      register_loop env e.e_loc Model_parser.ExecConcrete;
+      register_loop env e.e_loc ExecConcrete;
       (* TODO variants *)
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
@@ -1719,7 +1945,7 @@ and eval_expr' env e =
             (value assigned to i is not compatible with loop range)
         6 - abort2: we have a false counterexample
             (the abstract rac cannot continue from this state) *)
-      register_loop env e.e_loc Model_parser.ExecAbstract;
+      register_loop env e.e_loc ExecAbstract;
       try
   let a = big_int_of_value (get_pvs env pvs1) in
   let b = big_int_of_value (get_pvs env pvs2) in
@@ -1770,7 +1996,7 @@ and eval_expr' env e =
       with NotNum -> Irred e
     end
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) -> (
-    register_loop env e.e_loc Model_parser.ExecConcrete;
+    register_loop env e.e_loc ExecConcrete;
     try
       let a = big_int_of_value (get_pvs env pvs1) in
       let b = big_int_of_value (get_pvs env pvs2) in
@@ -1877,12 +2103,12 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
      (List.map (asprintf "%a" print_value) arg_vs)) in
   if env.rac.rac_abstract && can_interpret_abstractly &&
        not main_function then begin
-      register_call env loc (Some rs) mvs Model_parser.ExecAbstract;
+      register_call env loc (Some rs) mvs ExecAbstract;
       let rs_name,cty = rs.rs_name, rs.rs_cty in
       exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
     end
   else begin
-      register_call env loc (Some rs) mvs Model_parser.ExecConcrete;
+      register_call env loc (Some rs) mvs ExecConcrete;
       let res =
         if rs_equal rs rs_func_app then
           match arg_vs with
@@ -2077,33 +2303,33 @@ let check_model_rs rac env pm model rs =
     let _, env = eval_rs rac env pm.mod_known pm.mod_theory.Theory.th_known model rs in
     let reason = sprintf "%s RAC does not confirm the counter-example, no \
                           contradiction during execution" abs_Msg in
-    Model_parser.{verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
+    {verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
   with
   | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc (Model_parser.get_model_term_loc model) ->
       let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
-      Model_parser.{verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
+      {verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | Contr (ctx, t) ->
       let reason = asprintf "%s RAC found a contradiction at different location %a"
           abs_Msg (Pp.print_option_or_default "NO LOC" print_loc') t.Term.t_loc in
-      Model_parser.{verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
+      {verdict= Good_model; reason; exec_log= !(ctx.c_env.rac.exec_log)}
   | CannotImportModelValue msg ->
       let reason = sprintf "cannot import value from model: %s" msg in
-      Model_parser.{verdict= Dont_know; reason; exec_log= Model_parser.empty_log}
+      {verdict= Dont_know; reason; exec_log= empty_log}
   | CannotCompute r ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
       let reason = sprintf "RAC execution got stuck: %s" r.reason in
-      Model_parser.{verdict= Dont_know; reason; exec_log= Model_parser.empty_log}
+      {verdict= Dont_know; reason; exec_log= empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
           term for constructor that is not a function *)
       let reason = sprintf "failure: %s" msg in
-      Model_parser.{verdict= Dont_know; reason; exec_log= Model_parser.empty_log}
+      {verdict= Dont_know; reason; exec_log= empty_log}
   | RACStuck (env,l) ->
       let reason =
         asprintf "%s RAC, with the counterexample model cannot continue after %a"
           abs_Msg (Pp.print_option print_loc') l in
-      Model_parser.{verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
+      {verdict= Bad_model; reason; exec_log= !(env.rac.exec_log)}
 
 let report_eval_result body fmt (res, vsenv, rsenv) =
   let print_envs fmt =

@@ -9,9 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-val debug_check_ce : Debug.flag
-
-
 (** {1 Counter-example model values} *)
 
 type float_type =
@@ -137,6 +134,7 @@ type model
 
 val is_model_empty : model -> bool
 val default_model : model
+val set_model_files : model -> model_element list Wstdlib.Mint.t Wstdlib.Mstr.t -> model
 
 (** {2 Querying the model} *)
 
@@ -259,82 +257,6 @@ val interleave_with_source :
     locations modified so that it takes into account that counterexamples
     were added.
 *)
-
-(** Result when checking a CE model *)
-
-open Term
-open Ident
-
-type verdict = Good_model | Bad_model | Dont_know
-
-type exec_kind = ExecAbstract | ExecConcrete
-
-type log_entry_desc =
-  | Val_from_model of (ident * string)
-  (** values taken from model during interpretation *)
-  | Exec_call of (Expr.rsymbol option * string Mvs.t  * exec_kind)
-  (** executed function call or lambda if no rsymbol,
-      arguments, execution type*)
-  | Exec_pure of (lsymbol * exec_kind)
-  (** executed pure function call *)
-  | Exec_any of string
-  (** execute any function call *)
-  | Exec_loop of exec_kind
-  (** execute loop *)
-  | Exec_stucked of (string * string Mid.t)
-  (** stucked execution information *)
-  | Exec_failed of (string * string Mid.t)
-  (** failed execution information *)
-  | Exec_ended
-  (** execution terminated normally *)
-
-type log_entry = {
-    log_desc : log_entry_desc;
-    log_loc  : Loc.position option;
-}
-
-type exec_log
-
-val empty_log : exec_log
-val add_log_entry : log_entry_desc -> Loc.position option -> exec_log -> exec_log
-val add_val_to_log :
-  Ident.ident -> string -> Loc.position option -> exec_log -> exec_log
-val add_call_to_log :
-  Expr.rsymbol option -> string Mvs.t -> exec_kind -> Loc.position option -> exec_log -> exec_log
-val add_pure_call_to_log :
-  lsymbol -> exec_kind -> Loc.position option -> exec_log -> exec_log
-val add_any_call_to_log : string -> Loc.position option -> exec_log -> exec_log
-val add_failed_to_log :
-  string -> string Mid.t -> Loc.position option -> exec_log -> exec_log
-val add_stucked_to_log :
-  string -> string Mid.t -> Loc.position option -> exec_log -> exec_log
-val add_exec_ended_to_log : Loc.position option -> exec_log -> exec_log
-val add_exec_loop_to_log : exec_kind -> Loc.position option -> exec_log -> exec_log
-val log_to_list : exec_log -> log_entry list
-val print_exec_log : json:bool -> exec_log Pp.pp
-
-val model_of_exec_log :
-  original_model:model -> ?valid_loc:(Loc.position -> bool) ->
-  exec_log -> model
-
-val sort_exec_log : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
-
-type full_verdict = {
-    verdict  : verdict;
-    reason   : string;
-    exec_log : exec_log;
-  }
-
-val print_verdict : verdict Pp.pp
-val print_full_verdict : full_verdict Pp.pp
-
-(** Checking a model either results in a reason why it was not possible or a full
-    verdict from abstract and concrete RAC *)
-type check_model_result =
-  | Cannot_check_model of {reason: string}
-  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
-
-val print_check_model_result : check_model_result Pp.pp
 
 (*
 ***************************************************************
