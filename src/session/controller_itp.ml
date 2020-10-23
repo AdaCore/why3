@@ -420,16 +420,6 @@ let build_prover_call spa =
     let inplace = config_pr.Whyconf.in_place in
     let interactive = config_pr.Whyconf.interactive in
     try
-      (* let rec find_th s id = match get_proof_parent s id with
-       *   | Theory th -> th
-       *   | Trans id -> find_th s (get_trans_parent s id) in
-       * let th = find_th c.controller_session spa.spa_id in
-       * let pm = Pmodule.restore_module (Theory.restore_theory (Session_itp.theory_name th)) in
-       * let check_model =
-       *   let aux lit_conf =
-       *     let reduce_conf = Pinterp.rac_reduce_config_lit c.controller_config c.controller_env lit_conf in
-       *     Counterexample.check_model reduce_conf c.controller_env pm in
-       *   Opt.map aux spa.spa_check_model in *)
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
           ~limit ~interactive driver task in
       let pa =

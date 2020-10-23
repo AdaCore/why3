@@ -262,8 +262,7 @@ let analyse_result exit_result res_parser printer_mapping out =
   let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        let model = List.rev saved_models in
-        Opt.get_def HighFailure saved_res, model
+        Opt.get_def HighFailure saved_res, List.rev saved_models
     | Answer res1 :: (Answer res2 :: tl as tl1) ->
        Debug.dprintf debug "Call_provers: two consecutive answers: %a %a@."
           print_prover_answer res1 print_prover_answer res2;
