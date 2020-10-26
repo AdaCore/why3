@@ -230,11 +230,15 @@ Task 1: theory Task
             forall x:int.
              x <= 100 ->
              (forall x1:int.
+               let x2 = Ref'mk x1 in
+               let x3 = x2 in
                if x1 < 100
-               then forall x2:int.
-                     x2 = (x1 + 1) ->
-                     0 <= (100 - x1) /\ (100 - x2) < (100 - x1)
+               then let r = x2 in
+                    forall x4:int.
+                     let x5 = Ref'mk x4 in
+                     x4 = (x1 + 1) ->
+                     0 <= (100 - x1) /\ (100 - x4) < (100 - x1)
                else x1 = 100)
 end
 
-On task 1, alt-ergo answers unknown () (0.0xs).
+On task 1, alt-ergo answers Prover result is: unknown () (0.0xs).

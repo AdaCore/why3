@@ -443,7 +443,8 @@ Task 2: theory Task
           
           (* use int.Int *)
           
-          goal f'vc : forall x:int. x = 6 -> (x * 7) = 42
+          goal f'vc :
+            forall x:int. x = 6 -> (let result = x * 7 in result = 42)
 end
 
 Task 3: theory Task
@@ -659,7 +660,7 @@ Task 3: theory Task
           
           (* use ref.Ref1 *)
           
-          goal f'vc : 42 >= 0
+          goal f'vc : let x = Ref'mk 42 in let result = 42 in result >= 0
 end
 
 Task 4: theory Task
@@ -921,12 +922,14 @@ Task 4: theory Task
             forall a:array int.
              length a >= 1 ->
              (0 <= 0 /\ 0 < length a) /\
-             (forall a1:array int.
-               length a1 = length a ->
-               elts a1 = set (elts a) 0 42 /\ a1 = a[0 <- 42]' -> a1[0]' = 42)
+             (let a1 = a in
+              forall a2:array int.
+               length a2 = length a ->
+               elts a2 = set (elts a1) 0 42 /\ a2 = a1[0 <- 42]' ->
+               a2[0]' = 42)
 end
 
-On task 1, alt-ergo answers valid (0.0xs, 0 steps).
-On task 2, alt-ergo answers valid (0.0xs, 2 steps).
-On task 3, alt-ergo answers valid (0.0xs, 0 steps).
-On task 4, alt-ergo answers valid (0.0xs, 8 steps).
+On task 1, alt-ergo answers Prover result is: valid (0.0xs, 0 steps).
+On task 2, alt-ergo answers Prover result is: valid (0.0xs, 2 steps).
+On task 3, alt-ergo answers Prover result is: valid (0.0xs, 0 steps).
+On task 4, alt-ergo answers Prover result is: valid (0.0xs, 8 steps).

@@ -35,8 +35,11 @@ let debug_rac_check_sat =
   Debug.register_info_flag "rac-check-term-sat"
     ~desc:"satisfiability of terms in rac"
 (* print debug information when checking the satisfiability of terms
-   during run time assertion checking *)
+   during rac *)
 
+let debug_rac_check_term_result =
+  Debug.register_info_flag "rac-check-term-result"
+    ~desc:"print the result when terms are checked for validity"
 
 (*********************)
 (* WORK IN PROGRESS  *)
@@ -1492,13 +1495,13 @@ let check_term ?vsenv ctx t =
     else res in
   match res with
   | Some true ->
-      Debug.dprintf debug_rac_check_sat "%a@." report_cntr_head (ctx, "is ok", t)
+      Debug.dprintf debug_rac_check_term_result "%a@." report_cntr_head (ctx, "is ok", t)
   | Some false ->
-      Debug.dprintf debug_rac_check_sat "%a@." report_cntr_head (ctx, "has failed", t);
+      Debug.dprintf debug_rac_check_term_result "%a@." report_cntr_head (ctx, "has failed", t);
       raise (Contr (ctx, t))
   | None ->
       let msg = "cannot be evaluated" in
-      Debug.dprintf debug_rac_check_sat "%a: %a@." report_cntr_title (ctx, msg) print_term t;
+      Debug.dprintf debug_rac_check_term_result "%a: %a@." report_cntr_title (ctx, msg) print_term t;
       if not (Model_parser.is_model_empty ctx.c_env.rac.ce_model) then
         cannot_compute "%a" report_cntr_title (ctx, msg)
 

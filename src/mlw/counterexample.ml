@@ -119,8 +119,7 @@ let check_model reduce env pm model =
               Pretty.print_loc' loc in
           Cannot_check_model {reason}
 
-(** See output of [ce_summary_title] for details *)
-
+(** See output of [print_ce_summary_title] for details *)
 type ce_summary = NCCE of exec_log | SWCE of exec_log
                   | NCCE_SWCE of exec_log | BAD_CE | UNKNOWN of string
 
