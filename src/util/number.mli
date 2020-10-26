@@ -50,7 +50,7 @@ val abs_int : int_constant -> int_constant
 val neg_real : real_constant -> real_constant
 val abs_real : real_constant -> real_constant
 
-val compare_real : real_value -> real_value -> int
+val compare_real : ?structural:bool -> real_value -> real_value -> int
 (** structural comparison; two ordered values might compare differently *)
 
 val int_literal : int_literal_kind -> neg:bool -> string -> int_constant
