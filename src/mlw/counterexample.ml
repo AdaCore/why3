@@ -191,7 +191,7 @@ let model_of_exec_log ~original_model ?(valid_loc=(fun loc -> not (Loc.equal loc
       | Some me -> me.me_name.men_kind
       | None -> Other in
     let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
-    let me_value = Integer v in (* TODO Type me_value correctly when the exec log is typed *)
+    let me_value = assert false (* Integer v *) in (* TODO Type me_value correctly when the exec log is typed *)
     {me_name; me_value; me_location= Some loc; me_term= None} in
   let aux e = match e.log_loc with
     | Some loc when valid_loc loc -> (

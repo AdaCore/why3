@@ -12,6 +12,25 @@
 open Term
 open Ident
 
+(** {1 Values and results} *)
+
+type value
+
+val v_ty : value -> Ty.ty
+val print_value : Format.formatter -> value -> unit
+
+(** {1 Interpreter types} *)
+
+type env
+(** Context for the interpreter *)
+
+type result =
+  | Normal of value
+  | Excep of Ity.xsymbol * value
+  | Irred of Expr.expr
+  | Fun of Expr.rsymbol * Ity.pvsymbol list * int
+(** Result of the interpreter **)
+
 (** {1 Interpretation log} *)
 
 type verdict = Good_model | Bad_model | Dont_know
@@ -19,20 +38,20 @@ type verdict = Good_model | Bad_model | Dont_know
 type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
-  | Val_from_model of (ident * string)
+  | Val_from_model of (ident * value)
   (** values taken from model during interpretation *)
-  | Exec_call of (Expr.rsymbol option * string Mvs.t  * exec_kind)
+  | Exec_call of (Expr.rsymbol option * value Mvs.t  * exec_kind)
   (** executed function call or lambda if no rsymbol,
       arguments, execution type*)
   | Exec_pure of (lsymbol * exec_kind)
   (** executed pure function call *)
-  | Exec_any of string
+  | Exec_any of value
   (** execute any function call *)
   | Exec_loop of exec_kind
   (** execute loop *)
-  | Exec_stucked of (string * string Mid.t)
+  | Exec_stucked of (string * value Mid.t)
   (** stucked execution information *)
-  | Exec_failed of (string * string Mid.t)
+  | Exec_failed of (string * value Mid.t)
   (** failed execution information *)
   | Exec_ended
   (** execution terminated normally *)
@@ -64,25 +83,6 @@ type check_model_result =
   | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
 
 val print_check_model_result : check_model_result Pp.pp
-
-(** {1 Values and results} *)
-
-type value
-
-val v_ty : value -> Ty.ty
-val print_value : Format.formatter -> value -> unit
-
-(** {1 Interpreter types} *)
-
-type env
-(** Context for the interpreter *)
-
-type result =
-  | Normal of value
-  | Excep of Ity.xsymbol * value
-  | Irred of Expr.expr
-  | Fun of Expr.rsymbol * Ity.pvsymbol list * int
-(** Result of the interpreter **)
 
 (** {1 Contradiction context} *)
 

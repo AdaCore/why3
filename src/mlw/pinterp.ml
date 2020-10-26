@@ -403,13 +403,13 @@ type verdict = Good_model | Bad_model | Dont_know
 type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
-  | Val_from_model of (ident * string)
-  | Exec_call of (Expr.rsymbol option * string Mvs.t  * exec_kind)
+  | Val_from_model of (ident * value)
+  | Exec_call of (Expr.rsymbol option * value Mvs.t  * exec_kind)
   | Exec_pure of (Term.lsymbol * exec_kind)
-  | Exec_any of string
+  | Exec_any of value
   | Exec_loop of exec_kind
-  | Exec_stucked of (string * string Mid.t)
-  | Exec_failed of (string * string Mid.t)
+  | Exec_stucked of (string * value Mid.t)
+  | Exec_failed of (string * value Mid.t)
   | Exec_ended
 
 type log_entry = {
@@ -478,16 +478,20 @@ let rec consecutives key ?(sofar=[]) ?current xs =
 
 let print_log_entry_desc fmt e =
   let print_vs_v fmt (vs,v) =
-    fprintf fmt "@[%a = %s@]" Ident.print_decoded vs.vs_name.id_string v in
+    fprintf fmt "@[%a = %a@]" Ident.print_decoded
+      vs.vs_name.id_string print_value v in
   let print_mvs fmt mvs =
-    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_vs_v) (Mvs.bindings mvs) in
+    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_vs_v)
+      (Mvs.bindings mvs) in
   let print_id_v fmt (id,v) =
-    fprintf fmt "@[%a = %s@]" Ident.print_decoded id.id_string v in
+    fprintf fmt "@[%a = %a@]" Ident.print_decoded id.id_string
+      print_value v in
   let print_mid fmt mid =
-    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_id_v) (Mid.bindings mid) in
+    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_id_v)
+      (Mid.bindings mid) in
   match e.log_desc with
   | Val_from_model (id, v) ->
-      fprintf fmt "@[<h>%a = %s@]" Ident.print_decoded id.id_string v;
+      fprintf fmt "@[<h>%a = %a@]" Ident.print_decoded id.id_string print_value v;
   | Exec_call (None, mvs, k) ->
       fprintf fmt "@[<h>%s execution of anonymous function with args:%a@]"
         (exec_kind_to_string k)
@@ -501,7 +505,7 @@ let print_log_entry_desc fmt e =
       fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
         Ident.print_decoded ls.ls_name.id_string
   | Exec_any v ->
-     fprintf fmt "@[<h>execution of any, result: %s@]" v
+     fprintf fmt "@[<h>execution of any, result: %a@]" print_value v
   | Exec_loop k ->
       fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
   | Exec_failed (msg,mid) ->
@@ -521,18 +525,18 @@ let print_log ~json fmt entry_log =
     let print_vs_value fmt (vs,v) =
       fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
         (print_json_field "name" print_json) (String vs.vs_name.id_string)
-        (print_json_field "value" print_json) (String v) in
+        (print_json_field "value" print_value) v in
     let print_id_value fmt (id,v) =
       fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
         (print_json_field "name" print_json) (String id.id_string)
-        (print_json_field "value" print_json) (String v) in
+        (print_json_field "value" print_value) v in
     let print_log_entry fmt = function
-      | Val_from_model (id, s) ->
+      | Val_from_model (id, v) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "VAL_FROM_MODEL")
             (print_json_field "vs" print_json)
             (string "%a" Ident.print_decoded id.id_string)
-            (print_json_field "value" print_json) (String s)
+            (print_json_field "value" print_value) v
       | Exec_call (ors, mvs, kind) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "EXEC_CALL")
@@ -546,10 +550,10 @@ let print_log ~json fmt entry_log =
             (print_json_field "kind" print_json) (string "EXEC_PURE")
             (print_json_field "ls" print_json) (string "%a" Pretty.print_ls ls)
             (print_json_field "exec" print_json_kind) kind
-      | Exec_any s ->
+      | Exec_any v ->
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "EXEC_ANY")
-            (print_json_field "value" print_json) (String s)
+            (print_json_field "value" print_value) v
       | Exec_loop kind ->
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
         (print_json_field "kind" print_json) (string "EXEC_LOOP")
@@ -663,7 +667,7 @@ let default_env env rac mod_known th_known =
   { mod_known; th_known; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty }
 
 let register_used_value env loc id value =
-  log_val env.rac.log_uc id (asprintf "%a" print_value value) loc
+  log_val env.rac.log_uc id (snapshot value) loc
 
 let register_call env loc rs mvs kind =
   log_call env.rac.log_uc rs mvs kind loc
@@ -672,8 +676,7 @@ let register_pure_call env loc ls kind =
   log_pure_call env.rac.log_uc ls kind loc
 
 let register_any_call env loc value =
-    let v = (asprintf "%a" print_value value) in
-    log_any_call env.rac.log_uc v loc
+    log_any_call env.rac.log_uc (snapshot value) loc
 
 let register_failure env loc reason mvs =
   log_failed env.rac.log_uc reason mvs loc
@@ -1545,15 +1548,19 @@ exception RACStuck of env * Loc.position option
    with RACStuck. *)
 
 let value_of_free_vars env t =
-  let get_value get env x =
-    asprintf "%a" (Pp.print_option_or_default "(??)" print_value)
-      (get x env) in
+  let get_value get_value get_ty env x =
+    let def = {v_desc= Vundefined; v_ty= get_ty x} in
+    snapshot (Opt.get_def def (get_value x env))  in
   let mid = t_v_fold (fun mvs vs ->
-    Mid.add vs.vs_name (get_value Mvs.find_opt env.vsenv vs) mvs) Mid.empty t in
+    let get_ty vs = vs.vs_ty in
+    let value = get_value Mvs.find_opt get_ty env.vsenv vs in
+    Mid.add vs.vs_name value mvs) Mid.empty t in
   t_app_fold (fun mrs ls tyl ty ->
+      let get_ty rs = ty_of_ity rs.rs_cty.cty_result in
       if tyl = [] && ty <> None then
         try let rs = restore_rs ls in
-            Mid.add rs.rs_name (get_value Mrs.find_opt env.rsenv rs) mrs
+            let value = get_value Mrs.find_opt get_ty env.rsenv rs in
+            Mid.add rs.rs_name value mrs
         with Not_found -> mrs
       else mrs
     ) mid t
@@ -1778,7 +1785,7 @@ and eval_expr' env e =
         Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
         let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
         let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
-        let mvs = Mvs.map (asprintf "%a" print_value) cl in
+        let mvs = Mvs.map snapshot cl in
         ( match ce.c_cty.cty_args with
           | [] ->
              if env.rac.rac_abstract then begin
@@ -1991,19 +1998,19 @@ and eval_expr' env e =
     let i_val = get_and_register_value ~def ~ity:i.pv_ity env i.pv_vs
                   (Opt.get i.pv_vs.vs_name.id_loc) in
     let env = bind_vs i.pv_vs i_val env in
-    let i_val = big_int_of_value i_val in
-    if not (le a i_val && le i_val (suc b)) then begin
+    let i_bi = big_int_of_value i_val in
+    if not (le a i_bi && le i_bi (suc b)) then begin
         let msg = asprintf "Iterating variable not in bounds" in
-        let mid = Mid.singleton i.pv_vs.vs_name (BigInt.to_string i_val) in
+        let mid = Mid.singleton i.pv_vs.vs_name i_val in
         register_stucked env e.e_loc msg mid;
         raise (RACStuck (env,e.e_loc)) end;
-    if le a i_val && le i_val b then begin
+    if le a i_bi && le i_bi b then begin
       (* assert2 *)
       let ctx = cntr_ctx "Assume loop invariant" env in
       check_assume_terms ctx inv;
       match eval_expr env e1 with
       | Normal _ ->
-         let env = bind_vs i.pv_vs (value ty_int (Vnum (suc i_val))) env in
+         let env = bind_vs i.pv_vs (value ty_int (Vnum (suc i_bi))) env in
          (* assert3 *)
          if env.rac.do_rac then
            check_terms (cntr_ctx "Loop invariant preservation" env) inv;
@@ -2128,7 +2135,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
       | LocalFunction _ -> true | _ -> false in
   let mvs = Mvs.of_list (List.combine
      (List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args)
-     (List.map (asprintf "%a" print_value) arg_vs)) in
+     (List.map snapshot arg_vs)) in
   if env.rac.rac_abstract && can_interpret_abstractly &&
        not main_function then begin
       register_call env loc (Some rs) mvs ExecAbstract;
