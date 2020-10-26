@@ -165,39 +165,20 @@ let print_ce_summary_values ~json ~print_attrs model fmt s =
   let print_model_field =
     print_json_field "model" (Model_parser.print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
   let print_log_field =
-    print_json_field "log" (print_exec_log ~json:true) in
+    print_json_field "log" (print_log ~json:true) in
   match s with
   | NCCE log | SWCE log | NCCE_SWCE log ->
       if json then
         fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
           print_model_field model print_log_field log
       else
-        fprintf fmt "@[%a@]" (print_exec_log ~json:false) log
+        fprintf fmt "@[%a@]" (print_log ~json:false) log
   | UNKNOWN _ ->
       if json then
         fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
       else
         fprintf fmt "@[%a@]" (Model_parser.print_model_human ?me_name_trans:None ~print_attrs) model
   | BAD_CE -> ()
-
-let sort_exec_log log =
-  let open Wstdlib in
-  let insert f l e sofar =
-    let insert_line opt_l =
-      let l = Opt.get_def [] opt_l in
-      Some (e :: l) in
-    let insert_file opt_mf =
-      let mf = Opt.get_def Mint.empty opt_mf in
-      let res = Mint.change insert_line l mf in
-      Some res in
-    Mstr.change insert_file f sofar in
-  let aux entry sofar = match entry.log_loc with
-    | Some loc when not (Loc.equal loc Loc.dummy_position) ->
-        let f, l, _, _ = Loc.get loc in
-        insert f l entry sofar
-    | _ -> sofar in
-  Mstr.map (Mint.map List.rev)
-    (List.fold_right aux log Mstr.empty)
 
 let model_of_exec_log ~original_model ?(valid_loc=(fun loc -> not (Loc.equal loc Loc.dummy_position))) log =
   let open Model_parser in
@@ -225,12 +206,12 @@ let model_of_exec_log ~original_model ?(valid_loc=(fun loc -> not (Loc.equal loc
   let aux_mint mint =
     let res = Mint.map_filter aux_l mint in
     if Mint.is_empty res then None else Some res in
-  let model_files = (Mstr.map_filter aux_mint (sort_exec_log log)) in
+  let model_files = (Mstr.map_filter aux_mint (sort_log_by_loc log)) in
   set_model_files original_model model_files
 
 let model_of_ce_summary ~original_model ?valid_loc = function
   | NCCE log | SWCE log | NCCE_SWCE log ->
-      model_of_exec_log ~original_model ?valid_loc (log_to_list log)
+      model_of_exec_log ~original_model ?valid_loc log
   | UNKNOWN _ | BAD_CE -> original_model
 
 let ce_summary v_concrete v_abstract =

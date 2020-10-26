@@ -9,15 +9,10 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*********************)
-(* WORK IN PROGRESS  *)
-(* FROM Model_parser *)
-(*********************)
-
-(** Result when checking a CE model *)
-
 open Term
 open Ident
+
+(** {1 Interpretation log} *)
 
 type verdict = Good_model | Bad_model | Dont_know
 
@@ -49,23 +44,9 @@ type log_entry = {
 
 type exec_log
 
-val empty_log : exec_log
-val add_log_entry : log_entry_desc -> Loc.position option -> exec_log -> exec_log
-val add_val_to_log :
-  Ident.ident -> string -> Loc.position option -> exec_log -> exec_log
-val add_call_to_log :
-  Expr.rsymbol option -> string Mvs.t -> exec_kind -> Loc.position option -> exec_log -> exec_log
-val add_pure_call_to_log :
-  lsymbol -> exec_kind -> Loc.position option -> exec_log -> exec_log
-val add_any_call_to_log : string -> Loc.position option -> exec_log -> exec_log
-val add_failed_to_log :
-  string -> string Mid.t -> Loc.position option -> exec_log -> exec_log
-val add_stucked_to_log :
-  string -> string Mid.t -> Loc.position option -> exec_log -> exec_log
-val add_exec_ended_to_log : Loc.position option -> exec_log -> exec_log
-val add_exec_loop_to_log : exec_kind -> Loc.position option -> exec_log -> exec_log
-val log_to_list : exec_log -> log_entry list
-val print_exec_log : json:bool -> exec_log Pp.pp
+val print_log : json:bool -> exec_log Pp.pp
+
+val sort_log_by_loc : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
 
 type full_verdict = {
     verdict  : verdict;
@@ -83,10 +64,6 @@ type check_model_result =
   | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
 
 val print_check_model_result : check_model_result Pp.pp
-
-(*********************)
-(* end Model_parser  *)
-(*********************)
 
 (** {1 Values and results} *)
 
