@@ -1,5 +1,21 @@
 :x: marks a potential source of incompatibility
 
+Tools
+  * command-line options now follow the getopt standard;
+    in particular, long options start with `--`
+  * binaries `why3config`, `why3prove`, etc, no longer exist;
+    they are now plugins that can be loaded only using the main `why3` binary,
+    e.g., `why3 config`
+
+IDE
+  * use native modifiers on macOS
+
+TryWhy3
+  * `?lang=foo` can now be used to select an input format other than WhyML;
+    the input format can also be changed dynamically using a combobox
+  * examples are no longer embedded; only files mentioned
+    in `examples/index.txt` are considered
+
 Provers
   * support for PVS 7.1 (released Apr 30, 2020)
 
