@@ -15,10 +15,8 @@ open Expr
 open Format
 open Pinterp
 
-(*********************)
-(* WORK IN PROGRESS  *)
-(* FROM Pinterp      *)
-(*********************)
+let debug_check_ce = Debug.register_info_flag "check-ce"
+    ~desc:"Debug@ info@ for@ --check-ce"
 
 (** Identifies the rsymbol of the definition that contains the given position. **)
 let find_rs pm loc =
@@ -120,11 +118,6 @@ let check_model reduce env pm model =
             Format.asprintf "no corresponding routine symbol found for %a"
               Pretty.print_loc' loc in
           Cannot_check_model {reason}
-
-(*********************)
-(* WORK IN PROGRESS  *)
-(* FROM Call_provers *)
-(*********************)
 
 (** See output of [ce_summary_title] for details *)
 

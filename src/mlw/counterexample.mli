@@ -12,6 +12,8 @@
 open Format
 open Pinterp
 
+val debug_check_ce : Debug.flag
+
 val check_model : rac_reduce_config -> Env.env -> Pmodule.pmodule -> Model_parser.model -> check_model_result
 (** [check_model env pm m] checks if model [m] is valid, i.e. the abstract
     execution using the model values triggers a RAC contradiction in the

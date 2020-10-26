@@ -20,11 +20,28 @@ open Expr
 open Big_real
 open Mlmpfr_wrapper
 
+let debug_trace_exec =
+  Debug.register_info_flag "trace_exec"
+    ~desc:"trace execution of code given by --exec or --eval"
+(* print debug information during the interpretation of an expression *)
+
+let debug_rac =
+  Debug.register_info_flag "rac"
+    ~desc:"trace evaluation for RAC"
+(* print debug information about the environment used in the
+   interpretation *)
+
+let debug_rac_check_sat =
+  Debug.register_info_flag "rac-check-term-sat"
+    ~desc:"satisfiability of terms in rac"
+(* print debug information when checking the satisfiability of terms
+   during run time assertion checking *)
+
+
 (*********************)
 (* WORK IN PROGRESS  *)
 (* FROM Model_parser *)
 (*********************)
-
 
 type verdict = Good_model | Bad_model | Dont_know
 
@@ -241,17 +258,6 @@ let print_check_model_result fmt = function
 (*********************)
 (* end Model_parser  *)
 (*********************)
-
-let debug =
-  Debug.register_info_flag "trace_exec"
-    ~desc:"trace execution of code given by --exec or --eval"
-
-(* TODO move to counterexample *)
-let debug_check_ce = Debug.register_info_flag "check-ce"
-    ~desc:"Debug@ info@ for@ --check-ce"
-
-let debug_rac = Debug.register_info_flag "rac" ~desc:"trace evaluation for RAC"
-let debug_rac_check = Debug.register_info_flag "rac-check" ~desc:"trace checking assertions in RAC"
 
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
@@ -1165,11 +1171,11 @@ let rec find_constr_or_proj dl rs =
   | [] -> raise Not_found
   | d :: rem ->
       if List.mem rs d.Pdecl.itd_constructors then (
-        Debug.dprintf debug "@[<hov 2>[interp] found constructor:@ %s@]@."
+        Debug.dprintf debug_trace_exec "@[<hov 2>[interp] found constructor:@ %s@]@."
           rs.rs_name.id_string ;
         Constructor d )
       else if List.mem rs d.Pdecl.itd_fields then (
-        Debug.dprintf debug "@[<hov 2>[interp] found projection:@ %s@]@."
+        Debug.dprintf debug_trace_exec "@[<hov 2>[interp] found projection:@ %s@]@."
           rs.rs_name.id_string ;
         Projection d )
       else
@@ -1451,11 +1457,11 @@ let check_term_compute env trans task =
   match trans_and_bind_quants env trans task with
   | [] -> Some true
   | tasks ->
-      Debug.dprintf debug_rac_check "Transformation produced %d tasks@." (List.length tasks);
+      Debug.dprintf debug_rac_check_sat "Transformation produced %d tasks@." (List.length tasks);
       if List.exists is_false tasks then
         Some false
       else (
-        List.iter (Debug.dprintf debug_rac_check "- %a@." print_tdecl)
+        List.iter (Debug.dprintf debug_rac_check_sat "- %a@." print_tdecl)
           (Lists.map_filter (Opt.map (fun t -> t.Task.task_decl)) tasks);
         None )
 
@@ -1464,7 +1470,7 @@ let check_term_dispatch (Rac_prover {command; driver; limit}) task =
   let open Call_provers in
   let call = Driver.prove_task ~command ~limit driver task in
   let res = wait_on_call call in
-  Debug.dprintf debug_rac_check "Check term dispatch answer: %a@."
+  Debug.dprintf debug_rac_check_sat "Check term dispatch answer: %a@."
     print_prover_answer res.pr_answer;
   match res.pr_answer with
   | Valid -> Some true
@@ -1472,15 +1478,15 @@ let check_term_dispatch (Rac_prover {command; driver; limit}) task =
   | _ -> None
 
 let check_term ?vsenv ctx t =
-  Debug.dprintf debug_rac_check "@[<hv2>Check term: %a@]@." print_term t;
+  Debug.dprintf debug_rac_check_sat "@[<hv2>Check term: %a@]@." print_term t;
   let task, _ = task_of_term ?vsenv ctx.c_env t in
   let res = (* Try checking the term using computation first ... *)
-    Opt.map (fun b -> Debug.dprintf debug_rac_check "Computed %b.@." b; b)
+    Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Computed %b.@." b; b)
       (Opt.bind ctx.c_env.rac.rac_reduce.rac_trans
          (fun trans -> check_term_compute ctx.c_env trans task)) in
   let res =
     if res = None then (* ... then try solving using a prover *)
-      Opt.map (fun b -> Debug.dprintf debug_rac_check "Dispatched: %b.@." b; b)
+      Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Dispatched: %b.@." b; b)
         (Opt.bind ctx.c_env.rac.rac_reduce.rac_prover
            (fun rp -> check_term_dispatch rp task))
     else res in
@@ -1662,7 +1668,7 @@ let get_and_register_value env ?def ?ity vs loc =
   let value = match Model_parser.get_model_element env.rac.ce_model name loc with
     | Some me ->
        let v = import_model_value env.env env.mod_known ity me.Model_parser.me_value in
-       Debug.dprintf debug_check_ce "@[<h>VALUE from ce-model for %a at %a: %a@]@."
+       Debug.dprintf debug_rac "@[<h>VALUE from ce-model for %a at %a: %a@]@."
          Ident.print_decoded name
          Pretty.print_loc' loc
          print_value v;
@@ -1672,7 +1678,7 @@ let get_and_register_value env ?def ?ity vs loc =
          | None ->
             default_value_of_type env.env env.mod_known ity
          | Some v -> v in
-       Debug.dprintf debug_check_ce "@[<h>VALUE for %s %a not in ce-model, taking \
+       Debug.dprintf debug_rac "@[<h>VALUE for %s %a not in ce-model, taking \
                 default %a@]@." name print_loc' loc print_value v;
        v
   in
@@ -1698,7 +1704,7 @@ let set_constr v1 v2 =
 let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
   let pv = restore_pv vs in
   if pv_affected wrt pv then (
-    Debug.dprintf debug "@[<h>%tVAR %a is written in loop %a@]@."
+    Debug.dprintf debug_trace_exec "@[<h>%tVAR %a is written in loop %a@]@."
       pp_indent print_pv pv
       (Pp.print_option print_loc') pv.pv_vs.vs_name.id_loc;
     let pv = Mpv.find_def pv pv vars_map in
@@ -1706,11 +1712,11 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
     set_constr (get_vs env vs) value )
 
 let rec eval_expr env e =
-  Debug.dprintf debug "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
+  Debug.dprintf debug_trace_exec "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
     (if env.rac.rac_abstract then "Abs. " else "")
     (pp_limited print_expr) e;
   let res = eval_expr' env e in
-  Debug.dprintf debug "@[<h>%t -> %a@]@." pp_indent (print_result) res;
+  Debug.dprintf debug_trace_exec "@[<h>%t -> %a@]@." pp_indent (print_result) res;
   res
 
 (* abs = abstractly - do not execute loops and function calls - use
@@ -1720,7 +1726,7 @@ and eval_expr' env e =
   match e.e_node with
   | Evar pvs ->
       let v = get_pvs env pvs in
-      Debug.dprintf debug "[interp] reading var %s from env -> %a@\n"
+      Debug.dprintf debug_trace_exec "[interp] reading var %s from env -> %a@\n"
         pvs.pv_vs.vs_name.id_string print_value v ;
       Normal v
   | Econst (Constant.ConstInt c) ->
@@ -1743,11 +1749,11 @@ and eval_expr' env e =
       (* check_terms (cntr_ctx "Exec precondition" env) cty.cty_pre; *)
       match ce.c_node with
       | Cpur (ls, pvs) ->
-          Debug.dprintf debug "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent print_ls ls
+          Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent print_ls ls
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
           exec_pure ~loc:e.e_loc env ls pvs
       | Cfun e' ->
-        Debug.dprintf debug "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
+        Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
         let add_free pv = Mvs.add pv.pv_vs (Mvs.find pv.pv_vs env.vsenv) in
         let cl = Spv.fold add_free ce.c_cty.cty_effect.eff_reads Mvs.empty in
         let mvs = Mvs.map (asprintf "%a" print_value) cl in
@@ -1779,7 +1785,7 @@ and eval_expr' env e =
               let pp_loc fmt = function
                 | Some loc -> fprintf fmt " at %a" Pretty.print_loc' loc
                 | None -> () in
-              Debug.dprintf debug "Take default value %a for any expression%a"
+              Debug.dprintf debug_trace_exec "Take default value %a for any expression%a"
                 print_value v pp_loc e.e_loc;
               v in
           register_any_call env e.e_loc v;
@@ -2005,7 +2011,7 @@ and eval_expr' env e =
         | To -> BigInt.le, BigInt.succ
         | DownTo -> BigInt.ge, BigInt.pred in
       let rec iter i =
-        Debug.dprintf debug "[interp] for loop with index = %s@."
+        Debug.dprintf debug_trace_exec "[interp] for loop with index = %s@."
           (BigInt.to_string i) ;
         if le i b then
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum i)) env in
@@ -2054,11 +2060,11 @@ and eval_expr' env e =
         end;
       Normal (value ty_unit Vvoid)
   | Eghost e1 ->
-      Debug.dprintf debug "@[<h>%tEVAL EXPR: GHOST %a@]@." pp_indent print_expr e1;
+      Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: GHOST %a@]@." pp_indent print_expr e1;
       (* TODO: do not eval ghost if no assertion check *)
       eval_expr env e1
   | Epure t ->
-      Debug.dprintf debug "@[<h>%tEVAL EXPR: PURE %a@]@." pp_indent print_term t;
+      Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: PURE %a@]@." pp_indent print_term t;
       let t = compute_term env t in
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
@@ -2081,7 +2087,7 @@ and exec_match env t ebl =
 
 and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
   let arg_vs = List.map (get_pvs env) arg_pvs in
-  Debug.dprintf debug "@[<h>%tExec call %a %a@]@."
+  Debug.dprintf debug_trace_exec "@[<h>%tExec call %a %a@]@."
     pp_indent print_rs rs Pp.(print_list space print_value) arg_vs;
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let oldies =
@@ -2128,32 +2134,32 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                let env = add_local_funs locals env in
                match ce.c_node with
                | Capp (rs', pvl) ->
-                  Debug.dprintf debug "@[<h>%tEXEC CALL %a: Capp %a]@."
+                  Debug.dprintf debug_trace_exec "@[<h>%tEXEC CALL %a: Capp %a]@."
                     pp_indent print_rs rs print_rs rs';
                   exec_call ?loc env rs' (pvl @ arg_pvs) ity_result
                | Cfun body ->
-                  Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: FUN/%d %a@]@."
+                  Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: FUN/%d %a@]@."
                     pp_indent print_rs rs (List.length ce.c_cty.cty_args) (pp_limited print_expr) body;
                   let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
                   eval_expr env' body
                | Cany ->
-                  Debug.dprintf debug  "@[<hv2>%tEXEC CALL %a: ANY@]@."
+                  Debug.dprintf debug_trace_exec  "@[<hv2>%tEXEC CALL %a: ANY@]@."
                     pp_indent print_rs rs;
                   cannot_compute "Cannot compute application of local any-function %a"
                     print_rs rs
                | Cpur _ -> assert false (* TODO ? *) )
           | Builtin f ->
-             Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
+             Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
              Normal (f rs arg_vs)
           | Constructor _ ->
-             Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
+             Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
              let mt = List.fold_left2 ty_match Mtv.empty
                         (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
              let ty = ty_inst mt (ty_of_ity ity_result) in
              let fs = List.map field arg_vs in
              Normal (value ty (Vconstr (rs, fs)))
           | Projection _d -> (
-            Debug.dprintf debug "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
+            Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
             match rs.rs_field, arg_vs with
             | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
                let rec search constr_args args =

@@ -88,9 +88,6 @@ val print_check_model_result : check_model_result Pp.pp
 (* end Model_parser  *)
 (*********************)
 
-(* TODO move to counterexample *)
-val debug_check_ce : Debug.flag
-
 (** {1 Values and results} *)
 
 type value
@@ -210,7 +207,3 @@ val report_eval_result :
   result * value Term.Mvs.t * value Expr.Mrs.t ->
   unit
 (** Report an evaluation result *)
-
-(**/**)
-
-val debug_rac : Debug.flag
