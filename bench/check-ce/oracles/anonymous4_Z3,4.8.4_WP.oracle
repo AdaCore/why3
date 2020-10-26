@@ -1,5 +1,17 @@
 <check-ce>Check model 0 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
-<check-ce>VALUE for result "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 not in ce-model, taking default UNDEFINED
+<rac>Validating model concretely:
+File anonymous4.mlw:
+  Line 6:
+    y = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File anonymous4.mlw:
+  Line 6:
+    y = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 not in ce-model, taking default UNDEFINED
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
               File anonymous4.mlw:
@@ -20,7 +32,21 @@
             - Abstract: don't know (RAC execution got stuck: Assume postcondition of f cannot be evaluated)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
-<check-ce>VALUE for result "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 not in ce-model, taking default UNDEFINED
+<rac>Validating model concretely:
+File anonymous4.mlw:
+  Line 6:
+    y = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "-175"}
+    y = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File anonymous4.mlw:
+  Line 6:
+    y = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "-175"}
+    y = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 not in ce-model, taking default UNDEFINED
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
               File anonymous4.mlw:
@@ -41,7 +67,21 @@
             - Abstract: don't know (RAC execution got stuck: Assume postcondition of f cannot be evaluated)
               
 <check-ce>Check model 2 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
-<check-ce>VALUE for result "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 not in ce-model, taking default UNDEFINED
+<rac>Validating model concretely:
+File anonymous4.mlw:
+  Line 6:
+    y = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "0"}
+    y = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File anonymous4.mlw:
+  Line 6:
+    y = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "0"}
+    y = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 not in ce-model, taking default UNDEFINED
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
               File anonymous4.mlw:
@@ -73,7 +113,7 @@
     (RAC execution got stuck: Assume postcondition of f cannot be evaluated)
 File "bench/check-ce/anonymous4.mlw", line 8, characters 13-23:
 Goal Postcondition from verification condition g'vc.
-Prover result is: timeout (1.00s, 2776800 steps).
+Prover result is: timeout (1.00s, 2576469 steps).
 The following counterexample model could not be verified
   (RAC execution got stuck: Assume postcondition of f cannot be evaluated):
 File anonymous4.mlw:

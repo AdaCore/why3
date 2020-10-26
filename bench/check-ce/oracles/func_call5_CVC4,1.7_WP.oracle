@@ -7,6 +7,54 @@ Goal Precondition from verification condition f1'vc.
 Prover result is: valid (0.02s, 1094 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
+<rac>Validating model concretely:
+File func_call5.mlw:
+  Line 8:
+    x = {"type": "Integer", "val": "-1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 11:
+    x = {"type": "Integer", "val": "-1"}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 14:
+    x = {"type": "Integer", "val": "0"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<rac>Validating model abstractly:
+File func_call5.mlw:
+  Line 8:
+    x = {"type": "Integer", "val": "-1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 11:
+    x = {"type": "Integer", "val": "-1"}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 14:
+    x = {"type": "Integer", "val": "0"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 12, characters 13-18)
               File func_call5.mlw:
@@ -23,7 +71,55 @@ Prover result is: valid (0.02s, 1094 steps).
                   Execution got stuck, Precondition of f1 with:
                     x = (-1)
 <check-ce>Check model 1 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
-<check-ce>VALUE for result "bench/check-ce/func_call5.mlw", line 13, characters 10-14 not in ce-model, taking default (ref'mk 0)
+<rac>Validating model concretely:
+File func_call5.mlw:
+  Line 8:
+    x = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 11:
+    x = {"type": "Integer", "val": "1"}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 14:
+    x = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Validating model abstractly:
+File func_call5.mlw:
+  Line 8:
+    x = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 11:
+    x = {"type": "Integer", "val": "1"}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 14:
+    x = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>VALUE for result "bench/check-ce/func_call5.mlw", line 13, characters 10-14 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call5.mlw:
@@ -56,7 +152,55 @@ Prover result is: valid (0.02s, 1094 steps).
                     y = 1
                     result = (ref'mk 0)
 <check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
-<check-ce>VALUE for result "bench/check-ce/func_call5.mlw", line 13, characters 10-14 not in ce-model, taking default (ref'mk 0)
+<rac>Validating model concretely:
+File func_call5.mlw:
+  Line 8:
+    x = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 11:
+    x = {"type": "Integer", "val": "1"}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 14:
+    x = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Validating model abstractly:
+File func_call5.mlw:
+  Line 8:
+    x = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 11:
+    x = {"type": "Integer", "val": "1"}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 14:
+    x = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>VALUE for result "bench/check-ce/func_call5.mlw", line 13, characters 10-14 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call5.mlw:
@@ -97,12 +241,24 @@ Prover result is: valid (0.02s, 1094 steps).
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
 Goal Assertion from verification condition f1'vc.
-Prover result is: unknown (unknown + incomplete) (0.06s, 6679 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6679 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 20, characters 11-17)
-<check-ce>VALUE for result "bench/check-ce/func_call5.mlw", line 19, characters 10-14 not in ce-model, taking default (ref'mk 0)
+<rac>Validating model concretely:
+File func_call5.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 20:
+    x = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File func_call5.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 20:
+    x = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/func_call5.mlw", line 19, characters 10-14 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call5.mlw:
@@ -140,7 +296,19 @@ Sorry, we don't have a good counterexample for you :(
                     y = 0
                     result = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/func_call5.mlw", line 20, characters 11-17)
-<check-ce>VALUE for result "bench/check-ce/func_call5.mlw", line 19, characters 10-14 not in ce-model, taking default (ref'mk 0)
+<rac>Validating model concretely:
+File func_call5.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 20:
+    x = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File func_call5.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 20:
+    x = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/func_call5.mlw", line 19, characters 10-14 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call5.mlw:
@@ -178,7 +346,19 @@ Sorry, we don't have a good counterexample for you :(
                     y = 0
                     result = (ref'mk 0)
 <check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 20, characters 11-17)
-<check-ce>VALUE for result "bench/check-ce/func_call5.mlw", line 19, characters 10-14 not in ce-model, taking default (ref'mk 0)
+<rac>Validating model concretely:
+File func_call5.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 20:
+    x = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File func_call5.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 20:
+    x = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/func_call5.mlw", line 19, characters 10-14 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call5.mlw:

@@ -1,10 +1,74 @@
 File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.03s, 1582 steps).
+Prover result is: valid (0.05s, 1582 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<check-ce>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
-<check-ce>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
+<rac>Validating model concretely:
+File func_call.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 11:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 12:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>Validating model abstractly:
+File func_call.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 11:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 12:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
+<rac>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -53,8 +117,72 @@ Prover result is: valid (0.03s, 1582 steps).
                     z = (ref'mk 0)
                     z = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<check-ce>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<check-ce>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
+<rac>Validating model concretely:
+File func_call.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 11:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 12:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>Validating model abstractly:
+File func_call.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 11:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 12:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -102,8 +230,72 @@ Prover result is: valid (0.03s, 1582 steps).
                   Property failure, Assertion with:
                     z = (ref'mk 2)
 <check-ce>Check model 2 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<check-ce>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<check-ce>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
+<rac>Validating model concretely:
+File func_call.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 11:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 12:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>Validating model abstractly:
+File func_call.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 11:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 12:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 13:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:

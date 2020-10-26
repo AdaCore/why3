@@ -1,5 +1,17 @@
 <check-ce>Check model 0 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
-<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
+<rac>Validating model concretely:
+File multifile2.mlw:
+  Line 7:
+    x = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File multifile2.mlw:
+  Line 7:
+    x = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File multifile2.mlw:
@@ -49,7 +61,21 @@
                     x = 0
                     result = 0
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
-<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
+<rac>Validating model concretely:
+File multifile2.mlw:
+  Line 7:
+    x = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "2"}
+    x = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File multifile2.mlw:
+  Line 7:
+    x = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "2"}
+    x = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File multifile2.mlw:
@@ -99,7 +125,21 @@
                     x = 0
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
-<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
+<rac>Validating model concretely:
+File multifile2.mlw:
+  Line 7:
+    x = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "2"}
+    x = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File multifile2.mlw:
+  Line 7:
+    x = {"type": "Integer", "val": "0"}
+  Line 8:
+    result = {"type": "Integer", "val": "2"}
+    x = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/multifile2.mlw", line 9, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File multifile2.mlw:
@@ -157,12 +197,32 @@
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
 Goal Postcondition from verification condition f'vc.
-Prover result is: unknown (sat) (0.03s, 866 steps).
+Prover result is: unknown (sat) (0.02s, 866 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 <check-ce>Check model 0 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
-<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
+<rac>Validating model concretely:
+File multifile1.mlw:
+  Line 10:
+    result = {"type": "Integer", "val": "0"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 12:
+    x = {"type": "Integer", "val": "0"}
+  Line 13:
+    result = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File multifile1.mlw:
+  Line 10:
+    result = {"type": "Integer", "val": "0"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 12:
+    x = {"type": "Integer", "val": "0"}
+  Line 13:
+    result = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File multifile2.mlw:
@@ -214,7 +274,29 @@ Sorry, we don't have a good counterexample for you :(
                     x = 0
                     result = 0
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
-<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
+<rac>Validating model concretely:
+File multifile1.mlw:
+  Line 10:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 12:
+    x = {"type": "Integer", "val": "0"}
+  Line 13:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File multifile1.mlw:
+  Line 10:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 12:
+    x = {"type": "Integer", "val": "0"}
+  Line 13:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File multifile2.mlw:
@@ -266,7 +348,29 @@ Sorry, we don't have a good counterexample for you :(
                     x = 0
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
-<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
+<rac>Validating model concretely:
+File multifile1.mlw:
+  Line 10:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 12:
+    x = {"type": "Integer", "val": "0"}
+  Line 13:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File multifile1.mlw:
+  Line 10:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 12:
+    x = {"type": "Integer", "val": "0"}
+  Line 13:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/multifile2.mlw", line 14, characters 2-8 not in ce-model, taking default 0
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File multifile2.mlw:
@@ -364,7 +468,27 @@ File multifile2.mlw:
       result = 1
 
 <check-ce>Check model 0 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
-<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
+<rac>Validating model concretely:
+File multifile1.mlw:
+  Line 14:
+    result = {"type": "Integer", "val": "0"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 19:
+    result = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File multifile1.mlw:
+  Line 14:
+    result = {"type": "Integer", "val": "0"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 19:
+    result = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
 <check-ce>Model 0:
             - Concrete: don't know (RAC execution got stuck: Cannot compute application of local any-function incr_val)
               
@@ -384,7 +508,29 @@ File multifile2.mlw:
                     x = 0
                     result = 0
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
-<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
+<rac>Validating model concretely:
+File multifile1.mlw:
+  Line 14:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 19:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File multifile1.mlw:
+  Line 14:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 19:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
 <check-ce>Model 1:
             - Concrete: don't know (RAC execution got stuck: Cannot compute application of local any-function incr_val)
               
@@ -404,7 +550,29 @@ File multifile2.mlw:
                     x = 0
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
-<check-ce>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
+<rac>Validating model concretely:
+File multifile1.mlw:
+  Line 14:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 19:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File multifile1.mlw:
+  Line 14:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+File multifile2.mlw:
+  Line 18:
+    x = {"type": "Integer", "val": "0"}
+  Line 19:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+<rac>VALUE for result "bench/check-ce/multifile2.mlw", line 20, characters 2-12 not in ce-model, taking default 0
 <check-ce>Model 2:
             - Concrete: don't know (RAC execution got stuck: Cannot compute application of local any-function incr_val)
               

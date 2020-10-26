@@ -1,4 +1,22 @@
 <check-ce>Check model 0 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<rac>Validating model concretely:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "-2"}
+    b = {"type": "Integer", "val": "-2"}
+  Line 15:
+    a = {"type": "Integer", "val": "0"}
+    b = {"type": "Integer", "val": "0"}
+    c = {"type": "Integer", "val": "0"}
+<rac>Validating model abstractly:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "-2"}
+    b = {"type": "Integer", "val": "-2"}
+  Line 15:
+    a = {"type": "Integer", "val": "0"}
+    b = {"type": "Integer", "val": "0"}
+    c = {"type": "Integer", "val": "0"}
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
               File falseCE.mlw:
@@ -19,6 +37,24 @@
                     a = (-2)
                     b = (-2)
 <check-ce>Check model 1 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<rac>Validating model concretely:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "2"}
+    b = {"type": "Integer", "val": "2"}
+  Line 15:
+    a = {"type": "Integer", "val": "2"}
+    b = {"type": "Integer", "val": "2"}
+    c = {"type": "Integer", "val": "12166397"}
+<rac>Validating model abstractly:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "2"}
+    b = {"type": "Integer", "val": "2"}
+  Line 15:
+    a = {"type": "Integer", "val": "2"}
+    b = {"type": "Integer", "val": "2"}
+    c = {"type": "Integer", "val": "12166397"}
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File falseCE.mlw:
@@ -39,6 +75,24 @@
                     b = 2
                   Execution of main function terminated normally
 <check-ce>Check model 2 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<rac>Validating model concretely:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "2"}
+    b = {"type": "Integer", "val": "2"}
+  Line 15:
+    a = {"type": "Integer", "val": "2"}
+    b = {"type": "Integer", "val": "2"}
+    c = {"type": "Integer", "val": "12166397"}
+<rac>Validating model abstractly:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "2"}
+    b = {"type": "Integer", "val": "2"}
+  Line 15:
+    a = {"type": "Integer", "val": "2"}
+    b = {"type": "Integer", "val": "2"}
+    c = {"type": "Integer", "val": "12166397"}
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File falseCE.mlw:
@@ -67,7 +121,7 @@
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
 Goal Assertion from verification condition rsa'vc.
-Prover result is: unknown (unknown + incomplete) (0.08s, 15078 steps).
+Prover result is: unknown (unknown + incomplete) (0.10s, 15078 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

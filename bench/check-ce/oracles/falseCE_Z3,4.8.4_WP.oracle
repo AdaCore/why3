@@ -1,5 +1,23 @@
 <check-ce>Model 1 is empty
 <check-ce>Check model 0 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<rac>Validating model concretely:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "0"}
+    b = {"type": "Integer", "val": "0"}
+  Line 14:
+    c = {"type": "Integer", "val": "0"}
+  Line 15:
+    the check fails with all inputs
+<rac>Validating model abstractly:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "0"}
+    b = {"type": "Integer", "val": "0"}
+  Line 14:
+    c = {"type": "Integer", "val": "0"}
+  Line 15:
+    the check fails with all inputs
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
               File falseCE.mlw:
@@ -20,6 +38,28 @@
                     a = 0
                     b = 0
 <check-ce>Check model 2 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<rac>Validating model concretely:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "514"}
+    b = {"type": "Integer", "val": "514"}
+  Line 14:
+    c = {"type": "Integer", "val": "12166397"}
+  Line 15:
+    a = {"type": "Integer", "val": "514"}
+    b = {"type": "Integer", "val": "514"}
+    c = {"type": "Integer", "val": "12166397"}
+<rac>Validating model abstractly:
+File falseCE.mlw:
+  Line 12:
+    a = {"type": "Integer", "val": "514"}
+    b = {"type": "Integer", "val": "514"}
+  Line 14:
+    c = {"type": "Integer", "val": "12166397"}
+  Line 15:
+    a = {"type": "Integer", "val": "514"}
+    b = {"type": "Integer", "val": "514"}
+    c = {"type": "Integer", "val": "12166397"}
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File falseCE.mlw:
@@ -46,7 +86,7 @@
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
 Goal Assertion from verification condition rsa'vc.
-Prover result is: timeout (1.00s, 6088022 steps).
+Prover result is: timeout (1.00s, 3168435 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

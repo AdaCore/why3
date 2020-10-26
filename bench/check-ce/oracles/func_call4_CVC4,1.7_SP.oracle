@@ -1,6 +1,56 @@
 <check-ce>Check model 0 ("bench/check-ce/func_call4.mlw", line 9, characters 34-39)
-<check-ce>VALUE from ce-model for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 0)
-<check-ce>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
+<rac>Validating model concretely:
+File func_call4.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>Validating model abstractly:
+File func_call4.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>VALUE from ce-model for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 0)
+<rac>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
 <check-ce>Model 0:
             - Concrete: don't know (RAC execution got stuck: Cannot compute application of local any-function g)
               
@@ -26,8 +76,58 @@
                     z = (ref'mk 0)
                     z = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/func_call4.mlw", line 9, characters 34-39)
-<check-ce>VALUE from ce-model for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
-<check-ce>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
+<rac>Validating model concretely:
+File func_call4.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>Validating model abstractly:
+File func_call4.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>VALUE from ce-model for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
+<rac>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
 <check-ce>Model 1:
             - Concrete: don't know (RAC execution got stuck: Cannot compute application of local any-function g)
               
@@ -51,8 +151,58 @@
                   Property failure, Assertion with:
                     z = (ref'mk 2)
 <check-ce>Check model 2 ("bench/check-ce/func_call4.mlw", line 9, characters 34-39)
-<check-ce>VALUE from ce-model for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
-<check-ce>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
+<rac>Validating model concretely:
+File func_call4.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>Validating model abstractly:
+File func_call4.mlw:
+  Line 7:
+    old z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>VALUE from ce-model for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
+<rac>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
 <check-ce>Model 2:
             - Concrete: don't know (RAC execution got stuck: Cannot compute application of local any-function g)
               

@@ -1,8 +1,60 @@
 File "bench/check-ce/func_call2.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.04s, 1608 steps).
+Prover result is: valid (0.05s, 1608 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call2.mlw", line 8, characters 12-26)
+<rac>Validating model concretely:
+File func_call2.mlw:
+  Line 3:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 5:
+    x = {"type": "Integer", "val": "0"}
+  Line 7:
+    result = {"type": "Integer", "val": "0"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 8:
+    result = {"type": "Integer", "val": "0"}
+    x = {"type": "Integer", "val": "0"}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<rac>Validating model abstractly:
+File func_call2.mlw:
+  Line 3:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 5:
+    x = {"type": "Integer", "val": "0"}
+  Line 7:
+    result = {"type": "Integer", "val": "0"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 8:
+    result = {"type": "Integer", "val": "0"}
+    x = {"type": "Integer", "val": "0"}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call2.mlw:
@@ -49,6 +101,58 @@ Prover result is: valid (0.04s, 1608 steps).
                     x = 0
                     result = 1
 <check-ce>Check model 1 ("bench/check-ce/func_call2.mlw", line 8, characters 12-26)
+<rac>Validating model concretely:
+File func_call2.mlw:
+  Line 3:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+  Line 5:
+    x = {"type": "Integer", "val": "0"}
+  Line 7:
+    result = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 8:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<rac>Validating model abstractly:
+File func_call2.mlw:
+  Line 3:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+  Line 5:
+    x = {"type": "Integer", "val": "0"}
+  Line 7:
+    result = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 8:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call2.mlw:
@@ -95,6 +199,58 @@ Prover result is: valid (0.04s, 1608 steps).
                     x = 0
                     result = 1
 <check-ce>Check model 2 ("bench/check-ce/func_call2.mlw", line 8, characters 12-26)
+<rac>Validating model concretely:
+File func_call2.mlw:
+  Line 3:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+  Line 5:
+    x = {"type": "Integer", "val": "0"}
+  Line 7:
+    result = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 8:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<rac>Validating model abstractly:
+File func_call2.mlw:
+  Line 3:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+  Line 5:
+    x = {"type": "Integer", "val": "0"}
+  Line 7:
+    result = {"type": "Integer", "val": "1"}
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 8:
+    result = {"type": "Integer", "val": "1"}
+    x = {"type": "Integer", "val": "0"}
+  Line 9:
+    z =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call2.mlw:
@@ -149,7 +305,7 @@ Prover result is: valid (0.04s, 1608 steps).
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call2.mlw", line 8, characters 12-26:
 Goal Postcondition from verification condition g'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6726 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 6726 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File func_call2.mlw:

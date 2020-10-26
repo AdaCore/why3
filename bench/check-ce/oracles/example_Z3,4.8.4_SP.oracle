@@ -1,0 +1,137 @@
+<check-ce>Check model 0 ("bench/check-ce/example.mlw", line 7, characters 15-22)
+<rac>Validating model concretely:
+File example.mlw:
+  Line 4:
+    a = {"type": "Integer", "val": "42"}
+  Line 7:
+    the check fails with all inputs
+<rac>Missing value for parameter _, continue with default value ()
+<rac>Validating model abstractly:
+File example.mlw:
+  Line 4:
+    a = {"type": "Integer", "val": "42"}
+  Line 7:
+    the check fails with all inputs
+<rac>Missing value for parameter _, continue with default value ()
+<check-ce>Model 0:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Concrete execution of def with args:
+                    _ = ()
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Concrete execution of def with args:
+                    _ = ()
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+<check-ce>Check model 1 ("bench/check-ce/example.mlw", line 7, characters 15-22)
+<rac>Validating model concretely:
+File example.mlw:
+  Line 4:
+    a = {"type": "Integer", "val": "42"}
+  Line 7:
+    a = {"type": "Integer", "val": "42"}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>Validating model abstractly:
+File example.mlw:
+  Line 4:
+    a = {"type": "Integer", "val": "42"}
+  Line 7:
+    a = {"type": "Integer", "val": "42"}
+<rac>Missing value for parameter _, continue with default value ()
+<check-ce>Model 1:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Concrete execution of def with args:
+                    _ = ()
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Concrete execution of def with args:
+                    _ = ()
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+<check-ce>Check model 2 ("bench/check-ce/example.mlw", line 7, characters 15-22)
+<rac>Validating model concretely:
+File example.mlw:
+  Line 4:
+    a = {"type": "Integer", "val": "42"}
+  Line 7:
+    a = {"type": "Integer", "val": "42"}
+<rac>Missing value for parameter _, continue with default value ()
+<rac>Validating model abstractly:
+File example.mlw:
+  Line 4:
+    a = {"type": "Integer", "val": "42"}
+  Line 7:
+    a = {"type": "Integer", "val": "42"}
+<rac>Missing value for parameter _, continue with default value ()
+<check-ce>Model 2:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Concrete execution of def with args:
+                    _ = ()
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File example.mlw:
+                Line 4:
+                  a = 42
+                Line 6:
+                  _ = ()
+                  Concrete execution of def with args:
+                    _ = ()
+                Line 7:
+                  Property failure, Assertion with:
+                    a = 42
+<check-ce>Models:
+- Selected model 0 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+- Checked model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+File "bench/check-ce/example.mlw", line 7, characters 15-22:
+Goal Assertion from verification condition def'vc.
+Prover result is: unknown (sat) (0.03s, 684 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File example.mlw:
+  Line 4:
+    a = 42
+  Line 6:
+    _ = ()
+    Concrete execution of def with args:
+      _ = ()
+  Line 7:
+    Property failure, Assertion with:
+      a = 42
+
