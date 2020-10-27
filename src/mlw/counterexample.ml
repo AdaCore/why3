@@ -94,6 +94,116 @@ let find_rs pm loc =
     | Udecl pd -> find_pdecl pd in
   find_in_list find_mod_unit pm.mod_units
 
+(* VALUE IMPORT *)
+
+(* TODO Remove argument [env] after replacing Varray by model substitution *)
+let rec import_model_value env known ity v =
+  let open Pinterp in
+  (* TODO If the type has a model projection `p` and the model value is a
+     projection `p _ = v`, we could add this equality as a rule to the
+     reduction engine. (Cf. bench/ce/oracles/double_projection.mlw) *)
+  (* TODO If the type is a non-free record, we could similarily axiomatize
+     the values of the fields by rules in the reduction engine. (Cf.
+     bench/ce/record_one_field.mlw)  *)
+  let def, subst =
+    match ity.ity_node with
+    | Ityapp (ts, l1, l2) | Ityreg {reg_its= ts; reg_args= l1; reg_regs= l2} ->
+        Pdecl.find_its_defn known ts,
+        its_match_regs ts l1 l2
+    | Ityvar _ -> assert false in
+  (* let is_ity_array env ity =
+   *   let pm = Pmodule.read_module env ["array"] "Array" in
+   *   let its_array = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
+   *   match ity.ity_node with
+   *   | Ityreg r -> its_equal r.reg_its its_array
+   *   | _ -> false in *)
+  (* if is_ity_array env ity then (\* TODO *\)
+   *   kasprintf failwith "ARRAY: %a@." print_model_value v
+   * else *)
+  let open Model_parser in
+  let open Wstdlib in
+  if Ty.is_range_type_def def.Pdecl.itd_its.its_def then
+    match v with
+    | Proj (_, Integer s)
+    | Integer s -> range_value ity s
+    | _ -> assert false
+  else
+    let check_construction def =
+      if def.Pdecl.itd_its.its_nonfree then
+        let msg = asprintf "value of non-free type %a" print_ity ity in
+        raise (CannotImportModelValue msg) in
+    match v with
+    | Integer s ->
+        assert (ity_equal ity ity_int);
+        int_value s
+    | String s ->
+        assert (ity_equal ity ity_str);
+        string_value s
+    | Boolean b ->
+        assert (ity_equal ity ity_bool);
+        bool_value b
+    | Record r ->
+        check_construction def;
+        let rs = match def.Pdecl.itd_constructors with [c] -> c | _ -> assert false in
+        let assoc_ity rs =
+          let name =
+            try Ident.get_model_element_name ~attrs:rs.rs_name.id_attrs
+            with Not_found -> rs.rs_name.id_string in
+          let ity = ity_full_inst subst (fd_of_rs rs).pv_ity in
+          name, ity in
+        let arg_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
+        let fs = List.map (fun (f, mv) -> import_model_value env known (Mstr.find f arg_itys) mv) r in
+        constr_value ity rs fs
+    | Apply (s, mvs) ->
+        check_construction def;
+        let matching_name rs = String.equal rs.rs_name.id_string s in
+        let rs = List.find matching_name def.Pdecl.itd_constructors in
+        let import field_pv = import_model_value env known (ity_full_inst subst field_pv.pv_ity) in
+        let fs = List.map2 import rs.rs_cty.cty_args mvs in
+        constr_value ity rs fs
+    | Proj (s, mv) ->
+        check_construction def;
+        let rs = match def.Pdecl.itd_constructors with
+          | [rs] -> rs
+          | [] ->
+              failwith "Cannot import projection to type without constructor"
+          | _ -> failwith "(Singleton) record constructor expected" in
+        let import_or_default field_pv =
+          let ity = ity_full_inst subst field_pv.pv_ity in
+          let name = field_pv.pv_vs.vs_name.id_string and attrs = field_pv.pv_vs.vs_name.id_attrs in
+          if String.equal (Ident.get_model_trace_string ~name ~attrs) s then
+            import_model_value env known ity mv
+          else default_value_of_type env known ity in
+        let fs = List.map import_or_default rs.rs_cty.cty_args in
+        constr_value ity rs fs
+    | Array a ->
+        assert (its_equal def.Pdecl.itd_its its_func);
+        let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
+          | [ts1; ts2] -> Ty.Mtv.find ts1 subst.isb_var, Ty.Mtv.find ts2 subst.isb_var
+          | _ -> assert false in
+        let add_index mv ix =
+          let key = import_model_value env known key_ity ix.Model_parser.arr_index_key in
+          let value = import_model_value env known value_ity ix.arr_index_value in
+          Mv.add key value mv in
+        let mv = List.fold_left add_index Mv.empty a.arr_indices in
+        let v0 = import_model_value env known value_ity a.arr_others in
+        purefun_value ity key_ity mv v0
+    | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
+        kasprintf failwith "import_model_value (not implemented): %a" Model_parser.print_model_value v
+
+let get_model_value (m:Model_parser.model) (env:Env.env) (known:Pdecl.known_map) =
+  fun ?name ?loc (ity:ity) : value option ->
+  let open Model_parser in
+  match loc with
+  | None -> None
+  | Some l ->
+     let me = match name with
+       | None -> get_model_element_by_loc m l
+       | Some s -> get_model_element m s l in
+     begin match me with
+     | None -> None
+     | Some v -> Some (import_model_value env known ity v.me_value) end
+
 let check_model reduce env pm model =
   let open Model_parser in
   match get_model_term_loc model with
@@ -108,9 +218,17 @@ let check_model reduce env pm model =
       match find_rs pm loc with
       | Some rs ->
           let check_model_rs ~abstract =
-            let rac = rac_config ~do_rac:true ~abstract ~reduce ~model () in
-            check_model_rs rac env pm model rs in
+            let get_value = get_model_value model env pm.mod_known in
+            let rac = rac_config ~do_rac:true ~abstract ~skip_cannot_compute:false
+                        ~reduce ~get_value () in
+            check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
+          Debug.dprintf debug_check_ce
+            "Validating model concretely:@\n%a@."
+            (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) model;
           let concrete = check_model_rs ~abstract:false in
+          Debug.dprintf debug_check_ce
+            "Validating model abstractly:@\n%a@."
+            (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) model;
           let abstract = check_model_rs ~abstract:true in
           Check_model_result {concrete; abstract}
       | None ->

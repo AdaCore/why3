@@ -1,18 +1,20 @@
 <check-ce>Check model 0 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "-1"}
   Line 8:
     the check fails with all inputs
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "-1"}
   Line 8:
     the check fails with all inputs
-<rac>Missing value for parameter _, continue with default value ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File global_logic_constant.mlw:
@@ -37,20 +39,22 @@ File global_logic_constant.mlw:
                   Property failure, Postcondition of f1 with:
                     result = (-1)
 <check-ce>Check model 1 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "-1"}
   Line 8:
     the check fails with all inputs
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "-1"}
   Line 8:
     the check fails with all inputs
-<rac>Missing value for parameter _, continue with default value ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File global_logic_constant.mlw:
@@ -75,20 +79,22 @@ File global_logic_constant.mlw:
                   Property failure, Postcondition of f1 with:
                     result = (-1)
 <check-ce>Check model 2 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "-1"}
   Line 8:
     the check fails with all inputs
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "-1"}
   Line 8:
     the check fails with all inputs
-<rac>Missing value for parameter _, continue with default value ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File global_logic_constant.mlw:
@@ -136,7 +142,7 @@ File global_logic_constant.mlw:
       result = (-1)
 
 <check-ce>Check model 0 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "0"}
@@ -148,8 +154,9 @@ File global_logic_constant.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 14:
     result = {"type": "Integer", "val": "-1"}
-<rac>Missing value for parameter _1, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _1, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "0"}
@@ -161,7 +168,8 @@ File global_logic_constant.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 14:
     result = {"type": "Integer", "val": "-1"}
-<rac>Missing value for parameter _1, continue with default value ()
+<rac-values>Missing value for parameter _1, continue with default value (
+)
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File global_logic_constant.mlw:
@@ -194,7 +202,7 @@ File global_logic_constant.mlw:
                 Line 13:
                   Execution of main function terminated normally
 <check-ce>Check model 1 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "0"}
@@ -206,8 +214,9 @@ File global_logic_constant.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 14:
     result = {"type": "Integer", "val": "-1"}
-<rac>Missing value for parameter _1, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _1, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "0"}
@@ -219,7 +228,8 @@ File global_logic_constant.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 14:
     result = {"type": "Integer", "val": "-1"}
-<rac>Missing value for parameter _1, continue with default value ()
+<rac-values>Missing value for parameter _1, continue with default value (
+)
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File global_logic_constant.mlw:
@@ -254,7 +264,7 @@ File global_logic_constant.mlw:
                   Property failure, Postcondition of f2 with:
                     result = (-1)
 <check-ce>Check model 2 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "0"}
@@ -266,8 +276,9 @@ File global_logic_constant.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 14:
     result = {"type": "Integer", "val": "-1"}
-<rac>Missing value for parameter _1, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _1, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File global_logic_constant.mlw:
   Line 5:
     v1 = {"type": "Integer", "val": "0"}
@@ -279,7 +290,8 @@ File global_logic_constant.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 14:
     result = {"type": "Integer", "val": "-1"}
-<rac>Missing value for parameter _1, continue with default value ()
+<rac-values>Missing value for parameter _1, continue with default value (
+)
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File global_logic_constant.mlw:

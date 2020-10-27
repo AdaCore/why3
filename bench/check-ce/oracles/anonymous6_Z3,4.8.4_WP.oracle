@@ -1,9 +1,9 @@
 File "bench/check-ce/anonymous6.mlw", line 6, characters 18-27:
 Goal Postcondition from verification condition f'vc.
-Prover result is: valid (0.03s, 2263 steps).
+Prover result is: valid (0.02s, 2263 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File anonymous6.mlw:
   Line 6:
     z =
@@ -13,8 +13,9 @@ File anonymous6.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 7:
     the check fails with all inputs
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File anonymous6.mlw:
   Line 6:
     z =
@@ -24,10 +25,11 @@ File anonymous6.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 7:
     the check fails with all inputs
-<rac>Missing value for parameter _, continue with default value ()
-<rac>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 0)
-<rac>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous6.mlw:
@@ -63,7 +65,7 @@ File anonymous6.mlw:
                   Execution got stuck, Assume postcondition of anonymous function with:
                     z = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File anonymous6.mlw:
   Line 6:
     z =
@@ -77,8 +79,9 @@ File anonymous6.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File anonymous6.mlw:
   Line 6:
     z =
@@ -92,10 +95,11 @@ File anonymous6.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
-<rac>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous6.mlw:
@@ -132,7 +136,7 @@ File anonymous6.mlw:
                   Property failure, Assertion with:
                     z = (ref'mk 3)
 <check-ce>Check model 2 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File anonymous6.mlw:
   Line 6:
     z =
@@ -146,8 +150,9 @@ File anonymous6.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File anonymous6.mlw:
   Line 6:
     z =
@@ -161,10 +166,11 @@ File anonymous6.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
-<rac>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous6.mlw:
@@ -209,7 +215,7 @@ File anonymous6.mlw:
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous6.mlw", line 7, characters 10-15:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 5248816 steps).
+Prover result is: timeout (1.00s, 5028508 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File anonymous6.mlw:

@@ -4,10 +4,10 @@ Prover result is: valid (0.02s, 105 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: valid (0.02s, 2819 steps).
+Prover result is: valid (0.01s, 2819 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File while.mlw:
   Line 10:
     the check fails with all inputs
@@ -17,8 +17,8 @@ File while.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
-<rac>Missing value for parameter z, continue with default value 0
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter z, continue with default value 0
+<check-ce>Validating model abstractly:
 File while.mlw:
   Line 10:
     the check fails with all inputs
@@ -28,13 +28,13 @@ File while.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
-<rac>Missing value for parameter z, continue with default value 0
-<rac>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for result "bench/check-ce/while.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for result "bench/check-ce/while.mlw", line 7, characters 14-15 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for x1 "bench/check-ce/while.mlw", line 8, characters 2-161 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for x2 "bench/check-ce/while.mlw", line 8, characters 2-161 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for i "bench/check-ce/while.mlw", line 8, characters 2-161 not in ce-model, taking default (ref'mk 0)
+<rac-values>Missing value for parameter z, continue with default value 0
+<rac-values>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/while.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/while.mlw", line 7, characters 14-15 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for x1 "bench/check-ce/while.mlw", line 8, characters 2-161 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for x2 "bench/check-ce/while.mlw", line 8, characters 2-161 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for i "bench/check-ce/while.mlw", line 8, characters 2-161 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File while.mlw:
@@ -165,7 +165,7 @@ File while.mlw:
                 Line 8:
                   Execution got stuck, Cannot continue after arbitrary iteration with:
 <check-ce>Check model 1 ("bench/check-ce/while.mlw", line 10, characters 25-32)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File while.mlw:
   Line 4:
     z = {"type": "Integer", "val": "3"}
@@ -203,7 +203,7 @@ File while.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-<rac>Validating model abstractly:
+<check-ce>Validating model abstractly:
 File while.mlw:
   Line 4:
     z = {"type": "Integer", "val": "3"}
@@ -241,7 +241,7 @@ File while.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-<rac>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File while.mlw:
@@ -338,7 +338,7 @@ File while.mlw:
                     contents = 3
                     result = (ref'mk 0)
 <check-ce>Check model 2 ("bench/check-ce/while.mlw", line 10, characters 25-32)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File while.mlw:
   Line 4:
     z = {"type": "Integer", "val": "3"}
@@ -376,7 +376,7 @@ File while.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-<rac>Validating model abstractly:
+<check-ce>Validating model abstractly:
 File while.mlw:
   Line 4:
     z = {"type": "Integer", "val": "3"}
@@ -414,7 +414,7 @@ File while.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-<rac>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File while.mlw:
@@ -519,7 +519,7 @@ File while.mlw:
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 4730097 steps).
+Prover result is: timeout (1.00s, 4868930 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

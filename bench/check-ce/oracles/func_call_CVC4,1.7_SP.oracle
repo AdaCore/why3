@@ -3,7 +3,7 @@ Goal Postcondition from verification condition g'vc.
 Prover result is: valid (0.05s, 1582 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File func_call.mlw:
   Line 7:
     old z =
@@ -34,8 +34,9 @@ File func_call.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File func_call.mlw:
   Line 7:
     old z =
@@ -66,9 +67,10 @@ File func_call.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
-<rac>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<rac-values>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -117,7 +119,7 @@ File func_call.mlw:
                     z = (ref'mk 0)
                     z = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File func_call.mlw:
   Line 7:
     old z =
@@ -148,8 +150,9 @@ File func_call.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File func_call.mlw:
   Line 7:
     old z =
@@ -180,9 +183,10 @@ File func_call.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<rac>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<rac-values>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -230,7 +234,7 @@ File func_call.mlw:
                   Property failure, Assertion with:
                     z = (ref'mk 2)
 <check-ce>Check model 2 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File func_call.mlw:
   Line 7:
     old z =
@@ -261,8 +265,9 @@ File func_call.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File func_call.mlw:
   Line 7:
     old z =
@@ -293,9 +298,10 @@ File func_call.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<rac>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<rac-values>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -351,7 +357,7 @@ File func_call.mlw:
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.06s, 6620 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6620 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File func_call.mlw:

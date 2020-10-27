@@ -3,7 +3,7 @@ Goal Loop invariant init from verification condition f'vc.
 Prover result is: valid (0.02s, 58 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File for.mlw:
   Line 8:
     the check fails with all inputs
@@ -13,8 +13,9 @@ File for.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File for.mlw:
   Line 8:
     the check fails with all inputs
@@ -24,12 +25,13 @@ File for.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for x1 "bench/check-ce/for.mlw", line 7, characters 2-125 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for x2 "bench/check-ce/for.mlw", line 7, characters 2-125 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for i "bench/check-ce/for.mlw", line 7, characters 6-7 not in ce-model, taking default 2
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<rac-values>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for x1 "bench/check-ce/for.mlw", line 7, characters 2-125 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for x2 "bench/check-ce/for.mlw", line 7, characters 2-125 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for i "bench/check-ce/for.mlw", line 7, characters 6-7 not in ce-model, taking default 2
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File for.mlw:
@@ -95,7 +97,7 @@ File for.mlw:
                     x1 = (ref'mk 0)
                     i = 2
 <check-ce>Check model 1 ("bench/check-ce/for.mlw", line 8, characters 25-31)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File for.mlw:
   Line 7:
     [current iteration] i = {"type": "Integer", "val": "0"}
@@ -116,8 +118,9 @@ File for.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-400"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File for.mlw:
   Line 7:
     [current iteration] i = {"type": "Integer", "val": "0"}
@@ -138,12 +141,13 @@ File for.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-400"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE from ce-model for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-401))
-<rac>VALUE for x2 "bench/check-ce/for.mlw", line 7, characters 2-125 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE from ce-model for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<rac-values>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE from ce-model for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-401))
+<rac-values>VALUE for x2 "bench/check-ce/for.mlw", line 7, characters 2-125 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE from ce-model for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File for.mlw:
@@ -219,7 +223,7 @@ File for.mlw:
                     x1 = (ref'mk (-400))
                     i = 1
 <check-ce>Check model 2 ("bench/check-ce/for.mlw", line 8, characters 25-31)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File for.mlw:
   Line 7:
     [current iteration] i = {"type": "Integer", "val": "0"}
@@ -243,8 +247,9 @@ File for.mlw:
         {"Field":
           [{"field": "contents",
             "value": {"type": "Integer", "val": "-7868"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File for.mlw:
   Line 7:
     [current iteration] i = {"type": "Integer", "val": "0"}
@@ -268,12 +273,13 @@ File for.mlw:
         {"Field":
           [{"field": "contents",
             "value": {"type": "Integer", "val": "-7868"}}]}}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE from ce-model for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-7869))
-<rac>VALUE for x2 "bench/check-ce/for.mlw", line 7, characters 2-125 not in ce-model, taking default (ref'mk 0)
-<rac>VALUE from ce-model for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<rac-values>VALUE for result "bench/check-ce/for.mlw", line 5, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/for.mlw", line 6, characters 15-16 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE from ce-model for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-7869))
+<rac-values>VALUE for x2 "bench/check-ce/for.mlw", line 7, characters 2-125 not in ce-model, taking default (ref'mk 0)
+<rac-values>VALUE from ce-model for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File for.mlw:
@@ -357,7 +363,7 @@ File for.mlw:
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 5261341 steps).
+Prover result is: timeout (1.00s, 4756491 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File for.mlw:

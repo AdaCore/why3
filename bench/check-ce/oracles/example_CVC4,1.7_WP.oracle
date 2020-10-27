@@ -1,18 +1,20 @@
 <check-ce>Check model 0 ("bench/check-ce/example.mlw", line 7, characters 15-22)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File example.mlw:
   Line 4:
     a = {"type": "Integer", "val": "42"}
   Line 7:
     a = {"type": "Integer", "val": "0"}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File example.mlw:
   Line 4:
     a = {"type": "Integer", "val": "42"}
   Line 7:
     a = {"type": "Integer", "val": "0"}
-<rac>Missing value for parameter _, continue with default value ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File example.mlw:
@@ -37,20 +39,22 @@ File example.mlw:
                   Property failure, Assertion with:
                     a = 42
 <check-ce>Check model 1 ("bench/check-ce/example.mlw", line 7, characters 15-22)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File example.mlw:
   Line 4:
     a = {"type": "Integer", "val": "42"}
   Line 7:
     a = {"type": "Integer", "val": "42"}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File example.mlw:
   Line 4:
     a = {"type": "Integer", "val": "42"}
   Line 7:
     a = {"type": "Integer", "val": "42"}
-<rac>Missing value for parameter _, continue with default value ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File example.mlw:
@@ -75,20 +79,22 @@ File example.mlw:
                   Property failure, Assertion with:
                     a = 42
 <check-ce>Check model 2 ("bench/check-ce/example.mlw", line 7, characters 15-22)
-<rac>Validating model concretely:
+<check-ce>Validating model concretely:
 File example.mlw:
   Line 4:
     a = {"type": "Integer", "val": "42"}
   Line 7:
     a = {"type": "Integer", "val": "42"}
-<rac>Missing value for parameter _, continue with default value ()
-<rac>Validating model abstractly:
+<rac-values>Missing value for parameter _, continue with default value (
+)
+<check-ce>Validating model abstractly:
 File example.mlw:
   Line 4:
     a = {"type": "Integer", "val": "42"}
   Line 7:
     a = {"type": "Integer", "val": "42"}
-<rac>Missing value for parameter _, continue with default value ()
+<rac-values>Missing value for parameter _, continue with default value (
+)
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File example.mlw:

@@ -16,7 +16,22 @@ open Ident
 
 type value
 
+module Mv : Map.S with type key = value
+
 val v_ty : value -> Ty.ty
+
+(* non defensive API for building value: there are no checks that ity
+   is compatible with the value being built *)
+(* TODO: make it defensive? *)
+val int_value : string -> value
+val range_value : Ity.ity -> string -> value
+val string_value : string -> value
+val bool_value : bool -> value
+val constr_value : Ity.ity -> Expr.rsymbol -> value list -> value
+val purefun_value : value_ity:Ity.ity -> arg_ity:Ity.ity -> value Mv.t -> value -> value
+
+val default_value_of_type : Env.env -> Pdecl.known_map -> Ity.ity -> value
+
 val print_value : Format.formatter -> value -> unit
 
 (** {1 Interpreter types} *)
@@ -100,6 +115,8 @@ exception Contr of cntr_ctx * Term.term
 
 exception RACStuck of env * Loc.position option
 
+exception CannotImportModelValue of string
+
 (** {1 Configuration} *)
 
 val init_real : int * int * int -> unit
@@ -132,8 +149,9 @@ type rac_config
 val rac_config :
   do_rac:bool ->
   abstract:bool ->
+  ?skip_cannot_compute:bool ->
   ?reduce:rac_reduce_config ->
-  ?model:Model_parser.model ->
+  ?get_value:(?name:string -> ?loc:Loc.position -> Ity.ity -> value option) ->
   unit -> rac_config
 
 (** {1 Interpreter} *)
@@ -146,6 +164,7 @@ val eval_global_fundef :
   (Expr.rsymbol * Expr.cexp) list ->
   Expr.expr ->
   result * value Term.Mvs.t * value Expr.Mrs.t
+(* TODO update comment *)
 (** [eval_global_fundef ~rac env disp_ctx known def] evaluates a function definition and
    returns an evaluation result and a final variable environment.
 
@@ -160,10 +179,10 @@ val eval_global_fundef :
 (** {1 Check counter-example models using RAC}*)
 
 val check_model_rs :
+  ?loc:Loc.position -> (* TODO should be handled other way, see it's use *)
   rac_config ->
   Env.env ->
   Pmodule.pmodule ->
-  Model_parser.model ->
   Expr.rsymbol ->
   full_verdict
 (** [check_model_rs env pm loc m rs] checks if executing the definition of
