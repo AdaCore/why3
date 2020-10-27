@@ -332,12 +332,10 @@ let rec term_of_value env vsenv v : (vsymbol * term) list * term =
           let t = t_app_infer ls_update [t; t_ix; t_a_ix] in
           loop (vsenv, t) (succ ix) in
       let t_n = t_const (Constant.int_const_of_int (Array.length a)) ty_int in
-      let t_v =
-        let val_ty = match v.v_ty.ty_node with
-          | Tyapp (_, [ty]) -> ty
-          | _ -> assert false in
-        let vs = create_vsymbol (Ident.id_fresh "v") val_ty in
-        t_eps (t_close_bound vs t_true) in
+      let val_ty = match v.v_ty.ty_node with
+        | Tyapp (_, [ty]) -> ty
+        | _ -> assert false in
+      let t_v = t_app ls_undefined [] (Some val_ty) in
       let t_make = t_app_infer ls_make [t_n; t_v] in
       loop (vsenv, t_make) 0
   | Vpurefun (ty, m, v) ->
