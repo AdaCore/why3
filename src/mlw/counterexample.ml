@@ -298,7 +298,7 @@ let print_ce_summary_values ~json ~print_attrs model fmt s =
         fprintf fmt "@[%a@]" (Model_parser.print_model_human ?me_name_trans:None ~print_attrs) model
   | BAD_CE -> ()
 
-let model_of_exec_log ~original_model ?(valid_loc=(fun loc -> not (Loc.equal loc Loc.dummy_position))) log =
+let model_of_exec_log ~original_model log =
   let open Model_parser in
   let open Ident in
   let open Wstdlib in
@@ -312,7 +312,7 @@ let model_of_exec_log ~original_model ?(valid_loc=(fun loc -> not (Loc.equal loc
     let me_value = assert false (* Integer v *) in (* TODO Type me_value correctly when the exec log is typed *)
     {me_name; me_value; me_location= Some loc; me_term= None} in
   let aux e = match e.log_loc with
-    | Some loc when valid_loc loc -> (
+    | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.log_desc with
         | Val_from_model (id, v) ->
             [me loc id v]
@@ -327,9 +327,9 @@ let model_of_exec_log ~original_model ?(valid_loc=(fun loc -> not (Loc.equal loc
   let model_files = (Mstr.map_filter aux_mint (sort_log_by_loc log)) in
   set_model_files original_model model_files
 
-let model_of_ce_summary ~original_model ?valid_loc = function
+let model_of_ce_summary ~original_model = function
   | NCCE log | SWCE log | NCCE_SWCE log ->
-      model_of_exec_log ~original_model ?valid_loc log
+      model_of_exec_log ~original_model log
   | UNKNOWN _ | BAD_CE -> original_model
 
 let ce_summary v_concrete v_abstract =

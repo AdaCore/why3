@@ -30,3 +30,5 @@ val print_counterexample : ?check_ce:bool -> ?json:bool -> formatter ->
 
 val select_model : ?check:bool -> rac_reduce_config -> Env.env -> Pmodule.pmodule ->
 ('a * Model_parser.model) list -> (Model_parser.model * ce_summary) option
+
+val model_of_ce_summary : original_model:Model_parser.model -> ce_summary -> Model_parser.model
