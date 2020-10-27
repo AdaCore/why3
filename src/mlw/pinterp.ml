@@ -726,8 +726,6 @@ let multibind_pvs ?register l tl env =
 
 let big_int_of_const i = i.Number.il_int
 let big_int_of_value v = match v.v_desc with Vnum i -> i | _ -> raise NotNum
-let eval_true _ls _l = value ty_bool (Vbool true)
-let eval_false _ls _l = value ty_bool (Vbool false)
 
 let eval_int_op op ls l =
   value (ty_of_ity ls.rs_cty.cty_result)
@@ -827,54 +825,6 @@ let eval_real : type a. a real_arity -> a -> Expr.rsymbol -> value list -> value
 
 let builtin_progs = Hrs.create 17
 
-let builtin_mode _kn _its = ()
-let builtin_float_type _kn _its = ()
-let builtin_array_type _kn _its = ()
-
-let exec_array_make ts_array _ args =
-  match args with
-  | [{v_desc= Vnum n};def] -> (
-      try
-        let n = BigInt.to_int n in
-        let ty = ty_app ts_array [def.v_ty] in
-        value ty (Varray (Array.make n def))
-      with e ->
-        cannot_compute "Error making array: %a" Exn_printer.exn_printer e )
-  | _ -> assert false
-
-let exec_array_empty ts_array _ args =
-  match args with
-  | [{v_desc= Vconstr(_, [])}] ->
-      (* we know by typing that the constructor
-         will be the Tuple0 constructor *)
-      let ty = ty_app ts_array [ty_var (tv_of_string "a")] in
-      value ty (Varray [||])
-  | _ -> assert false
-
-let exec_array_get _ args =
-  match args with
-  | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
-      try a.(BigInt.to_int i)
-      with e ->
-        cannot_compute "Error getting array: %a" Exn_printer.exn_printer e )
-  | _ -> assert false
-
-let exec_array_length _ args =
-  match args with
-  | [{v_desc= Varray a}] ->
-      value ty_int (Vnum (BigInt.of_int (Array.length a)))
-  | _ -> assert false
-
-let exec_array_set _ args =
-  match args with
-  | [{v_desc= Varray a}; {v_desc= Vnum i}; v] -> (
-      try
-        a.(BigInt.to_int i) <- v;
-        value ty_unit Vvoid
-      with e ->
-        cannot_compute "Error setting array: %a" Exn_printer.exn_printer e )
-| _ -> assert false
-
 type builtin = Builtin_module of {
   path: string list;
   name: string;
@@ -897,7 +847,7 @@ let builtin1t path name (type_name, type_def) values =
    why3execute. *)
 
 (** Description of modules *)
-let built_in_modules env =
+let built_in_modules () =
   let int_ops = [
     op_infix "+",      eval_int_op BigInt.add;
     (* defined as x+(-y)
@@ -917,7 +867,7 @@ let built_in_modules env =
     op_infix "/",      eval_int_op BigInt.computer_div;
     op_infix "%",      eval_int_op BigInt.computer_mod;
   ] in
-  let float_module tyb ~prec m = builtin1t ["ieee_float"] m ("t", builtin_float_type) (fun ts -> [
+  let float_module tyb ~prec m = builtin1t ["ieee_float"] m ("t", dummy_type) (fun ts -> [
     "zeroF",           (fun _ _ -> value (ty_app ts []) (Vfloat (make_zero ~prec Positive)));
     "add",             eval_float ts tyb Mode2 (fun rnd -> add ~rnd ~prec);
     "sub",             eval_float ts tyb Mode2 (fun rnd -> sub ~rnd ~prec);
@@ -987,8 +937,8 @@ let built_in_modules env =
       "exp",           eval_real Mode1r Big_real.exp;
       "log",           eval_real Mode1r Big_real.log;
     ];
-    builtin1t ["array"] "Array" ("array", builtin_array_type) (fun ts -> [
-      "make", (fun ts_array args -> match args with
+    builtin1t ["array"] "Array" ("array", dummy_type) (fun ts -> [
+      "make", (fun _ args -> match args with
           | [{v_desc= Vnum n}; def] -> (
               try
                 let n = BigInt.to_int n in
@@ -996,7 +946,7 @@ let built_in_modules env =
                 value ty (Varray (Array.make n def))
               with e -> cannot_compute "Error making array: %a" Exn_printer.exn_printer e )
           | _ -> assert false);
-      "empty", (fun ts_array args -> match args with
+      "empty", (fun _ args -> match args with
           | [{v_desc= Vconstr(_, [])}] ->
               (* we know by typing that the constructor
                   will be the Tuple0 constructor *)
@@ -1043,7 +993,7 @@ let add_builtin_mo env (Builtin_module {path; name; types; values}) =
     (values pm)
 
 let get_builtin_progs env =
-  List.iter (add_builtin_mo env) (built_in_modules env)
+  List.iter (add_builtin_mo env) (built_in_modules ())
 
 let get_vs env vs =
   try Mvs.find vs env.vsenv
