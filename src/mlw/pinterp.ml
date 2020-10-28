@@ -2225,7 +2225,7 @@ let check_model_rs ?loc rac env pm rs =
   | CannotCompute r ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
-      let reason = sprintf "RAC execution got stuck: %s" r.reason in
+      let reason = sprintf "%s RAC got stuck: %s" abs_Msg r.reason in
       {verdict= Dont_know; reason; exec_log= empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
