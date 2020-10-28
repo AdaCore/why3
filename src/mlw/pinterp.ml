@@ -17,8 +17,6 @@ open Ty
 open Pretty
 open Ity
 open Expr
-open Big_real
-open Mlmpfr_wrapper
 
 let debug_trace_exec =
   Debug.register_info_flag "trace_exec"
@@ -62,7 +60,7 @@ let pp_indent fmt =
 let is_prog_constant d =
   let open Pdecl in
   match d.pd_node with
-  | PDlet (LDsym (_, {c_cty= {Ity.cty_args= []}})) -> true
+  | PDlet (LDsym (_, {c_cty= {cty_args= []}})) -> true
   | _ -> false
 
 (* EXCEPTIONS *)
@@ -78,11 +76,12 @@ let cannot_compute f =
 
 (* VALUES *)
 
-type float_mode = mpfr_rnd_t
+type float_mode = Mlmpfr_wrapper.mpfr_rnd_t
 
-type big_float = mpfr_float
+type big_float = Mlmpfr_wrapper.mpfr_float
 
 let mode_to_string m =
+  let open Mlmpfr_wrapper in
   match m with
   | To_Nearest -> "RNE"
   | Away_From_Zero -> "RNA"
@@ -96,7 +95,7 @@ module rec Value : sig
   and value_desc =
     | Vconstr of rsymbol * field list
     | Vnum of BigInt.t
-    | Vreal of real
+    | Vreal of Big_real.real
     | Vfloat_mode of float_mode
     | Vfloat of big_float
     | Vstring of string
@@ -114,7 +113,7 @@ end = struct
   and value_desc =
     | Vconstr of rsymbol * field list
     | Vnum of BigInt.t
-    | Vreal of real
+    | Vreal of Big_real.real
     | Vfloat_mode of float_mode
     | Vfloat of big_float
     | Vstring of string
@@ -205,8 +204,8 @@ let bool_value b = value ty_bool (Vbool b)
 let range_value ity s = value (ty_of_ity ity) (Vnum (BigInt.of_string s))
 let constr_value ity rs vl =
   value (ty_of_ity ity) (Vconstr (rs, List.map field vl))
-let purefun_value ~value_ity ~arg_ity mv v =
-  value (ty_of_ity value_ity) (Vpurefun (ty_of_ity arg_ity, mv, v))
+let purefun_value ~result_ity ~arg_ity mv v =
+  value (ty_of_ity result_ity) (Vpurefun (ty_of_ity arg_ity, mv, v))
 
 let rec print_value fmt v =
   match v.v_desc with
@@ -216,12 +215,12 @@ let rec print_value fmt v =
       else
         fprintf fmt "(%s)" (BigInt.to_string n)
   | Vbool b -> fprintf fmt "%b" b
-  | Vreal r -> print_real fmt r
+  | Vreal r -> Big_real.print_real fmt r
   | Vfloat f ->
       (* Getting "@" is intentional in mlmpfr library for bases higher than 10.
          So, we keep this notation. *)
-      let hexadecimal = get_formatted_str ~base:16 f in
-      let decimal = get_formatted_str ~base:10 f in
+      let hexadecimal = Mlmpfr_wrapper.get_formatted_str ~base:16 f in
+      let decimal = Mlmpfr_wrapper.get_formatted_str ~base:10 f in
       fprintf fmt "%s (%s)" decimal hexadecimal
   | Vfloat_mode m -> fprintf fmt "%s" (mode_to_string m)
   | Vstring s -> Constant.print_string_def fmt s
@@ -320,10 +319,11 @@ let rec term_of_value env vsenv v : (vsymbol * term) list * term =
       let t = t_ty_subst mt mv t in
       vsenv, t_lambda [arg'] [] t
   | Varray a ->
+      let open Pmodule in
       (* TERM: [make a.length (eps v. true)][0 <- a[0]]...[n-1 <- a[n-1]] *)
-      let pm = Pmodule.read_module env ["array"] "Array" in
-      let ls_make = Mstr.find "make" pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
-      let ls_update = Mstr.find (Ident.op_update "") pm.Pmodule.mod_theory.Theory.th_export.Theory.ns_ls in
+      let pm = read_module env ["array"] "Array" in
+      let ls_make = Mstr.find "make" pm.mod_theory.Theory.th_export.Theory.ns_ls in
+      let ls_update = Mstr.find (op_update "") pm.mod_theory.Theory.th_export.Theory.ns_ls in
       let rec loop (vsenv, t) ix =
         if ix = Array.length a then vsenv, t
         else
@@ -409,8 +409,8 @@ type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
   | Val_assumed of (ident * value)
-  | Exec_call of (Expr.rsymbol option * value Mvs.t  * exec_kind)
-  | Exec_pure of (Term.lsymbol * exec_kind)
+  | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
+  | Exec_pure of (lsymbol * exec_kind)
   | Exec_any of value
   | Exec_loop of exec_kind
   | Exec_stucked of (string * value Mid.t)
@@ -483,20 +483,20 @@ let rec consecutives key ?(sofar=[]) ?current xs =
 
 let print_log_entry_desc fmt e =
   let print_vs_v fmt (vs,v) =
-    fprintf fmt "@[%a = %a@]" Ident.print_decoded
+    fprintf fmt "@[%a = %a@]" print_decoded
       vs.vs_name.id_string print_value v in
   let print_mvs fmt mvs =
     fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_vs_v)
       (Mvs.bindings mvs) in
   let print_id_v fmt (id,v) =
-    fprintf fmt "@[%a = %a@]" Ident.print_decoded id.id_string
+    fprintf fmt "@[%a = %a@]" print_decoded id.id_string
       print_value v in
   let print_mid fmt mid =
     fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_id_v)
       (Mid.bindings mid) in
   match e.log_desc with
   | Val_assumed (id, v) ->
-      fprintf fmt "@[<h>%a = %a@]" Ident.print_decoded id.id_string print_value v;
+      fprintf fmt "@[<h>%a = %a@]" print_decoded id.id_string print_value v;
   | Exec_call (None, mvs, k) ->
       fprintf fmt "@[<h>%s execution of anonymous function with args:%a@]"
         (exec_kind_to_string k)
@@ -504,11 +504,11 @@ let print_log_entry_desc fmt e =
   | Exec_call (Some rs, mvs, k) ->
       fprintf fmt "@[<hv2>%s execution of %a with args:%a@]"
         (exec_kind_to_string k)
-        Ident.print_decoded rs.Expr.rs_name.id_string
+        print_decoded rs.rs_name.id_string
         print_mvs mvs
   | Exec_pure (ls,k) ->
       fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
-        Ident.print_decoded ls.ls_name.id_string
+        print_decoded ls.ls_name.id_string
   | Exec_any v ->
      fprintf fmt "@[<h>execution of any, result: %a@]" print_value v
   | Exec_loop k ->
@@ -538,22 +538,22 @@ let print_log ~json fmt entry_log =
     let print_log_entry fmt = function
       | Val_assumed (id, v) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-            (print_json_field "kind" print_json) (string "VAL_FROM_MODEL")
+            (print_json_field "kind" print_json) (string "VAL_ASSUMED")
             (print_json_field "vs" print_json)
-            (string "%a" Ident.print_decoded id.id_string)
+            (string "%a" print_decoded id.id_string)
             (print_json_field "value" print_value) v
       | Exec_call (ors, mvs, kind) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "EXEC_CALL")
             (print_json_field "rs" print_json) (match ors with
-                | Some rs -> string "%a" Ident.print_decoded rs.Expr.rs_name.id_string
+                | Some rs -> string "%a" print_decoded rs.rs_name.id_string
                 | None -> Null)
             (print_json_field "exec" print_json_kind) kind
             (print_json_field "args" (list print_vs_value)) (Mvs.bindings mvs)
       | Exec_pure (ls, kind) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "EXEC_PURE")
-            (print_json_field "ls" print_json) (string "%a" Pretty.print_ls ls)
+            (print_json_field "ls" print_json) (string "%a" print_ls ls)
             (print_json_field "exec" print_json_kind) kind
       | Exec_any v ->
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
@@ -579,7 +579,7 @@ let print_log ~json fmt entry_log =
     let print_json_entry fmt e =
       fprintf fmt "@[@[<hv1>{@[<hv2>%a@];@ @[<hv2>%a@]@]}@]"
         (Pp.print_option_or_default "NOLOC"
-           (print_json_field "loc" Pretty.print_json_loc)) e.log_loc
+           (print_json_field "loc" print_json_loc)) e.log_loc
         (print_json_field "entry" print_log_entry) e.log_desc in
     fprintf fmt "@[@[<hv1>[%a@]@]"
       Pp.(print_list comma print_json_entry) entry_log
@@ -599,7 +599,6 @@ let print_log ~json fmt entry_log =
     Pp.(print_list newline pp_files) fmt entry_log
 
 let sort_log_by_loc log =
-  let open Wstdlib in
   let insert f l e sofar =
     let insert_line opt_l =
       let l = Opt.get_def [] opt_l in
@@ -642,7 +641,7 @@ let rac_config ~do_rac ~abstract:rac_abstract ?(skip_cannot_compute=true)
 type env =
   { mod_known   : Pdecl.known_map;
     th_known    : Decl.known_map;
-    funenv      : Expr.cexp Mrs.t;
+    funenv      : cexp Mrs.t;
     vsenv       : value Mvs.t;
     rsenv       : value Mrs.t; (* global constants *)
     env         : Env.env;
@@ -720,10 +719,13 @@ let eval_int_rel op ls l =
   {v_desc; v_ty= ty_bool}
 
 (* This initialize Mpfr for float32 behavior *)
-let initialize_float32 () = set_default_prec 24 ; set_emin (-148) ; set_emax 128
+let initialize_float32 () =
+  let open Mlmpfr_wrapper in
+  set_default_prec 24 ; set_emin (-148) ; set_emax 128
 
 (* This initialize Mpfr for float64 behavior *)
 let initialize_float64 () =
+  let open Mlmpfr_wrapper in
   set_default_prec 53 ; set_emin (-1073) ; set_emax 1024
 
 type 'a float_arity =
@@ -743,13 +745,14 @@ let use_float_format (float_format : int) =
 
 let eval_float :
     type a.
-    tysymbol -> int -> a float_arity -> a -> Expr.rsymbol -> value list -> value =
+    tysymbol -> int -> a float_arity -> a -> rsymbol -> value list -> value =
  fun tys_result float_format ty op ls l ->
   (* Set the exponent depending on Float type that are used: 32 or 64 *)
  let ty_result = ty_app tys_result [] in
   use_float_format float_format ;
   try
     let v_desc =
+      let open Mlmpfr_wrapper in
       match ty, List.map v_desc l with
       | Mode1, [Vfloat_mode mode; Vfloat f] ->
           (* Subnormalize used to simulate IEEE behavior *)
@@ -768,12 +771,12 @@ let eval_float :
   | _ -> assert false
 
 type 'a real_arity =
-  | Modeconst : real real_arity
-  | Mode1r : (real -> real) real_arity
-  | Mode2r : (real -> real -> real) real_arity
-  | Mode_relr : (real -> real -> bool) real_arity
+  | Modeconst : Big_real.real real_arity
+  | Mode1r : (Big_real.real -> Big_real.real) real_arity
+  | Mode2r : (Big_real.real -> Big_real.real -> Big_real.real) real_arity
+  | Mode_relr : (Big_real.real -> Big_real.real -> bool) real_arity
 
-let eval_real : type a. a real_arity -> a -> Expr.rsymbol -> value list -> value
+let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value
     =
  fun ty op ls l ->
   let v_desc =
@@ -837,6 +840,7 @@ let built_in_modules () =
     op_infix "/",      eval_int_op BigInt.computer_div;
     op_infix "%",      eval_int_op BigInt.computer_mod;
   ] in
+  let open Mlmpfr_wrapper in
   let float_module tyb ~prec m = builtin1t ["ieee_float"] m ("t", dummy_type) (fun ts -> [
     "zeroF",           (fun _ _ -> value (ty_app ts []) (Vfloat (make_zero ~prec Positive)));
     "add",             eval_float ts tyb Mode2 (fun rnd -> add ~rnd ~prec);
@@ -1016,10 +1020,6 @@ let rec default_value_of_type env known ity : value =
                * else *)
               value ty Vundefined
 
-(* VALUE IMPORT *)
-
-exception CannotImportModelValue of string
-
 (* ROUTINE DEFINITIONS *)
 
 type routine_defn =
@@ -1095,9 +1095,9 @@ let report_cntr_head fmt (ctx, msg, term) =
     (fun fmt ->
        match ctx.c_trigger_loc, term.t_loc with
        | Some t1, Some t2 ->
-           fprintf fmt " at %a@,- Defined at %a" Pretty.print_loc' t1 Pretty.print_loc' t2
+           fprintf fmt " at %a@,- Defined at %a" print_loc' t1 print_loc' t2
        | Some t, None | None, Some t ->
-           fprintf fmt " at %a" Pretty.print_loc' t
+           fprintf fmt " at %a" print_loc' t
        | None, None -> () )
 
 let env_sep = Pp.comma
@@ -1172,8 +1172,8 @@ let bind_fun rs cexp (task, ls_mv) =
     let t = match cexp.c_node with
       | Cfun e -> Opt.get_exn Exit (term_of_expr ~prop:false e)
       | _ -> raise Exit in
-    let ty_args = List.map (fun pv -> Ity.ty_of_ity pv.pv_ity) rs.rs_cty.cty_args in
-    let ty_res = Ity.ty_of_ity rs.rs_cty.cty_result in
+    let ty_args = List.map (fun pv -> ty_of_ity pv.pv_ity) rs.rs_cty.cty_args in
+    let ty_res = ty_of_ity rs.rs_cty.cty_result in
     let ls, ls_mv = match rs.rs_logic with
       | RLlemma | RLnone -> raise Exit
       | RLls ls -> ls, ls_mv
@@ -1231,22 +1231,23 @@ let task_of_term ?(vsenv=[]) env t =
       add_prop_decl task Pgoal prs (p#create_app t) in
   task, ls_mv
 
-(* Parameters for binding universally quantified variables to a value from the CE model or the default value *)
-let bind_univ_quant_vars_ce_model = false
+(* Parameters for binding universally quantified variables to a value
+   obtained with rac_config.get_value or the default value *)
+let bind_univ_quant_vars = false
 let bind_univ_quant_vars_default = false
 
-(* Get the value of a vsymbol from the CE-model, a default value *)
+(* Get the value of a vsymbol with env.rac.get_value or a default value *)
 let get_value_for_quant_var env vs =
   match vs.vs_name.id_loc with
   | None -> None
   | Some loc ->
       let value =
-        if bind_univ_quant_vars_ce_model then
+        if bind_univ_quant_vars then
           let v = env.rac.get_value ~name:vs.vs_name.id_string
                     ~loc (ity_of_ty vs.vs_ty) in
           (Opt.iter (fun v ->
                Debug.dprintf debug_rac_values
-                 "Bind model value for all-quantified variable %a to %a@."
+                 "Bind all-quantified variable %a to %a@."
                  print_vs vs print_value v) v; v)
         else None in
       if value <> None then value else
@@ -1258,9 +1259,9 @@ let get_value_for_quant_var env vs =
         Some v
       ) else None
 
-(** When the task goal is [forall vs* . t], add declarations to the task that bind the
-   variables [vs*] to concrete values (from the CE-model or default values), and make [t]
-   the new goal. *)
+(** When the task goal is [forall vs* . t], add declarations to the
+   task that bind the variables [vs*] to concrete values (with
+   env.rac.get_value or default values), and make [t] the new goal. *)
 let bind_univ_quant_vars env task =
   try match (Task.task_goal_fmla task).t_node with
     | Tquant (Tforall, tq) ->
@@ -1283,7 +1284,7 @@ let task_hd_equal t1 t2 = let open Task in let open Theory in let open Decl in
   | _ -> t1 == t2
 
 (** Apply the (reduction) transformation and fill universally quantified variables
-    in the head of the task by values from the CE model, recursively. *)
+    in the head of the task by values obtained with env.rac.get_value, recursively. *)
 let rec trans_and_bind_quants env trans task =
   let task = bind_univ_quant_vars env task in
   let tasks = Trans.apply trans task in
@@ -1542,16 +1543,16 @@ let get_and_register_value env ?def ?ity vs loc =
   let value = match env.rac.get_value ~name ~loc ity with
     | Some v ->
        Debug.dprintf debug_rac_values
-         "@[<h>VALUE from ce-model for %a at %a: %a@]@."
-         Ident.print_decoded name
-         Pretty.print_loc' loc
+         "@[<h>VALUE imported for %a at %a: %a@]@."
+         print_decoded name
+         print_loc' loc
          print_value v; v
     | None ->
        let v = match def with
          | None -> default_value_of_type env.env env.mod_known ity
          | Some v -> v in
        Debug.dprintf debug_rac_values
-         "@[<h>VALUE for %s %a not in ce-model, taking \
+         "@[<h>VALUE for %s %a cannot be imported, taking \
           default %a@]@." name print_loc' loc print_value v;
        v
   in
@@ -1609,13 +1610,13 @@ and eval_expr' env e =
       if ity_equal e.e_ity ity_real then
         let p, q = compute_fraction r.Number.rl_real in
         let sp, sq = BigInt.to_string p, BigInt.to_string q in
-        try Normal (value ty_real (Vreal (real_from_fraction sp sq)))
+        try Normal (value ty_real (Vreal (Big_real.real_from_fraction sp sq)))
         with Mlmpfr_wrapper.Not_Implemented ->
           cannot_compute "Mlmpfr wrapper: not implemented"
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
-        Normal (value ty_real (Vfloat (make_from_str s)))
+        Normal (value ty_real (Vfloat (Mlmpfr_wrapper.make_from_str s)))
   | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
   | Eexec (ce, cty) -> begin
       (* TODO (When) do we have to check the contracts in cty? When ce <> Capp? *)
@@ -1655,13 +1656,13 @@ and eval_expr' env e =
             | None ->
                let v = default_value_of_type env.env env.mod_known e.e_ity in
                let pp_loc fmt = function
-                 | Some loc -> fprintf fmt " at %a" Pretty.print_loc' loc
+                 | Some loc -> fprintf fmt " at %a" print_loc' loc
                  | None -> () in
                Debug.dprintf debug_trace_exec "Take default value %a for any expression%a"
                  print_value v pp_loc e.e_loc;
                v in
           register_any_call env e.e_loc value;
-          (* register_used_value env e.e_loc Ident.(id_register (id_fresh ?loc:e.e_loc "ANY")) v; *)
+          (* register_used_value env e.e_loc (id_register (id_fresh ?loc:e.e_loc "ANY")) v; *)
           (* check_posts "Exec postcondition" e.e_loc env v cty.cty_post; *)
           Normal value
       | Capp (rs, pvsl) when Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.mod_known) = Some true ->
@@ -2112,9 +2113,9 @@ let bind_globals ?rs_main mod_known env =
           | Normal v -> v
           | Fun _ -> failwith "bind_globals: should be program constant, is function"
           | Excep _ -> cannot_compute "exception in initialization of global variable %a"
-                         Ident.print_decoded id.id_string
+                         print_decoded id.id_string
           | Irred _ -> cannot_compute "initialization of global variable %a irreducible"
-                         Ident.print_decoded id.id_string
+                         print_decoded id.id_string
   in
   let open Pdecl in
   let eval_global _ d env =
@@ -2152,10 +2153,13 @@ let eval_global_fundef rac env mod_known th_known locals e =
   let res = eval_expr env e in
   res, env.vsenv, env.rsenv
 
-let eval_rs rac env mod_known th_known (rs: rsymbol) =
+let eval_rs rac env pm rs =
+  let open Pmodule in
+  let mod_known = pm.mod_known in
+  let th_known = pm.mod_theory.Theory.th_known in
   let get_value (pv: pvsymbol) =
     let id = pv.pv_vs.vs_name in
-    let name = Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs in
+    let name = get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs in
     match rac.get_value ~name ?loc:id.id_loc pv.pv_ity with
     | Some v -> v
     | None ->
@@ -2173,70 +2177,6 @@ let eval_rs rac env mod_known th_known (rs: rsymbol) =
   let res = exec_call ~main_function:true ~loc:e_loc env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   register_ended env rs.rs_name.id_loc;
   res, env
-
-type verdict = Good_model | Bad_model | Dont_know
-
-type full_verdict = {
-    verdict  : verdict;
-    reason   : string;
-    exec_log : exec_log;
-  }
-
-let print_verdict fmt = function
-  | Good_model -> fprintf fmt "good model"
-  | Bad_model -> fprintf fmt "bad model"
-  | Dont_know -> fprintf fmt "don't know"
-
-let print_full_verdict fmt v =
-  fprintf fmt "%a (%s)@,%a"
-    print_verdict v.verdict v.reason (print_log ~json:false) v.exec_log
-
-type check_model_result =
-  | Cannot_check_model of {reason: string}
-  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
-
-let print_check_model_result fmt = function
-  | Cannot_check_model r ->
-      fprintf fmt "@[Cannot check model (%s)@]" r.reason
-  | Check_model_result r ->
-      fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@\n@[<hv2>- Abstract: %a@]@]"
-        print_full_verdict r.concrete print_full_verdict r.abstract
-
-let check_model_rs ?loc rac env pm rs =
-  let open Pmodule in
-  let abs_msg = if rac.rac_abstract then "abstract" else "concrete" in
-  let abs_Msg = String.capitalize_ascii abs_msg in
-  try
-    let _, env = eval_rs rac env pm.mod_known pm.mod_theory.Theory.th_known rs in
-    let reason = sprintf "%s RAC does not confirm the counter-example, no \
-                          contradiction during execution" abs_Msg in
-    {verdict= Bad_model; reason; exec_log= close_log env.rac.log_uc}
-  with
-  | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc loc ->
-      let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
-      {verdict= Good_model; reason; exec_log= close_log ctx.c_env.rac.log_uc}
-  | Contr (ctx, t) ->
-      let reason = asprintf "%s RAC found a contradiction at different location %a"
-          abs_Msg (Pp.print_option_or_default "NO LOC" print_loc') t.Term.t_loc in
-      {verdict= Good_model; reason; exec_log= close_log ctx.c_env.rac.log_uc}
-  | CannotImportModelValue msg ->
-      let reason = sprintf "cannot import value from model: %s" msg in
-      {verdict= Dont_know; reason; exec_log= empty_log}
-  | CannotCompute r ->
-      (* TODO E.g., bad default value for parameter and cannot evaluate
-         pre-condition *)
-      let reason = sprintf "%s RAC got stuck: %s" abs_Msg r.reason in
-      {verdict= Dont_know; reason; exec_log= empty_log}
-  | Failure msg ->
-      (* E.g., cannot create default value for non-free type, cannot construct
-          term for constructor that is not a function *)
-      let reason = sprintf "failure: %s" msg in
-      {verdict= Dont_know; reason; exec_log= empty_log}
-  | RACStuck (env,l) ->
-      let reason =
-        asprintf "%s RAC, with the counterexample model cannot continue after %a"
-          abs_Msg (Pp.print_option print_loc') l in
-      {verdict= Bad_model; reason; exec_log= close_log env.rac.log_uc}
 
 let report_eval_result body fmt (res, vsenv, rsenv) =
   let print_envs fmt =

@@ -15,7 +15,7 @@ File anonymous1.mlw:
     w = {"type": "Integer", "val": "0"}
   Line 6:
     the check fails with all inputs
-<rac-values>VALUE for result "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 not in ce-model, taking default 0
+<rac-values>VALUE for result "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 cannot be imported, taking default 0
 <check-ce>Model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File anonymous1.mlw:
@@ -65,7 +65,7 @@ File anonymous1.mlw:
   Line 6:
     w = {"type": "Integer", "val": "2"}
     x = {"type": "Integer", "val": "0"}
-<rac-values>VALUE for result "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 not in ce-model, taking default 0
+<rac-values>VALUE for result "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 cannot be imported, taking default 0
 <check-ce>Model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File anonymous1.mlw:
@@ -115,7 +115,7 @@ File anonymous1.mlw:
   Line 6:
     w = {"type": "Integer", "val": "2"}
     x = {"type": "Integer", "val": "0"}
-<rac-values>VALUE for result "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 not in ce-model, taking default 0
+<rac-values>VALUE for result "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 cannot be imported, taking default 0
 <check-ce>Model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File anonymous1.mlw:
@@ -155,7 +155,7 @@ File anonymous1.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (sat) (0.03s, 880 steps).
+Prover result is: unknown (sat) (0.04s, 880 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File anonymous1.mlw:

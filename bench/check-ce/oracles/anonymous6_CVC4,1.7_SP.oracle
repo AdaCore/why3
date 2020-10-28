@@ -1,6 +1,6 @@
 File "bench/check-ce/anonymous6.mlw", line 6, characters 18-27:
 Goal Postcondition from verification condition f'vc.
-Prover result is: valid (0.05s, 1516 steps).
+Prover result is: valid (0.04s, 1516 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 <check-ce>Validating model concretely:
@@ -35,9 +35,9 @@ File anonymous6.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
-<rac-values>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 cannot be imported, taking default (ref'mk 0)
+<rac-values>VALUE imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 cannot be imported, taking default ()
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous6.mlw:
@@ -105,9 +105,9 @@ File anonymous6.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
-<rac-values>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
-<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 cannot be imported, taking default (ref'mk 0)
+<rac-values>VALUE imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 cannot be imported, taking default ()
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous6.mlw:
@@ -176,9 +176,9 @@ File anonymous6.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 not in ce-model, taking default (ref'mk 0)
-<rac-values>VALUE from ce-model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
-<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 not in ce-model, taking default ()
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 cannot be imported, taking default (ref'mk 0)
+<rac-values>VALUE imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
+<rac-values>VALUE for result "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 cannot be imported, taking default ()
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous6.mlw:
@@ -223,7 +223,7 @@ File anonymous6.mlw:
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous6.mlw", line 7, characters 10-15:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6611 steps).
+Prover result is: unknown (unknown + incomplete) (0.08s, 6611 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File anonymous6.mlw:

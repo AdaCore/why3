@@ -69,8 +69,8 @@ File func_call.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<rac-values>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
+<rac-values>VALUE imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 cannot be imported, taking default ()
 <check-ce>Model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -185,8 +185,8 @@ File func_call.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<rac-values>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
+<rac-values>VALUE imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 cannot be imported, taking default ()
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -300,8 +300,8 @@ File func_call.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<rac-values>VALUE from ce-model for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 not in ce-model, taking default ()
+<rac-values>VALUE imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 cannot be imported, taking default ()
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -357,7 +357,7 @@ File func_call.mlw:
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6620 steps).
+Prover result is: unknown (unknown + incomplete) (0.08s, 6620 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File func_call.mlw:

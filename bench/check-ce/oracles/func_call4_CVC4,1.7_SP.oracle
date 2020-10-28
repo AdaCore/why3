@@ -51,8 +51,8 @@ File func_call4.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<rac-values>VALUE from ce-model for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
+<rac-values>VALUE imported for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 cannot be imported, taking default ()
 <check-ce>Model 0:
             - Concrete: don't know (Concrete RAC got stuck: Cannot compute application of local any-function g)
               
@@ -130,8 +130,8 @@ File func_call4.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<rac-values>VALUE from ce-model for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
-<rac-values>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
+<rac-values>VALUE imported for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
+<rac-values>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 cannot be imported, taking default ()
 <check-ce>Model 1:
             - Concrete: don't know (Concrete RAC got stuck: Cannot compute application of local any-function g)
               
@@ -207,8 +207,8 @@ File func_call4.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<rac-values>VALUE from ce-model for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
-<rac-values>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 not in ce-model, taking default ()
+<rac-values>VALUE imported for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
+<rac-values>VALUE for result "bench/check-ce/func_call4.mlw", line 9, characters 19-23 cannot be imported, taking default ()
 <check-ce>Model 2:
             - Concrete: don't know (Concrete RAC got stuck: Cannot compute application of local any-function g)
               
@@ -243,7 +243,7 @@ File func_call4.mlw:
     contracts of some loop or function are too weak
 File "bench/check-ce/func_call4.mlw", line 9, characters 34-39:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6512 steps).
+Prover result is: unknown (unknown + incomplete) (0.10s, 6512 steps).
 The program does not comply to the verification goal, or the contracts of
   some loop or function are too weak, for example during the following
   execution:

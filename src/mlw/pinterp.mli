@@ -9,10 +9,13 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Term
+open Wstdlib
 open Ident
+open Term
+open Ity
+open Expr
 
-(** {1 Values and results} *)
+(** {1 Interpreter values} *)
 
 type value
 
@@ -24,36 +27,24 @@ val v_ty : value -> Ty.ty
    is compatible with the value being built *)
 (* TODO: make it defensive? *)
 val int_value : string -> value
-val range_value : Ity.ity -> string -> value
+val range_value : ity -> string -> value
 val string_value : string -> value
 val bool_value : bool -> value
-val constr_value : Ity.ity -> Expr.rsymbol -> value list -> value
-val purefun_value : value_ity:Ity.ity -> arg_ity:Ity.ity -> value Mv.t -> value -> value
+val constr_value : ity -> rsymbol -> value list -> value
+val purefun_value : result_ity:ity -> arg_ity:ity -> value Mv.t -> value -> value
 
-val default_value_of_type : Env.env -> Pdecl.known_map -> Ity.ity -> value
+val default_value_of_type : Env.env -> Pdecl.known_map -> ity -> value
 
 val print_value : Format.formatter -> value -> unit
 
-(** {1 Interpreter types} *)
-
-type env
-(** Context for the interpreter *)
-
-type result =
-  | Normal of value
-  | Excep of Ity.xsymbol * value
-  | Irred of Expr.expr
-  | Fun of Expr.rsymbol * Ity.pvsymbol list * int
-(** Result of the interpreter **)
-
-(** {1 Interpretation log} *)
+(** {2 Interpreter log} *)
 
 type exec_kind = ExecAbstract | ExecConcrete
 
-type log_entry_desc =
+type log_entry_desc = private
   | Val_assumed of (ident * value)
   (** values imported/assumed during interpretation *)
-  | Exec_call of (Expr.rsymbol option * value Mvs.t  * exec_kind)
+  | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
   (** executed function call or lambda if no rsymbol,
       arguments, execution type*)
   | Exec_pure of (lsymbol * exec_kind)
@@ -69,36 +60,21 @@ type log_entry_desc =
   | Exec_ended
   (** execution terminated normally *)
 
-type log_entry = {
+type log_entry = private {
     log_desc : log_entry_desc;
     log_loc  : Loc.position option;
 }
 
 type exec_log
+type log_uc
 
+val empty_log_uc : unit -> log_uc
+val empty_log : exec_log
+val close_log : log_uc -> exec_log
+val sort_log_by_loc : exec_log -> log_entry list Mint.t Mstr.t
 val print_log : json:bool -> exec_log Pp.pp
 
-val sort_log_by_loc : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
-
-(** {1 Contradiction context} *)
-
-type cntr_ctx = {
-  c_desc: string;
-  c_trigger_loc: Loc.position option;
-  c_env: env
-}
-(** Context of a contradiction during RAC *)
-
-exception CannotCompute of {reason: string}
-
-exception Contr of cntr_ctx * Term.term
-(** Exception [Contr] is raised when a contradiction is detected during RAC. *)
-
-exception RACStuck of env * Loc.position option
-
-exception CannotImportModelValue of string
-
-(** {1 Configuration} *)
+(** {3 Interpreter configuration} *)
 
 val init_real : int * int * int -> unit
 (** Give a precision on real computation. *)
@@ -125,26 +101,69 @@ val rac_reduce_config_lit :
   Call_provers.rac_reduce_config_lit ->
   rac_reduce_config
 
-type rac_config
+type rac_config = private {
+  do_rac              : bool;
+  rac_abstract        : bool;
+  skip_cannot_compute : bool; (* skip when it cannot compute, if possible*)
+  rac_reduce          : rac_reduce_config;
+  get_value           : ?name:string -> ?loc:Loc.position ->
+                        ity -> value option;
+  log_uc              : log_uc;
+}
 
 val rac_config :
   do_rac:bool ->
   abstract:bool ->
   ?skip_cannot_compute:bool ->
   ?reduce:rac_reduce_config ->
-  ?get_value:(?name:string -> ?loc:Loc.position -> Ity.ity -> value option) ->
+  ?get_value:(?name:string -> ?loc:Loc.position -> ity -> value option) ->
   unit -> rac_config
 
-(** {1 Interpreter} *)
+(** {4 Interpreter environment and results} *)
+
+(** Context for the interpreter *)
+type env = private {
+  mod_known   : Pdecl.known_map;
+  th_known    : Decl.known_map;
+  funenv      : cexp Mrs.t;
+  vsenv       : value Mvs.t;
+  rsenv       : value Mrs.t; (* global constants *)
+  env         : Env.env;
+  rac         : rac_config;
+}
+
+(** Result of the interpreter **)
+type result = private
+  | Normal of value
+  | Excep of xsymbol * value
+  | Irred of expr
+  | Fun of rsymbol * pvsymbol list * int
+
+(** Context of a contradiction during RAC *)
+type cntr_ctx = private {
+  c_desc: string;
+  c_trigger_loc: Loc.position option;
+  c_env: env
+}
+
+exception CannotCompute of {reason: string}
+(** raised when interpretation cannot continue due to unsupported
+   feature *)
+exception Contr of cntr_ctx * term
+(** raised when a contradiction is detected during RAC. *)
+exception RACStuck of env * Loc.position option
+(** raised when an assumed property is not satisfied *)
+
+(** {5 Interpreter} *)
 
 val eval_global_fundef :
   rac_config ->
   Env.env ->
   Pdecl.known_map ->
   Decl.known_map ->
-  (Expr.rsymbol * Expr.cexp) list ->
-  Expr.expr ->
-  result * value Term.Mvs.t * value Expr.Mrs.t
+  (rsymbol * cexp) list ->
+  expr ->
+  result * value Mvs.t * value Mrs.t
 (* TODO update comment *)
 (** [eval_global_fundef ~rac env disp_ctx known def] evaluates a function definition and
    returns an evaluation result and a final variable environment.
@@ -157,50 +176,13 @@ val eval_global_fundef :
 
     @raise Contr RAC is enabled and a contradiction was found *)
 
-(** {1 Reporting results} *)
-
-val report_cntr : Format.formatter -> cntr_ctx * Term.term -> unit
-val report_cntr_body : Format.formatter -> cntr_ctx * Term.term -> unit
+val report_cntr : Format.formatter -> cntr_ctx * term -> unit
+val report_cntr_body : Format.formatter -> cntr_ctx * term -> unit
 (** Report a contradiction context and term *)
 
 val report_eval_result :
-  Expr.expr ->
-  Format.formatter ->
-  result * value Term.Mvs.t * value Expr.Mrs.t ->
-  unit
+  expr -> Format.formatter -> result * value Mvs.t * value Mrs.t -> unit
 (** Report an evaluation result *)
 
-
-type verdict = Good_model | Bad_model | Dont_know
-
-type full_verdict = {
-    verdict  : verdict;
-    reason   : string;
-    exec_log : exec_log;
-  }
-
-val print_verdict : verdict Pp.pp
-val print_full_verdict : full_verdict Pp.pp
-
-(** Checking a model either results in a reason why it was not
-   possible or a full verdict from abstract and concrete RAC *)
-type check_model_result =
-  | Cannot_check_model of {reason: string}
-  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
-
-val print_check_model_result : check_model_result Pp.pp
-
-(** {1 Check counter-example models using RAC}*)
-
-val check_model_rs :
-  ?loc:Loc.position -> (* TODO should be handled other way, see it's use *)
-  rac_config ->
-  Env.env ->
-  Pmodule.pmodule ->
-  Expr.rsymbol ->
-  full_verdict
-(** [check_model_rs env pm loc m rs] checks if executing the definition of
-    [rs] (abstractly) using the values from the counter-example model [m]
-    trigger a RAC contradiction at location [loc].
-
-    Optional arguments [rac_trans] and [rac_prover] as in [eval_global_fundef]. *)
+val eval_rs : rac_config -> Env.env -> Pmodule.pmodule -> rsymbol -> result * env
+(** [eval_rs rac_config env km pm rs] interprets [rs] *)

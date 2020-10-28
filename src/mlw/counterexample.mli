@@ -16,15 +16,28 @@ open Pmodule
 
 val debug_check_ce : Debug.flag
 
+type check_model_result
+
+val check_model :
+  rac_reduce_config ->
+  Env.env ->
+  pmodule ->
+  model ->
+  check_model_result
+
 type ce_summary
 
-val print_counterexample : ?check_ce:bool -> ?json:bool -> formatter ->
-                           model * ce_summary -> unit
-
-val check_model : rac_reduce_config -> Env.env -> pmodule ->
-                  model -> check_model_result
-
-val select_model :?check:bool -> ?reduce_config:rac_reduce_config -> Env.env ->
-                  pmodule -> ('a * model) list -> (model * ce_summary) option
+val select_model :
+  ?check:bool ->
+  ?reduce_config:rac_reduce_config ->
+  Env.env ->
+  pmodule ->
+  (Call_provers.prover_answer * model) list ->
+  (model * ce_summary) option
 
 val model_of_ce_summary : original_model:model -> ce_summary -> model
+
+val print_counterexample :
+  ?check_ce:bool -> ?json:bool -> formatter -> model * ce_summary -> unit
+
+val print_check_model_result : Format.formatter -> check_model_result -> unit

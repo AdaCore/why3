@@ -81,8 +81,8 @@ File anonymous2.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<rac-values>VALUE from ce-model for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 not in ce-model, taking default ()
+<rac-values>VALUE imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 cannot be imported, taking default ()
 <check-ce>Model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous2.mlw:
@@ -159,8 +159,8 @@ File anonymous2.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<rac-values>VALUE from ce-model for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 not in ce-model, taking default ()
+<rac-values>VALUE imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
+<rac-values>VALUE for result "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 cannot be imported, taking default ()
 <check-ce>Model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous2.mlw:
@@ -213,7 +213,7 @@ File anonymous2.mlw:
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous2.mlw", line 9, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 4910184 steps).
+Prover result is: timeout (1.00s, 2624841 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File anonymous2.mlw:
