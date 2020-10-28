@@ -410,7 +410,7 @@ type verdict = Good_model | Bad_model | Dont_know
 type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
-  | Val_from_model of (ident * value)
+  | Val_assumed of (ident * value)
   | Exec_call of (Expr.rsymbol option * value Mvs.t  * exec_kind)
   | Exec_pure of (Term.lsymbol * exec_kind)
   | Exec_any of value
@@ -438,7 +438,7 @@ let log_entry log_uc log_desc log_loc =
   log_uc := {log_desc; log_loc} :: !log_uc
 
 let log_val log_uc id v loc =
-  log_entry log_uc (Val_from_model (id,v)) loc
+  log_entry log_uc (Val_assumed (id,v)) loc
 
 let log_call log_uc rs mvs kind loc =
   log_entry log_uc (Exec_call (rs,mvs,kind)) loc
@@ -497,7 +497,7 @@ let print_log_entry_desc fmt e =
     fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_id_v)
       (Mid.bindings mid) in
   match e.log_desc with
-  | Val_from_model (id, v) ->
+  | Val_assumed (id, v) ->
       fprintf fmt "@[<h>%a = %a@]" Ident.print_decoded id.id_string print_value v;
   | Exec_call (None, mvs, k) ->
       fprintf fmt "@[<h>%s execution of anonymous function with args:%a@]"
@@ -538,7 +538,7 @@ let print_log ~json fmt entry_log =
         (print_json_field "name" print_json) (String id.id_string)
         (print_json_field "value" print_value) v in
     let print_log_entry fmt = function
-      | Val_from_model (id, v) ->
+      | Val_assumed (id, v) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "VAL_FROM_MODEL")
             (print_json_field "vs" print_json)

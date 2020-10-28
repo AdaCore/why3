@@ -316,7 +316,7 @@ let model_of_exec_log ~original_model log =
   let aux e = match e.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.log_desc with
-        | Val_from_model (id, v) ->
+        | Val_assumed (id, v) ->
             [me loc id v]
         | Exec_failed (_, mid) ->
             Mid.fold (fun id v l -> me loc id v :: l) mid []

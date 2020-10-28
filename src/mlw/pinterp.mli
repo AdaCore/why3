@@ -53,8 +53,8 @@ type verdict = Good_model | Bad_model | Dont_know
 type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
-  | Val_from_model of (ident * value)
-  (** values taken from model during interpretation *)
+  | Val_assumed of (ident * value)
+  (** values imported/assumed during interpretation *)
   | Exec_call of (Expr.rsymbol option * value Mvs.t  * exec_kind)
   (** executed function call or lambda if no rsymbol,
       arguments, execution type*)
