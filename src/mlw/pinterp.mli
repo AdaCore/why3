@@ -48,8 +48,6 @@ type result =
 
 (** {1 Interpretation log} *)
 
-type verdict = Good_model | Bad_model | Dont_know
-
 type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
@@ -81,23 +79,6 @@ type exec_log
 val print_log : json:bool -> exec_log Pp.pp
 
 val sort_log_by_loc : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
-
-type full_verdict = {
-    verdict  : verdict;
-    reason   : string;
-    exec_log : exec_log;
-  }
-
-val print_verdict : verdict Pp.pp
-val print_full_verdict : full_verdict Pp.pp
-
-(** Checking a model either results in a reason why it was not possible or a full
-    verdict from abstract and concrete RAC *)
-type check_model_result =
-  | Cannot_check_model of {reason: string}
-  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
-
-val print_check_model_result : check_model_result Pp.pp
 
 (** {1 Contradiction context} *)
 
@@ -176,6 +157,39 @@ val eval_global_fundef :
 
     @raise Contr RAC is enabled and a contradiction was found *)
 
+(** {1 Reporting results} *)
+
+val report_cntr : Format.formatter -> cntr_ctx * Term.term -> unit
+val report_cntr_body : Format.formatter -> cntr_ctx * Term.term -> unit
+(** Report a contradiction context and term *)
+
+val report_eval_result :
+  Expr.expr ->
+  Format.formatter ->
+  result * value Term.Mvs.t * value Expr.Mrs.t ->
+  unit
+(** Report an evaluation result *)
+
+
+type verdict = Good_model | Bad_model | Dont_know
+
+type full_verdict = {
+    verdict  : verdict;
+    reason   : string;
+    exec_log : exec_log;
+  }
+
+val print_verdict : verdict Pp.pp
+val print_full_verdict : full_verdict Pp.pp
+
+(** Checking a model either results in a reason why it was not
+   possible or a full verdict from abstract and concrete RAC *)
+type check_model_result =
+  | Cannot_check_model of {reason: string}
+  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
+
+val print_check_model_result : check_model_result Pp.pp
+
 (** {1 Check counter-example models using RAC}*)
 
 val check_model_rs :
@@ -190,16 +204,3 @@ val check_model_rs :
     trigger a RAC contradiction at location [loc].
 
     Optional arguments [rac_trans] and [rac_prover] as in [eval_global_fundef]. *)
-
-(** {1 Reporting results} *)
-
-val report_cntr : Format.formatter -> cntr_ctx * Term.term -> unit
-val report_cntr_body : Format.formatter -> cntr_ctx * Term.term -> unit
-(** Report a contradiction context and term *)
-
-val report_eval_result :
-  Expr.expr ->
-  Format.formatter ->
-  result * value Term.Mvs.t * value Expr.Mrs.t ->
-  unit
-(** Report an evaluation result *)

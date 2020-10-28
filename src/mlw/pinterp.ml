@@ -405,8 +405,6 @@ let rac_reduce_config_lit config env lit_conf =
 
 (* Interpretation log *)
 
-type verdict = Good_model | Bad_model | Dont_know
-
 type exec_kind = ExecAbstract | ExecConcrete
 
 type log_entry_desc =
@@ -618,32 +616,6 @@ let sort_log_by_loc log =
     | _ -> sofar in
   Mstr.map (Mint.map List.rev)
     (List.fold_right aux log Mstr.empty)
-
-type full_verdict = {
-    verdict  : verdict;
-    reason   : string;
-    exec_log : exec_log;
-  }
-
-let print_verdict fmt = function
-  | Good_model -> fprintf fmt "good model"
-  | Bad_model -> fprintf fmt "bad model"
-  | Dont_know -> fprintf fmt "don't know"
-
-let print_full_verdict fmt v =
-  fprintf fmt "%a (%s)@,%a"
-    print_verdict v.verdict v.reason (print_log ~json:false) v.exec_log
-
-type check_model_result =
-  | Cannot_check_model of {reason: string}
-  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
-
-let print_check_model_result fmt = function
-  | Cannot_check_model r ->
-      fprintf fmt "@[Cannot check model (%s)@]" r.reason
-  | Check_model_result r ->
-      fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@\n@[<hv2>- Abstract: %a@]@]"
-        print_full_verdict r.concrete print_full_verdict r.abstract
 
 (** RAC configuration  *)
 
@@ -2201,6 +2173,34 @@ let eval_rs rac env mod_known th_known (rs: rsymbol) =
   let res = exec_call ~main_function:true ~loc:e_loc env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   register_ended env rs.rs_name.id_loc;
   res, env
+
+type verdict = Good_model | Bad_model | Dont_know
+
+type full_verdict = {
+    verdict  : verdict;
+    reason   : string;
+    exec_log : exec_log;
+  }
+
+let print_verdict fmt = function
+  | Good_model -> fprintf fmt "good model"
+  | Bad_model -> fprintf fmt "bad model"
+  | Dont_know -> fprintf fmt "don't know"
+
+let print_full_verdict fmt v =
+  fprintf fmt "%a (%s)@,%a"
+    print_verdict v.verdict v.reason (print_log ~json:false) v.exec_log
+
+type check_model_result =
+  | Cannot_check_model of {reason: string}
+  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
+
+let print_check_model_result fmt = function
+  | Cannot_check_model r ->
+      fprintf fmt "@[Cannot check model (%s)@]" r.reason
+  | Check_model_result r ->
+      fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@\n@[<hv2>- Abstract: %a@]@]"
+        print_full_verdict r.concrete print_full_verdict r.abstract
 
 let check_model_rs ?loc rac env pm rs =
   let open Pmodule in

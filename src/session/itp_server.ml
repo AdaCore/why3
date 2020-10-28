@@ -1007,17 +1007,20 @@ match pa.proof_state with
      let result = Pp.string_of print_prover_answer res.pr_answer in
      let cont = d.cont in
      let selected_model =
-       let reduce_lit = rac_reduce_config_lit ~trans:"compute_in_goal" () in
        let rec find_th s id = match get_proof_parent s id with
          | Theory th -> th
          | Trans id -> find_th s (get_trans_parent s id) in
        let th = find_th cont.controller_session parid in
        let pm = Pmodule.restore_module (Theory.restore_theory (theory_name th)) in
        let env = cont.controller_env in
+       let reduce_lit =
+         Call_provers.rac_reduce_config_lit ~trans:"compute_in_goal" () in
        let reduce_config =
-         Pinterp.rac_reduce_config_lit cont.controller_config env reduce_lit in
+         Pinterp.rac_reduce_config_lit
+           cont.controller_config env reduce_lit in
        let sel =
-         Counterexample.select_model ~check:true reduce_config env pm res.pr_models in
+         Counterexample.select_model ~check:true
+           ~reduce_config env pm res.pr_models in
        match sel with None -> Model_parser.default_model | Some (m,_) -> m in
      let ce_result =
        Pp.string_of (Model_parser.print_model_human ~print_attrs ?me_name_trans:None)
