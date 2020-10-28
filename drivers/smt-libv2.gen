@@ -125,6 +125,13 @@ theory real.MinMax
   remove allprops
 end
 
+theory int.MinMax
+  syntax function min "(ite (< %1 %2) %1 %2)"
+  syntax function max "(ite (< %1 %2) %2 %1)"
+
+  remove allprops
+end
+
 theory real.FromInt
   syntax function from_int "(to_real %1)"
 
