@@ -146,9 +146,11 @@ let rec import_model_value env known ity v =
         check_construction def;
         let rs = match def.Pdecl.itd_constructors with [c] -> c | _ -> assert false in
         let assoc_ity rs =
-          let name =
-            try Ident.get_model_element_name ~attrs:rs.rs_name.id_attrs
-            with Not_found -> rs.rs_name.id_string in
+          let attrs = rs.rs_name.Ident.id_attrs in
+          let name = match Ident.get_model_element_name ~attrs with
+            | exception Not_found -> rs.rs_name.Ident.id_string
+            | "" -> rs.rs_name.Ident.id_string
+            | name -> name in
           let ity = ity_full_inst subst (fd_of_rs rs).pv_ity in
           name, ity in
         let arg_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
