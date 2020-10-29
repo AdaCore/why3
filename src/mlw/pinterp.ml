@@ -1250,14 +1250,18 @@ let get_value_for_quant_var env vs =
                  "Bind all-quantified variable %a to %a@."
                  print_vs vs print_value v) v; v)
         else None in
-      if value <> None then value else
-      if bind_univ_quant_vars_default then (
-        let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
-        Debug.dprintf debug_rac_values
-          "Use default value for all-quantified variable %a: %a@."
-          print_vs vs print_value v;
-        Some v
-      ) else None
+      let value =
+        if value <> None then value else
+          if bind_univ_quant_vars_default then (
+            let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
+            Debug.dprintf debug_rac_values
+              "Use default value for all-quantified variable %a: %a@."
+              print_vs vs print_value v;
+            Some v
+          ) else None in
+      Opt.iter (fun v ->
+          register_used_value env (Some loc) vs.vs_name v) value;
+      value
 
 (** When the task goal is [forall vs* . t], add declarations to the
    task that bind the variables [vs*] to concrete values (with
