@@ -618,18 +618,21 @@ let sort_log_by_loc log =
 
 (** RAC configuration  *)
 
+type import_value = ?name:string -> ?loc:Loc.position -> ity -> value option
+
 type rac_config = {
   do_rac              : bool;
   rac_abstract        : bool;
-  skip_cannot_compute : bool; (* skip when it cannot compute, if possible*)
+  skip_cannot_compute : bool; (* skip if it cannot compute, when possible *)
   rac_reduce          : rac_reduce_config;
-  get_value           : ?name:string -> ?loc:Loc.position -> ity -> value option;
+  get_value           : import_value;
   log_uc              : log_uc;
 }
 
 let default_get_value ?name:_ ?loc:_ _ = None
 
-let rac_config ~do_rac ~abstract:rac_abstract ?(skip_cannot_compute=true)
+let rac_config ~do_rac ~abstract:rac_abstract
+      ?(skip_cannot_compute=true)
       ?reduce:rac_reduce
       ?(get_value=default_get_value) () =
   let rac_reduce = match rac_reduce with
