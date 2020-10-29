@@ -1,29 +1,22 @@
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 12:
-    the check fails with all inputs
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 11:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 12:
+              the check fails with all inputs
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter b, continue with default value (
 ref'mk 0)
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 12:
-    the check fails with all inputs
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter b, continue with default value (
 ref'mk 0)
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
                 Line 6:
@@ -45,60 +38,40 @@ ref'mk 0)
                     a = (ref'mk 0)
                     b = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 12:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 12:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 6:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 8:
+              b =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "4"}}]}}
+            Line 11:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "4"}}]}}
+            Line 12:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 cannot be imported, taking default 0
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -150,60 +123,40 @@ File jlamp0.mlw:
                     r = (ref'mk 4)
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 12:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 12:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 6:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "1"}}]}}
+            Line 8:
+              b =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "3"}}]}}
+            Line 11:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "4"}}]}}
+            Line 12:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 cannot be imported, taking default 0
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -263,7 +216,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Goal Assertion from verification condition p1'vc.
-Prover result is: timeout (1.00s, 3318644 steps).
+Prover result is: timeout (1.00s, 5319746 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0.mlw:
@@ -301,39 +254,29 @@ File jlamp0.mlw:
       a = (ref'mk 4)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 13:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 10:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 13:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter b, continue with default value (
 ref'mk 0)
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 13:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter b, continue with default value (
 ref'mk 0)
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
                 Line 6:
@@ -355,82 +298,53 @@ ref'mk 0)
                     a = (ref'mk 0)
                     b = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "7"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-  Line 13:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "7"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-  Line 13:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 6:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "7"}}]}}
+            Line 8:
+              b =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "3"}}]}}
+            Line 10:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "9"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "9"}}]}}
+            Line 11:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "10"}}]}}
+            Line 13:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "9"}}]}}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 cannot be imported, taking default 0
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -517,82 +431,53 @@ File jlamp0.mlw:
                     r = (ref'mk 3)
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "7"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-  Line 13:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "7"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-  Line 13:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 6:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "7"}}]}}
+            Line 8:
+              b =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "3"}}]}}
+            Line 10:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "9"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "9"}}]}}
+            Line 11:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "10"}}]}}
+            Line 13:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "9"}}]}}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 cannot be imported, taking default 0
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -687,7 +572,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: timeout (1.00s, 3682186 steps).
+Prover result is: timeout (1.00s, 5888541 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0.mlw:
@@ -760,39 +645,29 @@ File jlamp0.mlw:
       a = (ref'mk 9)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 10:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 11:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter b, continue with default value (
 ref'mk 0)
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter b, continue with default value (
 ref'mk 0)
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File jlamp0.mlw:
                 Line 6:
@@ -814,70 +689,46 @@ ref'mk 0)
                     a = (ref'mk 0)
                     b = (ref'mk 0)
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 6:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+            Line 8:
+              b =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "3"}}]}}
+            Line 10:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "5"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "5"}}]}}
+            Line 11:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "5"}}]}}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 cannot be imported, taking default 0
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -942,70 +793,46 @@ File jlamp0.mlw:
                     r = (ref'mk 3)
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 8:
-    b =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 10:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-  Line 11:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 6:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+            Line 8:
+              b =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "3"}}]}}
+            Line 10:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "5"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "5"}}]}}
+            Line 11:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "5"}}]}}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 cannot be imported, taking default 0
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -1078,7 +905,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: timeout (1.00s, 2748930 steps).
+Prover result is: timeout (1.00s, 6164724 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0.mlw:
@@ -1129,33 +956,26 @@ File jlamp0.mlw:
       a = (ref'mk 5)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 22:
-    the check fails with all inputs
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 20:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 22:
+              the check fails with all inputs
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 22:
-    the check fails with all inputs
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 0)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -1197,53 +1017,38 @@ File jlamp0.mlw:
                     r = (ref'mk 0)
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 22:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 6:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 20:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "1"}}]}}
+            Line 22:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "1"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 22:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -1285,53 +1090,38 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 22:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 6:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 20:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "1"}}]}}
+            Line 22:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "1"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 22:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -1381,7 +1171,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: timeout (1.00s, 1863598 steps).
+Prover result is: timeout (1.00s, 6167783 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0.mlw:
@@ -1405,50 +1195,37 @@ File jlamp0.mlw:
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: valid (0.02s, 295 steps).
+Prover result is: valid (0.01s, 295 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
-<check-ce>Validating model concretely:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
-File jlamp0.mlw:
-  Line 21:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
-  Line 24:
-    the check fails with all inputs
+<check-ce>Validating model:
+          File ref.mlw:
+            Line 18:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+            File jlamp0.mlw:
+              Line 21:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "-1"}}]}}
+              Line 24:
+                the check fails with all inputs
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
-File jlamp0.mlw:
-  Line 21:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
-  Line 24:
-    the check fails with all inputs
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE for c "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default (ref'mk 0)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 6:
@@ -1490,123 +1267,79 @@ File jlamp0.mlw:
                     r = (ref'mk 0)
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
-<check-ce>Validating model concretely:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 24:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Validating model:
+          File ref.mlw:
+            Line 18:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+            File jlamp0.mlw:
+              Line 6:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "0"}}]}}
+              Line 20:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "1"}}]}}
+              Line 21:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "2"}}]}}
+              Line 24:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "4"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "4"}}]}}
+              Line 25:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "5"}}]}}
+              Line 26:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 24:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 6:
@@ -1648,123 +1381,79 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
-<check-ce>Validating model concretely:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 24:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Validating model:
+          File ref.mlw:
+            Line 18:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+            File jlamp0.mlw:
+              Line 6:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "0"}}]}}
+              Line 20:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "1"}}]}}
+              Line 21:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "2"}}]}}
+              Line 24:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "4"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "4"}}]}}
+              Line 25:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "5"}}]}}
+              Line 26:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 24:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 6:
@@ -1814,7 +1503,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Goal Loop variant decrease from verification condition p2'vc.
-Prover result is: timeout (1.00s, 2317473 steps).
+Prover result is: timeout (1.00s, 5966761 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0.mlw:
@@ -1837,33 +1526,26 @@ File jlamp0.mlw:
       c = (ref'mk 1)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 22:
-    the check fails with all inputs
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 22:
+              the check fails with all inputs
+            Line 26:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 22:
-    the check fails with all inputs
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE for c "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default (ref'mk 0)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -1905,113 +1587,73 @@ File jlamp0.mlw:
                     r = (ref'mk 0)
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-<check-ce>Validating model concretely:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-  Line 22:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "13"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+<check-ce>Validating model:
+          File ref.mlw:
+            Line 18:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "10"}}]}}
+            File jlamp0.mlw:
+              Line 6:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "0"}}]}}
+              Line 20:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "1"}}]}}
+              Line 21:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "10"}}]}}
+              Line 22:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "12"}}]}}
+              Line 25:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "13"}}]}}
+              Line 26:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "12"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-  Line 22:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "13"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -2053,113 +1695,73 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-<check-ce>Validating model concretely:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-  Line 22:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "13"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+<check-ce>Validating model:
+          File ref.mlw:
+            Line 18:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "10"}}]}}
+            File jlamp0.mlw:
+              Line 6:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "0"}}]}}
+              Line 20:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "1"}}]}}
+              Line 21:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "10"}}]}}
+              Line 22:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "12"}}]}}
+              Line 25:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "13"}}]}}
+              Line 26:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "12"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-  Line 22:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "13"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File jlamp0.mlw:
                 Line 6:
@@ -2209,7 +1811,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: timeout (1.00s, 3028988 steps).
+Prover result is: timeout (1.00s, 5986020 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0.mlw:
@@ -2232,33 +1834,26 @@ File jlamp0.mlw:
       c = (ref'mk 1)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 23:
-    the check fails with all inputs
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 23:
+              the check fails with all inputs
+            Line 25:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 23:
-    the check fails with all inputs
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE for c "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default (ref'mk 0)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 6:
@@ -2300,113 +1895,73 @@ File jlamp0.mlw:
                     r = (ref'mk 0)
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
-<check-ce>Validating model concretely:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 23:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Validating model:
+          File ref.mlw:
+            Line 18:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+            File jlamp0.mlw:
+              Line 6:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "0"}}]}}
+              Line 20:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "1"}}]}}
+              Line 21:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "9"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "2"}}]}}
+              Line 23:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "11"}}]}}
+              Line 25:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "11"}}]}}
+              Line 26:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 23:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 6:
@@ -2448,113 +2003,73 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
-<check-ce>Validating model concretely:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 23:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Validating model:
+          File ref.mlw:
+            Line 18:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+            File jlamp0.mlw:
+              Line 6:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "0"}}]}}
+              Line 20:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "1"}}]}}
+              Line 21:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "9"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "2"}}]}}
+              Line 23:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "11"}}]}}
+              Line 25:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "11"}}]}}
+              Line 26:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
-  Line 23:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-  Line 25:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-  Line 26:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 6:
@@ -2604,7 +2119,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: timeout (1.00s, 4064413 steps).
+Prover result is: timeout (1.00s, 5986956 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0.mlw:
@@ -2627,41 +2142,31 @@ File jlamp0.mlw:
       c = (ref'mk 1)
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
-<check-ce>Validating model concretely:
-File jlamp0.mlw:
-  Line 19:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File jlamp0.mlw:
+            Line 19:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 21:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File jlamp0.mlw:
-  Line 19:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE for c "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default (ref'mk 0)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 6:
@@ -2703,99 +2208,65 @@ File jlamp0.mlw:
                     r = (ref'mk 0)
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
-<check-ce>Validating model concretely:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 19:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+<check-ce>Validating model:
+          File ref.mlw:
+            Line 18:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "11"}}]}}
+            File jlamp0.mlw:
+              Line 6:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "0"}}]}}
+              Line 19:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+              Line 20:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "1"}}]}}
+              Line 21:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "11"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 19:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 6:
@@ -2837,99 +2308,65 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
-<check-ce>Validating model concretely:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 19:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+<check-ce>Validating model:
+          File ref.mlw:
+            Line 18:
+              c =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "11"}}]}}
+            File jlamp0.mlw:
+              Line 6:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "0"}}]}}
+              Line 19:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+              Line 20:
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "1"}}]}}
+              Line 21:
+                a =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "3"}}]}}
+                c =
+                  {"type": "Record",
+                   "val":
+                    {"Field":
+                      [{"field": "contents",
+                        "value": {"type": "Integer", "val": "11"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File ref.mlw:
-  Line 18:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
-File jlamp0.mlw:
-  Line 6:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 19:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-  Line 20:
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 21:
-    a =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
 <rac-values>VALUE for result "bench/check-ce/jlamp0.mlw", line 20, characters 4-10 cannot be imported, taking default ()
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File jlamp0.mlw:
                 Line 6:
@@ -2979,7 +2416,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Goal Postcondition from verification condition p2'vc.
-Prover result is: timeout (1.00s, 2922450 steps).
+Prover result is: timeout (1.00s, 6040354 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0.mlw:

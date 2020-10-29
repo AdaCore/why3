@@ -1,40 +1,33 @@
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.04s, 1182 steps).
+Prover result is: valid (0.03s, 1182 steps).
 
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Goal Loop invariant preservation from verification condition f'vc.
 Prover result is: valid (0.03s, 1654 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
-<check-ce>Validating model concretely:
-File for1.mlw:
-  Line 4:
-    result = {"type": "Integer", "val": "0"}
-  Line 6:
-    x =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File for1.mlw:
+            Line 4:
+              result = {"type": "Integer", "val": "0"}
+            Line 6:
+              x =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File for1.mlw:
-  Line 4:
-    result = {"type": "Integer", "val": "0"}
-  Line 6:
-    x =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE for result "bench/check-ce/for1.mlw", line 5, characters 16-17 cannot be imported, taking default (ref'mk 0)
 <rac-values>VALUE imported for x at "bench/check-ce/for1.mlw", line 6, characters 4-74: (ref'mk 0)
 <rac-values>VALUE for i "bench/check-ce/for1.mlw", line 6, characters 8-9 cannot be imported, taking default 2
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File for1.mlw:
                 Line 3:
@@ -85,34 +78,27 @@ File for1.mlw:
                   Property failure, Postcondition of f with:
                     result = 0
 <check-ce>Check model 1 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
-<check-ce>Validating model concretely:
-File for1.mlw:
-  Line 4:
-    result = {"type": "Integer", "val": "0"}
-  Line 6:
-    x =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File for1.mlw:
+            Line 4:
+              result = {"type": "Integer", "val": "0"}
+            Line 6:
+              x =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File for1.mlw:
-  Line 4:
-    result = {"type": "Integer", "val": "0"}
-  Line 6:
-    x =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE for result "bench/check-ce/for1.mlw", line 5, characters 16-17 cannot be imported, taking default (ref'mk 0)
 <rac-values>VALUE imported for x at "bench/check-ce/for1.mlw", line 6, characters 4-74: (ref'mk 0)
 <rac-values>VALUE for i "bench/check-ce/for1.mlw", line 6, characters 8-9 cannot be imported, taking default 2
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File for1.mlw:
                 Line 3:
@@ -163,34 +149,27 @@ File for1.mlw:
                   Property failure, Postcondition of f with:
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
-<check-ce>Validating model concretely:
-File for1.mlw:
-  Line 4:
-    result = {"type": "Integer", "val": "0"}
-  Line 6:
-    x =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File for1.mlw:
+            Line 4:
+              result = {"type": "Integer", "val": "0"}
+            Line 6:
+              x =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File for1.mlw:
-  Line 4:
-    result = {"type": "Integer", "val": "0"}
-  Line 6:
-    x =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
 <rac-values>VALUE for result "bench/check-ce/for1.mlw", line 5, characters 16-17 cannot be imported, taking default (ref'mk 0)
 <rac-values>VALUE imported for x at "bench/check-ce/for1.mlw", line 6, characters 4-74: (ref'mk 0)
 <rac-values>VALUE for i "bench/check-ce/for1.mlw", line 6, characters 8-9 cannot be imported, taking default 2
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File for1.mlw:
                 Line 3:
@@ -249,7 +228,7 @@ File for1.mlw:
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Goal Postcondition from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.06s, 6492 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6492 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File for1.mlw:

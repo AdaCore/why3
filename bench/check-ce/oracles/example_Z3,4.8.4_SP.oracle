@@ -1,21 +1,17 @@
 <check-ce>Check model 0 ("bench/check-ce/example.mlw", line 7, characters 15-22)
-<check-ce>Validating model concretely:
-File example.mlw:
-  Line 4:
-    a = {"type": "Integer", "val": "42"}
-  Line 7:
-    the check fails with all inputs
+<check-ce>Validating model:
+          File example.mlw:
+            Line 4:
+              a = {"type": "Integer", "val": "42"}
+            Line 7:
+              the check fails with all inputs
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File example.mlw:
-  Line 4:
-    a = {"type": "Integer", "val": "42"}
-  Line 7:
-    the check fails with all inputs
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Model 0:
+<check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File example.mlw:
                 Line 4:
@@ -39,23 +35,19 @@ File example.mlw:
                   Property failure, Assertion with:
                     a = 42
 <check-ce>Check model 1 ("bench/check-ce/example.mlw", line 7, characters 15-22)
-<check-ce>Validating model concretely:
-File example.mlw:
-  Line 4:
-    a = {"type": "Integer", "val": "42"}
-  Line 7:
-    a = {"type": "Integer", "val": "42"}
+<check-ce>Validating model:
+          File example.mlw:
+            Line 4:
+              a = {"type": "Integer", "val": "42"}
+            Line 7:
+              a = {"type": "Integer", "val": "42"}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File example.mlw:
-  Line 4:
-    a = {"type": "Integer", "val": "42"}
-  Line 7:
-    a = {"type": "Integer", "val": "42"}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File example.mlw:
                 Line 4:
@@ -79,23 +71,19 @@ File example.mlw:
                   Property failure, Assertion with:
                     a = 42
 <check-ce>Check model 2 ("bench/check-ce/example.mlw", line 7, characters 15-22)
-<check-ce>Validating model concretely:
-File example.mlw:
-  Line 4:
-    a = {"type": "Integer", "val": "42"}
-  Line 7:
-    a = {"type": "Integer", "val": "42"}
+<check-ce>Validating model:
+          File example.mlw:
+            Line 4:
+              a = {"type": "Integer", "val": "42"}
+            Line 7:
+              a = {"type": "Integer", "val": "42"}
+<check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Validating model abstractly:
-File example.mlw:
-  Line 4:
-    a = {"type": "Integer", "val": "42"}
-  Line 7:
-    a = {"type": "Integer", "val": "42"}
+<check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value (
 )
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File example.mlw:
                 Line 4:

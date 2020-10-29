@@ -1,37 +1,25 @@
 <check-ce>Check model 0 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
-<check-ce>Validating model concretely:
-File anonymous2.mlw:
-  Line 5:
-    x = {"type": "Integer", "val": "0"}
-  Line 8:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 9:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Validating model abstractly:
-File anonymous2.mlw:
-  Line 5:
-    x = {"type": "Integer", "val": "0"}
-  Line 8:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 9:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Model 0:
+<check-ce>Validating model:
+          File anonymous2.mlw:
+            Line 5:
+              x = {"type": "Integer", "val": "0"}
+            Line 8:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 9:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
+<check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous2.mlw", line 6, characters 13-18)
               File anonymous2.mlw:
                 Line 3:
@@ -59,41 +47,29 @@ File anonymous2.mlw:
                   Execution got stuck, Precondition of f with:
                     x = 0
 <check-ce>Check model 1 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
-<check-ce>Validating model concretely:
-File anonymous2.mlw:
-  Line 5:
-    x = {"type": "Integer", "val": "1"}
-  Line 8:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 9:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Validating model abstractly:
-File anonymous2.mlw:
-  Line 5:
-    x = {"type": "Integer", "val": "1"}
-  Line 8:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 9:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File anonymous2.mlw:
+            Line 5:
+              x = {"type": "Integer", "val": "1"}
+            Line 8:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 9:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
 <rac-values>VALUE imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
 <rac-values>VALUE for result "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 cannot be imported, taking default ()
-<check-ce>Model 1:
+<check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous2.mlw:
                 Line 3:
@@ -137,41 +113,29 @@ File anonymous2.mlw:
                   Property failure, Assertion with:
                     z = (ref'mk 0)
 <check-ce>Check model 2 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
-<check-ce>Validating model concretely:
-File anonymous2.mlw:
-  Line 5:
-    x = {"type": "Integer", "val": "1"}
-  Line 8:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 9:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Validating model abstractly:
-File anonymous2.mlw:
-  Line 5:
-    x = {"type": "Integer", "val": "1"}
-  Line 8:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 9:
-    z =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Validating model:
+          File anonymous2.mlw:
+            Line 5:
+              x = {"type": "Integer", "val": "1"}
+            Line 8:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 9:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
 <rac-values>VALUE imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
 <rac-values>VALUE for result "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 cannot be imported, taking default ()
-<check-ce>Model 2:
+<check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous2.mlw:
                 Line 3:
@@ -223,7 +187,7 @@ File anonymous2.mlw:
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous2.mlw", line 9, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.08s, 6026 steps).
+Prover result is: unknown (unknown + incomplete) (0.07s, 6026 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File anonymous2.mlw:

@@ -402,7 +402,8 @@ let check_model_rs ?loc rac env pm rs =
   | CannotCompute r ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
-      let reason = sprintf "%s RAC got stuck: %s" abs_Msg r.reason in
+      let reason = sprintf "%s RAC terminated due to unsupported feature: %s"
+                     abs_Msg r.reason in
       {verdict= Dont_know; reason; exec_log= empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
@@ -435,14 +436,12 @@ let check_model reduce env pm model =
                       ~skip_cannot_compute:false ~reduce ~get_value () in
           check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
         Debug.dprintf debug_check_ce
-          "Validating model concretely:@\n%a@."
+          "@[Validating model:@\n@[<hv2>%a@]@]@\n"
           (Model_parser.print_model ?me_name_trans:None ~print_attrs:false)
           model;
+        Debug.dprintf debug_check_ce "@[Interpreting concretly@]@\n";
         let concrete = check_model_rs ~abstract:false in
-        Debug.dprintf debug_check_ce
-          "Validating model abstractly:@\n%a@."
-          (Model_parser.print_model ?me_name_trans:None ~print_attrs:false)
-          model;
+        Debug.dprintf debug_check_ce "@[Interpreting abstractly@]@\n";
         let abstract = check_model_rs ~abstract:true in
         Check_model_result {concrete; abstract}
      | None ->
@@ -463,7 +462,7 @@ let select_model ?(check=false) ?(reduce_config=rac_reduce_config ()) env pmodul
     (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
      *   (print_model ?me_name_trans:None ~print_attrs:false) m; *)
     let mr = check_model m in
-    Debug.dprintf debug_check_ce "@[<v2>Model %d:@\n@[%a@]@]@." i
+    Debug.dprintf debug_check_ce "@[<v2>Result of checking model %d:@\n@[%a@]@]@." i
       print_check_model_result mr;
     i,r,m,mr in
   let not_empty (i,_,m) =
