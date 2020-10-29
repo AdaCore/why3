@@ -34,7 +34,6 @@ let debug_rac_check_sat =
     ~desc:"satisfiability of terms in rac"
 (* print debug information when checking the satisfiability of terms
    during rac *)
-
 let debug_rac_check_term_result =
   Debug.register_info_flag "rac-check-term-result"
     ~desc:"print the result when terms are checked for validity"
@@ -482,30 +481,25 @@ let rec consecutives key ?(sofar=[]) ?current xs =
           consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
 
 let print_log_entry_desc fmt e =
-  let print_vs_v fmt (vs,v) =
-    fprintf fmt "@[%a = %a@]" print_decoded
-      vs.vs_name.id_string print_value v in
-  let print_mvs fmt mvs =
-    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_vs_v)
-      (Mvs.bindings mvs) in
-  let print_id_v fmt (id,v) =
-    fprintf fmt "@[%a = %a@]" print_decoded id.id_string
-      print_value v in
-  let print_mid fmt mid =
-    fprintf fmt "%a" (Pp.print_list_pre Pp.newline print_id_v)
-      (Mid.bindings mid) in
+  let print_assgn key2string fmt (k,v) =
+    fprintf fmt "@[%a = %a@]"
+      print_decoded (key2string k) print_value v in
+  let print_list key2string =
+    Pp.print_list_pre Pp.newline (print_assgn key2string) in
+  let vs2string vs = vs.vs_name.id_string in
+  let id2string id = id.id_string in
   match e.log_desc with
   | Val_assumed (id, v) ->
       fprintf fmt "@[<h>%a = %a@]" print_decoded id.id_string print_value v;
   | Exec_call (None, mvs, k) ->
       fprintf fmt "@[<h>%s execution of anonymous function with args:%a@]"
         (exec_kind_to_string k)
-        print_mvs mvs
+        (print_list vs2string) (Mvs.bindings mvs)
   | Exec_call (Some rs, mvs, k) ->
       fprintf fmt "@[<hv2>%s execution of %a with args:%a@]"
         (exec_kind_to_string k)
         print_decoded rs.rs_name.id_string
-        print_mvs mvs
+        (print_list vs2string) (Mvs.bindings mvs)
   | Exec_pure (ls,k) ->
       fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
         print_decoded ls.ls_name.id_string
@@ -514,9 +508,11 @@ let print_log_entry_desc fmt e =
   | Exec_loop k ->
       fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
   | Exec_failed (msg,mid) ->
-     fprintf fmt "@[<hv2>Property failure, %s with:%a@]" msg print_mid mid
+     fprintf fmt "@[<hv2>Property failure, %s with:%a@]"
+       msg (print_list id2string) (Mid.bindings mid)
   | Exec_stucked (msg,mid) ->
-     fprintf fmt "@[<hv2>Execution got stuck, %s with:%a@]" msg print_mid mid
+     fprintf fmt "@[<hv2>Execution got stuck, %s with:%a@]"
+       msg (print_list id2string) (Mid.bindings mid)
   | Exec_ended ->
       fprintf fmt "@[<h>Execution of main function terminated normally@]"
 
@@ -527,14 +523,12 @@ let print_log ~json fmt entry_log =
     let print_json_kind fmt = function
       | ExecAbstract -> print_json fmt (string "ABSTRACT")
       | ExecConcrete -> print_json fmt (string "CONCRETE") in
-    let print_vs_value fmt (vs,v) =
+    let print_key_value key2string fmt (k,v) =
       fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-        (print_json_field "name" print_json) (String vs.vs_name.id_string)
+        (print_json_field "name" print_json) (String (key2string k))
         (print_json_field "value" print_value) v in
-    let print_id_value fmt (id,v) =
-      fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-        (print_json_field "name" print_json) (String id.id_string)
-        (print_json_field "value" print_value) v in
+    let vs2string vs = vs.vs_name.id_string in
+    let id2string id = id.id_string in
     let print_log_entry fmt = function
       | Val_assumed (id, v) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
@@ -549,7 +543,8 @@ let print_log ~json fmt entry_log =
                 | Some rs -> string "%a" print_decoded rs.rs_name.id_string
                 | None -> Null)
             (print_json_field "exec" print_json_kind) kind
-            (print_json_field "args" (list print_vs_value)) (Mvs.bindings mvs)
+            (print_json_field "args" (list (print_key_value vs2string)))
+            (Mvs.bindings mvs)
       | Exec_pure (ls, kind) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "EXEC_PURE")
@@ -567,12 +562,14 @@ let print_log ~json fmt entry_log =
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "FAILED")
             (print_json_field "reason" print_json) (String reason)
-            (print_json_field "state" (list print_id_value)) (Mid.bindings mid)
+            (print_json_field "state" (list (print_key_value id2string)))
+            (Mid.bindings mid)
       | Exec_stucked (reason,mid) ->
           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
             (print_json_field "kind" print_json) (string "STUCKED")
             (print_json_field "reason" print_json) (String reason)
-            (print_json_field "state" (list print_id_value)) (Mid.bindings mid)
+            (print_json_field "state" (list (print_key_value id2string)))
+            (Mid.bindings mid)
       | Exec_ended ->
           fprintf fmt "@[@[<hv1>{%a@]}@]"
             (print_json_field "kind" print_json) (string "ENDED") in
