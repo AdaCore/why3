@@ -112,10 +112,17 @@ let do_input f =
         muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
-  with Contr (ctx, term) ->
-    Pretty.forget_all ();
-    printf "%a@." report_cntr_body (ctx, term) ;
-    exit 1
+  with | Contr (ctx, term) ->
+          Pretty.forget_all ();
+          printf "%a@." report_cntr_body (ctx, term) ;
+          exit 1
+       | CannotCompute reason ->
+          printf "RAC terminated due to unsupported feature: %s@." reason.reason
+       | Failure msg ->
+          printf "failure: %s@." msg
+       | RACStuck (env,l) ->
+          printf "RAC, with the counterexample model cannot continue after %a@."
+            (Pp.print_option Pretty.print_loc') l
 
 let () =
   try
