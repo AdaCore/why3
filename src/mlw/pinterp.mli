@@ -9,13 +9,15 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** {2 Interpretation of Why3 programs} *)
+
 open Wstdlib
 open Ident
 open Term
 open Ity
 open Expr
 
-(** {1 Interpreter values} *)
+(** {2 Interpreter values} *)
 
 type value
 
@@ -23,8 +25,9 @@ module Mv : Map.S with type key = value
 
 val v_ty : value -> Ty.ty
 
-(* non defensive API for building value: there are no checks that ity
-   is compatible with the value being built *)
+(** non defensive API for building [value]s: there are no checks that
+   [ity] is compatible with the [value] being built *)
+
 (* TODO: make it defensive? *)
 val int_value : string -> value
 val range_value : ity -> string -> value
@@ -66,7 +69,9 @@ type log_entry = private {
 }
 
 type exec_log
+(** final log *)
 type log_uc
+(** log under construction *)
 
 val empty_log_uc : unit -> log_uc
 val empty_log : exec_log
@@ -74,7 +79,7 @@ val close_log : log_uc -> exec_log
 val sort_log_by_loc : exec_log -> log_entry list Mint.t Mstr.t
 val print_log : json:bool -> exec_log Pp.pp
 
-(** {3 Interpreter configuration} *)
+(** {2 Interpreter configuration} *)
 
 val init_real : int * int * int -> unit
 (** Give a precision on real computation. *)
@@ -104,12 +109,18 @@ val rac_reduce_config_lit :
 type import_value = ?name:string -> ?loc:Loc.position -> ity -> value option
 
 type rac_config = private {
-  do_rac              : bool;
-  rac_abstract        : bool;
-  skip_cannot_compute : bool; (* skip if it cannot compute, when possible *)
-  rac_reduce          : rac_reduce_config;
-  get_value           : import_value;
-  log_uc              : log_uc;
+  do_rac : bool;
+  (** check assertions *)
+  rac_abstract : bool;
+  (** interpret abstractly *)
+  skip_cannot_compute : bool;
+  (** continue when term cannot be checked *)
+  rac_reduce : rac_reduce_config;
+  (** configuration for reducing terms *)
+  get_value : import_value;
+  (** import values when they are needed *)
+  log_uc : log_uc;
+  (** log *)
 }
 
 val rac_config :
@@ -120,7 +131,7 @@ val rac_config :
   ?get_value:(?name:string -> ?loc:Loc.position -> ity -> value option) ->
   unit -> rac_config
 
-(** {4 Interpreter environment and results} *)
+(** {2 Interpreter environment and results} *)
 
 (** Context for the interpreter *)
 type env = private {
@@ -155,7 +166,7 @@ exception Contr of cntr_ctx * term
 exception RACStuck of env * Loc.position option
 (** raised when an assumed property is not satisfied *)
 
-(** {5 Interpreter} *)
+(** {2 Interpreter} *)
 
 val eval_global_fundef :
   rac_config ->
@@ -165,17 +176,26 @@ val eval_global_fundef :
   (rsymbol * cexp) list ->
   expr ->
   result * value Mvs.t * value Mrs.t
-(* TODO update comment *)
-(** [eval_global_fundef ~rac env disp_ctx known def] evaluates a function definition and
-   returns an evaluation result and a final variable environment.
+(** [eval_global_fundef ~rac env pkm dkm rcl e] evaluates [e] and
+   returns an evaluation result and a final variable environment (for
+   both local and global variables).
 
-    During RAC, annotations are first reduced by applying transformation [rac_trans], and
-   if the transformation doesn't return to a trivial formula ([true]/[false]), the prover
-   [rac_prover] is applied. Pure expressions and pure executions are reduced only using
-   [rac_trans]. When neither [rac_trans] or [rac_prover] are defined, RAC does not
-    progress.
+   During RAC, annotations are first reduced by applying
+   transformation [rac.rac_trans], and if the transformation doesn't
+   return to a trivial formula ([true]/[false]), the prover
+   [rac.rac_prover] is applied. Pure expressions and pure executions
+   are reduced only using [rac.rac_trans]. When neither [ra.rac_trans]
+   or [rac.rac_prover] are defined, RAC does not progress.
 
-    @raise Contr RAC is enabled and a contradiction was found *)
+   raises [Contr _] if [rac.rac] and a an assertion was violated.
+
+   raises [CannotCompute _] if some term could not be reduced due to
+   unsopported feature.
+
+   raises [Failure _] if there is an unsopported feature.
+
+   raises [RACStuck _] if a property that should be assumed is not
+   satisfied in the current enviroment. *)
 
 val report_cntr : Format.formatter -> cntr_ctx * term -> unit
 val report_cntr_body : Format.formatter -> cntr_ctx * term -> unit
@@ -186,4 +206,16 @@ val report_eval_result :
 (** Report an evaluation result *)
 
 val eval_rs : rac_config -> Env.env -> Pmodule.pmodule -> rsymbol -> result * env
-(** [eval_rs rac_config env km pm rs] interprets [rs] *)
+(** [eval_rs ~rac env pm rs] evaluates the definition of [rs] and
+   returns an evaluation result and a final environment.
+
+  raises [Contr _] if [rac.rac] and a an assertion was violated.
+
+  raises [CannotCompute _] if some term could not be reduced due to
+   unsopported feature.
+
+  raises [Failure _] if there is an unsopported feature.
+
+  raises [RACStuck _] if a property that should be assumed is not
+   satisfied in the current enviroment. *)
+
