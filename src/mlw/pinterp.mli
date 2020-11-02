@@ -42,42 +42,47 @@ val print_value : Format.formatter -> value -> unit
 
 (** {2 Interpreter log} *)
 
-type exec_kind = ExecAbstract | ExecConcrete
+module type Log = sig
+  type exec_kind = ExecAbstract | ExecConcrete
 
-type log_entry_desc = private
-  | Val_assumed of (ident * value)
-  (** values imported/assumed during interpretation *)
-  | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
-  (** executed function call or lambda if no rsymbol,
-      arguments, execution type*)
-  | Exec_pure of (lsymbol * exec_kind)
-  (** executed pure function call *)
-  | Exec_any of value
-  (** execute any function call *)
-  | Exec_loop of exec_kind
-  (** execute loop *)
-  | Exec_stucked of (string * value Mid.t)
-  (** stucked execution information *)
-  | Exec_failed of (string * value Mid.t)
-  (** failed execution information *)
-  | Exec_ended
-  (** execution terminated normally *)
+  type log_entry_desc = private
+    | Val_assumed of (ident * value)
+    | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
+    | Exec_pure of (lsymbol * exec_kind)
+    | Exec_any of value
+    | Exec_loop of exec_kind
+    | Exec_stucked of (string * value Mid.t)
+    | Exec_failed of (string * value Mid.t)
+    | Exec_ended
 
-type log_entry = private {
+  type log_entry = private {
     log_desc : log_entry_desc;
     log_loc  : Loc.position option;
-}
+  }
 
-type exec_log
-(** final log *)
-type log_uc
-(** log under construction *)
+  type exec_log
+  type log_uc
 
-val empty_log_uc : unit -> log_uc
-val empty_log : exec_log
-val close_log : log_uc -> exec_log
-val sort_log_by_loc : exec_log -> log_entry list Mint.t Mstr.t
-val print_log : json:bool -> exec_log Pp.pp
+  val log_val : log_uc -> ident -> value -> Loc.position option -> unit
+  val log_call : log_uc -> rsymbol option -> value Mvs.t ->
+                 exec_kind -> Loc.position option -> unit
+  val log_pure_call : log_uc -> lsymbol -> exec_kind ->
+                      Loc.position option -> unit
+  val log_any_call : log_uc -> value -> Loc.position option -> unit
+  val log_failed : log_uc -> string -> value Mid.t ->
+                   Loc.position option -> unit
+  val log_stucked : log_uc -> string -> value Mid.t ->
+                    Loc.position option -> unit
+  val log_exec_ended : log_uc -> Loc.position option -> unit
+  val log_exec_loop : log_uc -> exec_kind -> Loc.position option -> unit
+  val empty_log_uc : unit -> log_uc
+  val empty_log : exec_log
+  val close_log : log_uc -> exec_log
+  val sort_log_by_loc : exec_log -> log_entry list Mint.t Mstr.t
+  val print_log : json:bool -> exec_log Pp.pp
+end
+
+module Log : Log
 
 (** {2 Interpreter configuration} *)
 
@@ -119,7 +124,7 @@ type rac_config = private {
   (** configuration for reducing terms *)
   get_value : import_value;
   (** import values when they are needed *)
-  log_uc : log_uc;
+  log_uc : Log.log_uc;
   (** log *)
 }
 

@@ -34,7 +34,7 @@ let model_of_exec_log ~original_model log =
     let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
     let me_value = assert false (* Integer v *) in (* TODO Type me_value correctly when the exec log is typed *)
     {me_name; me_value; me_location= Some loc; me_term= None} in
-  let aux e = match e.log_loc with
+  let aux e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
       match e.log_desc with
       | Val_assumed (id, v) -> [me loc id v]
@@ -47,16 +47,16 @@ let model_of_exec_log ~original_model log =
   let aux_mint mint =
     let res = Mint.map_filter aux_l mint in
     if Mint.is_empty res then None else Some res in
-  let model_files = (Mstr.map_filter aux_mint (sort_log_by_loc log)) in
+  let model_files = (Mstr.map_filter aux_mint (Log.sort_log_by_loc log)) in
   set_model_files original_model model_files
 
 (** Result of checking solvers' counterexample models *)
 
 (** See output of [print_ce_summary_title] for details *)
 type ce_summary =
-  | NCCE of exec_log
-  | SWCE of exec_log
-  | NCCE_SWCE of exec_log
+  | NCCE of Log.exec_log
+  | SWCE of Log.exec_log
+  | NCCE_SWCE of Log.exec_log
   | BAD_CE
   | UNKNOWN of string
 
@@ -106,13 +106,13 @@ let print_ce_summary_values ~json ~print_attrs model fmt s =
     print_json_field "model"
       (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
   let print_log_field =
-    print_json_field "log" (print_log ~json:true) in
+    print_json_field "log" (Log.print_log ~json:true) in
   match s with
   | NCCE log | SWCE log | NCCE_SWCE log ->
       if json then
         fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
           print_model_field model print_log_field log
-      else fprintf fmt "@[%a@]" (print_log ~json:false) log
+      else fprintf fmt "@[%a@]" (Log.print_log ~json:false) log
   | UNKNOWN _ ->
      if json then
        fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
@@ -130,7 +130,7 @@ type verdict = Good_model | Bad_model | Dont_know
 type full_verdict = {
     verdict  : verdict;
     reason   : string;
-    exec_log : exec_log;
+    exec_log : Log.exec_log;
   }
 
 let print_verdict fmt = function
@@ -140,7 +140,7 @@ let print_verdict fmt = function
 
 let print_full_verdict fmt v =
   fprintf fmt "%a (%s)@,%a"
-    print_verdict v.verdict v.reason (print_log ~json:false) v.exec_log
+    print_verdict v.verdict v.reason (Log.print_log ~json:false) v.exec_log
 
 type check_model_result =
   | Cannot_check_model of {reason: string}
@@ -387,34 +387,34 @@ let check_model_rs ?loc rac env pm rs =
     let _, env = eval_rs rac env pm rs in
     let reason = sprintf "%s RAC does not confirm the counter-example, no \
                           contradiction during execution" abs_Msg in
-    {verdict= Bad_model; reason; exec_log= close_log env.rac.log_uc}
+    {verdict= Bad_model; reason; exec_log= Log.close_log env.rac.log_uc}
   with
   | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc loc ->
       let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
-      {verdict= Good_model; reason; exec_log= close_log ctx.c_env.rac.log_uc}
+      {verdict= Good_model; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
   | Contr (ctx, t) ->
       let reason = asprintf "%s RAC found a contradiction at different location %a"
           abs_Msg (Pp.print_option_or_default "NO LOC" Pretty.print_loc') t.t_loc in
-      {verdict= Good_model; reason; exec_log= close_log ctx.c_env.rac.log_uc}
+      {verdict= Good_model; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
   | CannotImportModelValue msg ->
       let reason = sprintf "cannot import value from model: %s" msg in
-      {verdict= Dont_know; reason; exec_log= empty_log}
+      {verdict= Dont_know; reason; exec_log= Log.empty_log}
   | CannotCompute r ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
       let reason = sprintf "%s RAC terminated due to unsupported feature: %s"
                      abs_Msg r.reason in
-      {verdict= Dont_know; reason; exec_log= empty_log}
+      {verdict= Dont_know; reason; exec_log= Log.empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
           term for constructor that is not a function *)
       let reason = sprintf "failure: %s" msg in
-      {verdict= Dont_know; reason; exec_log= empty_log}
+      {verdict= Dont_know; reason; exec_log= Log.empty_log}
   | RACStuck (env,l) ->
       let reason =
         asprintf "%s RAC, with the counterexample model cannot continue after %a"
           abs_Msg (Pp.print_option Pretty.print_loc') l in
-      {verdict= Bad_model; reason; exec_log= close_log env.rac.log_uc}
+      {verdict= Bad_model; reason; exec_log= Log.close_log env.rac.log_uc}
 
 let check_model reduce env pm model =
   let open Model_parser in

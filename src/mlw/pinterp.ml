@@ -404,214 +404,258 @@ let rac_reduce_config_lit config env lit_conf =
 
 (* Interpretation log *)
 
-type exec_kind = ExecAbstract | ExecConcrete
 
-type log_entry_desc =
-  | Val_assumed of (ident * value)
-  | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
-  | Exec_pure of (lsymbol * exec_kind)
-  | Exec_any of value
-  | Exec_loop of exec_kind
-  | Exec_stucked of (string * value Mid.t)
-  | Exec_failed of (string * value Mid.t)
-  | Exec_ended
+module type Log = sig
+  type exec_kind = ExecAbstract | ExecConcrete
 
-type log_entry = {
+  type log_entry_desc = private
+    | Val_assumed of (ident * value)
+    | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
+    | Exec_pure of (lsymbol * exec_kind)
+    | Exec_any of value
+    | Exec_loop of exec_kind
+    | Exec_stucked of (string * value Mid.t)
+    | Exec_failed of (string * value Mid.t)
+    | Exec_ended
+
+  type log_entry = private {
     log_desc : log_entry_desc;
     log_loc  : Loc.position option;
-}
+  }
 
-type log_uc = (log_entry list) ref
-(* new log elements are added to the head of the list *)
+  type exec_log
+  type log_uc
 
-type exec_log = log_entry list
-(* supposed to contain the reverse log_uc contents after close_log *)
+  val log_val : log_uc -> ident -> value -> Loc.position option -> unit
+  val log_call : log_uc -> rsymbol option -> value Mvs.t ->
+                 exec_kind -> Loc.position option -> unit
+  val log_pure_call : log_uc -> lsymbol -> exec_kind ->
+                      Loc.position option -> unit
+  val log_any_call : log_uc -> value -> Loc.position option -> unit
+  val log_failed : log_uc -> string -> value Mid.t ->
+                   Loc.position option -> unit
+  val log_stucked : log_uc -> string -> value Mid.t ->
+                    Loc.position option -> unit
+  val log_exec_ended : log_uc -> Loc.position option -> unit
+  val log_exec_loop : log_uc -> exec_kind -> Loc.position option -> unit
+  val empty_log_uc : unit -> log_uc
+  val empty_log : exec_log
+  val close_log : log_uc -> exec_log
+  val sort_log_by_loc : exec_log -> log_entry list Mint.t Mstr.t
+  val print_log : json:bool -> exec_log Pp.pp
+end
 
-let empty_log_uc () = ref []
+module Log : Log = struct
+  type exec_kind = ExecAbstract | ExecConcrete
 
-let empty_log = []
+  type log_entry_desc =
+    | Val_assumed of (ident * value)
+    | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
+    | Exec_pure of (lsymbol * exec_kind)
+    | Exec_any of value
+    | Exec_loop of exec_kind
+    | Exec_stucked of (string * value Mid.t)
+    | Exec_failed of (string * value Mid.t)
+    | Exec_ended
 
-let log_entry log_uc log_desc log_loc =
-  log_uc := {log_desc; log_loc} :: !log_uc
+  type log_entry = {
+    log_desc : log_entry_desc;
+    log_loc  : Loc.position option;
+  }
 
-let log_val log_uc id v loc =
-  log_entry log_uc (Val_assumed (id,v)) loc
+  type log_uc = (log_entry list) ref
+  (* new log elements are added to the head of the list *)
 
-let log_call log_uc rs mvs kind loc =
-  log_entry log_uc (Exec_call (rs,mvs,kind)) loc
+  type exec_log = log_entry list
+  (* supposed to contain the reverse log_uc contents after close_log *)
 
-let log_pure_call log_uc ls kind loc =
-  log_entry log_uc (Exec_pure (ls,kind)) loc
+  let empty_log_uc () = ref []
 
-let log_any_call log_uc s loc =
-  log_entry log_uc (Exec_any s) loc
+  let empty_log = []
 
-let log_failed log_uc s mvs loc =
-  log_entry log_uc (Exec_failed (s,mvs)) loc
+  let log_entry log_uc log_desc log_loc =
+    log_uc := {log_desc; log_loc} :: !log_uc
 
-let log_stucked log_uc s mvs loc =
-  log_entry log_uc (Exec_stucked (s,mvs)) loc
+  let log_val log_uc id v loc =
+    log_entry log_uc (Val_assumed (id,v)) loc
 
-let log_exec_ended log_uc loc =
-  log_entry log_uc Exec_ended loc
+  let log_call log_uc rs mvs kind loc =
+    log_entry log_uc (Exec_call (rs,mvs,kind)) loc
 
-let log_exec_loop log_uc kind loc =
-  log_entry log_uc (Exec_loop kind) loc
+  let log_pure_call log_uc ls kind loc =
+    log_entry log_uc (Exec_pure (ls,kind)) loc
 
-let close_log log_uc = List.rev !log_uc
+  let log_any_call log_uc s loc =
+    log_entry log_uc (Exec_any s) loc
 
-let exec_kind_to_string ?(cap=true) = function
-  | ExecAbstract -> if cap then "Abstract" else "abstract"
-  | ExecConcrete -> if cap then "Concrete" else "concrete"
+  let log_failed log_uc s mvs loc =
+    log_entry log_uc (Exec_failed (s,mvs)) loc
 
-(** Partition a list of elements into lists of pairs, of consecutive
-    elements with the same value for f *)
-let rec consecutives key ?(sofar=[]) ?current xs =
-  let to_list = function Some (k, xs) -> [Some k, List.rev xs] | None -> [] in
-  match xs with
-  | [] -> List.rev (to_list current @ sofar)
-  | x :: xs -> match key x with
-    | None -> consecutives key ~sofar:((None, [x]) :: to_list current @ sofar) xs
-    | Some k -> match current with
-      | None ->
-          consecutives key ~sofar ~current:(k, [x]) xs
-      | Some (k', xs') when k' = k ->
-          consecutives key ~sofar ~current:(k, x::xs') xs
-      | Some _ ->
-          consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
+  let log_stucked log_uc s mvs loc =
+    log_entry log_uc (Exec_stucked (s,mvs)) loc
 
-let print_log_entry_desc fmt e =
-  let print_assgn key2string fmt (k,v) =
-    fprintf fmt "@[%a = %a@]"
-      print_decoded (key2string k) print_value v in
-  let print_list key2string =
-    Pp.print_list_pre Pp.newline (print_assgn key2string) in
-  let vs2string vs = vs.vs_name.id_string in
-  let id2string id = id.id_string in
-  match e.log_desc with
-  | Val_assumed (id, v) ->
-      fprintf fmt "@[<h>%a = %a@]" print_decoded id.id_string print_value v;
-  | Exec_call (None, mvs, k) ->
-      fprintf fmt "@[<h>%s execution of anonymous function with args:%a@]"
-        (exec_kind_to_string k)
-        (print_list vs2string) (Mvs.bindings mvs)
-  | Exec_call (Some rs, mvs, k) ->
-      fprintf fmt "@[<hv2>%s execution of %a with args:%a@]"
-        (exec_kind_to_string k)
-        print_decoded rs.rs_name.id_string
-        (print_list vs2string) (Mvs.bindings mvs)
-  | Exec_pure (ls,k) ->
-      fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
-        print_decoded ls.ls_name.id_string
-  | Exec_any v ->
-     fprintf fmt "@[<h>execution of any, result: %a@]" print_value v
-  | Exec_loop k ->
-      fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
-  | Exec_failed (msg,mid) ->
-     fprintf fmt "@[<hv2>Property failure, %s with:%a@]"
-       msg (print_list id2string) (Mid.bindings mid)
-  | Exec_stucked (msg,mid) ->
-     fprintf fmt "@[<hv2>Execution got stuck, %s with:%a@]"
-       msg (print_list id2string) (Mid.bindings mid)
-  | Exec_ended ->
-      fprintf fmt "@[<h>Execution of main function terminated normally@]"
+  let log_exec_ended log_uc loc =
+    log_entry log_uc Exec_ended loc
 
-let print_log ~json fmt entry_log =
-  if json then
-    let open Json_base in
-    let string f = kasprintf (fun s -> String s) f in
-    let print_json_kind fmt = function
-      | ExecAbstract -> print_json fmt (string "ABSTRACT")
-      | ExecConcrete -> print_json fmt (string "CONCRETE") in
-    let print_key_value key2string fmt (k,v) =
-      fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-        (print_json_field "name" print_json) (String (key2string k))
-        (print_json_field "value" print_value) v in
+  let log_exec_loop log_uc kind loc =
+    log_entry log_uc (Exec_loop kind) loc
+
+  let close_log log_uc = List.rev !log_uc
+
+  let exec_kind_to_string ?(cap=true) = function
+    | ExecAbstract -> if cap then "Abstract" else "abstract"
+    | ExecConcrete -> if cap then "Concrete" else "concrete"
+
+  (** Partition a list of elements into lists of pairs, of consecutive
+      elements with the same value for f *)
+  let rec consecutives key ?(sofar=[]) ?current xs =
+    let to_list = function Some (k, xs) -> [Some k, List.rev xs] | None -> [] in
+    match xs with
+    | [] -> List.rev (to_list current @ sofar)
+    | x :: xs -> match key x with
+      | None -> consecutives key ~sofar:((None, [x]) :: to_list current @ sofar) xs
+      | Some k -> match current with
+        | None ->
+            consecutives key ~sofar ~current:(k, [x]) xs
+        | Some (k', xs') when k' = k ->
+            consecutives key ~sofar ~current:(k, x::xs') xs
+        | Some _ ->
+            consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
+
+  let print_log_entry_desc fmt e =
+    let print_assgn key2string fmt (k,v) =
+      fprintf fmt "@[%a = %a@]"
+        print_decoded (key2string k) print_value v in
+    let print_list key2string =
+      Pp.print_list_pre Pp.newline (print_assgn key2string) in
     let vs2string vs = vs.vs_name.id_string in
     let id2string id = id.id_string in
-    let print_log_entry fmt = function
-      | Val_assumed (id, v) ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-            (print_json_field "kind" print_json) (string "VAL_ASSUMED")
-            (print_json_field "vs" print_json)
-            (string "%a" print_decoded id.id_string)
-            (print_json_field "value" print_value) v
-      | Exec_call (ors, mvs, kind) ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
-            (print_json_field "kind" print_json) (string "EXEC_CALL")
-            (print_json_field "rs" print_json) (match ors with
-                | Some rs -> string "%a" print_decoded rs.rs_name.id_string
-                | None -> Null)
-            (print_json_field "exec" print_json_kind) kind
-            (print_json_field "args" (list (print_key_value vs2string)))
-            (Mvs.bindings mvs)
-      | Exec_pure (ls, kind) ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-            (print_json_field "kind" print_json) (string "EXEC_PURE")
-            (print_json_field "ls" print_json) (string "%a" print_ls ls)
-            (print_json_field "exec" print_json_kind) kind
-      | Exec_any v ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-            (print_json_field "kind" print_json) (string "EXEC_ANY")
-            (print_json_field "value" print_value) v
-      | Exec_loop kind ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-        (print_json_field "kind" print_json) (string "EXEC_LOOP")
-        (print_json_field "exec" print_json_kind) kind
-      | Exec_failed (reason,mid) ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-            (print_json_field "kind" print_json) (string "FAILED")
-            (print_json_field "reason" print_json) (String reason)
-            (print_json_field "state" (list (print_key_value id2string)))
-            (Mid.bindings mid)
-      | Exec_stucked (reason,mid) ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-            (print_json_field "kind" print_json) (string "STUCKED")
-            (print_json_field "reason" print_json) (String reason)
-            (print_json_field "state" (list (print_key_value id2string)))
-            (Mid.bindings mid)
-      | Exec_ended ->
-          fprintf fmt "@[@[<hv1>{%a@]}@]"
-            (print_json_field "kind" print_json) (string "ENDED") in
-    let print_json_entry fmt e =
-      fprintf fmt "@[@[<hv1>{@[<hv2>%a@];@ @[<hv2>%a@]@]}@]"
-        (Pp.print_option_or_default "NOLOC"
-           (print_json_field "loc" print_json_loc)) e.log_loc
-        (print_json_field "entry" print_log_entry) e.log_desc in
-    fprintf fmt "@[@[<hv1>[%a@]@]"
-      Pp.(print_list comma print_json_entry) entry_log
-  else
-    let entry_log =
-      let on_file e = Opt.map (fun (f,_,_,_) -> f) (Opt.map Loc.get e.log_loc) in
-      let on_line e = Opt.map (fun (_,l,_,_) -> l) (Opt.map Loc.get e.log_loc) in
-      List.map (fun (f, es) -> f, consecutives on_line es)
-        (consecutives on_file entry_log) in
-    let pp_entries = Pp.(print_list newline print_log_entry_desc) in
-    let pp_lines fmt (opt_line, entries) = match opt_line with
-      | Some line -> fprintf fmt "@[<v2>Line %d:@\n%a@]" line pp_entries entries
-      | None -> pp_entries fmt entries in
-    let pp_files fmt (opt_file, l) = match opt_file with
-      | Some file -> fprintf fmt "@[<v2>File %s:@\n%a@]" (Filename.basename file) Pp.(print_list newline pp_lines) l
-      | None -> fprintf fmt "@[<v4>Unknown location:@\n%a@]" Pp.(print_list newline pp_lines) l in
-    Pp.(print_list newline pp_files) fmt entry_log
+    match e.log_desc with
+    | Val_assumed (id, v) ->
+        fprintf fmt "@[<h>%a = %a@]" print_decoded id.id_string print_value v;
+    | Exec_call (None, mvs, k) ->
+        fprintf fmt "@[<h>%s execution of anonymous function with args:%a@]"
+          (exec_kind_to_string k)
+          (print_list vs2string) (Mvs.bindings mvs)
+    | Exec_call (Some rs, mvs, k) ->
+        fprintf fmt "@[<hv2>%s execution of %a with args:%a@]"
+          (exec_kind_to_string k)
+          print_decoded rs.rs_name.id_string
+          (print_list vs2string) (Mvs.bindings mvs)
+    | Exec_pure (ls,k) ->
+        fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
+          print_decoded ls.ls_name.id_string
+    | Exec_any v ->
+       fprintf fmt "@[<h>execution of any, result: %a@]" print_value v
+    | Exec_loop k ->
+        fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
+    | Exec_failed (msg,mid) ->
+       fprintf fmt "@[<hv2>Property failure, %s with:%a@]"
+         msg (print_list id2string) (Mid.bindings mid)
+    | Exec_stucked (msg,mid) ->
+       fprintf fmt "@[<hv2>Execution got stuck, %s with:%a@]"
+         msg (print_list id2string) (Mid.bindings mid)
+    | Exec_ended ->
+        fprintf fmt "@[<h>Execution of main function terminated normally@]"
 
-let sort_log_by_loc log =
-  let insert f l e sofar =
-    let insert_line opt_l =
-      let l = Opt.get_def [] opt_l in
-      Some (e :: l) in
-    let insert_file opt_mf =
-      let mf = Opt.get_def Mint.empty opt_mf in
-      let res = Mint.change insert_line l mf in
-      Some res in
-    Mstr.change insert_file f sofar in
-  let aux entry sofar = match entry.log_loc with
-    | Some loc when not (Loc.equal loc Loc.dummy_position) ->
-        let f, l, _, _ = Loc.get loc in
-        insert f l entry sofar
-    | _ -> sofar in
-  Mstr.map (Mint.map List.rev)
-    (List.fold_right aux log Mstr.empty)
+  let print_log ~json fmt entry_log =
+    if json then
+      let open Json_base in
+      let string f = kasprintf (fun s -> String s) f in
+      let print_json_kind fmt = function
+        | ExecAbstract -> print_json fmt (string "ABSTRACT")
+        | ExecConcrete -> print_json fmt (string "CONCRETE") in
+      let print_key_value key2string fmt (k,v) =
+        fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+          (print_json_field "name" print_json) (String (key2string k))
+          (print_json_field "value" print_value) v in
+      let vs2string vs = vs.vs_name.id_string in
+      let id2string id = id.id_string in
+      let print_log_entry fmt = function
+        | Val_assumed (id, v) ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+              (print_json_field "kind" print_json) (string "VAL_ASSUMED")
+              (print_json_field "vs" print_json)
+              (string "%a" print_decoded id.id_string)
+              (print_json_field "value" print_value) v
+        | Exec_call (ors, mvs, kind) ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
+              (print_json_field "kind" print_json) (string "EXEC_CALL")
+              (print_json_field "rs" print_json) (match ors with
+                  | Some rs -> string "%a" print_decoded rs.rs_name.id_string
+                  | None -> Null)
+              (print_json_field "exec" print_json_kind) kind
+              (print_json_field "args" (list (print_key_value vs2string)))
+              (Mvs.bindings mvs)
+        | Exec_pure (ls, kind) ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+              (print_json_field "kind" print_json) (string "EXEC_PURE")
+              (print_json_field "ls" print_json) (string "%a" print_ls ls)
+              (print_json_field "exec" print_json_kind) kind
+        | Exec_any v ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+              (print_json_field "kind" print_json) (string "EXEC_ANY")
+              (print_json_field "value" print_value) v
+        | Exec_loop kind ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+          (print_json_field "kind" print_json) (string "EXEC_LOOP")
+          (print_json_field "exec" print_json_kind) kind
+        | Exec_failed (reason,mid) ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+              (print_json_field "kind" print_json) (string "FAILED")
+              (print_json_field "reason" print_json) (String reason)
+              (print_json_field "state" (list (print_key_value id2string)))
+              (Mid.bindings mid)
+        | Exec_stucked (reason,mid) ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+              (print_json_field "kind" print_json) (string "STUCKED")
+              (print_json_field "reason" print_json) (String reason)
+              (print_json_field "state" (list (print_key_value id2string)))
+              (Mid.bindings mid)
+        | Exec_ended ->
+            fprintf fmt "@[@[<hv1>{%a@]}@]"
+              (print_json_field "kind" print_json) (string "ENDED") in
+      let print_json_entry fmt e =
+        fprintf fmt "@[@[<hv1>{@[<hv2>%a@];@ @[<hv2>%a@]@]}@]"
+          (Pp.print_option_or_default "NOLOC"
+             (print_json_field "loc" print_json_loc)) e.log_loc
+          (print_json_field "entry" print_log_entry) e.log_desc in
+      fprintf fmt "@[@[<hv1>[%a@]@]"
+        Pp.(print_list comma print_json_entry) entry_log
+    else
+      let entry_log =
+        let on_file e = Opt.map (fun (f,_,_,_) -> f) (Opt.map Loc.get e.log_loc) in
+        let on_line e = Opt.map (fun (_,l,_,_) -> l) (Opt.map Loc.get e.log_loc) in
+        List.map (fun (f, es) -> f, consecutives on_line es)
+          (consecutives on_file entry_log) in
+      let pp_entries = Pp.(print_list newline print_log_entry_desc) in
+      let pp_lines fmt (opt_line, entries) = match opt_line with
+        | Some line -> fprintf fmt "@[<v2>Line %d:@\n%a@]" line pp_entries entries
+        | None -> pp_entries fmt entries in
+      let pp_files fmt (opt_file, l) = match opt_file with
+        | Some file -> fprintf fmt "@[<v2>File %s:@\n%a@]" (Filename.basename file) Pp.(print_list newline pp_lines) l
+        | None -> fprintf fmt "@[<v4>Unknown location:@\n%a@]" Pp.(print_list newline pp_lines) l in
+      Pp.(print_list newline pp_files) fmt entry_log
+
+  let sort_log_by_loc log =
+    let insert f l e sofar =
+      let insert_line opt_l =
+        let l = Opt.get_def [] opt_l in
+        Some (e :: l) in
+      let insert_file opt_mf =
+        let mf = Opt.get_def Mint.empty opt_mf in
+        let res = Mint.change insert_line l mf in
+        Some res in
+      Mstr.change insert_file f sofar in
+    let aux entry sofar = match entry.log_loc with
+      | Some loc when not (Loc.equal loc Loc.dummy_position) ->
+          let f, l, _, _ = Loc.get loc in
+          insert f l entry sofar
+      | _ -> sofar in
+    Mstr.map (Mint.map List.rev)
+      (List.fold_right aux log Mstr.empty)
+
+end
 
 (** RAC configuration  *)
 
@@ -623,7 +667,7 @@ type rac_config = {
   skip_cannot_compute : bool; (* skip if it cannot compute, when possible *)
   rac_reduce          : rac_reduce_config;
   get_value           : import_value;
-  log_uc              : log_uc;
+  log_uc              : Log.log_uc;
 }
 
 let default_get_value ?name:_ ?loc:_ _ = None
@@ -635,7 +679,7 @@ let rac_config ~do_rac ~abstract:rac_abstract
   let rac_reduce = match rac_reduce with
     | Some r -> r
     | None -> rac_reduce_config () in
-  {do_rac; rac_abstract; rac_reduce; log_uc= empty_log_uc ();
+  {do_rac; rac_abstract; rac_reduce; log_uc= Log.empty_log_uc ();
    get_value; skip_cannot_compute }
 
 type env =
@@ -652,28 +696,28 @@ let default_env env rac mod_known th_known =
   { mod_known; th_known; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty }
 
 let register_used_value env loc id value =
-  log_val env.rac.log_uc id (snapshot value) loc
+  Log.log_val env.rac.log_uc id (snapshot value) loc
 
 let register_call env loc rs mvs kind =
-  log_call env.rac.log_uc rs mvs kind loc
+  Log.log_call env.rac.log_uc rs mvs kind loc
 
 let register_pure_call env loc ls kind =
-  log_pure_call env.rac.log_uc ls kind loc
+  Log.log_pure_call env.rac.log_uc ls kind loc
 
 let register_any_call env loc value =
-    log_any_call env.rac.log_uc (snapshot value) loc
+  Log.log_any_call env.rac.log_uc (snapshot value) loc
 
 let register_failure env loc reason mvs =
-  log_failed env.rac.log_uc reason mvs loc
+  Log.log_failed env.rac.log_uc reason mvs loc
 
 let register_stucked env loc reason mvs =
-  log_stucked env.rac.log_uc reason mvs loc
+  Log.log_stucked env.rac.log_uc reason mvs loc
 
 let register_ended env loc =
-  log_exec_ended env.rac.log_uc loc
+  Log.log_exec_ended env.rac.log_uc loc
 
 let register_loop env loc kind =
-  log_exec_loop env.rac.log_uc kind loc
+  Log.log_exec_loop env.rac.log_uc kind loc
 
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 

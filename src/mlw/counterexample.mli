@@ -32,7 +32,7 @@ type verdict = private
 type full_verdict = private {
     verdict  : verdict;
     reason   : string;
-    exec_log : exec_log;
+    exec_log : Log.exec_log;
   }
 
 type check_model_result = private
