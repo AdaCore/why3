@@ -1551,7 +1551,7 @@ let fix_boolean_term t =
   if t_equal t t_false then t_bool_false else t
 
 let exec_pure ~loc env ls pvs =
-  register_pure_call env loc ls ExecConcrete;
+  register_pure_call env loc ls Log.ExecConcrete;
   if ls_equal ls ps_equ then
     (* TODO (?) Add more builtin logical symbols *)
     let pv1, pv2 = match pvs with [pv1; pv2] -> pv1, pv2 | _ -> assert false in
@@ -1682,11 +1682,11 @@ and eval_expr' env e =
         ( match ce.c_cty.cty_args with
           | [] ->
              if env.rac.rac_abstract then begin
-                 register_call env e.e_loc None mvs ExecAbstract;
+                 register_call env e.e_loc None mvs Log.ExecAbstract;
                  exec_call_abstract ?loc:e.e_loc env ce.c_cty [] e.e_ity
                end
              else begin
-                 register_call env e.e_loc None mvs ExecConcrete;
+                 register_call env e.e_loc None mvs Log.ExecConcrete;
                  eval_expr env e'
                end
           | [arg] ->
@@ -1789,7 +1789,7 @@ and eval_expr' env e =
             (invariant does not hold after iteration)
         * stop the interpretation here - raise RACStuck *)
       (* assert1 *)
-      register_loop env e.e_loc ExecAbstract;
+      register_loop env e.e_loc Log.ExecAbstract;
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
@@ -1817,7 +1817,7 @@ and eval_expr' env e =
       | r -> r
     end
   | Ewhile (cond, inv, _var, e1) -> begin
-      register_loop env e.e_loc ExecConcrete;
+      register_loop env e.e_loc Log.ExecConcrete;
       (* TODO variants *)
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
@@ -1872,7 +1872,7 @@ and eval_expr' env e =
             (value assigned to i is not compatible with loop range)
         6 - abort2: we have a false counterexample
             (the abstract rac cannot continue from this state) *)
-      register_loop env e.e_loc ExecAbstract;
+      register_loop env e.e_loc Log.ExecAbstract;
       try
   let a = big_int_of_value (get_pvs env pvs1) in
   let b = big_int_of_value (get_pvs env pvs2) in
@@ -1923,7 +1923,7 @@ and eval_expr' env e =
       with NotNum -> Irred e
     end
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) -> (
-    register_loop env e.e_loc ExecConcrete;
+    register_loop env e.e_loc Log.ExecConcrete;
     try
       let a = big_int_of_value (get_pvs env pvs1) in
       let b = big_int_of_value (get_pvs env pvs2) in
@@ -2030,12 +2030,12 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
      (List.map snapshot arg_vs)) in
   if env.rac.rac_abstract && can_interpret_abstractly &&
        not main_function then begin
-      register_call env loc (Some rs) mvs ExecAbstract;
+      register_call env loc (Some rs) mvs Log.ExecAbstract;
       let rs_name,cty = rs.rs_name, rs.rs_cty in
       exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
     end
   else begin
-      register_call env loc (Some rs) mvs ExecConcrete;
+      register_call env loc (Some rs) mvs Log.ExecConcrete;
       let res =
         if rs_equal rs rs_func_app then
           match arg_vs with

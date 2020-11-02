@@ -36,9 +36,9 @@ let model_of_exec_log ~original_model log =
     {me_name; me_value; me_location= Some loc; me_term= None} in
   let aux e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
-      match e.log_desc with
-      | Val_assumed (id, v) -> [me loc id v]
-      | Exec_failed (_, mid) ->
+      match e.Log.log_desc with
+      | Log.Val_assumed (id, v) -> [me loc id v]
+      | Log.Exec_failed (_, mid) ->
          Mid.fold (fun id v l -> me loc id v :: l) mid []
       | _ -> [] )
     | _ -> [] in

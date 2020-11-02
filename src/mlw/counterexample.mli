@@ -11,7 +11,6 @@
 
 (** Use solver models and Pinterp to create counterexamples *)
 
-open Format
 open Pinterp
 open Model_parser
 open Pmodule
@@ -49,6 +48,8 @@ val check_model :
 
 type ce_summary
 
+val print_ce_summary_kind : ce_summary Pp.pp
+
 val select_model :
   ?check:bool ->
   ?reduce_config:rac_reduce_config ->
@@ -68,7 +69,7 @@ val model_of_ce_summary : original_model:model -> ce_summary -> model
 
 (** {2 Pretty-printing results} *)
 
-val print_check_model_result : Format.formatter -> check_model_result -> unit
+val print_check_model_result : check_model_result Pp.pp
 
 val print_counterexample :
-  ?check_ce:bool -> ?json:bool -> formatter -> model * ce_summary -> unit
+  ?check_ce:bool -> ?json:bool -> (model * ce_summary) Pp.pp
