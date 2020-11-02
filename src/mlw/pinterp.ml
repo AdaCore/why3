@@ -355,7 +355,6 @@ type result =
   | Normal of value
   | Excep of xsymbol * value
   | Irred of expr
-  | Fun of rsymbol * pvsymbol list * int
 
 let print_logic_result fmt r =
   match r with
@@ -363,7 +362,6 @@ let print_logic_result fmt r =
   | Excep (x, v) ->
       fprintf fmt "@[exception %s(@[%a@])@]" x.xs_name.id_string print_value v
   | Irred e -> fprintf fmt "@[Cannot execute expression@ @[%a@]@]" print_expr e
-  | Fun _ -> fprintf fmt "@[Result is a function@]"
 
 (* ENV *)
 
@@ -1582,7 +1580,6 @@ let pp_limited ?(n=100) pp fmt x =
 let print_result fmt = function
   | Normal v -> print_value fmt v
   | Excep (xs, v) -> fprintf fmt "EXC %a: %a" print_xs xs print_value v
-  | Fun (rs, _, _) -> fprintf fmt "FUN %a" print_rs rs
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
 
 let get_and_register_value env ?def ?ity vs loc =
@@ -2159,7 +2156,6 @@ let bind_globals ?rs_main mod_known env =
           let env = {env with rac= {env.rac with rac_abstract= false}} in
           match eval_expr env e with
           | Normal v -> v
-          | Fun _ -> failwith "bind_globals: should be program constant, is function"
           | Excep _ -> cannot_compute "exception in initialization of global variable %a"
                          print_decoded id.id_string
           | Irred _ -> cannot_compute "initialization of global variable %a irreducible"
@@ -2243,7 +2239,7 @@ let report_eval_result body fmt (res, vsenv, rsenv) =
       fprintf fmt "@[<hov2>exceptional result:@ %a@]@,"
         print_logic_result res;
       fprintf fmt "@[<hov2>globals:@ %t@]" print_envs
-  | Irred _ | Fun _ ->
+  | Irred _ ->
       fprintf fmt "@[<hov2>Execution error: %a@]@," print_logic_result res ;
       fprintf fmt "@[globals:@ %t@]" print_envs
 

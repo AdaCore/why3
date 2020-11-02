@@ -154,7 +154,6 @@ type result = private
   | Normal of value
   | Excep of xsymbol * value
   | Irred of expr
-  | Fun of rsymbol * pvsymbol list * int
 
 (** Context of a contradiction during RAC *)
 type cntr_ctx = private {
