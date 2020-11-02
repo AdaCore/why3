@@ -41,7 +41,7 @@ module Global
   let ref y = 42
 
   let test2 () =
-    assert { y = 42 } (* ok, TODO *)
+    assert { y = 42 } (* ok *)
 end
 
 module Functions
@@ -160,7 +160,6 @@ module Aliasing
     assert { (x, y) = (111, 111) }
 end
 
-(* TODO *)
 module Labels
   use int.Int
 
@@ -174,6 +173,7 @@ module Labels
     x.value <- x.value + 1;
     assert { x.value = x.value at B + 1 = x.value at A + 2 }
 end
+
 
 (* TODO *)
 module Chars

@@ -489,11 +489,11 @@ mlw="examples/tests/rac.mlw"
 output="examples/tests/rac.out"
 (
     rac "$mlw" Local test1 test2 test3 test4 test5
-    rac "$mlw" Global test1 # TODO test2
+    rac "$mlw" Global test1 test2
     rac "$mlw" Functions test1 test2 test3a test3b test4 test5 test6
     rac "$mlw" Loops test1 test2 test3
     rac "$mlw" Aliasing test1 test2
-    # rac "$mlw" Labels test1  # TODO
+    rac "$mlw" Labels test1
     # rac "$mlw" Chars test1  # TODO
     # rac "$mlw" Strings test1  # TODO
     rac "$mlw" RecordMutGhost test
