@@ -450,79 +450,92 @@ let check_model reduce env pm model =
             Pretty.print_loc' loc in
         Cannot_check_model {reason}
 
-let select_model ?(check=false) ?(reduce_config=rac_reduce_config ()) env pmodule models =
+let select_model ?(check=false) ?(conservative=false) ?(reduce_config=rac_reduce_config ()) env pmodule models =
   let check_model =
     if check then check_model reduce_config env pmodule
-    else fun _ ->
-         Cannot_check_model {reason="not checking CE model"} in
-  let check_model (i,r,m) =
-    Debug.dprintf debug_check_ce "Check model %d (%a)@." i
-      (Pp.print_option_or_default "NO LOC" Pretty.print_loc')
-      (Model_parser.get_model_term_loc m);
-    (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
-     *   (print_model ?me_name_trans:None ~print_attrs:false) m; *)
-    let mr = check_model m in
-    Debug.dprintf debug_check_ce "@[<v2>Result of checking model %d:@\n@[%a@]@]@." i
-      print_check_model_result mr;
-    i,r,m,mr in
-  let not_empty (i,_,m) =
-    let empty = Model_parser.is_model_empty m in
-    if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
-    not empty in
-  let add_ce_summary (i,r,m,mr) =
-    let summary = match mr with
-      | Cannot_check_model {reason} -> UNKNOWN reason
-      | Check_model_result r -> ce_summary r.concrete r.abstract in
-    i,r,m,mr,summary in
+    else fun _ -> Cannot_check_model {reason="not checking CE model"} in
   let models =
-    List.map add_ce_summary
-      (List.map check_model
-         (List.filter not_empty
-            (List.mapi (fun i (r,m) -> i,r,m)
-               models))) in
-  let is_good (_,_,_,_,s) = match s with
-    NCCE _ | SWCE _ | NCCE_SWCE _ -> true | BAD_CE | UNKNOWN _ -> false in
-  let good_models, other_models = List.partition is_good models in
-  let model_infos =
+    let add_index i (r,m) = i,r,m in
+    List.mapi add_index models in
+  let models =
+    let not_empty (i,_,m) =
+      let empty = Model_parser.is_model_empty m in
+      if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
+      not empty in
+    List.filter not_empty models in
+  let models =
+    let add_check_model_result (i,r,m) =
+      Debug.dprintf debug_check_ce "Check model %d (%a)@." i
+        (Pp.print_option_or_default "NO LOC" Pretty.print_loc')
+        (Model_parser.get_model_term_loc m);
+      (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
+       *   (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) m; *)
+      let mr = check_model m in
+      Debug.dprintf debug_check_ce "@[<v2>Result of checking model %d:@\n@[%a@]@]@." i
+        print_check_model_result mr;
+      i,r,m,mr in
+    List.map add_check_model_result models in
+  let models =
+    let add_ce_summary (i,r,m,mr) =
+      let summary = match mr with
+        | Cannot_check_model {reason} -> UNKNOWN reason
+        | Check_model_result r -> ce_summary r.concrete r.abstract in
+      i,r,m,mr,summary in
+    List.map add_ce_summary models in
+  let sorted_models =
     let open Util in
-    if good_models <> [] then
-      let ce_summary_index = function
-        | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2
-        | UNKNOWN _ | BAD_CE -> assert false in
+    if conservative then
+      (* Do not consider the result of checking the model but just
+         priotize the last, non-empty model, as node before 2020 *)
       let compare = cmp [
-          (* prefer NCCE > SWCE > NCCE_SWCE > UNKNOWN > BAD *)
-          cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
-          (* prefer simpler models *)
-          cmptr (fun (i,_,_,_,_) -> i) (-);
-        ] in
-      List.sort compare good_models
-    else
-      (* No interesting models, so choose the most complex (later) model
-         as it was done before 2020, but penalize bad models. *)
-      let ce_summary_index = function
-        | UNKNOWN _ -> 0 | BAD_CE -> 1 | NCCE _
-        | SWCE _ | NCCE_SWCE _ -> assert false in
-      let compare = cmp [
-          cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
           cmptr (fun (i,_,_,_,_) -> -i) (-);
         ] in
-      List.sort compare other_models in
-  let selected_ix, selected = match model_infos with
+      List.sort compare models
+    else
+      let good_models, other_models =
+        let is_good (_,_,_,_,s) = match s with
+          | NCCE _ | SWCE _ | NCCE_SWCE _ -> true
+          | BAD_CE | UNKNOWN _ -> false in
+        List.partition is_good models in
+      if good_models = [] then
+        (* No interesting models, prioritize the last, non-empty model
+           as it was done before 2020, but penalize bad models. *)
+        let ce_summary_index = function
+          | UNKNOWN _ -> 0 | BAD_CE -> 1 | NCCE _
+          | SWCE _ | NCCE_SWCE _ -> assert false in
+        let compare = cmp [
+            cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
+            cmptr (fun (i,_,_,_,_) -> -i) (-);
+          ] in
+        List.sort compare other_models
+      else
+        let ce_summary_index = function
+          | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2
+          | UNKNOWN _ | BAD_CE -> assert false in
+        let compare = cmp [
+            (* prefer NCCE > SWCE > NCCE_SWCE > UNKNOWN > BAD *)
+            cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
+            (* prefer simpler models *)
+            cmptr (fun (i,_,_,_,_) -> i) (-);
+          ] in
+        List.sort compare good_models in
+  let selected, selected_ix =
+    match sorted_models with
     | [] -> None, None
-    | (i,_,m,_,s) :: _ -> Some i, Some (m, s) in
+    | (i,_,m,_,s) :: _ -> Some (m, s), Some i in
   let print_dbg_model fmt (i,_,_,mr,s) =
     let mark_selected fmt =
       let s = if selected_ix = Some i then "Selected" else "Checked" in
       pp_print_string fmt s in
     match mr with
     | Cannot_check_model {reason} ->
-       fprintf fmt "- Couldn't check model: %s" reason
+        fprintf fmt "- Couldn't check model: %s" reason
     | Check_model_result r ->
-       fprintf fmt
-         "- @[<v2>%t model %d (Concrete: %a, Abstract: %a)@ @[Summary: %a@]@]"
-         mark_selected i print_verdict r.concrete.verdict
-         print_verdict r.abstract.verdict
-         (print_ce_summary_title ?check_ce:None) s in
+        fprintf fmt
+          "- @[<v2>%t model %d (Concrete: %a, Abstract: %a)@ @[Summary: %a@]@]"
+          mark_selected i print_verdict r.concrete.verdict
+          print_verdict r.abstract.verdict
+          (print_ce_summary_title ?check_ce:None) s in
   if models <> [] then
     Debug.dprintf debug_check_ce "Models:@\n%a@."
       Pp.(print_list space print_dbg_model) models;

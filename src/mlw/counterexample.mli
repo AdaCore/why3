@@ -51,17 +51,16 @@ type ce_summary
 val print_ce_summary_kind : ce_summary Pp.pp
 
 val select_model :
-  ?check:bool ->
-  ?reduce_config:rac_reduce_config ->
-  Env.env ->
-  pmodule ->
-  (Call_provers.prover_answer * model) list ->
+  ?check:bool -> ?conservative:bool -> ?reduce_config:rac_reduce_config ->
+  Env.env -> pmodule -> (Call_provers.prover_answer * model) list ->
   (model * ce_summary) option
-(** [select ~check ~reduce_config env pm ml] chooses a model from
-   [ml]. [check] is set to false by default and indicates if
-   interpretation should be used to select the model. [reduce_config]
-   is set to [rac_reduce_config ()] by default and is only used if
-   [check=true] *)
+(** [select ~check ~conservative ~reduce_config env pm ml] chooses a
+   model from [ml]. [check] is set to false by default and indicates if
+   interpretation should be used to select the model. [reduce_config] is
+   set to [rac_reduce_config ()] by default and is only used if
+   [check=true]. [conservative] is set to false by default and indicates
+   that the last, non-empty model is always selected (as done before
+   2020). *)
 
 val model_of_ce_summary : original_model:model -> ce_summary -> model
 (** [model_of_ce_summary ~original_model summary] updates
