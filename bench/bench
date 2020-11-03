@@ -202,7 +202,8 @@ replay_without_shape () {
 execute () {
     pgm="bin/why3execute$suffix"
     echo -n "  ${@:1}... "
-    if "$pgm" "$@" > /dev/null; then
+    # Run why3execute and discard warnings from the reduction engine
+    if "$pgm" "$@" > /dev/null 2> >(grep -v '$warning: reduction of term'); then
         echo "ok"
     else
         echo "execution test failed! $?"
