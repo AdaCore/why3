@@ -70,5 +70,7 @@ val model_of_ce_summary : original_model:model -> ce_summary -> model
 
 val print_check_model_result : check_model_result Pp.pp
 
+val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
+
 val print_counterexample :
   ?check_ce:bool -> ?json:bool -> (model * ce_summary) Pp.pp
