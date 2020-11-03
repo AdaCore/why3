@@ -2030,39 +2030,42 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
     let snapshot_oldie old_pv pv =
       Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs env.vsenv)) in
     Mpv.fold snapshot_oldie rs.rs_cty.cty_oldies Mvs.empty in
-  let env = {env with vsenv= Mvs.union (fun _ _ v -> Some v)
-                               env.vsenv oldies} in
-  if env.rac.do_rac then begin
-      let ctx = cntr_ctx (cntr_desc "Precondition" rs.rs_name) ?trigger_loc:loc env in
-      if main_function then check_assume_terms ctx rs.rs_cty.cty_pre
-      else check_terms ctx rs.rs_cty.cty_pre end;
-  let can_interpret_abstractly =
-    if rs_equal rs rs_func_app then false else
-      match find_definition env rs with
-      | LocalFunction _ -> true | _ -> false in
-  let mvs = Mvs.of_list (List.combine
-     (List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args)
-     (List.map snapshot arg_vs)) in
-  if env.rac.rac_abstract && can_interpret_abstractly &&
-       not main_function then begin
-      register_call env loc (Some rs) mvs Log.ExecAbstract;
+  let env =
+    let vsenv = Mvs.union (fun _ _ v -> Some v) env.vsenv oldies in
+    {env with vsenv} in
+  let exec_kind =
+    let can_interpret_abstractly =
+      if rs_equal rs rs_func_app then false else
+        match find_definition env rs with
+        | LocalFunction _ -> true | _ -> false in
+    if env.rac.rac_abstract && can_interpret_abstractly && not main_function
+    then Log.ExecAbstract
+    else Log.ExecConcrete in
+  let mvs = let aux pv v = pv.pv_vs, snapshot v in
+    Mvs.of_list (List.map2 aux rs.rs_cty.cty_args arg_vs) in
+  register_call env loc (Some rs) mvs exec_kind;
+  if env.rac.do_rac then (
+    let desc = cntr_desc "Precondition" rs.rs_name in
+    let ctx = cntr_ctx desc ?trigger_loc:loc env in
+    if main_function then check_assume_terms ctx rs.rs_cty.cty_pre
+    else check_terms ctx rs.rs_cty.cty_pre );
+  match exec_kind with
+  | Log.ExecAbstract ->
       let rs_name,cty = rs.rs_name, rs.rs_cty in
       exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
-    end
-  else begin
-      register_call env loc (Some rs) mvs Log.ExecConcrete;
+  | Log.ExecConcrete ->
       let res =
         if rs_equal rs rs_func_app then
           match arg_vs with
           | [{v_desc= Vfun (cl, arg, e)}; value] ->
-             let env =
-               {env with vsenv= Mvs.union (fun _ _ v -> Some v)
-                                  env.vsenv cl} in
-             let env = bind_vs arg value env in
-             eval_expr env e
+              let env =
+                let vsenv = Mvs.union (fun _ _ v -> Some v) env.vsenv cl in
+                {env with vsenv} in
+              let env = bind_vs arg value env in
+              eval_expr env e
           | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
-             let v = try Mv.find value bindings with Not_found -> default in
-             Normal v
+              let v = try Mv.find value bindings with Not_found -> default in
+              Normal v
           | _ -> assert false
         else
           match find_definition env rs with
@@ -2120,7 +2123,6 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
            check_posts desc loc env v posts
         | _ -> () );
       res
-    end
 
 and exec_call_abstract ?loc ?rs_name env cty arg_pvs ity_result =
   (* let f (x1: ...) ... (xn: ...) = e
