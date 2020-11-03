@@ -125,6 +125,9 @@ let debug_print_attrs = Debug.register_info_flag "print_attributes"
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
+let debug_print_types = Debug.register_info_flag "print_types"
+    ~desc:"Print@ types@ of@ terms"
+
 let debug_print_coercions = Debug.register_info_flag "print_coercions"
   ~desc:"Print@ coercions@ in@ logical@ formulas."
 
@@ -353,7 +356,12 @@ and print_lterm pri fmt t =
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
       (print_option print_loc) t.t_loc (print_tattr 0) t
     else print_tattr pri fmt t in
-  print_tloc pri fmt t
+  let print_types pri fmt t =
+    if Debug.test_flag debug_print_types && t.t_ty <> None
+    then fprintf fmt (protect_on (pri > 0) "(%a: %a)")
+        (print_tloc 0) t (print_option print_ty) t.t_ty
+    else print_tloc pri fmt t in
+  print_types pri fmt t
 
 and print_app pri ls fmt tl =
   if tl = [] then print_ls fmt ls else
