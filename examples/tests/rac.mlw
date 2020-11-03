@@ -397,8 +397,22 @@ module Arrays
     a[1] <- 11;
     assert { a[0] = 0 }; (* ok *)
     assert { a[1] = 11 }; (* ok *)
-    assert { a[2] = 11 }; (* failure *)
+    assert { a[2] = 11 }; (* failure, TODO *)
     ()
+
+  use int.Int
+
+  let test2 () =
+    let a = make 1 11 in
+    assert { a.length = 42 } (* failure, cannot evaluate TODO *)
+
+  let test3 () =
+    let a = (empty () : array int) in
+    assert { a.length = 42 } (* failure, cannot evaluate TODO *)
+
+  let test4 () =
+    let a : array int = empty () in
+    assert { a.length > 0 } (* failure, cannot evaluate TODO *)
 end
 
 module Ghost
