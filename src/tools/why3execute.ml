@@ -105,8 +105,9 @@ let do_input f =
   Opt.iter init_real !prec;
   try
     let rac =
-      let reduce_lit = Call_provers.rac_reduce_config_lit ~trans:"compute_in_goal" ?prover:!opt_rac_prover () in
-      let reduce = rac_reduce_config_lit config env reduce_lit in
+      let reduce =
+        let trans = "compute_in_goal" and prover = !opt_rac_prover in
+        rac_reduce_config_lit config env ~trans ?prover () in
       rac_config ~do_rac:!opt_enable_rac ~abstract:false ~reduce () in
     let res = eval_global_fundef rac env
         muc.muc_known muc.muc_theory.Theory.uc_known [] expr in

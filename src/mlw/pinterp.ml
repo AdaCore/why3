@@ -377,7 +377,11 @@ let print_logic_result fmt r =
 
 (* ENV *)
 
-type rac_prover = Rac_prover of {command: string; driver: Driver.driver; limit: Call_provers.resource_limit}
+type rac_prover = Rac_prover of {
+    command: string;
+    driver: Driver.driver;
+    limit: Call_provers.resource_limit;
+  }
 
 let rac_prover ~command driver limit =
   Rac_prover {command; driver; limit}
@@ -389,14 +393,14 @@ type rac_reduce_config = {
 
 let rac_reduce_config ?trans:rac_trans ?prover:rac_prover () = {rac_trans; rac_prover}
 
-let rac_reduce_config_lit config env lit_conf =
+let rac_reduce_config_lit config env ?trans ?prover () =
   let trans =
     let aux s = Trans.lookup_transform_l s env in
-    Opt.map aux lit_conf.Call_provers.lit_trans in
+    Opt.map aux trans in
   let prover =
-    let aux s =
+    let aux prover_string =
       let name, limit_time, limit_mem =
-        match Strings.split ' ' s with
+        match Strings.split ' ' prover_string with
         | [name; limit_time; limit_mem] ->
             name, int_of_string limit_time, int_of_string limit_mem
         | [name; limit_time] ->
@@ -409,11 +413,10 @@ let rac_reduce_config_lit config env lit_conf =
           env prover.Whyconf.driver prover.Whyconf.extra_drivers in
       let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
       rac_prover ~command driver limit in
-    Opt.map aux lit_conf.Call_provers.lit_prover in
+    Opt.map aux prover in
   rac_reduce_config ?trans ?prover ()
 
 (* Interpretation log *)
-
 
 module type Log = sig
   type exec_kind = ExecAbstract | ExecConcrete

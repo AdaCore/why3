@@ -34,17 +34,6 @@ type prover_answer =
       (** An error occured during the call to the prover or none
           of the given regexps match the output of the prover *)
 
-type rac_reduce_config_lit = {
-  lit_trans: string option;
-  (** Name of a list transformation to reduce terms, usually "compute_in_goal" *)
-  lit_prover: string option;
-  (** Prover (with optional, space-separated time limit and memory limit) used to reduce
-     terms when the list transformation was incomplete, e.g. "cvc4 1 100" *)
-}
-(** Literal configuration of RAC reduction. *)
-
-val rac_reduce_config_lit : ?trans:string -> ?prover:string -> unit -> rac_reduce_config_lit
-
 type prover_result = {
   pr_answer : prover_answer;
   (** The answer of the prover on the given task *)
