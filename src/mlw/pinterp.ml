@@ -1193,20 +1193,17 @@ let bind_value env vs v (task, ls_mt, ls_mv) =
   let task = Task.add_logic_decl task [defn] in
   task, ls_mt, ls_mv
 
-(* Create and open a formula `p t` for a non-formula term `t`, to use the reduction engine
-   to evaluate `t` *)
-let p = object
-  val ls_p =
-    let tv = create_tvsymbol (id_fresh "a") in
-    create_psymbol (id_fresh "p") [ty_var tv]
-  method decl =
-    Decl.create_param_decl ls_p
-  method create_app t =
-    t_app ls_p [t] None
-  method open_app t = match t with
-    | {t_node= Tapp (ls, [t])} when ls_equal ls ls_p -> t
-    | _ -> failwith "p#open_app"
-end
+(* Create and open a formula `p t` where `p` refers to a predicate without definition, to
+   use the reduction engine to evaluate `t` *)
+let undef_pred_decl, undef_pred_app, undef_pred_app_arg =
+  let ls = let tv = create_tvsymbol (id_fresh "a") in
+    create_psymbol (id_fresh "p") [ty_var tv] in
+  let decl = Decl.create_param_decl ls in
+  let app t = t_app ls [t] None in
+  let app_arg t = match t with
+    | {t_node= Tapp (ls, [t])} when ls_equal ls ls -> t
+    | _ -> failwith "open_app" in
+  decl, app, app_arg
 
 (* Add declarations from local functions in [env.funenv] *)
 let bind_fun rs cexp (task, ls_mv) =
@@ -1268,9 +1265,9 @@ let task_of_term ?(vsenv=[]) env t =
       let prs = create_prsymbol (id_fresh "goal") in
       add_prop_decl task Pgoal prs t
     else (* ... and wrap a non-formula in a call to a predicate with no definition *)
-      let task = add_decl task p#decl in
+      let task = add_decl task undef_pred_decl in
       let prs = create_prsymbol (id_fresh "goal") in
-      add_prop_decl task Pgoal prs (p#create_app t) in
+      add_prop_decl task Pgoal prs (undef_pred_app t) in
   task, ls_mv
 
 (* Parameters for binding universally quantified variables to a value
@@ -1354,7 +1351,7 @@ let compute_term env t =
         | t :: ts -> List.fold_left t_and t ts
       else (* [t] is not a formula *)
         let t = match Trans.apply trans task with
-          | [task] -> p#open_app (Task.task_goal_fmla task)
+          | [task] -> undef_pred_app_arg (Task.task_goal_fmla task)
           | _ -> failwith "compute_term" in
         (* Free vsymbols in the original [t] have been substituted in by fresh lsymbols
            (actually: ls @ []) to bind them to declarations in the task. Now we have to
