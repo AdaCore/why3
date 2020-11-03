@@ -269,27 +269,44 @@ let ls_undefined =
   let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
   create_fsymbol (id_fresh "undefined") [] ty_a
 
-     (** Convert a value into a term. The first component of the result are additional bindings
-    from closures, (roughly) sorted by strongly connected components. *)
-let rec term_of_value env vsenv v : (vsymbol * term) list * term =
+(** [ty_app_arg ts nth ty] returns the nth argument in the type application [ty]. Fails
+   when ty is not a type application of [ts] *)
+let ty_app_arg ts ix ty = match ty.ty_node with
+  | Tyapp (ts', ty_args) when ts_equal ts' ts ->
+      List.nth ty_args ix
+  | _ -> kasprintf failwith "@[<h>ty_arg: not an singleton application of %a: %a@]" print_ts ts print_ty ty
+
+(** Convert a value into a term. The first component of the result are additional bindings
+   from closures. *)
+let rec term_of_value ?ty_mt env vsenv v : (vsymbol * term) list * term =
+  let v_ty = ty_inst (Opt.get_def Mtv.empty ty_mt) v.v_ty in
   match v.v_desc with
   | Vundefined ->
       (* TODO Replace ls_undefined by fs_any_function when branch
        * fun-lits-noptree is merged:
-       * env, t_app fs_any_function [t_tuple []] v.v_ty *)
-      vsenv, t_app ls_undefined [] (Some v.v_ty)
-  | Vnum i -> vsenv, t_const (Constant.int_const i) v.v_ty
-  | Vstring s -> vsenv, t_const (Constant.ConstStr s) ty_str
-  | Vbool b -> vsenv, if b then t_bool_true else t_bool_false
-  | Vvoid -> vsenv, t_tuple []
-  | Vterm t -> vsenv, t
+       * env, fs_app fs_any_function [t_tuple []] v_ty *)
+      vsenv, fs_app ls_undefined [] v_ty
+  | Vnum i ->
+      vsenv, t_const (Constant.int_const i) v_ty
+  | Vstring s ->
+      ty_equal_check v_ty ty_str;
+      vsenv, t_const (Constant.ConstStr s) ty_str
+  | Vbool b ->
+      ty_equal_check v_ty ty_bool;
+      vsenv, if b then t_bool_true else t_bool_false
+  | Vvoid ->
+      ty_equal_check v_ty ty_unit;
+      vsenv, t_tuple []
+  | Vterm t ->
+      Opt.iter (ty_equal_check v_ty) t.t_ty;
+      vsenv, t
   | Vreal _ | Vfloat _ | Vfloat_mode _ -> (* TODO *)
       Format.kasprintf failwith "term_of_value: %a" print_value v
   | Vconstr (rs, fs) ->
       if rs_kind rs = RKfunc then
-        let term_of_field vsenv f = term_of_value env vsenv (field_get f) in
+        let term_of_field vsenv f = term_of_value ?ty_mt env vsenv (field_get f) in
         let vsenv, fs = Lists.map_fold_left term_of_field vsenv fs in
-        vsenv, t_app_infer (ls_of_rs rs) fs
+        vsenv, fs_app (ls_of_rs rs) fs v_ty
       else (* TODO bench/ce/{record_one_field,record_inv}.mlw/CVC4/WP *)
         kasprintf failwith "Cannot construct term for constructor \
                             %a that is not a function" print_rs rs
@@ -297,26 +314,22 @@ let rec term_of_value env vsenv v : (vsymbol * term) list * term =
       (* TERM: fun arg -> t *)
       let t = Opt.get_exn (Failure "Cannot convert function body to term")
           (term_of_expr ~prop:false e) in
-
       (* Rebind values from closure *)
       let bind_cl vs v (mt, mv, vsenv) =
         let vs' = create_vsymbol (id_clone vs.vs_name) v.v_ty in
         let mt = ty_match mt vs.vs_ty v.v_ty in
         let mv = Mvs.add vs (t_var vs') mv in
-        let vsenv, t = term_of_value env vsenv v in
+        let vsenv, t = term_of_value ?ty_mt env vsenv v in
         let vsenv = (vs', t) :: vsenv in
         mt, mv, vsenv in
       let mt, mv, vsenv = Mvs.fold bind_cl cl (Mtv.empty, Mvs.empty, vsenv) in
-
       (* Substitute argument type *)
-      let ty_arg = match v.v_ty.ty_node with
-        | Tyapp (ts, [ty_arg; _]) when ts_equal ts ts_func -> ty_arg
-        | _ -> assert false in
+      let ty_arg = ty_app_arg ts_func 0 v_ty in
+      let vs_arg = create_vsymbol (id_clone arg.vs_name) ty_arg in
+      let mv = Mvs.add arg (t_var vs_arg) mv in
       let mt = ty_match mt arg.vs_ty ty_arg in
-      let arg' = create_vsymbol (id_clone arg.vs_name) ty_arg in
-      let mv = Mvs.add arg (t_var arg') mv in
       let t = t_ty_subst mt mv t in
-      vsenv, t_lambda [arg'] [] t
+      vsenv, t_lambda [vs_arg] [] t
   | Varray a ->
       let open Pmodule in
       (* TERM: [make a.length (eps v. true)][0 <- a[0]]...[n-1 <- a[n-1]] *)
@@ -341,13 +354,16 @@ let rec term_of_value env vsenv v : (vsymbol * term) list * term =
       (* TERM: fun arg -> if arg = k0 then v0 else ... else v *)
       (* TODO Use function literal [|mv...; _ -> v|] when available in Why3 *)
       let arg = create_vsymbol (id_fresh "arg") ty in
+  | Vpurefun (ty, m, def) ->
+      (* TERM: fun x -> if x = k0 then v0 else ... else def *)
+      let vs_arg = create_vsymbol (id_fresh "x") ty in
       let mk_case key value (vsenv, t) =
-        let vsenv, key = term_of_value env vsenv key in      (* k_i *)
-        let vsenv, value = term_of_value env vsenv value in  (* v_i *)
-        let t = t_if (t_equ (t_var arg) key) value t in (* if arg = k_i then v_i else ... *)
+        let vsenv, key = term_of_value ?ty_mt env vsenv key in      (* k_i *)
+        let vsenv, value = term_of_value ?ty_mt env vsenv value in  (* v_i *)
+        let t = t_if (t_equ (t_var vs_arg) key) value t in (* if arg = k_i then v_i else ... *)
         vsenv, t in
-      let vsenv, t = Mv.fold mk_case m (term_of_value env vsenv v) in
-      vsenv, t_lambda [arg] [] t
+      let vsenv, t = Mv.fold mk_case m (term_of_value ?ty_mt env vsenv def) in
+      vsenv, t_lambda [vs_arg] [] t
 
 (* RESULT *)
 
@@ -1183,10 +1199,16 @@ let bind_term (vs, t) (task, ls_mt, ls_mv) =
 
 (* Add declarations for value bindings in [env.vsenv] *)
 let bind_value env vs v (task, ls_mt, ls_mv) =
-  let ls = create_fsymbol (id_clone vs.vs_name) [] v.v_ty in
-  let ls_mt = ty_match ls_mt vs.vs_ty v.v_ty in
-  let ls_mv = Mvs.add vs (fs_app ls [] v.v_ty) ls_mv in
-  let vsenv, t = term_of_value env [] v in
+  let ty, ty_mt, ls_mt =
+    (* [ty_mt] is a type substitution for [v],
+       [ls_mt] is a type substitution for the remaining task *)
+    if ty_closed v.v_ty then
+      v.v_ty, Mtv.empty, ty_match ls_mt vs.vs_ty v.v_ty
+    else
+      vs.vs_ty, ty_match Mtv.empty v.v_ty vs.vs_ty, ls_mt in
+  let ls = create_fsymbol (id_clone vs.vs_name) [] ty in
+  let ls_mv = Mvs.add vs (fs_app ls [] ty) ls_mv in
+  let vsenv, t = term_of_value ~ty_mt env [] v in
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
   let t = t_ty_subst ls_mt ls_mv t in
   let defn = Decl.make_ls_defn ls [] t in
