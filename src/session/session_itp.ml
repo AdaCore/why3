@@ -358,6 +358,10 @@ let get_proof_parent (s : session) (id : proofNodeID) =
 let get_trans_parent (s : session) (id : transID) =
   (get_transfNode s id).transf_parent
 
+let rec find_th s id = match get_proof_parent s id with
+  | Theory th -> th
+  | Trans id -> find_th s (get_trans_parent s id)
+
 let goal_is_detached s pn =
   try let (_:Task.task) = get_task s pn in false
   with Not_found -> true
