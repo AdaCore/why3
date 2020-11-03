@@ -5,7 +5,7 @@ module Local
   let test1 () =
     let x = 1 in
     assert { x >= 0 }; (* ok *)
-    assert { forall y. y = 1 -> x = y }; (* cannot evaluate *)
+    assert { forall y. y = 1 -> x = y }; (* ok *)
     assert { x = 0 } (* failure *)
 
   predicate p (_: unit) = false
