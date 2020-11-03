@@ -330,30 +330,26 @@ let rec term_of_value ?ty_mt env vsenv v : (vsymbol * term) list * term =
       let mt = ty_match mt arg.vs_ty ty_arg in
       let t = t_ty_subst mt mv t in
       vsenv, t_lambda [vs_arg] [] t
-  | Varray a ->
+  | Varray arr ->
       let open Pmodule in
-      (* TERM: [make a.length (eps v. true)][0 <- a[0]]...[n-1 <- a[n-1]] *)
-      let pm = read_module env ["array"] "Array" in
-      let ls_make = Mstr.find "make" pm.mod_theory.Theory.th_export.Theory.ns_ls in
-      let ls_update = Mstr.find (op_update "") pm.mod_theory.Theory.th_export.Theory.ns_ls in
-      let rec loop (vsenv, t) ix =
-        if ix = Array.length a then vsenv, t
-        else
-          let t_ix = t_const (Constant.int_const_of_int ix) ty_int in
-          let vsenv, t_a_ix = term_of_value env vsenv a.(ix) in
-          let t = t_app_infer ls_update [t; t_ix; t_a_ix] in
-          loop (vsenv, t) (succ ix) in
-      let t_n = t_const (Constant.int_const_of_int (Array.length a)) ty_int in
-      let val_ty = match v.v_ty.ty_node with
-        | Tyapp (_, [ty]) -> ty
-        | _ -> assert false in
-      let t_v = t_app ls_undefined [] (Some val_ty) in
-      let t_make = t_app_infer ls_make [t_n; t_v] in
-      loop (vsenv, t_make) 0
-  | Vpurefun (ty, m, v) ->
-      (* TERM: fun arg -> if arg = k0 then v0 else ... else v *)
-      (* TODO Use function literal [|mv...; _ -> v|] when available in Why3 *)
-      let arg = create_vsymbol (id_fresh "arg") ty in
+      (* TERM: epsilon v. v.length = length arr /\ v[0] = arr.(ix) /\ ... *)
+      let {mod_theory= {Theory.th_export= ns}} = read_module env ["array"] "Array" in
+      let ts_array = Theory.ns_find_ts ns ["array"] in
+      let ls_length = Theory.ns_find_ls ns ["length"] in
+      let ls_get = Theory.ns_find_ls ns [op_get ""] in
+      let v = create_vsymbol (id_fresh "a") v_ty in
+      let t_eq_length = (* v.length = length arr *)
+        t_equ (fs_app ls_length [t_var v] ty_int)
+          (t_nat_const (Array.length arr)) in
+      let elt_ty = ty_app_arg ts_array 0 v_ty in
+      let rec loop vsenv sofar ix = (* v[ix] = arr.(ix) *)
+        if ix = Array.length arr then vsenv, List.rev sofar else
+          let vsenv, t_a_ix = term_of_value ?ty_mt env vsenv arr.(ix) in
+          let t_eq_ix = t_equ (fs_app ls_get [t_var v; t_nat_const ix] elt_ty) t_a_ix in
+          loop vsenv (t_eq_ix :: sofar) (succ ix) in
+      let vsenv, t_eq_ixs = loop vsenv [] 0 in
+      let t = t_and_l (t_eq_length :: t_eq_ixs) in
+      vsenv, t_eps (t_close_bound v t)
   | Vpurefun (ty, m, def) ->
       (* TERM: fun x -> if x = k0 then v0 else ... else def *)
       let vs_arg = create_vsymbol (id_fresh "x") ty in
