@@ -1,0 +1,110 @@
+<check-ce>Model 2 is empty
+<check-ce>Check model 0 ("bench/check-ce/tuple1.mlw", line 7, characters 14-19)
+<check-ce>Validating model:
+          File tuple1.mlw:
+            Line 6:
+              a =
+                {"proj_name": "int63'int",
+                 "type": "Proj",
+                 "value": {"type": "Integer", "val": "0"}}
+              b =
+                {"proj_name": "int63'int",
+                 "type": "Proj",
+                 "value": {"type": "Integer", "val": "0"}}
+            Line 7:
+              the check fails with all inputs
+<check-ce>Interpreting concretly
+<rac-values>Missing value for parameter x, continue with default value (
+(-4611686018427387904), (-4611686018427387904))
+<check-ce>Interpreting abstractly
+<rac-values>Missing value for parameter x, continue with default value (
+(-4611686018427387904), (-4611686018427387904))
+<check-ce>Result of checking model 0:
+            - Concrete: don't know (Concrete RAC terminated due to unsupported feature: Precondition of (+) cannot be evaluated)
+              
+            - Abstract: don't know (Abstract RAC terminated due to unsupported feature: Precondition of (+) cannot be evaluated)
+              
+<check-ce>Check model 1 ("bench/check-ce/tuple1.mlw", line 7, characters 14-19)
+<check-ce>Validating model:
+          File int.mlw:
+            Line 432:
+              max_int =
+                {"proj_name": "int63'int",
+                 "type": "Proj",
+                 "value": {"type": "Integer", "val": "4611686018427387903"}}
+            Line 434:
+              min_int =
+                {"proj_name": "int63'int",
+                 "type": "Proj",
+                 "value": {"type": "Integer", "val": "-4611686018427387904"}}
+            File tuple1.mlw:
+              Line 6:
+                a =
+                  {"proj_name": "int63'int",
+                   "type": "Proj",
+                   "value": {"type": "Integer", "val": "0"}}
+                b =
+                  {"proj_name": "int63'int",
+                   "type": "Proj",
+                   "value": {"type": "Integer", "val": "0"}}
+              Line 7:
+                a =
+                  {"proj_name": "int63'int",
+                   "type": "Proj",
+                   "value": {"type": "Integer", "val": "0"}}
+                b =
+                  {"proj_name": "int63'int",
+                   "type": "Proj",
+                   "value": {"type": "Integer", "val": "0"}}
+<check-ce>Interpreting concretly
+<rac-values>Missing value for parameter x, continue with default value (
+(-4611686018427387904), (-4611686018427387904))
+<check-ce>Interpreting abstractly
+<rac-values>Missing value for parameter x, continue with default value (
+(-4611686018427387904), (-4611686018427387904))
+<check-ce>Result of checking model 1:
+            - Concrete: don't know (Concrete RAC terminated due to unsupported feature: Precondition of (+) cannot be evaluated)
+              
+            - Abstract: don't know (Abstract RAC terminated due to unsupported feature: Precondition of (+) cannot be evaluated)
+              
+<check-ce>Models:
+- Checked model 0 (Concrete: don't know, Abstract: don't know)
+    Summary: The following counterexample model has not been verified
+    (Concrete RAC terminated due to unsupported feature: Precondition of (+) cannot be evaluated)
+- Selected model 1 (Concrete: don't know, Abstract: don't know)
+    Summary: The following counterexample model has not been verified
+    (Concrete RAC terminated due to unsupported feature: Precondition of (+) cannot be evaluated)
+File "bench/check-ce/tuple1.mlw", line 7, characters 14-19:
+Goal Integer overflow from verification condition swap'vc.
+Prover result is: timeout (1.00s, 4514536 steps).
+The following counterexample model could not be verified
+  (Concrete RAC terminated due to unsupported feature: Precondition of (+) cannot be evaluated):
+File int.mlw:
+  Line 432:
+    max_int = {int63'int => 4611686018427387903 (0x3FFFFFFFFFFFFFFF)}
+  Line 434:
+    min_int = {int63'int => -4611686018427387904 (-0x4000000000000000)}
+File tuple1.mlw:
+  Line 6:
+    a = {int63'int => 0 (0x0)}
+    b = {int63'int => 0 (0x0)}
+  Line 7:
+    a = {int63'int => 0 (0x0)}
+    b = {int63'int => 0 (0x0)}
+
+File "bench/check-ce/tuple1.mlw", line 7, characters 14-23:
+Goal Integer overflow from verification condition swap'vc.
+Prover result is: valid (0.02s, 7309 steps).
+
+File "bench/check-ce/tuple1.mlw", line 7, characters 3-8:
+Goal Integer overflow from verification condition swap'vc.
+Prover result is: valid (0.00s, 7440 steps).
+
+File "bench/check-ce/tuple1.mlw", line 7, characters 3-12:
+Goal Integer overflow from verification condition swap'vc.
+Prover result is: valid (0.01s, 7986 steps).
+
+File "bench/check-ce/tuple1.mlw", line 5, characters 38-43:
+Goal Postcondition from verification condition swap'vc.
+Prover result is: valid (0.00s, 8449 steps).
+

@@ -1051,7 +1051,11 @@ let rec default_value_of_type env known ity : value =
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
   | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
   | Ityapp (ts, _, _) when its_equal ts its_str -> value ty (Vstring "")
-  (* | Ityapp(ts,_,_) when is_its_tuple ts -> assert false (* TODO *) *)
+  | Ityapp(ts,ityl1,ityl2) when is_ts_tuple ts.its_ts ->
+     let fields = List.map (fun ity ->
+       Field (ref (default_value_of_type env known ity))) ityl1 in
+     let v = Vconstr (rs_tuple (List.length ityl1), fields) in
+     value ty v
   | Ityreg {reg_its= its; reg_args= l1; reg_regs= l2}
   | Ityapp (its, l1, l2) ->
       if is_array_its env its then
