@@ -312,18 +312,8 @@ let find_rs pm loc =
     | [] -> None
     | x :: xs ->
        match f x with None -> find_in_list f xs | res -> res in
-  let contains l1 l2 = (* check if l2 is contained in l1 *)
-    match l1 with
-    | None -> false
-    | Some loc1 ->
-       let f1,(bl1,bc1),(el1,ec1) = Loc.get_multiline loc1 in
-       let f2,(bl2,bc2),(el2,ec2) = Loc.get_multiline l2 in
-       f2 = f1 && bl1 <= bl2 && el1 >= el2
-       && if bl1 = bl2 then bc1 <= bc2 else true
-       && if el1 = el2 then ec1 >= ec2 else true in
-  let in_t t =
-    contains t.t_loc loc ||
-    t_any (fun t -> contains t.t_loc loc) t in
+  let rec in_t t =
+    Opt.equal Loc.equal (Some loc) t.t_loc || t_any in_t t in
   let in_cty cty =
     List.exists in_t cty.cty_pre ||
     List.exists in_t cty.cty_post ||
