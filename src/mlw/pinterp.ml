@@ -62,6 +62,16 @@ let is_prog_constant d =
   | PDlet (LDsym (_, {c_cty= {cty_args= []}})) -> true
   | _ -> false
 
+let ity_components ity = match ity.ity_node with
+  | Ityapp (ts, l1, l2)
+  | Ityreg {reg_its= ts; reg_args= l1; reg_regs= l2} ->
+      ts, l1, l2
+  | _ -> failwith "ity_components"
+
+let is_range_ty ty =
+  let its, _, _ = ity_components (ity_of_ty ty) in
+  Ty.is_range_type_def its.its_def
+
 (* EXCEPTIONS *)
 
 exception NoMatch
@@ -198,9 +208,9 @@ let field_get (Field r) = r.contents
 let field_set (Field r) v = r := v
 
 let int_value s = value ty_int (Vnum (BigInt.of_string s))
+let range_value ity s = value (ty_of_ity ity) (Vnum (BigInt.of_string s))
 let string_value s = value ty_str (Vstring s)
 let bool_value b = value ty_bool (Vbool b)
-let range_value ity s = value (ty_of_ity ity) (Vnum (BigInt.of_string s))
 let constr_value ity rs vl =
   value (ty_of_ity ity) (Vconstr (rs, List.map field vl))
 let purefun_value ~result_ity ~arg_ity mv v =

@@ -224,3 +224,8 @@ val eval_rs : rac_config -> Env.env -> Pmodule.pmodule -> rsymbol -> result * en
   raises [RACStuck _] if a property that should be assumed is not
    satisfied in the current enviroment. *)
 
+(**/**)
+
+val ity_components : Ity.ity -> Ity.itysymbol * Ity.ity list * Ity.ity list
+
+val is_range_ty : Ty.ty -> bool

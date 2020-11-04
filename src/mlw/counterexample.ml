@@ -19,6 +19,7 @@ open Pinterp
 let debug_check_ce = Debug.register_info_flag "check-ce"
     ~desc:"Debug@ info@ for@ --check-ce"
 
+
 (** Transformations interpretation log and prover models *)
 
 (** transform an interpretation log into a prover model *)
@@ -190,13 +191,9 @@ let rec import_model_value env known ity v =
   (* TODO If the type is a non-free record, we could similarily axiomatize
      the values of the fields by rules in the reduction engine. (Cf.
      bench/ce/record_one_field.mlw)  *)
-  let def, subst =
-    match ity.ity_node with
-    | Ityapp (ts, l1, l2)
-    | Ityreg {reg_its= ts; reg_args= l1; reg_regs= l2} ->
-       Pdecl.find_its_defn known ts,
-       its_match_regs ts l1 l2
-    | Ityvar _ -> assert false in
+  let ts, l1, l2 = ity_components ity in
+  let def = Pdecl.find_its_defn known ts in
+  let subst = its_match_regs ts l1 l2 in
   (* let is_ity_array env ity =
    *   let pm = Pmodule.read_module env ["array"] "Array" in
    *   let its_array = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
