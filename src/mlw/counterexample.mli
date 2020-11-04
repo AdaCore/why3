@@ -22,7 +22,6 @@ val debug_check_ce : Debug.flag
    result of checking them by interpreting the program concretly and
    abstractly using the values in the solver's model *)
 
-
 type verdict = private
   | Good_model (* the model leads to a counterexample *)
   | Bad_model  (* the model doesn't lead to a counterexample *)
@@ -40,37 +39,55 @@ type check_model_result = private
   | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
   (* the model was checked *)
 
+val print_check_model_result : check_model_result Pp.pp
+
 val check_model :
   rac_reduce_config -> Env.env -> pmodule -> model -> check_model_result
 (* interpret concrecly and abstractly the program corresponding to the
    model (the program corresponding to the model is obtained from the
    location in the model) *)
 
+(** {2 Summary of checking models} *)
+
 type ce_summary
-
-val print_ce_summary_kind : ce_summary Pp.pp
-
-val select_model :
-  ?check:bool -> ?conservative:bool -> ?reduce_config:rac_reduce_config ->
-  Env.env -> pmodule -> (Call_provers.prover_answer * model) list ->
-  (model * ce_summary) option
-(** [select ~check ~conservative ~reduce_config env pm ml] chooses a
-   model from [ml]. [check] is set to false by default and indicates if
-   interpretation should be used to select the model. [reduce_config] is
-   set to [rac_reduce_config ()] by default and is only used if
-   [check=true]. [conservative] is set to false by default and indicates
-   that the last, non-empty model is always selected (as done before
-   2020). *)
-
-val model_of_ce_summary : original_model:model -> ce_summary -> model
-(** [model_of_ce_summary ~original_model summary] updates
-   [original_model] with information from [ce_summary] *)
-
-(** {2 Pretty-printing results} *)
-
-val print_check_model_result : check_model_result Pp.pp
 
 val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 
+val print_ce_summary_kind : ce_summary Pp.pp
+
 val print_counterexample :
   ?check_ce:bool -> ?json:bool -> (model * ce_summary) Pp.pp
+
+(** {2 Model selection} *)
+
+type sort_models
+(** Sort solver models in [select_model]. *)
+
+val select_model :
+  ?check:bool -> ?reduce_config:rac_reduce_config -> ?sort_models:sort_models ->
+  Env.env -> pmodule -> (Call_provers.prover_answer * model) list ->
+  (model * ce_summary) option
+(** [select ~check ~conservative ~reduce_config env pm ml] chooses a
+    model from [ml]. [check] is set to false by default and indicates if
+    interpretation should be used to select the model. [reduce_config] is
+    set to [rac_reduce_config ()] by default and is only used if
+    [check=true]. Different priorizations of solver models can be
+    selected by [sort_models], which is [prioritize_first_good_model] by
+    default. *)
+
+val prioritize_first_good_model : sort_models
+(** If there is any model that can be verified by counterexample
+    checking, prioritize NCCE over SWCE over NCCE_SWCE, and prioritize
+    simpler models from the incremental list produced by the prover.mi_df
+
+    Otherwise prioritize the last, non-empty model in the incremental
+    list, but penalize bad models. *)
+
+val prioritize_last_model : sort_models
+(** Do not consider the result of checking the counterexample model, but
+    just priotize the last, non-empty model in the incremental list of
+    models created by the prover (as done before 2020) *)
+
+(* val model_of_ce_summary : original_model:model -> ce_summary -> model
+ * (\** [model_of_ce_summary ~original_model summary] updates
+ *    [original_model] with information from [ce_summary] *\) *)
