@@ -1,0 +1,7 @@
+
+use mach.int.Int63
+
+let swap (x:(int63,int63))
+  ensures { let (a,b) = x in result = (b,a)}
+= let (a,b) = x in
+  (a + b - a, b + a - b)
