@@ -1623,7 +1623,7 @@ let get_and_register_value env ?def ?ity vs loc =
   let value = match env.rac.get_value ~name ~loc ity with
     | Some v ->
        Debug.dprintf debug_rac_values
-         "@[<h>VALUE imported for %a at %a: %a@]@."
+         "@[<h>Value imported for %a at %a: %a@]@."
          print_decoded name
          print_loc' loc
          print_value v; v
@@ -1632,10 +1632,9 @@ let get_and_register_value env ?def ?ity vs loc =
          | None -> default_value_of_type env.env env.mod_known ity
          | Some v -> v in
        Debug.dprintf debug_rac_values
-         "@[<h>VALUE for %s %a cannot be imported, taking \
-          default %a@]@." name print_loc' loc print_value v;
-       v
-  in
+         "@[<h>No value for %s at %a, taking default%t.@]@." name print_loc' loc
+         (fun fmt -> if def <> None then fprintf fmt " %a" print_value v);
+       v in
   register_used_value env (Some loc) vs.vs_name value;
   value
 
@@ -1735,10 +1734,10 @@ and eval_expr' env e =
             | Some v -> v
             | None ->
                let v = default_value_of_type env.env env.mod_known e.e_ity in
-               let pp_loc fmt = function
-                 | Some loc -> fprintf fmt " at %a" print_loc' loc
-                 | None -> () in
-               Debug.dprintf debug_trace_exec "Take default value %a for any expression%a"
+               let pp_loc fmt loc =
+                 if loc <> None then
+                   fprintf fmt " at %a" (Pp.print_option print_loc') loc in
+               Debug.dprintf debug_rac_values "@[<h>Choose default value %a for any expression%a@]@."
                  print_value v pp_loc e.e_loc;
                v in
           register_any_call env e.e_loc value;
@@ -2247,7 +2246,7 @@ let eval_rs rac env pm rs =
     | None ->
        let v = default_value_of_type env mod_known pv.pv_ity in
        Debug.dprintf debug_rac_values
-         "Missing value for parameter %a, continue with default value %a@."
+         "@[<h>Missing value for parameter %a, continue with default value %a.@]@."
          print_pv pv print_value v;
        v in
   get_builtin_progs env ;
