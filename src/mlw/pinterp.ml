@@ -1310,6 +1310,9 @@ let task_of_term ?(vsenv=[]) env t =
 let bind_univ_quant_vars = false
 let bind_univ_quant_vars_default = false
 
+let string_or_model_trace id =
+  Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
+
 (* Get the value of a vsymbol with env.rac.get_value or a default value *)
 let get_value_for_quant_var env vs =
   match vs.vs_name.id_loc with
@@ -1317,8 +1320,8 @@ let get_value_for_quant_var env vs =
   | Some loc ->
       let value =
         if bind_univ_quant_vars then
-          let v = env.rac.get_value ~name:vs.vs_name.id_string
-                    ~loc (ity_of_ty vs.vs_ty) in
+          let name = string_or_model_trace vs.vs_name in
+          let v = env.rac.get_value ~name ~loc (ity_of_ty vs.vs_ty) in
           (Opt.iter (fun v ->
                Debug.dprintf debug_rac_values
                  "Bind all-quantified variable %a to %a@."
@@ -1616,7 +1619,7 @@ let print_result fmt = function
 
 let get_and_register_value env ?def ?ity vs loc =
   let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
-  let name = vs.vs_name.id_string in
+  let name = string_or_model_trace vs.vs_name in
   let value = match env.rac.get_value ~name ~loc ity with
     | Some v ->
        Debug.dprintf debug_rac_values
@@ -2179,7 +2182,8 @@ let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 let bind_globals ?rs_main mod_known env =
   let get_value register id opt_e ity =
-    match env.rac.get_value ~name:id.id_string ?loc:id.id_loc ity with
+    let name = string_or_model_trace id in
+    match env.rac.get_value ~name ?loc:id.id_loc ity with
     | Some v -> register v; v
     | None ->
        match opt_e with
@@ -2237,7 +2241,7 @@ let eval_rs rac env pm rs =
   let th_known = pm.mod_theory.Theory.th_known in
   let get_value (pv: pvsymbol) =
     let id = pv.pv_vs.vs_name in
-    let name = get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs in
+    let name = string_or_model_trace id in
     match rac.get_value ~name ?loc:id.id_loc pv.pv_ity with
     | Some v -> v
     | None ->

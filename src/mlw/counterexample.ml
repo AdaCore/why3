@@ -294,9 +294,9 @@ let get_model_value (m:Model_parser.model) (env:Env.env) (known:Pdecl.known_map)
      let me = match name with
        | None -> get_model_element_by_loc m l
        | Some s -> get_model_element m s l in
-     begin match me with
+     match me with
      | None -> None
-     | Some v -> Some (import_model_value env known ity v.me_value) end
+     | Some v -> Some (import_model_value env known ity v.me_value)
 
 (** Check and select solver counterexample models *)
 
