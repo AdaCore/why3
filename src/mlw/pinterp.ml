@@ -1061,19 +1061,22 @@ let rec default_value_of_type env known ity : value =
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
   | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
   | Ityapp (ts, _, _) when its_equal ts its_str -> value ty (Vstring "")
-  | Ityapp(ts,ityl1,ityl2) when is_ts_tuple ts.its_ts ->
+  | Ityapp(ts,ityl1,_) when is_ts_tuple ts.its_ts ->
      let fields = List.map (fun ity ->
        Field (ref (default_value_of_type env known ity))) ityl1 in
      let v = Vconstr (rs_tuple (List.length ityl1), fields) in
      value ty v
-  | Ityreg {reg_its= its; reg_args= l1; reg_regs= l2}
-  | Ityapp (its, l1, l2) ->
+  | Ityapp (its, l1, l2)
+  | Ityreg {reg_its= its; reg_args= l1; reg_regs= l2} ->
       if is_array_its env its then
         value ty (Varray (Array.init 0 (fun _ -> assert false)))
       else
         let itd = Pdecl.find_its_defn known its in
         match itd.Pdecl.itd_its.its_def with
-        | Range r -> value ty (Vnum r.Number.ir_lower)
+        | Range r ->
+            let zero_in_range = BigInt.(le r.Number.ir_lower zero && le zero r.Number.ir_upper) in
+            let n = if zero_in_range then BigInt.zero else r.Number.ir_lower in
+            value ty (Vnum n)
         | _ -> match itd.Pdecl.itd_constructors with
           | rs :: _ ->
               let subst = its_match_regs its l1 l2 in
@@ -1737,8 +1740,8 @@ and eval_expr' env e =
                let pp_loc fmt loc =
                  if loc <> None then
                    fprintf fmt " at %a" (Pp.print_option print_loc') loc in
-               Debug.dprintf debug_rac_values "@[<h>Choose default value %a for any expression%a@]@."
-                 print_value v pp_loc e.e_loc;
+               Debug.dprintf debug_rac_values "@[<h>Choose default value %a for type %a in any-expression%a@]@."
+                 print_value v print_ity e.e_ity pp_loc e.e_loc;
                v in
           register_any_call env e.e_loc value;
           (* register_used_value env e.e_loc (id_register (id_fresh ?loc:e.e_loc "ANY")) v; *)
