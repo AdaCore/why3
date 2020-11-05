@@ -6,23 +6,29 @@ updateoracle=false
 forceupdateoracle=false
 files=""
 success=true
+suffix=""
 
 while test $# != 0; do
 case "$1" in
+  "-suffix")
+      suffix="$2"
+      shift 2;;
   "-update-oracle")
-      updateoracle=true;;
+      updateoracle=true
+      shift 1;;
   "-force-update-oracle")
-      forceupdateoracle=true;;
+      forceupdateoracle=true
+      shift 1;;
   "-"*)
       printf "unknown option: %s\n" "$1"
-      printf "usage: check-ce-bench [-update-oracle] <files>\n"
+      printf "usage: check-ce-bench [-update-oracle] [-suffix <suffix>] <files>\n"
       printf "  <files> must be given without the '.mlw' suffix\n"
       printf "  if <files> empty, use all files from directory 'ce'\n"
       exit 2;;
   *)
-       files="$files $1"
+      files="$files $1"
+      shift 1;;
 esac
-shift
 done
 
 if test "$files" = "" ; then
@@ -30,6 +36,9 @@ if test "$files" = "" ; then
 fi
 
 failed=""
+
+whydata=$(bin/why3"$suffix" --print-datadir)
+whylib=$(bin/why3"$suffix" --print-libdir)
 
 # $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP
 run () {
@@ -49,9 +58,9 @@ run () {
         printf "Strongest Postcondition  ${file_path} ($1)... "
     fi
     prover="$1,counterexamples"
-    $dir/../bin/why3prove.opt --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce --debug=rac-values 2>&1 \
-      | sed "s|$(bin/why3.opt --print-datadir)|WHY3DATA|g" \
-      | sed "s|$(bin/why3.opt --print-libdir)|WHY3LIB|g" \
+    echo $dir/../bin/why3prove"$suffix" --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce,rac-values
+    $dir/../bin/why3prove"$suffix" --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce,rac-values 2>&1 \
+      | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
       > "$f.out"
     str_out=$(sed 's/[0-9]\+\.[0-9]\+s//g' "$f.out" | \
               sed 's/[0-9]\+ steps//g' | \
