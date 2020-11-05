@@ -40,6 +40,14 @@ failed=""
 whydata=$(bin/why3"$suffix" --print-datadir)
 whylib=$(bin/why3"$suffix" --print-libdir)
 
+colorize() {
+    if command -v pygmentize &> /dev/null; then
+        pygmentize -ldiff
+    else
+        cat
+    fi
+}
+
 # $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP
 run () {
     printf "  $2 ($1)... "
@@ -78,7 +86,7 @@ run () {
             echo "FAILED!"
             echo "diff is the following:"
             echo "$f"
-            diff <(echo "$str_oracle") <(echo "$str_out")
+            diff -u <(echo "$str_oracle") <(echo "$str_out")|colorize
             failed="$failed$f\n"
             success=false
         fi
