@@ -21,7 +21,7 @@ open Expr
 
 type value
 
-module Mv : Map.S with type key = value
+module Mv : Extmap.S with type key = value
 
 val v_ty : value -> Ty.ty
 
@@ -33,6 +33,7 @@ val int_value : string -> value
 val range_value : ity -> string -> value
 val string_value : string -> value
 val bool_value : bool -> value
+val proj_value : ity -> lsymbol -> value -> value
 val constr_value : ity -> rsymbol -> value list -> value
 val purefun_value : result_ity:ity -> arg_ity:ity -> value Mv.t -> value -> value
 
@@ -226,6 +227,14 @@ val eval_rs : rac_config -> Env.env -> Pmodule.pmodule -> rsymbol -> result * en
 
 (**/**)
 
+(** {2 Some auxilaries that are shared with module [Counterexample]} *)
+
+(** [ty_app_arg ts n ty] returns the [n]-th argument of the type application of [ts] in
+   [ty]. Fails if [ty] is not an type application of [ts] *)
+val ty_app_arg : Ty.tysymbol -> int -> Ty.ty -> Ty.ty
+
+(** Gets the components of an ity *)
 val ity_components : Ity.ity -> Ity.itysymbol * Ity.ity list * Ity.ity list
 
+(** Checks if the argument is a range type *)
 val is_range_ty : Ty.ty -> bool

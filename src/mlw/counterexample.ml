@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
 open Ident
 open Term
 open Ity
@@ -182,121 +183,119 @@ let print_counterexample ?check_ce ?(json=false) fmt (model,ce_summary) =
 
 exception CannotImportModelValue of string
 
-(* TODO Remove argument [env] after replacing Varray by model substitution *)
-let rec import_model_value env known ity v =
-  let open Pinterp in
-  (* TODO If the type has a model projection `p` and the model value is a
-     projection `p _ = v`, we could add this equality as a rule to the
-     reduction engine. (Cf. bench/ce/oracles/double_projection.mlw) *)
-  (* TODO If the type is a non-free record, we could similarily axiomatize
-     the values of the fields by rules in the reduction engine. (Cf.
-     bench/ce/record_one_field.mlw)  *)
-  let ts, l1, l2 = ity_components ity in
-  let def = Pdecl.find_its_defn known ts in
-  let subst = its_match_regs ts l1 l2 in
-  (* let is_ity_array env ity =
-   *   let pm = Pmodule.read_module env ["array"] "Array" in
-   *   let its_array = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
-   *   match ity.ity_node with
-   *   | Ityreg r -> its_equal r.reg_its its_array
-   *   | _ -> false in *)
-  (* if is_ity_array env ity then (\* TODO *\)
-   *   kasprintf failwith "ARRAY: %a@." print_model_value v
-   * else *)
-  let open Model_parser in
-  let open Wstdlib in
-  if Ty.is_range_type_def def.Pdecl.itd_its.its_def then
-    match v with
-    | Proj (_, Integer s)
-    | Integer s -> range_value ity s
-    | _ -> assert false
-  else
-    let check_construction def =
-      if def.Pdecl.itd_its.its_nonfree then
-        let msg = asprintf "value of non-free type %a" print_ity ity in
-        raise (CannotImportModelValue msg) in
-    match v with
-    | Integer s ->
-       assert (ity_equal ity ity_int);
-       int_value s
-    | String s ->
-       assert (ity_equal ity ity_str);
-       string_value s
-    | Boolean b ->
-       assert (ity_equal ity ity_bool);
-       bool_value b
-    | Record r ->
-       check_construction def;
-       let rs = match def.Pdecl.itd_constructors with
-         | [c] -> c | _ -> assert false in
-       let assoc_ity rs =
-         let attrs = rs.rs_name.id_attrs in
-         let name = match get_model_element_name ~attrs with
-           | exception Not_found -> rs.rs_name.id_string
-           | "" -> rs.rs_name.id_string
-           | name -> name in
-         let ity = ity_full_inst subst (fd_of_rs rs).pv_ity in
-         name, ity in
-       let arg_itys =
-         Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
-       let fs =
-         List.map (fun (f, mv) ->
-             import_model_value env known (Mstr.find f arg_itys) mv) r in
-       constr_value ity rs fs
-    | Apply (s, mvs) ->
-       check_construction def;
-       let matching_name rs = String.equal rs.rs_name.id_string s in
-       let rs = List.find matching_name def.Pdecl.itd_constructors in
-       let import field_pv =
-         import_model_value env known
-           (ity_full_inst subst field_pv.pv_ity) in
-       let fs = List.map2 import rs.rs_cty.cty_args mvs in
-       constr_value ity rs fs
-    | Proj (s, mv) ->
-       check_construction def;
-       let rs = match def.Pdecl.itd_constructors with
-         | [rs] -> rs
-         | [] ->
-            failwith "Cannot import projection to type without constructor"
-         | _ -> failwith "(Singleton) record constructor expected" in
-       let import_or_default field_pv =
-         let ity = ity_full_inst subst field_pv.pv_ity in
-         let name = field_pv.pv_vs.vs_name.id_string
-         and attrs = field_pv.pv_vs.vs_name.id_attrs in
-         if String.equal (get_model_trace_string ~name ~attrs) s then
-           import_model_value env known ity mv
-         else default_value_of_type env known ity in
-       let fs = List.map import_or_default rs.rs_cty.cty_args in
-       constr_value ity rs fs
-    | Array a ->
-       let open Ty in
-       assert (its_equal def.Pdecl.itd_its its_func);
-       let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
-         | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
-         | _ -> assert false in
-       let add_index mv ix =
-         let key = import_model_value env known key_ity ix.Model_parser.arr_index_key in
-         let value = import_model_value env known value_ity ix.arr_index_value in
-         Mv.add key value mv in
-       let mv = List.fold_left add_index Mv.empty a.arr_indices in
-       let v0 = import_model_value env known value_ity a.arr_others in
-       purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
-    | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
-       kasprintf failwith "import_model_value (not implemented): %a"
-         Model_parser.print_model_value v
+let check_not_nonfree its_def =
+  if its_def.Pdecl.itd_its.its_nonfree then
+    let msg = asprintf "value of non-free type %a" print_its its_def.Pdecl.itd_its in
+    raise (CannotImportModelValue msg)
 
-let get_model_value (m:Model_parser.model) (env:Env.env) (known:Pdecl.known_map) =
-  fun ?name ?loc (ity:ity) : value option ->
+let get_field_name rs =
+  match get_model_element_name ~attrs:rs.rs_name.id_attrs with
+  | exception Not_found -> rs.rs_name.id_string
+  | "" -> rs.rs_name.id_string
+  | name -> name
+
+let empty_model_trace attrs =
+  try
+    let a = Ident.get_model_trace_attr ~attrs in
+    a.attr_string = "model_trace:"
+  with Not_found -> false
+
+(** Import a value from the prover model to an interpreter value. Raises [Exit] if the
+    value cannot be imported. *)
+let rec import_model_value known (th_known: Decl.known_map) ity v =
+  let open Model_parser in
+  let ts, l1, l2 = ity_components ity in
+  let subst = its_match_regs ts l1 l2 in
+  let def = Pdecl.find_its_defn known ts in
+  let ity, wrap =
+    match def.Pdecl.itd_constructors, def.Pdecl.itd_fields with
+    | [rs_constr], [rs_field]
+      when empty_model_trace rs_field.rs_name.id_attrs ->
+        (* type ty = { f[@model_trace:]: ty'} *)
+        let wrap v = constr_value ity rs_constr [v] in
+        rs_field.rs_cty.cty_result, wrap
+    | _ -> ity, (fun v -> v) in
+  wrap (match v with
+      | Integer s ->
+          if ity_equal ity ity_int then
+            int_value s
+          else if is_range_ty (ty_of_ity ity) then
+            range_value ity s
+          else
+            kasprintf failwith "import_model_value: found type %a instead of int or range type"
+              print_ity ity
+      | String s ->
+          ity_equal_check ity ity_str;
+          string_value s
+      | Boolean b ->
+          ity_equal_check ity ity_bool;
+          bool_value b
+      | Record r ->
+          check_not_nonfree def;
+          let rs = match def.Pdecl.itd_constructors with
+            | [rs] -> rs
+            | _ -> failwith "import_model_value: type with not exactly one constructors" in
+          let assoc_ity rs =
+            get_field_name rs, ity_full_inst subst (fd_of_rs rs).pv_ity in
+          let field_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
+          let field_names, field_values = List.split r in
+          let itys = List.map (fun f -> Mstr.find f field_itys) field_names in
+          let fields = List.map2 (import_model_value known th_known) itys field_values in
+          constr_value ity rs fields
+      | Apply (s, vs) ->
+          check_not_nonfree def;
+          let matching_name rs = String.equal rs.rs_name.id_string s in
+          let rs = List.find matching_name def.Pdecl.itd_constructors in
+          let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
+              rs.rs_cty.cty_args in
+          let vs = List.map2 (import_model_value known th_known) itys vs in
+          constr_value ity rs vs
+      | Proj (p, x) ->
+          let is_proj id _ = id.id_string = p in
+          let ls = try
+              let _, d = Mid.choose (Mid.filter is_proj th_known) in
+              match d.Decl.d_node with Decl.Dparam ls -> ls | _ -> raise Not_found
+            with Not_found -> kasprintf failwith "Projection %s not found" p in
+          (* eprintf "FOUND PROJECTION for %s in %a: %a:%a->%a ity=%a,%a@." p Model_parser.print_model_value v Pretty.print_ls ls Pp.(print_list arrow Pretty.print_ty) ls.ls_args (Pp.print_option Pretty.print_ty) ls.ls_value print_ity ity print_ity ity; *)
+          let ty_arg = match ls.ls_args with [ty] -> ty
+            | _ -> kasprintf failwith "import_model_value: projection %s not unary" p in
+          if not (Ty.ty_equal ty_arg (ty_of_ity ity)) then raise Exit;
+          let x_ty = Opt.get_exn (Failure "import_model_value: projection is predicate") ls.ls_value in
+          let x = import_model_value known th_known (ity_of_ty x_ty) x in
+          (* eprintf "MAKE PROJ ity=%a ls=%a x=%a:%a@." Pretty.print_ty ty_arg Pretty.print_ls ls print_value x Pretty.print_ty x_ty; *)
+          proj_value ity ls x
+      | Array a ->
+          let open Ty in
+          assert (its_equal def.Pdecl.itd_its its_func);
+          let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
+            | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
+            | _ -> assert false in
+          let keys, values =
+            List.split (List.map (fun ix -> ix.arr_index_key, ix.arr_index_value)
+                          a.arr_indices) in
+          let keys = List.map (import_model_value known th_known key_ity) keys in
+          let values = List.map (import_model_value known th_known value_ity) values in
+          let mv = Mv.of_list (List.combine keys values) in
+          let v0 = import_model_value known th_known value_ity a.arr_others in
+          purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
+      | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
+          kasprintf failwith "import_model_value: not implemented for value %a"
+            Model_parser.print_model_value v)
+
+let get_model_value m known th_known =
+  fun ?name ?loc ity : value option ->
   let open Model_parser in
   match loc with
   | None -> None
   | Some l ->
-     let me = match name with
+     let ome = match name with
        | None -> get_model_element_by_loc m l
        | Some s -> get_model_element m s l in
-     match me with
+     match ome with
      | None -> None
-     | Some v -> Some (import_model_value env known ity v.me_value)
+     | Some me ->
+         try Some (import_model_value known th_known ity me.me_value)
+         with Exit -> None
 
 (** Check and select solver counterexample models *)
 
@@ -427,7 +426,8 @@ let check_model reduce env pm model =
      match find_rs pm loc with
      | Some rs ->
         let check_model_rs ~abstract =
-          let get_value = get_model_value model env pm.Pmodule.mod_known in
+          let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
+          let get_value = get_model_value model mod_known th_known in
           let rac = rac_config ~do_rac:true ~abstract
                       ~skip_cannot_compute:false ~reduce ~get_value () in
           check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
