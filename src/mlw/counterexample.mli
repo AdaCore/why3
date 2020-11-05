@@ -23,9 +23,9 @@ val debug_check_ce : Debug.flag
    abstractly using the values in the solver's model *)
 
 type verdict = private
-  | Good_model (* the model leads to a counterexample *)
-  | Bad_model  (* the model doesn't lead to a counterexample *)
-  | Dont_know  (* cannot decide if the model leads to a counterexample *)
+  | Good_model (** the model leads to a counterexample *)
+  | Bad_model  (** the model doesn't lead to a counterexample *)
+  | Dont_know  (** cannot decide if the model leads to a counterexample *)
 
 type full_verdict = private {
     verdict  : verdict;
