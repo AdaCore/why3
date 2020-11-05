@@ -124,7 +124,8 @@ let option_list =
     KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
     " check the counter-examples using runtime assertion checking (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
-    " use prover in RAC when term reduction is insufficient";
+    "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
+    "with optional, space-separated time and memory limit (e.g. 'cvc4 2 1000')";
     KLong "all-json", Hnd0 (fun () -> opt_json := Some `All),
     " print output in JSON format";
     KLong "json", Hnd0 (fun () -> opt_json := Some `Model),
