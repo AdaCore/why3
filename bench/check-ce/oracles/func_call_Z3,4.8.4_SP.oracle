@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.03s, 2283 steps).
+Prover result is: valid (0.00s, 2283 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Validating model:
@@ -22,13 +22,13 @@ Prover result is: valid (0.03s, 2283 steps).
             Line 13:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value (
-)
+<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value (
-)
-<rac-values>VALUE imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 cannot be imported, taking default ()
+<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
+<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -114,13 +114,13 @@ Prover result is: valid (0.03s, 2283 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value (
-)
+<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value (
-)
-<rac-values>VALUE imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 cannot be imported, taking default ()
+<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -205,13 +205,13 @@ Prover result is: valid (0.03s, 2283 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value (
-)
+<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value (
-)
-<rac-values>VALUE imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<rac-values>VALUE for result "bench/check-ce/func_call.mlw", line 12, characters 2-6 cannot be imported, taking default ()
+<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
@@ -267,7 +267,7 @@ Prover result is: valid (0.03s, 2283 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 5535680 steps).
+Prover result is: timeout (1.00s, 7532610 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File func_call.mlw:

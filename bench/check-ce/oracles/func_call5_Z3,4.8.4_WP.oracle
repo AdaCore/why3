@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Goal Postcondition from verification condition g1'vc.
-Prover result is: valid (0.03s, 33 steps).
+Prover result is: valid (0.01s, 33 steps).
 
 File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
 Goal Precondition from verification condition f1'vc.
-Prover result is: valid (0.01s, 83 steps).
+Prover result is: valid (0.00s, 83 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Validating model:
@@ -30,7 +30,7 @@ Prover result is: valid (0.01s, 83 steps).
               the check fails with all inputs
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/func_call5.mlw", line 13, characters 10-14 cannot be imported, taking default (ref'mk 0)
+<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call5.mlw:
@@ -92,7 +92,7 @@ Prover result is: valid (0.01s, 83 steps).
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/func_call5.mlw", line 13, characters 10-14 cannot be imported, taking default (ref'mk 0)
+<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call5.mlw:
@@ -154,7 +154,7 @@ Prover result is: valid (0.01s, 83 steps).
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/func_call5.mlw", line 13, characters 10-14 cannot be imported, taking default (ref'mk 0)
+<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call5.mlw:
@@ -195,7 +195,7 @@ Prover result is: valid (0.01s, 83 steps).
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
 Goal Assertion from verification condition f1'vc.
-Prover result is: timeout (1.00s, 4599468 steps).
+Prover result is: timeout (1.00s, 6855852 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -209,7 +209,7 @@ Sorry, we don't have a good counterexample for you :(
               x = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/func_call5.mlw", line 19, characters 10-14 cannot be imported, taking default (ref'mk 0)
+<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call5.mlw:
@@ -255,7 +255,7 @@ Sorry, we don't have a good counterexample for you :(
               x = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/func_call5.mlw", line 19, characters 10-14 cannot be imported, taking default (ref'mk 0)
+<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File func_call5.mlw:
@@ -299,7 +299,7 @@ Sorry, we don't have a good counterexample for you :(
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
 Goal Assertion from verification condition f2'vc.
-Prover result is: timeout (1.00s, 5154871 steps).
+Prover result is: timeout (1.00s, 7722510 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File func_call5.mlw:

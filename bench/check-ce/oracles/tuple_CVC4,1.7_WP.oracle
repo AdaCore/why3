@@ -5,13 +5,11 @@
               a = {"type": "Integer", "val": "0"}
               b = {"type": "Integer", "val": "-1"}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter x, continue with default value (
-0, 0)
+<rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter x, continue with default value (
-0, 0)
-<rac-values>VALUE for result "bench/check-ce/tuple.mlw", line 7, characters 14-23 cannot be imported, taking default 0
-<rac-values>VALUE for result "bench/check-ce/tuple.mlw", line 7, characters 3-12 cannot be imported, taking default 0
+<rac-values>Missing value for parameter x, continue with default value (0, 0).
+<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 14-23, taking default.
+<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File tuple.mlw:
@@ -98,13 +96,11 @@
               a = {"type": "Integer", "val": "-1"}
               b = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter x, continue with default value (
-0, 0)
+<rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter x, continue with default value (
-0, 0)
-<rac-values>VALUE for result "bench/check-ce/tuple.mlw", line 7, characters 14-23 cannot be imported, taking default 0
-<rac-values>VALUE for result "bench/check-ce/tuple.mlw", line 7, characters 3-12 cannot be imported, taking default 0
+<rac-values>Missing value for parameter x, continue with default value (0, 0).
+<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 14-23, taking default.
+<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File tuple.mlw:
@@ -191,13 +187,11 @@
               a = {"type": "Integer", "val": "-1"}
               b = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter x, continue with default value (
-0, 0)
+<rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter x, continue with default value (
-0, 0)
-<rac-values>VALUE for result "bench/check-ce/tuple.mlw", line 7, characters 14-23 cannot be imported, taking default 0
-<rac-values>VALUE for result "bench/check-ce/tuple.mlw", line 7, characters 3-12 cannot be imported, taking default 0
+<rac-values>Missing value for parameter x, continue with default value (0, 0).
+<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 14-23, taking default.
+<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File tuple.mlw:
@@ -286,7 +280,7 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/tuple.mlw", line 5, characters 38-43:
 Goal Postcondition from verification condition swap'vc.
-Prover result is: unknown (unknown + incomplete) (0.08s, 7045 steps).
+Prover result is: unknown (unknown + incomplete) (0.03s, 7045 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File tuple.mlw:

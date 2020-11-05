@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.02s, 105 steps).
+Prover result is: valid (0.00s, 105 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: valid (0.00s, 2819 steps).
+Prover result is: valid (0.01s, 2819 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Validating model:
@@ -19,15 +19,15 @@ Prover result is: valid (0.00s, 2819 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter z, continue with default value 0
+<rac-values>Missing value for parameter z, continue with default value 0.
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter z, continue with default value 0
-<rac-values>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/while.mlw", line 6, characters 15-16 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/while.mlw", line 7, characters 14-15 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for x1 "bench/check-ce/while.mlw", line 8, characters 2-161 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for x2 "bench/check-ce/while.mlw", line 8, characters 2-161 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for i "bench/check-ce/while.mlw", line 8, characters 2-161 cannot be imported, taking default (ref'mk 0)
+<rac-values>Missing value for parameter z, continue with default value 0.
+<rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
+<rac-values>No value for result at "bench/check-ce/while.mlw", line 6, characters 15-16, taking default.
+<rac-values>No value for result at "bench/check-ce/while.mlw", line 7, characters 14-15, taking default.
+<rac-values>No value for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161, taking default.
+<rac-values>No value for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161, taking default.
+<rac-values>No value for i at "bench/check-ce/while.mlw", line 8, characters 2-161, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File while.mlw:
@@ -204,7 +204,7 @@ Prover result is: valid (0.00s, 2819 steps).
                       "value": {"type": "Integer", "val": "1"}}]}}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 cannot be imported, taking default (ref'mk 0)
+<rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File while.mlw:
@@ -347,7 +347,7 @@ Prover result is: valid (0.00s, 2819 steps).
                       "value": {"type": "Integer", "val": "1"}}]}}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/while.mlw", line 5, characters 15-16 cannot be imported, taking default (ref'mk 0)
+<rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File while.mlw:
@@ -452,15 +452,15 @@ Prover result is: valid (0.00s, 2819 steps).
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 5099500 steps).
+Prover result is: timeout (1.00s, 6527276 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: valid (0.01s, 2817 steps).
+Prover result is: valid (0.00s, 2817 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.01s, 2745 steps).
+Prover result is: valid (0.00s, 2745 steps).
 

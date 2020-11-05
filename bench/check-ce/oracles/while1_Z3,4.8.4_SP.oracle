@@ -1,6 +1,6 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.04s, 32 steps).
+Prover result is: valid (0.00s, 32 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Goal Loop variant decrease from verification condition f'vc.
@@ -16,15 +16,13 @@ Prover result is: valid (0.01s, 2706 steps).
             Line 5:
               result = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value (
-)
+<rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value (
-)
-<rac-values>VALUE for result "bench/check-ce/while1.mlw", line 6, characters 16-17 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/while1.mlw", line 7, characters 16-17 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for x "bench/check-ce/while1.mlw", line 8, characters 4-113 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for i "bench/check-ce/while1.mlw", line 8, characters 4-113 cannot be imported, taking default (ref'mk 0)
+<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>No value for result at "bench/check-ce/while1.mlw", line 6, characters 16-17, taking default.
+<rac-values>No value for result at "bench/check-ce/while1.mlw", line 7, characters 16-17, taking default.
+<rac-values>No value for x at "bench/check-ce/while1.mlw", line 8, characters 4-113, taking default.
+<rac-values>No value for i at "bench/check-ce/while1.mlw", line 8, characters 4-113, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File while1.mlw:
@@ -154,15 +152,13 @@ Prover result is: valid (0.01s, 2706 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value (
-)
+<rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value (
-)
-<rac-values>VALUE for result "bench/check-ce/while1.mlw", line 6, characters 16-17 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/while1.mlw", line 7, characters 16-17 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 1)
-<rac-values>VALUE imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 2)
+<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>No value for result at "bench/check-ce/while1.mlw", line 6, characters 16-17, taking default.
+<rac-values>No value for result at "bench/check-ce/while1.mlw", line 7, characters 16-17, taking default.
+<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 1)
+<rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 2)
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File while1.mlw:
@@ -284,15 +280,13 @@ Prover result is: valid (0.01s, 2706 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value (
-)
+<rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value (
-)
-<rac-values>VALUE for result "bench/check-ce/while1.mlw", line 6, characters 16-17 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE for result "bench/check-ce/while1.mlw", line 7, characters 16-17 cannot be imported, taking default (ref'mk 0)
-<rac-values>VALUE imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 1)
-<rac-values>VALUE imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 2)
+<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>No value for result at "bench/check-ce/while1.mlw", line 6, characters 16-17, taking default.
+<rac-values>No value for result at "bench/check-ce/while1.mlw", line 7, characters 16-17, taking default.
+<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 1)
+<rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 2)
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File while1.mlw:
@@ -398,7 +392,7 @@ Prover result is: valid (0.01s, 2706 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Goal Postcondition from verification condition f'vc.
-Prover result is: timeout (1.00s, 5120315 steps).
+Prover result is: timeout (1.00s, 7037395 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File while1.mlw:

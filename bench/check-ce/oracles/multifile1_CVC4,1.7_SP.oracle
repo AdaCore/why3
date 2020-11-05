@@ -1,6 +1,6 @@
 File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
 Goal Postcondition from verification condition decr'vc.
-Prover result is: valid (0.02s, 287 steps).
+Prover result is: valid (0.01s, 287 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 <check-ce>Validating model:
@@ -13,7 +13,7 @@ Prover result is: valid (0.02s, 287 steps).
               x = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 cannot be imported, taking default 0
+<rac-values>No value for result at "bench/check-ce/multifile1.mlw", line 11, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File multifile1.mlw:
@@ -70,7 +70,7 @@ Prover result is: valid (0.02s, 287 steps).
               x = {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 cannot be imported, taking default 0
+<rac-values>No value for result at "bench/check-ce/multifile1.mlw", line 11, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File multifile1.mlw:
@@ -127,7 +127,7 @@ Prover result is: valid (0.02s, 287 steps).
               x = {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
-<rac-values>VALUE for result "bench/check-ce/multifile1.mlw", line 11, characters 4-10 cannot be imported, taking default 0
+<rac-values>No value for result at "bench/check-ce/multifile1.mlw", line 11, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File multifile1.mlw:
@@ -182,7 +182,7 @@ Prover result is: valid (0.02s, 287 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
 Goal Postcondition from verification condition incr'vc.
-Prover result is: unknown (sat) (0.04s, 4862 steps).
+Prover result is: unknown (sat) (0.02s, 4862 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File multifile1.mlw:
