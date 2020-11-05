@@ -28,15 +28,15 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
+<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
+<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>Value imported for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 0)
 <rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 9, characters 19-23, taking default.
 <check-ce>Result of checking model 0:
-            - Concrete: don't know (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function g)
+            - Concrete: don't know (Concrete RAC terminated because function g has no definition)
               
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call4.mlw", line 7, characters 12-21)
               File func_call4.mlw:
@@ -89,15 +89,15 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
+<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
+<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>Value imported for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
 <rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 9, characters 19-23, taking default.
 <check-ce>Result of checking model 1:
-            - Concrete: don't know (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function g)
+            - Concrete: don't know (Concrete RAC terminated because function g has no definition)
               
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call4.mlw:
@@ -148,15 +148,15 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
+<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for type int in any-expression at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
+<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call4.mlw", line 3, characters 9-14
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>Value imported for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23: (ref'mk 2)
 <rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 9, characters 19-23, taking default.
 <check-ce>Result of checking model 2:
-            - Concrete: don't know (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function g)
+            - Concrete: don't know (Concrete RAC terminated because function g has no definition)
               
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call4.mlw:
@@ -180,7 +180,7 @@
 <check-ce>Models:
 - Checked model 0 (Concrete: don't know, Abstract: bad model)
     Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function g)
+    (Concrete RAC terminated because function g has no definition)
 - Selected model 1 (Concrete: don't know, Abstract: good model)
     Summary: The program does not comply to the verification goal, or the
     contracts of some loop or function are too weak
@@ -189,7 +189,7 @@
     contracts of some loop or function are too weak
 File "bench/check-ce/func_call4.mlw", line 9, characters 34-39:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.03s, 6512 steps).
+Prover result is: unknown (unknown + incomplete) (0.07s, 6512 steps).
 The program does not comply to the verification goal, or the contracts of
   some loop or function are too weak, for example during the following
   execution:

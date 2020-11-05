@@ -141,9 +141,9 @@ end = struct
 
   let rec compare_values v1 v2 =
     if v1.v_desc = Vundefined then
-      cannot_compute "compare with undefined value of type %a" print_ty v1.v_ty;
+      cannot_compute "undefined value of type %a cannot be compared" print_ty v1.v_ty;
     if v2.v_desc = Vundefined then
-      cannot_compute "compare with undefined value of type %a" print_ty v2.v_ty;
+      cannot_compute "undefined value of type %a cannot be compared" print_ty v2.v_ty;
     let v_ty v = v.v_ty and v_desc v = v.v_desc in
     cmp [cmptr v_ty ty_compare; cmptr v_desc compare_desc] v1 v2
   and compare_desc d1 d2 =
@@ -737,7 +737,7 @@ let use_float_format (float_format : int) =
   match float_format with
   | 32 -> initialize_float32 ()
   | 64 -> initialize_float64 ()
-  | _ -> cannot_compute "Unknown float format: %d" float_format
+  | _ -> cannot_compute "float format is unknown: %d" float_format
 
 let eval_float :
     type a.
@@ -763,7 +763,7 @@ let eval_float :
     {v_desc; v_ty= ty_result}
   with
   | Mlmpfr_wrapper.Not_Implemented ->
-      cannot_compute "Mlmpfr wrapper: not implemented"
+      cannot_compute "mlmpfr wrapper is not implemented"
   | _ -> assert false
 
 type 'a real_arity =
@@ -788,7 +788,7 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value
         (* Cannot decide interval comparison *)
         constr ls l
     | Mlmpfr_wrapper.Not_Implemented ->
-        cannot_compute "Mlmpfr wrapper: not implemented"
+        cannot_compute "mlmpfr wrapper is not implemented"
     | _ -> assert false in
   {v_desc; v_ty= ty_real}
 
@@ -914,7 +914,7 @@ let built_in_modules () =
                 let n = BigInt.to_int n in
                 let ty = ty_app ts [def.v_ty] in
                 value ty (Varray (Array.make n def))
-              with e -> cannot_compute "Error making array: %a" Exn_printer.exn_printer e )
+              with e -> cannot_compute "array could not be made: %a" Exn_printer.exn_printer e )
           | _ -> assert false);
       "empty", (fun _ args -> match args with
           | [{v_desc= Vconstr(_, [])}] ->
@@ -930,14 +930,14 @@ let built_in_modules () =
       op_get "", (fun _ args -> match args with
           | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
               try a.(BigInt.to_int i)
-              with e -> cannot_compute "Error getting array: %a" Exn_printer.exn_printer e )
+              with e -> cannot_compute "array element could not be retrieved: %a" Exn_printer.exn_printer e )
           | _ -> assert false);
       op_set "", (fun _ args -> match args with
           | [{v_desc= Varray a}; {v_desc= Vnum i}; v] -> (
               try
                 a.(BigInt.to_int i) <- v;
                 value ty_unit Vvoid
-              with e -> cannot_compute "Error setting array: %a" Exn_printer.exn_printer e )
+              with e -> cannot_compute "array element could not be set: %a" Exn_printer.exn_printer e )
           | _ -> assert false) ;
         ]);
     float_module 32 ~prec:24 "Float32";
@@ -1728,7 +1728,7 @@ and eval_expr' env e =
         let sp, sq = BigInt.to_string p, BigInt.to_string q in
         try Normal (value ty_real (Vreal (Big_real.real_from_fraction sp sq)))
         with Mlmpfr_wrapper.Not_Implemented ->
-          cannot_compute "Mlmpfr wrapper: not implemented"
+          cannot_compute "mlmpfr wrapper is not implemented"
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
@@ -1774,7 +1774,7 @@ and eval_expr' env e =
                let pp_loc fmt loc =
                  if loc <> None then
                    fprintf fmt " at %a" (Pp.print_option print_loc') loc in
-               Debug.dprintf debug_rac_values "@[<h>Choose default value %a for type %a in any-expression%a@]@."
+               Debug.dprintf debug_rac_values "@[<h>Choose default value %a for any-expression of type %a%a@]@."
                  print_value v print_ity e.e_ity pp_loc e.e_loc;
                v in
           register_any_call env e.e_loc value;
@@ -1787,8 +1787,8 @@ and eval_expr' env e =
           (* check_posts "Exec postcondition" e.e_loc env v cty.cty_post; *)
           Normal v
       | Capp (rs, pvsl) ->
-        if cty.cty_args <> [] then cannot_compute "Cannot compute partial function application";
-        exec_call ?loc:e.e_loc env rs pvsl e.e_ity
+          if cty.cty_args <> [] then cannot_compute "function cannot be applied partially";
+          exec_call ?loc:e.e_loc env rs pvsl e.e_ity
     end
   | Eassign l ->
       List.iter
@@ -1836,7 +1836,7 @@ and eval_expr' env e =
       else if is_false v then
         eval_expr env e3
       else (
-        eprintf "@[[Exec] Cannot decide condition of if: @[%a@]@]@." print_value v ;
+        Warning.emit "@[[Exec] Cannot decide condition of if: @[%a@]@]@." print_value v ;
         Irred e )
     | r -> r )
   | Ewhile (cond, inv, _var, e1) when env.rac.rac_abstract -> begin
@@ -1879,7 +1879,7 @@ and eval_expr' env e =
          else if is_false v then
            Normal (value ty_unit Vvoid)
          else (
-           eprintf "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
+           Warning.emit "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
              print_value v ;
            Irred e )
       | r -> r
@@ -1901,7 +1901,7 @@ and eval_expr' env e =
           else if is_false v then
             Normal (value ty_unit Vvoid)
           else (
-            eprintf "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
+            Warning.emit "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
               print_value v ;
             Irred e )
       | r -> r end
@@ -2057,7 +2057,7 @@ and eval_expr' env e =
       let t = compute_term env t in
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
-      eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
+      Warning.emit "@[[Exec] unsupported expression: @[%a@]@]@."
         print_expr e ;
       Irred e
 
@@ -2065,7 +2065,7 @@ and exec_match env t ebl =
   let rec iter ebl =
     match ebl with
     | [] ->
-        eprintf "[Exec] Pattern matching not exhaustive in evaluation@." ;
+        Warning.emit "[Exec] Pattern matching not exhaustive in evaluation@." ;
         assert false
     | (p, e) :: rem -> (
       try
@@ -2141,8 +2141,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                 | Cany ->
                     Debug.dprintf debug_trace_exec  "@[<hv2>%tEXEC CALL %a: ANY@]@."
                       pp_indent print_rs rs;
-                    cannot_compute "Cannot compute application of local any-function %a"
-                      print_rs rs
+                    cannot_compute "function %a has no definition" print_rs rs
                 | Cpur _ -> assert false (* TODO ? *) )
             | Builtin f ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
@@ -2168,7 +2167,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                     search cstr.rs_cty.cty_args args
                 | _ -> assert false )
             | exception Not_found ->
-                cannot_compute "[interp] cannot find definition of routine %s"
+                cannot_compute "definition of routine %s could not be found"
                   rs.rs_name.id_string in
       ( match res with
         | Normal v ->
@@ -2234,9 +2233,9 @@ let bind_globals ?rs_main mod_known env =
           let env = {env with rac= {env.rac with rac_abstract= false}} in
           match eval_expr env e with
           | Normal v -> v
-          | Excep _ -> cannot_compute "exception in initialization of global variable %a"
+          | Excep _ -> cannot_compute "initialization of global variable %a raised an exception"
                          print_decoded id.id_string
-          | Irred _ -> cannot_compute "initialization of global variable %a irreducible"
+          | Irred _ -> cannot_compute "initialization of global variable %a is irreducible"
                          print_decoded id.id_string
   in
   let open Pdecl in

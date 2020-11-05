@@ -442,7 +442,7 @@ File multifile2.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Result of checking model 0:
-            - Concrete: don't know (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function incr_val)
+            - Concrete: don't know (Concrete RAC terminated because function incr_val has no definition)
               
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
               File multifile2.mlw:
@@ -475,7 +475,7 @@ File multifile2.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Result of checking model 1:
-            - Concrete: don't know (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function incr_val)
+            - Concrete: don't know (Concrete RAC terminated because function incr_val has no definition)
               
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
               File multifile2.mlw:
@@ -508,7 +508,7 @@ File multifile2.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Result of checking model 2:
-            - Concrete: don't know (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function incr_val)
+            - Concrete: don't know (Concrete RAC terminated because function incr_val has no definition)
               
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
               File multifile2.mlw:
@@ -528,18 +528,18 @@ File multifile2.mlw:
 <check-ce>Models:
 - Checked model 0 (Concrete: don't know, Abstract: bad model)
     Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function incr_val)
+    (Concrete RAC terminated because function incr_val has no definition)
 - Checked model 1 (Concrete: don't know, Abstract: bad model)
     Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function incr_val)
+    (Concrete RAC terminated because function incr_val has no definition)
 - Selected model 2 (Concrete: don't know, Abstract: bad model)
     Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function incr_val)
+    (Concrete RAC terminated because function incr_val has no definition)
 File "bench/check-ce/multifile2.mlw", line 19, characters 12-26:
 Goal Postcondition from verification condition h'vc.
 Prover result is: unknown (sat) (0.01s, 878 steps).
 The following counterexample model could not be verified
-  (Concrete RAC terminated due to unsupported feature: Cannot compute application of local any-function incr_val):
+  (Concrete RAC terminated because function incr_val has no definition):
 File multifile1.mlw:
   Line 14:
     result = 1 (0x1)

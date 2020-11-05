@@ -119,10 +119,10 @@ let do_input f =
           printf "%a@." report_cntr_body (ctx, term) ;
           exit 1
        | CannotCompute reason ->
-          printf "RAC terminated due to unsupported feature: %s@." reason.reason
+          printf "RAC terminated because %s@." reason.reason
        | Failure msg ->
           printf "failure: %s@." msg
-       | RACStuck (env,l) ->
+       | RACStuck (_, l) ->
           printf "RAC, with the counterexample model cannot continue after %a@."
             (Pp.print_option Pretty.print_loc') l
 

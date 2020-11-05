@@ -122,7 +122,7 @@ let print_ce_summary_values ~json ~print_attrs model fmt s =
             (print_model_human ?me_name_trans:None ~print_attrs) model
   | BAD_CE -> ()
 
-let model_of_ce_summary ~original_model = function
+let _model_of_ce_summary ~original_model = function
   | NCCE log | SWCE log | NCCE_SWCE log ->
      model_of_exec_log ~original_model log
   | UNKNOWN _ | BAD_CE -> original_model
@@ -397,7 +397,7 @@ let check_model_rs ?loc rac env pm rs =
   | CannotCompute r ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
-      let reason = sprintf "%s RAC terminated due to unsupported feature: %s"
+      let reason = sprintf "%s RAC terminated because %s"
                      abs_Msg r.reason in
       {verdict= Dont_know; reason; exec_log= Log.empty_log}
   | Failure msg ->
