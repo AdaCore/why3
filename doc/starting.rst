@@ -27,6 +27,15 @@ We don’t give more details here about the syntax and refer to
 show how this file is handled in the Why3 GUI (:numref:`sec.gui`) then
 in batch mode using the :program:`why3` executable (:numref:`sec.batch`).
 
+But before running any Why3 command, you should proceed with the
+automated detection of external provers (see also :numref:`sec.provers`).
+This is done by running the :why3:tool:`config` tool on the command line,
+as follows:
+
+::
+
+    why3 config --detect
+
 .. %EXECUTE rm -rf doc/hello_proof/
 .. %EXECUTE cp examples/logic/hello_proof.why doc/
 
@@ -227,14 +236,6 @@ The :why3:tool:`why3 prove` command makes it possible to check the validity of g
 with external provers, in batch mode. This section presents the basic
 use of this tool. Refer to :numref:`sec.why3prove` for a more complete
 description of this tool and all its command-line options.
-
-The very first time you want to use Why3, you should proceed with
-autodetection of external provers. On the command line, this is done as
-follows:
-
-::
-
-    why3 config --detect
 
 This prints some information messages on what detections are attempted.
 To know which provers have been successfully detected, you can do as

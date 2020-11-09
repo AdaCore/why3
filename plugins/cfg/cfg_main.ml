@@ -240,14 +240,7 @@ let translate (m,dl) =
   (m,List.fold_right translate_decl dl [])
 
 let read_channel env _path file c =
-  let f : Cfg_ast.cfg_file =
-    try
-      Cfg_lexer.parse_channel file c
-    with Loc.Located(loc,e) ->
-      Format.eprintf "%a%a@." Loc.report_position loc Exn_printer.exn_printer e;
-      exit 1
-  in
-  Debug.dprintf debug "%s parsed successfully.@." file;
+  let f : Cfg_ast.cfg_file = Cfg_lexer.parse_channel file c in
   let ptree = Modules (List.map translate f) in
   let mm = Typing.type_mlw_file env [] (file ^ ".mlw") ptree in
   Debug.dprintf debug "%a@." Mlw_printer.pp_mlw_file ptree;

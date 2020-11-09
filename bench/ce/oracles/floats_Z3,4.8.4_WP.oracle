@@ -1,6 +1,9 @@
 Weakest Precondition
-bench/ce/floats.mlw T32 g1: HighFailure
+bench/ce/floats.mlw T32 g1: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 5:
     x, [[@introduced]] =
@@ -10,33 +13,11 @@ File floats.mlw:
          "str_hexa": "-0x1.000002p-126",
          "value": -1.17549e-38}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b1 #x01 #b00000000000000000000001))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b1 #x01 #b00000000000000000000001))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T32 g2: HighFailure
+bench/ce/floats.mlw T32 g2: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 7:
     x, [[@introduced]] =
@@ -46,64 +27,20 @@ File floats.mlw:
          "str_hexa": "-0x0.008000p-127",
          "value": -1.14794e-41}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b1 #x00 #b00000000100000000000000))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b1 #x00 #b00000000100000000000000))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T32 g3: HighFailure
+bench/ce/floats.mlw T32 g3: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 9:
     x, [[@introduced]] = {"type": "Float", "val": {"cons": "Minus_zero"}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (_ -zero 8 24))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (_ -zero 8 24))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T32 g4: HighFailure
+bench/ce/floats.mlw T32 g4: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 11:
     x, [[@introduced]] =
@@ -111,33 +48,11 @@ File floats.mlw:
        "val":
         {"cons": "Float_hexa", "str_hexa": "0x1.400000p0", "value": 1.25}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b0 #x7f #b01000000000000000000000))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b0 #x7f #b01000000000000000000000))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T32 g5: HighFailure
+bench/ce/floats.mlw T32 g5: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 13:
     x, [[@introduced]] =
@@ -145,131 +60,43 @@ File floats.mlw:
        "val":
         {"cons": "Float_hexa", "str_hexa": "0x1.300004p3", "value": 9.5}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b0 #x82 #b00110000000000000000010))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b0 #x82 #b00110000000000000000010))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T32 g6: HighFailure
+bench/ce/floats.mlw T32 g6: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 15:
     x, [[@introduced]] = {"type": "Float", "val": {"cons": "Not_a_number"}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (_ NaN 8 24))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (_ NaN 8 24))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T32 g7: HighFailure
+bench/ce/floats.mlw T32 g7: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 17:
     x, [[@introduced]] =
       {"type": "Float",
        "val":
         {"cons": "Float_hexa",
-         "str_hexa": "-0x1.000000p120",
-         "value": -1.32923e+36}}
+         "str_hexa": "-0x1.000004p24",
+         "value": -1.67772e+07}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (_ NaN 8 24))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b1 #xf7 #b00000000000000000000000))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T32 g8: HighFailure
+bench/ce/floats.mlw T32 g8: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 19:
     x, [[@introduced]] = {"type": "Float", "val": {"cons": "Plus_infinity"}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (_ +oo 8 24))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (_ +oo 8 24))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T32 g9: HighFailure
+bench/ce/floats.mlw T32 g9: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 21:
     x, [[@introduced]] =
@@ -279,33 +106,11 @@ File floats.mlw:
          "str_hexa": "0x0.000002p-127",
          "value": 7.00649e-46}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (_ NaN 8 24))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b0 #x00 #b00000000000000000000001))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T32 g10: HighFailure
+bench/ce/floats.mlw T32 g10: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 23:
     x, [[@introduced]] =
@@ -313,33 +118,11 @@ File floats.mlw:
        "val":
         {"cons": "Float_hexa", "str_hexa": "0x1.99999ap-4", "value": 0.1}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b0 #x7b #b10011001100110011001101))
-)
-sat
-(model 
-  (define-fun x () Float32
-    (fp #b0 #x7b #b10011001100110011001101))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T64 g1: HighFailure
+bench/ce/floats.mlw T64 g1: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 31:
     x, [[@introduced]] =
@@ -349,33 +132,11 @@ File floats.mlw:
          "str_hexa": "-0x1.0000000000001p-1022",
          "value": -2.22507e-308}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b1 #b00000000001 #x0000000000001))
-)
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b1 #b00000000001 #x0000000000001))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T64 g2: HighFailure
+bench/ce/floats.mlw T64 g2: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 33:
     x, [[@introduced]] =
@@ -385,64 +146,20 @@ File floats.mlw:
          "str_hexa": "-0x0.0000040000000p-1023",
          "value": -2.65249e-315}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b1 #b00000000000 #x0000040000000))
-)
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b1 #b00000000000 #x0000040000000))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T64 g3: HighFailure
+bench/ce/floats.mlw T64 g3: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 35:
     x, [[@introduced]] = {"type": "Float", "val": {"cons": "Minus_zero"}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float64
-    (_ -zero 11 53))
-)
-sat
-(model 
-  (define-fun x () Float64
-    (_ -zero 11 53))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T64 g4: HighFailure
+bench/ce/floats.mlw T64 g4: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 37:
     x, [[@introduced]] =
@@ -452,33 +169,11 @@ File floats.mlw:
          "str_hexa": "0x1.4000000000000p0",
          "value": 1.25}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b0 #b01111111111 #x4000000000000))
-)
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b0 #b01111111111 #x4000000000000))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T64 g5: HighFailure
+bench/ce/floats.mlw T64 g5: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 39:
     x, [[@introduced]] =
@@ -488,131 +183,43 @@ File floats.mlw:
          "str_hexa": "0x1.1000000000000p2",
          "value": 4.25}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b0 #b10000000001 #x1000000000000))
-)
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b0 #b10000000001 #x1000000000000))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T64 g6: HighFailure
+bench/ce/floats.mlw T64 g6: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 41:
     x, [[@introduced]] = {"type": "Float", "val": {"cons": "Not_a_number"}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float64
-    (_ NaN 11 53))
-)
-sat
-(model 
-  (define-fun x () Float64
-    (_ NaN 11 53))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T64 g7: HighFailure
+bench/ce/floats.mlw T64 g7: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 43:
     x, [[@introduced]] =
       {"type": "Float",
        "val":
         {"cons": "Float_hexa",
-         "str_hexa": "-0x1.0000000000000p128",
-         "value": -3.40282e+38}}
+         "str_hexa": "0x1.0000000000000p105",
+         "value": 4.05648e+31}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float64
-    (_ NaN 11 53))
-)
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b1 #b10001111111 #x0000000000000))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T64 g8: HighFailure
+bench/ce/floats.mlw T64 g8: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 45:
     x, [[@introduced]] = {"type": "Float", "val": {"cons": "Plus_infinity"}}
 
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float64
-    (_ +oo 11 53))
-)
-sat
-(model 
-  (define-fun x () Float64
-    (_ +oo 11 53))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
-
-bench/ce/floats.mlw T64 g10: HighFailure
+bench/ce/floats.mlw T64 g10: Unknown (sat)
 Counter-example model:
+File ieee_float.mlw:
+  Line 222:
+    max_int, [] = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 49:
     x, [[@introduced]] =
@@ -621,29 +228,4 @@ File floats.mlw:
         {"cons": "Float_hexa",
          "str_hexa": "0x1.999999999999ap-4",
          "value": 0.1}}
-
-Prover exit status: killed by signal 11
-Prover output:
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b0 #b01111111011 #x999999999999a))
-)
-sat
-(model 
-  (define-fun x () Float64
-    (fp #b0 #b01111111011 #x999999999999a))
-  (define-fun index_bool ((x!0 Bool)) Int
-    (ite (= x!0 false) 1
-    (ite (= x!0 true) 0
-      1)))
-  (define-fun index_mode ((x!0 RoundingMode)) Int
-    (ite (= x!0 roundTowardZero) 4
-    (ite (= x!0 roundTowardNegative) 3
-    (ite (= x!0 roundTowardPositive) 2
-    (ite (= x!0 roundNearestTiesToAway) 1
-    (ite (= x!0 roundNearestTiesToEven) 0
-      4))))))
-)
-
 

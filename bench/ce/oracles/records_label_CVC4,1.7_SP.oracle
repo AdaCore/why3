@@ -1,5 +1,5 @@
 Strongest Postcondition
-bench/ce/records_label.mlw Old record_old_test1'vc: Timeout or Unknown
+bench/ce/records_label.mlw Old record_old_test1'vc: Unknown (sat)
 Counter-example model:
 File records_label.mlw:
   Line 9:
@@ -7,14 +7,14 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "4"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 11:
     x, [[@at:'Old:loc:bench/ce/records_label.mlw:12], [@introduced]] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "5"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "4"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 12:
     old x, [[@at:'Old], [@at:'Old:loc:bench/ce/records_label.mlw:12],
@@ -22,7 +22,7 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "5"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "4"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x, [[@introduced], [@model_trace:x]] =
       {"type": "Record",
@@ -35,7 +35,7 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "4"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 14:
     x, [[@introduced]] =
@@ -45,7 +45,7 @@ File records_label.mlw:
           [{"field": "f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-bench/ce/records_label.mlw Old record_at_test2'vc: Timeout or Unknown
+bench/ce/records_label.mlw Old record_at_test2'vc: Unknown (sat)
 Counter-example model:
 File records_label.mlw:
   Line 9:
@@ -53,14 +53,14 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "12"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 16:
     x, [[@at:L:loc:bench/ce/records_label.mlw:22], [@introduced]] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "12"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 19:
     x, [[@at:M:loc:bench/ce/records_label.mlw:22], [@introduced]] =
@@ -82,7 +82,7 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "12"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x at M, [[@at:M], [@at:M:loc:bench/ce/records_label.mlw:22],
       [@introduced], [@model_trace:x]] =
@@ -101,10 +101,10 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "12"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-bench/ce/records_label.mlw Old several_hats'vc: Timeout or Unknown
+bench/ce/records_label.mlw Old several_hats'vc: Unknown (sat)
 Counter-example model:
 File records_label.mlw:
   Line 24:

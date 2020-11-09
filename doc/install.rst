@@ -16,7 +16,7 @@ is as simple as
 
     opam install why3
 
-Then jump to :numref:`provers` to install external provers.
+Then jump to :numref:`sec.provers` to install external provers.
 
 Installation via Docker
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,7 +120,7 @@ Installation is performed (as super-user if needed) using
 
 Installation can be tested as follows:
 
-#. install some external provers (see :numref:`provers` below)
+#. install some external provers (see :numref:`sec.provers` below)
 
 #. run :option:`why3 config --detect`
 
@@ -176,7 +176,7 @@ Removing installation can be done using
     make uninstall
     make uninstall-lib
 
-.. _provers:
+.. _sec.provers:
 
 Installing External Provers
 ---------------------------

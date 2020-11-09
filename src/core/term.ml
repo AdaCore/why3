@@ -275,7 +275,7 @@ let rec descend vml t = match t.t_node with
       find vs vml
   | _ -> Trm (t, vml)
 
-let t_compare trigger attr loc t1 t2 =
+let t_compare ~trigger ~attr ~loc ~const t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
   let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
@@ -331,7 +331,7 @@ let t_compare trigger attr loc t1 t2 =
           | Tvar v1, Tvar v2 ->
               comp_raise (vs_compare v1 v2)
           | Tconst c1, Tconst c2 ->
-              comp_raise (Constant.compare_const c1 c2)
+              comp_raise (Constant.compare_const ~structural:const c1 c2)
           | Tapp (s1,l1), Tapp (s2,l2) ->
               comp_raise (ls_compare s1 s2);
               List.iter2 (t_compare bnd vml1 vml2) l1 l2
@@ -400,7 +400,7 @@ let t_similar t1 t2 =
   oty_equal t1.t_ty t2.t_ty &&
   match t1.t_node, t2.t_node with
     | Tvar v1, Tvar v2 -> vs_equal v1 v2
-    | Tconst c1, Tconst c2 -> Constant.compare_const c1 c2 = 0
+    | Tconst c1, Tconst c2 -> Constant.compare_const ~structural:true c1 c2 = 0
     | Tapp (s1,l1), Tapp (s2,l2) -> ls_equal s1 s2 && Lists.equal (==) l1 l2
     | Tif (f1,t1,e1), Tif (f2,t2,e2) -> f1 == f2 && t1 == t2 && e1 == e2
     | Tlet (t1,bv1), Tlet (t2,bv2) -> t1 == t2 && bv1 == bv2
@@ -412,7 +412,7 @@ let t_similar t1 t2 =
     | Ttrue, Ttrue | Tfalse, Tfalse -> true
     | _, _ -> false
 
-let t_hash trigger attr t =
+let t_hash ~trigger ~attr t =
   let rec pat_hash bnd bv p = match p.pat_node with
     | Pwild -> bnd, bv, 0
     | Pvar v -> bnd + 1, Mvs.add v bnd bv, bnd + 1
@@ -498,35 +498,57 @@ let t_hash trigger attr t =
     end in
   t_hash 0 [] t
 
-let t_hash_strict t = t_hash true true t
-let t_equal_strict t1 t2 = t_compare true true true t1 t2 = 0
-let t_compare_strict t1 t2 = t_compare true true true t1 t2
+let t_hash_generic ~trigger ~attr t = t_hash ~trigger ~attr t
+let t_compare_generic ~trigger ~attr ~loc ~const t1 t2=
+  t_compare ~trigger ~attr ~loc ~const t1 t2
+let t_equal_generic ~trigger ~attr ~loc ~const t1 t2 =
+  t_compare ~trigger ~attr ~loc ~const t1 t2 = 0
 
-module TermOHT_strict = struct
-  type t = term
-  let hash = t_hash_strict
-  let equal = t_equal_strict
-  let compare = t_compare_strict
-end
+let mterm_generic ~trigger ~attr ~loc ~const
+    : (module (Extmap.S with type key = term)) =
+  (module (Extmap.Make(struct
+      type t = term
+      let compare t1 t2 = t_compare ~trigger ~attr ~loc ~const t1 t2
+    end)))
 
-module Mterm_strict = Extmap.Make(TermOHT_strict)
-module Sterm_strict = Extset.MakeOfMap(Mterm_strict)
-module Hterm_strict = Exthtbl.Make(TermOHT_strict)
+let sterm_generic ~trigger ~attr ~loc ~const
+    : (module (Extset.S with type M.key = term)) =
+  let module M = (val (mterm_generic ~trigger ~attr ~loc ~const)) in
+  (module (Extset.MakeOfMap(M)))
 
-let t_hash t = t_hash false false t
-let t_equal t1 t2 = t_compare false false false t1 t2 = 0
-let t_compare t1 t2 = t_compare false false false t1 t2
+let hterm_generic ~trigger ~attr ~loc ~const
+    : (module (Exthtbl.S with type key = term)) =
+  (module (Exthtbl.Make(struct
+      type t = term
+      let hash t = t_hash ~trigger ~attr t
+      let equal t1 t2 = t_compare ~trigger ~attr ~loc ~const t1 t2 = 0
+    end)))
 
-module TermOHT = struct
-  type t = term
-  let hash = t_hash
-  let equal = t_equal
-  let compare = t_compare
-end
+let t_hash_strict t = t_hash ~trigger:true ~attr:true t
+let t_equal_strict t1 t2 =
+  t_compare ~trigger:true ~attr:true ~loc:true ~const:true t1 t2 = 0
+let t_compare_strict t1 t2 =
+  t_compare ~trigger:true ~attr:true ~loc:true ~const:true t1 t2
 
-module Mterm = Extmap.Make(TermOHT)
-module Sterm = Extset.MakeOfMap(Mterm)
-module Hterm = Exthtbl.Make(TermOHT)
+module Mterm_strict =
+  (val (mterm_generic ~trigger:true ~attr:true ~loc:true ~const:true))
+module Sterm_strict =
+  (val (sterm_generic ~trigger:true ~attr:true ~loc:true ~const:true))
+module Hterm_strict=
+  (val (hterm_generic ~trigger:true ~attr:true ~loc:true ~const:true))
+
+let t_hash t = t_hash ~trigger:false ~attr:false t
+let t_equal t1 t2 =
+  t_compare ~trigger:false ~attr:false ~loc:false ~const:true t1 t2 = 0
+let t_compare t1 t2 =
+  t_compare ~trigger:false ~attr:false ~loc:false ~const:true t1 t2
+
+module Mterm =
+  (val (mterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+module Sterm =
+  (val (sterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+module Hterm =
+  (val (hterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
 
 (* type checking *)
 

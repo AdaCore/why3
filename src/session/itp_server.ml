@@ -1214,17 +1214,17 @@ end
     match any with
     | None -> P.notify (Message (Error "Please select a node id"));
     | Some any ->
-        try
-          let id =
+        match
             match any with
             | APn id -> id
             | APa panid ->
                 get_proof_attempt_parent d.cont.controller_session panid
             | _ -> raise Not_found
-          in
+        with
+        | id ->
           C.schedule_edition d.cont id prover
             ~callback ~notification:(notify_change_proved d.cont)
-        with Not_found ->
+        | exception Not_found ->
           P.notify
             (Message
                (Error

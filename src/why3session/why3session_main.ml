@@ -54,7 +54,7 @@ let option_list =
     " display this help and exit" ]
 
 let () =
-  let i = Getopt.parse_many option_list Sys.argv 1 in
+  let i = Getopt.parse_many option_list Sys.argv !Whyconf.Args.first_arg in
   if i = Array.length Sys.argv then do_usage ();
   let cmd_name = Sys.argv.(i) in
   let cmd =

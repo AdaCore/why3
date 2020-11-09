@@ -126,7 +126,7 @@ File records_inv.mlw:
     the check fails with all inputs
 
 bench/ce/records_inv.mlw M test_record_match_eval_test5'vc: Valid
-bench/ce/records_inv.mlw Mutable record_match_eval_test1'vc: Timeout or Unknown
+bench/ce/records_inv.mlw Mutable record_match_eval_test1'vc: Unknown (sat)
 Counter-example model:
 File records_inv.mlw:
   Line 65:
@@ -140,7 +140,7 @@ File records_inv.mlw:
     result, [[@introduced]] = {"type": "Integer", "val": "0"}
 
 bench/ce/records_inv.mlw Mutable record_match_eval_test1'vc: Valid
-bench/ce/records_inv.mlw Mutable record_match_eval_test2'vc: Timeout or Unknown
+bench/ce/records_inv.mlw Mutable record_match_eval_test2'vc: Unknown (sat)
 Counter-example model:
 File records_inv.mlw:
   Line 73:
@@ -158,7 +158,7 @@ File records_inv.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-bench/ce/records_inv.mlw Mutable record_match_eval_test3'vc: Timeout or Unknown
+bench/ce/records_inv.mlw Mutable record_match_eval_test3'vc: Unknown (sat)
 Counter-example model:
 File records_inv.mlw:
   Line 78:
@@ -166,7 +166,7 @@ File records_inv.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 79:
     x, [[@introduced], [@model_trace:x]] =
@@ -183,7 +183,7 @@ File records_inv.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-bench/ce/records_inv.mlw Mutable record_match_eval_test4'vc: Timeout or Unknown
+bench/ce/records_inv.mlw Mutable record_match_eval_test4'vc: Unknown (sat)
 Counter-example model:
 File records_inv.mlw:
   Line 83:
@@ -191,7 +191,7 @@ File records_inv.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 84:
     x, [[@introduced], [@model_trace:x]] =

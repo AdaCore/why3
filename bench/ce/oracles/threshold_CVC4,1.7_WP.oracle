@@ -6,24 +6,24 @@ File threshold.mlw:
     max, [[@introduced]] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1073741824"}}
+       "value": {"type": "Integer", "val": "-1"}}
     min, [[@introduced]] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1073741825"}}
+       "value": {"type": "Integer", "val": "-2147483648"}}
     n, [[@introduced]] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1073741825"}}
+       "value": {"type": "Integer", "val": "-2147483648"}}
   Line 10:
     max, [[@introduced], [@model_trace:max]] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1073741824"}}
+       "value": {"type": "Integer", "val": "-1"}}
     min, [[@introduced], [@model_trace:min]] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1073741825"}}
+       "value": {"type": "Integer", "val": "-2147483648"}}
 
 bench/ce/threshold.mlw WithInt32 f'vc: Timeout or Unknown
 Counter-example model:
