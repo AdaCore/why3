@@ -51,11 +51,10 @@ open Smt2_model_defs
 %token EOF
 %%
 
-
 output:
 | EOF { Wstdlib.Mstr.empty }
-| LPAREN MODEL RPAREN { Wstdlib.Mstr.empty }
-| LPAREN MODEL list_decls RPAREN { $3 }
+| LPAREN option(MODEL) RPAREN { Wstdlib.Mstr.empty }
+| LPAREN option(MODEL) list_decls RPAREN { $3 }
 
 list_decls:
 | LPAREN decl RPAREN { add_element $2 Wstdlib.Mstr.empty}
