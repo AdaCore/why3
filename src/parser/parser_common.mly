@@ -230,18 +230,20 @@
   let expr_fun_lit loc_begin loc_end (el,default) =
     let lit_loc = Loc.join loc_begin loc_end in
     let var id expr_loc = {expr_desc = Eident (Qident id); expr_loc} in
-    let id id_str id_loc = { id_str; id_ats = []; id_loc } in
-    let var_of_string nm loc = var (id nm loc) loc in
+    let id ?(id_ats=[]) id_str id_loc = { id_str; id_ats; id_loc } in
+    let var_of_string ?(id_ats=[]) nm loc = var (id ~id_ats nm loc) loc in
+    let proxy_atr = ATstr Ident.proxy_attr in
     (* proxy vars for the literal domain/range expressions *)
     let domain_ranga_vars i (e1,e2) =
       let i = string_of_int i in
-      var_of_string ("%d" ^ i) e1.expr_loc,
-      var_of_string ("%r" ^ i) e2.expr_loc in
+      var_of_string ~id_ats:[proxy_atr] ("d'i" ^ i) e1.expr_loc,
+      var_of_string ~id_ats:[proxy_atr] ("r'i" ^ i) e2.expr_loc in
     let el_proxies = List.mapi domain_ranga_vars el in
     let default_proxy =
-      Opt.map (fun d -> var_of_string "%def" d.expr_loc) default in
+      Opt.map (fun d ->
+          var_of_string ~id_ats:[proxy_atr] "def'e" d.expr_loc) default in
     (* fun x -> if ... *)
-    let fun_id_var = id (if el = [] then "_" else "%x") loc_begin in
+    let fun_id_var = id (if el = [] then "_" else "x'x") loc_begin in
     let fun_var = var fun_id_var loc_begin in
     let add_expr (e1,e2) e =
       let eq_id = { id_str = Ident.op_equ; id_ats = [];
