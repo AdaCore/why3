@@ -196,4 +196,3 @@ apply proj2 in Pp.
 apply Pp.
 omega.
 Qed.
-

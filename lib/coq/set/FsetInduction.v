@@ -42,4 +42,3 @@ intros h1 h2 s.
 (* TODO make something interesting *)
 unfold p. constructor.
 Qed.
-

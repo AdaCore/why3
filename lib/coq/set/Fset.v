@@ -595,4 +595,3 @@ unfold cardinal, inter, disjoint, mem in *.
 destruct s.
 eapply Cardinal.cardinal_map; eauto.
 Qed.
-

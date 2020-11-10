@@ -319,4 +319,3 @@ rewrite IHx. rewrite @fold_left_symm; eauto.
 intuition.
 intuition.
 Qed.
-

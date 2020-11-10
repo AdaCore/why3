@@ -99,4 +99,3 @@ intros l.
 rewrite 2!Length.length_std.
 now rewrite List.rev_length.
 Qed.
-

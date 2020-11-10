@@ -139,4 +139,3 @@ rewrite <- Zeven_bool_iff.
 rewrite Zquot.Zeven_rem.
 now rewrite Z.eqb_eq.
 Qed.
-

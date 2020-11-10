@@ -31,4 +31,3 @@ intros H1 H2.
 simpl in H1.
 omega.
 Qed.
-

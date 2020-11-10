@@ -57,4 +57,3 @@ inversion h1 ; subst.
   apply h3.
   now right.
 Qed.
-

@@ -259,4 +259,3 @@ elim H.
 now apply -> even_divides.
 exact H0.
 Qed.
-

@@ -32,4 +32,3 @@ Definition tl {a:Type} {a_WT:WhyType a} (l:Init.Datatypes.list a) :
   | Init.Datatypes.nil => Init.Datatypes.None
   | Init.Datatypes.cons _ t => Init.Datatypes.Some t
   end.
-

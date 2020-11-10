@@ -31,4 +31,3 @@ Lemma combine'def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
 Proof.
 now intros [|xh xt] [|yh yt].
 Qed.
-

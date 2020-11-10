@@ -97,4 +97,3 @@ Lemma cmod_cases :
     rewrite Z.mul_opp_l.
     omega.
 Qed.
-

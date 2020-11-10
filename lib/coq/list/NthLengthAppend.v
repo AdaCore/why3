@@ -73,4 +73,3 @@ intros _.
 apply IHl1.
 omega.
 Qed.
-

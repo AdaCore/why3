@@ -335,4 +335,3 @@ intros p1 p2 a b h1.
 apply le_ge_eq.
 split; apply numof_change_any; intros; now apply h1.
 Qed.
-

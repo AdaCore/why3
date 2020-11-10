@@ -27,4 +27,3 @@ Existing Instance mode_WhyType.
 
 (* Why3 assumption *)
 Definition to_nearest (m:mode) : Prop := (m = RNE) \/ (m = RNA).
-

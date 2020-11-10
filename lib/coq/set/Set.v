@@ -431,4 +431,3 @@ intuition.
 apply H1.
 exists x; intuition.
 Qed.
-

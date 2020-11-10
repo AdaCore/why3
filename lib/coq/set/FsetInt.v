@@ -257,4 +257,3 @@ split.
   specialize (H2 z). contradict H2. destruct Z_le_dec.
   destruct Z_lt_dec. omega. intuition. intuition.
 Qed.
-

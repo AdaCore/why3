@@ -112,4 +112,3 @@ ring_simplify.
 simpl (num_occ x (a0 :: nil))%list.
 ring.
 Qed.
-

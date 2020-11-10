@@ -92,4 +92,3 @@ intros r.
 simpl.
 now rewrite <- IHs.
 Qed.
-
