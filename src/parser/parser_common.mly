@@ -198,33 +198,18 @@
       | _ -> Loc.errorm ?loc "illegal kind qualifier" in
     unfold false d pat
 
-  (* each function literal with no default value has a unique
-     identifier *)
-  let fun_lit_id = ref 0
+  let rec reduce_fun_lit f l default =
+    match default, l with
+    | Some t, []      -> t
+    | None  , [x]     -> f x (snd x)
+    | _     , x :: xs -> f x (reduce_fun_lit f xs default)
+    | None  , []      -> assert false (* should not happen *)
 
-  let next_fun_lit_id () =
-    let x = !fun_lit_id in
-    fun_lit_id := x + 1;
-    Constant.int_const (BigInt.of_int x)
-
+  (* if tl = [] then default <> None *)
   let term_fun_lit loc_begin loc_end (tl,default) =
-    let id_var = { id_str = "_x"; id_ats = []; id_loc = loc_begin } in
+    let id_str = if tl = [] then "_" else "%x" in
+    let id_var = { id_str; id_ats = []; id_loc = loc_begin } in
     let var = { term_desc = Tident (Qident id_var); term_loc = loc_begin } in
-    let default = match default with
-      | Some e -> e
-      | None ->
-         let any_function = Qident { id_str = "any function"; id_ats = [];
-                                     id_loc = loc_end } in
-         let int_id = { id_str = "int"; id_ats = []; id_loc = loc_end } in
-         let int_pty = PTtyapp (Qident int_id,[]) in
-         let lit_id_t = { term_desc = Tconst (next_fun_lit_id ());
-                          term_loc = loc_end } in
-         let lit_id_t = { term_desc = Tcast (lit_id_t, int_pty);
-                          term_loc = loc_end } in
-         let tuple_t = { term_desc = Ttuple [lit_id_t;var];
-                            term_loc = loc_end } in
-         let app_t = Tidapp (any_function, [tuple_t]) in
-         { term_desc = app_t; term_loc = loc_end } in
 
     let add_term (t1,t2) t =
       let eq_id = { id_str = Ident.op_equ; id_ats = [];
@@ -235,30 +220,17 @@
         term_loc = Loc.join t1.term_loc t.term_loc}
     in
 
-    let ifte = List.fold_right add_term tl default in
+    let ifte = reduce_fun_lit add_term tl default in
     let binder = (loc_begin, Some id_var, false, None) in
     let desc = Ptree.Tquant (Dterm.DTlambda, [binder], [], ifte) in
     let t = { term_desc = desc; term_loc = Loc.join loc_begin loc_end } in
     Ptree.Tattr (Ptree.ATstr Ident.funlit, t)
 
+  (* if el = [] then default <> None *)
   let expr_fun_lit loc_begin loc_end (el,default) =
-    let id_var = { id_str = "_x"; id_ats = []; id_loc = loc_begin } in
+    let id_str = if el = [] then "_" else "%x" in
+    let id_var = { id_str; id_ats = []; id_loc = loc_begin } in
     let var = { expr_desc = Eident (Qident id_var); expr_loc = loc_begin } in
-    let default = match default with
-      | Some e -> e
-      | None ->
-         let any_function = Qident { id_str = "any function"; id_ats = [];
-                                     id_loc = loc_end } in
-         let int_id = { id_str = "int"; id_ats = []; id_loc = loc_end } in
-         let int_pty = PTtyapp (Qident int_id,[]) in
-         let fun_id_e = { expr_desc = Econst (next_fun_lit_id ());
-                          expr_loc = loc_end } in
-         let lit_id_e = { expr_desc = Ecast (fun_id_e, int_pty);
-                          expr_loc = loc_end } in
-         let tuple_e = { expr_desc = Etuple [lit_id_e;var];
-                         expr_loc = loc_end } in
-         let app_e = Eidapp (any_function, [tuple_e]) in
-         { expr_desc = app_e; expr_loc = loc_end } in
 
     let add_expr (e1,e2) e =
       let eq_id = { id_str = Ident.op_equ; id_ats = [];
@@ -269,7 +241,7 @@
         expr_loc = Loc.join e1.expr_loc e.expr_loc }
     in
 
-    let ifte = List.fold_right add_expr el default in
+    let ifte = reduce_fun_lit add_expr el default in
     let binder = (loc_begin, Some id_var, false, None) in
     let pattern = { pat_desc = Ptree.Pvar id_var;
                     pat_loc = loc_begin } in
@@ -828,7 +800,6 @@ term_sub_:
     { Tidapp (lcut_op $5 $startpos($2) $endpos($2), [$1;$4]) }
 
 term_fun_lit:
-| (* epsilon *)                     { [], None }
 | mapping_list_with_default(term)   { $1 }
 | semicolon_list1(term)
     { let mk_index_pair i t =
@@ -1190,7 +1161,6 @@ expr_arg_:
       expr_fun_lit loc_begin loc_end $2 }
 
 expr_fun_lit:
-| (* epsilon *)                     { [], None }
 | mapping_list_with_default(expr)   { $1 }
 | semicolon_list1(expr)
     { let mk_index_pair i e =

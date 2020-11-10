@@ -981,11 +981,6 @@ let highord_theory =
   let uc = add_param_decl uc fs_func_app in
   close_theory uc
 
-let any_func_theory =
-  let uc = empty_theory (id_fresh "AnyFunction") ["why3";"AnyFunction"] in
-  let uc = add_param_decl uc fs_any_function in
-  close_theory uc
-
 let tuple_theory = Hint.memo 17 (fun n ->
   let ts = ts_tuple n and fs = fs_tuple n in
   let pl = List.map (fun _ -> None) ts.ts_args in

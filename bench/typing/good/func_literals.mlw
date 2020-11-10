@@ -1,5 +1,4 @@
 
-constant a1 : int -> int = [||]
 constant a2 : int -> int = [|1|]
 constant a3 : int -> int = [|1;2|]
 constant a4 : int -> int = [|1;2;3;4;5;6;7|]
@@ -17,7 +16,6 @@ constant c4 : int -> int = [|0 => 1; 1 => 2; 2 => 3; _ => 4|]
 use int.Int
 function z (x: int) : int = x + x
 
-function d1 (_: int) : int -> int = [||]
 function d2 (x: int) : int -> int = [|1; x|]
 function d3 (x: int) : int -> int = [|1; x; x + 1|]
 function d4 (x: int) : int -> int = [|1; x; x + 1; z x |]
@@ -36,7 +34,6 @@ constant f5 : int -> int = [|1 => 1;2 => 2;_ => -1;|]
 
 let w (x: int) = x + x
 
-let f0 ()                 = [| |]
 let f1 ()                 = [| _ => 1 |]
 let f2 ()                 = [| _ => "foo" |]
 let f3 (x: int)           = [| _ => x|]
@@ -57,7 +54,6 @@ use int.Int                                        (* required for '=' *)
 let f14 (x: int) : int -> int = [| 2 => 1; 3 => x; -1 => x + 1; _ => 0 |]
 let f15 (x: int) = f13 (x+1)
 
-let function f16 : int -> int = [||]
 let function f17 : int -> int = [|1|]
 
 use seq.Seq
