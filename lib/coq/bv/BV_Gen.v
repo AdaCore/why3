@@ -19,13 +19,6 @@ Require int.Abs.
 Require int.EuclideanDivision.
 Require bv.Pow2int.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 Local Parameter last_bit : nat.
 (* Important notice: do not remove 'Local' above, otherwise 'why3 realize' will
    assume it comes from Why3 and will remove it. We use 'Parameter' instead of

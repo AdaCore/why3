@@ -18,13 +18,6 @@ Require int.Abs.
 Require int.EuclideanDivision.
 Require int.ComputerDivision.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 Lemma on_pos_euclidean_is_div:
   forall n d, (int.EuclideanDivision.div n (Zpos d)) = Z.div n (Zpos d).
 intros n d.

@@ -15,13 +15,6 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require list.List.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 (* Why3 comment *)
 (* combine is replaced with (Lists.List.combine x x1) by the coq driver *)
 

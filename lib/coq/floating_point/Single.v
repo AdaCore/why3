@@ -21,13 +21,6 @@ Require real.FromInt.
 Require floating_point.Rounding.
 Require floating_point.SingleFormat.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 Require Import floating_point.GenFloat.
 
 (* Why3 goal *)

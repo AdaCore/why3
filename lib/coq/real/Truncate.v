@@ -17,13 +17,6 @@ Require int.Int.
 Require real.Real.
 Require real.FromInt.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 Require Import Flocq.Core.Core.
 Require Import Lra.
 

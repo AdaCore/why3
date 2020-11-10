@@ -18,13 +18,6 @@ Require int.Int.
 Require map.Map.
 Require map.Occ.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 (* preliminaries *)
 
 Definition into (n:nat) (f:nat -> nat) :=

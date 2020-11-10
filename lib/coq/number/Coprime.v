@@ -22,13 +22,6 @@ Require number.Divisibility.
 Require number.Gcd.
 Require number.Prime.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 (* Why3 assumption *)
 Definition coprime (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) : Prop :=
   ((number.Gcd.gcd a b) = 1%Z).

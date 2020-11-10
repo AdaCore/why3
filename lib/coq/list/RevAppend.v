@@ -21,13 +21,6 @@ Require list.Append.
 Require list.Reverse.
 
 (* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
-(* Why3 goal *)
 Lemma rev_append'def {a:Type} {a_WT:WhyType a} :
   forall (s:Init.Datatypes.list a) (t:Init.Datatypes.list a),
   ((Lists.List.rev_append s t) =

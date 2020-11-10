@@ -18,13 +18,6 @@ Require int.Int.
 Require map.Map.
 Require map.Occ.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 (* Why3 assumption *)
 Definition permut {a:Type} {a_WT:WhyType a} (m1:Numbers.BinNums.Z -> a)
     (m2:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z) :

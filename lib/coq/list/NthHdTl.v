@@ -20,13 +20,6 @@ Require option.Option.
 Require list.HdTl.
 
 (* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
-(* Why3 goal *)
 Lemma Nth_tl {a:Type} {a_WT:WhyType a} :
   forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a),
   ((list.HdTl.tl l1) = (Init.Datatypes.Some l2)) ->

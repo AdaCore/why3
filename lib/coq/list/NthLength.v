@@ -20,13 +20,6 @@ Require list.Nth.
 Require option.Option.
 
 (* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
-(* Why3 goal *)
 Lemma nth_none_1 {a:Type} {a_WT:WhyType a} :
   forall (l:Init.Datatypes.list a) (i:Numbers.BinNums.Z), (i < 0%Z)%Z ->
   ((list.Nth.nth i l) = Init.Datatypes.None).

@@ -17,13 +17,6 @@ Require BuiltIn.
 Require real.Real.
 
 (* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
-(* Why3 goal *)
 Lemma sqr'def :
   forall (x:Reals.Rdefinitions.R), ((Reals.RIneq.Rsqr x) = (x * x)%R).
 Proof.

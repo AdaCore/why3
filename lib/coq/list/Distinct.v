@@ -19,13 +19,6 @@ Require list.Length.
 Require list.Mem.
 Require list.Append.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 (* Why3 assumption *)
 Inductive distinct {a:Type} {a_WT:WhyType a}: Init.Datatypes.list a ->
   Prop :=

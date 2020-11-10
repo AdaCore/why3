@@ -15,13 +15,6 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 (* Why3 comment *)
 (* abs is replaced with (ZArith.BinInt.Z.abs x) by the coq driver *)
 

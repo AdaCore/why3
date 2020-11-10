@@ -16,13 +16,6 @@ Require BuiltIn.
 Require int.Int.
 Require int.Abs.
 
-(* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
 Require Import Zquot.
 
 (* Why3 comment *)

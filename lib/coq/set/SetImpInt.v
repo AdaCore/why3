@@ -20,13 +20,6 @@ Require set.FsetInt.
 Require set.SetImp.
 
 (* Why3 goal *)
-Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  a -> b.
-Proof.
-
-Defined.
-
-(* Why3 goal *)
 Definition set : Type.
 Proof.
 (* TODO find something more interesting. *)
