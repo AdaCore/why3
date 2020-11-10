@@ -13,9 +13,15 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
 Require list.List.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 assumption *)
 Fixpoint length {a:Type} {a_WT:WhyType a}
@@ -57,3 +63,4 @@ exfalso.
 generalize (Length_nonnegative t).
 omega.
 Qed.
+

@@ -13,13 +13,19 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
 Require int.ComputerDivision.
 Require number.Parity.
 Require number.Divisibility.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 Import Znumtheory.
 
@@ -196,3 +202,4 @@ apply proj2 in Pp.
 apply Pp.
 omega.
 Qed.
+

@@ -13,9 +13,15 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require list.List.
 Require option.Option.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 assumption *)
 Definition hd {a:Type} {a_WT:WhyType a} (l:Init.Datatypes.list a) :
@@ -32,3 +38,4 @@ Definition tl {a:Type} {a_WT:WhyType a} (l:Init.Datatypes.list a) :
   | Init.Datatypes.nil => Init.Datatypes.None
   | Init.Datatypes.cons _ t => Init.Datatypes.Some t
   end.
+

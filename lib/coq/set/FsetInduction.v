@@ -14,9 +14,15 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
-Require AnyFunction.
 Require int.Int.
 Require set.Fset.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 goal *)
 Definition t : Type.
@@ -42,3 +48,4 @@ intros h1 h2 s.
 (* TODO make something interesting *)
 unfold p. constructor.
 Qed.
+

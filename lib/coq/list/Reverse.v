@@ -13,12 +13,18 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
 Require list.List.
 Require list.Length.
 Require list.Mem.
 Require list.Append.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 goal *)
 Lemma reverse'def {a:Type} {a_WT:WhyType a} :
@@ -99,3 +105,4 @@ intros l.
 rewrite 2!Length.length_std.
 now rewrite List.rev_length.
 Qed.
+

@@ -13,11 +13,17 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
 Require list.List.
 Require list.Length.
 Require list.Mem.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 goal *)
 Lemma infix_plpl'def {a:Type} {a_WT:WhyType a} :
@@ -101,3 +107,4 @@ intros x l h1.
 apply in_split.
 now apply Mem.mem_std.
 Qed.
+

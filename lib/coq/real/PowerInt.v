@@ -14,10 +14,16 @@
 Require Import BuiltIn.
 Require Reals.Rfunctions.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
 Require real.Real.
 Require real.RealInfix.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 Require Import Exponentiation.
 Import Rfunctions.
@@ -140,3 +146,4 @@ apply Hind; omega.
 replace 1%R with (1*1)%R by auto with real.
 apply Rmult_le_compat; auto with real.
 Qed.
+

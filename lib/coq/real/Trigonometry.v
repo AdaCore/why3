@@ -18,10 +18,16 @@ Require Reals.Rtrigo_def.
 Require Reals.Rtrigo1.
 Require Reals.Ratan.
 Require BuiltIn.
-Require AnyFunction.
 Require real.Real.
 Require real.Abs.
 Require real.Square.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 Require Import Reals.
 
@@ -88,7 +94,7 @@ rewrite <- atan_1.
 admit. (* to avoid a dependency on CoqInterval *)
 (*
 Require Import Interval_tactic.
-split ; interval with (i_prec 55).
+split ; interval with (i_prec 55). 
 *)
 Admitted.
 
@@ -225,3 +231,4 @@ Proof.
 intros x.
 apply atan_right_inv.
 Qed.
+

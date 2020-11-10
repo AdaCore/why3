@@ -13,8 +13,14 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require list.List.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 goal *)
 Definition hd {a:Type} {a_WT:WhyType a} : Init.Datatypes.list a -> a.
@@ -46,3 +52,4 @@ Lemma tl_cons {a:Type} {a_WT:WhyType a} :
 Proof.
 now intros x r.
 Qed.
+

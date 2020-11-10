@@ -13,7 +13,6 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
@@ -22,6 +21,13 @@ Require number.Parity.
 Require number.Divisibility.
 Require number.Gcd.
 Require number.Prime.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 assumption *)
 Definition coprime (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) : Prop :=
@@ -103,3 +109,4 @@ apply Z.gcd_unique.
   rewrite coprime_is_Zrel_prime in h1.
   now apply Znumtheory.rel_prime_div with (2:=h2).
 Qed.
+

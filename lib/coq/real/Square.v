@@ -14,8 +14,14 @@
 Require Import BuiltIn.
 Require Reals.R_sqrt.
 Require BuiltIn.
-Require AnyFunction.
 Require real.Real.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 goal *)
 Lemma sqr'def :
@@ -69,3 +75,4 @@ Lemma Sqrt_le :
 intros x y (h1 & h2); apply sqrt_le_1; auto.
 apply Rle_trans with x; auto.
 Qed.
+

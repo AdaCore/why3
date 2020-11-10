@@ -14,10 +14,16 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
-Require AnyFunction.
 Require int.Int.
 Require map.Map.
 Require map.Occ.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* preliminaries *)
 
@@ -340,3 +346,4 @@ assert (occ v m (i+1) n >= 1)%Z.
   omega.
 generalize (Hocc v); omega.
 Qed.
+

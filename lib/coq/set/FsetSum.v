@@ -14,9 +14,15 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
-Require AnyFunction.
 Require int.Int.
 Require set.Fset.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 goal *)
 Definition sum {a:Type} {a_WT:WhyType a} :
@@ -38,16 +44,16 @@ Proof.
 intros s f h1.
 unfold sum, Fset.is_empty, Fset.mem, set.Set.mem in *. destruct s.
 destruct ClassicalEpsilon.constructive_indefinite_description.
-destruct x0.
+destruct x0. 
 + reflexivity.
 + destruct a0. destruct (h1 a1).
   apply H0. left. reflexivity.
 Qed.
 
-Lemma fold_left_symm: forall {A} {B} l i s (conv: B -> A)
+Lemma fold_left_symm: forall {A} {B} l i s (conv: B -> A) 
   (Hsymm: forall a (b: A), s a b = s b a)
   (Hassoc: forall a b c, s (s a b) c = s a (s b c)) v,
-  s (List.fold_left (fun acc x => s (conv x) acc) l i) v =
+  s (List.fold_left (fun acc x => s (conv x) acc) l i) v = 
   List.fold_left (fun acc x => s (conv x) acc) l (s i v).
 Proof.
 induction l; intros.
@@ -61,30 +67,30 @@ Lemma fold_left_iff_symm: forall {A} {B} l l1 i (s: A -> A -> A) (conv: B -> A)
   (Hassoc: forall a b c, s (s a b) c = s a (s b c))
   (Heq: forall e, List.In e l <-> List.In e l1)
   (Hdup: List.NoDup l) (Hdup': List.NoDup l1),
-  List.fold_left (fun acc x => s (conv x) acc) l i =
+  List.fold_left (fun acc x => s (conv x) acc) l i = 
   List.fold_left (fun acc x => s (conv x) acc) l1 i.
 Proof.
 induction l; intros.
-+ destruct l1. reflexivity. specialize (Heq b). destruct Heq. destruct H0.
++ destruct l1. reflexivity. specialize (Heq b). destruct Heq. destruct H0. 
   left. reflexivity.
 + simpl.
   destruct (List.in_split a l1) as [l1' [l1'' Hsplit]].
   - eapply Heq. left. reflexivity.
   - rewrite (IHl (List.app l1' l1'')); eauto.
     * rewrite Hsplit. rewrite List.fold_left_app.
-      rewrite List.fold_left_app. simpl. rewrite (Hsymm (conv a) (List.fold_left _ _ _)).
+      rewrite List.fold_left_app. simpl. rewrite (Hsymm (conv a) (List.fold_left _ _ _)). 
       rewrite fold_left_symm; eauto. rewrite Hsymm. reflexivity.
     * intros. rewrite List.in_app_iff. rewrite Hsplit in Heq.
       specialize (Heq e). rewrite List.in_app_iff in Heq. simpl in Heq.
       split; intros.
       ++ intuition. subst. inversion Hdup; intuition. subst. inversion Hdup; intuition.
-      ++ destruct H. destruct Heq. assert (a = e \/ List.In e l). apply H1. auto. destruct H2; eauto.
+      ++ destruct H. destruct Heq. assert (a = e \/ List.In e l). apply H1. auto. destruct H2; eauto. 
          subst. eapply List.NoDup_remove_2 in Hdup'. rewrite List.in_app_iff in Hdup'. destruct Hdup'; eauto.
-         destruct Heq. assert (a = e \/ List.In e l). apply H1. auto. destruct H2; eauto.
+         destruct Heq. assert (a = e \/ List.In e l). apply H1. auto. destruct H2; eauto. 
          subst. eapply List.NoDup_remove_2 in Hdup'. rewrite List.in_app_iff in Hdup'. destruct Hdup'; eauto.
     * inversion Hdup; auto.
     * rewrite Hsplit in Hdup'. eapply List.NoDup_remove_1; eauto.
-Qed.
+Qed. 
 
 (* Why3 goal *)
 Lemma sum_add {a:Type} {a_WT:WhyType a} :
@@ -103,13 +109,13 @@ split. intros.
 + eapply fold_left_iff_symm; eauto.
   * intuition.
   * intuition.
-  * intros. rewrite Hx0eq. rewrite Hx1eq. unfold Map.set.
+  * intros. rewrite Hx0eq. rewrite Hx1eq. unfold Map.set. 
     destruct why_decidable_eq; try subst; intuition.
 + intros.
   assert (List.In x x0). { eapply Hx0eq. unfold Map.set. destruct why_decidable_eq; eauto. }
   destruct (List.in_split x x0 H1) as [x0' [x0'' Hx0]].
-  rewrite Hx0. rewrite List.fold_left_app. simpl.
-  rewrite (Zplus_comm (f x)). symmetry.
+  rewrite Hx0. rewrite List.fold_left_app. simpl. 
+  rewrite (Zplus_comm (f x)). symmetry. 
   erewrite <- (fold_left_iff_symm (List.app x0' x0'')); eauto.
   * rewrite List.fold_left_app. rewrite fold_left_symm.
     ++ auto.
@@ -150,9 +156,9 @@ split; intros.
   rewrite H0 at 2. destruct (sum_add (Fset.remove x s) f x).
   rewrite H2. ring.
   rewrite Fset.remove_def. intuition.
-+ assert (s = Fset.remove x s).
++ assert (s = Fset.remove x s). 
   {
-    apply Fset.extensionality. intro.
+    apply Fset.extensionality. intro. 
     rewrite Fset.remove_def. intuition. subst. destruct H; assumption.
   }
   rewrite <- H0. reflexivity.
@@ -161,13 +167,13 @@ Qed.
 Lemma sum_diff {a:Type} {a_WT:WhyType a} :
   forall (s1:set.Fset.fset a) (s2:set.Fset.fset a),
   forall (f:a -> Numbers.BinNums.Z),
-  Fset.subset s1 s2 ->
+  Fset.subset s1 s2 -> 
     (sum s2 f - sum s1 f = sum (set.Fset.diff s2 s1) f)%Z.
 Proof.
 intros.
 assert (sum s2 f = sum (Fset.diff s2 s1) f + sum s1 f)%Z.
 {
-  unfold sum, Fset.diff, Fset.union, Fset.subset, Fset.disjoint,
+  unfold sum, Fset.diff, Fset.union, Fset.subset, Fset.disjoint, 
     Fset.inter, Fset.mem, set.Set.mem, Fset.add in *.
 destruct s1 as (sf1, H1).
 destruct s2 as (sf2, H2).
@@ -234,11 +240,11 @@ Lemma sum_union {a:Type} {a_WT:WhyType a} :
    (((sum s1 f) + (sum s2 f))%Z - (sum (set.Fset.inter s1 s2) f))%Z).
 Proof.
 intros s1 s2 f.
-assert (sum (Fset.union s1 s2) f - sum (Fset.inter s1 s2) f =
+assert (sum (Fset.union s1 s2) f - sum (Fset.inter s1 s2) f = 
   (sum s1 f - sum (Fset.inter s1 s2) f) + (sum s2 f - sum (Fset.inter s1 s2) f))%Z.
 {
   rewrite sum_diff; [rewrite sum_diff; [rewrite sum_diff |] |].
-  + assert (Fset.diff (Fset.union s1 s2) (Fset.inter s1 s2) =
+  + assert (Fset.diff (Fset.union s1 s2) (Fset.inter s1 s2) = 
           Fset.union (Fset.diff s1 (Fset.inter s1 s2)) (Fset.diff s2 (Fset.inter s1 s2))).
     {
       eapply Fset.extensionality. intro e.
@@ -275,14 +281,14 @@ assert (forall e, List.In e x -> f e = g e).
 {
   intros. rewrite h1. reflexivity. apply a0. assumption.
 }
-assert (forall l (f: int -> a -> int) g a
+assert (forall l (f: int -> a -> int) g a 
   (Heq: forall e acc, List.In e l -> f acc e = g acc e),
   List.fold_left f l a = List.fold_left g l a).
 {
   induction l; simpl; intros; eauto.
   rewrite Heq; eauto.
 }
-erewrite H0; eauto.
+erewrite H0; eauto. 
 intros. simpl. rewrite H; eauto.
 Qed.
 
@@ -319,3 +325,4 @@ rewrite IHx. rewrite @fold_left_symm; eauto.
 intuition.
 intuition.
 Qed.
+

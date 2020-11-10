@@ -13,8 +13,14 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 goal *)
 Definition pow2 : Numbers.BinNums.Z -> Numbers.BinNums.Z.
@@ -382,3 +388,4 @@ Qed.
 Lemma pow2_64 : ((pow2 64%Z) = 18446744073709551616%Z).
   easy.
 Qed.
+

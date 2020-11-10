@@ -14,8 +14,14 @@
 Require Import BuiltIn.
 Require Reals.Rbasic_fun.
 Require BuiltIn.
-Require AnyFunction.
 Require real.Real.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 Import Rbasic_fun.
 
@@ -95,3 +101,4 @@ intros x y z.
 replace (x - z)%R with ((x - y) + (y - z))%R by ring.
 apply Rabs_triang.
 Qed.
+

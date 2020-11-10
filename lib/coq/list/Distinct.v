@@ -13,12 +13,18 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
 Require list.List.
 Require list.Length.
 Require list.Mem.
 Require list.Append.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Why3 assumption *)
 Inductive distinct {a:Type} {a_WT:WhyType a}: Init.Datatypes.list a ->
@@ -57,3 +63,4 @@ inversion h1 ; subst.
   apply h3.
   now right.
 Qed.
+

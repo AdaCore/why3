@@ -15,7 +15,6 @@ Require Import BuiltIn.
 Require Reals.Rbasic_fun.
 Require Reals.R_sqrt.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
 Require real.Real.
 Require real.RealInfix.
@@ -26,6 +25,13 @@ Require real.Square.
 Require bv.Pow2int.
 Require ieee_float.RoundingMode.
 Require ieee_float.GenericFloat.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 Import Flocq.Core.Core.
 Import Flocq.IEEE754.Binary.
@@ -1468,3 +1474,4 @@ Lemma round_bound :
     (1 / 713623846352979940529142984724747568191373312)%R)%R)%R.
 intros m x h1.
 Admitted.
+

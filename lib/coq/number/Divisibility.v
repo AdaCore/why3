@@ -13,12 +13,18 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require AnyFunction.
 Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
 Require int.ComputerDivision.
 Require number.Parity.
+
+(* Why3 goal *)
+Definition any_function {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  a -> b.
+Proof.
+
+Defined.
 
 (* Hack so that Why3 does not override the notation below.
 
@@ -259,3 +265,4 @@ elim H.
 now apply -> even_divides.
 exact H0.
 Qed.
+
