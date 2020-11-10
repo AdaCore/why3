@@ -228,28 +228,56 @@
 
   (* if el = [] then default <> None *)
   let expr_fun_lit loc_begin loc_end (el,default) =
-    let id_str = if el = [] then "_" else "%x" in
-    let id_var = { id_str; id_ats = []; id_loc = loc_begin } in
-    let var = { expr_desc = Eident (Qident id_var); expr_loc = loc_begin } in
-
+    let lit_loc = Loc.join loc_begin loc_end in
+    let var id expr_loc = {expr_desc = Eident (Qident id); expr_loc} in
+    let id id_str id_loc = { id_str; id_ats = []; id_loc } in
+    let var_of_string nm loc = var (id nm loc) loc in
+    (* proxy vars for the literal domain/range expressions *)
+    let domain_ranga_vars i (e1,e2) =
+      let i = string_of_int i in
+      var_of_string ("%d" ^ i) e1.expr_loc,
+      var_of_string ("%r" ^ i) e2.expr_loc in
+    let el_proxies = List.mapi domain_ranga_vars el in
+    let default_proxy =
+      Opt.map (fun d -> var_of_string "%def" d.expr_loc) default in
+    (* fun x -> if ... *)
+    let fun_id_var = id (if el = [] then "_" else "%x") loc_begin in
+    let fun_var = var fun_id_var loc_begin in
     let add_expr (e1,e2) e =
       let eq_id = { id_str = Ident.op_equ; id_ats = [];
                     id_loc = e1.expr_loc } in
-      let v_eq_e1 = Einfix (var,eq_id,e1) in
+      let v_eq_e1 = Einfix (fun_var,eq_id,e1) in
       let v_eq_e1 = { expr_desc = v_eq_e1; expr_loc = e1.expr_loc } in
       { expr_desc = Eif (v_eq_e1,e2,e);
-        expr_loc = Loc.join e1.expr_loc e.expr_loc }
-    in
-
-    let ifte = reduce_fun_lit add_expr el default in
-    let binder = (loc_begin, Some id_var, false, None) in
-    let pattern = { pat_desc = Ptree.Pvar id_var;
+        expr_loc = Loc.join e1.expr_loc e.expr_loc } in
+    let ifte = reduce_fun_lit add_expr el_proxies default_proxy in
+    let binder = (loc_begin, Some fun_id_var, false, None) in
+    let pattern = { pat_desc = Ptree.Pvar fun_id_var;
                     pat_loc = loc_begin } in
     let spec = { sp_pre = []; sp_post = []; sp_xpost = []; sp_reads = [];
                  sp_writes = []; sp_alias = []; sp_variant = [];
                  sp_checkrw = false; sp_diverge = false; sp_partial = false } in
-    let desc = Ptree.Efun ([binder], None, pattern, Ity.MaskVisible, spec, ifte) in
-    let e = { expr_desc = desc; expr_loc = Loc.join loc_begin loc_end } in
+    let efun = Ptree.Efun ([binder], None, pattern, Ity.MaskVisible, spec, ifte) in
+    let efun = { expr_desc = efun; expr_loc = lit_loc } in
+    (* let d1 = e1 in
+       let r1 = e2 in
+       let ... in
+       fun x -> if x = d1 then r1 else ... *)
+    let e2id e = match e with
+      | {expr_desc = Eident (Qident id)} -> id | _ -> assert false in
+    let mk_let e (d,r) (e1,e2) =
+      let expr_desc = Elet (e2id r,false,Expr.RKnone,e2,e) in
+      let e = {expr_desc; expr_loc = lit_loc} in
+      let expr_desc = Elet (e2id d,false,Expr.RKnone,e1,e) in
+      {expr_desc; expr_loc = lit_loc} in
+    let elets = List.fold_left2 mk_let efun el_proxies el in
+    (* let def = e_default in ... *)
+    let e = match default, default_proxy with
+      | Some e, Some d ->
+         let expr_desc = Elet (e2id d,false,Expr.RKnone,e,elets) in
+         {expr_desc; expr_loc = lit_loc}
+      | _ -> elets
+    in
     Ptree.Eattr (Ptree.ATstr Ident.funlit, e)
 
 %}
