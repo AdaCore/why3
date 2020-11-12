@@ -76,7 +76,7 @@ run () {
     printf "\n"
     if $updateoracle; then
       echo "Updating oracle for $file_base"
-      mv "$out_file" "$oracle_file"
+      cp "$out_file" "$oracle_file"
     else
       echo "FAILED!"
       echo "diff is the following:"
@@ -88,8 +88,9 @@ run () {
   fi
   if $forceupdateoracle; then
     echo "Forcing update oracle for $file_base"
-    mv "$out_file" "$oracle_file"
+    cp "$out_file" "$oracle_file"
   fi
+  rm "$out_file"
 }
 
 for file in $files; do
