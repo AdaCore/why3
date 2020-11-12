@@ -456,9 +456,21 @@ module Make(E: sig
        new_hedge_cfg cfg e_end end_match
          (fun _ abs -> abs) ~lbl:"exn e normal termination";
        e_begin, end_match, !additional_exn @ e_exn
-    | Eassert _ | Eabsurd -> (* FIXME: maybe they could be taken into account *)
+    | Eassert (kind,term) when kind <> Check ->
+       let begin_cp = new_node_cfg cfg expr ~lbl:"assert bgn" in
+       let end_cp   = new_node_cfg cfg expr ~lbl:"assert end" in
+       let constraints = QDom.meet_term manpk term in
+       new_hedge_cfg cfg begin_cp end_cp (fun _ -> constraints);
+       begin_cp, end_cp, []
+    | Eassert _ ->
        let node = new_node_cfg cfg expr in
        node, node, []
+    | Eabsurd ->
+       let begin_cp = new_node_cfg cfg expr ~lbl:"absurd bgn" in
+       let end_cp   = new_node_cfg cfg expr ~lbl:"absurd end" in
+       let constraints = QDom.meet_term manpk t_false in
+       new_hedge_cfg cfg begin_cp end_cp (fun _ -> constraints);
+       begin_cp, end_cp, []
     | Eghost e -> put_expr_in_cfg ~ret cfg manpk e
     | Efor (pv, (lo, dir, up), _, _, e) ->
        (* . before_loop
