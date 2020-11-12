@@ -1,13 +1,13 @@
 # Stage 1: build setup and prover download; to be cached
 
-FROM debian:buster as builder
+FROM debian:buster-slim as builder
 
 USER root
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends wget libcanberra-gtk3-module unzip build-essential autoconf automake ocaml-nox ca-certificates menhir libmenhir-ocaml-dev libzip-ocaml-dev liblablgtksourceview3-ocaml-dev alt-ergo && \
+    apt-get install -yq --no-install-recommends wget libcanberra-gtk3-module unzip build-essential autoconf automake ocaml-nox ca-certificates menhir libmenhir-ocaml-dev libzip-ocaml-dev liblablgtksourceview3-ocaml-dev ocaml-findlib alt-ergo && \
     apt-get clean
 
 RUN adduser --disabled-password --gecos '' guest

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="disamb.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="pe1" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="10555"/></proof>
+ </goal>
+ <goal name="pe2" proved="true">
+ <proof prover="0"><result status="valid" time="0.25" steps="64929"/></proof>
+ </goal>
+ <goal name="pep1" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="11818"/></proof>
+ </goal>
+ <goal name="pep2" proved="true">
+ <proof prover="0"><result status="valid" time="0.24" steps="68294"/></proof>
+ </goal>
+ <goal name="di_str&#39;vc" expl="VC for di_str" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="165"/></proof>
+ </goal>
+ <goal name="disambiguation_included&#39;vc" expl="VC for disambiguation_included" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="11001"/></proof>
+ </goal>
+ <goal name="oi_str&#39;vc" expl="VC for oi_str" proved="true">
+ <proof prover="3"><result status="valid" time="0.03" steps="203"/></proof>
+ </goal>
+ <goal name="decomp_last_plus&#39;vc" expl="VC for decomp_last_plus" proved="true">
+ <proof prover="3"><result status="valid" time="0.14" steps="1062"/></proof>
+ </goal>
+ <goal name="original_included" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="9231"/></proof>
+ </goal>
+ <goal name="original_equiv_disambiguation" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="9364"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

@@ -280,7 +280,7 @@ rule token = parse
   (* This ad hoc switch allows to not edit the automatically generated
      handcrafted.messages in ad hoc ways. *)
   | Error None -> Format.fprintf fmt "syntax error"
-  | Error (Some s) -> Format.fprintf fmt "syntax error:\n %s" s
+  | Error (Some s) -> Format.fprintf fmt "syntax error: %s" s
   | _ -> raise exn)
 
   let build_parsing_function (parser_entry: Lexing.position -> 'a) lb =

@@ -117,12 +117,12 @@ let normalize_goal_transf_few env =
 let () =
   Trans.register_env_transform_l "compute_in_goal" normalize_goal_transf_all
   ~desc:"Perform@ computations@ in@ the@ goal,@ also@ using@ \
-    the@ automatically@ derived@ rules)."
+    the@ automatically@ derived@ rules."
 
 let () =
   Trans.register_env_transform_l "compute_specified" normalize_goal_transf_few
   ~desc:"Perform@ computations@ in@ the@ goal,@ only@ using@ \
-    the@ user-specified@ rules)."
+    the@ user-specified@ rules."
 
 let normalize_hyp step_limit pr_norm env =
   let p = { compute_defs = true;
