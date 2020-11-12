@@ -210,18 +210,17 @@
     let id_str = if tl = [] then "_" else "%x" in
     let id_var = { id_str; id_ats = []; id_loc = loc_begin } in
     let var = { term_desc = Tident (Qident id_var); term_loc = loc_begin } in
-
     let add_term (t1,t2) t =
       let eq_id = { id_str = Ident.op_equ; id_ats = [];
                     id_loc = t1.term_loc } in
       let v_eq_t1 = Tinfix (var,eq_id,t1) in
       let v_eq_t1 = { term_desc = v_eq_t1; term_loc = t1.term_loc } in
       { term_desc = Tif (v_eq_t1,t2,t);
-        term_loc = Loc.join t1.term_loc t.term_loc}
-    in
-
+        term_loc = Loc.join t1.term_loc t.term_loc} in
+    (* if x = ... then ... else if x = .. then ... else ... *)
     let ifte = reduce_fun_lit add_term tl default in
     let binder = (loc_begin, Some id_var, false, None) in
+    (* fun x -> if x ... *)
     let desc = Ptree.Tquant (Dterm.DTlambda, [binder], [], ifte) in
     let t = { term_desc = desc; term_loc = Loc.join loc_begin loc_end } in
     Ptree.Tattr (Ptree.ATstr Ident.funlit, t)
