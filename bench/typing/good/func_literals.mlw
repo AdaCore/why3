@@ -31,6 +31,8 @@ constant f2 : int -> int = [|1 => 1;|]
 constant f3 : int -> int = [|1 => 1;1 => 1;|]
 constant f4 : int -> int = [|_ => 1;|]
 constant f5 : int -> int = [|1 => 1;2 => 2;_ => -1;|]
+constant f6 : int -> real -> string  = [|[|0. => "zero"|];[|1. => "one"; 2. => "two"|]|]
+
 
 let w (x: int) = x + x
 
@@ -55,6 +57,10 @@ let f14 (x: int) : int -> int = [| 2 => 1; 3 => x; -1 => x + 1; _ => 0 |]
 let f15 (x: int) = f13 (x+1)
 
 let function f17 () : int -> int = [|1|]
+
+use real.Real
+
+let f18 () :int -> real -> string  = [|[|0. => "zero"|];[|1. => "one"; 2. => "two"|]|]
 
 use seq.Seq
 function s1 : seq int = create 10 [|1;2;3;4|]
