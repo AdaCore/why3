@@ -238,7 +238,7 @@ The syntax of WhyML terms is given in :token:`term`.
         : | `term` "[" `term` ".." "]" "'"*   ; right-open slice
         : | `term` "[" ".." `term` "]" "'"*   ; left-open slice
         : | "[|" (`term` "=>" `term` ";")* ("_" "=>" `term`)? "|]" ; function literal
-        : | "[|" (`term` ";")* "|]" ; function literal (domain over int)
+        : | "[|" (`term` ";")+ "|]" ; function literal (domain over nat)
         : | `term` `term`+   ; application
         : | `prefix_op` `term`   ; prefix operator
         : | `term` `infix_op_4` `term`   ; infix operator 4
@@ -374,21 +374,17 @@ with normal identifiers, names with a letter after a prime, such as
 ``(+)'spec``, can only be introduced by Why3, and not by the user in a
 WhyML source.
 
-Functions can be written using a special syntax for `function
-literals`. The function literal ``[|t1 => u1; ...; tn => un; _ =>
-default|]``, where ``t1, ..., tn`` have some type ``t`` and ``u1,
-..., un, default`` some type ``u``, represents the term with a total
-function of the form ``fun x -> if x = t1 then u1 else if ... else if
-x = tn then un else default``. The default value can be omitted, and
-thus the function will map non-enumerated values into a
-non-deterministic value with the appropriate type. For instance, the
-function literal ``[|t1 => u1|]`` represents the term ``fun x -> if x
-= t1 then u1 else nondet``, where ``nondet`` is some non-deterministic
-value.
-
-When the domain of the function ranges over the ``int``
-type it is possible to write ``[|t1;t2;t3|]`` instead of ``[|0 => t1;
-1 => t2; 2 => t3|]``.
+WhyML provides a special syntax for `function literals`. The term
+``[|t1 => u1; ...; tn => un; _ => default|]``, where ``t1, ..., tn``
+have some type ``t`` and ``u1, ..., un, default`` some type ``u``,
+represents a total function of the form ``fun x -> if x = t1 then u1
+else if ... else if x = tn then un else default``. The default value
+can be omitted in which case the last value will be taken as the
+default value. For instance, the function literal ``[|t1 => u1|]``
+represents the term ``fun x -> if x = t1 then u1 else u1``. When the
+domain of the function ranges over an initial sequence of the natural
+numbers it is possible to write ``[|t1;t2;t3|]`` as a shortcut for
+``[|0 => t1; 1 => t2; 2 => t3|]``.  Function literals cannot be empty.
 
 .. index:: at; syntax
 .. index:: old; syntax
@@ -563,7 +559,7 @@ conjunction and disjunction, respectively.
         : | `expr` "[" `expr` ".." "]" "'"*   ; right-open slice
         : | `expr` "[" ".." `expr` "]" "'"*   ; left-open slice
         : | "[|" (`expr` "=>" `expr` ";")* ("_" "=>" `expr`)? "|]" ; function literal
-        : | "[|" (`expr` ";")* "|]" ; function literal (domain over int)
+        : | "[|" (`expr` ";")+ "|]" ; function literal (domain over nat)
         : | `expr` `expr`+   ; application
         : | `prefix_op` `expr`   ; prefix operator
         : | `expr` `infix_op_4` `expr`   ; infix operator 4
@@ -736,13 +732,28 @@ loops, with the expected semantics.
 .. index:: collections; syntax; function literals
 .. rubric:: Function literals
 
-Function literals can be used in expressions and have the same syntax
-as function literals in terms. However, when writing function literal
-expressions it is required that equality is defined for the type of
-the function literal's domain. For the expression ``[|t1 => u1|]`` to
-be well typed, if ``t1`` is of type ``t`` then a function ``val (=) (_
-_: t): bool`` should be visible in the current scope. This problem
-does not appear in terms because equality is polymorphic.
+Function literals can be written in expressions the same way as they
+are in terms but there are a few subtleties that one must bear in
+mind. First of all, if the domain of the literal is of type ``t`` then
+an equality infix operator ``=`` should exist. For instance, the
+literal ``[|t1 => u1|]`` with ``t1`` of type ``t``, is only considered
+well typed if the infix operator ``=`` of type ``t -> t -> bool`` is
+visible in the current scope. This problem does not exist in terms
+because the equality in terms is polymorphic.
+
+Second, the function literal expression ``[|t1 => u1; t2 => u2; _ =>
+u3|]`` will be translated into the following expression:
+
+.. code-block:: whyml
+
+    let def'e = u3 in
+    let d'i1 = t2 in
+    let r'i1 = u2 in
+    let d'i0 = t1 in
+    let r'i0 = u1 in
+    fun x'x -> if x'x = d'i0 then r'i0 else
+               if x'x = d'i1 then r'i1 else
+               def'e
 
 Modules
 -------
