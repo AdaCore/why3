@@ -462,15 +462,9 @@ module Make(E: sig
        let constraints = QDom.meet_term manpk term in
        new_hedge_cfg cfg begin_cp end_cp (fun _ -> constraints);
        begin_cp, end_cp, []
-    | Eassert _ ->
+    | Eassert _ | Eabsurd ->
        let node = new_node_cfg cfg expr in
        node, node, []
-    | Eabsurd ->
-       let begin_cp = new_node_cfg cfg expr ~lbl:"absurd bgn" in
-       let end_cp   = new_node_cfg cfg expr ~lbl:"absurd end" in
-       let constraints = QDom.meet_term manpk t_false in
-       new_hedge_cfg cfg begin_cp end_cp (fun _ -> constraints);
-       begin_cp, end_cp, []
     | Eghost e -> put_expr_in_cfg ~ret cfg manpk e
     | Efor (pv, (lo, dir, up), _, _, e) ->
        (* . before_loop
