@@ -263,7 +263,10 @@ rule token = parse
   | op_char_4+ as s
       { OP4 s }
   | "\""
-      { STRING (Lexlib.string lexbuf) }
+      { let start = lexbuf.Lexing.lex_start_p in
+        let s = Lexlib.string lexbuf in
+        lexbuf.Lexing.lex_start_p <- start;
+        STRING s }
   | eof
       { EOF }
   | _ as c
