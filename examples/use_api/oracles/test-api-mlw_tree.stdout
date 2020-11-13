@@ -9,8 +9,8 @@ module M2
   
   let f (x : int)
     requires { x = 6 }
-    ensures { result = 42 } =
-    Int.( * ) x 7
+    ensures { result = 42 }
+  = Int.( * ) x 7
 end
 
 module M3
@@ -18,8 +18,8 @@ module M3
   use  ref.Ref
   
   let f (_ : ())
-    ensures { Int.( >= ) result 0 } =
-    let x = Ref.ref 42 in Ref.( ! ) x
+    ensures { Int.( >= ) result 0 }
+  = let x = Ref.ref 42 in Ref.( ! ) x
 end
 
 module M4
@@ -28,8 +28,8 @@ module M4
   
   let f (a : Array.array int)
     requires { Int.( >= ) (a.Array.length) 1 }
-    ensures { (Array.( [] ) a 0) = 42 } =
-    Array.( []<- ) a 0 42
+    ensures { (Array.( [] ) a 0) = 42 }
+  = Array.( []<- ) a 0 42
 end
 module M5
   use  int.Int
@@ -37,8 +37,8 @@ module M5
   
   let f (a : Array.array int)
     requires { Int.( >= ) (a.Array.length) 1 }
-    ensures { (Array.( [] ) a 0) = 42 } =
-    Array.( []<- ) a 0 42
+    ensures { (Array.( [] ) a 0) = 42 }
+  = Array.( []<- ) a 0 42
 end
 module M6
   use  int.Int
@@ -46,7 +46,7 @@ module M6
   
   let f (a : Array.array int)
     requires { Int.( >= ) (a.Array.length) 1 }
-    ensures { (Array.( [] ) a 0) = 42 } =
-    Array.( []<- ) a 0 42
+    ensures { (Array.( [] ) a 0) = 42 }
+  = Array.( []<- ) a 0 42
 end
 On task 1, alt-ergo answers Valid (0.0xs, 8 steps)

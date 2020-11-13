@@ -4,8 +4,8 @@ module M1
   
   let f [@infer] (x : ref int)
     requires { Int.( <= ) (Refint.( ! ) x) 100 }
-    ensures { (Refint.( ! ) x) = 100 } =
-    while Int.( < ) (Refint.( ! ) x) 100 do
+    ensures { (Refint.( ! ) x) = 100 }
+  = while Int.( < ) (Refint.( ! ) x) 100 do
       variant { Int.( - ) 100 (Refint.( ! ) x) }
       Refint.incr x
     done
