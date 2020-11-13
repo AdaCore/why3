@@ -136,7 +136,8 @@ let pp_attr fmt = function
   | ATstr att -> fprintf fmt "[@%s]" att.Ident.attr_string
   | ATpos loc ->
       let filename, line, bchar, echar = Loc.get loc in
-      fprintf fmt "[#%S %d %d %d]" filename line bchar echar
+      fprintf fmt "[#%S %d %d %d]%a" filename line bchar echar
+        pp_maybe_marker loc
 
 let pp_id fmt (id: ident) =
   let pp_decode fmt str =
