@@ -12,9 +12,17 @@
 open Format
 open Ptree
 
+let debug_print_ids = Debug.register_flag "mlw_printer_print_ids"
+    ~desc:"Print@ IDs@ (the@ line@ number@ of@ locations@ when@ the@ filename@ is@ empty)"
+
 type 'a printers = { marked: 'a Pp.pp; closed: 'a Pp.pp }
 
 let marker = ref None
+
+let pp_loc_id fmt loc =
+  if Debug.test_flag debug_print_ids then
+    let f,l,_,_ = Loc.get loc in
+    if f = "" then fprintf fmt "(*%d*)" l
 
 let with_marker ?(msg="XXX") loc pp fmt x =
   marker := Some (msg, loc);
@@ -23,25 +31,27 @@ let with_marker ?(msg="XXX") loc pp fmt x =
 
 let marker loc =
   match !marker with
-  | Some (msg, loc') when loc' = loc ->
+  | Some (msg, loc') when Loc.equal loc' loc ->
       Some msg
   | _ -> None
 
 let pp_maybe_marker fmt loc =
+  pp_loc_id fmt loc;
   match marker loc with
   | Some msg ->
       fprintf fmt "(*%s*)@ " msg
   | None -> ()
 
 let pp_maybe_marked ?(parens=true) loc pp_raw fmt x =
-  match marker (loc x) with
+  let loc = loc x in
+  match marker loc with
   | Some msg ->
       if parens then
-        fprintf fmt "(*%s*)@ @[(%a)@]" msg pp_raw x
+        fprintf fmt "%a(*%s*)@ (%a)" pp_loc_id loc msg pp_raw x
       else
-        fprintf fmt "(*%s*)@ @[%a@]" msg pp_raw x
+        fprintf fmt "%a(*%s*)@ %a" pp_loc_id loc msg pp_raw x
   | None ->
-      pp_raw fmt x
+      fprintf fmt "%a%a" pp_loc_id loc pp_raw x
 
 let next_pos =
   let counter = ref 0 in
