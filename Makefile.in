@@ -2065,10 +2065,6 @@ clean::
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
-# src/tools/why3pretty.cmx: %.cmx: %.ml
-# 	$(SHOW) 'Ocamlopt $<'
-# 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
-
 %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $(CMIHACK) $<

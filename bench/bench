@@ -359,13 +359,13 @@ list_stuff () {
 }
 
 test_mlw_printer () {
-    why3pp="bin/why3$suffix pp"
+    why3="bin/why3$suffix"
     if ! python3 -m sexpdata 2> /dev/null; then
         echo "Skipping (Python module sexpdata not installed)" >&2
         return
     fi
-    if ! "$why3pp" --output=sexp <(echo '') > /dev/null 2>&1; then
-        echo 'Skipping (s-exp output unavailable for why3pp)' >&2
+    if ! "$why3" pp --output=sexp <(echo '') > /dev/null 2>&1; then
+        echo "Skipping (s-exp output unavailable in Why3)" >&2
         return
     fi
     find stdlib examples bench -name '*.mlw' \
@@ -375,7 +375,7 @@ test_mlw_printer () {
          -not -path "examples/in_progress/*" |
     sort | \
     while read filename; do
-        bench/test_mlw_printer "$why3pp" "$filename" || exit 1
+        bench/test_mlw_printer "$why3" "$filename" || exit 1
     done
 }
 
