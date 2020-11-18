@@ -439,11 +439,27 @@ File multifile2.mlw:
               Line 19:
                 result = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
+<rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Result of checking model 0:
-            - Concrete: don't know (Concrete RAC terminated because function incr_val has no definition)
-              
+            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File multifile2.mlw:
+                Line 18:
+                  x = 0
+                  Concrete execution of h with args:
+                    x = 0
+                Line 20:
+                  Concrete execution of incr_val with args:
+                    x = 0
+                  (abstract) execution of any function with args:
+                    x = 0
+                  result = 0
+              File multifile1.mlw:
+                Line 14:
+                  Execution got stuck, Assume postcondition of incr_val with:
+                    x = 0
+                    result = 0
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
               File multifile2.mlw:
                 Line 18:
@@ -472,11 +488,27 @@ File multifile2.mlw:
                 result = {"type": "Integer", "val": "1"}
                 x = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
+<rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Result of checking model 1:
-            - Concrete: don't know (Concrete RAC terminated because function incr_val has no definition)
-              
+            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File multifile2.mlw:
+                Line 18:
+                  x = 0
+                  Concrete execution of h with args:
+                    x = 0
+                Line 20:
+                  Concrete execution of incr_val with args:
+                    x = 0
+                  (abstract) execution of any function with args:
+                    x = 0
+                  result = 0
+              File multifile1.mlw:
+                Line 14:
+                  Execution got stuck, Assume postcondition of incr_val with:
+                    x = 0
+                    result = 0
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
               File multifile2.mlw:
                 Line 18:
@@ -505,11 +537,27 @@ File multifile2.mlw:
                 result = {"type": "Integer", "val": "1"}
                 x = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
+<rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Result of checking model 2:
-            - Concrete: don't know (Concrete RAC terminated because function incr_val has no definition)
-              
+            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File multifile2.mlw:
+                Line 18:
+                  x = 0
+                  Concrete execution of h with args:
+                    x = 0
+                Line 20:
+                  Concrete execution of incr_val with args:
+                    x = 0
+                  (abstract) execution of any function with args:
+                    x = 0
+                  result = 0
+              File multifile1.mlw:
+                Line 14:
+                  Execution got stuck, Assume postcondition of incr_val with:
+                    x = 0
+                    result = 0
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
               File multifile2.mlw:
                 Line 18:
@@ -526,28 +574,15 @@ File multifile2.mlw:
                     x = 0
                     result = 0
 <check-ce>Models:
-- Checked model 0 (Concrete: don't know, Abstract: bad model)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because function incr_val has no definition)
-- Checked model 1 (Concrete: don't know, Abstract: bad model)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because function incr_val has no definition)
-- Selected model 2 (Concrete: don't know, Abstract: bad model)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because function incr_val has no definition)
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Checked model 1 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 2 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/multifile2.mlw", line 19, characters 12-26:
 Goal Postcondition from verification condition h'vc.
 Prover result is: unknown (sat) (0.01s, 878 steps).
-The following counterexample model could not be verified
-  (Concrete RAC terminated because function incr_val has no definition):
-File multifile1.mlw:
-  Line 14:
-    result = 1 (0x1)
-    x = 0 (0x0)
-File multifile2.mlw:
-  Line 18:
-    x = 0 (0x0)
-  Line 19:
-    result = 1 (0x1)
-    x = 0 (0x0)
+Sorry, we don't have a good counterexample for you :(
+
 

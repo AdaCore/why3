@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.02s, 1582 steps).
+Prover result is: valid (0.04s, 1582 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Validating model:
@@ -40,10 +40,10 @@ Prover result is: valid (0.02s, 1582 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
@@ -51,7 +51,8 @@ Prover result is: valid (0.02s, 1582 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -75,7 +76,8 @@ Prover result is: valid (0.02s, 1582 steps).
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call.mlw", line 7, characters 12-21)
               File func_call.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -132,10 +134,10 @@ Prover result is: valid (0.02s, 1582 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
@@ -143,7 +145,8 @@ Prover result is: valid (0.02s, 1582 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -167,7 +170,8 @@ Prover result is: valid (0.02s, 1582 steps).
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -223,10 +227,10 @@ Prover result is: valid (0.02s, 1582 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/func_call.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
@@ -234,7 +238,8 @@ Prover result is: valid (0.02s, 1582 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File func_call.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -258,7 +263,8 @@ Prover result is: valid (0.02s, 1582 steps).
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File func_call.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -285,12 +291,13 @@ Prover result is: valid (0.02s, 1582 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.02s, 6620 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6620 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File func_call.mlw:
   Line 3:
-    execution of any, result: 0
+    (abstract) execution of any function
+    result = 0
     Concrete execution of ref with args:
       contents = 0
     Concrete execution of ref'mk with args:

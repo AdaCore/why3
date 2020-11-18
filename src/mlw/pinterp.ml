@@ -364,7 +364,7 @@ module type Log = sig
     | Val_assumed of (ident * value)
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
-    | Exec_any of value
+    | Exec_any of value Mvs.t
     | Exec_loop of exec_kind
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -383,7 +383,7 @@ module type Log = sig
                  exec_kind -> Loc.position option -> unit
   val log_pure_call : log_uc -> lsymbol -> exec_kind ->
                       Loc.position option -> unit
-  val log_any_call : log_uc -> value -> Loc.position option -> unit
+  val log_any_call : log_uc -> value Mvs.t -> Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
                    Loc.position option -> unit
   val log_stucked : log_uc -> string -> value Mid.t ->
@@ -404,7 +404,7 @@ module Log : Log = struct
     | Val_assumed of (ident * value)
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
-    | Exec_any of value
+    | Exec_any of value Mvs.t
     | Exec_loop of exec_kind
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -503,8 +503,13 @@ module Log : Log = struct
     | Exec_pure (ls,k) ->
         fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
           print_decoded ls.ls_name.id_string
-    | Exec_any v ->
-       fprintf fmt "@[<h>execution of any, result: %a@]" print_value v
+    | Exec_any mvs ->
+       if Mvs.is_empty mvs then
+         fprintf fmt "@[<h>(abstract) execution of any function@]"
+       else
+         fprintf fmt
+           "@[<h2>(abstract) execution of any function with args:%a@]"
+           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_loop k ->
         fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
     | Exec_failed (msg,mid) ->
@@ -550,10 +555,11 @@ module Log : Log = struct
               (print_json_field "kind" print_json) (string "EXEC_PURE")
               (print_json_field "ls" print_json) (string "%a" print_ls ls)
               (print_json_field "exec" print_json_kind) kind
-        | Exec_any v ->
+        | Exec_any mvs ->
             fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
               (print_json_field "kind" print_json) (string "EXEC_ANY")
-              (print_json_field "value" print_value) v
+              (print_json_field "args" (list (print_key_value vs2string)))
+              (Mvs.bindings mvs)
         | Exec_loop kind ->
             fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
           (print_json_field "kind" print_json) (string "EXEC_LOOP")
@@ -668,8 +674,8 @@ let register_call env loc rs mvs kind =
 let register_pure_call env loc ls kind =
   Log.log_pure_call env.rac.log_uc ls kind loc
 
-let register_any_call env loc value =
-  Log.log_any_call env.rac.log_uc (snapshot value) loc
+let register_any_call env loc mvs =
+  Log.log_any_call env.rac.log_uc mvs loc
 
 let register_failure env loc reason mvs =
   Log.log_failed env.rac.log_uc reason mvs loc
@@ -1778,21 +1784,8 @@ and eval_expr' env e =
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
           | _ -> failwith "many args for exec fun" (* TODO *) )
       | Cany ->
-          let value =
-            match env.rac.get_value ?loc:e.e_loc e.e_ity with
-            | Some v -> v
-            | None ->
-               let v = default_value_of_type env.env env.mod_known e.e_ity in
-               let pp_loc fmt loc =
-                 if loc <> None then
-                   fprintf fmt " at %a" (Pp.print_option print_loc') loc in
-               Debug.dprintf debug_rac_values "@[<h>Choose default value %a for any-expression of type %a%a@]@."
-                 print_value v print_ity e.e_ity pp_loc e.e_loc;
-               v in
-          register_any_call env e.e_loc value;
-          (* register_used_value env e.e_loc (id_register (id_fresh ?loc:e.e_loc "ANY")) v; *)
-          (* check_posts "Exec postcondition" e.e_loc env v cty.cty_post; *)
-          Normal value
+         register_any_call env e.e_loc Mvs.empty;
+         exec_call_abstract ?loc:e.e_loc env cty [] e.e_ity
       | Capp (rs, pvsl) when Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.mod_known) = Some true ->
           assert (cty.cty_args = [] && pvsl = []);
           let v = Mrs.find rs env.rsenv in
@@ -2151,9 +2144,9 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                     let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
                     eval_expr env' body
                 | Cany ->
-                    Debug.dprintf debug_trace_exec  "@[<hv2>%tEXEC CALL %a: ANY@]@."
-                      pp_indent print_rs rs;
-                    cannot_compute "function %a has no definition" print_rs rs
+                    register_any_call env loc mvs;
+                    let rs_name,cty = rs.rs_name, rs.rs_cty in
+                    exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
                 | Cpur _ -> assert false (* TODO ? *) )
             | Builtin f ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;

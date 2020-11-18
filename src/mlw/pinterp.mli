@@ -50,7 +50,7 @@ module type Log = sig
     | Val_assumed of (ident * value)
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
-    | Exec_any of value
+    | Exec_any of value Mvs.t
     | Exec_loop of exec_kind
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -69,7 +69,7 @@ module type Log = sig
                  exec_kind -> Loc.position option -> unit
   val log_pure_call : log_uc -> lsymbol -> exec_kind ->
                       Loc.position option -> unit
-  val log_any_call : log_uc -> value -> Loc.position option -> unit
+  val log_any_call : log_uc -> value Mvs.t -> Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
                    Loc.position option -> unit
   val log_stucked : log_uc -> string -> value Mid.t ->

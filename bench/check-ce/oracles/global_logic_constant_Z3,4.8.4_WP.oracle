@@ -4,16 +4,17 @@
             Line 8:
               result = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File global_logic_constant.mlw:
                 Line 5:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                 Line 7:
                   _ = ()
                   Concrete execution of f1 with args:
@@ -22,7 +23,8 @@
             - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
               File global_logic_constant.mlw:
                 Line 5:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                 Line 7:
                   _ = ()
                   Concrete execution of f1 with args:
@@ -125,20 +127,22 @@ File global_logic_constant.mlw:
             Line 14:
               result = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 11, characters 12-17
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 11, characters 12-17, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 11, characters 12-17
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 11, characters 12-17, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File global_logic_constant.mlw:
                 Line 5:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                 Line 11:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -155,9 +159,11 @@ File global_logic_constant.mlw:
             - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
               File global_logic_constant.mlw:
                 Line 5:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                 Line 11:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -184,16 +190,17 @@ File global_logic_constant.mlw:
             Line 14:
               result = {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File global_logic_constant.mlw:
                 Line 5:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                 Line 11:
                   v2 = (ref'mk 2)
                 Line 13:
@@ -209,7 +216,8 @@ File global_logic_constant.mlw:
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File global_logic_constant.mlw:
                 Line 5:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                 Line 11:
                   v2 = (ref'mk 2)
                 Line 13:
@@ -235,16 +243,17 @@ File global_logic_constant.mlw:
             Line 14:
               result = {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22
+<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File global_logic_constant.mlw:
                 Line 5:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                 Line 11:
                   v2 = (ref'mk 2)
                 Line 13:
@@ -260,7 +269,8 @@ File global_logic_constant.mlw:
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File global_logic_constant.mlw:
                 Line 5:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                 Line 11:
                   v2 = (ref'mk 2)
                 Line 13:
@@ -282,12 +292,13 @@ File global_logic_constant.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24:
 Goal Postcondition from verification condition f2'vc.
-Prover result is: timeout (1.00s, 7472249 steps).
+Prover result is: timeout (1.00s, 5797788 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File global_logic_constant.mlw:
   Line 5:
-    execution of any, result: 0
+    (abstract) execution of any function
+    result = 0
   Line 11:
     v2 = (ref'mk 2)
   Line 13:

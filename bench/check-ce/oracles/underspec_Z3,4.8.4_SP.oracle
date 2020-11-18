@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.00s, 58 steps).
+Prover result is: valid (0.02s, 58 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Validating model:
@@ -312,7 +312,7 @@ Prover result is: valid (0.00s, 58 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 7169216 steps).
+Prover result is: timeout (1.00s, 5748557 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File underspec.mlw:
@@ -350,11 +350,11 @@ File underspec.mlw:
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.00s, 2384 steps).
+Prover result is: valid (0.01s, 2384 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.01s, 2283 steps).
+Prover result is: valid (0.00s, 2283 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Validating model:
@@ -376,10 +376,10 @@ Prover result is: valid (0.01s, 2283 steps).
             Line 47:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/underspec.mlw", line 37, characters 11-16
+<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/underspec.mlw", line 37, characters 11-16
+<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8: (ref'mk 0)
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
@@ -387,7 +387,8 @@ Prover result is: valid (0.01s, 2283 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File underspec.mlw:
                 Line 37:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -411,7 +412,8 @@ Prover result is: valid (0.01s, 2283 steps).
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 41, characters 14-23)
               File underspec.mlw:
                 Line 37:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -468,10 +470,10 @@ Prover result is: valid (0.01s, 2283 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/underspec.mlw", line 37, characters 11-16
+<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/underspec.mlw", line 37, characters 11-16
+<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8: (ref'mk 2)
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
@@ -479,7 +481,8 @@ Prover result is: valid (0.01s, 2283 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File underspec.mlw:
                 Line 37:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -503,7 +506,8 @@ Prover result is: valid (0.01s, 2283 steps).
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File underspec.mlw:
                 Line 37:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -559,10 +563,10 @@ Prover result is: valid (0.01s, 2283 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/underspec.mlw", line 37, characters 11-16
+<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/underspec.mlw", line 37, characters 11-16
+<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8: (ref'mk 2)
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
@@ -570,7 +574,8 @@ Prover result is: valid (0.01s, 2283 steps).
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File underspec.mlw:
                 Line 37:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -594,7 +599,8 @@ Prover result is: valid (0.01s, 2283 steps).
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File underspec.mlw:
                 Line 37:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -621,12 +627,13 @@ Prover result is: valid (0.01s, 2283 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 6699155 steps).
+Prover result is: timeout (1.00s, 5989716 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File underspec.mlw:
   Line 37:
-    execution of any, result: 0
+    (abstract) execution of any function
+    result = 0
     Concrete execution of ref with args:
       contents = 0
     Concrete execution of ref'mk with args:

@@ -11,16 +11,17 @@
             Line 9:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter x, continue with default value 0.
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter x, continue with default value 0.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous2.mlw", line 6, characters 13-18)
               File anonymous2.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -35,7 +36,8 @@
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous2.mlw", line 6, characters 13-18)
               File anonymous2.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -67,16 +69,17 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
 <rac-values>Value imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
 <rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous2.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -98,7 +101,8 @@
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File anonymous2.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -135,16 +139,17 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
 <check-ce>Interpreting abstractly
-<rac-values>Choose default value 0 for any-expression of type int at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14
+<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
 <rac-values>Value imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
 <rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File anonymous2.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -166,7 +171,8 @@
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File anonymous2.mlw:
                 Line 3:
-                  execution of any, result: 0
+                  (abstract) execution of any function
+                  result = 0
                   Concrete execution of ref with args:
                     contents = 0
                   Concrete execution of ref'mk with args:
@@ -192,12 +198,13 @@
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous2.mlw", line 9, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 7656827 steps).
+Prover result is: timeout (1.00s, 6182477 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File anonymous2.mlw:
   Line 3:
-    execution of any, result: 0
+    (abstract) execution of any function
+    result = 0
     Concrete execution of ref with args:
       contents = 0
     Concrete execution of ref'mk with args:
