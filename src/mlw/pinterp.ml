@@ -394,7 +394,7 @@ module type Log = sig
   val empty_log : exec_log
   val close_log : log_uc -> exec_log
   val sort_log_by_loc : exec_log -> log_entry list Mint.t Mstr.t
-  val print_log : json:bool -> exec_log Pp.pp
+  val print_log : ?verb_lvl:int -> json:bool -> exec_log Pp.pp
 end
 
 module Log : Log = struct
@@ -474,6 +474,12 @@ module Log : Log = struct
         | Some _ ->
             consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
 
+  (** verbosity level:
+     1 : just imported values
+     2 : + execution of function calls
+     3 : + execution of loops
+     4 : + termination of execution
+   *)
   let print_log_entry_desc fmt e =
     let print_assgn key2string fmt (k,v) =
       fprintf fmt "@[%a = %a@]"
@@ -510,7 +516,7 @@ module Log : Log = struct
     | Exec_ended ->
         fprintf fmt "@[<h>Execution of main function terminated normally@]"
 
-  let print_log ~json fmt entry_log =
+  let print_log ?(verb_lvl=4) ~json fmt entry_log =
     if json then
       let open Json_base in
       let string f = kasprintf (fun s -> String s) f in
@@ -575,6 +581,12 @@ module Log : Log = struct
       fprintf fmt "@[@[<hv1>[%a@]@]"
         Pp.(print_list comma print_json_entry) entry_log
     else
+      let entry_log = List.filter (fun le -> match le.log_desc with
+        | Val_assumed _ -> true
+        | Exec_call _ | Exec_pure _ | Exec_any _ when verb_lvl > 1 -> true
+        | Exec_loop _ when verb_lvl > 2 -> true
+        | Exec_failed _ | Exec_stucked _ | Exec_ended when verb_lvl > 3 -> true
+        | _ -> false) entry_log in
       let entry_log =
         let on_file e = Opt.map (fun (f,_,_,_) -> f) (Opt.map Loc.get e.log_loc) in
         let on_line e = Opt.map (fun (_,l,_,_) -> l) (Opt.map Loc.get e.log_loc) in

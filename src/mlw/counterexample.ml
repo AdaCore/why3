@@ -101,20 +101,20 @@ let print_ce_summary_title ?check_ce fmt = function
         fprintf fmt "The@ following@ counterexample@ model@ has@ not@ \
                      been@ verified@ (%s)" reason
 
-let print_ce_summary_values ~json ~print_attrs model fmt s =
+let print_ce_summary_values ?verb_lvl ~json ~print_attrs model fmt s =
   let open Json_base in
   let open Model_parser in
   let print_model_field =
     print_json_field "model"
       (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
   let print_log_field =
-    print_json_field "log" (Log.print_log ~json:true) in
+    print_json_field "log" (Log.print_log ?verb_lvl ~json:true) in
   match s with
   | NCCE log | SWCE log | NCCE_SWCE log ->
       if json then
         fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
           print_model_field model print_log_field log
-      else fprintf fmt "@[%a@]" (Log.print_log ~json:false) log
+      else fprintf fmt "@[%a@]" (Log.print_log ?verb_lvl ~json:false) log
   | UNKNOWN _ ->
      if json then
        fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
@@ -140,20 +140,21 @@ let print_verdict fmt = function
   | Bad_model -> fprintf fmt "bad model"
   | Dont_know -> fprintf fmt "don't know"
 
-let print_full_verdict fmt v =
+let print_full_verdict ?verb_lvl fmt v =
   fprintf fmt "%a (%s)@,%a"
-    print_verdict v.verdict v.reason (Log.print_log ~json:false) v.exec_log
+    print_verdict v.verdict v.reason (Log.print_log ?verb_lvl ~json:false) v.exec_log
 
 type check_model_result =
   | Cannot_check_model of {reason: string}
   | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
 
-let print_check_model_result fmt = function
+let print_check_model_result ?verb_lvl fmt = function
   | Cannot_check_model r ->
       fprintf fmt "@[Cannot check model (%s)@]" r.reason
   | Check_model_result r ->
       fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@\n@[<hv2>- Abstract: %a@]@]"
-        print_full_verdict r.concrete print_full_verdict r.abstract
+        (print_full_verdict ?verb_lvl) r.concrete
+        (print_full_verdict ?verb_lvl) r.abstract
 
 let ce_summary v_concrete v_abstract =
   match v_concrete.verdict, v_abstract.verdict with
@@ -165,7 +166,7 @@ let ce_summary v_concrete v_abstract =
   | Bad_model , Dont_know  -> UNKNOWN v_abstract.reason
   | Bad_model , Bad_model  -> BAD_CE
 
-let print_counterexample ?check_ce ?(json=false) fmt (model,ce_summary) =
+let print_counterexample ?verb_lvl ?check_ce ?(json=false) fmt (model,ce_summary) =
   if not (Model_parser.is_model_empty model) then
     fprintf fmt "@ @[<hov2>%a%t@]"
       (print_ce_summary_title ?check_ce) ce_summary
@@ -177,7 +178,7 @@ let print_counterexample ?check_ce ?(json=false) fmt (model,ce_summary) =
            fprintf fmt ":"
         | _ -> ());
   fprintf fmt "@ %a"
-    (print_ce_summary_values ~print_attrs:false ~json model) ce_summary
+    (print_ce_summary_values ?verb_lvl ~print_attrs:false ~json model) ce_summary
 
 (* Import values from solver counterexample model *)
 
@@ -502,7 +503,7 @@ let print_dbg_model selected_ix fmt (i,_,_,mr,s) =
         print_verdict r.abstract.verdict
         (print_ce_summary_title ?check_ce:None) s
 
-let select_model ?(check=false) ?(reduce_config=rac_reduce_config ())
+let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     ?(sort_models=prioritize_first_good_model) env pmodule models =
   let check_model =
     if check then check_model reduce_config env pmodule
@@ -525,7 +526,7 @@ let select_model ?(check=false) ?(reduce_config=rac_reduce_config ())
        *   (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) m; *)
       let mr = check_model m in
       Debug.dprintf debug_check_ce "@[<v2>Result of checking model %d:@\n@[%a@]@]@." i
-        print_check_model_result mr;
+        (print_check_model_result ?verb_lvl) mr;
       i,r,m,mr in
     List.map add_check_model_result models in
   let models =

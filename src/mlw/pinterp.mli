@@ -80,7 +80,7 @@ module type Log = sig
   val empty_log : exec_log
   val close_log : log_uc -> exec_log
   val sort_log_by_loc : exec_log -> log_entry list Mint.t Mstr.t
-  val print_log : json:bool -> exec_log Pp.pp
+  val print_log : ?verb_lvl:int -> json:bool -> exec_log Pp.pp
 end
 
 module Log : Log

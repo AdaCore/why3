@@ -39,7 +39,7 @@ type check_model_result = private
   | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
   (* the model was checked *)
 
-val print_check_model_result : check_model_result Pp.pp
+val print_check_model_result : ?verb_lvl:int -> check_model_result Pp.pp
 
 val check_model :
   rac_reduce_config -> Env.env -> pmodule -> model -> check_model_result
@@ -56,7 +56,7 @@ val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 val print_ce_summary_kind : ce_summary Pp.pp
 
 val print_counterexample :
-  ?check_ce:bool -> ?json:bool -> (model * ce_summary) Pp.pp
+  ?verb_lvl:int -> ?check_ce:bool -> ?json:bool -> (model * ce_summary) Pp.pp
 
 (** {2 Model selection} *)
 
@@ -64,8 +64,9 @@ type sort_models
 (** Sort solver models in [select_model]. *)
 
 val select_model :
-  ?check:bool -> ?reduce_config:rac_reduce_config -> ?sort_models:sort_models ->
-  Env.env -> pmodule -> (Call_provers.prover_answer * model) list ->
+  ?verb_lvl:int -> ?check:bool -> ?reduce_config:rac_reduce_config ->
+  ?sort_models:sort_models -> Env.env -> pmodule ->
+  (Call_provers.prover_answer * model) list ->
   (model * ce_summary) option
 (** [select ~check ~conservative ~reduce_config env pm ml] chooses a
     model from [ml]. [check] is set to false by default and indicates if

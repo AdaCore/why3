@@ -31,6 +31,7 @@ let opt_metas = ref []
 let opt_json = ref None
 let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
+let opt_ce_check_verbosity = ref None
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -126,6 +127,8 @@ let option_list =
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
     "with optional, space-separated time and memory limit (e.g. 'cvc4 2 1000')";
+    Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
+    "<lvl> verbosity level for interpretation log of counterexample solver model";
     KLong "all-json", Hnd0 (fun () -> opt_json := Some `All),
     " print output in JSON format";
     KLong "json", Hnd0 (fun () -> opt_json := Some `Model),
@@ -264,7 +267,7 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
     Call_provers.print_prover_result ?json fmt res;
     (match ce with
      | Some ce ->
-        Counterexample.print_counterexample
+        Counterexample.print_counterexample ?verb_lvl:!opt_ce_check_verbosity
           ~check_ce:!opt_check_ce_model ~json:(json = Some `Model) fmt ce
      | None -> ());
     fprintf fmt "@\n" )
@@ -284,7 +287,9 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let reduce_config =
           let trans = "compute_in_goal" and prover = !opt_rac_prover in
           Pinterp.rac_reduce_config_lit config env ~trans ?prover () in
-        let ce = Counterexample.select_model ~check:!opt_check_ce_model
+        let ce = Counterexample.select_model
+                   ?verb_lvl:!opt_ce_check_verbosity
+                   ~check:!opt_check_ce_model
                    ~reduce_config env (Pmodule.restore_module th)
                    res.pr_models in
         let t = task_goal_fmla task in
