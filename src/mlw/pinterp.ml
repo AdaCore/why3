@@ -364,7 +364,7 @@ module type Log = sig
     | Val_assumed of (ident * value)
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
-    | Exec_any of value Mvs.t
+    | Exec_any of (rsymbol option * value Mvs.t)
     | Exec_loop of exec_kind
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -383,7 +383,8 @@ module type Log = sig
                  exec_kind -> Loc.position option -> unit
   val log_pure_call : log_uc -> lsymbol -> exec_kind ->
                       Loc.position option -> unit
-  val log_any_call : log_uc -> value Mvs.t -> Loc.position option -> unit
+  val log_any_call : log_uc -> rsymbol option -> value Mvs.t ->
+                     Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
                    Loc.position option -> unit
   val log_stucked : log_uc -> string -> value Mid.t ->
@@ -404,7 +405,7 @@ module Log : Log = struct
     | Val_assumed of (ident * value)
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
-    | Exec_any of value Mvs.t
+    | Exec_any of (rsymbol option * value Mvs.t)
     | Exec_loop of exec_kind
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -437,8 +438,8 @@ module Log : Log = struct
   let log_pure_call log_uc ls kind loc =
     log_entry log_uc (Exec_pure (ls,kind)) loc
 
-  let log_any_call log_uc s loc =
-    log_entry log_uc (Exec_any s) loc
+  let log_any_call log_uc rs mvs loc =
+    log_entry log_uc (Exec_any (rs,mvs)) loc
 
   let log_failed log_uc s mvs loc =
     log_entry log_uc (Exec_failed (s,mvs)) loc
@@ -503,12 +504,12 @@ module Log : Log = struct
     | Exec_pure (ls,k) ->
         fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
           print_decoded ls.ls_name.id_string
-    | Exec_any mvs ->
-       if Mvs.is_empty mvs then
-         fprintf fmt "@[<h>(abstract) execution of any function@]"
-       else
+    | Exec_any (rs,mvs) ->
          fprintf fmt
-           "@[<h2>(abstract) execution of any function with args:%a@]"
+           "@[<h2>(abstract) execution of any function%s%a%s%a@]"
+           (if rs = None then "" else " ")
+           (Pp.print_option Pp.string) (Opt.map (fun rs -> rs.rs_name.id_string) rs)
+           (if Mvs.is_empty mvs then "" else " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
     | Exec_loop k ->
         fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
@@ -555,9 +556,12 @@ module Log : Log = struct
               (print_json_field "kind" print_json) (string "EXEC_PURE")
               (print_json_field "ls" print_json) (string "%a" print_ls ls)
               (print_json_field "exec" print_json_kind) kind
-        | Exec_any mvs ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+        | Exec_any (ors,mvs) ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
               (print_json_field "kind" print_json) (string "EXEC_ANY")
+              (print_json_field "rs" print_json) (match ors with
+                  | Some rs -> string "%a" print_decoded rs.rs_name.id_string
+                  | None -> Null)
               (print_json_field "args" (list (print_key_value vs2string)))
               (Mvs.bindings mvs)
         | Exec_loop kind ->
@@ -674,8 +678,8 @@ let register_call env loc rs mvs kind =
 let register_pure_call env loc ls kind =
   Log.log_pure_call env.rac.log_uc ls kind loc
 
-let register_any_call env loc mvs =
-  Log.log_any_call env.rac.log_uc mvs loc
+let register_any_call env loc rs mvs =
+  Log.log_any_call env.rac.log_uc rs mvs loc
 
 let register_failure env loc reason mvs =
   Log.log_failed env.rac.log_uc reason mvs loc
@@ -1784,7 +1788,7 @@ and eval_expr' env e =
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
           | _ -> failwith "many args for exec fun" (* TODO *) )
       | Cany ->
-         register_any_call env e.e_loc Mvs.empty;
+         register_any_call env e.e_loc None Mvs.empty;
          exec_call_abstract ?loc:e.e_loc env cty [] e.e_ity
       | Capp (rs, pvsl) when Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.mod_known) = Some true ->
           assert (cty.cty_args = [] && pvsl = []);
@@ -2101,19 +2105,25 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
     else Log.ExecConcrete in
   let mvs = let aux pv v = pv.pv_vs, snapshot v in
     Mvs.of_list (List.map2 aux rs.rs_cty.cty_args arg_vs) in
-  register_call env loc (Some rs) mvs exec_kind;
-  if env.rac.do_rac then (
-    let desc = cntr_desc "Precondition" rs.rs_name in
-    let ctx = cntr_ctx desc ?trigger_loc:loc env in
-    if main_function then check_assume_terms ctx rs.rs_cty.cty_pre
-    else check_terms ctx rs.rs_cty.cty_pre );
+  let check_pre_and_register_call ?(any_function=false) exec_kind =
+    if any_function then
+      register_any_call env loc (Some rs) mvs
+    else
+      register_call env loc (Some rs) mvs exec_kind;
+    if env.rac.do_rac then (
+      let desc = cntr_desc "Precondition" rs.rs_name in
+      let ctx = cntr_ctx desc ?trigger_loc:loc env in
+      if main_function then check_assume_terms ctx rs.rs_cty.cty_pre
+      else check_terms ctx rs.rs_cty.cty_pre ) in
   match exec_kind with
   | Log.ExecAbstract ->
+      check_pre_and_register_call Log.ExecAbstract;
       let rs_name,cty = rs.rs_name, rs.rs_cty in
       exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
   | Log.ExecConcrete ->
       let res =
-        if rs_equal rs rs_func_app then
+        if rs_equal rs rs_func_app then begin
+          check_pre_and_register_call Log.ExecConcrete;
           match arg_vs with
           | [{v_desc= Vfun (cl, arg, e)}; value] ->
               let env =
@@ -2125,33 +2135,39 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
               let v = try Mv.find value bindings with Not_found -> default in
               Normal v
           | _ -> assert false
+          end
         else
           match rs, arg_vs with
           | {rs_logic= RLls ls}, [{v_desc= Vproj (ls', v)}]
             when ls_equal ls ls' -> (* Projection of a projection value *)
+              check_pre_and_register_call Log.ExecConcrete;
               Normal v
           | _ -> match find_definition env rs with
             | LocalFunction (locals, ce) -> (
                 let env = add_local_funs locals env in
                 match ce.c_node with
                 | Capp (rs', pvl) ->
+                    check_pre_and_register_call Log.ExecConcrete;
                     Debug.dprintf debug_trace_exec "@[<h>%tEXEC CALL %a: Capp %a]@."
                       pp_indent print_rs rs print_rs rs';
                     exec_call ?loc env rs' (pvl @ arg_pvs) ity_result
                 | Cfun body ->
+                    check_pre_and_register_call Log.ExecConcrete;
                     Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: FUN/%d %a@]@."
                       pp_indent print_rs rs (List.length ce.c_cty.cty_args) (pp_limited print_expr) body;
                     let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
                     eval_expr env' body
                 | Cany ->
-                    register_any_call env loc mvs;
+                    check_pre_and_register_call ~any_function:true Log.ExecAbstract;
                     let rs_name,cty = rs.rs_name, rs.rs_cty in
                     exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
                 | Cpur _ -> assert false (* TODO ? *) )
             | Builtin f ->
+                check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
                 Normal (f rs arg_vs)
             | Constructor _ ->
+                check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
                 let mt = List.fold_left2 ty_match Mtv.empty
                     (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
@@ -2159,6 +2175,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                 let fs = List.map field arg_vs in
                 Normal (value ty (Vconstr (rs, fs)))
             | Projection _d -> (
+                check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
                 match rs.rs_field, arg_vs with
                 | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
