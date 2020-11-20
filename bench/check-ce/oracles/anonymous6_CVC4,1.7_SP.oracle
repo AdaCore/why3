@@ -1,6 +1,6 @@
 File "bench/check-ce/anonymous6.mlw", line 6, characters 18-27:
 Goal Postcondition from verification condition f'vc.
-Prover result is: valid (0.02s, 1516 steps).
+Prover result is: valid (0.03s, 1516 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 <check-ce>Validating model:
@@ -40,7 +40,7 @@ Prover result is: valid (0.02s, 1516 steps).
                     contents = 0
                 Line 6:
                   Concrete execution of anonymous function with args:
-                  z = (ref'mk 0)
+                    z = (ref'mk 0)
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous6.mlw", line 6, characters 18-27)
@@ -55,7 +55,7 @@ Prover result is: valid (0.02s, 1516 steps).
                   result = (ref'mk 0)
                 Line 6:
                   Abstract execution of anonymous function with args:
-                  z = (ref'mk 0)
+                    z = (ref'mk 0)
                   z = (ref'mk 0)
                   result = ()
                   Execution got stuck, Assume postcondition of anonymous function with:
@@ -98,7 +98,7 @@ Prover result is: valid (0.02s, 1516 steps).
                     contents = 0
                 Line 6:
                   Concrete execution of anonymous function with args:
-                  z = (ref'mk 0)
+                    z = (ref'mk 0)
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -113,7 +113,7 @@ Prover result is: valid (0.02s, 1516 steps).
                   result = (ref'mk 0)
                 Line 6:
                   Abstract execution of anonymous function with args:
-                  z = (ref'mk 0)
+                    z = (ref'mk 0)
                   z = (ref'mk 3)
                   result = ()
                 Line 7:
@@ -157,7 +157,7 @@ Prover result is: valid (0.02s, 1516 steps).
                     contents = 0
                 Line 6:
                   Concrete execution of anonymous function with args:
-                  z = (ref'mk 0)
+                    z = (ref'mk 0)
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -172,7 +172,7 @@ Prover result is: valid (0.02s, 1516 steps).
                   result = (ref'mk 0)
                 Line 6:
                   Abstract execution of anonymous function with args:
-                  z = (ref'mk 0)
+                    z = (ref'mk 0)
                   z = (ref'mk 3)
                   result = ()
                 Line 7:
@@ -187,7 +187,7 @@ Prover result is: valid (0.02s, 1516 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous6.mlw", line 7, characters 10-15:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.07s, 6611 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6611 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File anonymous6.mlw:
@@ -201,7 +201,7 @@ File anonymous6.mlw:
     result = (ref'mk 0)
   Line 6:
     Abstract execution of anonymous function with args:
-    z = (ref'mk 0)
+      z = (ref'mk 0)
     z = (ref'mk 3)
     result = ()
   Line 7:

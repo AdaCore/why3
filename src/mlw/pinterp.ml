@@ -493,7 +493,7 @@ module Log : Log = struct
     | Val_assumed (id, v) ->
         fprintf fmt "@[<h>%a = %a@]" print_decoded id.id_string print_value v;
     | Exec_call (None, mvs, k) ->
-        fprintf fmt "@[<h>%s execution of anonymous function with args:%a@]"
+        fprintf fmt "@[<h2>%s execution of anonymous function with args:%a@]"
           (exec_kind_to_string k)
           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_call (Some rs, mvs, k) ->
