@@ -48,10 +48,12 @@ module type Log = sig
 
   type log_entry_desc = private
     | Val_assumed of (ident * value)
+    | Const_init of ident
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
     | Exec_loop of exec_kind
+    | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
     | Exec_ended
@@ -65,18 +67,21 @@ module type Log = sig
   type log_uc
 
   val log_val : log_uc -> ident -> value -> Loc.position option -> unit
+  val log_const : log_uc -> ident -> Loc.position option -> unit
   val log_call : log_uc -> rsymbol option -> value Mvs.t ->
                  exec_kind -> Loc.position option -> unit
   val log_pure_call : log_uc -> lsymbol -> exec_kind ->
                       Loc.position option -> unit
   val log_any_call : log_uc -> rsymbol option -> value Mvs.t
                      -> Loc.position option -> unit
+  val log_exec_loop : log_uc -> exec_kind -> Loc.position option -> unit
+  val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Mrs.t ->
+                      Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
                    Loc.position option -> unit
   val log_stucked : log_uc -> string -> value Mid.t ->
                     Loc.position option -> unit
   val log_exec_ended : log_uc -> Loc.position option -> unit
-  val log_exec_loop : log_uc -> exec_kind -> Loc.position option -> unit
   val empty_log_uc : unit -> log_uc
   val empty_log : exec_log
   val close_log : log_uc -> exec_log

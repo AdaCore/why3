@@ -11,11 +11,18 @@
 <rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Concrete execution of swap with args:
+                  Execution of main function swap's body with env:
                     x = (0, 0)
+                    zero = 0
+                    one = 1
                 Line 7:
                   Concrete execution of (+) with args:
                     _ = 0
@@ -58,11 +65,18 @@
                     x = (0, 0)
                     result = (0, 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Concrete execution of swap with args:
+                  Execution of main function swap's body with env:
                     x = (0, 0)
+                    zero = 0
+                    one = 1
                 Line 7:
                   Concrete execution of (+) with args:
                     _ = 0
@@ -102,11 +116,18 @@
 <rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Concrete execution of swap with args:
+                  Execution of main function swap's body with env:
                     x = (0, 0)
+                    zero = 0
+                    one = 1
                 Line 7:
                   Concrete execution of (+) with args:
                     _ = 0
@@ -149,11 +170,18 @@
                     x = (0, 0)
                     result = (0, 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Concrete execution of swap with args:
+                  Execution of main function swap's body with env:
                     x = (0, 0)
+                    zero = 0
+                    one = 1
                 Line 7:
                   Concrete execution of (+) with args:
                     _ = 0
@@ -193,11 +221,18 @@
 <rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Concrete execution of swap with args:
+                  Execution of main function swap's body with env:
                     x = (0, 0)
+                    zero = 0
+                    one = 1
                 Line 7:
                   Concrete execution of (+) with args:
                     _ = 0
@@ -240,11 +275,18 @@
                     x = (0, 0)
                     result = (0, 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Concrete execution of swap with args:
+                  Execution of main function swap's body with env:
                     x = (0, 0)
+                    zero = 0
+                    one = 1
                 Line 7:
                   Concrete execution of (+) with args:
                     _ = 0
@@ -279,14 +321,21 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/tuple.mlw", line 5, characters 38-43:
 Goal Postcondition from verification condition swap'vc.
-Prover result is: timeout (1.00s, 7821355 steps).
+Prover result is: timeout (1.00s, 6503075 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File tuple.mlw:
   Line 4:
     x = (0, 0)
-    Concrete execution of swap with args:
+    Execution of main function swap's body with env:
       x = (0, 0)
+      zero = 0
+      one = 1
   Line 7:
     Concrete execution of (+) with args:
       _ = 0

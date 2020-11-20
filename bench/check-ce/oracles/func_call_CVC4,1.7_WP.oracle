@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.03s, 1582 steps).
+Prover result is: valid (0.05s, 1582 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Validating model:
@@ -49,8 +49,14 @@ Prover result is: valid (0.03s, 1582 steps).
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -59,8 +65,11 @@ Prover result is: valid (0.03s, 1582 steps).
                     contents = 0
                 Line 10:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 12:
                   Concrete execution of Tuple0 with args:
                   Concrete execution of g with args:
@@ -74,8 +83,14 @@ Prover result is: valid (0.03s, 1582 steps).
                 Line 10:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call.mlw", line 7, characters 12-21)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -84,8 +99,11 @@ Prover result is: valid (0.03s, 1582 steps).
                     contents = 0
                 Line 10:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 0)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 12:
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
@@ -143,8 +161,14 @@ Prover result is: valid (0.03s, 1582 steps).
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -153,8 +177,11 @@ Prover result is: valid (0.03s, 1582 steps).
                     contents = 0
                 Line 10:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 12:
                   Concrete execution of Tuple0 with args:
                   Concrete execution of g with args:
@@ -168,8 +195,14 @@ Prover result is: valid (0.03s, 1582 steps).
                 Line 10:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -178,8 +211,11 @@ Prover result is: valid (0.03s, 1582 steps).
                     contents = 0
                 Line 10:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 2)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 12:
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
@@ -236,8 +272,14 @@ Prover result is: valid (0.03s, 1582 steps).
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -246,8 +288,11 @@ Prover result is: valid (0.03s, 1582 steps).
                     contents = 0
                 Line 10:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 12:
                   Concrete execution of Tuple0 with args:
                   Concrete execution of g with args:
@@ -261,8 +306,14 @@ Prover result is: valid (0.03s, 1582 steps).
                 Line 10:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -271,8 +322,11 @@ Prover result is: valid (0.03s, 1582 steps).
                     contents = 0
                 Line 10:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 2)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 12:
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
@@ -291,11 +345,17 @@ Prover result is: valid (0.03s, 1582 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6620 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6620 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File func_call.mlw:
   Line 3:
+    Constant z initialization
     (abstract) execution of any function
     result = 0
     Concrete execution of ref with args:
@@ -304,8 +364,11 @@ File func_call.mlw:
       contents = 0
   Line 10:
     _ = ()
-    Concrete execution of f with args:
+    Execution of main function f's body with env:
+      z = (ref'mk 2)
       _ = ()
+      zero = 0
+      one = 1
   Line 12:
     Concrete execution of Tuple0 with args:
     Abstract execution of g with args:

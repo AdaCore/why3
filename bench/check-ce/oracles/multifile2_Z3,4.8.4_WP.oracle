@@ -10,11 +10,18 @@
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 7:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Concrete execution of incr with args:
                     x = 0
@@ -42,11 +49,18 @@
                 Line 7:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 7:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Abstract execution of incr with args:
                     x = 0
@@ -69,11 +83,18 @@
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 7:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Concrete execution of incr with args:
                     x = 0
@@ -101,11 +122,18 @@
                 Line 7:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 7:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Abstract execution of incr with args:
                     x = 0
@@ -128,11 +156,18 @@
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 7:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Concrete execution of incr with args:
                     x = 0
@@ -160,11 +195,18 @@
                 Line 7:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 7:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Abstract execution of incr with args:
                     x = 0
@@ -183,7 +225,7 @@
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
 Goal Postcondition from verification condition f'vc.
-Prover result is: unknown (sat) (0.02s, 866 steps).
+Prover result is: unknown (sat) (0.01s, 866 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -203,11 +245,18 @@ Sorry, we don't have a good counterexample for you :(
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 14, characters 2-8, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 12:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 14:
                   Concrete execution of incr with args:
                     x = 0
@@ -237,11 +286,18 @@ Sorry, we don't have a good counterexample for you :(
                     x = 0
                     result = 1
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 12:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 14:
                   Abstract execution of incr with args:
                     x = 0
@@ -268,11 +324,18 @@ Sorry, we don't have a good counterexample for you :(
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 14, characters 2-8, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 12:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 14:
                   Concrete execution of incr with args:
                     x = 0
@@ -302,11 +365,18 @@ Sorry, we don't have a good counterexample for you :(
                     x = 0
                     result = 1
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 12:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 14:
                   Abstract execution of incr with args:
                     x = 0
@@ -333,11 +403,18 @@ Sorry, we don't have a good counterexample for you :(
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 14, characters 2-8, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 12:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 14:
                   Concrete execution of incr with args:
                     x = 0
@@ -367,11 +444,18 @@ Sorry, we don't have a good counterexample for you :(
                     x = 0
                     result = 1
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 12:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 14:
                   Abstract execution of incr with args:
                     x = 0
@@ -390,14 +474,21 @@ Sorry, we don't have a good counterexample for you :(
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/multifile2.mlw", line 13, characters 12-26:
 Goal Postcondition from verification condition g'vc.
-Prover result is: unknown (sat) (0.00s, 878 steps).
+Prover result is: unknown (sat) (0.01s, 878 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File multifile2.mlw:
   Line 12:
     x = 0
-    Concrete execution of g with args:
+    Execution of main function g's body with env:
       x = 0
+      zero = 0
+      one = 1
   Line 14:
     Concrete execution of incr with args:
       x = 0
@@ -444,11 +535,18 @@ File multifile2.mlw:
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of h with args:
+                  Execution of main function h's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 20:
                   (abstract) execution of any function incr_val with args:
                     x = 0
@@ -459,11 +557,18 @@ File multifile2.mlw:
                     x = 0
                     result = 0
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of h with args:
+                  Execution of main function h's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of incr_val with args:
                     x = 0
@@ -491,11 +596,18 @@ File multifile2.mlw:
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of h with args:
+                  Execution of main function h's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 20:
                   (abstract) execution of any function incr_val with args:
                     x = 0
@@ -506,11 +618,18 @@ File multifile2.mlw:
                     x = 0
                     result = 0
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of h with args:
+                  Execution of main function h's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of incr_val with args:
                     x = 0
@@ -538,11 +657,18 @@ File multifile2.mlw:
 <rac-values>No value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of h with args:
+                  Execution of main function h's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 20:
                   (abstract) execution of any function incr_val with args:
                     x = 0
@@ -553,11 +679,18 @@ File multifile2.mlw:
                     x = 0
                     result = 0
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File multifile2.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of h with args:
+                  Execution of main function h's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of incr_val with args:
                     x = 0

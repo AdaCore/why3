@@ -362,10 +362,12 @@ module type Log = sig
 
   type log_entry_desc = private
     | Val_assumed of (ident * value)
+    | Const_init of ident
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
     | Exec_loop of exec_kind
+    | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
     | Exec_ended
@@ -379,18 +381,21 @@ module type Log = sig
   type log_uc
 
   val log_val : log_uc -> ident -> value -> Loc.position option -> unit
+  val log_const : log_uc -> ident -> Loc.position option -> unit
   val log_call : log_uc -> rsymbol option -> value Mvs.t ->
                  exec_kind -> Loc.position option -> unit
   val log_pure_call : log_uc -> lsymbol -> exec_kind ->
                       Loc.position option -> unit
   val log_any_call : log_uc -> rsymbol option -> value Mvs.t ->
                      Loc.position option -> unit
+  val log_exec_loop : log_uc -> exec_kind -> Loc.position option -> unit
+  val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Mrs.t ->
+                      Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
                    Loc.position option -> unit
   val log_stucked : log_uc -> string -> value Mid.t ->
                     Loc.position option -> unit
   val log_exec_ended : log_uc -> Loc.position option -> unit
-  val log_exec_loop : log_uc -> exec_kind -> Loc.position option -> unit
   val empty_log_uc : unit -> log_uc
   val empty_log : exec_log
   val close_log : log_uc -> exec_log
@@ -403,10 +408,12 @@ module Log : Log = struct
 
   type log_entry_desc =
     | Val_assumed of (ident * value)
+    | Const_init of ident
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
     | Exec_loop of exec_kind
+    | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
     | Exec_ended
@@ -432,6 +439,9 @@ module Log : Log = struct
   let log_val log_uc id v loc =
     log_entry log_uc (Val_assumed (id,v)) loc
 
+  let log_const log_uc id loc =
+    log_entry log_uc (Const_init id) loc
+
   let log_call log_uc rs mvs kind loc =
     log_entry log_uc (Exec_call (rs,mvs,kind)) loc
 
@@ -441,6 +451,12 @@ module Log : Log = struct
   let log_any_call log_uc rs mvs loc =
     log_entry log_uc (Exec_any (rs,mvs)) loc
 
+  let log_exec_loop log_uc kind loc =
+    log_entry log_uc (Exec_loop kind) loc
+
+  let log_exec_main log_uc rs mvs mrs loc =
+    log_entry log_uc (Exec_main (rs,mvs,mrs)) loc
+
   let log_failed log_uc s mvs loc =
     log_entry log_uc (Exec_failed (s,mvs)) loc
 
@@ -449,9 +465,6 @@ module Log : Log = struct
 
   let log_exec_ended log_uc loc =
     log_entry log_uc Exec_ended loc
-
-  let log_exec_loop log_uc kind loc =
-    log_entry log_uc (Exec_loop kind) loc
 
   let close_log log_uc = List.rev !log_uc
 
@@ -475,34 +488,31 @@ module Log : Log = struct
         | Some _ ->
             consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
 
-  (** verbosity level:
-     1 : just imported values
-     2 : + execution of function calls
-     3 : + execution of loops
-     4 : + termination of execution
-   *)
   let print_log_entry_desc fmt e =
-    let print_assgn key2string fmt (k,v) =
+    let print_assoc key2string fmt (k,v) =
       fprintf fmt "@[%a = %a@]"
         print_decoded (key2string k) print_value v in
     let print_list key2string =
-      Pp.print_list_pre Pp.newline (print_assgn key2string) in
+      Pp.print_list_pre Pp.newline (print_assoc key2string) in
     let vs2string vs = vs.vs_name.id_string in
+    let rs2string rs = rs.rs_name.id_string in
     let id2string id = id.id_string in
     match e.log_desc with
     | Val_assumed (id, v) ->
-        fprintf fmt "@[<h>%a = %a@]" print_decoded id.id_string print_value v;
+        fprintf fmt "@[<h2>%a = %a@]" print_decoded id.id_string print_value v;
+    | Const_init id ->
+        fprintf fmt "@[<h2>Constant %a initialization@]" print_decoded id.id_string;
     | Exec_call (None, mvs, k) ->
         fprintf fmt "@[<h2>%s execution of anonymous function with args:%a@]"
           (exec_kind_to_string k)
           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_call (Some rs, mvs, k) ->
-        fprintf fmt "@[<hv2>%s execution of %a with args:%a@]"
+        fprintf fmt "@[<h2>%s execution of %a with args:%a@]"
           (exec_kind_to_string k)
           print_decoded rs.rs_name.id_string
           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_pure (ls,k) ->
-        fprintf fmt "@[<h>%s execution of %a@]" (exec_kind_to_string k)
+        fprintf fmt "@[<h2>%s execution of %a@]" (exec_kind_to_string k)
           print_decoded ls.ls_name.id_string
     | Exec_any (rs,mvs) ->
          fprintf fmt
@@ -512,16 +522,28 @@ module Log : Log = struct
            (if Mvs.is_empty mvs then "" else " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
     | Exec_loop k ->
-        fprintf fmt "@[<h>%s execution of loop@]" (exec_kind_to_string k)
+        fprintf fmt "@[<h2>%s execution of loop@]" (exec_kind_to_string k)
+    | Exec_main (rs, mvs, mrs) ->
+        fprintf fmt "@[<h2>Execution of main function %a's body with env:%a%a@]"
+          print_decoded rs.rs_name.id_string
+          (print_list vs2string) (Mvs.bindings mvs)
+          (print_list rs2string) (Mrs.bindings mrs)
     | Exec_failed (msg,mid) ->
-       fprintf fmt "@[<hv2>Property failure, %s with:%a@]"
+       fprintf fmt "@[<h2>Property failure, %s with:%a@]"
          msg (print_list id2string) (Mid.bindings mid)
     | Exec_stucked (msg,mid) ->
-       fprintf fmt "@[<hv2>Execution got stuck, %s with:%a@]"
+       fprintf fmt "@[<h2>Execution got stuck, %s with:%a@]"
          msg (print_list id2string) (Mid.bindings mid)
     | Exec_ended ->
-        fprintf fmt "@[<h>Execution of main function terminated normally@]"
+        fprintf fmt "@[<h2>Execution of main function terminated normally@]"
 
+  (** verbosity level:
+     1 : just imported values
+     2 : + execution of function calls
+     3 : + execution of loops
+     4 : + termination of execution
+     5 : + log information about initialization of global vars
+   *)
   let print_log ?(verb_lvl=4) ~json fmt entry_log =
     if json then
       let open Json_base in
@@ -542,6 +564,11 @@ module Log : Log = struct
               (print_json_field "vs" print_json)
               (string "%a" print_decoded id.id_string)
               (print_json_field "value" print_value) v
+        | Const_init id ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+              (print_json_field "kind" print_json) (string "CONST_INIT")
+              (print_json_field "id" print_json)
+              (string "%a" print_decoded id.id_string)
         | Exec_call (ors, mvs, kind) ->
             fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
               (print_json_field "kind" print_json) (string "EXEC_CALL")
@@ -568,6 +595,15 @@ module Log : Log = struct
             fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
           (print_json_field "kind" print_json) (string "EXEC_LOOP")
           (print_json_field "exec" print_json_kind) kind
+        | Exec_main (rs,mvs,mrs) ->
+           let mid = Mvs.fold (fun vs v mid -> Mid.add vs.vs_name v mid) mvs Mid.empty in
+           let mid = Mrs.fold (fun rs v mid -> Mid.add rs.rs_name v mid) mrs mid in
+           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+             (print_json_field "kind" print_json) (string "EXEC_MAIN")
+             (print_json_field "rs" print_json)
+             (string "%a" print_decoded rs.rs_name.id_string)
+             (print_json_field "env" (list (print_key_value id2string)))
+             (Mid.bindings mid)
         | Exec_failed (reason,mid) ->
             fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
               (print_json_field "kind" print_json) (string "FAILED")
@@ -591,12 +627,22 @@ module Log : Log = struct
       fprintf fmt "@[@[<hv1>[%a@]@]"
         Pp.(print_list comma print_json_entry) entry_log
     else
-      let entry_log = List.filter (fun le -> match le.log_desc with
-        | Val_assumed _ -> true
-        | Exec_call _ | Exec_pure _ | Exec_any _ when verb_lvl > 1 -> true
-        | Exec_loop _ when verb_lvl > 2 -> true
-        | Exec_failed _ | Exec_stucked _ | Exec_ended when verb_lvl > 3 -> true
-        | _ -> false) entry_log in
+      let entry_log = List.filter (fun le ->
+            match le.log_desc with
+            | Val_assumed _ | Const_init _ | Exec_main _ -> true
+            | Exec_call _ | Exec_pure _ | Exec_any _
+                 when verb_lvl > 1 -> true
+            | Exec_loop _ when verb_lvl > 2 -> true
+            | Exec_failed _ | Exec_stucked _ | Exec_ended
+                 when verb_lvl > 3 -> true
+            | _ -> false) entry_log in
+      (* if verb_lvl < 5 remove log about initialization of global vars *)
+      let entry_log =
+        if verb_lvl < 5 then
+          Lists.drop_while (fun le ->
+              match le.log_desc with
+                Exec_main _ -> false | _ -> true) entry_log
+        else entry_log in
       let entry_log =
         let on_file e = Opt.map (fun (f,_,_,_) -> f) (Opt.map Loc.get e.log_loc) in
         let on_line e = Opt.map (fun (_,l,_,_) -> l) (Opt.map Loc.get e.log_loc) in
@@ -672,6 +718,9 @@ let default_env env rac mod_known th_known =
 let register_used_value env loc id value =
   Log.log_val env.rac.log_uc id (snapshot value) loc
 
+let register_const_init env loc id =
+  Log.log_const env.rac.log_uc id loc
+
 let register_call env loc rs mvs kind =
   Log.log_call env.rac.log_uc rs mvs kind loc
 
@@ -681,6 +730,12 @@ let register_pure_call env loc ls kind =
 let register_any_call env loc rs mvs =
   Log.log_any_call env.rac.log_uc rs mvs loc
 
+let register_loop env loc kind =
+  Log.log_exec_loop env.rac.log_uc kind loc
+
+let register_exec_main env rs =
+  Log.log_exec_main env.rac.log_uc rs env.vsenv env.rsenv rs.rs_name.id_loc
+
 let register_failure env loc reason mvs =
   Log.log_failed env.rac.log_uc reason mvs loc
 
@@ -689,9 +744,6 @@ let register_stucked env loc reason mvs =
 
 let register_ended env loc =
   Log.log_exec_ended env.rac.log_uc loc
-
-let register_loop env loc kind =
-  Log.log_exec_loop env.rac.log_uc kind loc
 
 let snapshot_env env = {env with vsenv= Mvs.map snapshot env.vsenv}
 
@@ -2106,10 +2158,11 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
   let mvs = let aux pv v = pv.pv_vs, snapshot v in
     Mvs.of_list (List.map2 aux rs.rs_cty.cty_args arg_vs) in
   let check_pre_and_register_call ?(any_function=false) exec_kind =
-    if any_function then
-      register_any_call env loc (Some rs) mvs
-    else
-      register_call env loc (Some rs) mvs exec_kind;
+    if not main_function then
+      if any_function then
+        register_any_call env loc (Some rs) mvs
+      else
+        register_call env loc (Some rs) mvs exec_kind;
     if env.rac.do_rac then (
       let desc = cntr_desc "Precondition" rs.rs_name in
       let ctx = cntr_ctx desc ?trigger_loc:loc env in
@@ -2242,18 +2295,19 @@ and exec_call_abstract ?loc ?rs_name env cty arg_pvs ity_result =
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 let bind_globals ?rs_main mod_known env =
-  let get_value register id opt_e ity =
+  let get_value id opt_e ity =
     let name = string_or_model_trace id in
     match env.rac.get_value ~name ?loc:id.id_loc ity with
-    | Some v -> register v; v
+    | Some v -> register_used_value env id.id_loc id v; v
     | None ->
        match opt_e with
        | None ->
           let v = default_value_of_type env.env mod_known ity in
-          register v; v
+          register_used_value env id.id_loc id v; v
        | Some e ->
-          let env = {env with rac= {env.rac with rac_abstract= false}} in
-          match eval_expr env e with
+          let env' = {env with rac= {env.rac with rac_abstract= false}} in
+          register_const_init env id.id_loc id;
+          match eval_expr env' e with
           | Normal v -> v
           | Excep _ -> cannot_compute "initialization of global variable %a raised an exception"
                          print_decoded id.id_string
@@ -2264,16 +2318,14 @@ let bind_globals ?rs_main mod_known env =
   let eval_global _ d env =
     match d.pd_node with
     | PDlet (LDvar (pv, e)) ->
-        let register = register_used_value env pv.pv_vs.vs_name.id_loc pv.pv_vs.vs_name in
-        let v = get_value register pv.pv_vs.vs_name (Some e) e.e_ity in
+        let v = get_value pv.pv_vs.vs_name (Some e) e.e_ity in
         bind_vs pv.pv_vs v env
     | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
         assert (ce.c_cty.cty_args = []);
-        let register = register_used_value env rs.rs_name.id_loc rs.rs_name in
         let opt_e = match ce.c_node with
           | Cany -> None | Cfun e -> Some e
           | _ -> failwith "eval_globals: program constant cexp" in
-        let v = get_value register rs.rs_name opt_e ce.c_cty.cty_result in
+        let v = get_value rs.rs_name opt_e ce.c_cty.cty_result in
         check_assume_posts (cntr_ctx "Any postcondition" env) v ce.c_cty.cty_post;
         bind_rs rs v env )
     | _ -> env in
@@ -2316,6 +2368,7 @@ let eval_rs rac env pm rs =
   let env = bind_globals ~rs_main:rs mod_known env in
   let env = multibind_pvs ~register:(register_used_value env rs.rs_name.id_loc)
       rs.rs_cty.cty_args (List.map get_value rs.rs_cty.cty_args) env in
+  register_exec_main env rs;
   let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
   let res = exec_call ~main_function:true ~loc:e_loc env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
   register_ended env rs.rs_name.id_loc;

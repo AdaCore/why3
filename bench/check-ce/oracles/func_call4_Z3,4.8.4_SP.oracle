@@ -27,8 +27,14 @@
 <rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 9, characters 19-23, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/func_call4.mlw", line 7, characters 12-21)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call4.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -37,8 +43,11 @@
                     contents = 0
                 Line 9:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 0)
                     _ = ()
+                    zero = 0
+                    one = 1
                   Concrete execution of Tuple0 with args:
                   (abstract) execution of any function g with args:
                     _ = ()
@@ -49,8 +58,14 @@
                     z = (ref'mk 0)
                     z = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call4.mlw", line 7, characters 12-21)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call4.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -59,8 +74,11 @@
                     contents = 0
                 Line 9:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 0)
                     _ = ()
+                    zero = 0
+                    one = 1
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
@@ -111,8 +129,14 @@
 <rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 9, characters 19-23, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call4.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -121,8 +145,11 @@
                     contents = 0
                 Line 9:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 2)
                     _ = ()
+                    zero = 0
+                    one = 1
                   Concrete execution of Tuple0 with args:
                   (abstract) execution of any function g with args:
                     _ = ()
@@ -131,8 +158,14 @@
                   Property failure, Assertion with:
                     z = (ref'mk 2)
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call4.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -141,8 +174,11 @@
                     contents = 0
                 Line 9:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 2)
                     _ = ()
+                    zero = 0
+                    one = 1
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
@@ -191,8 +227,14 @@
 <rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 9, characters 19-23, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call4.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -201,8 +243,11 @@
                     contents = 0
                 Line 9:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 2)
                     _ = ()
+                    zero = 0
+                    one = 1
                   Concrete execution of Tuple0 with args:
                   (abstract) execution of any function g with args:
                     _ = ()
@@ -211,8 +256,14 @@
                   Property failure, Assertion with:
                     z = (ref'mk 2)
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call4.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -221,8 +272,11 @@
                     contents = 0
                 Line 9:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 2)
                     _ = ()
+                    zero = 0
+                    one = 1
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
@@ -239,11 +293,17 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call4.mlw", line 9, characters 34-39:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 5154191 steps).
+Prover result is: timeout (1.00s, 5093410 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File func_call4.mlw:
   Line 3:
+    Constant z initialization
     (abstract) execution of any function
     result = 0
     Concrete execution of ref with args:
@@ -252,8 +312,11 @@ File func_call4.mlw:
       contents = 0
   Line 9:
     _ = ()
-    Concrete execution of f with args:
+    Execution of main function f's body with env:
+      z = (ref'mk 2)
       _ = ()
+      zero = 0
+      one = 1
     Concrete execution of Tuple0 with args:
     (abstract) execution of any function g with args:
       _ = ()

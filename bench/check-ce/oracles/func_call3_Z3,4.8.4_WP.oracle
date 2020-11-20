@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call3.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.02s, 2343 steps).
+Prover result is: valid (0.01s, 2343 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call3.mlw", line 8, characters 17-26)
 <check-ce>Validating model:
@@ -17,8 +17,14 @@ Prover result is: valid (0.02s, 2343 steps).
 <rac-values>No value for result at "bench/check-ce/func_call3.mlw", line 3, characters 9-14, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call3.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -27,8 +33,11 @@ Prover result is: valid (0.02s, 2343 steps).
                     contents = 0
                 Line 5:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
+                    z = (ref'mk 1)
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Concrete execution of contents with args:
                     arg = (ref'mk 0)
@@ -44,8 +53,14 @@ Prover result is: valid (0.02s, 2343 steps).
                     x = 0
                     r = 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call3.mlw:
                 Line 3:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -54,8 +69,11 @@ Prover result is: valid (0.02s, 2343 steps).
                     contents = 0
                 Line 5:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
+                    z = (ref'mk 1)
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Concrete execution of contents with args:
                     arg = (ref'mk 0)
@@ -104,13 +122,21 @@ Prover result is: valid (0.02s, 2343 steps).
 <check-ce>Interpreting abstractly
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call3.mlw:
                 Line 3:
                   z = (ref'mk 0)
                 Line 5:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
+                    z = (ref'mk 1)
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Concrete execution of contents with args:
                     arg = (ref'mk 0)
@@ -126,13 +152,21 @@ Prover result is: valid (0.02s, 2343 steps).
                     x = 0
                     r = 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call3.mlw:
                 Line 3:
                   z = (ref'mk 0)
                 Line 5:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
+                    z = (ref'mk 1)
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Concrete execution of contents with args:
                     arg = (ref'mk 0)
@@ -181,13 +215,21 @@ Prover result is: valid (0.02s, 2343 steps).
 <check-ce>Interpreting abstractly
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call3.mlw:
                 Line 3:
                   z = (ref'mk 0)
                 Line 5:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
+                    z = (ref'mk 1)
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Concrete execution of contents with args:
                     arg = (ref'mk 0)
@@ -203,13 +245,21 @@ Prover result is: valid (0.02s, 2343 steps).
                     x = 0
                     r = 1
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call3.mlw:
                 Line 3:
                   z = (ref'mk 0)
                 Line 5:
                   x = 0
-                  Concrete execution of g with args:
+                  Execution of main function g's body with env:
+                    z = (ref'mk 1)
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 9:
                   Concrete execution of contents with args:
                     arg = (ref'mk 0)
@@ -233,11 +283,17 @@ Prover result is: valid (0.02s, 2343 steps).
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call3.mlw", line 8, characters 17-26:
 Goal Postcondition from verification condition g'vc.
-Prover result is: timeout (1.00s, 6257589 steps).
+Prover result is: timeout (1.00s, 5781352 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File func_call3.mlw:
   Line 3:
+    Constant z initialization
     (abstract) execution of any function
     result = 0
     Concrete execution of ref with args:
@@ -246,8 +302,11 @@ File func_call3.mlw:
       contents = 0
   Line 5:
     x = 0
-    Concrete execution of g with args:
+    Execution of main function g's body with env:
+      z = (ref'mk 1)
       x = 0
+      zero = 0
+      one = 1
   Line 9:
     Concrete execution of contents with args:
       arg = (ref'mk 0)

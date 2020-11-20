@@ -12,11 +12,18 @@
 <rac-values>No value for result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 5:
                   Concrete execution of h with args:
                     y = 0
@@ -28,11 +35,18 @@
                     x = 0
                     w = 2
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous1.mlw", line 5, characters 20-25)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 5:
                   Abstract execution of h with args:
                     y = 0
@@ -55,11 +69,18 @@
 <rac-values>No value for result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 5:
                   Concrete execution of h with args:
                     y = 0
@@ -71,11 +92,18 @@
                     x = 0
                     w = 2
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous1.mlw", line 5, characters 20-25)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 5:
                   Abstract execution of h with args:
                     y = 0
@@ -98,11 +126,18 @@
 <rac-values>No value for result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 5:
                   Concrete execution of h with args:
                     y = 0
@@ -114,11 +149,18 @@
                     x = 0
                     w = 2
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous1.mlw", line 5, characters 20-25)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 5:
                   Abstract execution of h with args:
                     y = 0
@@ -135,14 +177,21 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (sat) (0.00s, 880 steps).
+Prover result is: unknown (sat) (0.02s, 880 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File anonymous1.mlw:
   Line 4:
     x = 0
-    Concrete execution of f with args:
+    Execution of main function f's body with env:
       x = 0
+      zero = 0
+      one = 1
   Line 5:
     Concrete execution of h with args:
       y = 0

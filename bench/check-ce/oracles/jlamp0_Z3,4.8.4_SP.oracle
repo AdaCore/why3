@@ -18,27 +18,45 @@
 <rac-values>Missing value for parameter b, continue with default value (ref'mk 0).
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 8:
                   b = (ref'mk 0)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 0)
                     b = (ref'mk 0)
+                    zero = 0
+                    one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
                     b = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 8:
                   b = (ref'mk 0)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 0)
                     b = (ref'mk 0)
+                    zero = 0
+                    one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
@@ -79,13 +97,21 @@
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 8:
                   b = (ref'mk 4)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 4)
                     b = (ref'mk 4)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Concrete execution of (!) with args:
                     r = (ref'mk 4)
@@ -113,13 +139,21 @@
                   Property failure, Assertion with:
                     a = (ref'mk 4)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 8:
                   b = (ref'mk 4)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 0)
                     b = (ref'mk 4)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Abstract execution of (!) with args:
                     r = (ref'mk 4)
@@ -164,13 +198,21 @@
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 1)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 4)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Concrete execution of (!) with args:
                     r = (ref'mk 3)
@@ -198,13 +240,21 @@
                   Property failure, Assertion with:
                     a = (ref'mk 4)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 1)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 1)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Abstract execution of (!) with args:
                     r = (ref'mk 3)
@@ -222,16 +272,24 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Goal Assertion from verification condition p1'vc.
-Prover result is: timeout (1.00s, 5963954 steps).
+Prover result is: timeout (1.00s, 5492531 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File jlamp0.mlw:
   Line 6:
     a = (ref'mk 0)
   Line 8:
     b = (ref'mk 4)
-    Concrete execution of p1 with args:
+    Execution of main function p1's body with env:
+      a = (ref'mk 4)
       b = (ref'mk 4)
+      zero = 0
+      one = 1
   Line 11:
     Concrete execution of (!) with args:
       r = (ref'mk 4)
@@ -284,27 +342,45 @@ File jlamp0.mlw:
 <rac-values>Missing value for parameter b, continue with default value (ref'mk 0).
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 8:
                   b = (ref'mk 0)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 0)
                     b = (ref'mk 0)
+                    zero = 0
+                    one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
                     b = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 8:
                   b = (ref'mk 0)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 0)
                     b = (ref'mk 0)
+                    zero = 0
+                    one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
@@ -358,13 +434,21 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 7)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 9)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Concrete execution of (!) with args:
                     r = (ref'mk 3)
@@ -427,13 +511,21 @@ File jlamp0.mlw:
                   Property failure, Postcondition of p1 with:
                     a = (ref'mk 9)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 7)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 7)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Abstract execution of (!) with args:
                     r = (ref'mk 3)
@@ -491,13 +583,21 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 7)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 9)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Concrete execution of (!) with args:
                     r = (ref'mk 3)
@@ -560,13 +660,21 @@ File jlamp0.mlw:
                   Property failure, Postcondition of p1 with:
                     a = (ref'mk 9)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 7)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 7)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Abstract execution of (!) with args:
                     r = (ref'mk 3)
@@ -584,16 +692,24 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: timeout (1.00s, 6046247 steps).
+Prover result is: timeout (1.00s, 5806055 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File jlamp0.mlw:
   Line 6:
     a = (ref'mk 7)
   Line 8:
     b = (ref'mk 3)
-    Concrete execution of p1 with args:
+    Execution of main function p1's body with env:
+      a = (ref'mk 9)
       b = (ref'mk 3)
+      zero = 0
+      one = 1
   Line 11:
     Concrete execution of (!) with args:
       r = (ref'mk 3)
@@ -681,27 +797,45 @@ File jlamp0.mlw:
 <rac-values>Missing value for parameter b, continue with default value (ref'mk 0).
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 8:
                   b = (ref'mk 0)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 0)
                     b = (ref'mk 0)
+                    zero = 0
+                    one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
                     b = (ref'mk 0)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 8:
                   b = (ref'mk 0)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 0)
                     b = (ref'mk 0)
+                    zero = 0
+                    one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
                     a = (ref'mk 0)
@@ -748,13 +882,21 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 2)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 5)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Concrete execution of (!) with args:
                     r = (ref'mk 3)
@@ -795,13 +937,21 @@ File jlamp0.mlw:
                   Property failure, Postcondition of p1 with:
                     a = (ref'mk 5)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 2)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 2)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Abstract execution of (!) with args:
                     r = (ref'mk 3)
@@ -852,13 +1002,21 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 2)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 5)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Concrete execution of (!) with args:
                     r = (ref'mk 3)
@@ -899,13 +1057,21 @@ File jlamp0.mlw:
                   Property failure, Postcondition of p1 with:
                     a = (ref'mk 5)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 2)
                 Line 8:
                   b = (ref'mk 3)
-                  Concrete execution of p1 with args:
+                  Execution of main function p1's body with env:
+                    a = (ref'mk 2)
                     b = (ref'mk 3)
+                    zero = 0
+                    one = 1
                 Line 11:
                   Abstract execution of (!) with args:
                     r = (ref'mk 3)
@@ -923,16 +1089,24 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: timeout (1.00s, 6283922 steps).
+Prover result is: timeout (1.00s, 5602587 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File jlamp0.mlw:
   Line 6:
     a = (ref'mk 2)
   Line 8:
     b = (ref'mk 3)
-    Concrete execution of p1 with args:
+    Execution of main function p1's body with env:
+      a = (ref'mk 5)
       b = (ref'mk 3)
+      zero = 0
+      one = 1
   Line 11:
     Concrete execution of (!) with args:
       r = (ref'mk 3)
@@ -997,17 +1171,28 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1018,17 +1203,28 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 0)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1074,16 +1270,26 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1094,16 +1300,26 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1149,16 +1365,26 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1169,16 +1395,26 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1199,20 +1435,31 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: timeout (1.00s, 6257359 steps).
+Prover result is: timeout (1.00s, 5698036 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File jlamp0.mlw:
   Line 6:
+    Constant a initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 15:
+    Constant c initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 17:
     _ = ()
-    Concrete execution of p2 with args:
+    Execution of main function p2's body with env:
+      a = (ref'mk 0)
+      c = (ref'mk 1)
       _ = ()
+      zero = 0
+      one = 1
   Line 20:
     Concrete execution of (:=) with args:
       r = (ref'mk 0)
@@ -1259,17 +1506,28 @@ Prover result is: valid (0.01s, 295 steps).
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1280,17 +1538,28 @@ Prover result is: valid (0.01s, 295 steps).
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 0)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1377,16 +1646,26 @@ Prover result is: valid (0.01s, 295 steps).
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1397,16 +1676,26 @@ Prover result is: valid (0.01s, 295 steps).
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1493,16 +1782,26 @@ Prover result is: valid (0.01s, 295 steps).
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1513,16 +1812,26 @@ Prover result is: valid (0.01s, 295 steps).
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1543,20 +1852,31 @@ Prover result is: valid (0.01s, 295 steps).
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Goal Loop variant decrease from verification condition p2'vc.
-Prover result is: timeout (1.00s, 6433803 steps).
+Prover result is: timeout (1.00s, 5842712 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File jlamp0.mlw:
   Line 6:
+    Constant a initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 15:
+    Constant c initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 17:
     _ = ()
-    Concrete execution of p2 with args:
+    Execution of main function p2's body with env:
+      a = (ref'mk 0)
+      c = (ref'mk 1)
       _ = ()
+      zero = 0
+      one = 1
   Line 20:
     Concrete execution of (:=) with args:
       r = (ref'mk 0)
@@ -1591,17 +1911,28 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1612,17 +1943,28 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 0)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1703,16 +2045,26 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1723,16 +2075,26 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1813,16 +2175,26 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1833,16 +2205,26 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1863,20 +2245,31 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: timeout (1.00s, 6541651 steps).
+Prover result is: timeout (1.00s, 6332588 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File jlamp0.mlw:
   Line 6:
+    Constant a initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 15:
+    Constant c initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 17:
     _ = ()
-    Concrete execution of p2 with args:
+    Execution of main function p2's body with env:
+      a = (ref'mk 0)
+      c = (ref'mk 1)
       _ = ()
+      zero = 0
+      one = 1
   Line 20:
     Concrete execution of (:=) with args:
       r = (ref'mk 0)
@@ -1911,17 +2304,28 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -1932,17 +2336,28 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 0)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2023,16 +2438,26 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2043,16 +2468,26 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2133,16 +2568,26 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2153,16 +2598,26 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2183,20 +2638,31 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: timeout (1.00s, 6350504 steps).
+Prover result is: timeout (1.00s, 6142610 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File jlamp0.mlw:
   Line 6:
+    Constant a initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 15:
+    Constant c initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 17:
     _ = ()
-    Concrete execution of p2 with args:
+    Execution of main function p2's body with env:
+      a = (ref'mk 0)
+      c = (ref'mk 1)
       _ = ()
+      zero = 0
+      one = 1
   Line 20:
     Concrete execution of (:=) with args:
       r = (ref'mk 0)
@@ -2236,17 +2702,28 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2257,17 +2734,28 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
+                  Constant a initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 0)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2340,16 +2828,26 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2360,16 +2858,26 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2442,16 +2950,26 @@ File jlamp0.mlw:
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2462,16 +2980,26 @@ File jlamp0.mlw:
                   Property failure, Loop invariant initialization with:
                     c = (ref'mk 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File jlamp0.mlw:
                 Line 6:
                   a = (ref'mk 0)
                 Line 15:
+                  Constant c initialization
                   (abstract) execution of any function
                   result = (ref'mk 0)
                 Line 17:
                   _ = ()
-                  Concrete execution of p2 with args:
+                  Execution of main function p2's body with env:
+                    a = (ref'mk 0)
+                    c = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
                     r = (ref'mk 0)
@@ -2492,20 +3020,31 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Goal Postcondition from verification condition p2'vc.
-Prover result is: timeout (1.00s, 6290134 steps).
+Prover result is: timeout (1.00s, 6078554 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File jlamp0.mlw:
   Line 6:
+    Constant a initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 15:
+    Constant c initialization
     (abstract) execution of any function
     result = (ref'mk 0)
   Line 17:
     _ = ()
-    Concrete execution of p2 with args:
+    Execution of main function p2's body with env:
+      a = (ref'mk 0)
+      c = (ref'mk 1)
       _ = ()
+      zero = 0
+      one = 1
   Line 20:
     Concrete execution of (:=) with args:
       r = (ref'mk 0)

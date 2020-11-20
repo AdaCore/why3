@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Goal Postcondition from verification condition g1'vc.
-Prover result is: valid (0.02s, 1216 steps).
+Prover result is: valid (0.05s, 1216 steps).
 
 File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
 Goal Precondition from verification condition f1'vc.
-Prover result is: valid (0.02s, 1094 steps).
+Prover result is: valid (0.03s, 1094 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Validating model:
@@ -38,20 +38,34 @@ Prover result is: valid (0.02s, 1094 steps).
 <check-ce>Interpreting abstractly
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 12, characters 13-18)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 11:
                   x = (-1)
-                  Concrete execution of f1 with args:
+                  Execution of main function f1's body with env:
                     x = (-1)
+                    zero = 0
+                    one = 1
                 Line 12:
                   Execution got stuck, Precondition of f1 with:
                     x = (-1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 12, characters 13-18)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 11:
                   x = (-1)
-                  Concrete execution of f1 with args:
+                  Execution of main function f1's body with env:
                     x = (-1)
+                    zero = 0
+                    one = 1
                 Line 12:
                   Execution got stuck, Precondition of f1 with:
                     x = (-1)
@@ -88,11 +102,18 @@ Prover result is: valid (0.02s, 1094 steps).
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 11:
                   x = 1
-                  Concrete execution of f1 with args:
+                  Execution of main function f1's body with env:
                     x = 1
+                    zero = 0
+                    one = 1
                 Line 13:
                   Concrete execution of g1 with args:
                     y = 1
@@ -104,11 +125,18 @@ Prover result is: valid (0.02s, 1094 steps).
                 Line 11:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 8, characters 12-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 11:
                   x = 1
-                  Concrete execution of f1 with args:
+                  Execution of main function f1's body with env:
                     x = 1
+                    zero = 0
+                    one = 1
                 Line 13:
                   Abstract execution of g1 with args:
                     y = 1
@@ -150,11 +178,18 @@ Prover result is: valid (0.02s, 1094 steps).
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 11:
                   x = 1
-                  Concrete execution of f1 with args:
+                  Execution of main function f1's body with env:
                     x = 1
+                    zero = 0
+                    one = 1
                 Line 13:
                   Concrete execution of g1 with args:
                     y = 1
@@ -166,11 +201,18 @@ Prover result is: valid (0.02s, 1094 steps).
                 Line 11:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 8, characters 12-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 11:
                   x = 1
-                  Concrete execution of f1 with args:
+                  Execution of main function f1's body with env:
                     x = 1
+                    zero = 0
+                    one = 1
                 Line 13:
                   Abstract execution of g1 with args:
                     y = 1
@@ -188,7 +230,7 @@ Prover result is: valid (0.02s, 1094 steps).
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
 Goal Assertion from verification condition f1'vc.
-Prover result is: unknown (unknown + incomplete) (0.03s, 6679 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6679 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -204,11 +246,18 @@ Sorry, we don't have a good counterexample for you :(
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of f2 with args:
+                  Execution of main function f2's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 19:
                   Concrete execution of g2 with args:
                     y = 0
@@ -225,11 +274,18 @@ Sorry, we don't have a good counterexample for you :(
                     x = 0
                     z = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 16, characters 18-29)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of f2 with args:
+                  Execution of main function f2's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 19:
                   Abstract execution of g2 with args:
                     y = 0
@@ -250,11 +306,18 @@ Sorry, we don't have a good counterexample for you :(
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of f2 with args:
+                  Execution of main function f2's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 19:
                   Concrete execution of g2 with args:
                     y = 0
@@ -271,11 +334,18 @@ Sorry, we don't have a good counterexample for you :(
                     x = 0
                     z = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 16, characters 18-29)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of f2 with args:
+                  Execution of main function f2's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 19:
                   Abstract execution of g2 with args:
                     y = 0
@@ -296,11 +366,18 @@ Sorry, we don't have a good counterexample for you :(
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of f2 with args:
+                  Execution of main function f2's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 19:
                   Concrete execution of g2 with args:
                     y = 0
@@ -317,11 +394,18 @@ Sorry, we don't have a good counterexample for you :(
                     x = 0
                     z = (ref'mk 1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 16, characters 18-29)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Concrete execution of f2 with args:
+                  Execution of main function f2's body with env:
                     x = 0
+                    zero = 0
+                    one = 1
                 Line 19:
                   Abstract execution of g2 with args:
                     y = 0
@@ -339,14 +423,21 @@ Sorry, we don't have a good counterexample for you :(
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
 Goal Assertion from verification condition f2'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6423 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6423 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File func_call5.mlw:
   Line 18:
     x = 0
-    Concrete execution of f2 with args:
+    Execution of main function f2's body with env:
       x = 0
+      zero = 0
+      one = 1
   Line 19:
     Concrete execution of g2 with args:
       y = 0

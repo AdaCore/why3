@@ -1,6 +1,6 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.00s, 105 steps).
+Prover result is: valid (0.03s, 105 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
@@ -30,11 +30,18 @@ Prover result is: valid (0.01s, 2819 steps).
 <rac-values>No value for i at "bench/check-ce/while.mlw", line 8, characters 2-161, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while.mlw:
                 Line 4:
                   z = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     z = 0
+                    zero = 0
+                    one = 1
                 Line 5:
                   Concrete execution of ref with args:
                     contents = 0
@@ -110,11 +117,18 @@ Prover result is: valid (0.01s, 2819 steps).
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/while.mlw", line 8, characters 2-161)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while.mlw:
                 Line 4:
                   z = 0
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     z = 0
+                    zero = 0
+                    one = 1
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
@@ -207,11 +221,18 @@ Prover result is: valid (0.01s, 2819 steps).
 <rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while.mlw:
                 Line 4:
                   z = 3
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     z = 3
+                    zero = 0
+                    one = 1
                 Line 5:
                   Concrete execution of ref with args:
                     contents = 3
@@ -287,11 +308,18 @@ Prover result is: valid (0.01s, 2819 steps).
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while.mlw:
                 Line 4:
                   z = 3
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     z = 3
+                    zero = 0
+                    one = 1
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 3
@@ -350,11 +378,18 @@ Prover result is: valid (0.01s, 2819 steps).
 <rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while.mlw:
                 Line 4:
                   z = 3
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     z = 3
+                    zero = 0
+                    one = 1
                 Line 5:
                   Concrete execution of ref with args:
                     contents = 3
@@ -430,11 +465,18 @@ Prover result is: valid (0.01s, 2819 steps).
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while.mlw:
                 Line 4:
                   z = 3
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     z = 3
+                    zero = 0
+                    one = 1
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 3
@@ -452,15 +494,15 @@ Prover result is: valid (0.01s, 2819 steps).
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 6527276 steps).
+Prover result is: timeout (1.00s, 5898281 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: valid (0.00s, 2817 steps).
+Prover result is: valid (0.01s, 2817 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.00s, 2745 steps).
+Prover result is: valid (0.01s, 2745 steps).
 

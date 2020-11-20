@@ -1,6 +1,6 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.01s, 1177 steps).
+Prover result is: valid (0.02s, 1177 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Goal Loop variant decrease from verification condition f'vc.
@@ -8,7 +8,7 @@ Prover result is: valid (0.02s, 1830 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.02s, 1763 steps).
+Prover result is: valid (0.03s, 1763 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce>Validating model:
@@ -44,11 +44,18 @@ Prover result is: valid (0.02s, 1763 steps).
 <rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 0)
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while1.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 6:
                   Concrete execution of ref with args:
                     contents = 0
@@ -110,11 +117,18 @@ Prover result is: valid (0.02s, 1763 steps).
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/while1.mlw", line 8, characters 4-113)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while1.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 6:
                   Abstract execution of ref with args:
                     contents = 0
@@ -180,11 +194,18 @@ Prover result is: valid (0.02s, 1763 steps).
 <rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 2)
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while1.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 6:
                   Concrete execution of ref with args:
                     contents = 0
@@ -246,11 +267,18 @@ Prover result is: valid (0.02s, 1763 steps).
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while1.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 6:
                   Abstract execution of ref with args:
                     contents = 0
@@ -308,11 +336,18 @@ Prover result is: valid (0.02s, 1763 steps).
 <rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 2)
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while1.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 6:
                   Concrete execution of ref with args:
                     contents = 0
@@ -374,11 +409,18 @@ Prover result is: valid (0.02s, 1763 steps).
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File while1.mlw:
                 Line 4:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 6:
                   Abstract execution of ref with args:
                     contents = 0
@@ -414,11 +456,18 @@ Goal Postcondition from verification condition f'vc.
 Prover result is: unknown (unknown + incomplete) (0.04s, 6577 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File while1.mlw:
   Line 4:
     _ = ()
-    Concrete execution of f with args:
+    Execution of main function f's body with env:
       _ = ()
+      zero = 0
+      one = 1
   Line 6:
     Abstract execution of ref with args:
       contents = 0

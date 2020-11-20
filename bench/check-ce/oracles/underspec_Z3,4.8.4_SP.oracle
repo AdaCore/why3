@@ -25,11 +25,18 @@ Prover result is: valid (0.02s, 58 steps).
 <rac-values>No value for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9, taking default 2.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 14:
                   Concrete execution of ref with args:
                     contents = 0
@@ -65,11 +72,18 @@ Prover result is: valid (0.02s, 58 steps).
                 Line 13:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 17, characters 18-33)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 14:
                   Abstract execution of ref with args:
                     contents = 0
@@ -123,11 +137,18 @@ Prover result is: valid (0.02s, 58 steps).
 <rac-values>Value imported for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 0
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 14:
                   Concrete execution of ref with args:
                     contents = 0
@@ -163,11 +184,18 @@ Prover result is: valid (0.02s, 58 steps).
                 Line 13:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/underspec.mlw", line 17, characters 18-33)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 14:
                   Abstract execution of ref with args:
                     contents = 0
@@ -231,11 +259,18 @@ Prover result is: valid (0.02s, 58 steps).
 <rac-values>Value imported for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 0
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 14:
                   Concrete execution of ref with args:
                     contents = 0
@@ -271,11 +306,18 @@ Prover result is: valid (0.02s, 58 steps).
                 Line 13:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/underspec.mlw", line 17, characters 18-33)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 13:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 14:
                   Abstract execution of ref with args:
                     contents = 0
@@ -312,14 +354,21 @@ Prover result is: valid (0.02s, 58 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 5748557 steps).
+Prover result is: timeout (1.00s, 5607611 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File underspec.mlw:
   Line 13:
     _ = ()
-    Concrete execution of f with args:
+    Execution of main function f's body with env:
       _ = ()
+      zero = 0
+      one = 1
   Line 14:
     Abstract execution of ref with args:
       contents = 0
@@ -354,7 +403,7 @@ Prover result is: valid (0.01s, 2384 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.00s, 2283 steps).
+Prover result is: valid (0.01s, 2283 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Validating model:
@@ -385,8 +434,14 @@ Prover result is: valid (0.00s, 2283 steps).
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 37:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -395,8 +450,11 @@ Prover result is: valid (0.00s, 2283 steps).
                     contents = 0
                 Line 44:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 46:
                   Concrete execution of Tuple0 with args:
                   Concrete execution of g with args:
@@ -410,8 +468,14 @@ Prover result is: valid (0.00s, 2283 steps).
                 Line 44:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 41, characters 14-23)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 37:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -420,8 +484,11 @@ Prover result is: valid (0.00s, 2283 steps).
                     contents = 0
                 Line 44:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 0)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 46:
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
@@ -479,8 +546,14 @@ Prover result is: valid (0.00s, 2283 steps).
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 37:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -489,8 +562,11 @@ Prover result is: valid (0.00s, 2283 steps).
                     contents = 0
                 Line 44:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 46:
                   Concrete execution of Tuple0 with args:
                   Concrete execution of g with args:
@@ -504,8 +580,14 @@ Prover result is: valid (0.00s, 2283 steps).
                 Line 44:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 37:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -514,8 +596,11 @@ Prover result is: valid (0.00s, 2283 steps).
                     contents = 0
                 Line 44:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 2)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 46:
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
@@ -572,8 +657,14 @@ Prover result is: valid (0.00s, 2283 steps).
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 37:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -582,8 +673,11 @@ Prover result is: valid (0.00s, 2283 steps).
                     contents = 0
                 Line 44:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 1)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 46:
                   Concrete execution of Tuple0 with args:
                   Concrete execution of g with args:
@@ -597,8 +691,14 @@ Prover result is: valid (0.00s, 2283 steps).
                 Line 44:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File underspec.mlw:
                 Line 37:
+                  Constant z initialization
                   (abstract) execution of any function
                   result = 0
                   Concrete execution of ref with args:
@@ -607,8 +707,11 @@ Prover result is: valid (0.00s, 2283 steps).
                     contents = 0
                 Line 44:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
+                    z = (ref'mk 2)
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 46:
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
@@ -627,11 +730,17 @@ Prover result is: valid (0.00s, 2283 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 5989716 steps).
+Prover result is: timeout (1.00s, 5990377 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File underspec.mlw:
   Line 37:
+    Constant z initialization
     (abstract) execution of any function
     result = 0
     Concrete execution of ref with args:
@@ -640,8 +749,11 @@ File underspec.mlw:
       contents = 0
   Line 44:
     _ = ()
-    Concrete execution of f with args:
+    Execution of main function f's body with env:
+      z = (ref'mk 2)
       _ = ()
+      zero = 0
+      one = 1
   Line 46:
     Concrete execution of Tuple0 with args:
     Abstract execution of g with args:

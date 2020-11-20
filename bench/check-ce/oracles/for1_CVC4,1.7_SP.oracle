@@ -27,11 +27,18 @@ Prover result is: valid (0.03s, 1654 steps).
 <rac-values>No value for i at "bench/check-ce/for1.mlw", line 6, characters 8-9, taking default 2.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File for1.mlw:
                 Line 3:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 5:
                   Concrete execution of ref with args:
                     contents = 0
@@ -56,11 +63,18 @@ Prover result is: valid (0.03s, 1654 steps).
                 Line 3:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File for1.mlw:
                 Line 3:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
@@ -96,11 +110,18 @@ Prover result is: valid (0.03s, 1654 steps).
 <rac-values>No value for i at "bench/check-ce/for1.mlw", line 6, characters 8-9, taking default 2.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File for1.mlw:
                 Line 3:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 5:
                   Concrete execution of ref with args:
                     contents = 0
@@ -125,11 +146,18 @@ Prover result is: valid (0.03s, 1654 steps).
                 Line 3:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File for1.mlw:
                 Line 3:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
@@ -165,11 +193,18 @@ Prover result is: valid (0.03s, 1654 steps).
 <rac-values>No value for i at "bench/check-ce/for1.mlw", line 6, characters 8-9, taking default 2.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File for1.mlw:
                 Line 3:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 5:
                   Concrete execution of ref with args:
                     contents = 0
@@ -194,11 +229,18 @@ Prover result is: valid (0.03s, 1654 steps).
                 Line 3:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
               File for1.mlw:
                 Line 3:
                   _ = ()
-                  Concrete execution of f with args:
+                  Execution of main function f's body with env:
                     _ = ()
+                    zero = 0
+                    one = 1
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
@@ -222,14 +264,21 @@ Prover result is: valid (0.03s, 1654 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Goal Postcondition from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6492 steps).
+Prover result is: unknown (unknown + incomplete) (0.06s, 6492 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
 File for1.mlw:
   Line 3:
     _ = ()
-    Concrete execution of f with args:
+    Execution of main function f's body with env:
       _ = ()
+      zero = 0
+      one = 1
   Line 5:
     Abstract execution of ref with args:
       contents = 0
@@ -247,5 +296,5 @@ File for1.mlw:
 
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Verification condition f'vc.
-Prover result is: valid (0.02s, 1390 steps).
+Prover result is: valid (0.03s, 1390 steps).
 

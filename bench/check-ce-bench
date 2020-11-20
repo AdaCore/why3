@@ -66,8 +66,8 @@ run () {
         printf "Strongest Postcondition  ${file_path} ($1)... "
     fi
     prover="$1,counterexamples"
-    echo $dir/../bin/why3prove"$suffix" --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce,rac-values
-    $dir/../bin/why3prove"$suffix" --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce,rac-values 2>&1 \
+    echo $dir/../bin/why3prove"$suffix" --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce,rac-values -v 5
+    $dir/../bin/why3prove"$suffix" --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce,rac-values -v 5 2>&1 \
       | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
       > "$f.out"
     str_out=$(sed 's/[0-9]\+\.[0-9]\+s//g' "$f.out" | \
