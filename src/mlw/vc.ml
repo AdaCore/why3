@@ -222,7 +222,7 @@ let wp_forall vl wp = t_forall_close_simp vl [] wp
 let sp_exists vl sp = t_exists_close_simp vl [] sp
 
 let t_let_close_simp v t f =
-  if relevant_for_counterexample v.vs_name then t_let_close v t f else
+  if true || relevant_for_counterexample v.vs_name then t_let_close v t f else
     t_let_close_simp v t f
 
 let wp_let v t wp =
