@@ -195,28 +195,28 @@ let get_field_name rs =
   | "" -> rs.rs_name.id_string
   | name -> name
 
-let empty_model_trace attrs =
-  try
-    let a = Ident.get_model_trace_attr ~attrs in
-    a.attr_string = "model_trace:"
-  with Not_found -> false
+(* let empty_model_trace attrs =
+ *   try
+ *     let a = Ident.get_model_trace_attr ~attrs in
+ *     a.attr_string = "model_trace:"
+ *   with Not_found -> false *)
 
 (** Import a value from the prover model to an interpreter value. Raises [Exit] if the
     value cannot be imported. *)
-let rec import_model_value known (th_known: Decl.known_map) ity v =
+let rec import_model_value known th_known ity v =
   let open Model_parser in
   let ts, l1, l2 = ity_components ity in
   let subst = its_match_regs ts l1 l2 in
   let def = Pdecl.find_its_defn known ts in
-  let ity, wrap =
-    match def.Pdecl.itd_constructors, def.Pdecl.itd_fields with
-    | [rs_constr], [rs_field]
-      when empty_model_trace rs_field.rs_name.id_attrs ->
-        (* type ty = { f[@model_trace:]: ty'} *)
-        let wrap v = constr_value ity rs_constr [v] in
-        rs_field.rs_cty.cty_result, wrap
-    | _ -> ity, (fun v -> v) in
-  wrap (match v with
+  (* match def.Pdecl.itd_constructors, def.Pdecl.itd_fields with
+   * | [rs_constr], [rs_field]
+   *   when empty_model_trace rs_field.rs_name.id_attrs ->
+   *     (\* type ty = { f[@model_trace:]: ty'} *\)
+   *     eprintf "WRAP %a in %a@." print_ity ity print_ity rs_field.rs_cty.cty_result;
+   *     let v = import_model_value known th_known rs_field.rs_cty.cty_result v in
+   *     constr_value ity rs_constr [v]
+   * | _ -> *)
+    match v with
       | Integer s ->
           if ity_equal ity ity_int then
             int_value s
@@ -281,7 +281,7 @@ let rec import_model_value known (th_known: Decl.known_map) ity v =
           purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
       | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
           kasprintf failwith "import_model_value: not implemented for value %a"
-            Model_parser.print_model_value v)
+            Model_parser.print_model_value v
 
 let get_model_value m known th_known =
   fun ?name ?loc ity : value option ->
@@ -434,8 +434,7 @@ let check_model reduce env pm model =
           check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
         Debug.dprintf debug_check_ce
           "@[Validating model:@\n@[<hv2>%a@]@]@\n"
-          (Model_parser.print_model ?me_name_trans:None ~print_attrs:false)
-          model;
+          (print_model ?me_name_trans:None ~print_attrs:false) model;
         Debug.dprintf debug_check_ce "@[Interpreting concretly@]@\n";
         let concrete = check_model_rs ~abstract:false in
         Debug.dprintf debug_check_ce "@[Interpreting abstractly@]@\n";
