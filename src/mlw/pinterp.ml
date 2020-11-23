@@ -1139,15 +1139,12 @@ let find_global_definition kn rs =
 
 let find_definition env (rs: rsymbol) =
   (* then try if it is a built-in symbol *)
-  match Hrs.find builtin_progs rs with
-  | f -> Builtin f
-  | exception Not_found ->
-      (* then try if it is a local function *)
-      match Mrs.find rs env.funenv with
-      | f -> LocalFunction ([], f)
-      | exception Not_found ->
-          (* else look for a global function *)
-          find_global_definition env.mod_known rs
+  try Builtin (Hrs.find builtin_progs rs) with Not_found ->
+  (* then try if it is a local function *)
+  try LocalFunction ([], Mrs.find rs env.funenv) with Not_found ->
+  (* else look for a global function *)
+  find_global_definition env.mod_known rs
+
 (** Convert a value into a term. The first component of the result are additional bindings
    from closures. *)
 let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * term =
