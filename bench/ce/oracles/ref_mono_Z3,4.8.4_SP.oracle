@@ -1,9 +1,21 @@
 Strongest Postcondition
-bench/ce/ref_mono.mlw Ref ref1'vc: Valid
-bench/ce/ref_mono.mlw Ref prefix !'vc: Valid
-bench/ce/ref_mono.mlw Ref infix :='vc: Valid
-bench/ce/ref_mono.mlw M test_post'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 7, characters 30-55:
+Goal Postcondition from verification condition ref1'vc.
+Prover result is: valid.
+
+File "bench/ce/ref_mono.mlw", line 9, characters 29-40:
+Goal Postcondition from verification condition prefix !'vc.
+Prover result is: valid.
+
+File "bench/ce/ref_mono.mlw", line 11, characters 38-44:
+Goal Postcondition from verification condition infix :='vc.
+Prover result is: valid.
+
+File "bench/ce/ref_mono.mlw", line 21, characters 14-25:
+Goal Postcondition from verification condition test_post'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
     y, [[@at:'Old:loc:bench/ce/ref_mono.mlw:21], [@field:0:contents],
@@ -41,8 +53,11 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "7868"}}]}}
 
-bench/ce/ref_mono.mlw M test_post2'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 27, characters 14-29:
+Goal Postcondition from verification condition test_post2'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
     y, [[@at:'Old:loc:bench/ce/ref_mono.mlw:27], [@field:0:contents],
@@ -91,8 +106,11 @@ File ref_mono.mlw:
           [{"field": "contents",
             "value": {"type": "Integer", "val": "-7826"}}]}}
 
-bench/ce/ref_mono.mlw M incr'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 38, characters 12-36:
+Goal Postcondition from verification condition incr'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
     y, [[@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents],
@@ -158,8 +176,11 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
 
-bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 51, characters 14-36:
+Goal Loop invariant init from verification condition test_loop'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 35:
     y, [[@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents],
@@ -216,9 +237,15 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "402"}}]}}
 
-bench/ce/ref_mono.mlw M test_loop'vc: Valid
-bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 52, characters 12-14:
+Goal Loop variant decrease from verification condition test_loop'vc.
+Prover result is: valid.
+
+File "bench/ce/ref_mono.mlw", line 51, characters 14-36:
+Goal Loop invariant preservation from verification condition test_loop'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
     x, [[@field:0:contents], [@introduced]] =
@@ -269,7 +296,7 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "107"}}]}}
   Line 50:
-    [previous iteration] x, [[@field:0:contents], [@introduced]] =
+    [before iteration] x, [[@field:0:contents], [@introduced]] =
       {"type": "Record",
        "val":
         {"Field":
@@ -300,8 +327,11 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "53"}}]}}
 
-bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 45, characters 12-23:
+Goal Postcondition from verification condition test_loop'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
     x, [[@field:0:contents], [@introduced]] =

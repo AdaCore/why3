@@ -1,7 +1,13 @@
 Weakest Precondition
-bench/ce/loop_inv.mlw M f'vc: Valid
-bench/ce/loop_inv.mlw M f'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/loop_inv.mlw", line 13, characters 16-25:
+Goal Loop invariant init from verification condition f'vc.
+Prover result is: valid.
+
+File "bench/ce/loop_inv.mlw", line 13, characters 16-25:
+Goal Loop invariant preservation from verification condition f'vc.
+Prover result is: unknown (unknown + incomplete).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File loop_inv.mlw:
   Line 10:
     a, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
@@ -10,7 +16,7 @@ File loop_inv.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 12:
-    [previous iteration] b, [[@field:0:contents], [@introduced],
+    [before iteration] b, [[@field:0:contents], [@introduced],
       [@mlw:reference_var]] =
       {"type": "Record",
        "val":
@@ -37,9 +43,15 @@ File loop_inv.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
 
-bench/ce/loop_inv.mlw N f'vc: Valid
-bench/ce/loop_inv.mlw N f'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/loop_inv.mlw", line 34, characters 16-25:
+Goal Loop invariant init from verification condition f'vc.
+Prover result is: valid.
+
+File "bench/ce/loop_inv.mlw", line 34, characters 16-25:
+Goal Loop invariant preservation from verification condition f'vc.
+Prover result is: unknown (unknown + incomplete).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File loop_inv.mlw:
   Line 31:
     a, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
@@ -54,7 +66,7 @@ File loop_inv.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
   Line 33:
-    [previous iteration] b, [[@field:0:contents], [@introduced],
+    [before iteration] b, [[@field:0:contents], [@introduced],
       [@mlw:reference_var]] =
       {"type": "Record",
        "val":
@@ -81,10 +93,19 @@ File loop_inv.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
 
-bench/ce/loop_inv.mlw N f'vc: Valid
-bench/ce/loop_inv.mlw R f'vc: Valid
-bench/ce/loop_inv.mlw R f'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/loop_inv.mlw", line 29, characters 12-22:
+Goal Postcondition from verification condition f'vc.
+Prover result is: valid.
+
+File "bench/ce/loop_inv.mlw", line 56, characters 16-27:
+Goal Loop invariant init from verification condition f'vc.
+Prover result is: valid.
+
+File "bench/ce/loop_inv.mlw", line 56, characters 16-27:
+Goal Loop invariant preservation from verification condition f'vc.
+Prover result is: unknown (unknown + incomplete).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File loop_inv.mlw:
   Line 53:
     a, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
@@ -99,7 +120,7 @@ File loop_inv.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Decimal", "val": "2.0"}}]}}
   Line 55:
-    [previous iteration] b, [[@field:0:contents], [@introduced],
+    [before iteration] b, [[@field:0:contents], [@introduced],
       [@mlw:reference_var]] =
       {"type": "Record",
        "val":
@@ -126,4 +147,7 @@ File loop_inv.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Decimal", "val": "6.0"}}]}}
 
-bench/ce/loop_inv.mlw R f'vc: Valid
+File "bench/ce/loop_inv.mlw", line 51, characters 12-22:
+Goal Postcondition from verification condition f'vc.
+Prover result is: valid.
+

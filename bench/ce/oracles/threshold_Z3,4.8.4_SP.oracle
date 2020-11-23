@@ -1,6 +1,9 @@
 Strongest Postcondition
-bench/ce/threshold.mlw WithInt32 f'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/threshold.mlw", line 10, characters 11-20:
+Goal Integer overflow from verification condition f'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 7:
     max, [[@introduced]] =
@@ -21,8 +24,11 @@ File threshold.mlw:
        "type": "Proj",
        "value": {"type": "Integer", "val": "2147483647"}}
 
-bench/ce/threshold.mlw WithInt32 f'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/threshold.mlw", line 8, characters 13-33:
+Goal Postcondition from verification condition f'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 7:
     max, [[@introduced]] =
@@ -56,8 +62,11 @@ File threshold.mlw:
        "type": "Proj",
        "value": {"type": "Integer", "val": "-1"}}
 
-bench/ce/threshold.mlw WithBV32 f'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/threshold.mlw", line 25, characters 11-28:
+Goal Arithmetic overflow from verification condition f'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 21:
     max, [[@introduced]] = {"type": "Integer", "val": "4026531703"}
@@ -68,8 +77,11 @@ File threshold.mlw:
     min, [[@introduced], [@model_trace:min]] =
       {"type": "Integer", "val": "4116707090"}
 
-bench/ce/threshold.mlw WithBV32 f'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/threshold.mlw", line 22, characters 13-45:
+Goal Postcondition from verification condition f'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 21:
     max, [[@introduced]] = {"type": "Integer", "val": "1074330528"}

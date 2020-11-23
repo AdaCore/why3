@@ -1,6 +1,9 @@
 Weakest Precondition
-bench/ce/ref_ex.mlw M test_post'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_ex.mlw", line 7, characters 14-25:
+Goal Postcondition from verification condition test_post'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_ex.mlw:
   Line 6:
     x, [[@introduced]] = {"type": "Integer", "val": "1"}
@@ -25,8 +28,11 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
-bench/ce/ref_ex.mlw M test_post2'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_ex.mlw", line 13, characters 14-29:
+Goal Postcondition from verification condition test_post2'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_ex.mlw:
   Line 11:
     x, [[@introduced]] = {"type": "Integer", "val": "43"}
@@ -56,8 +62,11 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
 
-bench/ce/ref_ex.mlw M incr'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_ex.mlw", line 24, characters 12-36:
+Goal Postcondition from verification condition incr'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
     y, [[@at:'Old:loc:bench/ce/ref_ex.mlw:24], [@field:0:contents],
@@ -124,8 +133,11 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
 
-bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_ex.mlw", line 38, characters 14-36:
+Goal Loop invariant init from verification condition test_loop'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_ex.mlw:
   Line 21:
     y, [[@at:'Old:loc:bench/ce/ref_ex.mlw:24], [@field:0:contents],
@@ -182,9 +194,15 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 
-bench/ce/ref_ex.mlw M test_loop'vc: Valid
-bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_ex.mlw", line 39, characters 12-14:
+Goal Loop variant decrease from verification condition test_loop'vc.
+Prover result is: valid.
+
+File "bench/ce/ref_ex.mlw", line 38, characters 14-36:
+Goal Loop invariant preservation from verification condition test_loop'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
     x, [[@field:0:contents], [@introduced]] =
@@ -236,7 +254,7 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 37:
-    [previous iteration] x, [[@field:0:contents], [@introduced]] =
+    [before iteration] x, [[@field:0:contents], [@introduced]] =
       {"type": "Record",
        "val":
         {"Field":
@@ -267,8 +285,11 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
-bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_ex.mlw", line 32, characters 12-23:
+Goal Postcondition from verification condition test_loop'vc.
+Prover result is: timeout.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
     x, [[@field:0:contents], [@introduced]] =

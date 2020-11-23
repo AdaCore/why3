@@ -1,14 +1,20 @@
 Weakest Precondition
-bench/ce/polymorphism.mlw Test gm: Unknown (sat)
-Counter-example model:
+File "bench/ce/polymorphism.mlw", line 7, characters 27-34:
+Verification condition gm.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File polymorphism.mlw:
   Line 7:
     x, [[@introduced]] =
       {"type": "Apply",
        "val": {"apply": "B", "list": [{"type": "Integer", "val": "1"}]}}
 
-bench/ce/polymorphism.mlw Test gm2: Unknown (sat)
-Counter-example model:
+File "bench/ce/polymorphism.mlw", line 11, characters 22-35:
+Verification condition gm2.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File polymorphism.mlw:
   Line 11:
     x, [[@introduced]] =
@@ -19,4 +25,7 @@ File polymorphism.mlw:
           [{"type": "Integer", "val": "1"},
            {"type": "Boolean", "val": false}]}}
 
-bench/ce/polymorphism.mlw Test g: Timeout or Unknown
+File "bench/ce/polymorphism.mlw", line 15, characters 30-37:
+Verification condition g.
+Prover result is: timeout.
+

@@ -1,7 +1,13 @@
 Weakest Precondition
-bench/ce/int32.mlw Ce_int32 dummy_update'vc: Valid
-bench/ce/int32.mlw Ce_int32 dummy_update'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/int32.mlw", line 9, characters 9-14:
+Goal Integer overflow from verification condition dummy_update'vc.
+Prover result is: valid.
+
+File "bench/ce/int32.mlw", line 7, characters 14-30:
+Goal Postcondition from verification condition dummy_update'vc.
+Prover result is: unknown (unknown + incomplete).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File int32.mlw:
   Line 5:
     r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
