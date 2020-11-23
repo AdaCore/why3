@@ -20,7 +20,6 @@ let string fmt s =
     (match s.[!i] with
     | '"'  -> Buffer.add_string b "\\\""
     | '\\' -> Buffer.add_string b "\\\\"
-    | '/'  -> Buffer.add_string b "\\/"
     | '\b' -> Buffer.add_string b "\\b"
     | c when c = Char.chr 12 -> Buffer.add_string b "\\f"
     | '\n' -> Buffer.add_string b "\\n"
