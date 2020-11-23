@@ -1,39 +1,22 @@
 Weakest Precondition
-File "bench/ce/polymorphism.mlw", line 7, characters 27-34:
-Verification condition gm.
-Prover result is: unknown (sat) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/polymorphism.mlw":
-    {"7":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Apply",
-          "val": {"apply": "B", "list": [{"type": "Integer", "val": "1"}]}},
-        "kind": "other"}]}}}
+bench/ce/polymorphism.mlw Test gm: Unknown (sat)
+Counter-example model:
+File polymorphism.mlw:
+  Line 7:
+    x, [[@introduced]] =
+      {"type": "Apply",
+       "val": {"apply": "B", "list": [{"type": "Integer", "val": "1"}]}}
 
-File "bench/ce/polymorphism.mlw", line 11, characters 22-35:
-Verification condition gm2.
-Prover result is: unknown (sat) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/polymorphism.mlw":
-    {"11":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Apply",
-          "val":
-           {"apply": "C",
-            "list":
-             [{"type": "Integer", "val": "1"},
-              {"type": "Boolean", "val": false}]}},
-        "kind": "other"}]}}}
+bench/ce/polymorphism.mlw Test gm2: Unknown (sat)
+Counter-example model:
+File polymorphism.mlw:
+  Line 11:
+    x, [[@introduced]] =
+      {"type": "Apply",
+       "val":
+        {"apply": "C",
+         "list":
+          [{"type": "Integer", "val": "1"},
+           {"type": "Boolean", "val": false}]}}
 
-File "bench/ce/polymorphism.mlw", line 15, characters 30-37:
-Verification condition g.
-Prover result is: timeout WHY3DATA.
-
+bench/ce/polymorphism.mlw Test g: Timeout or Unknown

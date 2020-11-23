@@ -1,253 +1,111 @@
 Weakest Precondition
-File "bench/ce/strings.mlw", line 6, characters 21-34:
-Verification condition T1.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"6":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "8"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T1: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 6:
+    s, [[@introduced]] = {"type": "String", "val": "8"}
 
-File "bench/ce/strings.mlw", line 7, characters 21-35:
-Verification condition T2.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"7":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "44424"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T2: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 7:
+    s, [[@introduced]] = {"type": "String", "val": "44424"}
 
-File "bench/ce/strings.mlw", line 8, characters 25-52:
-Verification condition T3.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"8":
-      [{"name": "s1",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "!!!1!!!"},
-        "kind": "other"},
-       {"name": "s2",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "!!!0!!!"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T3: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 8:
+    s1, [[@introduced]] = {"type": "String", "val": "!!!1!!!"}
+    s2, [[@introduced]] = {"type": "String", "val": "!!!0!!!"}
 
-File "bench/ce/strings.mlw", line 9, characters 38-55:
-Verification condition T4.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"9":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "118112148284"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T4: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 9:
+    s, [[@introduced]] = {"type": "String", "val": "118112148284"}
 
-File "bench/ce/strings.mlw", line 10, characters 59-78:
-Verification condition T5.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"10":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "2882262"},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "b{uoh\ti"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T5: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 10:
+    s, [[@introduced]] = {"type": "String", "val": "2882262"}
+    x, [[@introduced]] = {"type": "String", "val": "b{uoh\ti"}
 
-File "bench/ce/strings.mlw", line 11, characters 59-79:
-Verification condition T6.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"11":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "String",
-          "val": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "b{uoh\ti"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T6: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 11:
+    s, [[@introduced]] =
+      {"type": "String",
+       "val": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"}
+    x, [[@introduced]] = {"type": "String", "val": "b{uoh\ti"}
 
-File "bench/ce/strings.mlw", line 12, characters 59-78:
-Verification condition T7.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"12":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": ""},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "b{uoh\ti"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T7: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 12:
+    s, [[@introduced]] = {"type": "String", "val": ""}
+    x, [[@introduced]] = {"type": "String", "val": "b{uoh\ti"}
 
-File "bench/ce/strings.mlw", line 13, characters 59-79:
-Verification condition T8.
-Prover result is: valid WHY3DATA.
+bench/ce/strings.mlw TestCounterexample T8: Valid
+bench/ce/strings.mlw TestCounterexample T9: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 14:
+    s, [[@introduced]] = {"type": "String", "val": "2814148"}
+    x, [[@introduced]] = {"type": "String", "val": "b{uoh\ti"}
 
-File "bench/ce/strings.mlw", line 14, characters 59-78:
-Verification condition T9.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"14":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "2814148"},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "b{uoh\ti"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T10: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 15:
+    s, [[@introduced]] =
+      {"type": "String",
+       "val": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"}
+    x, [[@introduced]] = {"type": "String", "val": "b{uoh\ti"}
 
-File "bench/ce/strings.mlw", line 15, characters 60-80:
-Verification condition T10.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"15":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "String",
-          "val": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "b{uoh\ti"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T11: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 16:
+    s, [[@introduced]] = {"type": "String", "val": ""}
+    x, [[@introduced]] = {"type": "String", "val": "b{uoh\ti"}
 
-File "bench/ce/strings.mlw", line 16, characters 60-79:
-Verification condition T11.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"16":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": ""},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "b{uoh\ti"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T12: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 17:
+    s, [[@introduced]] = {"type": "String", "val": ""}
+    x, [[@introduced]] = {"type": "String", "val": "b{uoh\ti"}
 
-File "bench/ce/strings.mlw", line 17, characters 60-80:
-Verification condition T12.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"17":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": ""},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "b{uoh\ti"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T13: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 18:
+    s, [[@introduced]] = {"type": "String", "val": ""}
 
-File "bench/ce/strings.mlw", line 18, characters 22-28:
-Verification condition T13.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"18":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": ""},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T14: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 19:
+    s, [[@introduced]] = {"type": "String", "val": ""}
 
-File "bench/ce/strings.mlw", line 19, characters 22-34:
-Verification condition T14.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"19":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": ""},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T15: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 20:
+    i, [[@introduced]] = {"type": "Integer", "val": "-1"}
+    s, [[@introduced]] = {"type": "String", "val": ""}
 
-File "bench/ce/strings.mlw", line 20, characters 24-45:
-Verification condition T15.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"20":
-      [{"name": "i",
-        "attrs": ["introduced"],
-        "value": {"type": "Integer", "val": "-1"},
-        "kind": "other"},
-       {"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": ""},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T16: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 21:
+    s, [[@introduced]] = {"type": "String", "val": ""}
 
-File "bench/ce/strings.mlw", line 21, characters 22-38:
-Verification condition T16.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"21":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": ""},
-        "kind": "other"}]}}}
-
-File "bench/ce/strings.mlw", line 22, characters 42-54:
-Verification condition T17.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/strings.mlw":
-    {"22":
-      [{"name": "s",
-        "attrs": ["introduced"],
-        "value": {"type": "String", "val": "abc"},
-        "kind": "other"}]}}}
+bench/ce/strings.mlw TestCounterexample T17: Timeout or Unknown
+Counter-example model:
+File strings.mlw:
+  Line 22:
+    s, [[@introduced]] = {"type": "String", "val": "abc"}
 

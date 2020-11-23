@@ -1,126 +1,65 @@
 Weakest Precondition
-File "bench/ce/result.mlw", line 11, characters 15-38:
-Goal Postcondition from verification condition p1'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/result.mlw":
-    {"7":
-      [{"name": "a",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}],
-     "9":
-      [{"name": "b",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}},
-        "kind": "other"}],
-     "11":
-      [{"name": "a",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}},
-        "kind": "other"},
-       {"name": "a",
-        "attrs": ["field:0:contents", "introduced", "model_trace:a"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}},
-        "kind": "other"},
-       {"name": "result",
-        "attrs": ["introduced"],
-        "value": {"type": "Integer", "val": "4"},
-        "kind": "other"}],
-     "12":
-      [{"name": "a",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}},
-        "kind": "other"}]}}}
+bench/ce/result.mlw M p1'vc: Timeout or Unknown
+Counter-example model:
+File result.mlw:
+  Line 7:
+    a, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 9:
+    b, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 11:
+    a, [[@field:0:contents], [@introduced], [@model_trace:a]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    result, [[@introduced]] = {"type": "Integer", "val": "4"}
+  Line 12:
+    a, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
 
-File "bench/ce/result.mlw", line 18, characters 12-36:
-Goal Postcondition from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/result.mlw":
-    {"16":
-      [{"name": "A",
-        "attrs":
-         ["at:'Old:loc:bench\/ce\/result.mlw:18",
-          "field:0:contents",
-          "introduced",
-          "model",
-          "model_trace:A"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "42"}}]}},
-        "kind": "other"}],
-     "18":
-      [{"name": "A",
-        "attrs": ["field:0:contents", "introduced", "model", "model_trace:A"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}},
-        "kind": "other"},
-       {"name": "old A",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/result.mlw:18",
-          "field:0:contents",
-          "introduced",
-          "model",
-          "model_trace:A"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "42"}}]}},
-        "kind": "old"},
-       {"name": "result",
-        "attrs": ["introduced"],
-        "value": {"type": "Integer", "val": "2"},
-        "kind": "other"}],
-     "19":
-      [{"name": "A",
-        "attrs": ["field:0:contents", "introduced", "model", "model_trace:A"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}],
-     "20":
-      [{"name": "A",
-        "attrs": ["field:0:contents", "introduced", "model", "model_trace:A"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}},
-        "kind": "other"}]}}}
+bench/ce/result.mlw M f'vc: Timeout or Unknown
+Counter-example model:
+File result.mlw:
+  Line 16:
+    A, [[@at:'Old:loc:bench/ce/result.mlw:18], [@field:0:contents],
+      [@introduced], [@model], [@model_trace:A]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+  Line 18:
+    A, [[@field:0:contents], [@introduced], [@model], [@model_trace:A]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    old A, [[@at:'Old], [@at:'Old:loc:bench/ce/result.mlw:18],
+      [@field:0:contents], [@introduced], [@model], [@model_trace:A]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+  Line 19:
+    A, [[@field:0:contents], [@introduced], [@model], [@model_trace:A]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 20:
+    A, [[@field:0:contents], [@introduced], [@model], [@model_trace:A]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
 

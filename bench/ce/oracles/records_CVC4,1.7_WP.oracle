@@ -1,634 +1,421 @@
 Weakest Precondition
-File "bench/ce/records.mlw", line 15, characters 14-24:
-Goal Postcondition from verification condition record_match_eval_test1'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/records.mlw":
-    {"14":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "0"}},
-              {"field": "g", "value": {"type": "Boolean", "val": true}}]}},
-        "kind": "other"}],
-     "15":
-      [{"name": "result",
-        "attrs": ["introduced"],
-        "value": {"type": "Integer", "val": "0"},
-        "kind": "other"}]}}}
+bench/ce/records.mlw M record_match_eval_test1'vc: Timeout or Unknown
+Counter-example model:
+File records.mlw:
+  Line 14:
+    x, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
+  Line 15:
+    result, [[@introduced]] = {"type": "Integer", "val": "0"}
 
-File "bench/ce/records.mlw", line 15, characters 14-24:
-Goal Postcondition from verification condition record_match_eval_test1'vc.
-Prover result is: valid WHY3DATA.
+bench/ce/records.mlw M record_match_eval_test1'vc: Valid
+bench/ce/records.mlw M record_match_eval_test2'vc: Timeout or Unknown
+Counter-example model:
+File records.mlw:
+  Line 22:
+    x, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 23:
+    x, [[@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-File "bench/ce/records.mlw", line 23, characters 14-24:
-Goal Postcondition from verification condition record_match_eval_test2'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/records.mlw":
-    {"22":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "0"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}],
-     "23":
-      [{"name": "result",
-        "attrs": ["introduced"],
-        "value": {"type": "Integer", "val": "0"},
-        "kind": "other"}]}}}
+bench/ce/records.mlw M record_match_eval_test3'vc: Timeout or Unknown
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 20:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+File records.mlw:
+  Line 27:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 28:
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 30:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 
-File "bench/ce/records.mlw", line 28, characters 14-18:
-Goal Postcondition from verification condition record_match_eval_test3'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
-    {"18":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "20":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}]},
-   "bench\/ce\/records.mlw":
-    {"27":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "28":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced", "model_trace:x"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "30":
-      [{"name": "q ",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "3"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}]}}}
+bench/ce/records.mlw M record_match_eval_test4'vc: Timeout or Unknown
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 20:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+File records.mlw:
+  Line 32:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 33:
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 35:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 
-File "bench/ce/records.mlw", line 33, characters 14-22:
-Goal Postcondition from verification condition record_match_eval_test4'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
-    {"18":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "20":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}]},
-   "bench\/ce\/records.mlw":
-    {"32":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "33":
-      [{"name": "result",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "6"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}],
-     "35":
-      [{"name": "q ",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "3"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}]}}}
+bench/ce/records.mlw M record_match_eval_test44'vc: Timeout or Unknown
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 20:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+File records.mlw:
+  Line 38:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 40:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 42:
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 
-File "bench/ce/records.mlw", line 42, characters 13-22:
-Goal Assertion from verification condition record_match_eval_test44'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
-    {"18":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "20":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}]},
-   "bench\/ce\/records.mlw":
-    {"38":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "40":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "41":
-      [{"name": "q ",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "3"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}],
-     "42":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced", "model_trace:x"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}]}}}
+bench/ce/records.mlw M record_match_eval_test44'vc: Valid
+bench/ce/records.mlw M test_record_match_eval_test5'vc: Timeout or Unknown
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 20:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+File records.mlw:
+  Line 45:
+    re, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 47:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 48:
+    re, [[@field:0:contents], [@introduced], [@model_trace:re]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "3"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 50:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "6"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 
-File "bench/ce/records.mlw", line 39, characters 14-22:
-Goal Postcondition from verification condition record_match_eval_test44'vc.
-Prover result is: valid WHY3DATA.
+bench/ce/records.mlw Mutable record_match_eval_test1'vc: Unknown (sat)
+Counter-example model:
+File records.mlw:
+  Line 64:
+    x, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
+  Line 65:
+    result, [[@introduced]] = {"type": "Integer", "val": "0"}
 
-File "bench/ce/records.mlw", line 48, characters 14-26:
-Goal Postcondition from verification condition
-test_record_match_eval_test5'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
-    {"18":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "20":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}]},
-   "bench\/ce\/records.mlw":
-    {"45":
-      [{"name": "re",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "47":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}],
-     "48":
-      [{"name": "re",
-        "attrs": ["field:0:contents", "introduced", "model_trace:re"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "3"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"},
-       {"name": "result",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "6"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}],
-     "50":
-      [{"name": "q ",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "3"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": ".my_field_f",
-                      "value": {"type": "Integer", "val": "6"}},
-                     {"field": "g",
-                      "value": {"type": "Boolean", "val": false}}]}}}]}},
-        "kind": "other"}]}}}
+bench/ce/records.mlw Mutable record_match_eval_test1'vc: Valid
+bench/ce/records.mlw Mutable record_match_eval_test2'vc: Unknown (sat)
+Counter-example model:
+File records.mlw:
+  Line 72:
+    x, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 73:
+    x, [[@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-File "bench/ce/records.mlw", line 65, characters 14-24:
-Goal Postcondition from verification condition record_match_eval_test1'vc.
-Prover result is: unknown (sat) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/records.mlw":
-    {"64":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "0"}},
-              {"field": "g", "value": {"type": "Boolean", "val": true}}]}},
-        "kind": "other"}],
-     "65":
-      [{"name": "result",
-        "attrs": ["introduced"],
-        "value": {"type": "Integer", "val": "0"},
-        "kind": "other"}]}}}
+bench/ce/records.mlw Mutable record_match_eval_test3'vc: Unknown (sat)
+Counter-example model:
+File records.mlw:
+  Line 77:
+    x, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 78:
+    x, [[@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 80:
+    x, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-File "bench/ce/records.mlw", line 65, characters 14-24:
-Goal Postcondition from verification condition record_match_eval_test1'vc.
-Prover result is: valid WHY3DATA.
-
-File "bench/ce/records.mlw", line 73, characters 14-24:
-Goal Postcondition from verification condition record_match_eval_test2'vc.
-Prover result is: unknown (sat) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/records.mlw":
-    {"72":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "0"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}],
-     "73":
-      [{"name": "the check fails with all inputs",
-        "attrs": [],
-        "value": {"type": "Unparsed", "val": ""},
-        "kind": "error_message"}]}}}
-
-File "bench/ce/records.mlw", line 78, characters 14-17:
-Goal Postcondition from verification condition record_match_eval_test3'vc.
-Prover result is: unknown (sat) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/records.mlw":
-    {"77":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "0"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}],
-     "78":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "6"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"},
-       {"name": "x",
-        "attrs": ["introduced", "model_trace:x"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "6"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}],
-     "80":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "6"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}]}}}
-
-File "bench/ce/records.mlw", line 83, characters 14-22:
-Goal Postcondition from verification condition record_match_eval_test4'vc.
-Prover result is: unknown (sat) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/records.mlw":
-    {"82":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "0"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}],
-     "83":
-      [{"name": "the check fails with all inputs",
-        "attrs": [],
-        "value": {"type": "Unparsed", "val": ""},
-        "kind": "error_message"}],
-     "85":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": ".my_field_f",
-               "value": {"type": "Integer", "val": "6"}},
-              {"field": "g", "value": {"type": "Boolean", "val": false}}]}},
-        "kind": "other"}]}}}
+bench/ce/records.mlw Mutable record_match_eval_test4'vc: Unknown (sat)
+Counter-example model:
+File records.mlw:
+  Line 82:
+    x, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 83:
+    x, [[@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 85:
+    x, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 

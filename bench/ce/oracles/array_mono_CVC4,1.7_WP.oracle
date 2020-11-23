@@ -1,136 +1,117 @@
 Weakest Precondition
-File bench/ce/array_mono.mlw:
-Verification condition array'vc.
-Prover result is: valid WHY3DATA.
+bench/ce/array_mono.mlw Array array'vc: Valid
+bench/ce/array_mono.mlw A f1'vc: Timeout or Unknown
+Counter-example model:
+File array_mono.mlw:
+  Line 16:
+    a, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 35:
+    a, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 36:
+    a, [[@introduced], [@model_trace:a]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
 
-File "bench/ce/array_mono.mlw", line 36, characters 4-8:
-Goal Index in array bounds from verification condition f1'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/array_mono.mlw":
-    {"16":
-      [{"name": "a",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "elts",
-               "value":
-                {"type": "Array",
-                 "val": [{"others": {"type": "Integer", "val": "0"}}]}},
-              {"field": "length", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}],
-     "35":
-      [{"name": "a",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "elts",
-               "value":
-                {"type": "Array",
-                 "val": [{"others": {"type": "Integer", "val": "0"}}]}},
-              {"field": "length", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}],
-     "36":
-      [{"name": "a",
-        "attrs": ["introduced", "model_trace:a"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "elts",
-               "value":
-                {"type": "Array",
-                 "val": [{"others": {"type": "Integer", "val": "0"}}]}},
-              {"field": "length", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}]}}}
-
-File "bench/ce/array_mono.mlw", line 41, characters 4-14:
-Goal Index in array bounds from verification condition f2'vc.
-Prover result is: valid WHY3DATA.
-
-File "bench/ce/array_mono.mlw", line 40, characters 14-26:
-Goal Postcondition from verification condition f2'vc.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/array_mono.mlw":
-    {"25":
-      [{"name": "a",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "elts",
-               "value":
-                {"type": "Array",
-                 "val":
-                  [{"indice": {"type": "Integer", "val": "0"},
-                    "value": {"type": "Integer", "val": "42"}},
-                   {"indice": {"type": "Integer", "val": "1"},
-                    "value": {"type": "Integer", "val": "42"}},
-                   {"others": {"type": "Integer", "val": "0"}}]}},
-              {"field": "length", "value": {"type": "Integer", "val": "2"}}]}},
-        "kind": "other"}],
-     "38":
-      [{"name": "a",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "elts",
-               "value":
-                {"type": "Array",
-                 "val":
-                  [{"indice": {"type": "Integer", "val": "0"},
-                    "value": {"type": "Integer", "val": "42"}},
-                   {"indice": {"type": "Integer", "val": "1"},
-                    "value": {"type": "Integer", "val": "42"}},
-                   {"others": {"type": "Integer", "val": "0"}}]}},
-              {"field": "length", "value": {"type": "Integer", "val": "2"}}]}},
-        "kind": "other"}],
-     "40":
-      [{"name": "a",
-        "attrs": ["introduced", "model_trace:a"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "elts",
-               "value":
-                {"type": "Array",
-                 "val":
-                  [{"indice": {"type": "Integer", "val": "0"},
-                    "value": {"type": "Integer", "val": "42"}},
-                   {"indice": {"type": "Integer", "val": "1"},
-                    "value": {"type": "Integer", "val": "42"}},
-                   {"others": {"type": "Integer", "val": "0"}}]}},
-              {"field": "length", "value": {"type": "Integer", "val": "2"}}]}},
-        "kind": "other"}],
-     "41":
-      [{"name": "a",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "elts",
-               "value":
-                {"type": "Array",
-                 "val":
-                  [{"indice": {"type": "Integer", "val": "0"},
-                    "value": {"type": "Integer", "val": "42"}},
-                   {"indice": {"type": "Integer", "val": "1"},
-                    "value": {"type": "Integer", "val": "42"}},
-                   {"others": {"type": "Integer", "val": "0"}}]}},
-              {"field": "length", "value": {"type": "Integer", "val": "2"}}]}},
-        "kind": "other"}]}}}
+bench/ce/array_mono.mlw A f2'vc: Valid
+bench/ce/array_mono.mlw A f2'vc: Timeout or Unknown
+Counter-example model:
+File array_mono.mlw:
+  Line 25:
+    old a, [[@at:'Old], [@at:'Old:loc:bench/ce/array_mono.mlw:25],
+      [@at:'Old:loc:bench/ce/array_mono.mlw:26], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
+    a, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 38:
+    a, [[@at:'Old], [@at:'Old:loc:bench/ce/array_mono.mlw:25],
+      [@at:'Old:loc:bench/ce/array_mono.mlw:26], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 40:
+    a, [[@introduced], [@model_trace:a]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 41:
+    a, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
 

@@ -1,123 +1,59 @@
 Weakest Precondition
-File "bench/ce/bv32.mlw", line 9, characters 14-29:
-Goal Postcondition from verification condition dummy_update'vc.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/bv32.mlw":
-    {"7":
-      [{"name": "r",
-        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "34"}}]}},
-        "kind": "other"}],
-     "9":
-      [{"name": "r",
-        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "132"}}]}},
-        "kind": "other"},
-       {"name": "r",
-        "attrs":
-         ["field:0:contents",
-          "introduced",
-          "mlw:reference_var",
-          "model_trace:r"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "132"}}]}},
-        "kind": "other"}],
-     "10":
-      [{"name": "r",
-        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "66"}}]}},
-        "kind": "other"}],
-     "11":
-      [{"name": "r",
-        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "132"}}]}},
-        "kind": "other"}]}}}
+bench/ce/bv32.mlw Ce_int32bv dummy_update'vc: Timeout or Unknown
+Counter-example model:
+File bv32.mlw:
+  Line 7:
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "34"}}]}}
+  Line 9:
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var],
+      [@model_trace:r]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "132"}}]}}
+  Line 10:
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "66"}}]}}
+  Line 11:
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "132"}}]}}
 
-File "bench/ce/bv32.mlw", line 15, characters 14-28:
-Goal Postcondition from verification condition dummy_update_with_int'vc.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/bv32.mlw":
-    {"13":
-      [{"name": "r",
-        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "34"}}]}},
-        "kind": "other"}],
-     "15":
-      [{"name": "r",
-        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "132"}}]}},
-        "kind": "other"},
-       {"name": "r",
-        "attrs":
-         ["field:0:contents",
-          "introduced",
-          "mlw:reference_var",
-          "model_trace:r"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "132"}}]}},
-        "kind": "other"}],
-     "16":
-      [{"name": "r",
-        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "66"}}]}},
-        "kind": "other"}],
-     "17":
-      [{"name": "r",
-        "attrs": ["field:0:contents", "introduced", "mlw:reference_var"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "132"}}]}},
-        "kind": "other"}]}}}
+bench/ce/bv32.mlw Ce_int32bv dummy_update_with_int'vc: Timeout or Unknown
+Counter-example model:
+File bv32.mlw:
+  Line 13:
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "34"}}]}}
+  Line 15:
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var],
+      [@model_trace:r]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "132"}}]}}
+  Line 16:
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "66"}}]}}
+  Line 17:
+    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "132"}}]}}
 

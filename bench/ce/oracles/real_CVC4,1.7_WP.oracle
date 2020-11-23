@@ -1,27 +1,13 @@
 Weakest Precondition
-File "bench/ce/real.mlw", line 5, characters 28-47:
-Verification condition test1.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/real.mlw":
-    {"5":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "Fraction", "val": "1\/6"},
-        "kind": "other"}]}}}
+bench/ce/real.mlw ModelReal test1: Timeout or Unknown
+Counter-example model:
+File real.mlw:
+  Line 5:
+    x, [[@introduced]] = {"type": "Fraction", "val": "1\/6"}
 
-File "bench/ce/real.mlw", line 7, characters 28-35:
-Verification condition test2.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/real.mlw":
-    {"7":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "Decimal", "val": "0.0"},
-        "kind": "other"}]}}}
+bench/ce/real.mlw ModelReal test2: Timeout or Unknown
+Counter-example model:
+File real.mlw:
+  Line 7:
+    x, [[@introduced]] = {"type": "Decimal", "val": "0.0"}
 

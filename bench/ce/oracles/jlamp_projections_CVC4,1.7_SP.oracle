@@ -1,129 +1,84 @@
 Strongest Postcondition
-File "bench/ce/jlamp_projections.mlw", line 29, characters 8-18:
-Goal Precondition from verification condition p3'vc.
-Prover result is: valid WHY3DATA.
+bench/ce/jlamp_projections.mlw AbstractAlone p3'vc: Valid
+bench/ce/jlamp_projections.mlw AbstractAlone p3'vc: Timeout or Unknown
+Counter-example model:
+File jlamp_projections.mlw:
+  Line 18:
+    a, [[@introduced]] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "127"}}
+  Line 28:
+    a, [[@introduced]] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "127"}}
+  Line 29:
+    a, [[@introduced], [@model_trace:a]] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "127"}}
 
-File "bench/ce/jlamp_projections.mlw", line 29, characters 2-18:
-Goal Integer overflow from verification condition p3'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/jlamp_projections.mlw":
-    {"18":
-      [{"name": "a",
-        "attrs": ["introduced"],
-        "value":
-         {"proj_name": "to_int",
-          "type": "Proj",
-          "value": {"type": "Integer", "val": "127"}},
-        "kind": "other"}],
-     "28":
-      [{"name": "a",
-        "attrs": ["introduced"],
-        "value":
-         {"proj_name": "to_int",
-          "type": "Proj",
-          "value": {"type": "Integer", "val": "127"}},
-        "kind": "other"}],
-     "29":
-      [{"name": "a",
-        "attrs": ["introduced", "model_trace:a"],
-        "value":
-         {"proj_name": "to_int",
-          "type": "Proj",
-          "value": {"type": "Integer", "val": "127"}},
-        "kind": "other"}]}}}
+bench/ce/jlamp_projections.mlw AbstractWithRef p3'vc: Valid
+bench/ce/jlamp_projections.mlw AbstractWithRef p3'vc: Timeout or Unknown
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    a, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}}]}}
+File jlamp_projections.mlw:
+  Line 41:
+    a, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}}]}}
+  Line 42:
+    a, [[@field:0:contents], [@introduced], [@model_trace:a]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}}]}}
 
-File "bench/ce/jlamp_projections.mlw", line 42, characters 14-24:
-Goal Precondition from verification condition p3'vc.
-Prover result is: valid WHY3DATA.
-
-File "bench/ce/jlamp_projections.mlw", line 42, characters 7-24:
-Goal Integer overflow from verification condition p3'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
-    {"18":
-      [{"name": "a",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"proj_name": "to_int",
-                 "type": "Proj",
-                 "value": {"type": "Integer", "val": "127"}}}]}},
-        "kind": "other"}]},
-   "bench\/ce\/jlamp_projections.mlw":
-    {"41":
-      [{"name": "a",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"proj_name": "to_int",
-                 "type": "Proj",
-                 "value": {"type": "Integer", "val": "127"}}}]}},
-        "kind": "other"}],
-     "42":
-      [{"name": "a",
-        "attrs": ["field:0:contents", "introduced", "model_trace:a"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value":
-                {"proj_name": "to_int",
-                 "type": "Proj",
-                 "value": {"type": "Integer", "val": "127"}}}]}},
-        "kind": "other"}]}}}
-
-File "bench/ce/jlamp_projections.mlw", line 54, characters 29-39:
-Goal Precondition from verification condition p4'vc.
-Prover result is: valid WHY3DATA.
-
-File "bench/ce/jlamp_projections.mlw", line 54, characters 21-39:
-Goal Integer overflow from verification condition p4'vc.
-Prover result is: unknown (unknown + incomplete) WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/jlamp_projections.mlw":
-    {"53":
-      [{"name": "b",
-        "attrs": ["introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "f",
-               "value":
-                {"proj_name": "to_int",
-                 "type": "Proj",
-                 "value": {"type": "Integer", "val": "127"}}},
-              {"field": "g", "value": {"type": "Boolean", "val": true}}]}},
-        "kind": "other"}],
-     "54":
-      [{"name": "b",
-        "attrs": ["introduced", "model_trace:b"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "f",
-               "value":
-                {"proj_name": "to_int",
-                 "type": "Proj",
-                 "value": {"type": "Integer", "val": "127"}}},
-              {"field": "g", "value": {"type": "Boolean", "val": true}}]}},
-        "kind": "other"}]}}}
+bench/ce/jlamp_projections.mlw Record p4'vc: Valid
+bench/ce/jlamp_projections.mlw Record p4'vc: Timeout or Unknown
+Counter-example model:
+File jlamp_projections.mlw:
+  Line 53:
+    b, [[@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}},
+           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
+  Line 54:
+    b, [[@introduced], [@model_trace:b]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f",
+            "value":
+             {"proj_name": "to_int",
+              "type": "Proj",
+              "value": {"type": "Integer", "val": "127"}}},
+           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
 

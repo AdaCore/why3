@@ -1,563 +1,336 @@
 Weakest Precondition
-File "bench/ce/ref_ex.mlw", line 7, characters 14-25:
-Goal Postcondition from verification condition test_post'vc.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/ref_ex.mlw":
-    {"6":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "Integer", "val": "1"},
-        "kind": "other"},
-       {"name": "y",
-        "attrs":
-         ["at:'Old:loc:bench\/ce\/ref_ex.mlw:7",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}],
-     "7":
-      [{"name": "x",
-        "attrs": ["introduced", "model_trace:x"],
-        "value": {"type": "Integer", "val": "1"},
-        "kind": "other"},
-       {"name": "old y",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:7",
-          "field:0:contents",
-          "introduced",
-          "model_trace:y"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "old"}],
-     "9":
-      [{"name": "y",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}]}}}
+bench/ce/ref_ex.mlw M test_post'vc: Timeout or Unknown
+Counter-example model:
+File ref_ex.mlw:
+  Line 6:
+    x, [[@introduced]] = {"type": "Integer", "val": "1"}
+    y, [[@at:'Old:loc:bench/ce/ref_ex.mlw:7], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 7:
+    x, [[@introduced], [@model_trace:x]] = {"type": "Integer", "val": "1"}
+    old y, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:7],
+      [@field:0:contents], [@introduced], [@model_trace:y]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 9:
+    y, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
-File "bench/ce/ref_ex.mlw", line 13, characters 14-29:
-Goal Postcondition from verification condition test_post2'vc.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/ref_ex.mlw":
-    {"11":
-      [{"name": "x",
-        "attrs": ["introduced"],
-        "value": {"type": "Integer", "val": "43"},
-        "kind": "other"},
-       {"name": "y",
-        "attrs":
-         ["at:'Old:loc:bench\/ce\/ref_ex.mlw:13",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}],
-     "13":
-      [{"name": "x",
-        "attrs": ["introduced", "model_trace:x"],
-        "value": {"type": "Integer", "val": "43"},
-        "kind": "other"},
-       {"name": "y",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "42"}}]}},
-        "kind": "other"},
-       {"name": "old y",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:13",
-          "field:0:contents",
-          "introduced",
-          "model_trace:y"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "old"}],
-     "15":
-      [{"name": "y",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "42"}}]}},
-        "kind": "other"}]}}}
+bench/ce/ref_ex.mlw M test_post2'vc: Timeout or Unknown
+Counter-example model:
+File ref_ex.mlw:
+  Line 11:
+    x, [[@introduced]] = {"type": "Integer", "val": "43"}
+    y, [[@at:'Old:loc:bench/ce/ref_ex.mlw:13], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 13:
+    x, [[@introduced], [@model_trace:x]] = {"type": "Integer", "val": "43"}
+    y, [[@field:0:contents], [@introduced], [@model_trace:y]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+    old y, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:13],
+      [@field:0:contents], [@introduced], [@model_trace:y]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 15:
+    y, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
 
-File "bench/ce/ref_ex.mlw", line 24, characters 12-36:
-Goal Postcondition from verification condition incr'vc.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
-    {"18":
-      [{"name": "y",
-        "attrs":
-         ["at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "401"}}]}},
-        "kind": "other"}],
-     "20":
-      [{"name": "y",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "402"}}]}},
-        "kind": "other"}]},
-   "bench\/ce\/ref_ex.mlw":
-    {"21":
-      [{"name": "y",
-        "attrs":
-         ["at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "401"}}]}},
-        "kind": "other"}],
-     "23":
-      [{"name": "x23",
-        "attrs":
-         ["at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "-1"}}]}},
-        "kind": "other"}],
-     "24":
-      [{"name": "x23",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}},
-        "kind": "other"},
-       {"name": "old x23",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "field:0:contents",
-          "introduced",
-          "model_trace:x23"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "-1"}}]}},
-        "kind": "old"},
-       {"name": "old y",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "field:0:contents",
-          "introduced",
-          "model_trace:y"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "401"}}]}},
-        "kind": "old"}],
-     "27":
-      [{"name": "y",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "402"}}]}},
-        "kind": "other"}],
-     "28":
-      [{"name": "x23",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}],
-     "29":
-      [{"name": "x23",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}},
-        "kind": "other"}]}}}
+bench/ce/ref_ex.mlw M incr'vc: Timeout or Unknown
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    y, [[@at:'Old:loc:bench/ce/ref_ex.mlw:24], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 20:
+    y, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+File ref_ex.mlw:
+  Line 21:
+    y, [[@at:'Old:loc:bench/ce/ref_ex.mlw:24], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 23:
+    x23, [[@at:'Old:loc:bench/ce/ref_ex.mlw:24], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+  Line 24:
+    x23, [[@field:0:contents], [@introduced], [@model_trace:x23]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    old x23, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:24],
+      [@field:0:contents], [@introduced], [@model_trace:x23]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+    old y, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:24],
+      [@field:0:contents], [@introduced], [@model_trace:y]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 27:
+    y, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 28:
+    x23, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 29:
+    x23, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
 
-File "bench/ce/ref_ex.mlw", line 38, characters 14-36:
-Goal Loop invariant init from verification condition test_loop'vc.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"bench\/ce\/ref_ex.mlw":
-    {"21":
-      [{"name": "y",
-        "attrs":
-         ["at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "400"}}]}},
-        "kind": "other"}],
-     "24":
-      [{"name": "old x",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "at:L:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "old"},
-       {"name": "x",
-        "attrs":
-         ["at:M:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "402"}}]}},
-        "kind": "other"}],
-     "31":
-      [{"name": "x",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "at:L:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}],
-     "35":
-      [{"name": "x",
-        "attrs":
-         ["at:M:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "402"}}]}},
-        "kind": "other"}],
-     "38":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced", "model_trace:x"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "402"}}]}},
-        "kind": "other"}]}}}
+bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
+Counter-example model:
+File ref_ex.mlw:
+  Line 21:
+    y, [[@at:'Old:loc:bench/ce/ref_ex.mlw:24], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 24:
+    old x, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:24],
+      [@at:L:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x, [[@at:M:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 31:
+    x, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:24],
+      [@at:L:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 35:
+    x, [[@at:M:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 38:
+    x at L, [[@at:L], [@at:L:loc:bench/ce/ref_ex.mlw:38],
+      [@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x at M, [[@at:M], [@at:M:loc:bench/ce/ref_ex.mlw:38],
+      [@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 
-File "bench/ce/ref_ex.mlw", line 39, characters 12-14:
-Goal Loop variant decrease from verification condition test_loop'vc.
-Prover result is: valid WHY3DATA.
+bench/ce/ref_ex.mlw M test_loop'vc: Valid
+bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 20:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+File ref_ex.mlw:
+  Line 21:
+    y, [[@at:'Old:loc:bench/ce/ref_ex.mlw:24], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-2"}}]}}
+  Line 24:
+    old x, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:24],
+      [@at:L:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x, [[@at:M:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 31:
+    x, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:24],
+      [@at:L:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 35:
+    x, [[@at:M:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 37:
+    [previous iteration] x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 38:
+    x at L, [[@at:L], [@at:L:loc:bench/ce/ref_ex.mlw:38],
+      [@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x at M, [[@at:M], [@at:M:loc:bench/ce/ref_ex.mlw:38],
+      [@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    [current iteration] x, [[@field:0:contents], [@introduced],
+      [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 40:
+    [current iteration] x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
-File "bench/ce/ref_ex.mlw", line 38, characters 14-36:
-Goal Loop invariant preservation from verification condition test_loop'vc.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
-    {"18":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "803"}}]}},
-        "kind": "before_loop"}],
-     "20":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "802"}}]}},
-        "kind": "before_loop"}]},
-   "bench\/ce\/ref_ex.mlw":
-    {"21":
-      [{"name": "y",
-        "attrs":
-         ["at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "-2"}}]}},
-        "kind": "before_loop"}],
-     "24":
-      [{"name": "old x",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "at:L:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "401"}}]}},
-        "kind": "old"},
-       {"name": "x",
-        "attrs":
-         ["at:M:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "401"}}]}},
-        "kind": "before_loop"}],
-     "31":
-      [{"name": "x",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "at:L:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "401"}}]}},
-        "kind": "before_loop"}],
-     "35":
-      [{"name": "x",
-        "attrs":
-         ["at:M:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "401"}}]}},
-        "kind": "before_loop"}],
-     "37":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "803"}}]}},
-        "kind": "before_iteration"}],
-     "38":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced", "model_trace:x"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "802"}}]}},
-        "kind": "current_iteration"}],
-     "40":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "802"}}]}},
-        "kind": "current_iteration"}]}}}
-
-File "bench/ce/ref_ex.mlw", line 32, characters 12-23:
-Goal Postcondition from verification condition test_loop'vc.
-Prover result is: timeout WHY3DATA.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-{"model":
-  {"\/home\/claudio\/why3\/start-rac\/share\/stdlib\/ref.mlw":
-    {"18":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}]},
-   "bench\/ce\/ref_ex.mlw":
-    {"21":
-      [{"name": "y",
-        "attrs":
-         ["at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "347"}}]}},
-        "kind": "other"}],
-     "24":
-      [{"name": "old x",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:32",
-          "at:L:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "-175"}}]}},
-        "kind": "old"},
-       {"name": "x",
-        "attrs":
-         ["at:M:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "174"}}]}},
-        "kind": "other"}],
-     "31":
-      [{"name": "x",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:24",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:32",
-          "at:L:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "-175"}}]}},
-        "kind": "other"}],
-     "32":
-      [{"name": "old x",
-        "attrs":
-         ["at:'Old",
-          "at:'Old:loc:bench\/ce\/ref_ex.mlw:32",
-          "field:0:contents",
-          "introduced",
-          "model_trace:x"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "-175"}}]}},
-        "kind": "old"}],
-     "35":
-      [{"name": "x",
-        "attrs":
-         ["at:M:loc:bench\/ce\/ref_ex.mlw:38",
-          "field:0:contents",
-          "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents",
-               "value": {"type": "Integer", "val": "174"}}]}},
-        "kind": "other"}],
-     "37":
-      [{"name": "x",
-        "attrs": ["field:0:contents", "introduced"],
-        "value":
-         {"type": "Record",
-          "val":
-           {"Field":
-             [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}},
-        "kind": "other"}]}}}
+bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+File ref_ex.mlw:
+  Line 21:
+    y, [[@at:'Old:loc:bench/ce/ref_ex.mlw:24], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-3"}}]}}
+  Line 24:
+    old x, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:24],
+      [@at:'Old:loc:bench/ce/ref_ex.mlw:32],
+      [@at:L:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x, [[@at:M:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+  Line 31:
+    x, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:24],
+      [@at:'Old:loc:bench/ce/ref_ex.mlw:32],
+      [@at:L:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 32:
+    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    old x, [[@at:'Old], [@at:'Old:loc:bench/ce/ref_ex.mlw:32],
+      [@field:0:contents], [@introduced], [@model_trace:x]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 35:
+    x, [[@at:M:loc:bench/ce/ref_ex.mlw:38], [@field:0:contents],
+      [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+  Line 37:
+    x, [[@field:0:contents], [@introduced]] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
