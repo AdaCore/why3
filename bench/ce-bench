@@ -3,23 +3,31 @@
 dir=`dirname $0`
 
 updateoracle=false
+suffix=.opt
 files=""
 success=true
 
 while test $# != 0; do
-case "$1" in
-  "-update-oracle")
-      updateoracle=true;;
-  "-"*)
-      printf "unknown option: %s\n" "$1"
-      printf "usage: ce-bench [-update-oracle] <files>\n"
-      printf "  <files> must be given without the '.mlw' suffix\n"
-      printf "  if <files> empty, use all files from directory 'ce'\n"
-      exit 2;;
-  *)
-       files="$files $1"
-esac
-shift
+    case "$1" in
+        "-update-oracle")
+            updateoracle=true
+            shift 1
+            ;;
+        "-suffix")
+            suffix="$2"
+            shift 2
+            ;;
+        "-"*)
+            printf "unknown option: %s\n" "$1"
+            printf "usage: ce-bench [-update-oracle] [-suffix s] <files>\n"
+            printf "  <files> must be given without the '.mlw' suffix\n"
+            printf "  The suffix is appended on the why3 executable name, e.g. '.opt'"
+            printf "  if <files> empty, use all files from directory 'ce'\n"
+            exit 2;;
+        *)
+            files="$files $1"
+            shift 1
+    esac
 done
 
 if test "$files" = "" ; then
@@ -87,33 +95,45 @@ decide_fail () {
     esac
 }
 
+colorize() {
+    if command -v pygmentize &> /dev/null; then
+        pygmentize -ldiff
+    else
+        cat
+    fi
+}
+
+whydata=$(bin/why3"$suffix" --print-datadir)
+whylib=$(bin/why3"$suffix" --print-libdir)
+
 # $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP
 run () {
     printf "  $2 ($1)... "
     file_path="$2/$3"
+    wp_sp=""
     if $4; then
         f="${file_path}_$1_WP"
         oracle_file="$2/oracles/$3_$1_WP.oracle"
-        wp_sp=""
         echo "Weakest Precondition" > "$f.out"
-        printf "Weakest Precondition  ${file_path} ($1)... "
+        printf "Weakest Precondition ${file_path} ($1)... "
     else
         f="${file_path}_$1_SP"
         oracle_file="$2/oracles/$3_$1_SP.oracle"
-        wp_sp=" --debug=vc_sp"
+        wp_sp=",vc_sp"
         echo "Strongest Postcondition" > "$f.out"
-        printf "Strongest Postcondition  ${file_path} ($1)... "
+        printf "Strongest Postcondition ${file_path} ($1)... "
     fi
     if [ "$3" = "strings" ] && [ "$1" = "CVC4,1.7" ] ; then
         prover="$1,strings+counterexamples"
     else
         prover="$1,counterexamples"
     fi
-    $dir/../bin/why3prove.opt --json --debug=print_model_attrs${wp_sp} -P $prover --timelimit=1 -a split_vc "${file_path}.mlw" | \
-        sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" | \
+    $dir/../bin/why3"$suffix" prove -a split_vc -P $prover --timelimit=1 \
+            "${file_path}.mlw" --json --debug=print_model_attrs${wp_sp} | \
+        sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
-        sed 's/([0-9]\+\.[0-9]\+s, [0-9]\+ steps)/WHY3DATA/g' | \
+        sed 's/ *([0-9]\+\.[0-9]\+s, [0-9]\+ steps)//g' | \
         # This ad hoc sed removes diff between Timeout and Unknown (unknown)
         # when running from platform with different speed.
         sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/' | \
@@ -124,10 +144,12 @@ run () {
     str_out=$(tr -d ' \n' < "$f.out")
     decide_fail $f
     case $is_xfail in
-        "full") is_xfail=true;;
-        "none") is_xfail=false;;
-	"string_values")
-	    is_xfail=false
+        "full")
+            is_xfail=true;;
+        "none")
+            is_xfail=false;;
+        "string_values")
+            is_xfail=false
             str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"\([^"]\|\\"\)\+"/"val":"ANYSTRING"/g')
             str_out=$(echo ${str_out} | sed -e 's/"val":"\([^"]\|\\"\)\+"/"val":"ANYSTRING"/g')
             ;;
@@ -155,7 +177,7 @@ run () {
             else
                 echo "diff is the following:"
                 echo "$f"
-                diff "${oracle_file}" "$f.out"
+                diff -u "${oracle_file}" "$f.out"|colorize
                 success=false
             fi
         fi
