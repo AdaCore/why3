@@ -72,35 +72,35 @@
     (Concrete RAC terminated because Precondition of (+) cannot be evaluated)
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-19:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: timeout (1.00s, 5569119 steps).
+Prover result is: timeout (1.00s, 2851316 steps).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of (+) cannot be evaluated):
 File int.mlw:
   Line 432:
-    max_int = {int63'int => 4611686018427387903 (0x3FFFFFFFFFFFFFFF)}
+    max_int = {int63'int => 4611686018427387903 (4611686018427387903)}
   Line 434:
-    min_int = {int63'int => -4611686018427387904 (-0x4000000000000000)}
+    min_int = {int63'int => -4611686018427387904 (-4611686018427387904)}
 File tuple1.mlw:
   Line 6:
-    a = {int63'int => 0 (0x0)}
-    b = {int63'int => 0 (0x0)}
+    a = {int63'int => 0 (0)}
+    b = {int63'int => 0 (0)}
   Line 7:
-    a = {int63'int => 0 (0x0)}
-    b = {int63'int => 0 (0x0)}
+    a = {int63'int => 0 (0)}
+    b = {int63'int => 0 (0)}
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-23:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: valid (0.01s, 7309 steps).
+Prover result is: valid (0.00s, 5525 steps).
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 3-8:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: valid (0.01s, 7440 steps).
+Prover result is: valid (0.01s, 5656 steps).
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 3-12:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: valid (0.02s, 7986 steps).
+Prover result is: valid (0.01s, 6188 steps).
 
 File "bench/check-ce/tuple1.mlw", line 5, characters 38-43:
 Goal Postcondition from verification condition swap'vc.
-Prover result is: valid (0.01s, 8449 steps).
+Prover result is: valid (0.01s, 6422 steps).
 

@@ -146,7 +146,7 @@ Proving only partial correctness:
   clause, and the previous warning is now an error. The possibility of
   proving only partial correctness is now given on a more fine-grain
   basis: any expression for which one wants to prove partial correctness
-  only, must by annotated with the attribute ``[@vc:divergent]``.
+  only, must by annotated with the attribute :why3:attribute:`[@vc:divergent]`.
 
   In other words, if one was using the following structure in Why3 0.xx:
 

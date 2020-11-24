@@ -8,7 +8,7 @@ _why3()
     local cur prev words cword split
 
     if declare -F _init_completion > /dev/null ; then
-        _init_completion -n = || return
+        _init_completion -s || return
     else
         _get_comp_words_by_ref -n = cur prev words cword
     fi
@@ -17,16 +17,16 @@ _why3()
         -T|--theory)
             # this only completes the first '-T' option
             # also, we cannot complete library theories
-            unset words[cword]
-            words[cword-1]="--print-namespace"
-            theories=$(${words[@]} 2>/dev/null | grep '^[^ ]' | cut -d '-' -f 1)
+            ${split:-false} || cword=$((cword-1))
+            words=("${words[@]:0:$cword}" --print-namespace)
+            theories=$(${words[@]} 2>/dev/null | sed -n -e 's/^\([^ ][^-]*\).*/\1/p')
             COMPREPLY=( $( compgen -W "$theories" -- "$cur" ) )
             return 0
             ;;
         -G|--goal)
-            unset words[cword]
-            words[cword-1]="--print-namespace"
-            goals=$(${words[@]} 2>/dev/null | grep -- '-goal ' | sed -e 's/.*-goal //')
+            ${split:-false} || cword=$((cword-1))
+            words=("${words[@]:0:$cword}" --print-namespace)
+            goals=$(${words[@]} 2>/dev/null | sed -n -e 's/.*-goal //p')
             COMPREPLY=( $( compgen -W "$goals" -- "$cur" ) )
             return 0
             ;;
@@ -39,12 +39,12 @@ _why3()
             return 0
             ;;
         -P|--prover)
-            provers=$($1 --list-provers | grep '^  [^ ]' | cut -d ' ' -f 3)
+            provers=$($1 --list-provers | sed -n -e 's/^  \([^ ]\+\).*/\1/p' | uniq)
             COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
             return 0
             ;;
         -F|--format)
-            formats=$($1 --list-formats | grep '^  [^ ]' | cut -d ' ' -f 3)
+            formats=$($1 --list-formats | sed -n -e 's/^  \([^ ]\+\).*/\1/p')
             COMPREPLY=( $( compgen -W "$formats" -- "$cur" ) )
             return 0
             ;;
@@ -78,7 +78,7 @@ _why3()
             return 0
             ;;
         --add-prover)
-            ids=$($1 --list-prover-ids | grep -v '^Known \|^$')
+            ids=$($1 --list-prover-families | grep '^  [^ ]')
             COMPREPLY=( $( compgen -W "$ids" -- "$cur") )
             return 0
             ;;
@@ -87,12 +87,12 @@ _why3()
             return 0
             ;;
         --debug)
-            flags=$($1 --list-debug-flags | grep '^  [^ ]' | cut -d ' ' -f 3)
+            flags=$($1 --list-debug-flags | sed -n -e 's/^  \([^ ]\+\).*/\1/p')
             COMPREPLY=( $( compgen -W "$flags" -- "$cur" ) )
             return 0
             ;;
         --filter-prover)
-            provers=$(${1/session/} --list-provers | grep '^  [^ ]' | cut -d ' ' -f 3)
+            provers=$(${1/session/} --list-provers | sed -n -e 's/^  \([^ ]\+\).*/\1/p')
             COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
             return 0
             ;;
@@ -105,26 +105,27 @@ _why3()
             return 0
             ;;
         session)
-            cmds=$($1 session --help | grep '^  [^-]' | cut -d ' ' -f 3)
+            cmds=$($1 session --help | sed -n -e 's/^  \([^ ]\+\).*/\1/p')
             COMPREPLY=( $( compgen -W "$cmds --help -h" -- "$cur" ) )
             return 0
             ;;
     esac
 
+    case "$cur" in
+        -*) words[cword]="--help"
+            opts=$(_parse_help "${words[@]}")
+            COMPREPLY=( $( compgen -W "$opts" -- "$cur" ) )
+            [[ $COMPREPLY == *= ]] && compopt -o nospace
+            return 0
+            ;;
+    esac
+
     if [ $cword -eq 1 ] ; then
-        cmds=$($1 --help 2>&1 | grep '^  [^ ]' | cut -d ' ' -f 3)
+        cmds=$($1 --help 2>&1 | sed -n -e 's/^  \([a-z]\+\).*/\1/p')
         COMPREPLY=( $( compgen -W "$cmds" -- "$cur" ) )
         return 0
     fi
 
     _filedir
-
-    case "$cur" in
-        -*) words[cword]="--help"
-            opts=$(${words[@]} 2>/dev/null | grep '^  -' | cut -d ' ' -f 3)
-            COMPREPLY=( $( compgen -W "$opts" -- "$cur" ) )
-            return 0
-            ;;
-    esac
 
 } && complete -F _why3 why3 why3.opt why3.byte

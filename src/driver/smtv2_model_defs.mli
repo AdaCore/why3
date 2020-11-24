@@ -10,42 +10,25 @@
 (********************************************************************)
 
 open Wstdlib
+open Model_parser
 
 type variable = string
 
-type bv_value =
-  | Bv_int of string
-  | Bv_sharp of string
-
-(* Simple counterexample that already represent a complete value *)
-type simple_value =
-  | String of string
-  | Integer of string
-  | Decimal of (string * string)
-  | Fraction of (string * string)
-  | Float of Model_parser.float_type
-  | Other of string
-  | Bitvector of bv_value
-  | Boolean of bool
-
-type array =
-  (* Array_var is used by let-bindings only *)
-  | Array_var of variable
-  | Const of term
-  | Store of array * term * term
-
-and term =
-  | Sval of simple_value
+type term =
+  | Sval of model_value
   | Apply of (string * term list)
   | Array of array
-  | Cvc4_Variable of variable
-  | Function_Local_Variable of variable
-  | Variable of variable
+  | Var of variable
+  | Function_var of variable (* Function parameter *)
+  | Prover_var of variable (* Variable introduced by prover (e.g. @x or x!0) *)
   | Ite of term * term * term * term
   | Record of string * ((string * term) list)
   | To_array of term
-  (* TODO remove tree *)
-  | Trees of (string * term) list
+
+and array =
+  | Avar of variable (* Used by let-bindings only *)
+  | Aconst of term
+  | Astore of array * term * term
 
 type definition =
   | Function of (variable * string option) list * term
@@ -56,6 +39,12 @@ val add_element: (string * definition) option ->
   definition Mstr.t -> definition Mstr.t
 
 val make_local: (variable * string option) list -> term -> term
+(** For a definition of function f, local variables being in vars_lists and the
+    returned term being t, this function changes the term to give an appropriate
+    tag to variables that are actually local. *)
 
-(* Used for let bindings of z3 *)
 val substitute: (string * term) list -> term -> term
+(** Substitute variables by terms. Used for let bindings of z3 *)
+
+val print_term : term Pp.pp
+val print_definition : definition Pp.pp

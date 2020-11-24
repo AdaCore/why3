@@ -106,3 +106,6 @@ val ansi_color_tags : Format.formatter_tag_functions
     Valid formatting tags are for example ["@{<red>red text@}"], ["@{<bold>bold text@}"],
    ["@{<on green>text on green background@}"], or ["@{<bold red on green>unreadable@}"].
    *)
+
+(** Check if a non-empty string contains only characters [a-zA-Z0-9_-] *)
+val is_sexp_simple_token : string -> bool

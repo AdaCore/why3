@@ -228,9 +228,9 @@ let rec import_model_value known th_known ity v =
     match v with
       | Integer s ->
           if ity_equal ity ity_int then
-            int_value s
+            int_value s.int_value
           else if is_range_ty (ty_of_ity ity) then
-            range_value ity s
+            range_value ity s.int_value
           else
             kasprintf failwith "import_model_value: found type %a instead of int or range type"
               print_ity ity

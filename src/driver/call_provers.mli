@@ -183,3 +183,6 @@ val interrupt_call : prover_call -> unit
 
 val wait_on_call : prover_call -> prover_result
 (** blocking function that waits until the prover finishes. *)
+
+val debug_attrs : Debug.flag
+(** Print attributes in model *)

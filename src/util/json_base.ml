@@ -12,26 +12,21 @@
 open Format
 open Wstdlib
 
+let char fmt = function
+  | '"'  -> pp_print_string fmt "\\\""
+  | '\\' -> pp_print_string fmt "\\\\"
+  | '\b' -> pp_print_string fmt "\\b"
+  | '\n' -> pp_print_string fmt "\\n"
+  | '\r' -> pp_print_string fmt "\\r"
+  | '\t' -> pp_print_string fmt "\\t"
+  | '\012' -> pp_print_string fmt "\\f"
+  | '\032' .. '\126' as c -> pp_print_char fmt c
+  | c -> fprintf fmt "\\u%04x" (Char.code c)
+
 let string fmt s =
-  let b = Buffer.create (2 * String.length s) in
-  Buffer.add_char b '"';
-  let i = ref 0 in
-  while !i <= String.length s -1 do
-    (match s.[!i] with
-    | '"'  -> Buffer.add_string b "\\\""
-    | '\\' -> Buffer.add_string b "\\\\"
-    | '/'  -> Buffer.add_string b "\\/"
-    | '\b' -> Buffer.add_string b "\\b"
-    | c when c = Char.chr 12 -> Buffer.add_string b "\\f"
-    | '\n' -> Buffer.add_string b "\\n"
-    | '\r' -> Buffer.add_string b "\\r"
-    | '\t' -> Buffer.add_string b "\\t"
-    | '\032' .. '\126' as c -> Buffer.add_char b c
-    | c    -> Buffer.add_string b (Format.sprintf "\\u%04x" (Char.code c)));
-    i := !i + 1
-  done;
-  Buffer.add_char b '"';
-  fprintf fmt "%s" (Buffer.contents b)
+  pp_print_char fmt '"';
+  String.iter (char fmt) s;
+  pp_print_char fmt '"'
 
 let int fmt d = fprintf fmt "%d" d
 let bool fmt b = fprintf fmt "%b" b

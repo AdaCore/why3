@@ -18,8 +18,10 @@ type constant =
   | ConstStr  of string
 [@@deriving sexp_of]
 
-val compare_const : constant -> constant -> int
-(** structural comparison; two mathematically equal values might differ *)
+val compare_const : ?structural:bool -> constant -> constant -> int
+(** if [structural] then it is structural comparison, two
+   mathematically equal values might differ; otherwise. mathematical
+   values are compared *)
 
 val int_const : BigInt.t -> constant
 val int_const_of_int : int -> constant

@@ -1,6 +1,6 @@
 # If you modify this file, make sure to update the BUILD_IMAGE variable in .gitlab-ci.yml.
 
-FROM debian:buster
+FROM debian:buster-slim
 
 USER root
 
@@ -47,12 +47,12 @@ WORKDIR /home/why3
 # install opam
 ENV OPAM_PACKAGES="num menhir lablgtk3-sourceview3 zarith camlzip conf-autoconf"
 RUN opam init -y --no-setup -j1 --bare --disable-sandboxing && \
-    opam switch create latest ocaml-base-compiler.4.10.0 && opam install -y $OPAM_PACKAGES && \
+    opam switch create latest ocaml-base-compiler.4.11.1 && opam install -y $OPAM_PACKAGES && \
     opam switch create bench  ocaml-base-compiler.4.05.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create full   ocaml-base-compiler.4.08.1 && opam install -y $OPAM_PACKAGES && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
-    opam install -y --switch=bench zenon.0.8.0 coq.8.7.2 coq-flocq.3.1.0 && \
-    opam install -y --switch=full re coq-flocq.3.1.0 js_of_ocaml-ppx alt-ergo.2.3.0 sexplib ppx_deriving ppx_sexp_conv && \
+    opam install -y --switch=bench zenon.0.8.0 coq.8.7.2 coq-flocq.3.3.1 && \
+    opam install -y --switch=full re coq.8.12.0 coq-flocq.3.3.1 js_of_ocaml-ppx alt-ergo.2.3.0 sexplib ppx_deriving ppx_sexp_conv && \
     opam clean -a -c -r -s --logs
 
 USER root

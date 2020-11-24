@@ -152,10 +152,8 @@ module RAL
   type t 'a = { r: ral 'a; ghost l: list 'a }
     invariant { l = elements r }
 
-  let empty () : t 'a
+  let constant empty : t 'a = { r = Empty; l = Nil }
     ensures { result.l = Nil }
-    =
-    { r = Empty; l = Nil }
 
   let size (t: t 'a) : int
     ensures { result = length t.l }

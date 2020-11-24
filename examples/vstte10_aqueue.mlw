@@ -20,9 +20,9 @@ module AmortizedQueue
   function sequence (q: queue 'a) : list 'a =
     q.front ++ reverse q.rear
 
-  let empty () : queue 'a
+  let constant empty : queue 'a =
+    { front = Nil; lenf = 0; rear = Nil; lenr = 0 }
     ensures { sequence result = Nil }
-  = { front = Nil; lenf = 0; rear = Nil; lenr = 0 }
 
   let head (q: queue 'a) : 'a
     requires { sequence q <> Nil }

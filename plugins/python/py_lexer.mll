@@ -109,7 +109,7 @@ rule next_tokens = parse
   | integer as s
             { [INTEGER s] }
   | '"'     { [STRING (string lexbuf)] }
-  | eof     { [EOF] }
+  | eof     { NEWLINE :: unindent 0 @ [EOF] }
   | _ as c  { raise (Lexing_error ("illegal character: " ^ String.make 1 c)) }
 
 (* count the indentation, i.e. the number of space characters from bol *)

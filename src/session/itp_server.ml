@@ -1016,7 +1016,7 @@ match pa.proof_state with
        let sel =
          Counterexample.select_model ~check:true
            ~reduce_config env pm res.pr_models in
-       match sel with None -> Model_parser.default_model | Some (m,_) -> m in
+       match sel with None -> Model_parser.empty_model | Some (m,_) -> m in
      let ce_result =
        Pp.string_of (Model_parser.print_model_human ~print_attrs ?me_name_trans:None)
          selected_model in
@@ -1221,17 +1221,17 @@ match pa.proof_state with
     match any with
     | None -> P.notify (Message (Error "Please select a node id"));
     | Some any ->
-        try
-          let id =
+        match
             match any with
             | APn id -> id
             | APa panid ->
                 get_proof_attempt_parent d.cont.controller_session panid
             | _ -> raise Not_found
-          in
+        with
+        | id ->
           C.schedule_edition d.cont id prover
             ~callback ~notification:(notify_change_proved d.cont)
-        with Not_found ->
+        | exception Not_found ->
           P.notify
             (Message
                (Error

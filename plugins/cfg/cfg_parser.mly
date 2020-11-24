@@ -35,7 +35,7 @@ cfgfile:
 ;
 
 cfgmodule:
-  | MODULE id=attrs(uident_nq) dl=cfgdecl* END
+  | id=module_head_parsing_only dl=cfgdecl* END
     { (id,dl) }
 
 cfgdecl:
@@ -57,11 +57,11 @@ vardecls:
 ;
 
 vardecl:
-  | g=ghost VAR vl=attrs(lident_nq)* COLON t=ty SEMICOLON
+  | g=ghost_opt VAR vl=attrs(lident_nq)* COLON t=ty SEMICOLON
     { List.map (fun id -> (g,id,t)) vl }
 ;
 
-ghost:
+ghost_opt:
   | /* epsilon */ { false }
   | GHOST         { true }
 

@@ -223,3 +223,30 @@ module PeanoNumbers
   = if less x y then () else div_mod_correct (sub x y) y
 
 end
+
+(* chapter 12 *)
+module RecursiveIterative
+
+  use int.Int
+  use int.Fibonacci
+  use ref.Ref
+
+  let square_fib (n: int) : int
+    requires { 0 <= n }
+    ensures  { result = fib n * fib n }
+  = let ref i = 0 in
+    let ref x = 0 in
+    let ref y = 1 in
+    let ref k = 0 in
+    while i < n do
+      invariant { 0 <= i <= n }
+      invariant { x = fib i * fib i }
+      invariant { y = fib (i+1) * fib (i+1) }
+      invariant { k = 2 * fib i * fib (i+1) }
+      variant   { n - i }
+      x, y, k <- y, x + k + y, k + y + y;
+      i <- i + 1
+    done;
+    x
+
+end

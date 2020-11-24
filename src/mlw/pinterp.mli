@@ -29,8 +29,8 @@ val v_ty : value -> Ty.ty
    [ity] is compatible with the [value] being built *)
 
 (* TODO: make it defensive? *)
-val int_value : string -> value
-val range_value : ity -> string -> value
+val int_value : BigInt.t -> value
+val range_value : ity -> BigInt.t -> value
 val string_value : string -> value
 val bool_value : bool -> value
 val proj_value : ity -> lsymbol -> value -> value

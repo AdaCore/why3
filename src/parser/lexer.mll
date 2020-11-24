@@ -263,7 +263,12 @@ rule token = parse
   | op_char_4+ as s
       { OP4 s }
   | "\""
-      { STRING (Lexlib.string lexbuf) }
+      { let start_p = lexbuf.Lexing.lex_start_p in
+        let start_pos = lexbuf.Lexing.lex_start_pos in
+        let s = Lexlib.string lexbuf in
+        lexbuf.Lexing.lex_start_p <- start_p;
+        lexbuf.Lexing.lex_start_pos <- start_pos;
+        STRING s }
   | eof
       { EOF }
   | _ as c
@@ -280,7 +285,7 @@ rule token = parse
   (* This ad hoc switch allows to not edit the automatically generated
      handcrafted.messages in ad hoc ways. *)
   | Error None -> Format.fprintf fmt "syntax error"
-  | Error (Some s) -> Format.fprintf fmt "syntax error:\n %s" s
+  | Error (Some s) -> Format.fprintf fmt "syntax error: %s" s
   | _ -> raise exn)
 
   let build_parsing_function (parser_entry: Lexing.position -> 'a) lb =

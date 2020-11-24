@@ -17,7 +17,7 @@ let debug = Debug.register_info_flag "call_prover"
          and@ keep@ temporary@ files."
 
 let debug_attrs = Debug.register_info_flag "print_model_attrs"
-    ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
+    ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in@ CE@ model."
 
 (* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
@@ -164,7 +164,6 @@ let print_steps fmt s =
 
 let print_prover_result ~json fmt r =
   let open Json_base in
-  (* let print_attrs = Debug.test_flag debug_attrs in *)
   let print_json_model fmt (a,m) =
     fprintf fmt "@[@[<hv1>{%a;@ %a}@]}@]"
       (print_json_field "model"
@@ -261,12 +260,12 @@ let analyse_result exit_result res_parser printer_mapping out =
          | _,_ ->
             analyse saved_models saved_res tl1
        end
-    | Answer res :: Model model :: tl ->
+    | Answer res :: Model model_str :: tl ->
         if res = Valid then
           (Valid, [])
         else
           (* get model if possible *)
-          let m = res_parser.prp_model_parser model printer_mapping in
+          let m = res_parser.prp_model_parser printer_mapping model_str in
           Debug.dprintf debug "Call_provers: model:@.";
           debug_print_model ~print_attrs:false m;
           analyse ((res, m) :: saved_models) (Some res) tl

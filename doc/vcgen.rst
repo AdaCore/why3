@@ -1,9 +1,10 @@
 .. _chap.vcgen:
 
-The VC generators
+The VC Generators
 =================
 
-This chapter gives information about the various processes that generates the so-called verification conditions, VC for shot, from WhyML code.
+This chapter gives information about the various processes that generate
+the so-called verification conditions, VC for short, from WhyML code.
 
 
 VC generation for program functions
@@ -11,16 +12,21 @@ VC generation for program functions
 
 For each program function of the form
 
-|  let :math:`f (x_1:t_1) (x_n:t_n) : t`
-|    requires { :math:`Pre` }
-|    ensures  { :math:`Post` }
-|    `=` :math:`body`
+.. parsed-literal::
 
-a new logic goal called `f'VC` is generated. Its shape is
+   let *f* (*x*:sub:`1`: *t*:sub:`1`) ... (*x*:sub:`n`: *t*:sub:`n`): *t*
+     requires { *Pre* }
+     ensures  { *Post* }
+   = *body*
 
-| :math:`\forall x_1,..,x_n.  Pre \rightarrow WP(body,Post)`
+a new logic goal called ``f'VC`` is generated. Its shape is
 
-where :math:`WP(e,Q)` is a formula computed automatically using rules defined recursively on :math:`e`.
+.. math::
+
+   \forall x_1,\dots,x_n,\quad \mathit{Pre} \Rightarrow \mathit{WP}(\mathit{body},\mathit{Post})
+
+where :math:`\mathit{WP}(e,Q)` is a formula computed automatically using
+rules defined recursively on :math:`e`.
 
 TODO: Refer to `A Pragmatic Type System for Deductive Verification <https://hal.archives-ouvertes.fr/hal-01256434v3>`_
 
@@ -43,7 +49,7 @@ VC generation and lemma functions
 How a VC for a program function marked as `lemma` is turned into an
 hypothesis for the remaining of the module.
 
-Using Strongest Post-conditions
+Using strongest post-conditions
 -------------------------------
 
 To avoid exponential explosion of WP computation, Why3 provides a
@@ -66,8 +72,8 @@ Why3 can be executed with support for inferring loop invariants
 about the compilation of Why3 with support for `infer-loop`).
 
 There are two ways of enabling the inference of loop invariants: by
-passing the *debug* flag ``infer-loop`` to Why3 or by annotating *let*
-declarations with the ``[@infer]`` attribute.
+passing the debug flag :why3:debug:`infer-loop` to Why3 or by annotating ``let``
+declarations with the :why3:attribute:`[@infer]` attribute.
 
 Below is an example on how to invoke Why3 such that invariants are
 inferred for all the loops in the given file.
@@ -87,7 +93,7 @@ keyword as shown in :numref:`fig.gui.infer`.
 .. figure:: images/gui-infer.png
    :alt: The GUI with inferred invariants (after split).
 
-Alternatively, attributes can be used in *let* declarations so that
+Alternatively, attributes can be used in ``let`` declarations so that
 invariants are inferred for all the loops in that declaration. In this
 case, it is possible to select the desired domain and widening
 value. In the example below, invariants will be inferred using the
@@ -116,20 +122,20 @@ produce exactly the same invariants.
 
 
 There are a few debugging flags that can be passed to Why3 to output
-additional information about the inference of loop invariants. The
-``infer-print-cfg`` will print the Control Flow Graph (CFG) used for
-abstract interpretation in a file with the name ``inferdbg.dot``;
-``infer-print-ai-result`` will print to the standard output the
+additional information about the inference of loop invariants. Flag
+:why3:debug:`infer-print-cfg` will print the Control Flow Graph (CFG) used for
+abstract interpretation in a file with the name :file:`inferdbg.dot`;
+:why3:debug:`infer-print-ai-result` will print to the standard output the
 computed abstract values at each point of the CFG;
-``print-inferred-invs`` will print the inferred invariants to the
+:why3:debug:`print-inferred-invs` will print the inferred invariants to the
 standard output (note that the displayed identifiers names might not
-be consistent with those in the initial program); finally, the
-``print-domains-loop`` debugging flag will print for each loop the
+be consistent with those in the initial program); finally,
+:why3:debug:`print-domains-loop` will print for each loop the
 loop expression, the domain at that point, and its translation into a
 Why3 term.
 
 Current limitations
 """""""""""""""""""
 
-1. loop invariants can only be inferred for loops inside
-   (non-recursive) *let* declarations.
+1. Loop invariants can only be inferred for loops inside
+   (non-recursive) ``let`` declarations.

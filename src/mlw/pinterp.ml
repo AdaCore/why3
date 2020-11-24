@@ -212,8 +212,8 @@ let v_ty v = v.v_ty
 let field_get (Field r) = r.contents
 let field_set (Field r) v = r := v
 
-let int_value s = value ty_int (Vnum (BigInt.of_string s))
-let range_value ity s = value (ty_of_ity ity) (Vnum (BigInt.of_string s))
+let int_value n = value ty_int (Vnum n)
+let range_value ity n = value (ty_of_ity ity) (Vnum n)
 let string_value s = value ty_str (Vstring s)
 let bool_value b = value ty_bool (Vbool b)
 let proj_value ity ls v =
