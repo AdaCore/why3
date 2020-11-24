@@ -143,7 +143,7 @@ let result1 : Call_provers.prover_result =
 
 (* prints Alt-Ergo answer *)
 let () = printf "@[On task 1, Alt-Ergo answers %a@."
-  (Call_provers.print_prover_result ?json:None) result1
+    (Call_provers.print_prover_result ~json:false) result1
 (* END{callprover} *)
 
 (* BEGIN{calltimelimit} *)
@@ -199,7 +199,7 @@ let result3 =
     alt_ergo_driver task3)
 
 let () = printf "@[On task 3, Alt-Ergo answers %a@."
-  (Call_provers.print_prover_result ?json:None) result3
+  (Call_provers.print_prover_result ~json:false) result3
 
 (* quantifiers: let's build "forall x:int. x*x >= 0" *)
 (* BEGIN{quantfmla1} *)
@@ -237,7 +237,7 @@ let result4 =
     alt_ergo_driver task4)
 
 let () = printf "@[On task 4, Alt-Ergo answers %a@."
-  (Call_provers.print_prover_result ?json:None) result4
+  (Call_provers.print_prover_result ~json:false) result4
 
 (* build a theory with all these goals *)
 
