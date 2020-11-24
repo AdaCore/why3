@@ -56,7 +56,9 @@ val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 val print_ce_summary_kind : ce_summary Pp.pp
 
 val print_counterexample :
-  ?verb_lvl:int -> ?check_ce:bool -> ?json:bool -> (model * ce_summary) Pp.pp
+  ?verb_lvl:int -> ?check_ce:bool -> ?json:[< `All | `Values ] -> (model * ce_summary) Pp.pp
+(** Print a counterexample. (When the prover model is printed and [~json:`Values] is
+   given, only the values are printedas JSON.) *)
 
 (** {2 Model selection} *)
 

@@ -129,7 +129,7 @@ run () {
         prover="$1,counterexamples"
     fi
     $dir/../bin/why3"$suffix" prove -a split_vc -P $prover --timelimit=1 \
-            "${file_path}.mlw" --json --debug=print_model_attrs${wp_sp} | \
+            "${file_path}.mlw" --json-model-values --debug=print_model_attrs${wp_sp} | \
         sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.

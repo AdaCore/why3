@@ -28,7 +28,7 @@ let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
-let opt_json = ref None
+let opt_json : [< `All | `Values ] option ref = ref None
 let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
 let opt_ce_check_verbosity = ref None
@@ -129,10 +129,10 @@ let option_list =
     "with optional, space-separated time and memory limit (e.g. 'cvc4 2 1000')";
     Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
     "<lvl> verbosity level for interpretation log of counterexample solver model";
-    KLong "all-json", Hnd0 (fun () -> opt_json := Some `All),
+    KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
+    " print values of prover model in JSON format (backwards compatiblity with --json)";
+    KLong "json", Hnd0 (fun () -> opt_json := Some `All),
     " print output in JSON format";
-    KLong "json", Hnd0 (fun () -> opt_json := Some `Model),
-    " print counterexamples in JSON format";
     KLong "print-theory", Hnd0 (fun () -> opt_print_theory := true),
     " print selected theories";
     KLong "print-namespace", Hnd0 (fun () -> opt_print_namespace := true),
@@ -238,7 +238,8 @@ let output_task drv fname _tname th task dir =
   close_out cout
 
 let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
-  if json = Some `All then
+  match json with
+  | Some `All ->
     let open Json_base in
     let print_loc fmt (loc, fname) =
       match loc with
@@ -251,8 +252,8 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
         (print_json_field "explanations" print_json) (List (List.map (fun s -> String s) expls)) in
     fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
       (print_json_field "term" print_term) (loc, fname, goal_name, expls)
-      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:`All)) res
-  else (
+      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:true)) res
+  | None | Some `Values as json ->
     ( match loc with
       | None -> fprintf fmt "File %s:@\n" fname
       | Some loc -> Loc.report_position fmt loc );
@@ -263,14 +264,14 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
         fprintf fmt
           "@[<hov>Goal@ @{<bold>%s@}@ from@ verification@ condition@ @{<bold>%s@}.@]"
           expls goal_name );
-    if json <> Some `All then fprintf fmt "@\n";
-    Call_provers.print_prover_result ?json fmt res;
+    fprintf fmt "@\n";
+    Call_provers.print_prover_result ~json:false fmt res;
     (match ce with
      | Some ce ->
         Counterexample.print_counterexample ?verb_lvl:!opt_ce_check_verbosity
-          ~check_ce:!opt_check_ce_model ~json:(json = Some `Model) fmt ce
+          ~check_ce:!opt_check_ce_model ?json fmt ce
      | None -> ());
-    fprintf fmt "@\n" )
+    fprintf fmt "@\n"
 
 let unproved = ref false
 

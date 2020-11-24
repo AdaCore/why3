@@ -101,7 +101,7 @@ let print_ce_summary_title ?check_ce fmt = function
         fprintf fmt "The@ following@ counterexample@ model@ has@ not@ \
                      been@ verified@ (%s)" reason
 
-let print_ce_summary_values ?verb_lvl ~json ~print_attrs model fmt s =
+let print_ce_summary_values ?verb_lvl ?json ~print_attrs model fmt s =
   let open Json_base in
   let open Model_parser in
   let print_model_field =
@@ -109,18 +109,27 @@ let print_ce_summary_values ?verb_lvl ~json ~print_attrs model fmt s =
       (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
   let print_log_field =
     print_json_field "log" (Log.print_log ?verb_lvl ~json:true) in
-  match s with
-  | NCCE log | SWCE log | NCCE_SWCE log ->
-      if json then
-        fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-          print_model_field model print_log_field log
-      else fprintf fmt "@[%a@]" (Log.print_log ?verb_lvl ~json:false) log
-  | UNKNOWN _ ->
-     if json then
-       fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
-     else fprintf fmt "@[%a@]"
-            (print_model_human ?me_name_trans:None ~print_attrs) model
-  | BAD_CE -> ()
+  match json with
+  | None | Some `Values -> (
+      match s with
+      | NCCE log | SWCE log | NCCE_SWCE log ->
+          fprintf fmt "@[%a@]" (Log.print_log ?verb_lvl ~json:false) log
+      | UNKNOWN _ ->
+          let print_model fmt m =
+            if json = None then print_model_human fmt m
+            else print_model (* json values *) fmt m in
+          fprintf fmt "@[%a@]" (print_model ~print_attrs) model
+      | BAD_CE -> ()
+    )
+  | Some `All -> (
+      match s with
+      | NCCE log | SWCE log | NCCE_SWCE log ->
+          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+            print_model_field model print_log_field log
+      | UNKNOWN _ ->
+          fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
+      | BAD_CE -> ()
+    )
 
 let _model_of_ce_summary ~original_model = function
   | NCCE log | SWCE log | NCCE_SWCE log ->
@@ -166,7 +175,7 @@ let ce_summary v_concrete v_abstract =
   | Bad_model , Dont_know  -> UNKNOWN v_abstract.reason
   | Bad_model , Bad_model  -> BAD_CE
 
-let print_counterexample ?verb_lvl ?check_ce ?(json=false) fmt (model,ce_summary) =
+let print_counterexample ?verb_lvl ?check_ce ?json fmt (model,ce_summary) =
   if not (Model_parser.is_model_empty model) then
     fprintf fmt "@ @[<hov2>%a%t@]"
       (print_ce_summary_title ?check_ce) ce_summary
@@ -177,8 +186,9 @@ let print_counterexample ?verb_lvl ?check_ce ?(json=false) fmt (model,ce_summary
         | UNKNOWN _ ->
            fprintf fmt ":"
         | _ -> ());
+  let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
   fprintf fmt "@ %a"
-    (print_ce_summary_values ?verb_lvl ~print_attrs:false ~json model) ce_summary
+    (print_ce_summary_values ?verb_lvl ~print_attrs ?json model) ce_summary
 
 (* Import values from solver counterexample model *)
 

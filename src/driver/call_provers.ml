@@ -162,7 +162,7 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ?(json: [<`All | `Model] option) fmt r =
+let print_prover_result ~json fmt r =
   let open Json_base in
   (* let print_attrs = Debug.test_flag debug_attrs in *)
   let print_json_model fmt (a,m) =
@@ -171,7 +171,7 @@ let print_prover_result ?(json: [<`All | `Model] option) fmt r =
          (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int)) m
       (print_json_field "answer" print_prover_answer) a
   in
-  if json = Some `All then
+  if json then
     let print_model fmt (a,m) =
       if not (is_model_empty m) then
           print_json_model fmt (a,m)
@@ -184,14 +184,14 @@ let print_prover_result ?(json: [<`All | `Model] option) fmt r =
       (* TODO not sure if models should be printed here *)
       (print_json_field "ce-models" (list print_model)) r.pr_models
       (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
-  else (
+  else
     let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
     fprintf fmt "@[<v>@[<hov2>Prover@ result@ is:@ @{<bold %s>%a@}@ (%.2fs%a).@]"
       color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
     if r.pr_answer == HighFailure then
       fprintf fmt "@ Prover exit status: %a@\nProver output:@\n%s@\n"
         print_prover_status r.pr_status r.pr_output;
-    fprintf fmt "@]" )
+    fprintf fmt "@]"
 
 let rec grep out l = match l with
   | [] ->

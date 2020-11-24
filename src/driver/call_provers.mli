@@ -52,7 +52,7 @@ type prover_result = {
 val print_prover_answer : Format.formatter -> prover_answer -> unit
 (** Pretty-print a {! prover_answer} *)
 
-val print_prover_result : ?json:[`All|`Model] -> Format.formatter -> prover_result -> unit
+val print_prover_result : json:bool -> Format.formatter -> prover_result -> unit
 (** Pretty-print a prover_result. The answer and the time are output. The output of the
    prover is printed if and only if the answer is a [HighFailure]. *)
 
