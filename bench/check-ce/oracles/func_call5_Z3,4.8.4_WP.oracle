@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Goal Postcondition from verification condition g1'vc.
-Prover result is: valid (0.02s, 33 steps).
+Prover result is: valid (0.02s, 26 steps).
 
 File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
 Goal Precondition from verification condition f1'vc.
-Prover result is: valid (0.02s, 83 steps).
+Prover result is: valid (0.01s, 83 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Validating model:
@@ -237,7 +237,7 @@ Prover result is: valid (0.02s, 83 steps).
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
 Goal Assertion from verification condition f1'vc.
-Prover result is: timeout (1.00s, 5360615 steps).
+Prover result is: timeout (1.00s, 6511260 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -246,9 +246,9 @@ Sorry, we don't have a good counterexample for you :(
 <check-ce>Validating model:
           File func_call5.mlw:
             Line 18:
-              x = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "2"}
             Line 20:
-              x = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
@@ -261,26 +261,26 @@ Sorry, we don't have a good counterexample for you :(
                   Constant one initialization
               File func_call5.mlw:
                 Line 18:
-                  x = 0
+                  x = 2
                   Execution of main function f2's body with env:
-                    x = 0
+                    x = 2
                     zero = 0
                     one = 1
                 Line 19:
                   Concrete execution of g2 with args:
-                    y = 0
+                    y = 2
                 Line 16:
                   Concrete execution of (+) with args:
-                    _ = 0
+                    _ = 2
                     _ = 1
                   Concrete execution of ref with args:
-                    contents = 1
+                    contents = 3
                   Concrete execution of ref'mk with args:
-                    contents = 1
+                    contents = 3
                 Line 20:
                   Property failure, Assertion with:
-                    x = 0
-                    z = (ref'mk 1)
+                    x = 2
+                    z = (ref'mk 3)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 16, characters 18-29)
               File int.mlw:
                 Line 13:
@@ -289,26 +289,26 @@ Sorry, we don't have a good counterexample for you :(
                   Constant one initialization
               File func_call5.mlw:
                 Line 18:
-                  x = 0
+                  x = 2
                   Execution of main function f2's body with env:
-                    x = 0
+                    x = 2
                     zero = 0
                     one = 1
                 Line 19:
                   Abstract execution of g2 with args:
-                    y = 0
+                    y = 2
                   result = (ref'mk 0)
                 Line 16:
                   Execution got stuck, Assume postcondition of g2 with:
-                    y = 0
+                    y = 2
                     result = (ref'mk 0)
 <check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 20, characters 11-17)
 <check-ce>Validating model:
           File func_call5.mlw:
             Line 18:
-              x = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "2"}
             Line 20:
-              x = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
@@ -321,26 +321,26 @@ Sorry, we don't have a good counterexample for you :(
                   Constant one initialization
               File func_call5.mlw:
                 Line 18:
-                  x = 0
+                  x = 2
                   Execution of main function f2's body with env:
-                    x = 0
+                    x = 2
                     zero = 0
                     one = 1
                 Line 19:
                   Concrete execution of g2 with args:
-                    y = 0
+                    y = 2
                 Line 16:
                   Concrete execution of (+) with args:
-                    _ = 0
+                    _ = 2
                     _ = 1
                   Concrete execution of ref with args:
-                    contents = 1
+                    contents = 3
                   Concrete execution of ref'mk with args:
-                    contents = 1
+                    contents = 3
                 Line 20:
                   Property failure, Assertion with:
-                    x = 0
-                    z = (ref'mk 1)
+                    x = 2
+                    z = (ref'mk 3)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 16, characters 18-29)
               File int.mlw:
                 Line 13:
@@ -349,18 +349,18 @@ Sorry, we don't have a good counterexample for you :(
                   Constant one initialization
               File func_call5.mlw:
                 Line 18:
-                  x = 0
+                  x = 2
                   Execution of main function f2's body with env:
-                    x = 0
+                    x = 2
                     zero = 0
                     one = 1
                 Line 19:
                   Abstract execution of g2 with args:
-                    y = 0
+                    y = 2
                   result = (ref'mk 0)
                 Line 16:
                   Execution got stuck, Assume postcondition of g2 with:
-                    y = 0
+                    y = 2
                     result = (ref'mk 0)
 <check-ce>Models:
 - Selected model 1 (Concrete: good model, Abstract: bad model)
@@ -369,7 +369,7 @@ Sorry, we don't have a good counterexample for you :(
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
 Goal Assertion from verification condition f2'vc.
-Prover result is: timeout (1.00s, 5944920 steps).
+Prover result is: timeout (1.00s, 7454722 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -379,24 +379,24 @@ File int.mlw:
     Constant one initialization
 File func_call5.mlw:
   Line 18:
-    x = 0
+    x = 2
     Execution of main function f2's body with env:
-      x = 0
+      x = 2
       zero = 0
       one = 1
   Line 19:
     Concrete execution of g2 with args:
-      y = 0
+      y = 2
   Line 16:
     Concrete execution of (+) with args:
-      _ = 0
+      _ = 2
       _ = 1
     Concrete execution of ref with args:
-      contents = 1
+      contents = 3
     Concrete execution of ref'mk with args:
-      contents = 1
+      contents = 3
   Line 20:
     Property failure, Assertion with:
-      x = 0
-      z = (ref'mk 1)
+      x = 2
+      z = (ref'mk 3)
 

@@ -4,7 +4,7 @@
             Line 6:
               y = {"type": "Integer", "val": "0"}
             Line 7:
-              result = {"type": "Integer", "val": "0"}
+              the check fails with all inputs
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5, taking default.
@@ -44,7 +44,6 @@
             Line 6:
               y = {"type": "Integer", "val": "0"}
             Line 7:
-              result = {"type": "Integer", "val": "-175"}
               y = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
@@ -83,10 +82,9 @@
 <check-ce>Validating model:
           File anonymous3.mlw:
             Line 6:
-              y = {"type": "Integer", "val": "-1769"}
+              y = {"type": "Integer", "val": "-8016"}
             Line 7:
-              result = {"type": "Integer", "val": "-3538"}
-              y = {"type": "Integer", "val": "-1769"}
+              y = {"type": "Integer", "val": "-8016"}
 <check-ce>Interpreting concretly
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5, taking default.
@@ -99,25 +97,25 @@
                   Constant one initialization
               File anonymous3.mlw:
                 Line 6:
-                  y = (-1769)
+                  y = (-8016)
                   Execution of main function g's body with env:
-                    y = (-1769)
+                    y = (-8016)
                     zero = 0
                     one = 1
                 Line 8:
                   Concrete execution of f with args:
-                    x = (-1769)
+                    x = (-8016)
                   Concrete execution of (@) with args:
-                    u = ({x -> (-1769)} fun y -> y + x)
-                    u = (-1769)
+                    u = ({x -> (-8016)} fun y -> y + x)
+                    u = (-8016)
                 Line 4:
                   Concrete execution of (+) with args:
-                    _ = (-1769)
-                    _ = (-1769)
+                    _ = (-8016)
+                    _ = (-8016)
                 Line 7:
                   Property failure, Postcondition of g with:
-                    y = (-1769)
-                    result = (-3538)
+                    y = (-8016)
+                    result = (-16032)
             - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
               
 <check-ce>Models:
@@ -129,7 +127,7 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/anonymous3.mlw", line 7, characters 12-22:
 Goal Postcondition from verification condition g'vc.
-Prover result is: timeout (1.00s, 2089441 steps).
+Prover result is: timeout (1.00s, 2853636 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

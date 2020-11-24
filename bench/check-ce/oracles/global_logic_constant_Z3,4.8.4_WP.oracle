@@ -1,16 +1,16 @@
 <check-ce>Check model 0 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
 <check-ce>Validating model:
           File global_logic_constant.mlw:
+            Line 5:
+              v1 = {"type": "Integer", "val": "1"}
             Line 8:
-              result = {"type": "Integer", "val": "1"}
+              the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Result of checking model 0:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+            - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -18,18 +18,18 @@
                   Constant one initialization
               File global_logic_constant.mlw:
                 Line 5:
-                  Constant v1 initialization
-                  (abstract) execution of any function
-                  result = 0
+                  v1 = 1
                 Line 7:
                   _ = ()
                   Execution of main function f1's body with env:
                     _ = ()
                     zero = 0
                     one = 1
-                    v1 = 0
-                  Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
+                    v1 = 1
+                Line 8:
+                  Property failure, Postcondition of f1 with:
+                    result = 1
+            - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -37,24 +37,24 @@
                   Constant one initialization
               File global_logic_constant.mlw:
                 Line 5:
-                  Constant v1 initialization
-                  (abstract) execution of any function
-                  result = 0
+                  v1 = 1
                 Line 7:
                   _ = ()
                   Execution of main function f1's body with env:
                     _ = ()
                     zero = 0
                     one = 1
-                    v1 = 0
-                  Execution of main function terminated normally
+                    v1 = 1
+                Line 8:
+                  Property failure, Postcondition of f1 with:
+                    result = 1
 <check-ce>Check model 1 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
 <check-ce>Validating model:
           File global_logic_constant.mlw:
             Line 5:
               v1 = {"type": "Integer", "val": "1"}
             Line 8:
-              result = {"type": "Integer", "val": "1"}
+              v1 = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
@@ -104,7 +104,7 @@
             Line 5:
               v1 = {"type": "Integer", "val": "1"}
             Line 8:
-              result = {"type": "Integer", "val": "1"}
+              v1 = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
@@ -149,15 +149,15 @@
                   Property failure, Postcondition of f1 with:
                     result = 1
 <check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Selected model 1 (Concrete: good model, Abstract: good model)
+- Selected model 0 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+- Checked model 1 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
 - Checked model 2 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24:
 Goal Postcondition from verification condition f1'vc.
-Prover result is: unknown (sat) (0.03s, 696 steps).
+Prover result is: unknown (sat) (0.01s, 696 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -182,18 +182,23 @@ File global_logic_constant.mlw:
 <check-ce>Check model 0 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
 <check-ce>Validating model:
           File global_logic_constant.mlw:
+            Line 11:
+              v2 =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "1"}}]}}
             Line 14:
-              result = {"type": "Integer", "val": "1"}
+              the check fails with all inputs
 <check-ce>Interpreting concretly
 <rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
-<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 11, characters 12-17, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
-<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 11, characters 12-17, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Result of checking model 0:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+            - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -205,27 +210,22 @@ File global_logic_constant.mlw:
                   (abstract) execution of any function
                   result = 0
                 Line 11:
-                  Constant v2 initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
+                  v2 = (ref'mk 1)
                 Line 13:
                   _ = ()
                   Execution of main function f2's body with env:
-                    v2 = (ref'mk 0)
+                    v2 = (ref'mk 1)
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = 0
                 Line 15:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
-                Line 13:
-                  Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
+                    arg = (ref'mk 1)
+                Line 14:
+                  Property failure, Postcondition of f2 with:
+                    result = 1
+            - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -237,26 +237,21 @@ File global_logic_constant.mlw:
                   (abstract) execution of any function
                   result = 0
                 Line 11:
-                  Constant v2 initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
+                  v2 = (ref'mk 1)
                 Line 13:
                   _ = ()
                   Execution of main function f2's body with env:
-                    v2 = (ref'mk 0)
+                    v2 = (ref'mk 1)
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = 0
                 Line 15:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
-                Line 13:
-                  Execution of main function terminated normally
+                    arg = (ref'mk 1)
+                Line 14:
+                  Property failure, Postcondition of f2 with:
+                    result = 1
 <check-ce>Check model 1 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
 <check-ce>Validating model:
           File global_logic_constant.mlw:
@@ -268,7 +263,12 @@ File global_logic_constant.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 14:
-              result = {"type": "Integer", "val": "2"}
+              v2 =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
 <rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
@@ -341,7 +341,12 @@ File global_logic_constant.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 14:
-              result = {"type": "Integer", "val": "2"}
+              v2 =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
 <rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
@@ -404,15 +409,15 @@ File global_logic_constant.mlw:
                   Property failure, Postcondition of f2 with:
                     result = 2
 <check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Selected model 1 (Concrete: good model, Abstract: good model)
+- Selected model 0 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+- Checked model 1 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
 - Checked model 2 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24:
 Goal Postcondition from verification condition f2'vc.
-Prover result is: timeout (1.00s, 5611566 steps).
+Prover result is: timeout (1.00s, 7299698 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -426,19 +431,19 @@ File global_logic_constant.mlw:
     (abstract) execution of any function
     result = 0
   Line 11:
-    v2 = (ref'mk 2)
+    v2 = (ref'mk 1)
   Line 13:
     _ = ()
     Execution of main function f2's body with env:
-      v2 = (ref'mk 2)
+      v2 = (ref'mk 1)
       _ = ()
       zero = 0
       one = 1
       v1 = 0
   Line 15:
     Concrete execution of contents with args:
-      arg = (ref'mk 2)
+      arg = (ref'mk 1)
   Line 14:
     Property failure, Postcondition of f2 with:
-      result = 2
+      result = 1
 

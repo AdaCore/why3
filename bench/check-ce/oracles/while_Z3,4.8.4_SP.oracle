@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.03s, 105 steps).
+Prover result is: valid (0.00s, 96 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: valid (0.01s, 2819 steps).
+Prover result is: valid (0.00s, 1759 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Validating model:
@@ -174,8 +174,6 @@ Prover result is: valid (0.01s, 2819 steps).
 <check-ce>Check model 1 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Validating model:
           File while.mlw:
-            Line 4:
-              z = {"type": "Integer", "val": "3"}
             Line 8:
               [before iteration] i =
                 {"type": "Record",
@@ -217,8 +215,15 @@ Prover result is: valid (0.01s, 2819 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
 <check-ce>Interpreting concretly
+<rac-values>Missing value for parameter z, continue with default value 0.
 <check-ce>Interpreting abstractly
+<rac-values>Missing value for parameter z, continue with default value 0.
 <rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
+<rac-values>No value for result at "bench/check-ce/while.mlw", line 6, characters 15-16, taking default.
+<rac-values>No value for result at "bench/check-ce/while.mlw", line 7, characters 14-15, taking default.
+<rac-values>Value imported for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161: (ref'mk (-2))
+<rac-values>No value for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161, taking default.
+<rac-values>Value imported for i at "bench/check-ce/while.mlw", line 8, characters 2-161: (ref'mk 0)
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -228,16 +233,16 @@ Prover result is: valid (0.01s, 2819 steps).
                   Constant one initialization
               File while.mlw:
                 Line 4:
-                  z = 3
+                  z = 0
                   Execution of main function f's body with env:
-                    z = 3
+                    z = 0
                     zero = 0
                     one = 1
                 Line 5:
                   Concrete execution of ref with args:
-                    contents = 3
+                    contents = 0
                   Concrete execution of ref'mk with args:
-                    contents = 3
+                    contents = 0
                 Line 6:
                   Concrete execution of ref with args:
                     contents = 0
@@ -263,9 +268,9 @@ Prover result is: valid (0.01s, 2819 steps).
                     y = 0
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 3)
+                    arg = (ref'mk 0)
                   Concrete execution of (+) with args:
-                    _ = 3
+                    _ = 0
                     _ = 1
                 Line 15:
                   Concrete execution of contents with args:
@@ -307,7 +312,7 @@ Prover result is: valid (0.01s, 2819 steps).
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+            - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/while.mlw", line 10, characters 16-32)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -315,24 +320,58 @@ Prover result is: valid (0.01s, 2819 steps).
                   Constant one initialization
               File while.mlw:
                 Line 4:
-                  z = 3
+                  z = 0
                   Execution of main function f's body with env:
-                    z = 3
+                    z = 0
                     zero = 0
                     one = 1
                 Line 5:
                   Abstract execution of ref with args:
-                    contents = 3
+                    contents = 0
                   result = (ref'mk 0)
-              Unknown location:
-                  Execution got stuck, Assume postcondition of ref with:
-                    contents = 3
-                    result = (ref'mk 0)
+                Line 6:
+                  Abstract execution of ref with args:
+                    contents = 0
+                  result = (ref'mk 0)
+                Line 7:
+                  Abstract execution of ref with args:
+                    contents = 0
+                  result = (ref'mk 0)
+                Line 8:
+                  Abstract execution of loop
+                  x1 = (ref'mk (-2))
+                  x2 = (ref'mk 0)
+                  i = (ref'mk 0)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (<) with args:
+                    _ = 0
+                    _ = 2
+                Line 11:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
+                Line 12:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-2))
+                  Concrete execution of (+) with args:
+                    _ = (-2)
+                    _ = 1
+                Line 15:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
+                Line 10:
+                  Property failure, Loop invariant preservation with:
+                    x1 = (ref'mk (-1))
+                    i = (ref'mk 1)
 <check-ce>Check model 2 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Validating model:
           File while.mlw:
-            Line 4:
-              z = {"type": "Integer", "val": "3"}
             Line 8:
               [before iteration] i =
                 {"type": "Record",
@@ -374,8 +413,15 @@ Prover result is: valid (0.01s, 2819 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
 <check-ce>Interpreting concretly
+<rac-values>Missing value for parameter z, continue with default value 0.
 <check-ce>Interpreting abstractly
+<rac-values>Missing value for parameter z, continue with default value 0.
 <rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
+<rac-values>No value for result at "bench/check-ce/while.mlw", line 6, characters 15-16, taking default.
+<rac-values>No value for result at "bench/check-ce/while.mlw", line 7, characters 14-15, taking default.
+<rac-values>Value imported for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161: (ref'mk (-2))
+<rac-values>No value for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161, taking default.
+<rac-values>Value imported for i at "bench/check-ce/while.mlw", line 8, characters 2-161: (ref'mk 0)
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -385,16 +431,16 @@ Prover result is: valid (0.01s, 2819 steps).
                   Constant one initialization
               File while.mlw:
                 Line 4:
-                  z = 3
+                  z = 0
                   Execution of main function f's body with env:
-                    z = 3
+                    z = 0
                     zero = 0
                     one = 1
                 Line 5:
                   Concrete execution of ref with args:
-                    contents = 3
+                    contents = 0
                   Concrete execution of ref'mk with args:
-                    contents = 3
+                    contents = 0
                 Line 6:
                   Concrete execution of ref with args:
                     contents = 0
@@ -420,9 +466,9 @@ Prover result is: valid (0.01s, 2819 steps).
                     y = 0
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 3)
+                    arg = (ref'mk 0)
                   Concrete execution of (+) with args:
-                    _ = 3
+                    _ = 0
                     _ = 1
                 Line 15:
                   Concrete execution of contents with args:
@@ -464,7 +510,7 @@ Prover result is: valid (0.01s, 2819 steps).
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+            - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/while.mlw", line 10, characters 16-32)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -472,37 +518,129 @@ Prover result is: valid (0.01s, 2819 steps).
                   Constant one initialization
               File while.mlw:
                 Line 4:
-                  z = 3
+                  z = 0
                   Execution of main function f's body with env:
-                    z = 3
+                    z = 0
                     zero = 0
                     one = 1
                 Line 5:
                   Abstract execution of ref with args:
-                    contents = 3
+                    contents = 0
                   result = (ref'mk 0)
-              Unknown location:
-                  Execution got stuck, Assume postcondition of ref with:
-                    contents = 3
-                    result = (ref'mk 0)
+                Line 6:
+                  Abstract execution of ref with args:
+                    contents = 0
+                  result = (ref'mk 0)
+                Line 7:
+                  Abstract execution of ref with args:
+                    contents = 0
+                  result = (ref'mk 0)
+                Line 8:
+                  Abstract execution of loop
+                  x1 = (ref'mk (-2))
+                  x2 = (ref'mk 0)
+                  i = (ref'mk 0)
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (<) with args:
+                    _ = 0
+                    _ = 2
+                Line 11:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (=) with args:
+                    x = 0
+                    y = 0
+                Line 12:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk (-2))
+                  Concrete execution of (+) with args:
+                    _ = (-2)
+                    _ = 1
+                Line 15:
+                  Concrete execution of contents with args:
+                    arg = (ref'mk 0)
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 1
+                Line 10:
+                  Property failure, Loop invariant preservation with:
+                    x1 = (ref'mk (-1))
+                    i = (ref'mk 1)
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
-- Checked model 1 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Selected model 2 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 1 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified
+- Checked model 2 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 5898281 steps).
-Sorry, we don't have a good counterexample for you :(
-
+Prover result is: timeout (1.00s, 7999457 steps).
+The contracts of some function or loop are underspecified, for example during
+  the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
+File while.mlw:
+  Line 4:
+    z = 0
+    Execution of main function f's body with env:
+      z = 0
+      zero = 0
+      one = 1
+  Line 5:
+    Abstract execution of ref with args:
+      contents = 0
+    result = (ref'mk 0)
+  Line 6:
+    Abstract execution of ref with args:
+      contents = 0
+    result = (ref'mk 0)
+  Line 7:
+    Abstract execution of ref with args:
+      contents = 0
+    result = (ref'mk 0)
+  Line 8:
+    Abstract execution of loop
+    x1 = (ref'mk (-2))
+    x2 = (ref'mk 0)
+    i = (ref'mk 0)
+    Concrete execution of contents with args:
+      arg = (ref'mk 0)
+    Concrete execution of (<) with args:
+      _ = 0
+      _ = 2
+  Line 11:
+    Concrete execution of contents with args:
+      arg = (ref'mk 0)
+    Concrete execution of (=) with args:
+      x = 0
+      y = 0
+  Line 12:
+    Concrete execution of contents with args:
+      arg = (ref'mk (-2))
+    Concrete execution of (+) with args:
+      _ = (-2)
+      _ = 1
+  Line 15:
+    Concrete execution of contents with args:
+      arg = (ref'mk 0)
+    Concrete execution of (+) with args:
+      _ = 0
+      _ = 1
+  Line 10:
+    Property failure, Loop invariant preservation with:
+      x1 = (ref'mk (-1))
+      i = (ref'mk 1)
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: valid (0.01s, 2817 steps).
+Prover result is: valid (0.00s, 1759 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.01s, 2745 steps).
+Prover result is: valid (0.01s, 1720 steps).
 

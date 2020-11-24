@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.00s, 58 steps).
+Prover result is: valid (0.00s, 50 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Validating model:
@@ -111,28 +111,28 @@ Prover result is: valid (0.00s, 58 steps).
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-401"}}]}}
+                      "value": {"type": "Integer", "val": "-1"}}]}}
             Line 8:
               [current iteration] x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-400"}}]}}
+                      "value": {"type": "Integer", "val": "0"}}]}}
             Line 10:
               [current iteration] x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-400"}}]}}
+                      "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/for.mlw", line 5, characters 15-16, taking default.
 <rac-values>No value for result at "bench/check-ce/for.mlw", line 6, characters 15-16, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-401))
+<rac-values>Value imported for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-1))
 <rac-values>No value for x2 at "bench/check-ce/for.mlw", line 7, characters 2-125, taking default.
 <rac-values>Value imported for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
 <check-ce>Result of checking model 1:
@@ -206,7 +206,7 @@ Prover result is: valid (0.00s, 58 steps).
                   result = (ref'mk 0)
                 Line 7:
                   Abstract execution of loop
-                  x1 = (ref'mk (-401))
+                  x1 = (ref'mk (-1))
                   x2 = (ref'mk 0)
                   i = 0
                 Line 9:
@@ -215,13 +215,13 @@ Prover result is: valid (0.00s, 58 steps).
                     y = 0
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk (-401))
+                    arg = (ref'mk (-1))
                   Concrete execution of (+) with args:
-                    _ = (-401)
+                    _ = (-1)
                     _ = 1
                 Line 8:
                   Property failure, Loop invariant preservation with:
-                    x1 = (ref'mk (-400))
+                    x1 = (ref'mk 0)
                     i = 1
 <check-ce>Check model 2 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Validating model:
@@ -233,28 +233,28 @@ Prover result is: valid (0.00s, 58 steps).
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-7869"}}]}}
+                      "value": {"type": "Integer", "val": "-1"}}]}}
             Line 8:
               [current iteration] x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-7868"}}]}}
+                      "value": {"type": "Integer", "val": "0"}}]}}
             Line 10:
               [current iteration] x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-7868"}}]}}
+                      "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/for.mlw", line 5, characters 15-16, taking default.
 <rac-values>No value for result at "bench/check-ce/for.mlw", line 6, characters 15-16, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-7869))
+<rac-values>Value imported for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-1))
 <rac-values>No value for x2 at "bench/check-ce/for.mlw", line 7, characters 2-125, taking default.
 <rac-values>Value imported for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
 <check-ce>Result of checking model 2:
@@ -328,7 +328,7 @@ Prover result is: valid (0.00s, 58 steps).
                   result = (ref'mk 0)
                 Line 7:
                   Abstract execution of loop
-                  x1 = (ref'mk (-7869))
+                  x1 = (ref'mk (-1))
                   x2 = (ref'mk 0)
                   i = 0
                 Line 9:
@@ -337,13 +337,13 @@ Prover result is: valid (0.00s, 58 steps).
                     y = 0
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk (-7869))
+                    arg = (ref'mk (-1))
                   Concrete execution of (+) with args:
-                    _ = (-7869)
+                    _ = (-1)
                     _ = 1
                 Line 8:
                   Property failure, Loop invariant preservation with:
-                    x1 = (ref'mk (-7868))
+                    x1 = (ref'mk 0)
                     i = 1
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
@@ -354,7 +354,7 @@ Prover result is: valid (0.00s, 58 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 4928067 steps).
+Prover result is: timeout (1.00s, 7883306 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -379,7 +379,7 @@ File for.mlw:
     result = (ref'mk 0)
   Line 7:
     Abstract execution of loop
-    x1 = (ref'mk (-401))
+    x1 = (ref'mk (-1))
     x2 = (ref'mk 0)
     i = 0
   Line 9:
@@ -388,16 +388,16 @@ File for.mlw:
       y = 0
   Line 10:
     Concrete execution of contents with args:
-      arg = (ref'mk (-401))
+      arg = (ref'mk (-1))
     Concrete execution of (+) with args:
-      _ = (-401)
+      _ = (-1)
       _ = 1
   Line 8:
     Property failure, Loop invariant preservation with:
-      x1 = (ref'mk (-400))
+      x1 = (ref'mk 0)
       i = 1
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.01s, 2384 steps).
+Prover result is: valid (0.00s, 1611 steps).
 

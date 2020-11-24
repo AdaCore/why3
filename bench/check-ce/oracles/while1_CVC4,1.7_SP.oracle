@@ -1,20 +1,25 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.02s, 1177 steps).
+Prover result is: valid (0.01s, 859 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: valid (0.03s, 1830 steps).
+Prover result is: valid (0.02s, 1260 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.03s, 1763 steps).
+Prover result is: valid (0.02s, 1193 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce>Validating model:
           File while1.mlw:
             Line 5:
-              result = {"type": "Integer", "val": "0"}
+              x =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
             Line 8:
               i =
                 {"type": "Record",
@@ -164,7 +169,12 @@ Prover result is: valid (0.03s, 1763 steps).
 <check-ce>Validating model:
           File while1.mlw:
             Line 5:
-              result = {"type": "Integer", "val": "0"}
+              x =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
             Line 8:
               i =
                 {"type": "Record",
@@ -306,7 +316,12 @@ Prover result is: valid (0.03s, 1763 steps).
 <check-ce>Validating model:
           File while1.mlw:
             Line 5:
-              result = {"type": "Integer", "val": "0"}
+              x =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
             Line 8:
               i =
                 {"type": "Record",
@@ -453,7 +468,7 @@ Prover result is: valid (0.03s, 1763 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Goal Postcondition from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.06s, 6577 steps).
+Prover result is: unknown (unknown + incomplete) (0.03s, 6037 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
