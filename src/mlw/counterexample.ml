@@ -176,16 +176,15 @@ let ce_summary v_concrete v_abstract =
   | Bad_model , Bad_model  -> BAD_CE
 
 let print_counterexample ?verb_lvl ?check_ce ?json fmt (model,ce_summary) =
-  if not (Model_parser.is_model_empty model) then
-    fprintf fmt "@ @[<hov2>%a%t@]"
-      (print_ce_summary_title ?check_ce) ce_summary
-      (fun fmt ->
-        match ce_summary with
-        | NCCE _ | SWCE _ | NCCE_SWCE _ ->
+  fprintf fmt "@ @[<hov2>%a%t@]"
+    (print_ce_summary_title ?check_ce) ce_summary
+    (fun fmt ->
+       match ce_summary with
+       | NCCE _ | SWCE _ | NCCE_SWCE _ ->
            fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
-        | UNKNOWN _ ->
+       | UNKNOWN _ ->
            fprintf fmt ":"
-        | _ -> ());
+       | _ -> ());
   let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
   fprintf fmt "@ %a"
     (print_ce_summary_values ?verb_lvl ~print_attrs ?json model) ce_summary
