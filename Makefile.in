@@ -1795,7 +1795,7 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.$(SHAREDBEST) plugins $(TOOLS) \
 	@echo "=== Check API examples ==="
 	$(MAKE) bench-api
 	@echo "=== Check examples ==="
-	bash bench/bench ".@OCAMLBEST@"
+	bash bench/bench -suffix ".@OCAMLBEST@"
 	@echo "=== Check parsing messages ==="
 	bench/parsing-bench
 	@echo ""

@@ -11,20 +11,33 @@ has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
 shopt -s nullglob
 
-if [ "$1" = "--help" ]; then
-    echo "Usage: $0 [suffix [category]]"
-    echo "where suffix is .opt or .byte or the empty string"
-    echo "and category is one of: badfiles drivers execution extraction goodfiles"
-    echo "  invalidgoals list mlwprinter rac realizations replay replay-without-shapes"
-    echo "  stdlib validgoals validsplitgoals"
-    exit 0
-fi
+suffix=
+only=
 
-suffix=$1
-only=${2:-"ALL"}
+while [ $# != 0 ]; do
+    case "$1" in
+        "-suffix")
+            suffix="$2"
+            shift 2
+            ;;
+        "-only")
+            only="$2"
+            shift 2
+            ;;
+        *)
+            echo "Usage: $0 [-suffix s] [-only category]"
+            echo "The suffix for calling bin/why3 and either '.opt' or '.byte' or ''."
+            echo "The category can be used to select only a specific bench test"
+            echo "and is one of the following:"
+            echo "  badfiles drivers execution extraction goodfiles invalidgoals list"
+            echo "  mlwprinter rac realizations replay replay-without-shapes stdlib"
+            echo "  validgoals validsplitgoals."
+            exit 1
+    esac
+done
 
 enabled () {
-    [ "$only" = "ALL" -o "$only" = "$1" ]
+    test -z "$only" -o "$only" = "$1"
 }
 
 # TODO: remove the hack about int.mlw once it has become builtin
@@ -406,7 +419,7 @@ rac () {
         echo -n " $func" >&2
         bin/why3"$suffix" execute --rac --rac-prover=cvc4 \
                 --debug=rac-check-term-result \
-                "${RACARGS[@]}" "$file" "$func ()" --use="$mod" 2>&1 |\
+                "${RACARGS[@]}" "$file" --use="$mod" "$func ()" 2>&1 |\
             sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" |\
             sed "s|$(bin/why3$suffix --print-libdir)|WHY3LIB|g"
     done
