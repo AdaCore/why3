@@ -6,8 +6,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File list.mlw:
   Line 14:
-    l, [[@introduced]] =
-      {"type": "Apply", "val": {"apply": "Nil", "list": []}}
+    l [@introduced] = {"type": "Apply", "val": {"apply": "Nil", "list": []}}
 
 File "bench/ce/list.mlw", line 16, characters 26-39:
 Verification condition g2.
@@ -16,7 +15,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File list.mlw:
   Line 16:
-    l, [[@introduced]] =
+    l [@introduced] =
       {"type": "Apply",
        "val":
         {"apply": "Cons",

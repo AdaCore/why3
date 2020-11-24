@@ -10,17 +10,17 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File array_mono.mlw:
   Line 16:
-    a, [[@introduced]] =
+    a [@introduced] =
       {"proj_name": "length",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
   Line 35:
-    a, [[@introduced]] =
+    a [@introduced] =
       {"proj_name": "length",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
   Line 36:
-    a, [[@introduced], [@model_trace:a]] =
+    a [@introduced] [@model_trace:a] =
       {"proj_name": "length",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
@@ -36,8 +36,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File array_mono.mlw:
   Line 25:
-    old a, [[@at:'Old], [@at:'Old:loc:bench/ce/array_mono.mlw:25],
-      [@at:'Old:loc:bench/ce/array_mono.mlw:26], [@introduced]] =
+    old a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]
+      [@at:'Old:loc:bench/ce/array_mono.mlw:26] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -46,7 +46,7 @@ File array_mono.mlw:
              {"type": "Array",
               "val": [{"others": {"type": "Integer", "val": "4"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
-    a, [[@introduced]] =
+    a [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -59,8 +59,8 @@ File array_mono.mlw:
                 {"others": {"type": "Integer", "val": "4"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 38:
-    a, [[@at:'Old], [@at:'Old:loc:bench/ce/array_mono.mlw:25],
-      [@at:'Old:loc:bench/ce/array_mono.mlw:26], [@introduced]] =
+    a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]
+      [@at:'Old:loc:bench/ce/array_mono.mlw:26] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -70,7 +70,7 @@ File array_mono.mlw:
               "val": [{"others": {"type": "Integer", "val": "4"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 40:
-    a, [[@introduced], [@model_trace:a]] =
+    a [@introduced] [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
@@ -83,7 +83,7 @@ File array_mono.mlw:
                 {"others": {"type": "Integer", "val": "4"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 41:
-    a, [[@introduced]] =
+    a [@introduced] =
       {"type": "Record",
        "val":
         {"Field":

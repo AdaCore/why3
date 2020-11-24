@@ -6,7 +6,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 6:
-    s, [[@introduced]] = {"type": "String", "val": "A"}
+    s [@introduced] = {"type": "String", "val": "A"}
 
 File "bench/ce/strings.mlw", line 7, characters 21-35:
 Verification condition T2.
@@ -15,7 +15,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 7:
-    s, [[@introduced]] = {"type": "String", "val": "AAAA"}
+    s [@introduced] = {"type": "String", "val": "AAAA"}
 
 File "bench/ce/strings.mlw", line 8, characters 25-52:
 Verification condition T3.
@@ -24,8 +24,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 8:
-    s1, [[@introduced]] = {"type": "String", "val": "A"}
-    s2, [[@introduced]] = {"type": "String", "val": "B"}
+    s1 [@introduced] = {"type": "String", "val": "A"}
+    s2 [@introduced] = {"type": "String", "val": "B"}
 
 File "bench/ce/strings.mlw", line 9, characters 38-55:
 Verification condition T4.
@@ -34,7 +34,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 9:
-    s, [[@introduced]] = {"type": "String", "val": "AAAAAAAAAAA"}
+    s [@introduced] = {"type": "String", "val": "AAAAAAAAAAA"}
 
 File "bench/ce/strings.mlw", line 10, characters 59-78:
 Verification condition T5.
@@ -43,7 +43,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 10:
-    s, [[@introduced]] = {"type": "String", "val": "aAAAAAA"}
+    s [@introduced] = {"type": "String", "val": "aAAAAAA"}
 
 File "bench/ce/strings.mlw", line 11, characters 59-79:
 Verification condition T6.
@@ -52,25 +52,25 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 11:
-    s, [[@introduced]] = {"type": "String", "val": "aAAAAAAA"}
+    s [@introduced] = {"type": "String", "val": "aAAAAAAA"}
 
 File "bench/ce/strings.mlw", line 12, characters 59-78:
 Verification condition T7.
-Prover result is: unknown (unknown + incomplete).
+Prover result is: timeout.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 12:
-    s, [[@introduced]] = {"type": "String", "val": ""}
+    s [@introduced] = {"type": "String", "val": ""}
 
 File "bench/ce/strings.mlw", line 13, characters 59-79:
 Verification condition T8.
-Prover result is: unknown (unknown + incomplete).
+Prover result is: timeout.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 13:
-    s, [[@introduced]] = {"type": "String", "val": ""}
+    s [@introduced] = {"type": "String", "val": ""}
 
 File "bench/ce/strings.mlw", line 14, characters 59-78:
 Verification condition T9.
@@ -79,7 +79,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 14:
-    s, [[@introduced]] = {"type": "String", "val": "b{uoh\ti"}
+    s [@introduced] = {"type": "String", "val": "b{uoh\ti"}
 
 File "bench/ce/strings.mlw", line 15, characters 60-80:
 Verification condition T10.
@@ -88,16 +88,16 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 15:
-    s, [[@introduced]] = {"type": "String", "val": "aAAAAAAA"}
+    s [@introduced] = {"type": "String", "val": "aAAAAAAA"}
 
 File "bench/ce/strings.mlw", line 16, characters 60-79:
 Verification condition T11.
-Prover result is: unknown (unknown + incomplete).
+Prover result is: timeout.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 16:
-    s, [[@introduced]] = {"type": "String", "val": ""}
+    s [@introduced] = {"type": "String", "val": ""}
 
 File "bench/ce/strings.mlw", line 17, characters 60-80:
 Verification condition T12.
@@ -106,7 +106,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 17:
-    s, [[@introduced]] = {"type": "String", "val": ""}
+    s [@introduced] = {"type": "String", "val": ""}
 
 File "bench/ce/strings.mlw", line 18, characters 22-28:
 Verification condition T13.
@@ -115,7 +115,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 18:
-    s, [[@introduced]] = {"type": "String", "val": ""}
+    s [@introduced] = {"type": "String", "val": ""}
 
 File "bench/ce/strings.mlw", line 19, characters 22-34:
 Verification condition T14.
@@ -124,7 +124,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 19:
-    s, [[@introduced]] = {"type": "String", "val": ""}
+    s [@introduced] = {"type": "String", "val": ""}
 
 File "bench/ce/strings.mlw", line 20, characters 24-45:
 Verification condition T15.
@@ -133,8 +133,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 20:
-    i, [[@introduced]] = {"type": "Integer", "val": "0"}
-    s, [[@introduced]] = {"type": "String", "val": ""}
+    i [@introduced] = {"type": "Integer", "val": "0"}
+    s [@introduced] = {"type": "String", "val": ""}
 
 File "bench/ce/strings.mlw", line 21, characters 22-38:
 Verification condition T16.
@@ -143,7 +143,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 21:
-    s, [[@introduced]] = {"type": "String", "val": ""}
+    s [@introduced] = {"type": "String", "val": ""}
 
 File "bench/ce/strings.mlw", line 22, characters 42-54:
 Verification condition T17.
@@ -152,5 +152,5 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 22:
-    s, [[@introduced]] = {"type": "String", "val": "abc"}
+    s [@introduced] = {"type": "String", "val": "abc"}
 

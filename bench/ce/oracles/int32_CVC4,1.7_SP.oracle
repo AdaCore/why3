@@ -10,7 +10,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int32.mlw:
   Line 5:
-    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
        "val":
         {"Field":
@@ -20,8 +20,8 @@ File int32.mlw:
               "type": "Proj",
               "value": {"type": "Integer", "val": "22"}}}]}}
   Line 7:
-    r, [[@field:0:contents], [@introduced], [@mlw:reference_var],
-      [@model_trace:r]] =
+    r [@field:0:contents] [@introduced] [@mlw:reference_var]
+      [@model_trace:r] =
       {"type": "Record",
        "val":
         {"Field":
@@ -31,7 +31,7 @@ File int32.mlw:
               "type": "Proj",
               "value": {"type": "Integer", "val": "84"}}}]}}
   Line 8:
-    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
        "val":
         {"Field":
@@ -41,7 +41,7 @@ File int32.mlw:
               "type": "Proj",
               "value": {"type": "Integer", "val": "42"}}}]}}
   Line 9:
-    r, [[@field:0:contents], [@introduced], [@mlw:reference_var]] =
+    r [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
        "val":
         {"Field":

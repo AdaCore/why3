@@ -6,13 +6,13 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File if_assign.mlw:
   Line 10:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 12:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -25,13 +25,13 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File if_assign.mlw:
   Line 16:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 18:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -44,39 +44,39 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
   Line 16:
-    a, [[@introduced]] = {"type": "Integer", "val": "0"}
+    a [@introduced] = {"type": "Integer", "val": "0"}
 File ref.mlw:
   Line 18:
-    x, [[@field:0:contents], [@introduced],
-      [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-      [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x [@field:0:contents] [@introduced]
+      [@vc:written:25:4:20:bench/ce/if_assign.mlw]
+      [@vc:written:27:4:11:bench/ce/if_assign.mlw] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
 File if_assign.mlw:
   Line 21:
-    a, [[@introduced]] = {"type": "Integer", "val": "0"}
+    a [@introduced] = {"type": "Integer", "val": "0"}
   Line 22:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x],
-      [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-      [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x]
+      [@vc:written:25:4:20:bench/ce/if_assign.mlw]
+      [@vc:written:27:4:11:bench/ce/if_assign.mlw] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 25:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x],
-      [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-      [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x]
+      [@vc:written:25:4:20:bench/ce/if_assign.mlw]
+      [@vc:written:27:4:11:bench/ce/if_assign.mlw] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 27:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x],
-      [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-      [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x]
+      [@vc:written:25:4:20:bench/ce/if_assign.mlw]
+      [@vc:written:27:4:11:bench/ce/if_assign.mlw] =
       {"type": "Record",
        "val":
         {"Field":
@@ -89,39 +89,39 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
   Line 16:
-    a, [[@introduced]] = {"type": "Integer", "val": "-1"}
+    a [@introduced] = {"type": "Integer", "val": "-1"}
 File ref.mlw:
   Line 18:
-    x, [[@field:0:contents], [@introduced],
-      [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-      [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x [@field:0:contents] [@introduced]
+      [@vc:written:25:4:20:bench/ce/if_assign.mlw]
+      [@vc:written:27:4:11:bench/ce/if_assign.mlw] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
 File if_assign.mlw:
   Line 21:
-    a, [[@introduced]] = {"type": "Integer", "val": "-1"}
+    a [@introduced] = {"type": "Integer", "val": "-1"}
   Line 22:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x],
-      [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-      [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x]
+      [@vc:written:25:4:20:bench/ce/if_assign.mlw]
+      [@vc:written:27:4:11:bench/ce/if_assign.mlw] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
   Line 25:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x],
-      [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-      [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x]
+      [@vc:written:25:4:20:bench/ce/if_assign.mlw]
+      [@vc:written:27:4:11:bench/ce/if_assign.mlw] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
   Line 27:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x],
-      [@vc:written:25:4:20:bench/ce/if_assign.mlw],
-      [@vc:written:27:4:11:bench/ce/if_assign.mlw]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x]
+      [@vc:written:25:4:20:bench/ce/if_assign.mlw]
+      [@vc:written:27:4:11:bench/ce/if_assign.mlw] =
       {"type": "Record",
        "val":
         {"Field":
@@ -134,12 +134,12 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
   Line 16:
-    a, [[@introduced]] = {"type": "Integer", "val": "0"}
+    a [@introduced] = {"type": "Integer", "val": "0"}
 File if_assign.mlw:
   Line 30:
-    a, [[@introduced]] = {"type": "Integer", "val": "0"}
+    a [@introduced] = {"type": "Integer", "val": "0"}
   Line 34:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -156,27 +156,27 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
   Line 16:
-    a, [[@introduced]] = {"type": "Integer", "val": "-1"}
+    a [@introduced] = {"type": "Integer", "val": "-1"}
 File ref.mlw:
   Line 20:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
 File if_assign.mlw:
   Line 30:
-    a, [[@introduced]] = {"type": "Integer", "val": "-1"}
+    a [@introduced] = {"type": "Integer", "val": "-1"}
   Line 31:
     the check fails with all inputs
   Line 34:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 36:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":

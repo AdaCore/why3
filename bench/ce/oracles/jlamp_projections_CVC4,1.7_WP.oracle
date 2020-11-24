@@ -10,17 +10,17 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File jlamp_projections.mlw:
   Line 18:
-    a, [[@introduced]] =
+    a [@introduced] =
       {"proj_name": "to_int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "127"}}
   Line 28:
-    a, [[@introduced]] =
+    a [@introduced] =
       {"proj_name": "to_int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "127"}}
   Line 29:
-    a, [[@introduced], [@model_trace:a]] =
+    a [@introduced] [@model_trace:a] =
       {"proj_name": "to_int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "127"}}
@@ -36,7 +36,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    a, [[@field:0:contents], [@introduced]] =
+    a [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -47,7 +47,7 @@ File ref.mlw:
               "value": {"type": "Integer", "val": "127"}}}]}}
 File jlamp_projections.mlw:
   Line 41:
-    a, [[@field:0:contents], [@introduced]] =
+    a [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -57,7 +57,7 @@ File jlamp_projections.mlw:
               "type": "Proj",
               "value": {"type": "Integer", "val": "127"}}}]}}
   Line 42:
-    a, [[@field:0:contents], [@introduced], [@model_trace:a]] =
+    a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
@@ -78,7 +78,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File jlamp_projections.mlw:
   Line 53:
-    b, [[@introduced]] =
+    b [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -89,7 +89,7 @@ File jlamp_projections.mlw:
               "value": {"type": "Integer", "val": "127"}}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 54:
-    b, [[@introduced], [@model_trace:b]] =
+    b [@introduced] [@model_trace:b] =
       {"type": "Record",
        "val":
         {"Field":

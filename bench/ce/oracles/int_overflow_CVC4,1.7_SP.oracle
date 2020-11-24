@@ -10,7 +10,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 9:
-    x, [[@introduced]] = {"type": "Integer", "val": "0"}
+    x [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/int_overflow.mlw", line 14, characters 27-38:
 Verification condition test2.
@@ -19,7 +19,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 14:
-    x, [[@introduced]] = {"type": "Integer", "val": "0"}
+    x [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/int_overflow.mlw", line 19, characters 43-53:
 Verification condition test_overflow.
@@ -32,8 +32,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 18:
-    x, [[@introduced]] = {"type": "Integer", "val": "65535"}
-    y, [[@introduced]] = {"type": "Integer", "val": "1"}
+    x [@introduced] = {"type": "Integer", "val": "65535"}
+    y [@introduced] = {"type": "Integer", "val": "1"}
 
 File "bench/ce/int_overflow.mlw", line 24, characters 45-56:
 Verification condition test_overflow2.
@@ -42,8 +42,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 23:
-    x, [[@introduced]] = {"type": "Integer", "val": "-2"}
-    y, [[@introduced]] = {"type": "Integer", "val": "-1"}
+    x [@introduced] = {"type": "Integer", "val": "-2"}
+    y [@introduced] = {"type": "Integer", "val": "-1"}
 
 File "bench/ce/int_overflow.mlw", line 24, characters 51-65:
 Verification condition test_overflow2.
@@ -52,8 +52,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 23:
-    x, [[@introduced]] = {"type": "Integer", "val": "65535"}
-    y, [[@introduced]] = {"type": "Integer", "val": "1"}
+    x [@introduced] = {"type": "Integer", "val": "65535"}
+    y [@introduced] = {"type": "Integer", "val": "1"}
 
 File "bench/ce/int_overflow.mlw", line 31, characters 33-49:
 Verification condition test_overflow_int16.
@@ -62,8 +62,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 30:
-    x, [[@introduced]] = {"type": "Integer", "val": "-65536"}
-    y, [[@introduced]] = {"type": "Integer", "val": "-1"}
+    x [@introduced] = {"type": "Integer", "val": "-65536"}
+    y [@introduced] = {"type": "Integer", "val": "-1"}
 
 File "bench/ce/int_overflow.mlw", line 36, characters 54-67:
 Verification condition test_overflow_int16_alt.
@@ -72,8 +72,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 35:
-    x, [[@introduced]] = {"type": "Integer", "val": "-65536"}
-    y, [[@introduced]] = {"type": "Integer", "val": "-1"}
+    x [@introduced] = {"type": "Integer", "val": "-65536"}
+    y [@introduced] = {"type": "Integer", "val": "-1"}
 
 File "bench/ce/int_overflow.mlw", line 36, characters 64-76:
 Verification condition test_overflow_int16_alt.
@@ -82,8 +82,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 35:
-    x, [[@introduced]] = {"type": "Integer", "val": "65535"}
-    y, [[@introduced]] = {"type": "Integer", "val": "1"}
+    x [@introduced] = {"type": "Integer", "val": "65535"}
+    y [@introduced] = {"type": "Integer", "val": "1"}
 
 File "bench/ce/int_overflow.mlw", line 42, characters 29-45:
 Verification condition test_overflow_int16_bis.
@@ -92,8 +92,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 40:
-    x, [[@introduced]] = {"type": "Integer", "val": "32768"}
-    y, [[@introduced]] = {"type": "Integer", "val": "32768"}
+    x [@introduced] = {"type": "Integer", "val": "32768"}
+    y [@introduced] = {"type": "Integer", "val": "32768"}
 
 File "bench/ce/int_overflow.mlw", line 49, characters 33-49:
 Verification condition test_overflow_int32.
@@ -102,8 +102,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 48:
-    x, [[@introduced]] = {"type": "Integer", "val": "-2147483648"}
-    y, [[@introduced]] = {"type": "Integer", "val": "-1"}
+    x [@introduced] = {"type": "Integer", "val": "-2147483648"}
+    y [@introduced] = {"type": "Integer", "val": "-1"}
 
 File "bench/ce/int_overflow.mlw", line 54, characters 48-64:
 Verification condition test_overflow_int32_bis.
@@ -112,8 +112,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 53:
-    x, [[@introduced]] = {"type": "Integer", "val": "1073741824"}
-    y, [[@introduced]] = {"type": "Integer", "val": "1073741824"}
+    x [@introduced] = {"type": "Integer", "val": "1073741824"}
+    y [@introduced] = {"type": "Integer", "val": "1073741824"}
 
 File "bench/ce/int_overflow.mlw", line 59, characters 88-108:
 Verification condition test_overflow_int32_bis_inline.
@@ -126,6 +126,6 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 58:
-    x, [[@introduced]] = {"type": "Integer", "val": "1073741824"}
-    y, [[@introduced]] = {"type": "Integer", "val": "1073741824"}
+    x [@introduced] = {"type": "Integer", "val": "1073741824"}
+    y [@introduced] = {"type": "Integer", "val": "1073741824"}
 

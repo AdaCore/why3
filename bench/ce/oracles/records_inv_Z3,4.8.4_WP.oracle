@@ -10,14 +10,14 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 15:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 16:
-    result, [[@introduced]] = {"type": "Integer", "val": "0"}
+    result [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records_inv.mlw", line 16, characters 14-24:
 Goal Postcondition from verification condition record_match_eval_test1'vc.
@@ -30,12 +30,12 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 23:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"proj_name": ".my_field_f",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
   Line 24:
-    x, [[@introduced], [@model_trace:x]] =
+    x [@introduced] [@model_trace:x] =
       {"proj_name": ".my_field_f",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
@@ -85,14 +85,14 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 65:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 66:
-    result, [[@introduced]] = {"type": "Integer", "val": "0"}
+    result [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records_inv.mlw", line 66, characters 14-24:
 Goal Postcondition from verification condition record_match_eval_test1'vc.
@@ -105,14 +105,14 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 73:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 74:
-    x, [[@introduced], [@model_trace:x]] =
+    x [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
@@ -126,21 +126,21 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 78:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 79:
-    x, [[@introduced], [@model_trace:x]] =
+    x [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 81:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -154,21 +154,21 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 83:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 84:
-    x, [[@introduced], [@model_trace:x]] =
+    x [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 86:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"type": "Record",
        "val":
         {"Field":

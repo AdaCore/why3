@@ -6,7 +6,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
   Line 5:
-    x, [[@introduced], [@model]] = {"type": "Integer", "val": "48"}
+    x [@introduced] [@model] = {"type": "Integer", "val": "48"}
 
 File "bench/ce/int.mlw", line 7, characters 43-54:
 Verification condition g_no_lab.
@@ -15,7 +15,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
   Line 7:
-    x, [[@introduced]] = {"type": "Integer", "val": "48"}
+    x [@introduced] = {"type": "Integer", "val": "48"}
 
 File "bench/ce/int.mlw", line 11, characters 30-38:
 Verification condition g2_lab.
@@ -24,9 +24,9 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
   Line 9:
-    g, [] = {"type": "Integer", "val": "0"}
+    g  = {"type": "Integer", "val": "0"}
   Line 11:
-    x, [[@introduced]] = {"type": "Integer", "val": "1"}
+    x [@introduced] = {"type": "Integer", "val": "1"}
 
 File "bench/ce/int.mlw", line 22, characters 2-45:
 Verification condition newgoal.
@@ -35,13 +35,13 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
   Line 13:
-    X, [[@introduced], [@model], [@model_trace:X]] =
+    X [@introduced] [@model] [@model_trace:X] =
       {"type": "Integer", "val": "1"}
-    x2, [[@introduced]] = {"type": "Integer", "val": "1"}
-    x3, [[@introduced]] = {"type": "Integer", "val": "1"}
-    x4, [[@introduced]] = {"type": "Integer", "val": "1"}
-    x5, [[@introduced]] = {"type": "Integer", "val": "1"}
-    x6, [[@introduced]] = {"type": "Integer", "val": "1"}
-    x7, [[@introduced]] = {"type": "Integer", "val": "1"}
-    x8, [[@introduced]] = {"type": "Integer", "val": "1"}
+    x2 [@introduced] = {"type": "Integer", "val": "1"}
+    x3 [@introduced] = {"type": "Integer", "val": "1"}
+    x4 [@introduced] = {"type": "Integer", "val": "1"}
+    x5 [@introduced] = {"type": "Integer", "val": "1"}
+    x6 [@introduced] = {"type": "Integer", "val": "1"}
+    x7 [@introduced] = {"type": "Integer", "val": "1"}
+    x8 [@introduced] = {"type": "Integer", "val": "1"}
 

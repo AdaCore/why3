@@ -6,12 +6,12 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File range_type.mlw:
   Line 7:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "5"}}
   Line 9:
-    x, [[@introduced], [@model_trace:x]] =
+    x [@introduced] [@model_trace:x] =
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "5"}}
@@ -23,12 +23,12 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File range_type.mlw:
   Line 20:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"proj_name": "t'real",
        "type": "Proj",
        "value": {"type": "Decimal", "val": "10.0"}}
   Line 22:
-    x, [[@introduced], [@model_trace:x]] =
+    x [@introduced] [@model_trace:x] =
       {"proj_name": "t'real",
        "type": "Proj",
        "value": {"type": "Decimal", "val": "10.0"}}

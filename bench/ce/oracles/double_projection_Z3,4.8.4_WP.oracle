@@ -6,12 +6,12 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File double_projection.mlw:
   Line 17:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"proj_name": "c",
        "type": "Proj",
        "value": {"type": "Integer", "val": "1"}}
   Line 19:
-    x, [[@introduced], [@model_trace:x]] =
+    x [@introduced] [@model_trace:x] =
       {"proj_name": "c",
        "type": "Proj",
        "value": {"type": "Integer", "val": "1"}}

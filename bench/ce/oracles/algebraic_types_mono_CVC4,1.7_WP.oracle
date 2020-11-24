@@ -6,7 +6,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File algebraic_types_mono.mlw:
   Line 6:
-    x, [[@introduced]] = {"type": "Integer", "val": "0"}
+    x [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/algebraic_types_mono.mlw", line 10, characters 21-26:
 Verification condition g2.
@@ -15,7 +15,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File algebraic_types_mono.mlw:
   Line 10:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"type": "Apply",
        "val": {"apply": "B", "list": [{"type": "Integer", "val": "0"}]}}
 
@@ -26,7 +26,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File algebraic_types_mono.mlw:
   Line 12:
-    x, [[@introduced]] = {"type": "Apply", "val": {"apply": "A", "list": []}}
+    x [@introduced] = {"type": "Apply", "val": {"apply": "A", "list": []}}
 
 File "bench/ce/algebraic_types_mono.mlw", line 16, characters 21-31:
 Verification condition g5.
@@ -35,7 +35,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File algebraic_types_mono.mlw:
   Line 16:
-    x, [[@introduced]] =
+    x [@introduced] =
       {"type": "Apply",
        "val":
         {"apply": "Au",
@@ -49,7 +49,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File algebraic_types_mono.mlw:
   Line 25:
-    l, [[@introduced]] =
+    l [@introduced] =
       {"type": "Apply",
        "val":
         {"apply": "Cons",
@@ -1198,6 +1198,36 @@ File algebraic_types_mono.mlw:
                                                                     [{"type":
                                                                     "Integer",
                                                                     "val":
+                                                                    "122"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "123"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
+                                                                    "124"},
+                                                                    {"type":
+                                                                    "Apply",
+                                                                    "val":
+                                                                    {"apply":
+                                                                    "Cons",
+                                                                    "list":
+                                                                    [{"type":
+                                                                    "Integer",
+                                                                    "val":
                                                                     "0"},
                                                                     {"type":
                                                                     "Apply",
@@ -1205,7 +1235,7 @@ File algebraic_types_mono.mlw:
                                                                     {"apply":
                                                                     "Nil",
                                                                     "list":
-                                                                    []}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}
+                                                                    []}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}]}}
 
 File "bench/ce/algebraic_types_mono.mlw", line 27, characters 29-36:
 Verification condition g7.
@@ -1214,7 +1244,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File algebraic_types_mono.mlw:
   Line 27:
-    l, [[@introduced]] =
+    l [@introduced] =
       {"type": "Apply",
        "val":
         {"apply": "Cons",
