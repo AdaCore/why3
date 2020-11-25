@@ -496,17 +496,19 @@ let similar_model_element_names me_nm1 me_nm2 =
   && Sattr.for_all (fun x ->
          not (Strings.has_prefix "at" x.attr_string)) symm_diff
 
+(* TODO optimize *)
+let rec filter_duplicated l =
+  let exist_similar a l = List.exists (fun x ->
+    similar_model_element_names a.me_name x.me_name) l in
+  match l with
+  | [] | [_] -> l
+  | me :: l when exist_similar me l -> filter_duplicated l
+  | me :: l -> me :: filter_duplicated l
+
 let print_model_elements ~filter_similar ~at_loc ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
-  let rec filter_duplicated l = match l with
-    | [] | [_] -> l
-    | me1 :: me2 :: l
-         when similar_model_element_names me1.me_name me2.me_name ->
-       filter_duplicated (me2::l)
-    | me :: l -> me :: filter_duplicated l in
-  let m_elements = if filter_similar then
-                     filter_duplicated m_elements
-                   else m_elements in
+  let m_elements =
+    if filter_similar then filter_duplicated m_elements else m_elements in
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
        (print_model_element ?print_locs:None ~at_loc ~print_attrs ~print_model_value
@@ -710,6 +712,7 @@ let print_model_element_json me_name_to_str fmt me =
       ("value", print_value) ; ("kind", print_kind) ]
 
 let print_model_elements_json me_name_to_str fmt model_elements =
+  let model_elements = filter_duplicated model_elements in
   Json_base.list (print_model_element_json me_name_to_str) fmt model_elements
 
 let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
