@@ -51,11 +51,10 @@ colorize() {
 # types for which the current bench is non deterministic
 nondet_types=""
 
-remove_solver_details_result=""
 remove_solver_details () {
-  remove_solver_details_result=$(sed 's/[0-9]\+\.[0-9]\+s//g' $1 2> /dev/null | \
-    sed 's/[0-9]\+ steps//g' | \
-    sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
+    sed 's/[0-9]\+\.[0-9]\+s//g' \
+  | sed 's/[0-9]\+ steps//g' \
+  | sed 's/Timeout.*$\|Unknown (unknown).*$\|Unknown (incomplete).*$\|Unknown (unknown + incomplete).*$\|Unknown (unknown + interrupted).*$/Timeout or Unknown/'
 }
 
 check_nondet () {
@@ -72,13 +71,11 @@ check_nondet () {
     esac
 }
 
-remove_nondet_result=""
-# $1 = string, $2 = type
+# $1 = type
 remove_nondet () {
-  remove_nondet_result=$(echo "$1" | \
-    sed 's/"type": "'"$2"'", "val": "\([^"]\|\\"\)\+"/"type": "'"$2"'", "val": "ANY_'"$2"'"/g' | \
-    # in the interpretation log there is no type in values, thus we need to remove all
-    sed 's/\(\([a-z]\|_\)[^ ]*\) = [^\n]\+/\1 = ANY_VALUE/g')
+    sed 's/"type": "'"$1"'", "val": "\([^"]\|\\"\)\+"/"type": "'"$2"'", "val": "ANY_'"$2"'"/g' \
+  | sed 's/\(\([a-z]\|_\)[^ ]*\) = [^\n]\+/\1 = ANY_VALUE/g'
+    # ^ in the interpretation log there is no type in values, thus we need to remove all
 }
 
 # $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP
@@ -102,19 +99,15 @@ run () {
     $dir/../bin/why3"$suffix" prove --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce,rac-values -v 5 2>&1 \
       | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
       > "$f.out"
-    remove_solver_details "$f.out"
-    str_out=$remove_solver_details_result
-    remove_solver_details "${oracle_file}"
-    str_oracle=$remove_solver_details_result
+    str_out=$(cat "$f.out"|remove_solver_details)
+    str_oracle=$(cat "$oracle_file"|remove_solver_details)
     if [ "$str_oracle" = "$str_out" ] ; then
         echo "ok"
     else
-        check_nondet "${file_path}.mlw"
+        check_nondet "$file_path.mlw"
         for type in $nondet_types; do
-            remove_nondet "$str_out" "$type"
-            str_out=$remove_nondet_result
-            remove_nondet "$str_oracle" "$type"
-            str_oracle=$remove_nondet_result
+            str_out=$(echo "$str_out"|remove_nondet "$type")
+            str_oracle=$(echo "$str_oracle"|remove_nondet "$type")
         done
         if [ "$nondet_types" != "" ] && [ "$str_oracle" = "$str_out" ] ; then
             echo "ok (nondet detected)"
