@@ -48,6 +48,39 @@ colorize() {
     fi
 }
 
+# types for which the current bench is non deterministic
+nondet_types=""
+
+remove_solver_details_result=""
+remove_solver_details () {
+  remove_solver_details_result=$(sed 's/[0-9]\+\.[0-9]\+s//g' $1 2> /dev/null | \
+    sed 's/[0-9]\+ steps//g' | \
+    sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
+}
+
+check_nondet () {
+    case "$1" in
+        # "bench/check-ce/EXAMPLE1.mlw")
+        #     nondet=true
+        #     nondet_types="Integer String";;
+        # "bench/check-ce/EXAMPLE2.mlw")
+        #     nondet=true
+        #     nondet_types="Integer";;
+        *)
+            nondet=false
+            nondet_types="";;
+    esac
+}
+
+remove_nondet_result=""
+# $1 = string, $2 = type
+remove_nondet () {
+  remove_nondet_result=$(echo "$1" | \
+    sed 's/"type": "'"$2"'", "val": "\([^"]\|\\"\)\+"/"type": "'"$2"'", "val": "ANY_'"$2"'"/g' | \
+    # in the interpretation log there is no type in values, thus we need to remove all
+    sed 's/\(\([a-z]\|_\)[^ ]*\) = [^\n]\+/\1 = ANY_VALUE/g')
+}
+
 # $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP
 run () {
     printf "  $2 ($1)... "
@@ -69,25 +102,34 @@ run () {
     $dir/../bin/why3"$suffix" prove --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce,rac-values -v 5 2>&1 \
       | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
       > "$f.out"
-    str_out=$(sed 's/[0-9]\+\.[0-9]\+s//g' "$f.out" | \
-              sed 's/[0-9]\+ steps//g' | \
-              sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
-    str_oracle=$(sed 's/[0-9]\+\.[0-9]\+s//g' "${oracle_file}" 2> /dev/null | \
-                 sed 's/[0-9]\+ steps//g' | \
-                 sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/')
+    remove_solver_details "$f.out"
+    str_out=$remove_solver_details_result
+    remove_solver_details "${oracle_file}"
+    str_oracle=$remove_solver_details_result
     if [ "$str_oracle" = "$str_out" ] ; then
         echo "ok"
     else
-        if $updateoracle; then
-            echo "Updating oracle for ${file_path}, prover $1"
-            mv "$f.out" "${oracle_file}"
+        check_nondet "${file_path}.mlw"
+        for type in $nondet_types; do
+            remove_nondet "$str_out" "$type"
+            str_out=$remove_nondet_result
+            remove_nondet "$str_oracle" "$type"
+            str_oracle=$remove_nondet_result
+        done
+        if [ "$nondet_types" != "" ] && [ "$str_oracle" = "$str_out" ] ; then
+            echo "ok (nondet detected)"
         else
-            echo "FAILED!"
-            echo "diff is the following:"
-            echo "$f"
-            diff -u <(echo "$str_oracle") <(echo "$str_out")|colorize
-            failed="$failed$f\n"
-            success=false
+            if $updateoracle; then
+                echo "Updating oracle"
+                mv "$f.out" "${oracle_file}"
+            else
+                echo "FAILED!"
+                echo "diff is the following:"
+                echo "$f"
+                diff -u <(echo "$str_oracle") <(echo "$str_out")|colorize
+                failed="$failed$f\n"
+                success=false
+            fi
         fi
     fi
     if $forceupdateoracle; then
