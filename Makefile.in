@@ -1802,7 +1802,12 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.$(SHAREDBEST) plugins $(TOOLS) \
 	@echo "=== Checking extraction ==="
 	$(MAKE) test-ocaml-extraction
 
-APITESTS=logic transform clone mlw_tree mlw_tree1 mlw_expr create_session counterexample
+APITESTS=logic transform clone mlw_tree mlw_expr create_session counterexample
+
+ifeq (@enable_infer@,yes)
+APITESTS += mlw_tree1
+endif
+
 
 bench-api: $(addprefix test-api-, $(APITESTS))
 
