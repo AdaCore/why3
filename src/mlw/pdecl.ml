@@ -65,7 +65,7 @@ let create_semi_constructor id s fdl pjl invl =
   let tvl = List.map ity_var s.its_ts.ts_args in
   let rgl = List.map ity_reg s.its_regions in
   let ity = ity_app s tvl rgl in
-  let res = create_vsymbol (id_fresh "result") (ty_of_ity ity) in
+  let res = create_vsymbol (result_id ()) (ty_of_ity ity) in
   let t = t_var res in
   let mk_q {pv_vs = v} p = t_equ (fs_app (ls_of_rs p) [t] v.vs_ty) (t_var v) in
   let q = create_post res (t_and_simp_l (List.map2 mk_q fdl pjl)) in

@@ -210,7 +210,8 @@ val t_open_bound_with : term -> term_bound -> term
 (** [t_open_bound_with t tb] opens the binding [tb] and immediately
     replaces the corresponding bound variable with [t] *)
 
-val t_clone_bound_id : term_bound -> preid
+val t_clone_bound_id :
+  ?loc:Loc.position -> ?attrs:Sattr.t -> term_bound -> preid
 
 (** open bindings with optimized closing callbacks *)
 
