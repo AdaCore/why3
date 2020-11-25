@@ -216,12 +216,12 @@ execute () {
     pgm="bin/why3$suffix execute"
     echo -n "  ${@:1}... "
     # Run why3execute and discard warnings from the reduction engine
-    if "$pgm" "$@" > /dev/null 2> >(grep -v '$warning: reduction of term'); then
+    if $pgm "$@" > /dev/null 2> >(grep -v '$warning: reduction of term'); then
         echo "ok"
     else
         echo "execution test failed! $?"
-        echo $pgm $@
-        "$pgm" "$@"
+        echo $pgm "$@"
+        $pgm "$@"
         exit 1
     fi
 }
