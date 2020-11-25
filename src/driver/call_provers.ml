@@ -162,7 +162,7 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ~json fmt r =
+let print_prover_result ?(json=false) fmt r =
   let open Json_base in
   let print_json_model fmt (a,m) =
     fprintf fmt "@[@[<hv1>{%a;@ %a}@]}@]"

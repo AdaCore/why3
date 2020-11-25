@@ -370,7 +370,7 @@ let () =
           ~command:alt_ergo.Whyconf.command alt_ergo_driver t in
       let r = Call_provers.wait_on_call call in
       printf "@[On task %d, alt-ergo answers %a@." (succ i)
-        (Call_provers.print_prover_result ~json:false) r)
+        (Call_provers.print_prover_result ?json:None) r)
     my_tasks
 (* END{checkingvcs} *)
 
