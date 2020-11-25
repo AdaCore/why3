@@ -1171,7 +1171,7 @@ module MLToC = struct
          | [] -> C.([], expr_or_return env Enothing);
          | [e] -> expr info env e
          | _ ->
-            let id_struct = id_register (result_id ()) in
+            let id_struct = id_register (id_fresh "result") in
             let e_struct = C.Evar id_struct in
             let d_struct =
               C.(Ddecl(Tstruct
@@ -1841,8 +1841,8 @@ let () =
     (fun fmt exn ->
       match exn with
       | C.Unsupported_stmt s ->
-         Format.fprintf fmt "@[Unsupported statement @[%a@]@]"
-           (Print.print_stmt ~braces:true) s
+         Format.fprintf fmt "Unsupported statement @[%a@]"
+           (Print.print_stmt ~braces:false) s
       | e -> raise e)
 
 (*
