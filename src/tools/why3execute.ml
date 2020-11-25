@@ -51,7 +51,7 @@ let option_list =
     " enable runtime basic runtime assertion checking";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
-    "with optional, space-separated time and memory limit (e.g. 'cvc4 2 1000')";
+    "with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
     KLong "dispatch", Hnd1 (APair ('/', APair ('.', AString, AString),
     APair ('.', AString, AString)), fun _arg -> eprintf "Dispatch currently not supported"; exit 1),
     ("<f.M>/<g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\

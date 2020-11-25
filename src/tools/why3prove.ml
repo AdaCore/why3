@@ -126,7 +126,7 @@ let option_list =
     " check the counter-examples using runtime assertion checking (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
-    "with optional, space-separated time and memory limit (e.g. 'cvc4 2 1000')";
+    "with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
     Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
     "<lvl> verbosity level for interpretation log of counterexample solver model";
     KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),

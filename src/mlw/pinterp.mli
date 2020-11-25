@@ -112,9 +112,9 @@ val rac_reduce_config :
   ?prover:rac_prover ->
   unit -> rac_reduce_config
 
-(** [rac_reduce_config_lit cfg env ~trans ~prover] makes configuration of RAC reduction
-   using the transformation with name [trans] (usually "compute_in_goal"), and a prover
-   string [prover] with optional, space-sparated time limit and memory limit. *)
+(** [rac_reduce_config_lit cnf env ?trans ?prover ()] configures the term reduction of
+   RAC. [trans] is the name of a transformation (usually "compute_in_goal"). [prover] is a
+   prover string with optional, space-sparated time limit and memory limit. *)
 val rac_reduce_config_lit :
   Whyconf.config -> Env.env -> ?trans:string -> ?prover:string ->
   unit -> rac_reduce_config
