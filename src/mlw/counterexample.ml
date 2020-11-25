@@ -443,7 +443,7 @@ let check_model reduce env pm model =
           check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
         Debug.dprintf debug_check_ce
           "@[Validating model:@\n@[<hv2>%a@]@]@\n"
-          (print_model ?me_name_trans:None ~print_attrs:false) model;
+          (print_model ~filter_similar:false ?me_name_trans:None ~print_attrs:false) model;
         Debug.dprintf debug_check_ce "@[Interpreting concretly@]@\n";
         let concrete = check_model_rs ~abstract:false in
         Debug.dprintf debug_check_ce "@[Interpreting abstractly@]@\n";

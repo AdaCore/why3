@@ -1018,7 +1018,7 @@ match pa.proof_state with
            ~reduce_config env pm res.pr_models in
        match sel with None -> Model_parser.empty_model | Some (m,_) -> m in
      let ce_result =
-       Pp.string_of (Model_parser.print_model_human ~print_attrs ?me_name_trans:None)
+       Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs ?me_name_trans:None)
          selected_model in
      if ce_result = "" then
        let result_pr =

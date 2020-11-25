@@ -487,21 +487,39 @@ let print_model_element ?(print_locs=false) ~at_loc ~print_attrs ~print_model_va
                (Pp.print_option_or_default "NO LOC "Pretty.print_loc) m_element.me_location)
         print_model_value m_element.me_value
 
-let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
+let similar_model_element_names me_nm1 me_nm2 =
+  (* TODO Add an efficient version of symmetric difference to extset *)
+  let symm_diff = Sattr.diff (Sattr.union me_nm1.men_attrs me_nm2.men_attrs)
+                    (Sattr.inter me_nm1.men_attrs me_nm2.men_attrs) in
+  Ident.get_model_trace_string ~name:me_nm1.men_name ~attrs:me_nm1.men_attrs
+  = Ident.get_model_trace_string ~name:me_nm2.men_name ~attrs:me_nm2.men_attrs
+  && Sattr.for_all (fun x ->
+         not (Strings.has_prefix "at" x.attr_string)) symm_diff
+
+let print_model_elements ~filter_similar ~at_loc ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
+  let rec filter_duplicated l = match l with
+    | [] | [_] -> l
+    | me1 :: me2 :: l
+         when similar_model_element_names me1.me_name me2.me_name ->
+       filter_duplicated (me2::l)
+    | me :: l -> me :: filter_duplicated l in
+  let m_elements = if filter_similar then
+                     filter_duplicated m_elements
+                   else m_elements in
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
        (print_model_element ?print_locs:None ~at_loc ~print_attrs ~print_model_value
           ~me_name_trans))
     m_elements
 
-let print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt (filename, model_file) =
+let print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_trans fmt (filename, model_file) =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths. *)
   let filename = Filename.basename filename in
   let pp fmt (line, m_elements) =
     fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
-      (print_model_elements ?sep:None ~at_loc:(filename, line) ~print_attrs
+      (print_model_elements ~filter_similar ?sep:None ~at_loc:(filename, line) ~print_attrs
          ~print_model_value ~me_name_trans) m_elements in
   fprintf fmt "@[<v 0>File %s:@ %a@]" filename
     Pp.(print_list space pp) (Mint.bindings model_file)
@@ -522,16 +540,16 @@ let json_name_trans {men_kind; men_name} =
   | Old -> "old "^men_name
   | _ -> men_name
 
-let print_model ~print_attrs ?(me_name_trans = why_name_trans)
+let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
     ~print_model_value fmt model =
-  Pp.print_list Pp.newline (print_model_file ~print_attrs ~print_model_value ~me_name_trans)
+  Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_trans)
     fmt (Mstr.bindings model.model_files)
 
-let print_model_human ?(me_name_trans = why_name_trans) fmt model =
-  print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
+let print_model_human ?(filter_similar = true) ?(me_name_trans = why_name_trans) fmt model =
+  print_model ~filter_similar ~me_name_trans ~print_model_value:print_model_value_human fmt model
 
-let print_model ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
-  print_model ~print_attrs ~me_name_trans ~print_model_value fmt model
+let print_model ?(filter_similar = true) ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
+  print_model ~filter_similar ~print_attrs ~me_name_trans ~print_model_value fmt model
 
 let get_model_file model filename =
   Mstr.find_def empty_model_file filename model
@@ -581,7 +599,7 @@ let interleave_line ~filename ~print_attrs start_comment end_comment
     let model_elements = Mint.find line_number model_file in
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
-        (print_model_elements ~sep:Pp.semi ~at_loc:(filename, line_number)
+        (print_model_elements ~filter_similar:true ~sep:Pp.semi ~at_loc:(filename, line_number)
            ~print_attrs ~print_model_value:print_model_value_human ~me_name_trans)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
@@ -780,32 +798,18 @@ let add_to_model ?vc_term_attrs model_element model =
       let filename, line_number, _, _ = Loc.get pos in
       let model_file = get_model_file model filename in
       let elements = get_elements model_file line_number in
-      let el = model_element.me_name in
-      (* This removes elements that are duplicated *)
-      let found_elements =
-        List.exists
-          (fun x ->
-            let xme = x.me_name in
-            Ident.get_model_trace_string ~name:xme.men_name ~attrs:xme.men_attrs
-            = Ident.get_model_trace_string ~name:el.men_name ~attrs:el.men_attrs
-            &&
-              pos = Opt.get_def Loc.dummy_position x.me_location
-            (* TODO Add an efficient version of symmetric difference to extset *)
-            (* FIXME the following comparison removes too many elements*)
-            (* let symm_diff =
-             *   Sattr.diff
-             *     (Sattr.union xme.men_attrs el.men_attrs)
-             *     (Sattr.inter xme.men_attrs el.men_attrs) in
-             * Sattr.for_all
-             *   (fun x -> not (Strings.has_prefix "at" x.attr_string))
-             *   symm_diff *)
-          )
-          elements in
       let model_element =
         match vc_term_attrs with
         | Some vc_term_attrs ->
             fix_kind (filename, line_number) vc_term_attrs model_element
         | None -> model_element in
+      let el = model_element.me_name in
+      (* This removes elements that are duplicated *)
+      let found_elements =
+        List.exists (fun x ->
+            similar_model_element_names x.me_name el
+            && pos = Opt.get_def Loc.dummy_position x.me_location)
+          elements in
       let elements = if found_elements then elements
                      else model_element :: elements in
       let model_file = Mint.add line_number elements model_file in

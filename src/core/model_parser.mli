@@ -149,6 +149,7 @@ val get_model_element_by_loc : model -> Loc.position -> model_element option
 (** {2 Printing the model} *)
 
 val print_model :
+  ?filter_similar:bool ->
   ?me_name_trans:(model_element_name -> string) ->
   print_attrs:bool ->
   Format.formatter ->
@@ -165,6 +166,7 @@ val print_model :
 *)
 
 val print_model_human :
+  ?filter_similar:bool ->
   ?me_name_trans:(model_element_name -> string) ->
   Format.formatter ->
   model ->
