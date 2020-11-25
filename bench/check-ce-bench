@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 dir=`dirname $0`
 
@@ -96,9 +97,13 @@ run () {
         printf "Strongest Postcondition  ${file_path} ($1)... "
     fi
     prover="$1,counterexamples"
-    $dir/../bin/why3"$suffix" prove --check-ce -P "$prover" --timelimit=1 -a split_vc "${file_path}.mlw" -L "$2" --debug=check-ce,rac-values -v 5 2>&1 \
-      | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
-      > "$f.out"
+    # Call why3 prove to create CE (and accept return value of 2 for unproven goals)
+    ($dir/../bin/why3"$suffix" prove --apply-transform=split_vc \
+       --prover="$prover" --check-ce --timelimit=1 --verbosity=5 \
+       --library="$2" "${file_path}.mlw" --debug=check-ce,rac-values \
+       || [ $? -eq 2 ]) 2>&1 \
+     | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
+     > "$f.out"
     str_out=$(cat "$f.out"|remove_solver_details)
     str_oracle=$(cat "$oracle_file"|remove_solver_details)
     if [ "$str_oracle" = "$str_out" ] ; then
@@ -140,7 +145,8 @@ for file in $files; do
     run Z3,4.8.4 $filedir $filebase true
     run Z3,4.8.4 $filedir $filebase false
 done
-if $success; then
+
+if [ "$success" = true ]; then
     echo "Check-ce bench: success"
     exit 0
 else
