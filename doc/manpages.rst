@@ -236,6 +236,10 @@ The :why3:tool:`prove` command executes the following steps:
    given, print each generated task using the format specified in the
    selected driver.
 
+#. Derive a validated counterexample using runtime-assertion checking, if option
+   :option:`--check-ce` is given and the selected prover generated a
+   counterexample, .
+
 Prover Results
 ~~~~~~~~~~~~~~
 
@@ -295,16 +299,63 @@ Options
    explanations. The option can be used several times to specify
    several prefixes.
 
-Getting Potential Counterexamples
+.. option:: --check-ce
+
+   Validate the counterexample using runtime-assertion checking. Only applicable
+   when the prover selected by :option:`--prover` is configured to generate a
+   counterexample.
+
+.. option:: --rac-prover=<p>
+
+   Use prover *p* for the runtime-assertion checking during the validation of
+   counterexamples, when term reduction is insufficient (which is always tried
+   first). The prover *p* is the name or shortcut of a prover, with optional,
+   comma-separated time limit and memory limit, e.g. ``cvc4,2,1000``.
+
+Generating Counterexamples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This feature is presented in details in :numref:`sec.idece`, which should
-be read first.
+When the selected prover has alternative `counterexample`, the prover is
+instructed to generate a model, and Why3 elaborates the model into a potential
+counterexample. The potential counterexample associates source locations and
+variables to values. The generation and display of potential counterexamples is
+presented in details in :numref:`sec.idece`.
 
-Counterexamples are also displayed by the :why3:tool:`prove` command when
-one selects a prover with the ``counterexamples`` alternative. The
-output is currently done in a JSON syntax (this may change in the
-future).
+A validated counterexample can be requested using option :option:`--check-ce`.
+The validated counterexample is derived by executing the relevant function using
+runtime assertion checking (RAC) [#ce-split]_. The potential counterexample
+serves as an oracle for values that are not or cannot be computed in the RAC
+execution (e.g., arguments to the relevant function or ``any``-expressions).
+
+The validated counterexample is a trace of the RAC execution, with one of the
+following qualifications:
+
+*The program does not comply to the verification goal.*
+
+   The validated counterexample is the trace of an execution that resulted in
+   the violation of an assertion.
+  
+*The contracts of some function or loop are underspecified.*
+
+   The validated counterexample is the trace of an abstract execution, which
+   resulted in the violation of an assertion. In an abstract execution, function
+   calls and loops are not executed. Their results and assignments are instead
+   chosen according to the contracts (function postcondition or loop invariants)
+   by picking them from the potential counterexample.
+
+*The program does not comply to the verification goal, or the contracts of some loop or function are too weak.*
+
+   Either of the above cases.
+
+*Sorry, we don't have a good counterexample for you :(*
+
+   The RAC execution did not violate any assertions. The execution trace does
+   not constitute a validated counterexample and is not shown.
+
+.. [#ce-split] The relevant function is generally only defined, when the
+   counterexample is not generated for the VC of the complete program, for
+   example by applying a split transformation using
+   ``--apply-transform=split_vc``.
 
 .. why3:tool:: ide
 .. _sec.ideref:
