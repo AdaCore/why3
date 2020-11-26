@@ -312,14 +312,17 @@ Options
    first). The prover *p* is the name or shortcut of a prover, with optional,
    comma-separated time limit and memory limit, e.g. ``cvc4,2,1000``.
 
-Generating Counterexamples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Generating potential counterexamples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When the selected prover has alternative `counterexample`, the prover is
 instructed to generate a model, and Why3 elaborates the model into a potential
 counterexample. The potential counterexample associates source locations and
 variables to values. The generation and display of potential counterexamples is
 presented in details in :numref:`sec.idece`.
+
+Generating validated counterexamples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A validated counterexample can be requested using option :option:`--check-ce`.
 The validated counterexample is derived by executing the relevant function using
@@ -330,12 +333,12 @@ execution (e.g., arguments to the relevant function or ``any``-expressions).
 The validated counterexample is a trace of the RAC execution, with one of the
 following qualifications:
 
-*The program does not comply to the verification goal.*
+*The program does not comply to the verification goal:*
 
    The validated counterexample is the trace of an execution that resulted in
    the violation of an assertion.
   
-*The contracts of some function or loop are underspecified.*
+*The contracts of some function or loop are underspecified:*
 
    The validated counterexample is the trace of an abstract execution, which
    resulted in the violation of an assertion. In an abstract execution, function
@@ -343,14 +346,20 @@ following qualifications:
    chosen according to the contracts (function postcondition or loop invariants)
    by picking them from the potential counterexample.
 
-*The program does not comply to the verification goal, or the contracts of some loop or function are too weak.*
+*The program does not comply to the verification goal, or the contracts of some loop or function are too weak:*
 
    Either of the above cases.
 
 *Sorry, we don't have a good counterexample for you :(*
 
-   The RAC execution did not violate any assertions. The execution trace does
-   not constitute a validated counterexample and is not shown.
+   The RAC execution did not violate any assertions. The execution trace does not
+   constitute a validated counterexample, and the potential counterexample is invalid, so
+   no counterexample is shown.
+
+*The counterexample model could not be verified:*
+
+   The validated counterexample could not be derived because RAC execution was incomplete.
+   The potential counterexample is instead shown with a warning.
 
 .. [#ce-split] The relevant function is generally only defined, when the
    counterexample is not generated for the VC of the complete program, for
