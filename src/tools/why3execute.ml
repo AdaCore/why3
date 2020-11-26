@@ -36,6 +36,7 @@ let opt_parser = ref None
 
 let opt_enable_rac = ref false
 let opt_rac_prover = ref None
+let opt_rac_fail_cannot_check = ref false
 
 let use_modules = ref []
 
@@ -48,10 +49,12 @@ let option_list =
     "<emin>,<emax>,<prec> set format used for real computations\n\
      (e.g., -148,128,24 for float32)";
     KLong "rac", Hnd0 (fun () -> opt_enable_rac := true),
-    " enable runtime basic runtime assertion checking";
+    " enable runtime assertion checking (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
     "with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
+    KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_fail_cannot_check := true),
+    " Fail when a assertion cannot be checked";
     KLong "dispatch", Hnd1 (APair ('/', APair ('.', AString, AString),
     APair ('.', AString, AString)), fun _arg -> eprintf "Dispatch currently not supported"; exit 1),
     ("<f.M>/<g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\
@@ -109,7 +112,8 @@ let do_input f =
       let reduce =
         let trans = "compute_in_goal" and prover = !opt_rac_prover in
         rac_reduce_config_lit config env ~trans ?prover () in
-      rac_config ~do_rac:!opt_enable_rac ~abstract:false ~reduce () in
+      let skip_cannot_compute = not !opt_rac_fail_cannot_check in
+      rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute ~reduce () in
     let res = eval_global_fundef rac env
         muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
     printf "%a@." (report_eval_result expr) res;
