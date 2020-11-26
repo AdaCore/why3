@@ -1476,7 +1476,7 @@ variables modified by that function are displayed too.
 See more details and examples of use in :numref:`sec.execute`.
 
 Runtime assertion checking (RAC)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The execution can be instructed using option :option:`--rac` to check the
 validity of the program annotations that are encountered during the execution.
@@ -1487,7 +1487,7 @@ There are two strategies to check the validity of an annotation: First, the term
 is reduced using the Why3 transformation ``compute_in_goal``. The annotation is
 valid when the result of the reduction is `true` and invalid when the result is
 `false`. When the transformation cannot reduce the term to a trivial term, and
-when a RAC prover is given using option :option:`--rac-prover=<p>`, prover `p`
+when a RAC prover is given using option :option:`--rac-prover`, prover `p`
 is used to verify the term.
 
 When a program annotation is found to be wrong during the execution, the
