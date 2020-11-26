@@ -74,7 +74,7 @@ check_nondet () {
 
 # $1 = type
 remove_nondet () {
-    sed 's/"type": "'"$1"'", "val": "\([^"]\|\\"\)\+"/"type": "'"$2"'", "val": "ANY_'"$2"'"/g' \
+    sed 's/"type": "'"$1"'", "val": "\([^"]\|\\"\)\+"/"type": "'"$1"'", "val": "ANY_'"$1"'"/g' \
   | sed 's/\(\([a-z]\|_\)[^ ]*\) = [^\n]\+/\1 = ANY_VALUE/g'
     # ^ in the interpretation log there is no type in values, thus we need to remove all
 }
