@@ -1,6 +1,8 @@
 open Format
 open Gnat_ast
 
+[@@@warning "-42"]
+
 let pp_symbol fmt s =
   match s with
   | No_symbol -> ()
@@ -480,19 +482,19 @@ and pp_epsilon fmt (n : epsilon_id) =
   Format.fprintf fmt "@[(epsilon %a : %a {@[%a@]})@]"
     pp_why_node r.name pp_why_node r.typ pp_why_node r.pred
 
-and pp_effects fmt (n : effects_id) = Format.fprintf fmt "--pp_effects NOT IMPLEMENTED"
-and pp_transparent_type_definition fmt (n : transparent_type_definition_id) = Format.fprintf fmt "--pp_transparent_type_definition NOT IMPLEMENTED"
-and pp_triggers fmt (n : triggers_id) = Format.fprintf fmt "--pp_triggers NOT IMPLEMENTED"
-and pp_trigger fmt (n : trigger_id) = Format.fprintf fmt "--pp_trigger NOT IMPLEMENTED"
-and pp_field_association fmt (n : field_association_id) = Format.fprintf fmt "--pp_field_association NOT IMPLEMENTED"
-and pp_universal_quantif fmt (n : universal_quantif_id) = Format.fprintf fmt "--pp_universal_quantif NOT IMPLEMENTED"
-and pp_existential_quantif fmt (n : existential_quantif_id) = Format.fprintf fmt "--pp_existential_quantif NOT IMPLEMENTED"
-and pp_not fmt (n : not_id) = Format.fprintf fmt "--pp_not NOT IMPLEMENTED"
-and pp_tagged fmt (n : tagged_id) = Format.fprintf fmt "--pp_tagged NOT IMPLEMENTED"
-and pp_record_update fmt (n : record_update_id) = Format.fprintf fmt "--pp_record_update NOT IMPLEMENTED"
-and pp_record_aggregate fmt (n : record_aggregate_id) = Format.fprintf fmt "--pp_record_aggregate NOT IMPLEMENTED"
-and pp_binding_ref fmt (n : binding_ref_id) = Format.fprintf fmt "--pp_binding_ref NOT IMPLEMENTED"
-and pp_exception_declaration fmt (n : exception_declaration_id) = Format.fprintf fmt "--pp_exception_declaration NOT IMPLEMENTED"
+and pp_effects fmt (_ : effects_id) = Format.fprintf fmt "--pp_effects NOT IMPLEMENTED"
+and pp_transparent_type_definition fmt (_ : transparent_type_definition_id) = Format.fprintf fmt "--pp_transparent_type_definition NOT IMPLEMENTED"
+and pp_triggers fmt (_ : triggers_id) = Format.fprintf fmt "--pp_triggers NOT IMPLEMENTED"
+and pp_trigger fmt (_ : trigger_id) = Format.fprintf fmt "--pp_trigger NOT IMPLEMENTED"
+and pp_field_association fmt (_ : field_association_id) = Format.fprintf fmt "--pp_field_association NOT IMPLEMENTED"
+and pp_universal_quantif fmt (_ : universal_quantif_id) = Format.fprintf fmt "--pp_universal_quantif NOT IMPLEMENTED"
+and pp_existential_quantif fmt (_ : existential_quantif_id) = Format.fprintf fmt "--pp_existential_quantif NOT IMPLEMENTED"
+and pp_not fmt (_ : not_id) = Format.fprintf fmt "--pp_not NOT IMPLEMENTED"
+and pp_tagged fmt (_ : tagged_id) = Format.fprintf fmt "--pp_tagged NOT IMPLEMENTED"
+and pp_record_update fmt (_ : record_update_id) = Format.fprintf fmt "--pp_record_update NOT IMPLEMENTED"
+and pp_record_aggregate fmt (_ : record_aggregate_id) = Format.fprintf fmt "--pp_record_aggregate NOT IMPLEMENTED"
+and pp_binding_ref fmt (_ : binding_ref_id) = Format.fprintf fmt "--pp_binding_ref NOT IMPLEMENTED"
+and pp_exception_declaration fmt (_ : exception_declaration_id) = Format.fprintf fmt "--pp_exception_declaration NOT IMPLEMENTED"
 
 let pp_file fmt f =
   pp_print_list ~pp_sep:Why3.Pp.newline2 pp_why_node fmt f.theory_declarations

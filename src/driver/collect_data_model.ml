@@ -488,7 +488,7 @@ let convert_simple_to_model_value (v: simple_value) =
         Model_parser.Integer bv
       with _ -> Model_parser.Bitvector bv end
   | Boolean b -> Model_parser.Boolean b
-  | Other _s -> raise Not_value
+  | Other s -> Model_parser.Unparsed s
 
 (* In the following lf is the list of fields. It is used to differentiate
    projections from fields so that projections cannot be reconstructed into a
@@ -498,7 +498,7 @@ let rec convert_array_value lf (a: array) : Model_parser.model_array =
 
   let rec create_array_value a =
     match a with
-    | Array_var _v -> raise Not_value
+    | Array_var _ -> raise Not_value
     | Const t -> { Model_parser.arr_indices = !array_indices;
                    Model_parser.arr_others = convert_to_model_value lf t}
     | Store (a, t1, t2) ->
@@ -531,7 +531,7 @@ and convert_to_model_value lf (t: term): Model_parser.model_value =
             let (proj_name, proj_value) = List.hd l in
             Model_parser.Proj (proj_name, convert_to_model_value lf proj_value)
       end
-  | Cvc4_Variable _v -> raise Not_value (*Model_parser.Unparsed "!"*)
+  | Cvc4_Variable _ -> raise Not_value (*Model_parser.Unparsed "!"*)
   (* TODO change the value returned for non populated Cvc4 variable '!' -> '?' ? *)
   | To_array t -> convert_to_model_value lf (Array (convert_z3_array t))
   | Apply (s, lt) -> Model_parser.Apply (s, List.map (convert_to_model_value lf) lt)
@@ -573,7 +573,7 @@ let default_apply_to_record (list_records: (string list) Mstr.t)
 
   let rec array_apply_to_record (a: array) =
     match a with
-    | Array_var _v -> raise Not_value
+    | Array_var _ -> a
     | Const x ->
         let x = apply_to_record x in
         Const x
@@ -612,8 +612,7 @@ let default_apply_to_record (list_records: (string list) Mstr.t)
         let t1 = apply_to_record t1 in
         To_array t1
     (* TODO Does not exist yet *)
-    | Trees _ -> raise Not_value
-  in
+    | Trees _ -> assert false in
   apply_to_record t
 
 let apply_to_records_ref = ref None
@@ -653,7 +652,7 @@ and convert_to_tree_term (t: term) : tterm =
   | Record (s, tl) -> TRecord (s, List.map (fun (s, t) -> (s, convert_to_tree_term t)) tl)
   | To_array t -> TTo_array (convert_to_tree_term t)
   (* TODO should not appear here *)
-  | Trees _ -> raise Not_value
+  | Trees _ -> assert false
 
 and convert_to_tree_array a =
   match a with

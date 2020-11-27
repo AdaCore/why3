@@ -150,6 +150,9 @@ let sort_messages (l : (Gnat_expl.check * msg) list) =
   List.sort (fun x y -> compare (fst x).Gnat_expl.id (fst y).Gnat_expl.id) l
 
 let print_json_msg fmt (check, m) =
+  let clean_model = Model_parser.map_filter_model_elements
+      Gnat_counterexamples.clean_element in
+  let cntexmp = Opt.map clean_model m.cntexmp_model in
   Format.fprintf fmt "{%a, %a, %a, %a, %a%a%a%a}"
     (print_json_field "id" int) check.Gnat_expl.id
     (print_json_field "reason" string)
@@ -158,7 +161,7 @@ let print_json_msg fmt (check, m) =
     (print_json_field "extra_info" int) (get_info m.extra_info)
     (print_json_field "check_tree" Json_base.print_json) m.check_tree
     print_stats (m.stats, m.stats_checker, m.stats_trivial)
-    print_cntexmp_model m.cntexmp_model
+    print_cntexmp_model cntexmp
     print_manual_proof_info m.manual_proof
 
 let print_warning_list fmt l =

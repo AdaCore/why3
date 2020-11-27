@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
+
 (** {1 Counter-example model values} *)
 
 type float_type =
@@ -131,6 +133,9 @@ val create_model_element :
   (** {2 Model definitions} *)
 
 type model
+
+val map_filter_model_elements :
+  (model_element -> model_element option) -> model -> model
 
 val is_model_empty : model -> bool
 val default_model : model

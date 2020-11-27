@@ -282,7 +282,7 @@ let rec no_vcs_no_side_effects e = match e.expr_desc with
   | Eupdate (e, fs) ->
       no_vcs_no_side_effects e &&
       List.for_all (fun (_, e) -> no_vcs_no_side_effects e) fs
-  | Eassign ans ->
+  | Eassign _ ->
       false
   | Esequence (e1, e2) ->
       no_vcs_no_side_effects e1 && no_vcs_no_side_effects e2

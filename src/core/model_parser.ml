@@ -386,17 +386,18 @@ type model_element_kind =
   | Loop_current_iteration
   | Other
 
-type model_element_name =
-  { men_name: string
-  ; men_kind: model_element_kind
-  ; (* Attributes associated to the id of the men *)
-    men_attrs: Sattr.t }
+type model_element_name = {
+  men_name: string;
+  men_kind: model_element_kind; (* Attributes associated to the id of the men *)
+  men_attrs: Sattr.t;
+}
 
-type model_element =
-  { me_name: model_element_name
-  ; me_value: model_value
-  ; me_location: Loc.position option
-  ; me_term: Term.term option }
+type model_element = {
+  me_name: model_element_name;
+  me_value: model_value;
+  me_location: Loc.position option;
+  me_term: Term.term option;
+}
 
 let split_model_trace_name mt_name =
   (* Mt_name is of the form "name[@type[@*]]". Return (name, type) *)
@@ -486,10 +487,22 @@ let print_location fmt m_element =
 type model_file = model_element list Mint.t
 type model_files = model_file Mstr.t
 
-type model =
-  { model_files: model_files
-  ; vc_term_loc: Loc.position option
-  ; vc_term_attrs: Sattr.t }
+type model = {
+  model_files: model_files;
+  vc_term_loc: Loc.position option;
+  vc_term_attrs: Sattr.t;
+}
+
+let map_filter_model_elements f m =
+  let f_list elts =
+    match Lists.map_filter f elts with
+    | [] -> None | l -> Some l in
+  let f_files mf =
+    let mf = Mint.map_filter f_list mf in
+    if Mint.is_empty mf then None else Some mf in
+  let model_files = Mstr.map_filter f_files m.model_files in
+  {m with model_files}
+
 
 let empty_model = Mstr.empty
 let empty_model_file = Mint.empty
