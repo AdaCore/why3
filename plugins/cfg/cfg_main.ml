@@ -205,7 +205,7 @@ let build_path_function retty pat mask postconds (startlabel, preconds, body) : 
   (id,false,Expr.RKnone, [arg], Some retty, pat, mask, spec, body)
 
 
-let translate_letcfg (id,args,retty,pat,mask,spec,locals,block,blocks) =
+let translate_cfg_fundef (id,args,retty,pat,mask,spec,locals,block,blocks) =
   Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
   Debug.dprintf debug "return type is `%a`@." pp_pty retty;
   let funs = translate_cfg spec.sp_pre block blocks in
@@ -226,15 +226,25 @@ let translate_letcfg (id,args,retty,pat,mask,spec,locals,block,blocks) =
   let body =
     mk_expr ~loc (Eattr(divergent_attr,body))
   in
-  let f =
-    Efun(args, Some retty, pat, mask, spec, body)
-  in
-  Dlet (id,false,Expr.RKnone,mk_expr ~loc:id.id_loc f)
+  (id,false,Expr.RKnone, args, Some retty, pat, mask, spec, body)
 
+let translate_letcfg d =
+  let loc = Loc.dummy_position in
+  let (id, ghost, rk, args, retty, pat, mask, spec, body) = translate_cfg_fundef d in
+
+  Dlet (id, ghost, rk, mk_expr ~loc (Efun (args, retty, pat, mask, spec, body)))
+
+let translate_reccfg ds =
+  let translated_fundefs = List.map translate_cfg_fundef ds in
+
+  Drec translated_fundefs
+
+(* mk_expr ~loc:id.id_loc *)
 let translate_decl d acc =
   match d with
   | Dmlw_decl d -> d :: acc
-  | Dletcfg l -> List.fold_right (fun d acc -> (translate_letcfg d)::acc) l acc
+  | Dletcfg d -> (translate_letcfg d)::acc
+  | Dreccfg l -> translate_reccfg l :: acc
 
 let translate (m,dl) =
   (m,List.fold_right translate_decl dl [])

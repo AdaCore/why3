@@ -362,7 +362,8 @@ The extension of syntax is described by the following rules.
 .. productionlist:: CFG
     file: `module`*
     module: "module" `:ident` `decl`* "end"
-    decl: "let" "cfg" `cfg_fundef` ("with" `cfg_fundef`)*
+    decl: "let" "cfg" `cfg_fundef`
+    : | "let" "rec" "cfg" `cfg_fundef` ("with" `cfg_fundef`)*
     cfg_fundef: `:ident` `:binder`+ : `:type` `:spec` "=" `vardecl`* "{" `block` "}" `labelblock`*
     vardecl: "var" `:ident`* ":" `:type` ";" | "ghost" "var" `:ident`* ":" `:type` ";"
     block: `instruction` (";" `instruction`)*
@@ -378,10 +379,17 @@ The extension of syntax is described by the following rules.
 An example
 ~~~~~~~~~~
 
-The following example is inspired from the documentation of the ANSI C
-Specification Language (See :cite:`baudin18acsl`, section 2.4.2 Loop
-invariants, Example 2.27). It aims at computing the maximum value of
-an array of integers.
+The following example is directly inspired from the documentation of
+the ANSI C Specification Language (See :cite:`baudin18acsl`, Section
+2.4.2 Loop invariants, Example 2.27). It is itself inspired from the
+first example of Knuth's MIX language, for which formal proofs were
+first investigated by J.-C. Filliâtre in 2007
+(:cite:`filliatre07mix`), and also revisited by T.-M.-T. Nguyen in her
+PhD thesis in 2012 (:cite:`nguyen12phd`, Section 9.5 Translation from
+a CFG to Why, page 115).
+
+This example aims at computing the maximum value of
+an array of integers. Its code in C is given below.
 
 .. code-block:: C
 
