@@ -11,7 +11,34 @@ has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
 shopt -s nullglob
 
-suffix=$1
+suffix=
+only=
+
+while [ $# != 0 ]; do
+    case "$1" in
+        "-suffix")
+            suffix="$2"
+            shift 2
+            ;;
+        "-only")
+            only="$2"
+            shift 2
+            ;;
+        *)
+            echo "Usage: $0 [-suffix s] [-only category]"
+            echo "The suffix for calling bin/why3 and either '.opt' or '.byte' or ''."
+            echo "The category can be used to select only a specific bench test"
+            echo "and is one of the following:"
+            echo "  badfiles drivers execution extraction goodfiles invalidgoals list"
+            echo "  mlwprinter rac realizations replay replay-without-shapes stdlib"
+            echo "  validgoals validsplitgoals."
+            exit 1
+    esac
+done
+
+enabled () {
+    test -z "$only" -o "$only" = "$1"
+}
 
 # TODO: remove the hack about int.mlw once it has become builtin
 goods () {
@@ -187,13 +214,14 @@ replay_without_shape () {
 
 execute () {
     pgm="bin/why3$suffix execute"
-    printf "  $1 $2... "
-    if $pgm $1 $2 > /dev/null; then
+    echo -n "  ${@:1}... "
+    # Run why3execute and discard warnings from the reduction engine
+    if $pgm "$@" > /dev/null 2> >(grep -v '$warning: reduction of term'); then
         echo "ok"
     else
-        echo "execution test failed!"
-        echo $pgm $1 $2
-        $pgm $1 $2
+        echo "execution test failed! $?"
+        echo $pgm "$@"
+        $pgm "$@"
         exit 1
     fi
 }
@@ -379,15 +407,39 @@ test_mlw_printer () {
     done
 }
 
+rac () {
+    file=$1
+    mod=$2
+    shift 2
+    echo
+    echo "* $mod"
+    echo -n "  $mod:" >&2
+    for func in $@; do
+        echo "** $mod.$func"
+        echo -n " $func" >&2
+        bin/why3"$suffix" execute --rac --rac-prover=cvc4 \
+                --debug=rac-check-term-result \
+                "${RACARGS[@]}" "$file" --use="$mod" "$func ()" 2>&1 |\
+            sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" |\
+            sed "s|$(bin/why3$suffix --print-libdir)|WHY3LIB|g"
+    done
+    echo >&2
+}
+
+if enabled stdlib; then
 echo "=== Checking stdlib ==="
 goods stdlib
 goods stdlib/mach
 echo ""
+fi
 
+if enabled drivers; then
 echo "=== Checking drivers ==="
 drivers drivers
 echo ""
+fi
 
+if enabled badfiles; then
 echo "=== Checking bad files ==="
 goods bench/typing/bad --parse-only
 goods bench/programs/bad-typing --parse-only
@@ -397,7 +449,9 @@ bads bench/programs/bad-typing --type-only
 warns bench/programs/warn-typing --type-only
 goods bench/typing/x-bad --type-only
 echo ""
+fi
 
+if enabled goodfiles; then
 echo "=== Checking good files ==="
 goods bench/typing/good
 goods bench/typing/x-good --parse-only
@@ -425,44 +479,84 @@ goods examples/in_progress
 plugins tests/python --type-only py
 plugins tests/microc --type-only c
 echo ""
+fi
 
+if enabled validgoals; then
 echo "=== Checking valid goals ==="
 valid_goals bench/valid
 echo ""
+fi
 
+if enabled validsplitgoals; then
 echo "=== Checking splitted valid goals ==="
 valid_goals bench/valid/split_vc "-a split_vc"
 echo ""
+fi
 
+if enabled invalidgoals; then
 echo "=== Checking invalid goals ==="
 invalid_goals bench/invalid
 echo ""
+fi
 
+if enabled rac; then
+echo "=== Checking RAC ==="
+mlw="examples/tests/rac.mlw"
+output="examples/tests/rac.out"
+(
+    rac "$mlw" Local test1 test2 test3 test4 test5
+    rac "$mlw" Global test1 test2
+    rac "$mlw" Functions test1 test2 test3a test3b test4 test5 test6
+    rac "$mlw" Loops test1 test2 test3
+    rac "$mlw" Aliasing test1 test2
+    rac "$mlw" Labels test1
+    # rac "$mlw" Chars test1  # TODO
+    # rac "$mlw" Strings test1  # TODO
+    rac "$mlw" RecordMutGhost test
+    rac "$mlw" PolyContext test1 test2
+    rac "$mlw" PolyRefContracts test1 test2a test2b test2c
+    rac "$mlw" RecordPoly test1 test2 test3
+    rac "$mlw" PolyFunc test1 test2
+    rac "$mlw" ArrayExec test1 test2 test3 test4
+    rac "$mlw" Ghost test1 test2
+    rac "$mlw" Predicates test1 test2
+    rac "$mlw" Arrays test0 test1 test2 test3
+) > "$output"
+if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
+    echo "RAC: ok"
+else
+    echo "RAC: diff in output $output"
+    exit 1
+fi
+echo ""
+fi
+
+if enabled execution; then
 echo "=== Checking execution ==="
-execute examples/euler001.mlw Euler001.bench
-execute examples/euler002.mlw Solve.bench
-execute examples/fibonacci.mlw FibRecGhost.bench
-execute examples/fibonacci.mlw FibonacciLogarithmic.bench
+execute examples/euler001.mlw "bench ()" --use=Euler001
+execute examples/euler002.mlw "bench ()" --use=Solve
+execute examples/fibonacci.mlw "bench ()" --use=FibRecGhost
+execute examples/fibonacci.mlw "bench ()" --use=FibonacciLogarithmic
 # fails: cannot execute Cany
 # execute examples/same_fringe.mlw SameFringe.bench
 # fails: cannot evaluate condition a=b (how to do it?)
 # execute examples/same_fringe.mlw SameFringe.test5
-execute examples/same_fringe.mlw Test.test1
-execute examples/vstte12_combinators.mlw Combinators.test_SKK
-execute examples/selection_sort.mlw SelectionSort.bench
-execute examples/insertion_sort.mlw InsertionSort.bench
-execute examples/quicksort.mlw Test.bench
-execute examples/conjugate.mlw Test.bench
+execute examples/same_fringe.mlw "test1 ()" --use=Test
+execute examples/vstte12_combinators.mlw "test_SKK ()" --use=Combinators
+execute examples/selection_sort.mlw "bench ()" --use=SelectionSort
+execute examples/insertion_sort.mlw "bench ()" --use=InsertionSort
+execute examples/quicksort.mlw "bench ()" --use=Test
+execute examples/conjugate.mlw "bench ()" --use=Test
 # fails: needs support for "val" without code (how to do it?)
 # examples/vacid_0_sparse_array.mlw Harness.bench
-execute examples/knuth_prime_numbers.mlw PrimeNumbers.bench
-execute examples/vstte10_max_sum.mlw TestCase.test_case
-execute examples/verifythis_fm2012_LRS.mlw LCP_test.bench
-execute examples/verifythis_fm2012_LRS.mlw SuffixSort_test.bench
-execute examples/verifythis_fm2012_LRS.mlw SuffixArray_test.bench
-execute examples/verifythis_fm2012_LRS.mlw LRS_test.bench
-execute examples/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
-execute examples/vstte10_queens.mlw NQueens.test8
+execute examples/knuth_prime_numbers.mlw "bench ()" --use=PrimeNumbers
+execute examples/vstte10_max_sum.mlw "test_case ()" --use=TestCase
+execute examples/verifythis_fm2012_LRS.mlw "bench ()" --use=LCP_test
+execute examples/verifythis_fm2012_LRS.mlw "bench ()" --use=SuffixSort_test
+execute examples/verifythis_fm2012_LRS.mlw "bench ()" --use=SuffixArray_test
+execute examples/verifythis_fm2012_LRS.mlw "bench ()" --use=LRS_test
+execute examples/verifythis_PrefixSumRec.mlw "bench ()" --use=PrefixSumRec
+execute examples/vstte10_queens.mlw "test8 ()" --use=NQueens
 # fails: "Cannot decide condition of if: (not ((~)((<<)((~)(0), 8)) = 0))"
 # examples/queens.mlw NQueensBits.test8
 # fails: cannot find definition of routine eq
@@ -470,39 +564,41 @@ execute examples/vstte10_queens.mlw NQueens.test8
 # test of execution on real numbers; only if mpfr installed
 if test -n "$has_mpfr"; then
     # Reals
-    execute bench/interp/real.mlw R.test0
-    execute bench/interp/real.mlw R.test1
-    execute bench/interp/real.mlw R.test2
-    execute bench/interp/real.mlw R.test3
-    execute bench/interp/real.mlw R.test_exp
-    execute bench/interp/real.mlw R.test_log
-    execute bench/interp/real.mlw R.test_exp_log
-    execute bench/interp/real.mlw R.bench1
-    execute bench/interp/real.mlw R.bench2
-    execute bench/interp/real.mlw R.bench3
+    execute bench/interp/real.mlw "test0 ()" --use=R
+    execute bench/interp/real.mlw "test1 ()" --use=R
+    execute bench/interp/real.mlw "test2 ()" --use=R
+    execute bench/interp/real.mlw "test3 ()" --use=R
+    execute bench/interp/real.mlw "test_exp ()" --use=R
+    execute bench/interp/real.mlw "test_log ()" --use=R
+    execute bench/interp/real.mlw "test_exp_log ()" --use=R
+    execute bench/interp/real.mlw "bench1 ()" --use=R
+    execute bench/interp/real.mlw "bench2 ()" --use=R
+    execute bench/interp/real.mlw "bench3 ()" --use=R
     # Float32
-    execute bench/interp/float32.mlw N.bench1
-    execute bench/interp/float32.mlw N.bench2
-    execute bench/interp/float32.mlw N.bench3
-    execute bench/interp/float32.mlw N.bench4
-    execute bench/interp/float32.mlw N.bench5
-    execute bench/interp/float32.mlw N.bench6
-    execute bench/interp/float32.mlw N.bench7
-    execute bench/interp/float32.mlw N.bench8
+    execute bench/interp/float32.mlw "bench1 ()" --use=N
+    execute bench/interp/float32.mlw "bench2 ()" --use=N
+    execute bench/interp/float32.mlw "bench3 ()" --use=N
+    execute bench/interp/float32.mlw "bench4 ()" --use=N
+    execute bench/interp/float32.mlw "bench5 ()" --use=N
+    execute bench/interp/float32.mlw "bench6 ()" --use=N
+    execute bench/interp/float32.mlw "bench7 ()" --use=N
+    execute bench/interp/float32.mlw "bench8 ()" --use=N
     # Float64
-    execute bench/interp/float64.mlw N.bench1
-    execute bench/interp/float64.mlw N.bench2
-    execute bench/interp/float64.mlw N.bench3
-    execute bench/interp/float64.mlw N.bench4
-    execute bench/interp/float64.mlw N.bench5
-    execute bench/interp/float64.mlw N.bench6
-    execute bench/interp/float64.mlw N.bench7
-    execute bench/interp/float64.mlw N.bench8
+    execute bench/interp/float64.mlw "bench1 ()" --use=N
+    execute bench/interp/float64.mlw "bench2 ()" --use=N
+    execute bench/interp/float64.mlw "bench3 ()" --use=N
+    execute bench/interp/float64.mlw "bench4 ()" --use=N
+    execute bench/interp/float64.mlw "bench5 ()" --use=N
+    execute bench/interp/float64.mlw "bench6 ()" --use=N
+    execute bench/interp/float64.mlw "bench7 ()" --use=N
+    execute bench/interp/float64.mlw "bench8 ()" --use=N
 else
     echo "MPFR not installed, skipping tests"
 fi
 echo ""
+fi
 
+if enabled extraction; then
 echo "=== Checking extraction to OCaml ==="
 extract bench/extraction -D ocaml64
 extract_and_run examples/euler001 euler001.ml 1000000
@@ -517,11 +613,15 @@ echo "=== Checking extraction to C ==="
 extract_and_test_wmp examples/multiprecision
 extract_and_test_c examples/c_cursor
 echo ""
+fi
 
+if enabled replay-without-shapes; then
 echo "=== Checking replay without shapes ==="
 replay_without_shape examples/tests/replay
 echo ""
+fi
 
+if enabled replay; then
 echo "=== Checking replay (no prover) ==="
 replay bench/replay
 replay examples/stdlib --merging-only
@@ -544,7 +644,9 @@ replay examples/multiprecision "-L examples/multiprecision --merging-only"
 replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_vars"
 #replay examples/in_progress --merging-only
 echo ""
+fi
 
+if enabled list; then
 echo "=== Checking --list-* ==="
 list_stuff --list-transforms
 list_stuff --list-printers
@@ -553,9 +655,14 @@ list_stuff --list-formats
 list_stuff --list-metas
 list_stuff --list-debug-flags
 echo ""
+fi
 
+if enabled realizations; then
 echo "=== Checking realizations ==="
 bench/check_realizations.sh || exit $?
+fi
 
+if enabled mlwprinter; then
 echo "=== Checking mlw_printer ==="
 test_mlw_printer
+fi

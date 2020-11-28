@@ -33,11 +33,9 @@ follows:
 
 .. code-block:: console
 
-    > why3 execute maxsum.mlw MaxAndSum.test
-    Execution of MaxAndSum.test ():
-         type: (int, int)
-       result: (45, 10)
-      globals:
+    > why3 execute maxsum.mlw --use=MaxAndSum 'test ()'
+    result: (int, int) = (45, 10)
+    globals:
 
 We get the expected output, namely the pair ``(45, 10)``.
 

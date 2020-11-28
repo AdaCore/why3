@@ -236,6 +236,10 @@ The :why3:tool:`prove` command executes the following steps:
    given, print each generated task using the format specified in the
    selected driver.
 
+#. Derive a validated counterexample using runtime-assertion checking, if option
+   :option:`--check-ce` is given and the selected prover generated a
+   counterexample, .
+
 Prover Results
 ~~~~~~~~~~~~~~
 
@@ -295,16 +299,72 @@ Options
    explanations. The option can be used several times to specify
    several prefixes.
 
-Getting Potential Counterexamples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. option:: --check-ce
 
-This feature is presented in details in :numref:`sec.idece`, which should
-be read first.
+   Validate the counterexample using runtime-assertion checking. Only applicable
+   when the prover selected by :option:`--prover` is configured to generate a
+   counterexample.
 
-Counterexamples are also displayed by the :why3:tool:`prove` command when
-one selects a prover with the ``counterexamples`` alternative. The
-output is currently done in a JSON syntax (this may change in the
-future).
+.. option:: --rac-prover=<p>
+
+   Use prover *p* for the runtime-assertion checking during the validation of
+   counterexamples, when term reduction is insufficient (which is always tried
+   first). The prover *p* is the name or shortcut of a prover, with optional,
+   comma-separated time limit and memory limit, e.g. ``cvc4,2,1000``.
+
+Generating potential counterexamples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When the selected prover has alternative `counterexample`, the prover is
+instructed to generate a model, and Why3 elaborates the model into a potential
+counterexample. The potential counterexample associates source locations and
+variables to values. The generation and display of potential counterexamples is
+presented in details in :numref:`sec.idece`.
+
+Generating validated counterexamples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A validated counterexample can be requested using option :option:`--check-ce`.
+The validated counterexample is derived by executing the relevant function using
+runtime assertion checking (RAC) [#ce-split]_. The potential counterexample
+serves as an oracle for values that are not or cannot be computed in the RAC
+execution (e.g., arguments to the relevant function or ``any``-expressions).
+
+The validated counterexample is a trace of the RAC execution, with one of the
+following qualifications:
+
+*The program does not comply to the verification goal:*
+
+   The validated counterexample is the trace of an execution that resulted in
+   the violation of an assertion.
+  
+*The contracts of some function or loop are underspecified:*
+
+   The validated counterexample is the trace of an abstract execution, which
+   resulted in the violation of an assertion. In an abstract execution, function
+   calls and loops are not executed. Their results and assignments are instead
+   chosen according to the contracts (function postcondition or loop invariants)
+   by picking them from the potential counterexample.
+
+*The program does not comply to the verification goal, or the contracts of some loop or function are too weak:*
+
+   Either of the above cases.
+
+*Sorry, we don't have a good counterexample for you :(*
+
+   The RAC execution did not violate any assertions. The execution trace does not
+   constitute a validated counterexample, and the potential counterexample is invalid, so
+   no counterexample is shown.
+
+*The counterexample model could not be verified:*
+
+   The validated counterexample could not be derived because RAC execution was incomplete.
+   The potential counterexample is instead shown with a warning.
+
+.. [#ce-split] The relevant function is generally only defined, when the
+   counterexample is not generated for the VC of the complete program, for
+   example by applying a split transformation using
+   ``--apply-transform=split_vc``.
 
 .. why3:tool:: ide
 .. _sec.ideref:
@@ -1392,26 +1452,73 @@ The ``execute`` Command
 
 .. program:: why3 execute
 
-Why3 can symbolically execute programs written using the WhyML language
-(extension :file:`.mlw`).
+Why3 can execute expressions in the context of a WhyML program (extension
+:file:`.mlw`).
 
 ::
 
-   why3 execute [options] file module.ident
+   why3 execute [options] <file> <expr>
 
-The first argument is the file where to read the code to execute. The
-second argument is a qualified identifier which denote a program
-function from that file. The latter function must have only `()` as
-argument.
 
-There are no specific options apart from the options common to all
-Why3 commands.
+`file` is a WhyML file, and `expr` is a WhyML expression. Using option
+``--use=<M>`` the definitions from module `M` are added to the context for
+executing `expr`. For example, the following command executes ``Mod1.f 42``
+defined in ``myfile.mlw``:
+
+::
+
+   why3 execute myfile.mlw --use=Mod1 'f 42'
 
 Upon completion of the execution, the value of the result is displayed
 on the standard input. Additionally, values of the global mutable
 variables modified by that function are displayed too.
 
 See more details and examples of use in :numref:`sec.execute`.
+
+Runtime assertion checking (RAC)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The execution can be instructed using option :option:`--rac` to check the
+validity of the program annotations that are encountered during the execution.
+This includes the validation of assertions, function contracts, and loop
+invariants [#no-function-invars]_.
+
+There are two strategies to check the validity of an annotation: First, the term
+is reduced using the Why3 transformation ``compute_in_goal``. The annotation is
+valid when the result of the reduction is `true` and invalid when the result is
+`false`. When the transformation cannot reduce the term to a trivial term, and
+when a RAC prover is given using option :option:`--rac-prover`, prover `p`
+is used to verify the term.
+
+When a program annotation is found to be wrong during the execution, the
+execution stops and reports the contradiction. Normally, the execution continues
+when an annotation cannot be checked (when the term can neither be reduced nor
+proven), but fails when option `--rac-fail-cannot-check` is given.
+
+Options
+~~~~~~~
+
+.. option:: --use=<Mod>
+
+   Add the definitions from `Mod` to the execution context.
+
+.. option:: --rac
+
+   Check the validity of program annotations encountered during the execution.
+
+.. option:: --rac-prover=<p>
+
+   Use the prover `p` to check assertions in RAC when term reduction is
+   insufficient, with optional, comma-separated time and memory limit (e.g.
+   ``cvc4,2,1000``).
+
+.. option:: --rac-fail-cannot-reduce
+
+   Instruct the RAC execution to fail when an annotation cannot be checked.
+   Normally the execution continues normally when an annotation cannot be
+   checked.
+
+.. [#no-function-invars] RAC for function invariants aren't supported yet.
 
 .. why3:tool:: extract
 .. _sec.why3extract:

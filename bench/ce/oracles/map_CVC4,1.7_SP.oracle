@@ -1,9 +1,12 @@
 Strongest Postcondition
-bench/ce/map.mlw M test_map'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/map.mlw", line 8, characters 14-28:
+Goal Postcondition from verification condition test_map'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File map.mlw:
   Line 7:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -15,7 +18,7 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
   Line 8:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
@@ -29,7 +32,7 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
   Line 10:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -43,11 +46,14 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
 
-bench/ce/map.mlw M test_map_multidim1'vc: Unknown (sat)
-Counter-example model:
+File "bench/ce/map.mlw", line 14, characters 14-34:
+Goal Postcondition from verification condition test_map_multidim1'vc.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File map.mlw:
   Line 13:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -59,7 +65,7 @@ File map.mlw:
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
   Line 14:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
@@ -71,7 +77,7 @@ File map.mlw:
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
   Line 16:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -90,11 +96,14 @@ File map.mlw:
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
 
-bench/ce/map.mlw M test_map_multidim2'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/map.mlw", line 19, characters 14-34:
+Goal Postcondition from verification condition test_map_multidim2'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -118,7 +127,7 @@ File ref.mlw:
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
 File map.mlw:
   Line 18:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -141,7 +150,7 @@ File map.mlw:
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
   Line 19:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
@@ -167,7 +176,7 @@ File map.mlw:
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
   Line 23:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -193,11 +202,14 @@ File map.mlw:
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
 
-bench/ce/map.mlw M proj_map_test1'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/map.mlw", line 26, characters 14-28:
+Goal Postcondition from verification condition proj_map_test1'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -209,7 +221,7 @@ File ref.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
   Line 20:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -224,7 +236,7 @@ File ref.mlw:
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
 File map.mlw:
   Line 25:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -236,7 +248,7 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
   Line 26:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
@@ -250,7 +262,7 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
   Line 28:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -264,11 +276,14 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
 
-bench/ce/map.mlw M proj_map_test2'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/map.mlw", line 31, characters 14-28:
+Goal Postcondition from verification condition proj_map_test2'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -280,7 +295,7 @@ File ref.mlw:
                  "value": {"type": "Boolean", "val": true}},
                 {"others": {"type": "Boolean", "val": false}}]}}]}}
   Line 20:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -295,7 +310,7 @@ File ref.mlw:
                 {"others": {"type": "Boolean", "val": false}}]}}]}}
 File map.mlw:
   Line 30:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -307,7 +322,7 @@ File map.mlw:
                  "value": {"type": "Boolean", "val": true}},
                 {"others": {"type": "Boolean", "val": false}}]}}]}}
   Line 31:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
@@ -321,7 +336,7 @@ File map.mlw:
                  "value": {"type": "Boolean", "val": true}},
                 {"others": {"type": "Boolean", "val": false}}]}}]}}
   Line 33:
-    x, [[@field:0:contents], [@introduced]] =
+    x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -335,23 +350,29 @@ File map.mlw:
                  "value": {"type": "Boolean", "val": true}},
                 {"others": {"type": "Boolean", "val": false}}]}}]}}
 
-bench/ce/map.mlw ModelMap t1: Unknown (sat)
-Counter-example model:
+File "bench/ce/map.mlw", line 42, characters 3-31:
+Verification condition t1.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File map.mlw:
   Line 41:
-    i, [[@introduced]] = {"type": "Integer", "val": "0"}
-    t, [[@introduced]] =
+    i [@introduced] = {"type": "Integer", "val": "0"}
+    t [@introduced] =
       {"type": "Array",
        "val":
         [{"indice": {"type": "Integer", "val": "0"},
           "value": {"type": "Integer", "val": "43"}},
          {"others": {"type": "Integer", "val": "0"}}]}
 
-bench/ce/map.mlw OtherIndices g: Unknown (sat)
-Counter-example model:
+File "bench/ce/map.mlw", line 50, characters 36-64:
+Verification condition g.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File map.mlw:
   Line 50:
-    m, [[@introduced]] =
+    m [@introduced] =
       {"type": "Array",
        "val":
         [{"indice": {"type": "Fraction", "val": "1/10"},

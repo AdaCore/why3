@@ -309,7 +309,7 @@ and print_record_human fmt r =
       (* Special pretty printing for record with only one element *)
       fprintf fmt "%a" print_model_value_human value
   | _ ->
-      fprintf fmt "@[%a@]"
+      fprintf fmt "@[<hv1>%a@]"
         (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
            (fun fmt (f, v) ->
              fprintf fmt "@[%s =@ %a@]" f print_model_value_human v))
@@ -413,8 +413,38 @@ let is_model_empty m = Mstr.is_empty m.model_files
 let empty_model =
   {vc_term_loc=None; vc_term_attrs=Sattr.empty; model_files=empty_model_files}
 
+let set_model_files model model_files =
+  { model with model_files }
+
 let get_model_elements m =
   List.(concat (concat (map Mint.values (Mstr.values m.model_files))))
+
+let get_model_term_loc m = m.vc_term_loc
+let get_model_term_attrs m = m.vc_term_attrs
+
+let get_model_element model name loc =
+  let aux me =
+    me.me_name.men_name = name &&
+    Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
+
+let get_model_element_value model name loc =
+  let aux me =
+    me.me_name.men_name = name &&
+    Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
+
+let get_model_element_by_id model id =
+  match id.id_loc with
+  | None -> None
+  | Some loc ->
+      let name = id.id_string in
+      let name = Ident.get_model_trace_string ~name ~attrs:id.id_attrs in
+      get_model_element_value model name loc
+
+let get_model_element_by_loc model loc =
+  let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
 
 type model_parser = printer_mapping -> string -> model
 type raw_model_parser = printer_mapping -> string -> model_element list
@@ -442,41 +472,59 @@ let fix_loc_kind ~at_loc name =
 let cmp_attrs a1 a2 =
   String.compare a1.attr_string a2.attr_string
 
-let print_model_element ~at_loc ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
+let print_model_element ?(print_locs=false) ~at_loc ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message -> fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
       let m_element = {m_element with me_name=fix_loc_kind ~at_loc m_element.me_name} in
-      fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]"
-        (me_name_trans m_element.me_name)
+      fprintf fmt "@[<hv2>@[<hov2>%s%t%t =@]@ %a@]" (me_name_trans m_element.me_name)
         (fun fmt ->
            if print_attrs then
-             fprintf fmt ",@ [%a]"
-               (Pp.print_list Pp.comma Pretty.print_attr)
+             fprintf fmt " %a" Pp.(print_list space Pretty.print_attr)
                (List.sort cmp_attrs (Sattr.elements m_element.me_name.men_attrs)))
+        (fun fmt ->
+           if print_locs then fprintf fmt " (%a)"
+               (Pp.print_option_or_default "NO LOC "Pretty.print_loc) m_element.me_location)
         print_model_value m_element.me_value
 
-let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
+let similar_model_element_names me_nm1 me_nm2 =
+  (* TODO Add an efficient version of symmetric difference to extset *)
+  let symm_diff = Sattr.diff (Sattr.union me_nm1.men_attrs me_nm2.men_attrs)
+                    (Sattr.inter me_nm1.men_attrs me_nm2.men_attrs) in
+  Ident.get_model_trace_string ~name:me_nm1.men_name ~attrs:me_nm1.men_attrs
+  = Ident.get_model_trace_string ~name:me_nm2.men_name ~attrs:me_nm2.men_attrs
+  && Sattr.for_all (fun x ->
+         not (Strings.has_prefix "at" x.attr_string)) symm_diff
+
+(* TODO optimize *)
+let rec filter_duplicated l =
+  let exist_similar a l = List.exists (fun x ->
+    similar_model_element_names a.me_name x.me_name) l in
+  match l with
+  | [] | [_] -> l
+  | me :: l when exist_similar me l -> filter_duplicated l
+  | me :: l -> me :: filter_duplicated l
+
+let print_model_elements ~filter_similar ~at_loc ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
+  let m_elements =
+    if filter_similar then filter_duplicated m_elements else m_elements in
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ~at_loc ~print_attrs ~print_model_value
+       (print_model_element ?print_locs:None ~at_loc ~print_attrs ~print_model_value
           ~me_name_trans))
     m_elements
 
-let print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt filename model_file =
+let print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_trans fmt (filename, model_file) =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths. *)
   let filename = Filename.basename filename in
-  fprintf fmt "@[<v 0>File %s:@\n" filename ;
-  Mint.iter
-    (fun line m_elements ->
-      fprintf fmt "  @[<v 2>Line %d:@\n" line ;
-      print_model_elements ~at_loc:(filename, line) ~print_attrs
-        ~print_model_value ~me_name_trans fmt m_elements ;
-      fprintf fmt "@]@\n")
-    model_file ;
-  fprintf fmt "@]"
+  let pp fmt (line, m_elements) =
+    fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
+      (print_model_elements ~filter_similar ?sep:None ~at_loc:(filename, line) ~print_attrs
+         ~print_model_value ~me_name_trans) m_elements in
+  fprintf fmt "@[<v 0>File %s:@ %a@]" filename
+    Pp.(print_list space pp) (Mint.bindings model_file)
 
 let why_name_trans {men_kind; men_name} =
   match men_kind with
@@ -484,7 +532,7 @@ let why_name_trans {men_kind; men_name} =
   | Old -> "old "^men_name
   | At l -> men_name^" at "^l
   (* | Loop_before -> "[before loop] "^men_name *)
-  | Loop_previous_iteration -> "[previous iteration] "^men_name
+  | Loop_previous_iteration -> "[before iteration] "^men_name
   | Loop_current_iteration -> "[current iteration] "^men_name
   | _ -> men_name
 
@@ -494,16 +542,16 @@ let json_name_trans {men_kind; men_name} =
   | Old -> "old "^men_name
   | _ -> men_name
 
-let print_model ~print_attrs ?(me_name_trans = why_name_trans)
+let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
     ~print_model_value fmt model =
-  Mstr.iter (print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt)
-    model.model_files
+  Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_trans)
+    fmt (Mstr.bindings model.model_files)
 
-let print_model_human ?(me_name_trans = why_name_trans) fmt model =
-  print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
+let print_model_human ?(filter_similar = true) ?(me_name_trans = why_name_trans) fmt model =
+  print_model ~filter_similar ~me_name_trans ~print_model_value:print_model_value_human fmt model
 
-let print_model ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
-  print_model ~print_attrs ~me_name_trans ~print_model_value fmt model
+let print_model ?(filter_similar = true) ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
+  print_model ~filter_similar ~print_attrs ~me_name_trans ~print_model_value fmt model
 
 let get_model_file model filename =
   Mstr.find_def empty_model_file filename model
@@ -553,7 +601,7 @@ let interleave_line ~filename ~print_attrs start_comment end_comment
     let model_elements = Mint.find line_number model_file in
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
-        (print_model_elements ~sep:Pp.semi ~at_loc:(filename, line_number)
+        (print_model_elements ~filter_similar:true ~sep:Pp.semi ~at_loc:(filename, line_number)
            ~print_attrs ~print_model_value:print_model_value_human ~me_name_trans)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
@@ -653,7 +701,7 @@ let print_model_element_json me_name_to_str fmt me =
     | Other -> fprintf fmt "%a" Json_base.string "other"
     | Loop_before -> fprintf fmt "%a" Json_base.string "before_loop"
     | Loop_previous_iteration ->
-        fprintf fmt "%a" Json_base.string "previous_iteration"
+        fprintf fmt "%a" Json_base.string "before_iteration"
     | Loop_current_iteration ->
         fprintf fmt "%a" Json_base.string "current_iteration" in
   let print_name fmt = Json_base.string fmt (me_name_to_str me.me_name) in
@@ -664,6 +712,7 @@ let print_model_element_json me_name_to_str fmt me =
       ("value", print_value) ; ("kind", print_kind) ]
 
 let print_model_elements_json me_name_to_str fmt model_elements =
+  let model_elements = filter_duplicated model_elements in
   Json_base.list (print_model_element_json me_name_to_str) fmt model_elements
 
 let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
@@ -752,31 +801,20 @@ let add_to_model ?vc_term_attrs model_element model =
       let filename, line_number, _, _ = Loc.get pos in
       let model_file = get_model_file model filename in
       let elements = get_elements model_file line_number in
-      let el = model_element.me_name in
-      (* This removes elements that are duplicated *)
-      let found_elements =
-        List.find_all
-          (fun x ->
-            let xme = x.me_name in
-            Ident.get_model_trace_string ~name:xme.men_name ~attrs:xme.men_attrs
-            = Ident.get_model_trace_string ~name:el.men_name ~attrs:el.men_attrs
-            &&
-            (* TODO Add an efficient version of symmetric difference to extset *)
-            let symm_diff =
-              Sattr.diff
-                (Sattr.union x.me_name.men_attrs el.men_attrs)
-                (Sattr.inter x.me_name.men_attrs el.men_attrs) in
-            Sattr.for_all
-              (fun x -> not (Strings.has_prefix "at" x.attr_string))
-              symm_diff)
-          elements in
       let model_element =
         match vc_term_attrs with
         | Some vc_term_attrs ->
             fix_kind (filename, line_number) vc_term_attrs model_element
         | None -> model_element in
-      let elements =
-        if found_elements <> [] then elements else model_element :: elements in
+      let el = model_element.me_name in
+      (* This removes elements that are duplicated *)
+      let found_elements =
+        List.exists (fun x ->
+            similar_model_element_names x.me_name el
+            && pos = Opt.get_def Loc.dummy_position x.me_location)
+          elements in
+      let elements = if found_elements then elements
+                     else model_element :: elements in
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 

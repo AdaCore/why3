@@ -1,0 +1,316 @@
+module Int63Test
+
+  use mach.int.Int63
+
+  let t1 (): int63 = 1
+
+  let t2 () = 2:int63
+
+  let t3 () =
+    let x:int63 = 1 in
+    x
+
+  let t4 () =
+    let x:int63 = 1 in
+    x + 2
+
+  let t5 () =
+    let x:int63 = 1 in
+    x - 2
+
+  let t6 () =
+    let x = 10 in
+    x + 2
+
+  let t7 () =
+    let x:int = 10 in
+    Int.(-) x 2
+
+  let t8 () =
+    let x = 20 in
+    let y = 21 in
+    x < y
+
+  let t9 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y
+
+  let t10 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y - 1
+
+  let t11 () =
+    let x = 20 in
+    let y = 21 in
+    x = y - 1 && x >= y - 1 && y > x
+
+  let t12 () =
+    let x = 42 in
+    x % 2 = 0
+
+  let t13 () =
+    let x = 42 in
+    let y = 24 in
+    let z = x + y / 2 in
+    let w = z * x in
+    let w = w % 10 in
+    let w = -w in
+    w = -8
+
+  let t14 () =
+    let x:int63 = of_int(42:int) in
+    let y:int = to_int x in
+    x + of_int y
+
+  let t15 () = Int.(+) max_int63 min_int63
+
+  (* let t16 () = zero + one + max_int + min_int *)
+
+end
+
+module Int31Test
+
+  use mach.int.Int31
+
+  let t1 (): int31 = 1
+
+  let t2 () = 2:int31
+
+  let t3 () =
+    let x:int31 = 1 in
+    x
+
+  let t4 () =
+    let x:int31 = 1 in
+    x + 2
+
+  let t5 () =
+    let x:int31 = 1 in
+    x - 2
+
+  let t6 () =
+    let x = 10 in
+    x + 2
+
+  let t7 () =
+    let x:int = 10 in
+    Int.(-) x 2
+
+  let t8 () =
+    let x = 20 in
+    let y = 21 in
+    x < y
+
+  let t9 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y
+
+  let t10 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y - 1
+
+  let t11 () =
+    let x = 20 in
+    let y = 21 in
+    x = y - 1 && x >= y - 1 && y > x
+
+  let t12 () =
+    let x = 42 in
+    x % 2 = 0
+
+  let t13 () =
+    let x = 42 in
+    let y = 24 in
+    let z = x + y / 2 in
+    let w = z * x in
+    let w = w % 10 in
+    let w = -w in
+    w = -8
+
+  let t14 () =
+    let x:int31 = of_int(42:int) in
+    let y:int = to_int x in
+    x + of_int y
+
+  let t15 () = Int.(+) max_int31 min_int31
+
+  (* let t16 () = zero + one + max_int + min_int *)
+
+end
+
+module ByteTest
+
+  use mach.int.Byte
+
+  let t1 (): byte = 1
+
+  let t2 () = 2:byte
+
+  let t3 () =
+    let x:byte = 1 in
+    x
+
+  let t4 () =
+    let x:byte = 1 in
+    x + 2
+
+  let t5 () =
+    let x:byte = 1 in
+    x - 2
+
+  let t6 () =
+    let x = 10 in
+    x + 2
+
+  let t7 () =
+    let x:int = 10 in
+    Int.(-) x 2
+
+  let t8 () =
+    let x = 20 in
+    let y = 21 in
+    x < y
+
+  let t9 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y
+
+  let t10 () =
+    let x = 20 in
+    let y = 21 in
+    x >= y - 1
+
+  let t11 () =
+    let x = 20 in
+    let y = 21 in
+    x = y - 1 && x >= y - 1 && y > x
+
+  let t12 () =
+    let x = 42 in
+    x % 2 = 0
+
+  let t13 () =
+    let x = 42 in
+    let y = 24 in
+    let z = x + y / 2 in
+    let w = z * x in
+    let w = w % 10 in
+    w = 8
+
+  let t14 () =
+    let x:byte = of_int(42:int) in
+    let y:int = to_int x in
+    x + of_int y
+
+  let t15 () = Int.(+) max_byte min_byte
+
+  (* let t16 () = zero + one + max_int + min_int *)
+
+end
+
+module TestArrays
+
+  use array.Array
+
+  let t1 () = empty ()
+
+  let t2 () = make 10 1
+
+end
+
+module TestArgs
+
+  use int.Int
+  use ref.Ref
+
+  let t1 x = x + 1
+(*
+why3 execute examples/tests/execute-tests.mlw "TestArgs.t1 1" --use=TestArgs
+why3 execute examples/tests/execute-tests.mlw "t1 1" --use=TestArgs
+*)
+
+  let c = ref 1
+
+  let t2 () = !c + 1
+(*
+why3 execute examples/tests/execute-tests.mlw "t2 ()" --use=TestArgs
+why3 execute examples/tests/execute-tests.mlw "c := 42; t2 ()" --use=ref.Ref --use=TestArgs
+*)
+
+  let t3 () = c := 52
+(*
+why3 execute examples/tests/execute-tests.mlw "t3 ()" --use=TestArgs
+*)
+
+  let t4 () = c := !c + 1
+(*
+why3 execute examples/tests/execute-tests.mlw "t4 ()" --use=TestArgs
+*)
+
+  let t5 x = c := !c + x
+(*
+why3 execute examples/tests/execute-tests.mlw "t5 42" --use=TestArgs
+*)
+
+  type t 'a = { f1: 'a; f2: int}
+
+  let t6 () = {f1 = ""; f2 = 2}
+(*
+why3 execute examples/tests/execute-tests.mlw "t6 ()" --use=TestArgs
+*)
+
+  let t7 s x = {f1 = s; f2 = x}
+(*
+why3 execute examples/tests/execute-tests.mlw "t7 \"hello\" 42" --use=TestArgs
+*)
+
+  let t8 s = {f1 = s; f2 = !c}
+(*
+why3 execute examples/tests/execute-tests.mlw 't8 "hello"' --use=TestArgs
+*)
+
+  let t9 (t: t 'a): 'a = t.f1
+(*
+why3 execute examples/tests/execute-tests.mlw "t9 {f1=1;f2=42}" --use=TestArgs
+why3 execute examples/tests/execute-tests.mlw 't9 {f1="hello";f2=42}' --use=TestArgs
+*)
+
+  let t10 t = t.f2
+(*
+why3 execute examples/tests/execute-tests.mlw 't10 !t11' --use=TestArgs --use=ref.Ref
+why3 execute examples/tests/execute-tests.mlw 't10 {f1="hello";f2=42}' --use=TestArgs
+*)
+
+  let t11 = ref {f1 = 1; f2 = 2}
+(*
+why3 execute examples/tests/execute-tests.mlw 't11 := {!t11 with f1 = 42}; t10 !t11' --use=TestArgs --use=ref.Ref
+*)
+
+  let t12 () = t9 {f1=1;f2=42}
+(*
+why3 execute examples/tests/execute-tests.mlw 't12 ()' --use=TestArgs
+*)
+
+end
+
+module ShouldFail
+  use random.Random
+  (*
+why3 execute examples/tests/execute-tests.mlw "()" --use=ShouldFail
+  *)
+end
+
+module TestRac
+  use int.Int
+
+  let f (x: int) = assert {x > 0}
+(*
+why3 execute examples/tests/execute-tests.mlw "f 1" --use=TestRac
+why3 execute examples/tests/execute-tests.mlw "f 0" --use=TestRac
+*)
+end

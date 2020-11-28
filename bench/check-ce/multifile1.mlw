@@ -1,0 +1,16 @@
+
+module M
+  use int.Int
+
+  let decr (x: int)
+    ensures { result < x }
+  = x - 1
+
+  let incr (x: int)
+    ensures { result > x }
+  = decr x + 2
+
+  val incr_val (x: int) : int
+    ensures { result > x }
+
+end

@@ -1,0 +1,31 @@
+use int.Int
+
+val ref z: int
+
+let f (x: int)
+  requires { x > 0 }
+= z <- 0;
+  (fun y -> z <- z + y) x;
+  assert { z > 0 }
+
+(*
+  Why3 intermediate form
+
+  let f (x:int) : ()
+    reads  { z }
+    writes { (z:ref int @rho).contents }
+    covers { z:ref int @rho }
+    requires { x > 0 } =
+    let o = 0
+    in
+    (z:ref int).contents <- o;
+    let h (y:int) : ()
+      reads  { z }
+      writes { (z:ref int @rho).contents }
+      covers { z:ref int @rho } =
+      let o = let o1 = contents z in
+        o1 + y in
+      (z:ref int).contents <- o in
+    h x;
+    assert { contents z > 0 }
+*)

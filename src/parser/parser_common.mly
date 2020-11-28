@@ -856,7 +856,7 @@ const_defn:
 
 mk_expr(X): d = X { mk_expr d $startpos $endpos }
 
-seq_expr:
+%public seq_expr:
 | contract_expr %prec below_SEMI  { $1 }
 | contract_expr SEMICOLON         { $1 }
 | contract_expr SEMICOLON seq_expr

@@ -1,0 +1,10 @@
+
+use int.Int
+val ref z: int
+
+let g (x: int)
+  writes { z }
+  ensures { z > old z }
+  ensures { result = x + 2 }
+= z <- z + 1;
+  x + 1

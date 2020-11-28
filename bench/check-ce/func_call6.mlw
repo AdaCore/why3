@@ -1,0 +1,16 @@
+
+(* similar to func_call4.mlw but uses a let to declare z *)
+
+use int.Int
+use ref.Ref
+
+let z = ref (any int)
+
+val g (): unit
+  writes { z }
+  ensures { !z > !(old z) }
+
+let f () =
+  z := 0;
+  g ();
+  assert { !z = 1 }

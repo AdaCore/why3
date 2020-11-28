@@ -41,6 +41,7 @@
 %start <Pmodule.pmodule Wstdlib.Mstr.t> mlw_file
 %start <Ptree.mlw_file> mlw_file_parsing_only
 %start <Ptree.term> term_eof
+%start <Ptree.expr> expr_eof
 %start <Ptree.decl> decl_eof
 %start <Ptree.qualid> qualid_eof
 %start <Ptree.qualid list> qualid_comma_list_eof
@@ -55,10 +56,12 @@
 term_eof:
 | term EOF { $1 }
 
+expr_eof:
+| seq_expr EOF { $1 }
+
 decl_eof:
 | pure_decl EOF { $1 }
 | prog_decl EOF { $1 }
-
 
 (* Parsing of a list of qualified identifiers for the ITP *)
 

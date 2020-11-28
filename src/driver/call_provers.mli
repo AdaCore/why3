@@ -45,18 +45,16 @@ type prover_result = {
   (** The time taken by the prover *)
   pr_steps  : int;
   (** The number of steps taken by the prover (-1 if not available) *)
-  pr_model  : model;
-  (** The model produced by a the solver *)
+  pr_models : (prover_answer * model) list;
+  (** The models produced by a the solver *)
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit
 (** Pretty-print a {! prover_answer} *)
 
-val print_prover_result :
-  json_model:bool -> Format.formatter -> prover_result -> unit
-(** Pretty-print a prover_result. The answer and the time are output.
-    The output of the prover is printed if and only if the answer is
-    a [HighFailure] *)
+val print_prover_result : ?json:bool -> Format.formatter -> prover_result -> unit
+(** Pretty-print a prover_result. The answer and the time are output. The output of the
+   prover is printed if and only if the answer is a [HighFailure]. *)
 
 val debug : Debug.flag
 (** debug flag for the calling procedure (option "--debug call_prover")
@@ -159,6 +157,8 @@ val call_on_buffer :
     prover was called. It is renamed as %f.save if inplace=true and the command
     [actualcommand] fails
 
+    @param maybe_ce_model : function to validate the model for counter-examples
+
     @param gen_new_file: When set, this generates a new temp file to run the
     prover on. Otherwise it reuses the filename already given.
 
@@ -183,3 +183,6 @@ val interrupt_call : prover_call -> unit
 
 val wait_on_call : prover_call -> prover_result
 (** blocking function that waits until the prover finishes. *)
+
+val debug_attrs : Debug.flag
+(** Print attributes in model *)

@@ -1,0 +1,17 @@
+(* Taken from
+
+Sylvain Dailler, David Hauzar, Claude Marché, Yannick Moy:
+Instrumenting a weakest precondition calculus for counterexample
+generation. J. Log. Algebraic Methods Program. 99: 97-113 (2018)
+
+Example 15
+*)
+
+use int.Int
+
+let rsa (a b: int)
+  requires { a >= 2 /\ b >= 2 }
+  = let c = 12166397 in
+    assert { a * b <> c }
+
+(* 3407 * 3571 = 12166397 *)
