@@ -116,6 +116,7 @@ let nothing _fmt _ = ()
 let string = pp_print_string
 let float = pp_print_float
 let int = pp_print_int
+let bool = pp_print_bool
 let constant_string s fmt () = string fmt s
 let formatted fmt x = Format.fprintf fmt "%( %)" x
 let constant_formatted f fmt () = formatted fmt f

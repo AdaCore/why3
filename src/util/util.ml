@@ -63,6 +63,54 @@ let anyd fold pr1 pr2 x =
 let ttrue _ = true
 let ffalse _ = false
 
+type _ cmptr = Cmptr : {proj: 'a -> 'b; cmp: 'b -> 'b -> int} -> 'a cmptr
+
+let cmptr proj cmp = Cmptr {proj; cmp}
+
+let rec cmp ls x y = match ls with
+  | [] -> 0
+  | Cmptr c :: ls ->
+      match c.cmp (c.proj x) (c.proj y) with
+      | 0 -> cmp ls x y
+      | n -> n
+
+let rec cmp_lists ls l1 l2 = match l1, l2 with
+  | h1::t1, h2::t2 ->
+      let ls = [cmptr fst (cmp ls); cmptr snd (cmp_lists ls)] in
+      cmp ls (h1, t1) (h2, t2)
+  | [], _ -> -1 | _, [] -> 1
+
+let terminal_has_color =
+  let term = try Sys.getenv "TERM" with Not_found -> "" in
+  term <> "" && term <> "dumb" && Unix.isatty Unix.stdout
+
+let esc_seq_of_tag str =
+  let tokens = String.split_on_char ' ' (String.lowercase_ascii str) in
+  let bold, tokens = match tokens with
+    | "bold" :: tokens -> true, tokens
+    | tokens -> false, tokens in
+  let fg, bg = match tokens with
+    | [] -> None, None
+    | [fg] -> Some fg, None
+    | ["on"; bg] -> None, Some bg
+    | [fg; "on"; bg] -> Some fg, Some bg
+    | _ -> Format.ksprintf failwith
+             "ANSI format tag must be <[bold] [<color>] [on <bg-color>]>, not %s" str in
+  let code = function
+    | "black" -> 0 | "red"     -> 1 | "green" -> 2 | "yellow" -> 3
+    | "blue"  -> 4 | "magenta" -> 5 | "cyan"  -> 6 | "white"  -> 7
+    | s -> Format.ksprintf failwith "Unknown color in ANSI format tag: %s" s in
+  let aux offset = function Some s -> [string_of_int (code s + offset)] | None -> [] in
+  let bold = if bold then ["1"] else [] in
+  String.concat ";" (aux 30 fg @ aux 40 bg @ bold)
+
+let ansi_color_tags = Format.{
+  mark_open_tag= (fun tag -> sprintf "\027[%sm" (esc_seq_of_tag tag));
+  mark_close_tag= (fun _ -> "\027[0m");
+  print_open_tag= ignore;
+  print_close_tag= ignore;
+}
+
 let is_sexp_simple_token s =
   let rec loop i =
     i < 0 || (

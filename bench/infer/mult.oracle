@@ -1,5 +1,5 @@
 CFG size: 23 nodes, 23 hyperedges
-Time elapsed 0.199369s
+Time elapsed 0.211171s
 ### Debug: inferred invariants ###
 forall w1:int.
  0 = contents i /\ contents i = 0 \/
@@ -8,7 +8,7 @@ forall w1:int.
  ((2 * (2 * 0)) = contents i /\ (2 * 0) <= 9) /\ (2 * (2 * 0)) = contents i
 ###
 CFG size: 23 nodes, 23 hyperedges
-Time elapsed 0.668759s
+Time elapsed 0.702336s
 ### Debug: inferred invariants ###
 forall w2:int.
  (0 <= contents i1 /\ contents i1 <= 0) /\ contents i1 = 0 \/
@@ -21,10 +21,19 @@ forall w2:int.
  (2 * (2 * 0)) = contents i1
 ###
 CFG size: 23 nodes, 23 hyperedges
-Time elapsed 0.006227s
+Time elapsed 0.007095s
 ### Debug: inferred invariants ###
 forall w3:int. true
 ###
-bench/infer/mult.mlw Mult1 b'vc: Unknown () (0.34s)
-bench/infer/mult.mlw Mult1 b2'vc: Unknown () (0.03s)
-bench/infer/mult.mlw Mult1 b3'vc: Unknown () (0.02s)
+File bench/infer/mult.mlw:
+Verification condition b'vc.
+Prover result is: unknown () (0.39s).
+
+File bench/infer/mult.mlw:
+Verification condition b2'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/mult.mlw:
+Verification condition b3'vc.
+Prover result is: unknown () (0.02s).
+

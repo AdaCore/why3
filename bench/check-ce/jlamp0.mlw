@@ -1,0 +1,29 @@
+module M
+
+  use int.Int
+  use ref.Ref
+
+  val a : ref int
+
+  let p1 (b : ref int)
+    requires { 0 <= !a <= 10 /\ 3 <= !b <= 17 }
+    ensures  { 17 <= !a <= 42 }
+  = a := !a + !b;
+    assert { 5 <= !a <= 15 };
+    if !a >= 10 then a := !a - 1
+
+  val c : ref int
+
+  let p2 ()
+    requires { 0 <= !a <= 10 }
+    ensures  { 7 <= !a <= 42 }
+  = c := 1;
+    while !c <= 10 do
+      invariant { 2 <= !c <= 11 }
+      invariant { 3 <= !a <= 10 }
+      variant { !c }
+      a := !a + !c;
+      c := !c + 2
+    done
+
+end

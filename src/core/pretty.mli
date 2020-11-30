@@ -73,7 +73,10 @@ module type Printer = sig
     val print_term : formatter -> term -> unit   (* term *)
 
     val print_attr : formatter -> attribute -> unit
+    val print_attrs : formatter -> Sattr.t -> unit
     val print_loc : formatter -> Loc.position -> unit
+    val print_loc' : formatter -> Loc.position -> unit
+    val print_json_loc : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit
     val print_meta_arg_type : formatter -> meta_arg_type -> unit

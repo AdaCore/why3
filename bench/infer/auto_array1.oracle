@@ -1,5 +1,5 @@
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.037289s
+Time elapsed 0.038870s
 ### Debug: inferred invariants ###
 ((forall w1:int.
    ((length (make x 2) = length a /\ length (make x 2) = x) /\ w1 < 0) /\
@@ -13,7 +13,7 @@ Time elapsed 0.037289s
 x = length a
 ###
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.114423s
+Time elapsed 0.122343s
 ### Debug: inferred invariants ###
 (((forall w2:int.
     ((((w2 < 0 /\ length (make x1 2) <= x1) /\ x1 <= length (make x1 2)) /\
@@ -35,12 +35,12 @@ Time elapsed 0.114423s
 x1 <= length a1
 ###
 CFG size: 14 nodes, 14 hyperedges
-Time elapsed 0.001065s
+Time elapsed 0.001032s
 ### Debug: inferred invariants ###
 length (make x2 2) = length a2 /\ x2 = length a2
 ###
 CFG size: 20 nodes, 20 hyperedges
-Time elapsed 0.087426s
+Time elapsed 0.079420s
 ### Debug: inferred invariants ###
 (((((forall w4:int.
       (((length (make n 10) = length a3 /\ length (make n 10) = n) /\ w4 < 0) /\
@@ -59,7 +59,7 @@ Time elapsed 0.087426s
 (elts a3 @ 5) = b
 ###
 CFG size: 20 nodes, 20 hyperedges
-Time elapsed 0.213440s
+Time elapsed 0.218369s
 ### Debug: inferred invariants ###
 (((((((((forall w5:int.
           ((((((((((0 <= length (make n1 10) /\ w5 < length (make n1 10)) /\
@@ -110,7 +110,7 @@ Time elapsed 0.213440s
 0 <= n1
 ###
 CFG size: 20 nodes, 20 hyperedges
-Time elapsed 0.008959s
+Time elapsed 0.009677s
 ### Debug: inferred invariants ###
 ((((forall w6:int.
      w6 < 0 /\ length (make n2 10) = length a5 \/
@@ -122,23 +122,83 @@ Time elapsed 0.008959s
  0 <= length a5) /\
 0 <= n2
 ###
-bench/infer/auto_array1.mlw Test basic'vc: Unknown () (0.02s)
-bench/infer/auto_array1.mlw Test basic1'vc: Unknown () (0.03s)
-bench/infer/auto_array1.mlw Test basic2'vc: Unknown () (0.00s)
-bench/infer/auto_array1.mlw Test b'vc: Unknown () (0.00s)
-bench/infer/auto_array1.mlw Test b2'vc: Unknown () (0.00s)
-bench/infer/auto_array1.mlw Test c'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test d_basic'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test d'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test e'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test f'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test cond'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test cond2'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test init1'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test init2'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test init3'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test init5'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test init_non_lin'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test instantiation'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test instantiation2'vc: Timeout (1.00s)
-bench/infer/auto_array1.mlw Test instantiation3'vc: Timeout (1.00s)
+File bench/infer/auto_array1.mlw:
+Verification condition basic'vc.
+Prover result is: unknown () (0.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition basic1'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition basic2'vc.
+Prover result is: unknown () (0.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition b'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition b2'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition c'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition d_basic'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition d'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition e'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition f'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition cond'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition cond2'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition init1'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition init2'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition init3'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition init5'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition init_non_lin'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition instantiation'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition instantiation2'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/auto_array1.mlw:
+Verification condition instantiation3'vc.
+Prover result is: timeout (1.00s).
+

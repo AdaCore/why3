@@ -134,12 +134,22 @@ type model
 
 val is_model_empty : model -> bool
 val empty_model : model
+val set_model_files : model -> model_element list Wstdlib.Mint.t Wstdlib.Mstr.t -> model
 
 (** {2 Querying the model} *)
 
-val get_model_elements: model -> model_element list
+val get_model_elements : model -> model_element list
+val get_model_term_loc : model -> Loc.position option
+val get_model_term_attrs : model -> Ident.Sattr.t
+
+val get_model_element : model -> string -> Loc.position -> model_element option
+val get_model_element_by_id : model -> Ident.ident -> model_element option
+val get_model_element_by_loc : model -> Loc.position -> model_element option
+
+(** {2 Printing the model} *)
 
 val print_model :
+  ?filter_similar:bool ->
   ?me_name_trans:(model_element_name -> string) ->
   print_attrs:bool ->
   Format.formatter ->
@@ -156,6 +166,7 @@ val print_model :
 *)
 
 val print_model_human :
+  ?filter_similar:bool ->
   ?me_name_trans:(model_element_name -> string) ->
   Format.formatter ->
   model ->

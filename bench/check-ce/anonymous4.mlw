@@ -1,0 +1,9 @@
+
+use int.Int
+
+let f (x: int) = (fun y -> assume {y > 0}; y + x)
+
+let g (y: int)
+  requires { y >= 0 }
+  ensures  { result > y }
+= f y y

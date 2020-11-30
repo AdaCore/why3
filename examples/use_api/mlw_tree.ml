@@ -365,21 +365,13 @@ let alt_ergo_driver : Driver.driver =
     exit 1
 
 let () =
-  let _ =
-    List.fold_left
-      (fun i t ->
-       let r =
-         Call_provers.wait_on_call
-           (Driver.prove_task ~limit:Call_provers.empty_limit
-                              ~command:alt_ergo.Whyconf.command
-                              alt_ergo_driver t)
-       in
-       printf "@[On task %d, alt-ergo answers %a@."
-              i (Call_provers.print_prover_result ~json_model:false) r;
-       i+1
-      )
-      1 my_tasks
-  in ()
+  List.iteri (fun i t ->
+      let call = Driver.prove_task ~limit:Call_provers.empty_limit
+          ~command:alt_ergo.Whyconf.command alt_ergo_driver t in
+      let r = Call_provers.wait_on_call call in
+      printf "@[On task %d, alt-ergo answers %a@." (succ i)
+        (Call_provers.print_prover_result ?json:None) r)
+    my_tasks
 (* END{checkingvcs} *)
 
 (*

@@ -1390,8 +1390,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       when Sattr.is_empty e.e_attrs ->
         proxy_args ghost ldl (v::vl) plp
     | EA (gh, e) :: plp ->
-        let id = id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o" in
-        let ld, v = let_var ~ghost:(ghost || gh) id e in
+        let ld, v  = mk_proxy_decl ~ghost:(ghost || gh) e in
         proxy_args ghost (LS ld :: ldl) (v::vl) plp
     | HD hd :: plp ->
         proxy_args ghost (hd :: ldl) vl plp

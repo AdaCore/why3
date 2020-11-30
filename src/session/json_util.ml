@@ -72,6 +72,9 @@ let convert_model (m: Model_parser.model) =
             (* By default, we print attributes in JSON *)
             (fun fmt m -> Model_parser.print_model ~print_attrs:true fmt m) m)
 
+let convert_models (ml: Model_parser.model list) =
+  List (List.map convert_model ml)
+
 (* TODO pr_model should have a different format *)
 let convert_proof_result (pr: prover_result) =
   let (a,s) = convert_prover_answer pr.pr_answer in
@@ -83,7 +86,7 @@ let convert_proof_result (pr: prover_result) =
         "pr_output", String pr.pr_output;
         "pr_time", Float pr.pr_time;
         "pr_steps", Int pr.pr_steps;
-        "pr_model", convert_model pr.pr_model])
+        "pr_models", convert_models (List.map snd pr.pr_models)]) (* TODO print also prover_answer? *)
 
 let convert_proof_attempt (pas: proof_attempt_status) =
   Record (match pas with
@@ -645,7 +648,7 @@ let parse_prover_result j =
     pr_output = pr_output;
     pr_time = pr_time;
     pr_steps = pr_steps;
-    pr_model = Model_parser.empty_model (* pr_model *)}
+    pr_models = [] (* pr_model *)}
     (* TODO pr_model is a string, should be model *)
 
 exception NotProofAttempt

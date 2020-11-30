@@ -40,7 +40,8 @@ cfgmodule:
 
 cfgdecl:
   | module_decl_parsing_only { Dmlw_decl $1 }
-  | LET CFG dl=with_list1(recdefn) { Dletcfg dl }
+  | LET CFG f=recdefn { Dletcfg f }
+  | LET REC CFG dl=with_list1(recdefn) { Dreccfg dl }
 ;
 
 recdefn:

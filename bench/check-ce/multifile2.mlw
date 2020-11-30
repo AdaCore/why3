@@ -1,0 +1,20 @@
+
+use multifile1.M
+
+use int.Int
+
+(* underspec *)
+let f (x: int)
+  ensures { result = x + 1 }
+= incr x
+
+(* wrong program w.r.t. postcondition *)
+let g (x: int)
+  ensures { result = x + 2 }
+= incr x
+
+(* this is currently not working because there is no result at line 17
+in the model *)
+let h (x: int)
+  ensures { result = x + 2 }
+= incr_val x

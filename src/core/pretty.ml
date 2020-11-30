@@ -90,7 +90,10 @@ module type Printer = sig
     val print_term : formatter -> term -> unit   (* term *)
 
     val print_attr : formatter -> attribute -> unit
+    val print_attrs : formatter -> Sattr.t -> unit
     val print_loc : formatter -> Loc.position -> unit
+    val print_loc' : formatter -> Loc.position -> unit
+    val print_json_loc : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit
     val print_meta_arg_type : formatter -> meta_arg_type -> unit
@@ -122,6 +125,9 @@ let debug_print_attrs = Debug.register_info_flag "print_attributes"
 
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
+
+let debug_print_types = Debug.register_info_flag "print_types"
+    ~desc:"Print@ types@ of@ terms"
 
 let debug_print_coercions = Debug.register_info_flag "print_coercions"
   ~desc:"Print@ coercions@ in@ logical@ formulas."
@@ -164,6 +170,19 @@ let print_attrs = print_iter1 Sattr.iter space print_attr
 let print_loc fmt l =
   let (f,l,b,e) = Loc.get l in
   fprintf fmt "#\"%s\" %d %d %d#" f l b e
+
+let print_loc' fmt l =
+  let (f,l,b,e) = Loc.get l in
+  fprintf fmt "%S, line %d, characters %d-%d" f l b e
+
+let print_json_loc fmt loc =
+  let open Json_base in
+  let f, l, b, e = Loc.get loc in
+  fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]@,}@]"
+    (print_json_field "filename" print_json) (String f)
+    (print_json_field "line" print_json) (Int l)
+    (print_json_field "start-char" print_json) (Int b)
+    (print_json_field "end-char" print_json) (Int e)
 
 let print_id_attrs fmt id =
   if Debug.test_flag debug_print_attrs &&
@@ -338,7 +357,12 @@ and print_lterm pri fmt t =
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
       (print_option print_loc) t.t_loc (print_tattr 0) t
     else print_tattr pri fmt t in
-  print_tloc pri fmt t
+  let print_types pri fmt t =
+    if Debug.test_flag debug_print_types && t.t_ty <> None
+    then fprintf fmt (protect_on (pri > 0) "(%a: %a)")
+        (print_tloc 0) t (print_option print_ty) t.t_ty
+    else print_tloc pri fmt t in
+  print_types pri fmt t
 
 and print_app pri ls fmt tl =
   if tl = [] then print_ls fmt ls else

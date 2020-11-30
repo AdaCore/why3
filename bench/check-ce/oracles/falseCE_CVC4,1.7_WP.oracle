@@ -1,0 +1,151 @@
+<check-ce>Check model 0 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<check-ce>Validating model:
+          File falseCE.mlw:
+            Line 12:
+              a = {"type": "Integer", "val": "-2"}
+              b = {"type": "Integer", "val": "-2"}
+            Line 15:
+              a = {"type": "Integer", "val": "0"}
+              b = {"type": "Integer", "val": "0"}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
+<check-ce>Result of checking model 0:
+            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File falseCE.mlw:
+                Line 12:
+                  a = (-2)
+                  b = (-2)
+                  Execution of main function rsa's body with env:
+                    a = (-2)
+                    b = (-2)
+                    zero = 0
+                    one = 1
+                Line 13:
+                  Execution got stuck, Precondition of rsa with:
+                    a = (-2)
+                    b = (-2)
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File falseCE.mlw:
+                Line 12:
+                  a = (-2)
+                  b = (-2)
+                  Execution of main function rsa's body with env:
+                    a = (-2)
+                    b = (-2)
+                    zero = 0
+                    one = 1
+                Line 13:
+                  Execution got stuck, Precondition of rsa with:
+                    a = (-2)
+                    b = (-2)
+<check-ce>Check model 1 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<check-ce>Validating model:
+          File falseCE.mlw:
+            Line 12:
+              a = {"type": "Integer", "val": "2"}
+              b = {"type": "Integer", "val": "2"}
+            Line 15:
+              a = {"type": "Integer", "val": "2"}
+              b = {"type": "Integer", "val": "2"}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
+<check-ce>Result of checking model 1:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File falseCE.mlw:
+                Line 12:
+                  a = 2
+                  b = 2
+                  Execution of main function rsa's body with env:
+                    a = 2
+                    b = 2
+                    zero = 0
+                    one = 1
+                  Execution of main function terminated normally
+            - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File falseCE.mlw:
+                Line 12:
+                  a = 2
+                  b = 2
+                  Execution of main function rsa's body with env:
+                    a = 2
+                    b = 2
+                    zero = 0
+                    one = 1
+                  Execution of main function terminated normally
+<check-ce>Check model 2 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<check-ce>Validating model:
+          File falseCE.mlw:
+            Line 12:
+              a = {"type": "Integer", "val": "2"}
+              b = {"type": "Integer", "val": "2"}
+            Line 15:
+              a = {"type": "Integer", "val": "2"}
+              b = {"type": "Integer", "val": "2"}
+<check-ce>Interpreting concretly
+<check-ce>Interpreting abstractly
+<check-ce>Result of checking model 2:
+            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File falseCE.mlw:
+                Line 12:
+                  a = 2
+                  b = 2
+                  Execution of main function rsa's body with env:
+                    a = 2
+                    b = 2
+                    zero = 0
+                    one = 1
+                  Execution of main function terminated normally
+            - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File falseCE.mlw:
+                Line 12:
+                  a = 2
+                  b = 2
+                  Execution of main function rsa's body with env:
+                    a = 2
+                    b = 2
+                    zero = 0
+                    one = 1
+                  Execution of main function terminated normally
+<check-ce>Models:
+- Checked model 0 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Checked model 1 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 2 (Concrete: bad model, Abstract: bad model)
+    Summary: Sorry, we don't have a good counterexample for you :(
+File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
+Goal Assertion from verification condition rsa'vc.
+Prover result is: unknown (unknown + incomplete) (0.08s, 15056 steps).
+Sorry, we don't have a good counterexample for you :(
+
+

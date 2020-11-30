@@ -410,8 +410,8 @@ let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =
-    call_on_buffer ~command ~limit ~gen_new_file
-                   ?inplace ~filename ~printer_mapping drv buf in
+    call_on_buffer ~command ~limit ~gen_new_file ?inplace
+      ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 

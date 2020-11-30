@@ -1,27 +1,27 @@
 CFG size: 17 nodes, 17 hyperedges
-Time elapsed 0.008625s
+Time elapsed 0.009156s
 ### Debug: inferred invariants ###
 (0 < x /\ contents k <= x) /\ 0 <= contents k
 ###
 CFG size: 17 nodes, 17 hyperedges
-Time elapsed 2.660925s
+Time elapsed 2.634018s
 ### Debug: inferred invariants ###
 ((0 = contents k1 /\ contents k1 = 0 \/ 0 < contents k1) /\ 0 <= contents k1) /\
 0 < x1
 ###
 CFG size: 35 nodes, 35 hyperedges
-Time elapsed 0.022252s
+Time elapsed 0.023992s
 ### Debug: inferred invariants ###
 ((2 <= x2 /\ contents k2 <= x2) /\ 0 <= contents k2) /\
 (2 * contents k2) = contents j
 ###
 CFG size: 35 nodes, 35 hyperedges
-Time elapsed 144.841948s
+Time elapsed 132.162689s
 ### Debug: inferred invariants ###
 contents k3 <= x3 /\ 2 <= x3
 ###
 CFG size: 35 nodes, 35 hyperedges
-Time elapsed 6.871813s
+Time elapsed 6.016813s
 ### Debug: inferred invariants ###
 (((((0 = contents k4 /\ 0 = contents j2) /\ contents k4 = 0) /\
    contents j2 = 0 \/ 0 < contents k4 /\ 2 <= contents j2) /\
@@ -29,8 +29,23 @@ Time elapsed 6.871813s
  0 <= contents k4) /\
 2 <= x4
 ###
-bench/infer/auto_ref_false.mlw Test b'vc: Unknown () (0.03s)
-bench/infer/auto_ref_false.mlw Test b3'vc: Unknown () (0.02s)
-bench/infer/auto_ref_false.mlw Test c'vc: Unknown () (0.31s)
-bench/infer/auto_ref_false.mlw Test c2'vc: Unknown () (0.04s)
-bench/infer/auto_ref_false.mlw Test c3'vc: Unknown () (0.06s)
+File bench/infer/auto_ref_false.mlw:
+Verification condition b'vc.
+Prover result is: unknown () (0.03s).
+
+File bench/infer/auto_ref_false.mlw:
+Verification condition b3'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/auto_ref_false.mlw:
+Verification condition c'vc.
+Prover result is: unknown () (0.25s).
+
+File bench/infer/auto_ref_false.mlw:
+Verification condition c2'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/auto_ref_false.mlw:
+Verification condition c3'vc.
+Prover result is: unknown () (0.04s).
+

@@ -2,7 +2,7 @@ CFG size: 69 nodes, 70 hyperedges
 Couldn't understand entirely the post condition:
 forall i1:int, i2:int.
  0 <= i1 /\ i1 <= i2 /\ i2 < length a -> (elts a @ i1) <= (elts a @ i2)
-Time elapsed 0.351980s
+Time elapsed 0.299043s
 ### Debug: inferred invariants ###
 ((((length a = (1 + contents u) /\ 0 = contents l) /\
    (length a - 1) = contents u) /\
@@ -20,7 +20,7 @@ CFG size: 69 nodes, 70 hyperedges
 Couldn't understand entirely the post condition:
 forall i11:int, i2:int.
  0 <= i11 /\ i11 <= i2 /\ i2 < length a1 -> (elts a1 @ i11) <= (elts a1 @ i2)
-Time elapsed 1.515371s
+Time elapsed 1.336411s
 ### Debug: inferred invariants ###
 (((contents l1 <= 0 /\ length a1 <= (1 + contents u1)) /\ contents l1 = 0 \/
   (((((((2 <= length a1 /\ 3 <= (length a1 + contents l1)) /\ 0 < contents l1) /\
@@ -54,11 +54,20 @@ Couldn't understand entirely the post condition:
 forall i11:int, i21:int.
  0 <= i11 /\ i11 <= i21 /\ i21 < length a2 ->
  (elts a2 @ i11) <= (elts a2 @ i21)
-Time elapsed 0.010692s
+Time elapsed 0.010433s
 ### Debug: inferred invariants ###
 (0 = contents l2 /\ contents l2 = 0 \/ 0 < contents l2 /\ 0 <= contents u2) /\
 0 <= contents l2
 ###
-bench/infer/binary_search2.mlw BinarySearchAnyMidPoint binary_search'vc: Timeout (1.00s)
-bench/infer/binary_search2.mlw BinarySearchAnyMidPoint binary_search2'vc: Valid (0.05s, 154 steps)
-bench/infer/binary_search2.mlw BinarySearchAnyMidPoint binary_search3'vc: Valid (0.03s, 102 steps)
+File bench/infer/binary_search2.mlw:
+Verification condition binary_search'vc.
+Prover result is: timeout (1.00s).
+
+File bench/infer/binary_search2.mlw:
+Verification condition binary_search2'vc.
+Prover result is: valid (0.04s, 154 steps).
+
+File bench/infer/binary_search2.mlw:
+Verification condition binary_search3'vc.
+Prover result is: valid (0.03s, 102 steps).
+

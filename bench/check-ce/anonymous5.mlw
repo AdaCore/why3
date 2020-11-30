@@ -1,0 +1,8 @@
+
+use int.Int
+
+let f (x: int) = (fun y z -> z + y + x)
+
+let g (y: int)
+  ensures { result > y }
+= f y y y

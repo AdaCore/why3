@@ -1,17 +1,17 @@
 CFG size: 17 nodes, 17 hyperedges
-Time elapsed 0.020617s
+Time elapsed 0.020471s
 ### Debug: inferred invariants ###
 (0 = contents k /\ contents k = 0 \/ 0 < contents k /\ contents k <= x) /\
 0 <= contents k
 ###
 CFG size: 17 nodes, 17 hyperedges
-Time elapsed 2.900953s
+Time elapsed 2.658197s
 ### Debug: inferred invariants ###
 (0 = contents k1 /\ contents k1 = 0 \/ 0 < x1 /\ 0 < contents k1) /\
 0 <= contents k1
 ###
 CFG size: 35 nodes, 35 hyperedges
-Time elapsed 0.055739s
+Time elapsed 0.050266s
 ### Debug: inferred invariants ###
 ((((0 = contents j /\ 0 = contents k2) /\ contents k2 = 0) /\ contents j = 0 \/
   0 < contents k2 /\ contents k2 <= x2) /\
@@ -19,12 +19,12 @@ Time elapsed 0.055739s
 (2 * contents k2) = contents j
 ###
 CFG size: 17 nodes, 17 hyperedges
-Time elapsed 0.001908s
+Time elapsed 0.001292s
 ### Debug: inferred invariants ###
 (x3 = contents k3 /\ 0 < x3) /\ x3 = contents k3
 ###
 CFG size: 17 nodes, 17 hyperedges
-Time elapsed 0.003150s
+Time elapsed 0.003158s
 ### Debug: inferred invariants ###
 ((((x4 = contents k4 /\ contents k4 <= x4) /\ 0 < contents k4) /\
   2 <= (x4 + contents k4)) /\
@@ -32,13 +32,31 @@ Time elapsed 0.003150s
 0 < x4
 ###
 CFG size: 17 nodes, 17 hyperedges
-Time elapsed 0.000802s
+Time elapsed 0.000425s
 ### Debug: inferred invariants ###
 (x5 = contents k5 /\ 0 < contents k5) /\ 0 < x5
 ###
-bench/infer/auto_ref3.mlw Test b'vc: Valid (0.01s, 10 steps)
-bench/infer/auto_ref3.mlw Test b3'vc: Valid (0.01s, 13 steps)
-bench/infer/auto_ref3.mlw Test c'vc: Valid (0.01s, 13 steps)
-bench/infer/auto_ref3.mlw Test e'vc: Unknown () (0.02s)
-bench/infer/auto_ref3.mlw Test e2'vc: Unknown () (0.00s)
-bench/infer/auto_ref3.mlw Test e3'vc: Unknown () (0.00s)
+File bench/infer/auto_ref3.mlw:
+Verification condition b'vc.
+Prover result is: valid (0.01s, 10 steps).
+
+File bench/infer/auto_ref3.mlw:
+Verification condition b3'vc.
+Prover result is: valid (0.01s, 13 steps).
+
+File bench/infer/auto_ref3.mlw:
+Verification condition c'vc.
+Prover result is: valid (0.01s, 13 steps).
+
+File bench/infer/auto_ref3.mlw:
+Verification condition e'vc.
+Prover result is: unknown () (0.00s).
+
+File bench/infer/auto_ref3.mlw:
+Verification condition e2'vc.
+Prover result is: unknown () (0.00s).
+
+File bench/infer/auto_ref3.mlw:
+Verification condition e3'vc.
+Prover result is: unknown () (0.02s).
+

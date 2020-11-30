@@ -1,10 +1,10 @@
 CFG size: 56 nodes, 56 hyperedges
-Time elapsed 0.058562s
+Time elapsed 0.065201s
 ### Debug: inferred invariants ###
 (0 <= contents i /\ contents i <= 10) /\ (2 * contents i) = contents j
 ###
 CFG size: 56 nodes, 56 hyperedges
-Time elapsed 15.187490s
+Time elapsed 16.017256s
 ### Debug: inferred invariants ###
 ((((((((((((contents i1 <= 0 /\ (contents i1 + contents j1) <= 0) /\
            contents j1 <= contents i1) /\
@@ -89,7 +89,7 @@ Time elapsed 15.187490s
 0 <= contents i1
 ###
 CFG size: 56 nodes, 56 hyperedges
-Time elapsed 10.124595s
+Time elapsed 7.287416s
 ### Debug: inferred invariants ###
 (((((0 = contents i2 /\ 0 = contents j2) /\ contents i2 = 0) /\
    contents j2 = 0 \/ 0 < contents i2 /\ 2 <= contents j2) /\
@@ -97,6 +97,15 @@ Time elapsed 10.124595s
  contents i2 <= 10) /\
 0 <= contents i2
 ###
-bench/infer/tuple1.mlw Tuple1 b'vc: Valid (0.00s, 12 steps)
-bench/infer/tuple1.mlw Tuple1 b2'vc: Valid (0.07s, 124 steps)
-bench/infer/tuple1.mlw Tuple1 b3'vc: Unknown () (0.05s)
+File bench/infer/tuple1.mlw:
+Verification condition b'vc.
+Prover result is: valid (0.01s, 12 steps).
+
+File bench/infer/tuple1.mlw:
+Verification condition b2'vc.
+Prover result is: valid (0.08s, 124 steps).
+
+File bench/infer/tuple1.mlw:
+Verification condition b3'vc.
+Prover result is: unknown () (0.06s).
+

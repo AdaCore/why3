@@ -65,7 +65,7 @@ let create_semi_constructor id s fdl pjl invl =
   let tvl = List.map ity_var s.its_ts.ts_args in
   let rgl = List.map ity_reg s.its_regions in
   let ity = ity_app s tvl rgl in
-  let res = create_vsymbol (id_fresh "result") (ty_of_ity ity) in
+  let res = create_vsymbol (result_id ()) (ty_of_ity ity) in
   let t = t_var res in
   let mk_q {pv_vs = v} p = t_equ (fs_app (ls_of_rs p) [t] v.vs_ty) (t_var v) in
   let q = create_post res (t_and_simp_l (List.map2 mk_q fdl pjl)) in
@@ -239,13 +239,6 @@ let get_syms node pure =
     | Eif (c,d,e) ->
         syms_expr (syms_expr (syms_eity syms c) d) e
     | Ematch (d,bl,xl) ->
-        (* Dexpr handles this, but not Expr, so we set a failsafe *)
-        let exhaustive = bl = [] ||
-          let v = create_vsymbol (id_fresh "x") (ty_of_ity d.e_ity) in
-          let pl = List.map (fun (p,_) -> [p.pp_pat]) bl in
-          Pattern.is_exhaustive [t_var v] pl in
-        if not exhaustive then
-          Loc.errorm ?loc:e.e_loc "Non-exhaustive pattern matching";
         let add_rbranch syms (p,e) =
           syms_pat (syms_expr syms e) p.pp_pat in
         let add_xbranch xs (vl,e) syms =
@@ -638,6 +631,76 @@ let known_add_decl kn0 d =
   let unk = Mid.set_diff d.pd_syms kn in
   if Sid.is_empty unk then kn else
     raise (UnknownIdent (Sid.choose unk))
+
+let check_match kn d =
+  let get_constructors ts =
+    match (Mid.find ts.ts_name kn).pd_node with
+    | PDtype dl ->
+        let rec get dl = match dl with
+          | d::_ when ts_equal ts d.itd_its.its_ts ->
+              List.map ls_of_rs d.itd_constructors
+          | _::dl -> get dl | [] -> assert false in
+        (try get dl with Invalid_argument _ -> [])
+    | PDlet _ | PDexn _ | PDpure -> assert false in
+  let check tl pl =
+    Pattern.check_compile ~get_constructors tl pl in
+  let rec check_term () t = match t.t_node with
+    | Tcase (t1,bl) ->
+        let pat b = let p,_ = t_open_branch b in [p] in
+        Loc.try2 ?loc:t.t_loc check [t1] (List.map pat bl);
+        t_fold check_term () t
+    | _ -> t_fold check_term () t in
+  let check_term t = check_term () t in
+  let check_tl tl = List.iter check_term tl in
+  let check_varl varl =
+    List.iter (fun (t,_) -> check_term t) varl in
+  let check_cty c =
+    check_tl c.cty_pre; check_tl c.cty_post;
+    Mxs.iter (fun _ ql -> check_tl ql) c.cty_xpost in
+  let rec check_expr e = match e.e_node with
+    | Evar _ | Econst _ | Eassign _ | Eabsurd -> ()
+    | Eghost e | Eraise (_,e) | Eexn (_,e) -> check_expr e
+    | Eassert (_,t) | Epure t -> check_term t
+    | Eexec (c,_) -> check_cexp c
+    | Elet (ld,e) -> check_let_defn ld; check_expr e
+    | Efor (_,_,_,invl,e) -> check_tl invl; check_expr e
+    | Ewhile (d,invl,varl,e) -> check_expr d; check_tl invl;
+                                check_varl varl; check_expr e
+    | Eif (c,d,e) -> check_expr c; check_expr d; check_expr e
+    | Ematch (d,[],xl) ->
+        check_expr d; Mxs.iter (fun _ (_,e) -> check_expr e) xl
+    | Ematch (d,bl,xl) ->
+        check_expr d;
+        let v = create_vsymbol (id_fresh "x") (ty_of_ity d.e_ity) in
+        let pl = List.map (fun (p,_) -> [p.pp_pat]) bl in
+        Loc.try2 ?loc:e.e_loc check [t_var v] pl;
+        List.iter (fun (_,e) -> check_expr e) bl;
+        Mxs.iter (fun _ (_,e) -> check_expr e) xl
+  and check_cexp c =
+    check_cty c.c_cty;
+    match c.c_node with
+    | Capp _ | Cpur _ | Cany -> ()
+    | Cfun e -> check_expr e
+  and check_let_defn = function
+    | LDvar (_,e) -> check_expr e
+    | LDsym (_,c) -> check_cexp c
+    | LDrec rdl ->
+        List.iter (fun rd ->
+          check_varl rd.rec_varl;
+          check_cexp rd.rec_fun) rdl
+  in
+  match d.pd_node with
+  | PDtype dl ->
+      List.iter (fun d ->
+        List.iter check_term d.itd_invariant;
+        List.iter check_expr d.itd_witness) dl
+  | PDlet ld -> check_let_defn ld
+  | PDexn _ | PDpure -> ()
+
+let known_add_decl kn d =
+  let kn = known_add_decl kn d in
+  check_match kn d;
+  kn
 
 (** {2 Records/algebraics handling} *)
 

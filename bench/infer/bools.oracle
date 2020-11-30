@@ -1,5 +1,5 @@
 CFG size: 44 nodes, 44 hyperedges
-Time elapsed 0.300280s
+Time elapsed 0.216798s
 ### Debug: inferred invariants ###
 (((((x = contents x1 /\ x <= 0) /\ contents y = True) /\ ref'mk x = x1) /\
   x = contents x1 \/
@@ -9,7 +9,7 @@ Time elapsed 0.300280s
 x <= contents x1
 ###
 CFG size: 44 nodes, 44 hyperedges
-Time elapsed 1.018642s
+Time elapsed 0.540180s
 ### Debug: inferred invariants ###
 ((((((contents x3 <= x2 /\ contents y1 = True) /\ ref'mk x2 = x3) /\
     x2 = contents x3 \/
@@ -20,10 +20,19 @@ Time elapsed 1.018642s
 x2 <= 0
 ###
 CFG size: 44 nodes, 44 hyperedges
-Time elapsed 0.013782s
+Time elapsed 0.009295s
 ### Debug: inferred invariants ###
 contents x5 <= 0 /\ x4 <= 0
 ###
-bench/infer/bools.mlw Example1 f'vc: Unknown () (0.02s)
-bench/infer/bools.mlw Example1 f2'vc: Unknown () (0.03s)
-bench/infer/bools.mlw Example1 f3'vc: Unknown () (0.02s)
+File bench/infer/bools.mlw:
+Verification condition f'vc.
+Prover result is: unknown () (0.04s).
+
+File bench/infer/bools.mlw:
+Verification condition f2'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/bools.mlw:
+Verification condition f3'vc.
+Prover result is: unknown () (0.00s).
+

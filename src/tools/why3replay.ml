@@ -100,7 +100,7 @@ let () =
       if Debug.test_flag debug then
         Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r)
 
-let print_result = Call_provers.print_prover_result ~json_model:false
+let print_result = Call_provers.print_prover_result ~json:false
 
 module S = Session_itp
 
@@ -170,8 +170,7 @@ let print_report ses (id,p,l,r) =
        | C.No_former_result new_res -> new_res
        | _ -> assert false
      in
-     printf "result is: %a -> Smoke detected!@."
-                 print_result res
+     printf "result is: %a -> Smoke detected!@." print_result res
 
 
 let same_result r1 r2 =
