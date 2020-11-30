@@ -401,10 +401,22 @@ let create_model_element_name name attrs : model_element_name =
 type model_file = model_element list Mint.t
 type model_files = model_file Mstr.t
 
-type model =
-  { model_files: model_files
-  ; vc_term_loc: Loc.position option
-  ; vc_term_attrs: Sattr.t }
+type model = {
+  model_files: model_files;
+  vc_term_loc: Loc.position option;
+  vc_term_attrs: Sattr.t;
+}
+
+let map_filter_model_elements f m =
+  let f_list elts =
+    match Lists.map_filter f elts with
+    | [] -> None | l -> Some l in
+  let f_files mf =
+    let mf = Mint.map_filter f_list mf in
+    if Mint.is_empty mf then None else Some mf in
+  let model_files = Mstr.map_filter f_files m.model_files in
+  {m with model_files}
+
 
 let empty_model_file = Mint.empty
 let empty_model_files = Mstr.empty

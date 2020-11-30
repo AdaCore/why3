@@ -11,7 +11,6 @@
 
 open Wstdlib
 open Printer
-open Model_parser
 open Smtv2_model_defs
 
 let debug_cntex = Debug.register_flag "cntex_collection"
