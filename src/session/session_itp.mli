@@ -115,6 +115,8 @@ val get_proof_expl : session -> proofNodeID -> string
 val get_proof_parent : session -> proofNodeID -> proof_parent
 val get_trans_parent : session -> transID -> proofNodeID
 
+val find_th : session -> proofNodeID -> theory
+
 val get_any_parent: session -> any -> any option
 
 (* Answers true if a node is in a detached subtree *)

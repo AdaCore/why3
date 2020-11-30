@@ -1,0 +1,20 @@
+
+
+use int.Int
+use ref.Ref
+
+let g1 (y: int)
+  requires { y > 0 }
+  ensures { !result >= y }
+= ref y
+
+let f1 (x : int)
+  requires { x > 0 }
+= let z = g1 x in
+  assert { !z = x }
+
+let g2 (y: int) = ref (y + 1)
+
+let f2 (x: int) =
+  let z = g2 x in
+  assert { !z = x }

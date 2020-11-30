@@ -12,6 +12,7 @@
 open Ident
 
 exception Unsupported = Printer.Unsupported
+
 let current_decl_name = ref ""
 
 module C = struct
@@ -348,7 +349,10 @@ module C = struct
     | [], Sexpr e -> e
     | [], Sif(c,t,e) ->
        Equestion (c, simplify_expr([],t), simplify_expr([],e))
-    | _ -> raise (Invalid_argument "simplify_expr")
+    | _ ->
+       (* FIXME : use a dedicated exception here.
+          See also the capture of [Invalid_argument] below *)
+       raise (Invalid_argument "simplify_expr")
 
   let rec simplify_cond (cd, cs) =
     match cd,elim_empty_blocks(elim_nop cs) with
@@ -1165,7 +1169,7 @@ module MLToC = struct
          | [] -> C.([], expr_or_return env Enothing);
          | [e] -> expr info env e
          | _ ->
-            let id_struct = id_register (id_fresh "result") in
+            let id_struct = id_register (result_id ()) in
             let e_struct = C.Evar id_struct in
             let d_struct =
               C.(Ddecl(Tstruct
@@ -1191,7 +1195,10 @@ module MLToC = struct
                  try
                    acc,
                    (simplify_expr (d,s), pty)
-                 with Invalid_argument _ ->
+                 with
+                 (* FIXME: use a dedicated exception instead.
+                    see also [simplify_expr]. *)
+                 Invalid_argument "simplify_expr" ->
                    let s', e' = get_last_expr s in
                    (accd@d, Sseq(accs, s')), (e', pty))
                ([], Snop)

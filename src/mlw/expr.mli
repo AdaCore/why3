@@ -208,6 +208,14 @@ val e_var : pvsymbol -> expr
 val e_const : Constant.constant -> ity -> expr
 val e_nat_const : int -> expr
 
+val mk_proxy_decl : ghost:bool -> expr -> let_defn * pvsymbol
+(** [mk_proxy_decl ~ghost e] returns a pair [(ld,v)] providing a fresh
+   variable [v] that can be used as a substitute for expression
+   [e]. [ld] is the corresponding let-definition. The fresh variable
+   is marked as proxy except when [e] is a function call. In the
+   latter case its name is chosen appropriately to match the
+   post-condition.  *)
+
 val e_exec : cexp -> expr
 
 val e_app : rsymbol -> expr list -> ity list -> ity -> expr
@@ -298,4 +306,5 @@ val e_func_app_l : expr -> expr list -> expr
 val forget_rs  : rsymbol -> unit (* flush id_unique for a program symbol *)
 val print_rs   : Format.formatter -> rsymbol -> unit  (* program symbol *)
 val print_expr : Format.formatter -> expr -> unit     (* expression *)
+val print_cexp : bool -> int -> Format.formatter -> cexp -> unit
 val print_let_defn : Format.formatter -> let_defn -> unit

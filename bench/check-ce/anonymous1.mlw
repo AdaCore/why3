@@ -1,0 +1,19 @@
+
+use int.Int
+
+let f (x: int) =
+  let w = (fun y -> y + 2) x in
+  assert {w = x + 1}
+
+(*
+  Why3 intermediate form
+
+  let f (x:int) : () =
+    let w =
+      let h (y:int) : int
+        ensures  { result = (y + 2) } =
+        let o = 2 in
+        y + o in
+      h x in
+    assert { w = (x + 1) }
+*)

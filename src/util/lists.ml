@@ -111,6 +111,11 @@ let first_nth f l =
       | Some r -> n,r in
   aux f 0 l
 
+let rec drop_while p = function
+  | [] -> []
+  | a::l when p a -> drop_while p l
+  | l -> l
+
 let iteri f l =
   let rec iter i = function
     | [] -> ()

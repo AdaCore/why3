@@ -1,9 +1,12 @@
 Strongest Postcondition
-bench/ce/record_map.mlw M map_record_proj_test1'vc: Unknown (sat)
-Counter-example model:
+File "bench/ce/record_map.mlw", line 42, characters 12-22:
+Goal Postcondition from verification condition map_record_proj_test1'vc.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File record_map.mlw:
   Line 41:
-    map_rec, [[@introduced], [@model_projected]] =
+    map_rec [@introduced] [@model_projected] =
       {"type": "Array",
        "val":
         [{"indice": {"type": "Boolean", "val": true},
@@ -22,7 +25,7 @@ File record_map.mlw:
                  "value": {"type": "Integer", "val": "0"}},
                 {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
   Line 42:
-    map_rec, [[@introduced], [@model_projected], [@model_trace:map_rec]] =
+    map_rec [@introduced] [@model_projected] [@model_trace:map_rec] =
       {"type": "Array",
        "val":
         [{"indice": {"type": "Boolean", "val": true},
@@ -41,11 +44,14 @@ File record_map.mlw:
                  "value": {"type": "Integer", "val": "0"}},
                 {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
 
-bench/ce/record_map.mlw M record_map_proj_test2'vc: Unknown (sat)
-Counter-example model:
+File "bench/ce/record_map.mlw", line 47, characters 12-22:
+Goal Postcondition from verification condition record_map_proj_test2'vc.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File record_map.mlw:
   Line 46:
-    rec_map, [[@introduced], [@model_projected]] =
+    rec_map [@introduced] [@model_projected] =
       {"type": "Record",
        "val":
         {"Field":
@@ -58,7 +64,7 @@ File record_map.mlw:
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 47:
-    rec_map, [[@introduced], [@model_projected], [@model_trace:rec_map]] =
+    rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
       {"type": "Record",
        "val":
         {"Field":
@@ -71,11 +77,14 @@ File record_map.mlw:
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
 
-bench/ce/record_map.mlw M record_map_proj_test3'vc: Unknown (sat)
-Counter-example model:
+File "bench/ce/record_map.mlw", line 54, characters 12-31:
+Goal Postcondition from verification condition record_map_proj_test3'vc.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File record_map.mlw:
   Line 51:
-    re_rec_map, [[@introduced], [@model_projected]] =
+    re_rec_map [@introduced] [@model_projected] =
       {"type": "Record",
        "val":
         {"Field":
@@ -85,7 +94,7 @@ File record_map.mlw:
               "val": [{"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": true}}]}}
   Line 53:
-    rec_map, [[@introduced], [@model_projected]] =
+    rec_map [@introduced] [@model_projected] =
       {"type": "Record",
        "val":
         {"Field":
@@ -95,8 +104,7 @@ File record_map.mlw:
               "val": [{"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 54:
-    re_rec_map, [[@introduced], [@model_projected],
-      [@model_trace:re_rec_map]] =
+    re_rec_map [@introduced] [@model_projected] [@model_trace:re_rec_map] =
       {"type": "Record",
        "val":
         {"Field":
@@ -105,7 +113,7 @@ File record_map.mlw:
              {"type": "Array",
               "val": [{"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": true}}]}}
-    rec_map, [[@introduced], [@model_projected], [@model_trace:rec_map]] =
+    rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
       {"type": "Record",
        "val":
         {"Field":

@@ -4,8 +4,8 @@ module M1
   
   let f [@infer] (x : ref int)
     requires { Int.( <= ) (Refint.( ! ) x) 100 }
-    ensures { (Refint.( ! ) x) = 100 } =
-    while Int.( < ) (Refint.( ! ) x) 100 do
+    ensures { (Refint.( ! ) x) = 100 }
+  = while Int.( < ) (Refint.( ! ) x) 100 do
       variant { Int.( - ) 100 (Refint.( ! ) x) }
       Refint.incr x
     done
@@ -237,4 +237,4 @@ Task 1: theory Task
                else x1 = 100)
 end
 
-On task 1, alt-ergo answers Unknown () (0.0xs)
+On task 1, alt-ergo answers Prover result is: unknown () (0.0xs).

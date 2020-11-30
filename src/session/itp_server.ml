@@ -924,7 +924,7 @@ end
     | Goal_loc
     | Color_loc of Itp_communication.color
 
-  let create_ce_tab ~print_attrs s res any list_loc goal_loc =
+  let create_ce_tab ~print_attrs s model any list_loc goal_loc =
     let f = get_encapsulating_file s any in
     let file_format = Session_itp.file_format f in
     let filename = Session_itp.system_path s f in
@@ -937,7 +937,7 @@ end
       | None          -> list_loc in
     let (source_result, list_loc) =
       Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
-      ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:filename
+        ?me_name_trans:None model ~rel_filename:filename
       ~source_code:source_code ~locations:list_loc
     in
     let goal_loc, list_loc = List.partition (fun (_, y) -> y = Goal_loc) list_loc in
@@ -1000,33 +1000,40 @@ end
           let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
           (* Display the result of the prover *)
           begin
-            match pa.proof_state with
-            | Some res ->
-                let result =
-                  Pp.string_of Call_provers.print_prover_answer
-                    res.Call_provers.pr_answer
-                in
-                let ce_result =
-                  Pp.string_of (Model_parser.print_model_human ~print_attrs ?me_name_trans:None)
-                  res.Call_provers.pr_model
-                in
-                if ce_result = "" then
-                  let result_pr =
-                    result ^ "\n\n" ^ "The prover did not return counterexamples."
-                  in
-                  P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc, lang))
-                else
-                  begin
-                    let result_pr =
-                      result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
-                    in
-                    let (source_result, list_loc, goal_loc, file_format) =
-                      create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc old_goal_loc
-                    in
-                    P.notify (Source_and_ce (source_result, list_loc, goal_loc, file_format));
-                    P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc, lang))
-                  end
-            | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc, lang))
+match pa.proof_state with
+| Some res ->
+   begin
+     let open Call_provers in
+     let result = Pp.string_of print_prover_answer res.pr_answer in
+     let cont = d.cont in
+     let selected_model =
+       let th = Session_itp.find_th cont.controller_session parid in
+       let pm = Pmodule.restore_module (Theory.restore_theory (theory_name th)) in
+       let env = cont.controller_env in
+       let reduce_config =
+         let trans = "compute_in_goal" and prover = None in
+         Pinterp.rac_reduce_config_lit cont.controller_config env ~trans ?prover () in
+       let sel =
+         Counterexample.select_model ~check:true
+           ~reduce_config env pm res.pr_models in
+       match sel with None -> Model_parser.empty_model | Some (m,_) -> m in
+     let ce_result =
+       Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs ?me_name_trans:None)
+         selected_model in
+     if ce_result = "" then
+       let result_pr =
+         result ^ "\n\n" ^ "The prover did not return counterexamples." in
+       P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc, lang))
+     else
+       let result_pr =
+         result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result in
+       let (source_result, list_loc, goal_loc, file_format) =
+         create_ce_tab cont.controller_session ~print_attrs
+           selected_model any old_list_loc old_goal_loc in
+       (P.notify (Source_and_ce (source_result, list_loc, goal_loc, file_format));
+       P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc, lang)))
+   end
+| None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc, lang))
           end
       | AFile f ->
           let file_loc =

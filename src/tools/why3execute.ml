@@ -11,42 +11,56 @@
 
 open Format
 open Why3
-open Wstdlib
+open Pmodule
 
 let usage_msg = sprintf
-  "Usage: %s [options] <file> <module>.<ident>...\n\
-   Run the interpreter on the given module symbols.\n"
+  "Usage: %s [options] <file> <expr>\n\
+   Execute the expression in the given file (and --use the necessary modules).\n"
   (Filename.basename Sys.argv.(0))
 
 let opt_file = ref None
-let opt_exec = Queue.create ()
+let opt_exec = ref ""
 
 let add_opt x =
-  if !opt_file = None then opt_file := Some x else
-  match Strings.split '.' x with
-  | [m;i] -> Queue.push (m,i) opt_exec
-  | _ ->
-    Format.eprintf "extra arguments must be of the form 'module.ident'@.";
-    exit 1
+  if !opt_file = None then opt_file := Some x else opt_exec := x
+  (* match Strings.split '.' x with
+   * | [m;i] -> Queue.push (m,i) opt_exec
+   * | _ ->
+   *   Format.eprintf "extra arguments must be of the form 'module.ident'@.";
+   *   exit 1 *)
 
 (* Used for real numbers approximation *)
-let real_prec = ref 0
-let real_emin = ref 0
-let real_emax = ref 0
-
-let precision () =
-  (!real_emin, !real_emax, !real_prec)
+let prec = ref None
 
 let opt_parser = ref None
+
+let opt_enable_rac = ref false
+let opt_rac_prover = ref None
+let opt_rac_fail_cannot_check = ref false
+
+let use_modules = ref []
 
 let option_list =
   let open Getopt in
   [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
     "<format> select input format (default: \"why\")";
     KLong "real", Hnd1 (APair (',', AInt, APair (',', AInt, AInt)),
-      fun (i1, (i2, i3)) -> real_emin := i1; real_emax := i2; real_prec := i3),
+      fun (i1, (i2, i3)) -> prec := Some (i1, i2, i3)),
     "<emin>,<emax>,<prec> set format used for real computations\n\
-     (e.g., -148,128,24 for float32)"
+     (e.g., -148,128,24 for float32)";
+    KLong "rac", Hnd0 (fun () -> opt_enable_rac := true),
+    " enable runtime assertion checking (RAC)";
+    KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
+    "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
+    "with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
+    KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_fail_cannot_check := true),
+    " Fail when a assertion cannot be checked";
+    KLong "dispatch", Hnd1 (APair ('/', APair ('.', AString, AString),
+    APair ('.', AString, AString)), fun _arg -> eprintf "Dispatch currently not supported"; exit 1),
+    ("<f.M>/<g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\
+      provide an implementation for a module with abstract types or values)");
+    KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
+    "<qualified_module> use module in the execution";
   ]
 
 let config, _, env =
@@ -55,45 +69,66 @@ let config, _, env =
 let () =
   if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
 
+let find_module env file q =
+  match List.rev q with
+  | [] -> assert false
+  | [nm] ->
+     (try Wstdlib.Mstr.find nm file with Not_found -> read_module env [] nm)
+  | nm :: p -> read_module env (List.rev p) nm
+
 let do_input f =
   let format = !opt_parser in
   let mm = match f with
     | "-" ->
-        Env.read_channel Pmodule.mlw_language ?format env "stdin" stdin
+        Env.read_channel mlw_language ?format env "stdin" stdin
     | file ->
         let (mlw_files, _) =
-          Env.read_file Pmodule.mlw_language ?format env file in
+          Env.read_file mlw_language ?format env file in
         mlw_files
   in
-  let do_exec (mid,name) =
-    let m = try Mstr.find mid mm with Not_found ->
-      eprintf "Module '%s' not found.@." mid;
-      exit 1 in
-    let rs =
-      try Pmodule.ns_find_rs m.Pmodule.mod_export [name]
-      with Not_found ->
-        eprintf "Function '%s' not found in module '%s'.@." name mid;
-        exit 1 in
-(*
-    match Pdecl.find_definition m.Pmodule.mod_known rs with
-    | None ->
-      eprintf "Function '%s.%s' has no definition.@." mid name;
-      exit 1
-    | Some d ->
-*)
-      try
-        let real_param = precision () in
-        let res =
-          if real_param <> (0, 0, 0) then
-            Pinterp.eval_global_symbol ~real_param env m
-          else
-            Pinterp.eval_global_symbol env m in
-        printf "@[<hov 2>Execution of %s.%s ():@\n%a" mid name
-          res rs
-      with e when Debug.test_noflag Debug.stack_trace ->
-        printf "@\n@]@.";
-        raise e in
-  Queue.iter do_exec opt_exec
+  let muc = create_module env (Ident.id_fresh "") in
+
+  (* add modules passed in the --use argument to the muc *)
+  let add_module muc m =
+    let qualid = String.split_on_char '.' m in
+    let qualid_last = List.hd (List.rev qualid) in
+    let muc = open_scope muc qualid_last in
+    let m = find_module env mm qualid in
+    let muc = use_export muc m in
+    close_scope muc ~import:true in
+  let muc = List.fold_left add_module muc (List.rev !use_modules) in
+
+  (* parse and type check command line expression *)
+  let lb = Lexing.from_string !opt_exec in
+  Loc.set_file "command line expression to execute" lb;
+  let prog_parsed = Lexer.parse_expr lb in
+  let expr = Typing.type_expr_in_muc muc prog_parsed in
+
+  (* execute expression *)
+  let open Pinterp in
+  Opt.iter init_real !prec;
+  try
+    let rac =
+      let reduce =
+        let trans = "compute_in_goal" and prover = !opt_rac_prover in
+        rac_reduce_config_lit config env ~trans ?prover () in
+      let skip_cannot_compute = not !opt_rac_fail_cannot_check in
+      rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute ~reduce () in
+    let res = eval_global_fundef rac env
+        muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
+    printf "%a@." (report_eval_result expr) res;
+    exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
+  with | Contr (ctx, term) ->
+          Pretty.forget_all ();
+          printf "%a@." report_cntr_body (ctx, term) ;
+          exit 1
+       | CannotCompute reason ->
+          printf "RAC terminated because %s@." reason.reason
+       | Failure msg ->
+          printf "failure: %s@." msg
+       | RACStuck (_, l) ->
+          printf "RAC, with the counterexample model cannot continue after %a@."
+            (Pp.print_option Pretty.print_loc') l
 
 let () =
   try

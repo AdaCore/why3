@@ -50,9 +50,7 @@ let pv_is_unit v = ity_equal v.pv_ity ity_unit
 
 let pv_of_ity s ity = create_pvsymbol (id_fresh s) ity
 
-let res_of_post ity = function
-  | q::_ -> create_pvsymbol (clone_post_result q) ity
-  | _ -> pv_of_ity "result" ity
+let res_of_post ity ql = create_pvsymbol (result_id ~ql ()) ity
 
 let res_of_cty cty = res_of_post cty.cty_result cty.cty_post
 
