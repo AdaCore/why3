@@ -240,11 +240,12 @@ let translate_reccfg ds =
   Drec translated_fundefs
 
 (* mk_expr ~loc:id.id_loc *)
-let translate_decl d acc =
+let rec translate_decl d acc =
   match d with
   | Dmlw_decl d -> d :: acc
   | Dletcfg d -> (translate_letcfg d)::acc
   | Dreccfg l -> translate_reccfg l :: acc
+  | Cfg_ast.Dscope (l, b, i, ds) -> Ptree.Dscope (l, b, i, List.fold_right translate_decl ds []) :: acc
 
 let translate (m,dl) =
   (m,List.fold_right translate_decl dl [])

@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Input Formats
+  * the MLCFG front end now supports recursive CFG functions and scope declarations.
+
 Tools
   * command-line options now follow the getopt standard;
     in particular, long options start with `--`
