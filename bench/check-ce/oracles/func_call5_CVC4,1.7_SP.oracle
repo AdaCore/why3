@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Goal Postcondition from verification condition g1'vc.
-Prover result is: valid (0.05s, 1216 steps).
+Prover result is: valid (0.04s, 899 steps).
 
 File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
 Goal Precondition from verification condition f1'vc.
-Prover result is: valid (0.02s, 1094 steps).
+Prover result is: valid (0.03s, 1094 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Validating model:
@@ -35,7 +35,9 @@ Prover result is: valid (0.02s, 1094 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: (-1)
 <check-ce>Interpreting abstractly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: (-1)
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 12, characters 13-18)
               File int.mlw:
@@ -98,7 +100,9 @@ Prover result is: valid (0.02s, 1094 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <check-ce>Interpreting abstractly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -174,7 +178,9 @@ Prover result is: valid (0.02s, 1094 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <check-ce>Interpreting abstractly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -230,7 +236,7 @@ Prover result is: valid (0.02s, 1094 steps).
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
 Goal Assertion from verification condition f1'vc.
-Prover result is: unknown (unknown + incomplete) (0.06s, 6679 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6212 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -242,7 +248,9 @@ Sorry, we don't have a good counterexample for you :(
             Line 20:
               x = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <check-ce>Interpreting abstractly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -302,7 +310,9 @@ Sorry, we don't have a good counterexample for you :(
             Line 20:
               x = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <check-ce>Interpreting abstractly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -362,7 +372,9 @@ Sorry, we don't have a good counterexample for you :(
             Line 20:
               x = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <check-ce>Interpreting abstractly
+<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -423,7 +435,7 @@ Sorry, we don't have a good counterexample for you :(
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
 Goal Assertion from verification condition f2'vc.
-Prover result is: unknown (unknown + incomplete) (0.04s, 6423 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 5935 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
