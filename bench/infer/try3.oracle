@@ -1,6 +1,18 @@
+CFG size: 44 nodes, 44 hyperedges
+Time elapsed 0.022385s
 ### Debug: inferred invariants ###
-(0 = 0 /\ 0 <= contents i) /\ contents i <= 10
+0 <= contents i /\ contents i <= 10
 ###
+CFG size: 44 nodes, 44 hyperedges
+Time elapsed 0.096545s
 ### Debug: inferred invariants ###
 contents i1 <= 10 /\ 0 <= contents i1
 ###
+File bench/infer/try3.mlw:
+Verification condition b'vc.
+Prover result is: valid (0.01s, 10 steps).
+
+File bench/infer/try3.mlw:
+Verification condition b2'vc.
+Prover result is: valid (0.01s, 10 steps).
+

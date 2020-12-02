@@ -158,6 +158,28 @@ let mlw_file = Modules [ mod_M1 ]
 
 let () = Format.printf "%a@." Mlw_printer.pp_mlw_file mlw_file
 
+(*BEGIN{inv_hook}*)
+let print_to_std invs =
+  let print_inv fmt (_,t) = Pretty.print_term fmt t in
+  Format.printf "The following invariants were generated:@\n%a@."
+    (Pp.print_list Pp.newline2 print_inv) invs
+
+let print_to_file invs =
+  let print_inv fmt (_,t) = Pretty.print_term fmt t in
+  let fmt = Format.formatter_of_out_channel (open_out "inferred_invs.out") in
+  Format.fprintf fmt "Generated invariants:@\n%a@."
+    (Pp.print_list Pp.newline2 print_inv) invs
+
+let inv_terms = ref []
+
+let save_invs invs =
+  inv_terms := List.map snd invs
+
+let () =
+  Infer_loop.register_hook (fun i ->
+      print_to_std i; print_to_file i; save_invs i)
+(*END{inv_hook}*)
+
 let mods =
   try
     Typing.type_mlw_file env [] "myfile.mlw" mlw_file
@@ -231,6 +253,6 @@ let () =
    in the why3 root directory *)
 (*
 Local Variables:
-compile-command: "ocamlfind ocamlopt -linkpkg -package why3 mlw_tree1.ml"
+compile-command: "ocamlfind ocamlopt -linkpkg -package why3 mlw_tree_infer_invs.ml"
 End:
 *)

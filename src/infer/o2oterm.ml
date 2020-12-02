@@ -1,11 +1,16 @@
 open Term
 
+module Mterm =
+  (val (mterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
+
 module Make(S:sig type t end) = struct
 
   module TMap = Map.Make(struct
     type      t = S.t
     let compare = compare
   end)
+
+  module Mterm = Mterm
 
   type t = {
     to_term : term TMap.t;

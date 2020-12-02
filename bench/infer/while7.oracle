@@ -1,21 +1,35 @@
+CFG size: 33 nodes, 34 hyperedges
+Time elapsed 0.031673s
 ### Debug: inferred invariants ###
-(((((102 = contents i /\ 102 = contents i) /\ 102 = contents i) /\ 1 = 1 \/
-   contents i <= 99) /\
-  0 = 0) /\
+((102 = contents i /\ 102 = contents i \/ contents i <= 99) /\
  0 <= contents i) /\
 contents i <= 102
 ###
+CFG size: 33 nodes, 34 hyperedges
+Time elapsed 0.097892s
 ### Debug: inferred invariants ###
 ((102 <= contents i1 /\ 102 = contents i1 \/ contents i1 <= 99) /\
  contents i1 <= 102) /\
 0 <= contents i1
 ###
+CFG size: 33 nodes, 34 hyperedges
+Time elapsed 3.934302s
 ### Debug: inferred invariants ###
-(((0 = contents i2 /\ contents i2 = 0 \/
-   (2 <= contents i2 /\ contents i2 <= 99) /\ 1 = 1 \/
-   (1 = contents i2 /\ 1 = contents i2) /\ 1 = contents i2 \/
-   ((102 = contents i2 /\ 1 = 1) /\ 102 = contents i2) /\ 102 = contents i2) /\
-  0 = 0) /\
+((0 = contents i2 /\ contents i2 = 0 \/
+  0 < contents i2 /\ contents i2 <= 99 \/
+  102 = contents i2 /\ 102 = contents i2) /\
  contents i2 <= 102) /\
 0 <= contents i2
 ###
+File bench/infer/while7.mlw:
+Verification condition b'vc.
+Prover result is: valid (0.01s, 10 steps).
+
+File bench/infer/while7.mlw:
+Verification condition b2'vc.
+Prover result is: valid (0.02s, 10 steps).
+
+File bench/infer/while7.mlw:
+Verification condition b3'vc.
+Prover result is: valid (0.02s, 17 steps).
+

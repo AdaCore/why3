@@ -1,11 +1,20 @@
+CFG size: 14 nodes, 14 hyperedges
+Time elapsed 0.031699s
 ### Debug: inferred invariants ###
-((0 = contents i /\ contents i = 0 \/ 0 < contents i /\ contents i <= x) /\
- 0 = 0) /\
+(0 = contents i /\ contents i = 0 \/ 0 < contents i /\ contents i <= x) /\
 0 <= contents i
 ###
+CFG size: 14 nodes, 14 hyperedges
+Time elapsed 3.467742s
 ### Debug: inferred invariants ###
-((0 = contents i1 /\ contents i1 = 0 \/
-  0 < x1 /\ 1 = contents i1 \/ 2 <= x1 /\ 2 <= contents i1) /\
- 0 = 0) /\
+(0 = contents i1 /\ contents i1 = 0 \/ 0 < x1 /\ 0 < contents i1) /\
 0 <= contents i1
 ###
+File bench/infer/incr.mlw:
+Verification condition incr1'vc.
+Prover result is: valid (0.02s, 20 steps).
+
+File bench/infer/incr.mlw:
+Verification condition incr3'vc.
+Prover result is: timeout (1.00s).
+

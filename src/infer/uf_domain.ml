@@ -37,9 +37,9 @@ module Make(S:sig
     mutable apron_mapping: Var.t Mterm.t;
     mutable region_mapping: (Ity.pvsymbol * term) list Ity.Mreg.t;
     mutable region_var: vsymbol list Ity.Mreg.t;
-    mutable env: Environment.t;
+    mutable env: Apron.Environment.t;
 
-    mutable defined_terms: unit Mterm.t;
+    mutable defined_terms: unit Mterm.t; (* TODO can I be removed? *)
 
     (* UF_QF *)
     mutable class_to_term: TermToClass.t;
@@ -76,10 +76,13 @@ module Make(S:sig
 
   let create_manager () =
     let var_pool = build_var_pool npool in
-    let vars = Array.of_list (VarPool.elements var_pool @ tmp_pool) in
+    let vars = Array.of_list (VarPool.elements var_pool
+                              @ tmp_pool) in
+    let variable_mapping = Hashtbl.create 512 in
+    let apron_mapping = Mterm.empty in
     let uf_man = {
-        variable_mapping = Hashtbl.create 512;
-        apron_mapping = Mterm.empty;
+        variable_mapping;
+        apron_mapping;
         region_mapping = Ity.Mreg.empty;
         region_var = Ity.Mreg.empty;
         env = Environment.make vars [||];
@@ -97,7 +100,34 @@ module Make(S:sig
     Dom.bottom man uf_man.env, empty_uf_domain
 
   let top (man, uf_man) _ =
-    Dom.top man uf_man.env, empty_uf_domain
+
+    let vt,vf = Var.of_string "true", Var.of_string "false" in
+    uf_man.env <- Environment.add uf_man.env [|vt;vf|] [||];
+    Hashtbl.add uf_man.variable_mapping vt t_bool_true;
+    Hashtbl.add uf_man.variable_mapping vf t_bool_false;
+    uf_man.apron_mapping <-
+      Mterm.(add t_bool_true vt
+               (add t_bool_false vf uf_man.apron_mapping));
+
+    let dom = Dom.top man uf_man.env in
+
+    let vt = Mterm.find t_bool_true uf_man.apron_mapping in
+    let expr1 = Linexpr1.make uf_man.env in
+    Linexpr1.set_coeff expr1 vt (Coeff.s_of_int 1);
+    Linexpr1.set_cst expr1 (Coeff.s_of_int (-1));
+    let lincons1 = Lincons1.make expr1 Lincons1.EQ in
+
+    let vf = Mterm.find t_bool_false uf_man.apron_mapping in
+    let expr2 = Linexpr1.make uf_man.env in
+    Linexpr1.set_coeff expr2 vf (Coeff.s_of_int 1);
+    let lincons2 = Lincons1.make expr2 Lincons1.EQ in
+
+    let lincons_array = Lincons1.array_make uf_man.env 2 in
+    Lincons1.array_set lincons_array 0 lincons1;
+    Lincons1.array_set lincons_array 1 lincons2;
+    let dom = Dom.meet_lincons_array man dom lincons_array in
+
+    dom, empty_uf_domain
 
   let canonicalize (man, _) (a, _) =
     Dom.canonicalize man a
@@ -116,22 +146,23 @@ module Make(S:sig
    *   Union_find.get_class tcl uf |> List.map (TermToClass.to_term uf_man.class_to_term) *)
 
   let apply_equal (man, uf_man) (dom,uf_t) tl =
-    List.fold_left (fun (dom, var) t ->
-        try match var with
-          | None -> dom, Some (TermToVar.to_t uf_t.uf_to_var t)
-          | Some var ->
-            let expr = Linexpr1.make uf_man.env in
-            let var' = TermToVar.to_t uf_t.uf_to_var t in
-            Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
-            Linexpr1.set_coeff expr var' (Coeff.s_of_int 1);
-            let lincons = Lincons1.make expr Lincons1.EQ in
-            let lincons_array = Lincons1.array_make uf_man.env 1 in
-            Lincons1.array_set lincons_array 0 lincons;
-            let d = Dom.meet_lincons_array man dom lincons_array in
-            d, Some var
-        with Not_found -> dom, var
-      ) (dom, None) tl
-    |> fst
+    match tl with
+    | [] | [_] -> dom,uf_t
+    | t :: tl ->
+       try
+       let var = TermToVar.to_t uf_t.uf_to_var t in
+       List.fold_left (fun dom t ->
+           let expr = Linexpr1.make uf_man.env in
+           let var' = TermToVar.to_t uf_t.uf_to_var t in
+           Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
+           Linexpr1.set_coeff expr var' (Coeff.s_of_int 1);
+           let lincons = Lincons1.make expr Lincons1.EQ in
+           let lincons_array = Lincons1.array_make uf_man.env 1 in
+           Lincons1.array_set lincons_array 0 lincons;
+           let dom = Dom.meet_lincons_array man dom lincons_array in
+           dom
+         ) dom tl, uf_t
+       with Not_found -> dom,uf_t
 
   exception Constant
 
@@ -141,8 +172,10 @@ module Make(S:sig
 
  (* let engine = Reduction_engine0.create {compute_defs = true; compute_builtin = true; compute_def_set = Sls.empty; } env known_logical_ident*)
 
-  (* we assume that there will be no overflow (oops) *)
+  (* simplifies constants in a term *)
   let rec eval_term t =
+    (* we assume that there will be no overflow (oops)
+       TODO: keep bigints and keep operations in case of overflow *)
     let t = t (* Reduction_engine0.normalize ~limit:50 engine  t*) in
     if Ty.ty_equal (t_type t) Ty.ty_int then
       let rec eval_num t =
@@ -150,36 +183,42 @@ module Make(S:sig
         match t.t_node with
         | Tvar _ -> Some t, 0
         | Tconst (Constant.ConstInt n) ->
-          (None, BigInt.to_int n.il_int)
-        | Tapp (func, args) when ls_equal func ad_int ->
-          List.fold_left (fun (acc_a, acc_b) arg ->
-              let a, b = eval_num arg in
-              match a, acc_a with
-              | None, None -> None, acc_b + b
-              | Some t, Some v ->
-                 Some (t_app ad_int [v; t] (Some Ty.ty_int)), acc_b + b
-              | Some t, None | None, Some t -> Some t, acc_b + b
-            ) (None, 0) args
-        | Tapp (func, [a;b]) when ls_equal func min_int ->
-          let ta, ca = eval_num a in
-          let tb, cb = eval_num b in
-          begin
-            match ta, tb with
-            | None, None -> None, ca - cb
-            | Some t, Some v -> Some (t_app_infer min_int [t; v]), ca - cb
-            | Some t, None -> Some t, ca - cb
-            | None, Some t -> Some (t_app_infer min_u_int [t]), ca - cb
-          end
-        | Tapp (func, [a]) when ls_equal func min_u_int ->
-          let ta, ca = eval_num a in
-          begin
-            match ta with
-            | None -> None, - ca
-            | Some a -> Some (t_app min_u_int [a] (Some Ty.ty_int)), - ca
-          end
-        | Tapp (func, args) ->
-          let t = t_app func (List.map eval_term args) (Some (t_type t)) in
-          Some t, 0
+           (None, BigInt.to_int n.il_int)
+        | Tapp (ls, tl) when ls_equal ls ad_int ->
+           List.fold_left (fun (acc_t, acc_cons) t ->
+               let t, cons = eval_num t in
+               match t, acc_t with
+               | None, None -> None, acc_cons + cons
+               | Some t, Some v ->
+                  Some (t_app ad_int [v; t] (Some Ty.ty_int)),
+                  acc_cons + cons
+               | Some t, None | None, Some t ->
+                  Some t, acc_cons + cons
+             ) (None, 0) tl
+        | Tapp (ls, [t1;t2]) when ls_equal ls min_int ->
+           let t1, cons1 = eval_num t1 in
+           let t2, cons2 = eval_num t2 in
+           begin
+             match t1, t2 with
+             | None, None -> None, cons1 - cons2
+             | Some t, Some v ->
+                Some (t_app_infer min_int [t; v]), cons1 - cons2
+             | Some t, None -> Some t, cons1 - cons2
+             | None, Some t ->
+                Some (t_app_infer min_u_int [t]), cons1 - cons2
+           end
+        | Tapp (ls, [t]) when ls_equal ls min_u_int ->
+           let t, cons = eval_num t in
+           begin
+             match t with
+             | None -> None, - cons
+             | Some t ->
+                Some (t_app min_u_int [t] (Some Ty.ty_int)),
+                - cons
+           end
+        | Tapp (ls, tl) ->
+           let t = t_app ls (List.map eval_term tl) (Some (t_type t)) in
+           Some t, 0
         | _ -> Some t, 0 in
       match eval_num t with
       | Some t, 0 -> t
@@ -187,54 +226,52 @@ module Make(S:sig
       | None, _ -> raise Constant
     else t_map eval_term t
 
+  (* t3[t2/t1] *)
   let rec replaceby t1 t2 t3 =
     if t_equal t3 t1 then t2
     else t_map (replaceby t1 t2) t3
 
   let do_eq (man, uf_man) t1 t2 =
-    if not (Ty.ty_equal (t_type t1) Ity.ty_unit) then
-      fun (d, ud) ->
-        let cla = get_class_for_term uf_man t1 in
-        let clb = get_class_for_term uf_man t2 in
-        let ud = { ud with classes = Union_find.union cla clb ud.classes; } in
-        let all_values = Union_find.flat ud.classes in
-        let all_terms =
-          List.map (fun cl ->
-              TermToClass.to_term uf_man.class_to_term cl, ()) all_values
-        in
-        let all_values = all_terms
-                         |> Mterm.of_list in
-        let all_terms = all_terms |> List.map fst in
-        Mterm.fold (fun v () (d, ud) ->
-            (* This is far from perfect. If there is a function f, then terms `f a` and `f b` will be marked as equal.
-             * But if there is g: 'a -> 'b -> 'c, then `g a b` and `g b a` can not be marked as such. (As the replacement is global.)
-             * However, it is unclear wether it is or it is not a limitation. *)
-            let v' = replaceby t1 t2 v in
-            let v'' = replaceby t2 t1 v in
-            let v' = try eval_term v' with Constant -> v in
-            let v'' = try eval_term v'' with Constant -> v in
-            let v' = if List.exists (t_equal v') all_terms then v'
-                     else v in
-            let v'' = if List.exists (t_equal v'') all_terms then v''
-                      else v in
-            if t_equal v v' && t_equal v v'' then d, ud
-            else
-              begin
-                let cl  = get_class_for_term uf_man v
-                and cl' = get_class_for_term uf_man v'
-                and cl'' = get_class_for_term uf_man v'' in
-                let cl_cl' = Union_find.union cl cl' ud.classes in
-                let ud = { ud with classes = Union_find.union cl cl'' cl_cl' } in
-                let d =
-                  if Ty.ty_equal (t_type v) Ty.ty_int then
-                    Union_find.get_class cl ud.classes
-                    |> List.map (TermToClass.to_term uf_man.class_to_term)
-                    |> apply_equal (man, uf_man) (d,ud)
-                  else d
-                in d, ud
-              end
-          ) all_values (d, ud)
-    else fun_id
+    if Ty.ty_equal (t_type t1) Ity.ty_unit then fun_id else
+      fun (dom, uf_t) ->
+        let cl1 = get_class_for_term uf_man t1 in
+        let cl2 = get_class_for_term uf_man t2 in
+        let uf_t = { uf_t with
+          classes = Union_find.union cl1 cl2 uf_t.classes } in
+        let all_values = Union_find.flat uf_t.classes in
+        let all_terms = List.map (TermToClass.to_term
+                          uf_man.class_to_term) all_values in
+        List.fold_left (fun (dom, uf_t) t ->
+            (* This is far from perfect. If there is a function f,
+               then terms `f a` and `f b` will be marked as equal.
+             * But if there is g: 'a -> 'b -> 'c, then `g a b` and `g
+               b a` can not be marked as such. (As the replacement is
+               global.)
+             * However, it is unclear wether it is or it is not a
+               limitation. *)
+            let t12 = try eval_term (replaceby t1 t2 t)
+                      with Constant -> t in
+            let t21 = try eval_term (replaceby t2 t1 t)
+                      with Constant -> t in
+
+            let t12 = if List.exists (t_equal t12) all_terms
+                      then t12 else t in
+            let t21 = if List.exists (t_equal t21) all_terms
+                      then t21 else t in
+            if t_equal t t12 && t_equal t t21 then dom, uf_t else
+              let cl   = get_class_for_term uf_man t
+              and cl12 = get_class_for_term uf_man t12
+              and cl21 = get_class_for_term uf_man t21 in
+              let cl_cl12 = Union_find.union cl cl12 uf_t.classes in
+              let uf_t = { uf_t with
+                classes = Union_find.union cl cl21 cl_cl12 } in
+              if Ty.ty_equal (t_type t) Ty.ty_int then begin
+                let classes = Union_find.get_class cl uf_t.classes in
+                let tl = List.map (
+                  TermToClass.to_term uf_man.class_to_term) classes in
+                apply_equal (man, uf_man) (dom,uf_t) tl end
+              else dom,uf_t
+          ) (dom, uf_t) all_terms
 
   (* probably not clever enough, will not work with a complex CFG with exceptions etc *)
   let print fmt (a, _) = Dom.print fmt a
@@ -312,7 +349,7 @@ module Make(S:sig
 
   (* Why3 terms and APRON variables must be kept consistent. So. First
      there is the case where two different terms are linked to the
-     same APRON variable. One on them must be erased. *)
+     same APRON variable. One of them must be erased. *)
   (* And this takes care of one term linked to 2 variables. (They are
      made equal, and then forgotten.) *)
   let join (man, uf_man) (dom_t1, uf_t1) (dom_t2, uf_t2) =
@@ -432,16 +469,18 @@ module Make(S:sig
 
   let rec extract_term (man, uf_man) is_in (dom_t, uf_t) v =
     let find_var v =
-      try let candidate = Hashtbl.find uf_man.variable_mapping v in
-          if is_in candidate then raise Not_found else candidate
-      with Not_found ->
-        try TermToVar.to_term uf_t.uf_to_var v
+      let t =
+        try let candidate = Hashtbl.find uf_man.variable_mapping v in
+            if is_in candidate then raise Not_found else candidate
         with Not_found ->
-          raise (Bad_domain (Dom.forget_array man dom_t [|v|] false)) in
+          try TermToVar.to_term uf_t.uf_to_var v with Not_found ->
+            raise (Bad_domain (Dom.forget_array man dom_t [|v|] false)) in
+      if Ty.ty_equal (t_type t) Ty.ty_bool then raise Not_found else t
+    in
     match Dom.get_linexpr man dom_t v with
     | Some x -> begin
         try let t = varlist_to_term find_var x in
-            assert (Ty.ty_equal (t_type t) Ty.ty_int); Some t
+            (* assert (Ty.ty_equal (t_type t) Ty.ty_int); *) Some t
         with Bad_domain dom_t ->
           extract_term (man, uf_man) is_in (dom_t, uf_t) v
       end
@@ -449,16 +488,39 @@ module Make(S:sig
 
   let to_term (man, uf_man) (dom_t, uf_t) =
     let find_var v =
-      try Hashtbl.find uf_man.variable_mapping v with Not_found ->
-        try TermToVar.to_term uf_t.uf_to_var v with Not_found ->
-          Format.eprintf "Couldn't find variable %a@." Var.print v;
-          raise Not_found in
+      let t =
+        try Hashtbl.find uf_man.variable_mapping v with Not_found ->
+          try TermToVar.to_term uf_t.uf_to_var v with Not_found ->
+            Format.eprintf "Couldn't find variable %a@." Var.print v;
+            raise Not_found in
+      if Ty.ty_equal (t_type t) Ty.ty_bool then raise Not_found else t
+    in
     let t = Dom.to_term S.Infer_why3.env
       (S.Infer_why3.th_known, S.Infer_why3.mod_known) man dom_t find_var in
+    let mix_int_bool ty1 ty2 =
+      Ty.((ty_equal ty_bool ty1 && ty_equal ty_int ty2) ||
+        (ty_equal ty_int ty1 && ty_equal ty_bool ty2)) in
     Union_find.fold_class (fun t uf1 uf2 ->
         let t1 = TermToClass.to_term uf_man.class_to_term uf1 in
         let t2 = TermToClass.to_term uf_man.class_to_term uf2 in
-        t_and t (t_equ t1 t2)) t uf_t.classes
+        match t1.t_ty, t2.t_ty with
+        | Some ty1, Some ty2 when mix_int_bool ty1 ty2 -> t
+        | _ -> t_and t (t_equ t1 t2)) t uf_t.classes
+
+  let try_mk_eq (man, uf_man) t1 t2 (dom,uf_t) =
+    try
+      let v1 = try Mterm.find t1 uf_man.apron_mapping with Not_found ->
+          TermToVar.to_t uf_t.uf_to_var t1 in
+      let v2 = try Mterm.find t2 uf_man.apron_mapping with Not_found ->
+                 TermToVar.to_t uf_t.uf_to_var t2 in
+      let expr = Linexpr1.make uf_man.env in
+      Linexpr1.set_coeff expr v1 (Coeff.s_of_int (-1));
+      Linexpr1.set_coeff expr v2 (Coeff.s_of_int 1);
+      let lincons = Lincons1.make expr Lincons1.EQ in
+      let lincons_array = Lincons1.array_make uf_man.env 1 in
+      Lincons1.array_set lincons_array 0 lincons;
+      Dom.meet_lincons_array man dom lincons_array, uf_t
+    with Not_found -> dom,uf_t
 
 
   (* Get a set of (apron) linear expressions from a constraint stated
@@ -577,13 +639,14 @@ module Make(S:sig
                Lincons1.array_set arr 0 cons;
                Dom.meet_lincons_array man dom arr, !ruf)
           | Tapp (ls, [t1;t2]) when ls_equal ps_equ ls ->
+            let f_eq = try_mk_eq (man,uf_man) t1 t2 in
             let f_uf = do_eq (man, uf_man) t1 t2 in
             let subv_1 = get_subvalues t1 None in
             let subv_2 = get_subvalues t2 None in
             List.fold_left (fun acc_f ((t1, _), (t2, _)) ->
                 let f_eq = abstract (t_app ps_equ [t1; t2] None) in
                 (fun abs -> acc_f (f_eq abs)))
-              f_uf (List.combine subv_1 subv_2)
+              (fun d -> f_eq (f_uf d)) (List.combine subv_1 subv_2)
           | Tif (t1, t2, t3) ->
             let f1 = abstract t1 in
             let f1_not = abstract (t_push_negation (t_not t1)) in
@@ -643,7 +706,8 @@ module Make(S:sig
         List.iter (fun (t2, _) ->
           let v = Var.of_string (name_var t t2) in
           ensure_variable uf_man v t2;
-          uf_man.apron_mapping <- Mterm.add t2 v uf_man.apron_mapping) subv
+          uf_man.apron_mapping <- Mterm.add t2 v uf_man.apron_mapping
+        ) subv
 
   let cached_vreturn = ref (Ty.Mty.empty)
 
@@ -717,6 +781,7 @@ module Make(S:sig
        Format.eprintf "Variable of type %a could not be added properly: %a@."
          print_ity pv.pv_ity print_term pv_t
 
+  (* t1 in t2 ?*)
   let is_in t1 t2 =
     let found = ref false in
     let rec is_in t =
@@ -727,18 +792,32 @@ module Make(S:sig
 
   let rec tdepth t = 1 + t_fold (fun i t -> max (tdepth t) i) 0 t
 
+  let adjust_term t ty =
+    if Ty.(ty_equal ty ty_bool) then
+      match t.t_node with
+      | Tconst (Constant.ConstInt n)
+           when BigInt.to_int n.il_int = 1 -> t_bool_true
+      | Tconst (Constant.ConstInt n)
+           when BigInt.to_int n.il_int = 0 -> t_bool_false
+      | _ -> assert false
+    else t
+
   let rec forget_term (man, uf_man) t =
     let forget_fun (dom_t, uf_t) =
       let dom_t, uf_t =
+        (* do t = t', where t' is the value of t in dom_t *)
         try
           let var = Mterm.find t uf_man.apron_mapping in
           let dom_t, uf_t =
             match extract_term (man, uf_man) (is_in t) (dom_t, uf_t) var with
-            | Some t2 -> do_eq (man, uf_man) t t2 (dom_t, uf_t)
+            | Some t2 ->
+               let t2 = adjust_term t2 (t_type t) in
+               do_eq (man, uf_man) t t2 (dom_t, uf_t)
             | None -> dom_t, uf_t in
           Dom.forget_array man dom_t [|var|] false, uf_t
         with Not_found -> dom_t, uf_t in
       let (dom_t, uf_t), alt =
+        (* t = t', where t' is the value of t in uf_t *)
         try
           let t_class = get_class_for_term uf_man t in
           let classes = Union_find.get_class t_class uf_t.classes in
@@ -748,15 +827,15 @@ module Make(S:sig
           do_eq (man, uf_man) term t (dom_t, uf_t), Some term
         with Not_found -> (dom_t, uf_t), None in
       let all_values = Union_find.flat uf_t.classes in
-      let all_values = List.map (fun c ->
+      let class2term = List.map (fun c ->
           c, TermToClass.to_term uf_man.class_to_term c) all_values in
-      let all_values =
+      let class2term =
           (get_class_for_term uf_man t, t) ::
-          List.filter (fun (_, a) ->
-              is_in t a && not (t_equal t a) ) all_values in
+          List.filter (fun (_, t1) ->
+              is_in t t1 && not (t_equal t t1) ) class2term in
       let int_values, other_values =
         List.partition (fun (_, t) ->
-            Ty.ty_equal (t_type t) Ty.ty_int) all_values in
+            Ty.ty_equal (t_type t) Ty.ty_int) class2term in
       let uf_t = List.fold_left (fun uf_t (cl, _) ->
         let classes = snd (Union_find.forget cl uf_t.classes) in
         { uf_t with classes} ) uf_t other_values in

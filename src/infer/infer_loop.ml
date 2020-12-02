@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Ident
-open Term
 open Ity
 open Expr
 
@@ -34,36 +33,43 @@ type domain = Polyhedra | Box | Oct
 let def_domain = Polyhedra
 let def_wid = 3
 
-type ('context,'cfg,'control_points,'domain) ai_ops = {
-    empty_context     : unit -> 'context;
-    start_cfg         : unit -> 'cfg;
-    put_expr_in_cfg   :
-      'cfg -> 'context -> ?ret:vsymbol option -> expr -> 'control_points;
-    put_expr_with_pre :
-      'cfg -> 'context -> expr -> term list -> 'control_points;
-    eval_fixpoints    : 'cfg -> 'context -> (expr * 'domain) list;
-    domain_to_term    : 'cfg -> 'context -> 'domain -> term;
-    add_variable      : 'context -> pvsymbol -> unit;
-}
+let apply_to_inv = ref (fun _ -> ())
 
-let ai_ops a b c d e f g =
-  {empty_context     = a; start_cfg      = b; put_expr_in_cfg = c;
-   put_expr_with_pre = d; eval_fixpoints = e; domain_to_term  = f;
-   add_variable      = g}
+let select_domain_module ?(dom=def_domain) ?(wid=def_wid) env tkn mkn
+    : (module Infer_cfg.INFERCFG) =
+  let module Infer_why3 =
+    Infer_why3.Make(struct
+        let       env = env
+        let  th_known = tkn
+        let mod_known = mkn
+      end) in
+  let module Infer =
+    Infer_cfg.Make (struct
+        module Infer_why3 = Infer_why3
+        let      widening = wid
+      end) in
+  match dom with
+  | Polyhedra -> (module (Infer(Domain.Polyhedra)))
+  | Box -> (module (Infer(Domain.Box)))
+  | Oct -> (module (Infer(Domain.Oct)))
 
-let infer_with_ops ai_ops e cty =
-  let cfg = ai_ops.start_cfg () in
-  let context = ai_ops.empty_context () in
-  List.iter (ai_ops.add_variable context) cty.cty_args;
-  Mpv.iter (fun pv _ -> ai_ops.add_variable context pv) cty.cty_effect.eff_reads;
-  ignore (ai_ops.put_expr_with_pre cfg context e cty.cty_pre);
-  let fixp = ai_ops.eval_fixpoints cfg context in
+let infer_loops ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
+  let module Infer = (val (select_domain_module ~dom ~wid env tkn mkn)) in
+  let cfg = Infer.start_cfg () in
+  let context = Infer.empty_context () in
+  List.iter (Infer.add_variable context) cty.cty_args;
+  Mpv.iter (fun pv _ -> Infer.add_variable context pv) cty.cty_effect.eff_reads;
+  ignore (Infer.put_expr_with_pre cfg context e cty.cty_pre);
+  let (n,h) = Infer.cfg_size cfg in
+  Format.eprintf "CFG size: %d nodes, %d hyperedges@." n h;
+  let fixp = Infer.eval_fixpoints cfg context in
   let domain2term (e,d) =
     let expl = "infer:inferred with apron" in
-    let t    = ai_ops.domain_to_term cfg context d in
+    let t    = Infer.domain_to_term cfg context d in
     let t    = Term.t_attr_add (Ident.create_attribute expl) t in
     (e,t) in
   let invs = List.map domain2term fixp in
+  !apply_to_inv invs;
   if Debug.test_flag print_inferred_invs then begin
       Format.printf "### Debug: inferred invariants ###@\n";
       let print_i (_,t) = Format.printf "%a@\n" Pretty.print_term t in
@@ -71,38 +77,6 @@ let infer_with_ops ai_ops e cty =
       Format.printf "###@."
     end;
   invs
-
-let infer_loops_for_dom ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
-  let module Infer_why3 = Infer_why3.Make(struct
-    let       env = env
-    let  th_known = tkn
-    let mod_known = mkn
-  end) in
-  let module Infer = Infer_cfg.Make (struct
-       module Infer_why3 = Infer_why3
-       let     widening = wid end) in
-  match dom with
-  | Polyhedra ->
-     let module Infer = Infer(Domain.Polyhedra) in
-     let ai_ops =
-       ai_ops Infer.empty_context Infer.start_cfg Infer.put_expr_in_cfg
-         Infer.put_expr_with_pre Infer.eval_fixpoints
-         Infer.domain_to_term Infer.add_variable in
-     infer_with_ops ai_ops e cty
-  | Box ->
-     let module Infer = Infer(Domain.Box) in
-     let ai_ops =
-       ai_ops Infer.empty_context Infer.start_cfg Infer.put_expr_in_cfg
-         Infer.put_expr_with_pre Infer.eval_fixpoints
-         Infer.domain_to_term Infer.add_variable in
-     infer_with_ops ai_ops e cty
-  | Oct ->
-     let module Infer = Infer(Domain.Oct) in
-     let ai_ops =
-       ai_ops Infer.empty_context Infer.start_cfg Infer.put_expr_in_cfg
-         Infer.put_expr_with_pre Infer.eval_fixpoints
-         Infer.domain_to_term Infer.add_variable in
-     infer_with_ops ai_ops e cty
 
 exception Parse_error
 
@@ -135,9 +109,11 @@ let infer_loops attrs env tkn mkn e cty =
         Warning.emit ?loc:e.e_loc
           "invalid@ infer@ attribute@ (using@ default@ values)";
         def_domain, def_wid in
-    infer_loops_for_dom ~dom ~wid env tkn mkn e cty
+    infer_loops ~dom ~wid env tkn mkn e cty
   else if Debug.test_flag infer_flag then
-    infer_loops_for_dom env tkn mkn e cty
+    infer_loops env tkn mkn e cty
   else []
+
+let register_hook f = apply_to_inv := f
 
 let () = Vc.set_infer_invs infer_loops

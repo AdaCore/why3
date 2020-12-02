@@ -695,13 +695,13 @@ while loop and an attribute that triggers the inference of loop
 invariants during VC generation. For more information about the
 inference of loop invariants refer to :numref:`sec.installinferloop`
 and :numref:`sec.runwithinferloop`. The examples shown below are
-available in the file :file:`examples/use_api/mlw_tree1.ml`.
+available in the file :file:`examples/use_api/mlw_tree_infer_invs.ml`.
 
 We build an environment and define the some helper functions exactly
 as in :numref:`sec.build_untyped`. Additionally we create two other
 helper functions as follows:
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{helper2}
    :end-before: END{helper2}
@@ -712,30 +712,48 @@ trigger the inference of loop invariants during VC generation (make
 sure that the why3 library was compiled with support for `infer-loop`,
 see :numref:`sec.installinferloop` for more information).
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{source1}
    :end-before: END{source1}
 
 The OCaml code that builds such a module is shown below.
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{code1}
    :end-before: END{code1}
 
-The debugging flags mentioned in :numref:`sec.runwithinferloop` can be
-enabled using the API as follows (the line(s) corresponding to the
-desired flag(s) should be uncommented).
+Optionally, the debugging flags mentioned in
+:numref:`sec.runwithinferloop` can be enabled by using the API as
+follows (the line(s) corresponding to the desired flag(s) should be
+uncommented).
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{flags}
    :end-before: END{flags}
 
+Another option is to register a function to be executed immediately
+after the invariants are inferred. The function should have type
+``(expr * term) list -> unit``, where ``expr`` corresponds to a while
+loop and ``term`` to the respective inferred invariant. The function
+can be registered using the function ``Infer_loop.register_hook``.
+
+In the following example a sequence of three functions are
+registered. The first function will write the invariants to the
+standard output, the second to a file named `inferred_invs.out`, and
+the third will save the inferred invariants in ``inv_terms``.
+
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
+   :language: ocaml
+   :start-after: BEGIN{inv_hook}
+   :end-before: END{inv_hook}
+
 Finally the code for closing the modules, printing it to the standard
 output, typing it, and so on is exactly the same as in the previous
-section, thus we omit it in here.
+section, thus we omit it in here. Note that in practice, the
+invariants are only inferred when invoking ``Typing.type_mlw_file``.
 
 .. _sec.build_typed:
 

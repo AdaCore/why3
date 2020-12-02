@@ -1,0 +1,24 @@
+
+
+use ref.Ref
+use int.Int
+
+val random_bool () : bool
+
+val andb (x:bool) (y:bool) : bool
+  ensures { result = True <-> x = True /\ y = True }
+
+let f [@infer] () : bool
+ diverges
+ =
+    let x = ref True in
+    let y = ref True in
+    let z = ref True in
+    let a = ref True in
+    while !z do
+      x := random_bool ();
+      y := random_bool ();
+      z := andb !x !y;
+      a := !z;
+    done;
+    !a

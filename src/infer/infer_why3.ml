@@ -113,6 +113,8 @@ module Make(S: sig
   let rec t_push_negation ?way:(way=false) t =
     let is_int t = Ty.ty_equal (t_type t) Ty.ty_int in
     match t.t_node with
+    | Ttrue -> if way then t_false else t_true
+    | Tfalse -> if way then t_true else t_false
     | Tbinop (Tand, t1, t2) ->
       if way then
         t_or_simp (t_push_negation ~way t1) (t_push_negation ~way t2)
@@ -142,9 +144,11 @@ module Make(S: sig
       t_app ps_equ [b;t_bool_false] None
     | Tapp (l, [b;a]) when ls_equal l ps_equ && way && t_equal t_bool_true a ->
       t_app ps_equ [b;t_bool_false] None
-    | Tapp (l, [a;b]) when ls_equal l ps_equ && way && t_equal t_bool_false a ->
+    | Tapp (l, [a;b]) when ls_equal l ps_equ && way &&
+                             t_equal t_bool_false a ->
       t_app ps_equ [b;t_bool_true] None
-    | Tapp (l, [b;a]) when ls_equal l ps_equ && way && t_equal t_bool_false a ->
+    | Tapp (l, [b;a]) when ls_equal l ps_equ && way &&
+                             t_equal t_bool_false a ->
       t_app ps_equ [b;t_bool_true] None
     | _ -> if way then t_not t else t
 

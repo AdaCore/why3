@@ -1805,13 +1805,13 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.$(SHAREDBEST) plugins $(TOOLS) \
 APITESTS=logic transform clone mlw_tree mlw_expr create_session counterexample
 
 ifeq (@enable_infer@,yes)
-APITESTS += mlw_tree1
+	APITESTS += mlw_tree_infer_invs
 endif
-
 
 bench-api: $(addprefix test-api-, $(APITESTS))
 
 clean::
+	rm -rf bench/infer/*.out
 	rm -rf bench/check-ce/*.out
 
 ###############

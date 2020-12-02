@@ -9,6 +9,8 @@
 
 has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
+has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
+
 shopt -s nullglob
 
 suffix=
@@ -665,4 +667,9 @@ fi
 if enabled mlwprinter; then
 echo "=== Checking mlw_printer ==="
 test_mlw_printer
+fi
+
+if test -n "$has_infer"; then
+    echo "=== Checking loop invariant inference ==="
+    bench/infer-bench bench/infer
 fi
