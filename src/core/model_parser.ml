@@ -401,10 +401,22 @@ let create_model_element_name name attrs : model_element_name =
 type model_file = model_element list Mint.t
 type model_files = model_file Mstr.t
 
-type model =
-  { model_files: model_files
-  ; vc_term_loc: Loc.position option
-  ; vc_term_attrs: Sattr.t }
+type model = {
+  model_files: model_files;
+  vc_term_loc: Loc.position option;
+  vc_term_attrs: Sattr.t;
+}
+
+let map_filter_model_elements f m =
+  let f_list elts =
+    match Lists.map_filter f elts with
+    | [] -> None | l -> Some l in
+  let f_files mf =
+    let mf = Mint.map_filter f_list mf in
+    if Mint.is_empty mf then None else Some mf in
+  let model_files = Mstr.map_filter f_files m.model_files in
+  {m with model_files}
+
 
 let empty_model_file = Mint.empty
 let empty_model_files = Mstr.empty
@@ -1008,6 +1020,61 @@ let model_for_positions_and_decls model ~positions =
   let model_filtered =
     Mstr.fold add_first_model_line model.model_files model_filtered in
   {model with model_files= model_filtered}
+
+let opt_bind_any os f =
+  f (Lists.map_filter (fun x -> x) os)
+
+let opt_bind_all os f =
+  if List.for_all Opt.inhabited os then
+    f (List.map Opt.get os)
+  else None
+
+class clean = object (self)
+  method model m =
+    map_filter_model_elements self#element m
+  method element me =
+    if me.me_name.men_kind = Error_message then
+      (* Keep unparsed values for error messages *)
+      Some me
+    else
+      Opt.bind (self#value me.me_value) @@ fun me_value ->
+      Some {me with me_value}
+  method value v = match v with
+    | Unparsed s    -> self#unparsed s | String v      -> self#string v
+    | Integer v     -> self#integer v  | Decimal v     -> self#decimal v
+    | Fraction v    -> self#fraction v | Float v       -> self#float v
+    | Boolean v     -> self#boolean v  | Bitvector v   -> self#bitvector v
+    | Proj (p, v)   -> self#proj p v   | Apply (s, vs) -> self#apply s vs
+    | Array a       -> self#array a    | Record fs     -> self#record fs
+  method unparsed _ = None
+  method string v = Some (String v)
+  method integer v = Some (Integer v)
+  method decimal v = Some (Decimal v)
+  method fraction v = Some (Fraction v)
+  method float v = Some (Float v)
+  method boolean v = Some (Boolean v)
+  method bitvector v = Some (Bitvector v)
+  method proj p v =
+    Opt.bind (self#value v) @@ fun v ->
+    Some (Proj (p, v))
+  method apply s vs =
+    opt_bind_all (List.map self#value vs) @@ fun vs ->
+    Some (Apply (s, vs))
+  method array a =
+    let clean_arr_index ix =
+      Opt.bind (self#value ix.arr_index_key) @@ fun key ->
+      Opt.bind (self#value ix.arr_index_value) @@ fun value ->
+      Some {arr_index_key= key; arr_index_value= value} in
+    Opt.bind (self#value a.arr_others) @@ fun others ->
+    opt_bind_any (List.map clean_arr_index a.arr_indices) @@ fun indices ->
+    Some (Array {arr_others= others; arr_indices= indices})
+  method record fs =
+    let clean_field (f, v) =
+      Opt.bind (self#value v) @@ fun v ->
+      Some (f, v) in
+    opt_bind_all (List.map clean_field fs) @@ fun fs ->
+    Some (Record fs)
+end
 
 (*
 ***************************************************************

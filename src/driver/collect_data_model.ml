@@ -11,7 +11,6 @@
 
 open Wstdlib
 open Printer
-open Model_parser
 open Smtv2_model_defs
 
 let debug_cntex = Debug.register_flag "cntex_collection"
@@ -53,10 +52,8 @@ let default_apply_to_record (list_records: (string list) Mstr.t)
     (noarg_constructors: string list) (t: term) =
 
   let rec array_apply_to_record = function
-    | Avar _v -> raise No_value
-    | Aconst x ->
-        let x = apply_to_record x in
-        Aconst x
+    | Avar _ as a -> a
+    | Aconst x -> Aconst (apply_to_record x)
     | Astore (a, t1, t2) ->
         let a = array_apply_to_record a in
         let t1 = apply_to_record t1 in
@@ -348,7 +345,6 @@ and bind_prover_vars_tree table tr pv_table = match tr with
    record. *)
 
 let rec model_value lf pv_table = function
-  | Sval (Unparsed _) -> raise No_value
   | Sval v -> v
   | Apply (s, ts) -> Model_parser.Apply (s, List.map (model_value lf pv_table) ts)
   | Array a -> Model_parser.Array (model_array lf pv_table a)
