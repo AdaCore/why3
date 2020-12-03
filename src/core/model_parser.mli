@@ -37,6 +37,7 @@ type model_value =
   | Record of model_record
   | Proj of model_proj
   | Apply of string * model_value list
+  | Undefined
   | Unparsed of string
 
 and arr_index = {arr_index_key: model_value; arr_index_value: model_value}
@@ -310,6 +311,7 @@ class clean : object
   method apply : string -> model_value list -> model_value option
   method array : model_array -> model_value option
   method record : model_record -> model_value option
+  method undefined : model_value option
 end
 
 (*

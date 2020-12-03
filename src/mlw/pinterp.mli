@@ -36,6 +36,7 @@ val bool_value : bool -> value
 val proj_value : ity -> lsymbol -> value -> value
 val constr_value : ity -> rsymbol -> value list -> value
 val purefun_value : result_ity:ity -> arg_ity:ity -> value Mv.t -> value -> value
+val undefined_value : ity -> value
 
 val default_value_of_type : Env.env -> Pdecl.known_map -> ity -> value
 

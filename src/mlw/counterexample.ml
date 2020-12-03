@@ -288,6 +288,7 @@ let rec import_model_value known th_known ity v =
           let mv = Mv.of_list (List.combine keys values) in
           let v0 = import_model_value known th_known value_ity a.arr_others in
           purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
+      | Undefined -> undefined_value ity
       | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
           kasprintf failwith "import_model_value: not implemented for value %a"
             Model_parser.print_model_value v

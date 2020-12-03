@@ -222,6 +222,8 @@ let constr_value ity rs vl =
   value (ty_of_ity ity) (Vconstr (rs, List.map field vl))
 let purefun_value ~result_ity ~arg_ity mv v =
   value (ty_of_ity result_ity) (Vpurefun (ty_of_ity arg_ity, mv, v))
+let undefined_value ity =
+  value (ty_of_ity ity) Vundefined
 
 let rec print_value fmt v =
   match v.v_desc with
@@ -1094,7 +1096,7 @@ let rec default_value_of_type env known ity : value =
                *   let fl = List.map (fun ity -> field (default_value_of_type env known ity)) itys in
                *   value ty (Vconstr (None, fl))
                * else *)
-              value ty Vundefined
+              undefined_value ity
 
 (* ROUTINE DEFINITIONS *)
 
@@ -1583,7 +1585,7 @@ exception RACStuck of env * Loc.position option
 
 let value_of_free_vars env t =
   let get_value get_value get_ty env x =
-    let def = {v_desc= Vundefined; v_ty= get_ty x} in
+    let def = undefined_value (ity_of_ty (get_ty x)) in
     snapshot (Opt.get_def def (get_value x env))  in
   let mid = t_v_fold (fun mvs vs ->
     let get_ty vs = vs.vs_ty in
