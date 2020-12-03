@@ -563,14 +563,16 @@ let model_of_exec_log ~original_model log =
     {me_name; me_value; me_location= Some loc; me_term= None} in
   let aux e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
-      match e.Log.log_desc with
-      | Log.Val_assumed (id, v) -> [me loc id v]
-      | Log.Exec_failed (_, mid) ->
-         Mid.fold (fun id v l -> me loc id v :: l) mid []
-      | _ -> [] )
+        match e.Log.log_desc with
+        | Log.Val_assumed (id, v) ->
+            [me loc id v]
+        | Log.Exec_failed (_, mid) ->
+            Mid.fold (fun id v l -> me loc id v :: l) mid []
+        | _ -> [] )
     | _ -> [] in
   let aux_l e =
-    match List.concat (List.map aux e) with [] -> None | l -> Some l in
+    let res = List.concat (List.map aux e) in
+    if res = [] then None else Some res in
   let aux_mint mint =
     let res = Mint.map_filter aux_l mint in
     if Mint.is_empty res then None else Some res in

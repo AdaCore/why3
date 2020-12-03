@@ -1061,29 +1061,26 @@ let rec default_value_of_type env known ity : value =
   | Ityreg {reg_its= its; reg_args= l1; reg_regs= l2} ->
       if is_array_its env its then
         value ty (Varray (Array.init 0 (fun _ -> assert false)))
-      else
-        let itd = Pdecl.find_its_defn known its in
-        match itd.Pdecl.itd_its.its_def with
-        | Range r ->
+      else match Pdecl.find_its_defn known its with
+        | {Pdecl.itd_its= {its_def= Range r}} ->
             let zero_in_range = BigInt.(le r.Number.ir_lower zero && le zero r.Number.ir_upper) in
             let n = if zero_in_range then BigInt.zero else r.Number.ir_lower in
-            value ty (Vnum n)
-        | _ -> match itd.Pdecl.itd_constructors with
-          | rs :: _ ->
-              let subst = its_match_regs its l1 l2 in
-              let ityl = List.map (fun pv -> pv.pv_ity) rs.rs_cty.cty_args in
-              let tyl = List.map (ity_full_inst subst) ityl in
-              let fl = List.map (fun ity -> field (default_value_of_type env known ity)) tyl in
-              value ty (Vconstr (rs, fl))
-          | [] ->
-              (* if its.its_private then
-               *   (\* There is no constructor so we can just invent a Vconstr,
-               *      but we will have to axiomatize the corresponding term *\)
-               *   let itys = List.map (fun rs -> (Opt.get rs.rs_field).pv_ity) itd.Pdecl.itd_fields in
-               *   let fl = List.map (fun ity -> field (default_value_of_type env known ity)) itys in
-               *   value ty (Vconstr (None, fl))
-               * else *)
-              undefined_value ity
+            range_value ity n
+        | {Pdecl.itd_constructors= rs :: _} ->
+            let subst = its_match_regs its l1 l2 in
+            let ityl = List.map (fun pv -> pv.pv_ity) rs.rs_cty.cty_args in
+            let tyl = List.map (ity_full_inst subst) ityl in
+            let vs = List.map (default_value_of_type env known) tyl in
+            constr_value ity rs vs
+        | {Pdecl.itd_constructors= []} ->
+            (* if its.its_private then
+             *   (\* There is no constructor so we can just invent a Vconstr,
+             *      but we will have to axiomatize the corresponding term *\)
+             *   let itys = List.map (fun rs -> (Opt.get rs.rs_field).pv_ity) itd.Pdecl.itd_fields in
+             *   let fl = List.map (fun ity -> field (default_value_of_type env known ity)) itys in
+             *   value ty (Vconstr (None, fl))
+             * else *)
+            value ty Vundefined
 
 (* ROUTINE DEFINITIONS *)
 
@@ -1716,10 +1713,8 @@ let get_and_register_value env ?def ?ity vs loc =
   let value = match env.rac.get_value ~name ~loc ity with
     | Some v ->
        Debug.dprintf debug_rac_values
-         "@[<h>Value imported for %a at %a: %a@]@."
-         print_decoded name
-         print_loc' loc
-         print_value v; v
+         "@[<hv2>Value imported for %a at %a:@ @[%a@]@]@."
+         print_decoded name print_loc' loc print_value v; v
     | None ->
        let v = match def with
          | None -> default_value_of_type env.env env.mod_known ity
@@ -1741,11 +1736,11 @@ let rec set_fields fs1 fs2 =
   List.iter2 set_field fs1 fs2
 
 let set_constr v1 v2 =
-  (match v1.v_desc, v2.v_desc with
+  match v1.v_desc, v2.v_desc with
    | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
        assert (rs_equal rs1 rs2);
        set_fields fs1 fs2;
-   | _ -> failwith "set_constr")
+   | _ -> failwith "set_constr"
 
 let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
   let pv = restore_pv vs in
