@@ -288,6 +288,32 @@ val model_for_positions_and_decls : model ->
 
 (*
 ***************************************************************
+**  Cleaning the model
+***************************************************************
+*)
+
+(** Method clean#model cleans a model from unparsed values (except for elements of kind
+   error messag). The cleaning can be extended by method overriding. *)
+class clean : object
+  method model : model -> model
+  method element : model_element -> model_element option
+  method value : model_value -> model_value option
+  method unparsed : string -> model_value option
+  method integer : model_int -> model_value option
+  method string : string -> model_value option
+  method decimal : model_dec -> model_value option
+  method fraction : model_frac -> model_value option
+  method float : model_float -> model_value option
+  method boolean : bool -> model_value option
+  method bitvector : model_bv -> model_value option
+  method proj : string -> model_value -> model_value option
+  method apply : string -> model_value list -> model_value option
+  method array : model_array -> model_value option
+  method record : model_record -> model_value option
+end
+
+(*
+***************************************************************
 ** Registering model parser
 ***************************************************************
 *)
