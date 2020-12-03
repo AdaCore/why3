@@ -32,7 +32,6 @@ module rec Value : sig
     | Vfloat of big_float
     | Vstring of string
     | Vbool of bool
-    | Vvoid
     | Vproj of lsymbol * value
     | Varray of value array
     | Vfun of value Mvs.t (* closure *) * vsymbol * expr
@@ -58,6 +57,7 @@ val bool_value : bool -> value
 val proj_value : ity -> lsymbol -> value -> value
 val constr_value : ity -> rsymbol -> value list -> value
 val purefun_value : result_ity:ity -> arg_ity:ity -> value Mv.t -> value -> value
+val unit_value : value
 val undefined_value : ity -> value
 
 val field : value -> field
