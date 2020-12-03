@@ -65,7 +65,11 @@ let ffalse _ = false
 
 type _ cmptr = Cmptr : {proj: 'a -> 'b; cmp: 'b -> 'b -> int} -> 'a cmptr
 
+type 'a compare = 'a -> 'a -> int
+
 let cmptr proj cmp = Cmptr {proj; cmp}
+
+let cmptr_direct cmp = Cmptr {cmp; proj= fun x -> x}
 
 let rec cmp ls x y = match ls with
   | [] -> 0
