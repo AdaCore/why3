@@ -30,9 +30,11 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 0)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 0)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
@@ -42,18 +44,18 @@
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 0)
+                  b = {contents= 0}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
                 Line 13:
@@ -62,18 +64,18 @@
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 0)
+                  b = {contents= 0}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
 <check-ce>Validating model:
           File jlamp0.mlw:
@@ -106,9 +108,11 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -119,40 +123,40 @@
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 3)
-                    b = (ref'mk 3)
+                    a = {contents= 3}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 3)
+                    arg = {contents= 3}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 3
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 3
                 Line 12:
                   Property failure, Assertion with:
-                    a = (ref'mk 3)
+                    a = {contents= 3}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File int.mlw:
                 Line 13:
@@ -161,21 +165,21 @@
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 0)
-                    b = (ref'mk 3)
+                    a = {contents= 0}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Abstract execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                   result = 0
               Unknown location:
                   Execution got stuck, Assume postcondition of (!) with:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
 <check-ce>Validating model:
@@ -209,9 +213,11 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -222,40 +228,40 @@
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 3)
-                    b = (ref'mk 3)
+                    a = {contents= 3}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 3)
+                    arg = {contents= 3}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 3
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 3
                 Line 12:
                   Property failure, Assertion with:
-                    a = (ref'mk 3)
+                    a = {contents= 3}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File int.mlw:
                 Line 13:
@@ -264,21 +270,21 @@
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 0)
-                    b = (ref'mk 3)
+                    a = {contents= 0}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Abstract execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                   result = 0
               Unknown location:
                   Execution got stuck, Assume postcondition of (!) with:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                     result = 0
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
@@ -289,7 +295,7 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Goal Assertion from verification condition p1'vc.
-Prover result is: unknown (unknown + incomplete) (0.07s, 6269 steps).
+Prover result is: unknown (unknown + incomplete) (0.05s, 6269 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -299,40 +305,40 @@ File int.mlw:
     Constant one initialization
 File jlamp0.mlw:
   Line 6:
-    a = (ref'mk 0)
+    a = {contents= 0}
   Line 8:
-    b = (ref'mk 3)
+    b = {contents= 3}
     Execution of main function p1's body with env:
-      a = (ref'mk 3)
-      b = (ref'mk 3)
+      a = {contents= 3}
+      b = {contents= 3}
       zero = 0
       one = 1
   Line 11:
     Concrete execution of (!) with args:
-      r = (ref'mk 3)
+      r = {contents= 3}
 File ref.mlw:
   Line 18:
     Concrete execution of contents with args:
-      arg = (ref'mk 3)
+      arg = {contents= 3}
 File jlamp0.mlw:
   Line 11:
     Concrete execution of (!) with args:
-      r = (ref'mk 0)
+      r = {contents= 0}
 File ref.mlw:
   Line 18:
     Concrete execution of contents with args:
-      arg = (ref'mk 0)
+      arg = {contents= 0}
 File jlamp0.mlw:
   Line 11:
     Concrete execution of (+) with args:
       _ = 0
       _ = 3
     Concrete execution of (:=) with args:
-      r = (ref'mk 0)
+      r = {contents= 0}
       v = 3
   Line 12:
     Property failure, Assertion with:
-      a = (ref'mk 3)
+      a = {contents= 3}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Validating model:
@@ -379,9 +385,11 @@ File jlamp0.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 0)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 0)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
@@ -391,18 +399,18 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 0)
+                  b = {contents= 0}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
                 Line 13:
@@ -411,18 +419,18 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 0)
+                  b = {contents= 0}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Validating model:
           File jlamp0.mlw:
@@ -468,9 +476,11 @@ File jlamp0.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "9"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -481,55 +491,55 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 7)
+                  a = {contents= 7}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 9)
-                    b = (ref'mk 3)
+                    a = {contents= 9}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 3)
+                    arg = {contents= 3}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 7)
+                    r = {contents= 7}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 7)
+                    arg = {contents= 7}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (+) with args:
                     _ = 7
                     _ = 3
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 7)
+                    r = {contents= 7}
                     v = 10
                 Line 13:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 10)
+                    r = {contents= 10}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 10)
+                    arg = {contents= 10}
               File jlamp0.mlw:
                 Line 13:
                   Concrete execution of (>=) with args:
                     x = 10
                     y = 10
                   Concrete execution of (!) with args:
-                    r = (ref'mk 10)
+                    r = {contents= 10}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 10)
+                    arg = {contents= 10}
               File jlamp0.mlw:
                 Line 13:
                   Concrete execution of (-) with args:
@@ -545,11 +555,11 @@ File jlamp0.mlw:
               File jlamp0.mlw:
                 Line 13:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 10)
+                    r = {contents= 10}
                     v = 9
                 Line 10:
                   Property failure, Postcondition of p1 with:
-                    a = (ref'mk 9)
+                    a = {contents= 9}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File int.mlw:
                 Line 13:
@@ -558,21 +568,21 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 7)
+                  a = {contents= 7}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 7)
-                    b = (ref'mk 3)
+                    a = {contents= 7}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Abstract execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                   result = 0
               Unknown location:
                   Execution got stuck, Assume postcondition of (!) with:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Validating model:
@@ -619,9 +629,11 @@ File jlamp0.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "9"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -632,55 +644,55 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 7)
+                  a = {contents= 7}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 9)
-                    b = (ref'mk 3)
+                    a = {contents= 9}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 3)
+                    arg = {contents= 3}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 7)
+                    r = {contents= 7}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 7)
+                    arg = {contents= 7}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (+) with args:
                     _ = 7
                     _ = 3
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 7)
+                    r = {contents= 7}
                     v = 10
                 Line 13:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 10)
+                    r = {contents= 10}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 10)
+                    arg = {contents= 10}
               File jlamp0.mlw:
                 Line 13:
                   Concrete execution of (>=) with args:
                     x = 10
                     y = 10
                   Concrete execution of (!) with args:
-                    r = (ref'mk 10)
+                    r = {contents= 10}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 10)
+                    arg = {contents= 10}
               File jlamp0.mlw:
                 Line 13:
                   Concrete execution of (-) with args:
@@ -696,11 +708,11 @@ File jlamp0.mlw:
               File jlamp0.mlw:
                 Line 13:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 10)
+                    r = {contents= 10}
                     v = 9
                 Line 10:
                   Property failure, Postcondition of p1 with:
-                    a = (ref'mk 9)
+                    a = {contents= 9}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File int.mlw:
                 Line 13:
@@ -709,21 +721,21 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 7)
+                  a = {contents= 7}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 7)
-                    b = (ref'mk 3)
+                    a = {contents= 7}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Abstract execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                   result = 0
               Unknown location:
                   Execution got stuck, Assume postcondition of (!) with:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                     result = 0
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
@@ -734,7 +746,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6467 steps).
+Prover result is: unknown (unknown + incomplete) (0.03s, 6467 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -744,55 +756,55 @@ File int.mlw:
     Constant one initialization
 File jlamp0.mlw:
   Line 6:
-    a = (ref'mk 7)
+    a = {contents= 7}
   Line 8:
-    b = (ref'mk 3)
+    b = {contents= 3}
     Execution of main function p1's body with env:
-      a = (ref'mk 9)
-      b = (ref'mk 3)
+      a = {contents= 9}
+      b = {contents= 3}
       zero = 0
       one = 1
   Line 11:
     Concrete execution of (!) with args:
-      r = (ref'mk 3)
+      r = {contents= 3}
 File ref.mlw:
   Line 18:
     Concrete execution of contents with args:
-      arg = (ref'mk 3)
+      arg = {contents= 3}
 File jlamp0.mlw:
   Line 11:
     Concrete execution of (!) with args:
-      r = (ref'mk 7)
+      r = {contents= 7}
 File ref.mlw:
   Line 18:
     Concrete execution of contents with args:
-      arg = (ref'mk 7)
+      arg = {contents= 7}
 File jlamp0.mlw:
   Line 11:
     Concrete execution of (+) with args:
       _ = 7
       _ = 3
     Concrete execution of (:=) with args:
-      r = (ref'mk 7)
+      r = {contents= 7}
       v = 10
   Line 13:
     Concrete execution of (!) with args:
-      r = (ref'mk 10)
+      r = {contents= 10}
 File ref.mlw:
   Line 18:
     Concrete execution of contents with args:
-      arg = (ref'mk 10)
+      arg = {contents= 10}
 File jlamp0.mlw:
   Line 13:
     Concrete execution of (>=) with args:
       x = 10
       y = 10
     Concrete execution of (!) with args:
-      r = (ref'mk 10)
+      r = {contents= 10}
 File ref.mlw:
   Line 18:
     Concrete execution of contents with args:
-      arg = (ref'mk 10)
+      arg = {contents= 10}
 File jlamp0.mlw:
   Line 13:
     Concrete execution of (-) with args:
@@ -808,11 +820,11 @@ File int.mlw:
 File jlamp0.mlw:
   Line 13:
     Concrete execution of (:=) with args:
-      r = (ref'mk 10)
+      r = {contents= 10}
       v = 9
   Line 10:
     Property failure, Postcondition of p1 with:
-      a = (ref'mk 9)
+      a = {contents= 9}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Validating model:
@@ -852,9 +864,11 @@ File jlamp0.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 0)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 0)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
@@ -864,18 +878,18 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 0)
+                  b = {contents= 0}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
                 Line 13:
@@ -884,18 +898,18 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 8:
-                  b = (ref'mk 0)
+                  b = {contents= 0}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
                   Execution got stuck, Precondition of p1 with:
-                    a = (ref'mk 0)
-                    b = (ref'mk 0)
+                    a = {contents= 0}
+                    b = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Validating model:
           File jlamp0.mlw:
@@ -934,9 +948,11 @@ File jlamp0.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "5"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -947,44 +963,44 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 2)
+                  a = {contents= 2}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 5)
-                    b = (ref'mk 3)
+                    a = {contents= 5}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 3)
+                    arg = {contents= 3}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 2)
+                    r = {contents= 2}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (+) with args:
                     _ = 2
                     _ = 3
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 2)
+                    r = {contents= 2}
                     v = 5
                 Line 13:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 5)
+                    r = {contents= 5}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 5)
+                    arg = {contents= 5}
               File jlamp0.mlw:
                 Line 13:
                   Concrete execution of (>=) with args:
@@ -993,7 +1009,7 @@ File jlamp0.mlw:
                   Concrete execution of Tuple0 with args:
                 Line 10:
                   Property failure, Postcondition of p1 with:
-                    a = (ref'mk 5)
+                    a = {contents= 5}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File int.mlw:
                 Line 13:
@@ -1002,21 +1018,21 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 2)
+                  a = {contents= 2}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 2)
-                    b = (ref'mk 3)
+                    a = {contents= 2}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Abstract execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                   result = 0
               Unknown location:
                   Execution got stuck, Assume postcondition of (!) with:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                     result = 0
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Validating model:
@@ -1056,9 +1072,11 @@ File jlamp0.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "5"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: (ref'mk 3)
+<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    3}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -1069,44 +1087,44 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 2)
+                  a = {contents= 2}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 5)
-                    b = (ref'mk 3)
+                    a = {contents= 5}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 3)
+                    arg = {contents= 3}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 2)
+                    r = {contents= 2}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of (+) with args:
                     _ = 2
                     _ = 3
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 2)
+                    r = {contents= 2}
                     v = 5
                 Line 13:
                   Concrete execution of (!) with args:
-                    r = (ref'mk 5)
+                    r = {contents= 5}
               File ref.mlw:
                 Line 18:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 5)
+                    arg = {contents= 5}
               File jlamp0.mlw:
                 Line 13:
                   Concrete execution of (>=) with args:
@@ -1115,7 +1133,7 @@ File jlamp0.mlw:
                   Concrete execution of Tuple0 with args:
                 Line 10:
                   Property failure, Postcondition of p1 with:
-                    a = (ref'mk 5)
+                    a = {contents= 5}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
               File int.mlw:
                 Line 13:
@@ -1124,21 +1142,21 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 2)
+                  a = {contents= 2}
                 Line 8:
-                  b = (ref'mk 3)
+                  b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = (ref'mk 2)
-                    b = (ref'mk 3)
+                    a = {contents= 2}
+                    b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
                   Abstract execution of (!) with args:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                   result = 0
               Unknown location:
                   Execution got stuck, Assume postcondition of (!) with:
-                    r = (ref'mk 3)
+                    r = {contents= 3}
                     result = 0
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
@@ -1149,7 +1167,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: unknown (unknown + incomplete) (0.04s, 6405 steps).
+Prover result is: unknown (unknown + incomplete) (0.03s, 6405 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1159,44 +1177,44 @@ File int.mlw:
     Constant one initialization
 File jlamp0.mlw:
   Line 6:
-    a = (ref'mk 2)
+    a = {contents= 2}
   Line 8:
-    b = (ref'mk 3)
+    b = {contents= 3}
     Execution of main function p1's body with env:
-      a = (ref'mk 5)
-      b = (ref'mk 3)
+      a = {contents= 5}
+      b = {contents= 3}
       zero = 0
       one = 1
   Line 11:
     Concrete execution of (!) with args:
-      r = (ref'mk 3)
+      r = {contents= 3}
 File ref.mlw:
   Line 18:
     Concrete execution of contents with args:
-      arg = (ref'mk 3)
+      arg = {contents= 3}
 File jlamp0.mlw:
   Line 11:
     Concrete execution of (!) with args:
-      r = (ref'mk 2)
+      r = {contents= 2}
 File ref.mlw:
   Line 18:
     Concrete execution of contents with args:
-      arg = (ref'mk 2)
+      arg = {contents= 2}
 File jlamp0.mlw:
   Line 11:
     Concrete execution of (+) with args:
       _ = 2
       _ = 3
     Concrete execution of (:=) with args:
-      r = (ref'mk 2)
+      r = {contents= 2}
       v = 5
   Line 13:
     Concrete execution of (!) with args:
-      r = (ref'mk 5)
+      r = {contents= 5}
 File ref.mlw:
   Line 18:
     Concrete execution of contents with args:
-      arg = (ref'mk 5)
+      arg = {contents= 5}
 File jlamp0.mlw:
   Line 13:
     Concrete execution of (>=) with args:
@@ -1205,7 +1223,7 @@ File jlamp0.mlw:
     Concrete execution of Tuple0 with args:
   Line 10:
     Property failure, Postcondition of p1 with:
-      a = (ref'mk 5)
+      a = {contents= 5}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Validating model:
@@ -1237,7 +1255,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 0)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -1248,28 +1267,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File int.mlw:
                 Line 13:
@@ -1278,29 +1297,29 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 0)
+                    a = {contents= 0}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 0)
+                  c = {contents= 0}
                   result = ()
               File ref.mlw:
                 Line 20:
                   Execution got stuck, Assume postcondition of (:=) with:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Validating model:
@@ -1332,7 +1351,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -1343,28 +1363,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
@@ -1373,30 +1393,30 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Validating model:
           File jlamp0.mlw:
@@ -1427,7 +1447,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -1438,28 +1459,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
@@ -1468,30 +1489,30 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
@@ -1501,7 +1522,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6106 steps).
+Prover result is: unknown (unknown + incomplete) (0.03s, 6106 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1511,28 +1532,28 @@ File int.mlw:
     Constant one initialization
 File jlamp0.mlw:
   Line 6:
-    a = (ref'mk 0)
+    a = {contents= 0}
   Line 15:
     Constant c initialization
     (abstract) execution of any function
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 17:
     _ = ()
     Execution of main function p2's body with env:
-      a = (ref'mk 0)
-      c = (ref'mk 1)
+      a = {contents= 0}
+      c = {contents= 1}
       _ = ()
       zero = 0
       one = 1
   Line 20:
     Concrete execution of (:=) with args:
-      r = (ref'mk 0)
+      r = {contents= 0}
       v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
     Property failure, Loop invariant initialization with:
-      c = (ref'mk 1)
+      c = {contents= 1}
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
@@ -1609,7 +1630,8 @@ Prover result is: valid (0.02s, 1180 steps).
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 0)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -1620,28 +1642,28 @@ Prover result is: valid (0.02s, 1180 steps).
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File int.mlw:
                 Line 13:
@@ -1650,29 +1672,29 @@ Prover result is: valid (0.02s, 1180 steps).
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 0)
+                    a = {contents= 0}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 0)
+                  c = {contents= 0}
                   result = ()
               File ref.mlw:
                 Line 20:
                   Execution got stuck, Assume postcondition of (:=) with:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>Validating model:
@@ -1745,7 +1767,8 @@ Prover result is: valid (0.02s, 1180 steps).
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -1756,28 +1779,28 @@ Prover result is: valid (0.02s, 1180 steps).
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
@@ -1786,30 +1809,30 @@ Prover result is: valid (0.02s, 1180 steps).
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>Validating model:
           File ref.mlw:
@@ -1881,7 +1904,8 @@ Prover result is: valid (0.02s, 1180 steps).
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -1892,28 +1916,28 @@ Prover result is: valid (0.02s, 1180 steps).
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
@@ -1922,30 +1946,30 @@ Prover result is: valid (0.02s, 1180 steps).
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
@@ -1965,28 +1989,28 @@ File int.mlw:
     Constant one initialization
 File jlamp0.mlw:
   Line 6:
-    a = (ref'mk 0)
+    a = {contents= 0}
   Line 15:
     Constant c initialization
     (abstract) execution of any function
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 17:
     _ = ()
     Execution of main function p2's body with env:
-      a = (ref'mk 0)
-      c = (ref'mk 1)
+      a = {contents= 0}
+      c = {contents= 1}
       _ = ()
       zero = 0
       one = 1
   Line 20:
     Concrete execution of (:=) with args:
-      r = (ref'mk 0)
+      r = {contents= 0}
       v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
     Property failure, Loop invariant initialization with:
-      c = (ref'mk 1)
+      c = {contents= 1}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Validating model:
@@ -2053,7 +2077,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 0)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -2064,28 +2089,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File int.mlw:
                 Line 13:
@@ -2094,29 +2119,29 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 0)
+                    a = {contents= 0}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 0)
+                  c = {contents= 0}
                   result = ()
               File ref.mlw:
                 Line 20:
                   Execution got stuck, Assume postcondition of (:=) with:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Validating model:
@@ -2183,7 +2208,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -2194,28 +2220,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
@@ -2224,30 +2250,30 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Validating model:
           File ref.mlw:
@@ -2313,7 +2339,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -2324,28 +2351,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
@@ -2354,30 +2381,30 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
@@ -2397,28 +2424,28 @@ File int.mlw:
     Constant one initialization
 File jlamp0.mlw:
   Line 6:
-    a = (ref'mk 0)
+    a = {contents= 0}
   Line 15:
     Constant c initialization
     (abstract) execution of any function
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 17:
     _ = ()
     Execution of main function p2's body with env:
-      a = (ref'mk 0)
-      c = (ref'mk 1)
+      a = {contents= 0}
+      c = {contents= 1}
       _ = ()
       zero = 0
       one = 1
   Line 20:
     Concrete execution of (:=) with args:
-      r = (ref'mk 0)
+      r = {contents= 0}
       v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
     Property failure, Loop invariant initialization with:
-      c = (ref'mk 1)
+      c = {contents= 1}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>Validating model:
@@ -2485,7 +2512,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 0)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -2496,28 +2524,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File int.mlw:
                 Line 13:
@@ -2526,29 +2554,29 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 0)
+                    a = {contents= 0}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 0)
+                  c = {contents= 0}
                   result = ()
               File ref.mlw:
                 Line 20:
                   Execution got stuck, Assume postcondition of (:=) with:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>Validating model:
@@ -2615,7 +2643,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -2626,28 +2655,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
@@ -2656,30 +2685,30 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>Validating model:
           File ref.mlw:
@@ -2745,7 +2774,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -2756,28 +2786,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
@@ -2786,30 +2816,30 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
@@ -2819,7 +2849,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.07s, 6515 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6515 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -2829,28 +2859,28 @@ File int.mlw:
     Constant one initialization
 File jlamp0.mlw:
   Line 6:
-    a = (ref'mk 0)
+    a = {contents= 0}
   Line 15:
     Constant c initialization
     (abstract) execution of any function
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 17:
     _ = ()
     Execution of main function p2's body with env:
-      a = (ref'mk 0)
-      c = (ref'mk 1)
+      a = {contents= 0}
+      c = {contents= 1}
       _ = ()
       zero = 0
       one = 1
   Line 20:
     Concrete execution of (:=) with args:
-      r = (ref'mk 0)
+      r = {contents= 0}
       v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
     Property failure, Loop invariant initialization with:
-      c = (ref'mk 1)
+      c = {contents= 1}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>Validating model:
@@ -2909,7 +2939,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 0)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -2920,28 +2951,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
               File int.mlw:
                 Line 13:
@@ -2950,29 +2981,29 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 0)
+                    a = {contents= 0}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 0)
+                  c = {contents= 0}
                   result = ()
               File ref.mlw:
                 Line 20:
                   Execution got stuck, Assume postcondition of (:=) with:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>Validating model:
@@ -3031,7 +3062,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -3042,28 +3074,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
@@ -3072,30 +3104,30 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>Validating model:
           File ref.mlw:
@@ -3153,7 +3185,8 @@ File jlamp0.mlw:
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: (ref'mk 1)
+<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
+              {contents= 1}
 <rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
@@ -3164,28 +3197,28 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
                 Line 21:
                   Concrete execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
@@ -3194,30 +3227,30 @@ File jlamp0.mlw:
                   Constant one initialization
               File jlamp0.mlw:
                 Line 6:
-                  a = (ref'mk 0)
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
                   (abstract) execution of any function
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 17:
                   _ = ()
                   Execution of main function p2's body with env:
-                    a = (ref'mk 0)
-                    c = (ref'mk 1)
+                    a = {contents= 0}
+                    c = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 1
-                  c = (ref'mk 1)
+                  c = {contents= 1}
                   result = ()
                 Line 21:
                   Abstract execution of loop
                 Line 22:
                   Property failure, Loop invariant initialization with:
-                    c = (ref'mk 1)
+                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
@@ -3227,7 +3260,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Goal Postcondition from verification condition p2'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6316 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6316 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -3237,26 +3270,26 @@ File int.mlw:
     Constant one initialization
 File jlamp0.mlw:
   Line 6:
-    a = (ref'mk 0)
+    a = {contents= 0}
   Line 15:
     Constant c initialization
     (abstract) execution of any function
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 17:
     _ = ()
     Execution of main function p2's body with env:
-      a = (ref'mk 0)
-      c = (ref'mk 1)
+      a = {contents= 0}
+      c = {contents= 1}
       _ = ()
       zero = 0
       one = 1
   Line 20:
     Concrete execution of (:=) with args:
-      r = (ref'mk 0)
+      r = {contents= 0}
       v = 1
   Line 21:
     Concrete execution of loop
   Line 22:
     Property failure, Loop invariant initialization with:
-      c = (ref'mk 1)
+      c = {contents= 1}
 

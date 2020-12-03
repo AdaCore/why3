@@ -38,14 +38,17 @@
 <check-ce>Interpreting concretly
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 7, characters 12-21, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 15, characters 2-6, taking default.
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 7, characters 12-21, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 14, characters 2-8: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 14, characters 2-8:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 14, characters 2-8, taking default.
-<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 15, characters 2-6, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/func_call6.mlw", line 11, characters 12-25)
@@ -66,24 +69,24 @@
                 Line 13:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 0
                 Line 15:
                   Concrete execution of Tuple0 with args:
                   (abstract) execution of any function g with args:
                     _ = ()
-                  z = (ref'mk 0)
+                  z = {contents= 0}
                   result = ()
                 Line 11:
                   Execution got stuck, Assume postcondition of g with:
-                    z = (ref'mk 0)
-                    z = (ref'mk 0)
+                    z = {contents= 0}
+                    z = {contents= 0}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call6.mlw", line 11, characters 12-25)
               File int.mlw:
                 Line 13:
@@ -102,26 +105,26 @@
                 Line 13:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 0
-                  z = (ref'mk 0)
+                  z = {contents= 0}
                   result = ()
                 Line 15:
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
-                  z = (ref'mk 0)
+                  z = {contents= 0}
                   result = ()
                 Line 11:
                   Execution got stuck, Assume postcondition of g with:
-                    z = (ref'mk 0)
-                    z = (ref'mk 0)
+                    z = {contents= 0}
+                    z = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/func_call6.mlw", line 16, characters 11-17)
 <check-ce>Validating model:
           File func_call6.mlw:
@@ -162,14 +165,17 @@
 <check-ce>Interpreting concretly
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 7, characters 12-21, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: (ref'mk 2)
+<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6:
+              {contents= 2}
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 15, characters 2-6, taking default.
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 7, characters 12-21, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 14, characters 2-8: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 14, characters 2-8:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 14, characters 2-8, taking default.
-<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: (ref'mk 2)
+<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6:
+              {contents= 2}
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 15, characters 2-6, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -190,23 +196,23 @@
                 Line 13:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 0
                 Line 15:
                   Concrete execution of Tuple0 with args:
                   (abstract) execution of any function g with args:
                     _ = ()
-                  z = (ref'mk 2)
+                  z = {contents= 2}
                   result = ()
                 Line 16:
                   Property failure, Assertion with:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
@@ -225,25 +231,25 @@
                 Line 13:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 0
-                  z = (ref'mk 0)
+                  z = {contents= 0}
                   result = ()
                 Line 15:
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
-                  z = (ref'mk 2)
+                  z = {contents= 2}
                   result = ()
                 Line 16:
                   Property failure, Assertion with:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
 <check-ce>Check model 2 ("bench/check-ce/func_call6.mlw", line 16, characters 11-17)
 <check-ce>Validating model:
           File func_call6.mlw:
@@ -284,14 +290,17 @@
 <check-ce>Interpreting concretly
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 7, characters 12-21, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: (ref'mk 2)
+<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6:
+              {contents= 2}
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 15, characters 2-6, taking default.
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 7, characters 12-21, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 14, characters 2-8: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 14, characters 2-8:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 14, characters 2-8, taking default.
-<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: (ref'mk 2)
+<rac-values>Value imported for z at "bench/check-ce/func_call6.mlw", line 15, characters 2-6:
+              {contents= 2}
 <rac-values>No value for result at "bench/check-ce/func_call6.mlw", line 15, characters 2-6, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -312,23 +321,23 @@
                 Line 13:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
                   Concrete execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 0
                 Line 15:
                   Concrete execution of Tuple0 with args:
                   (abstract) execution of any function g with args:
                     _ = ()
-                  z = (ref'mk 2)
+                  z = {contents= 2}
                   result = ()
                 Line 16:
                   Property failure, Assertion with:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
@@ -347,25 +356,25 @@
                 Line 13:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
                   Abstract execution of (:=) with args:
-                    r = (ref'mk 0)
+                    r = {contents= 0}
                     v = 0
-                  z = (ref'mk 0)
+                  z = {contents= 0}
                   result = ()
                 Line 15:
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
-                  z = (ref'mk 2)
+                  z = {contents= 2}
                   result = ()
                 Line 16:
                   Property failure, Assertion with:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
@@ -375,7 +384,7 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call6.mlw", line 16, characters 11-17:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6620 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6083 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -395,21 +404,21 @@ File func_call6.mlw:
   Line 13:
     _ = ()
     Execution of main function f's body with env:
-      z = (ref'mk 2)
+      z = {contents= 2}
       _ = ()
       zero = 0
       one = 1
   Line 14:
     Concrete execution of (:=) with args:
-      r = (ref'mk 0)
+      r = {contents= 0}
       v = 0
   Line 15:
     Concrete execution of Tuple0 with args:
     (abstract) execution of any function g with args:
       _ = ()
-    z = (ref'mk 2)
+    z = {contents= 2}
     result = ()
   Line 16:
     Property failure, Assertion with:
-      z = (ref'mk 2)
+      z = {contents= 2}
 
