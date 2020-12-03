@@ -39,7 +39,11 @@ cfgmodule:
     { (id,dl) }
 
 cfgdecl:
-  | module_decl_parsing_only { Dmlw_decl $1 }
+  | scope_head_parsing_only cfgdecl* END
+      { let loc,import,qid = $1 in (Cfg_ast.Dscope(loc,import,qid,$2))}
+  | IMPORT uqualid { (Dmlw_decl (Dimport $2)) }
+  | d = pure_decl | d = prog_decl | d = meta_decl { Dmlw_decl d }
+  | use_clone_parsing_only { Dmlw_decl $1 }
   | LET CFG f=recdefn { Dletcfg f }
   | LET REC CFG dl=with_list1(recdefn) { Dreccfg dl }
 ;

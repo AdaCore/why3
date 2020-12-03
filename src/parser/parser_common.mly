@@ -302,11 +302,11 @@ See also `plugins/cfg/cfg_parser.mly`
 | d = pure_decl | d = prog_decl | d = meta_decl { d }
 | use_clone_parsing_only { $1 }
 
-scope_head_parsing_only:
+%public scope_head_parsing_only:
 | SCOPE boption(IMPORT) attrs(uident_nq)
     { let loc = floc $startpos $endpos in (loc, $2, $3) }
 
-use_clone_parsing_only:
+%public use_clone_parsing_only:
 | USE EXPORT tqualid
     { (Duseexport $3) }
 | CLONE EXPORT tqualid clone_subst

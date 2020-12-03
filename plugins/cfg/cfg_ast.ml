@@ -46,6 +46,7 @@ type cfg_decl =
   | Dmlw_decl of Ptree.decl
   | Dletcfg of cfg_fundef
   | Dreccfg of cfg_fundef list
+  | Dscope of Loc.position * bool * ident * cfg_decl list
 
 type cfg_file = (ident * cfg_decl list) list
   (** a list of modules containing lists of declarations *)

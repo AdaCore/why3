@@ -364,6 +364,7 @@ The extension of syntax is described by the following rules.
     module: "module" `:ident` `decl`* "end"
     decl: "let" "cfg" `cfg_fundef`
     : | "let" "rec" "cfg" `cfg_fundef` ("with" `cfg_fundef`)*
+    : | "scope" `:ident` `decl`* "end"
     cfg_fundef: `:ident` `:binder`+ : `:type` `:spec` "=" `vardecl`* "{" `block` "}" `labelblock`*
     vardecl: "var" `:ident`* ":" `:type` ";" | "ghost" "var" `:ident`* ":" `:type` ";"
     block: `instruction` (";" `instruction`)*
