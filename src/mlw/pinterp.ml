@@ -206,7 +206,6 @@ include Value
 
 let value ty desc = {v_desc= desc; v_ty= ty}
 let field v = Field (ref v)
-let constr rs vl = Vconstr (rs, List.map field vl)
 let v_desc v = v.v_desc
 let v_ty v = v.v_ty
 let field_get (Field r) = r.contents

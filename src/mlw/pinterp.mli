@@ -19,9 +19,31 @@ open Expr
 
 (** {2 Interpreter values} *)
 
-type value
+type float_mode
+type big_float
 
-module Mv : Extmap.S with type key = value
+module rec Value : sig
+  type value = private {v_desc: value_desc; v_ty: Ty.ty}
+  and value_desc =
+    | Vconstr of rsymbol * field list
+    | Vnum of BigInt.t
+    | Vreal of Big_real.real
+    | Vfloat_mode of float_mode
+    | Vfloat of big_float
+    | Vstring of string
+    | Vbool of bool
+    | Vvoid
+    | Vproj of lsymbol * value
+    | Varray of value array
+    | Vfun of value Mvs.t (* closure *) * vsymbol * expr
+    | Vpurefun of Ty.ty (* keys *) * value Mv.t * value
+    | Vterm of term (* ghost values *)
+    | Vundefined
+  and field = Field of value ref
+end
+and Mv : Extmap.S with type key = Value.value
+
+open Value
 
 val v_ty : value -> Ty.ty
 
@@ -37,6 +59,10 @@ val proj_value : ity -> lsymbol -> value -> value
 val constr_value : ity -> rsymbol -> value list -> value
 val purefun_value : result_ity:ity -> arg_ity:ity -> value Mv.t -> value -> value
 val undefined_value : ity -> value
+
+val field : value -> field
+val field_get : field -> value
+val field_set : field -> value -> unit
 
 val default_value_of_type : Env.env -> Pdecl.known_map -> ity -> value
 
