@@ -30,8 +30,16 @@ let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
 let opt_json : [< `All | `Values ] option ref = ref None
 let opt_check_ce_model = ref false
+let opt_print_original_model = ref false
+let opt_print_derived_model = ref false
 let opt_rac_prover = ref None
 let opt_ce_check_verbosity = ref None
+
+let () = (* Instead of additional command line parameters *)
+  if Opt.get_def "" (Sys.getenv_opt "WHY3PRINTORIGINALMODEL") = "yes" then
+    opt_print_original_model := true;
+  if Opt.get_def "" (Sys.getenv_opt "WHY3PRINTDERIVEDMODEL") = "yes" then
+    opt_print_derived_model := true
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -125,8 +133,8 @@ let option_list =
     KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
     " check the counter-examples using runtime assertion checking (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
-    "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
-    "with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
+    "<prover> use <prover> to check assertions in RAC when term reduction is insufficient,
+    with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
     Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
     "<lvl> verbosity level for interpretation log of counterexample solver model";
     KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
@@ -288,19 +296,31 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let reduce_config =
           let trans = "compute_in_goal" and prover = !opt_rac_prover in
           Pinterp.rac_reduce_config_lit config env ~trans ?prover () in
+        let pm = Pmodule.restore_module th in
         let models =
           let clean = new Model_parser.clean in
           List.map (fun (r, m) -> r, clean#model m) res.pr_models in
-        let ce = Counterexample.select_model
-                   ?verb_lvl:!opt_ce_check_verbosity
-                   ~check:!opt_check_ce_model
-                   ~reduce_config env (Pmodule.restore_module th)
-                   models in
+        let ce = Counterexample.select_model ~check:!opt_check_ce_model
+            ?verb_lvl:!opt_ce_check_verbosity ~reduce_config env pm models in
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
         printf "%a@." (print_result ?json:!opt_json)
           (fname, t.Term.t_loc, goal_name, expls, res, ce);
+        let print_model fmt m =
+          let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
+          if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
+          else Model_parser.print_model (* json values *) fmt m ~print_attrs in
+        let print_other_models (m, ce_summary) =
+          match ce_summary with
+            | Counterexample.(NCCE log | SWCE log | NCCE_SWCE log) ->
+                if !opt_print_original_model then
+                  printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
+                if !opt_print_derived_model then
+                  printf "@[<v>Derived model:@\n%a@]@\n@." print_model
+                    (Counterexample.model_of_exec_log ~original_model:m log)
+            | _ -> () in
+        Opt.iter print_other_models ce;
         if res.pr_answer <> Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task

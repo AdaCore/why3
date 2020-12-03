@@ -49,7 +49,12 @@ val check_model :
 
 (** {2 Summary of checking models} *)
 
-type ce_summary
+type ce_summary =
+   | NCCE of Log.exec_log
+   | SWCE of Log.exec_log
+   | NCCE_SWCE of Log.exec_log
+   | BAD_CE
+   | UNKNOWN of string
 
 val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 
