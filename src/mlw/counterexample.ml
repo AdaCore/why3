@@ -16,41 +16,10 @@ open Ity
 open Expr
 open Format
 open Pinterp
+open Model_parser
 
 let debug_check_ce = Debug.register_info_flag "check-ce"
     ~desc:"Debug@ info@ for@ --check-ce"
-
-
-(** Transformations interpretation log and prover models *)
-
-(** transform an interpretation log into a prover model *)
-let model_of_exec_log ~original_model log =
-  let open Model_parser in
-  let open Wstdlib in
-  let me loc id _value =
-    let name = asprintf "%a" print_decoded id.id_string in
-    let men_name = get_model_trace_string ~name ~attrs:id.id_attrs in
-    let men_kind = match get_model_element_by_id original_model id with
-      | Some me -> me.me_name.men_kind
-      | None -> Other in
-    let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
-    let me_value = assert false (* Integer v *) in (* TODO Type me_value correctly when the exec log is typed *)
-    {me_name; me_value; me_location= Some loc; me_term= None} in
-  let aux e = match e.Log.log_loc with
-    | Some loc when not Loc.(equal loc dummy_position) -> (
-      match e.Log.log_desc with
-      | Log.Val_assumed (id, v) -> [me loc id v]
-      | Log.Exec_failed (_, mid) ->
-         Mid.fold (fun id v l -> me loc id v :: l) mid []
-      | _ -> [] )
-    | _ -> [] in
-  let aux_l e =
-    match List.concat (List.map aux e) with [] -> None | l -> Some l in
-  let aux_mint mint =
-    let res = Mint.map_filter aux_l mint in
-    if Mint.is_empty res then None else Some res in
-  let model_files = (Mstr.map_filter aux_mint (Log.sort_log_by_loc log)) in
-  set_model_files original_model model_files
 
 (** Result of checking solvers' counterexample models *)
 
@@ -103,7 +72,6 @@ let print_ce_summary_title ?check_ce fmt = function
 
 let print_ce_summary_values ?verb_lvl ?json ~print_attrs model fmt s =
   let open Json_base in
-  let open Model_parser in
   let print_model_field =
     print_json_field "model"
       (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
@@ -130,11 +98,6 @@ let print_ce_summary_values ?verb_lvl ?json ~print_attrs model fmt s =
           fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
       | BAD_CE -> ()
     )
-
-let _model_of_ce_summary ~original_model = function
-  | NCCE log | SWCE log | NCCE_SWCE log ->
-     model_of_exec_log ~original_model log
-  | UNKNOWN _ | BAD_CE -> original_model
 
 type verdict = Good_model | Bad_model | Dont_know
 
@@ -213,7 +176,6 @@ let get_field_name rs =
 (** Import a value from the prover model to an interpreter value. Raises [Exit] if the
     value cannot be imported. *)
 let rec import_model_value known th_known ity v =
-  let open Model_parser in
   let ts, l1, l2 = ity_components ity in
   let subst = its_match_regs ts l1 l2 in
   let def = Pdecl.find_its_defn known ts in
@@ -266,7 +228,7 @@ let rec import_model_value known th_known ity v =
               let _, d = Mid.choose (Mid.filter is_proj th_known) in
               match d.Decl.d_node with Decl.Dparam ls -> ls | _ -> raise Not_found
             with Not_found -> kasprintf failwith "Projection %s not found" p in
-          (* eprintf "FOUND PROJECTION for %s in %a: %a:%a->%a ity=%a,%a@." p Model_parser.print_model_value v Pretty.print_ls ls Pp.(print_list arrow Pretty.print_ty) ls.ls_args (Pp.print_option Pretty.print_ty) ls.ls_value print_ity ity print_ity ity; *)
+          (* eprintf "FOUND PROJECTION for %s in %a: %a:%a->%a ity=%a,%a@." p print_model_value v Pretty.print_ls ls Pp.(print_list arrow Pretty.print_ty) ls.ls_args (Pp.print_option Pretty.print_ty) ls.ls_value print_ity ity print_ity ity; *)
           let ty_arg = match ls.ls_args with [ty] -> ty
             | _ -> kasprintf failwith "import_model_value: projection %s not unary" p in
           if not (Ty.ty_equal ty_arg (ty_of_ity ity)) then raise Exit;
@@ -291,11 +253,10 @@ let rec import_model_value known th_known ity v =
       | Undefined -> undefined_value ity
       | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
           kasprintf failwith "import_model_value: not implemented for value %a"
-            Model_parser.print_model_value v
+            print_model_value v
 
 let get_model_value m known th_known =
-  fun ?name ?loc ity : value option ->
-  let open Model_parser in
+  fun ?name ?loc ity : Value.value option ->
   match loc with
   | None -> None
   | Some l ->
@@ -423,7 +384,6 @@ let check_model_rs ?loc rac env pm rs =
       {verdict= Bad_model; reason; exec_log= Log.close_log env.rac.log_uc}
 
 let check_model reduce env pm model =
-  let open Model_parser in
   match get_model_term_loc model with
   | None ->
      let reason = "model term has no location" in
@@ -457,8 +417,8 @@ let check_model reduce env pm model =
         Cannot_check_model {reason}
 
 type sort_models =
-  (int * Call_provers.prover_answer * Model_parser.model * check_model_result * ce_summary) list ->
-  (int * Call_provers.prover_answer * Model_parser.model * check_model_result * ce_summary) list
+  (int * Call_provers.prover_answer * model * check_model_result * ce_summary) list ->
+  (int * Call_provers.prover_answer * model * check_model_result * ce_summary) list
 
 let prioritize_last_model: sort_models =
   let open Util in
@@ -522,17 +482,17 @@ let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     List.mapi add_index models in
   let models =
     let not_empty (i,_,m) =
-      let empty = Model_parser.is_model_empty m in
-      if empty then Debug.dprintf debug_check_ce "Model %d is empty@." i;
-      not empty in
+      let res = is_model_empty m in
+      if res then Debug.dprintf debug_check_ce "Model %d is empty@." i;
+      not res in
     List.filter not_empty models in
   let models =
     let add_check_model_result (i,r,m) =
       Debug.dprintf debug_check_ce "Check model %d (%a)@." i
         (Pp.print_option_or_default "NO LOC" Pretty.print_loc')
-        (Model_parser.get_model_term_loc m);
+        (get_model_term_loc m);
       (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
-       *   (Model_parser.print_model ?me_name_trans:None ~print_attrs:false) m; *)
+       *   (print_model ?me_name_trans:None ~print_attrs:false) m; *)
       let mr = check_model m in
       Debug.dprintf debug_check_ce "@[<v2>Result of checking model %d:@\n@[%a@]@]@." i
         (print_check_model_result ?verb_lvl) mr;
@@ -553,3 +513,66 @@ let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     Debug.dprintf debug_check_ce "Models:@\n%a@."
       Pp.(print_list space (print_dbg_model selected_ix)) models;
   selected
+
+(** Transformations interpretation log and prover models *)
+
+let rec model_value v =
+  let open Value in
+  let id_name {id_string= name; id_attrs= attrs} =
+    Ident.get_model_trace_string ~name ~attrs in
+  match v.v_desc with
+  | Vnum i -> Integer { int_value= i; int_verbatim= BigInt.to_string i }
+  | Vstring s -> String s
+  | Vbool b -> Boolean b
+  | Vproj (ls, v) -> Proj (ls.ls_name.id_string, model_value v)
+  | Varray a ->
+      let aux i v = {
+        arr_index_key= Integer {
+            int_value= BigInt.of_int i;
+            int_verbatim= string_of_int i
+          };
+        arr_index_value= model_value v
+      } in
+      Array {
+        arr_indices= List.mapi aux (Array.to_list a);
+        arr_others= Undefined;
+      }
+  | Vconstr (rs, fs) -> (
+      let vs = List.map (fun f -> model_value (field_get f)) fs in
+      if Strings.has_suffix "'mk" rs.rs_name.id_string then
+        (* same test for record-ness as in smtv2.ml *)
+        let ns = List.map (fun pv -> id_name pv.pv_vs.vs_name) rs.rs_cty.cty_args in
+        Record (List.combine ns vs)
+      else
+        Apply (id_name rs.rs_name, vs) )
+  | Vreal _ | Vfloat _ | Vfloat_mode _
+  | Vfun _ | Vpurefun _ | Vterm _ | Vundefined ->
+      failwith "Cannot convert interpreter value to model value"
+
+(** Transform an interpretation log into a prover model.
+    TODO fail if the log doesn't fail at the location of the original model *)
+let model_of_exec_log ~original_model log =
+  let me loc id value =
+    let name = asprintf "%a" print_decoded id.id_string in
+    let men_name = get_model_trace_string ~name ~attrs:id.id_attrs in
+    let men_kind = match get_model_element_by_id original_model id with
+      | Some me -> me.me_name.men_kind
+      | None -> Other in
+    let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
+    let me_value = model_value value in
+    {me_name; me_value; me_location= Some loc; me_term= None} in
+  let aux e = match e.Log.log_loc with
+    | Some loc when not Loc.(equal loc dummy_position) -> (
+      match e.Log.log_desc with
+      | Log.Val_assumed (id, v) -> [me loc id v]
+      | Log.Exec_failed (_, mid) ->
+         Mid.fold (fun id v l -> me loc id v :: l) mid []
+      | _ -> [] )
+    | _ -> [] in
+  let aux_l e =
+    match List.concat (List.map aux e) with [] -> None | l -> Some l in
+  let aux_mint mint =
+    let res = Mint.map_filter aux_l mint in
+    if Mint.is_empty res then None else Some res in
+  let model_files = (Mstr.map_filter aux_mint (Log.sort_log_by_loc log)) in
+  set_model_files original_model model_files

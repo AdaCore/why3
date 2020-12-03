@@ -96,6 +96,8 @@ val prioritize_last_model : sort_models
     just priotize the last, non-empty model in the incremental list of
     models created by the prover (as done before 2020) *)
 
-(* val model_of_ce_summary : original_model:model -> ce_summary -> model
- * (\** [model_of_ce_summary ~original_model summary] updates
- *    [original_model] with information from [ce_summary] *\) *)
+(** {2 Conversion to [Model_parser.model] }*)
+
+val model_of_exec_log : original_model:model -> Log.exec_log -> model
+(** [model_of_exec_log ~original_model log)] populates a [Model_parser.model] from an
+   execution log [log] *)
