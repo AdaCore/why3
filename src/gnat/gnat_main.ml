@@ -162,22 +162,24 @@ let report_messages c obj =
       in
       let unproved_task = Opt.map (fun x -> Session_itp.get_task s x) unproved_goal in
       let model =
-        let unproved_pa = Opt.map (Session_itp.get_proof_attempt_node s) unproved_pa in
-        match unproved_pa with
-        | Some { Session_itp.proof_state =
-                   Some {Call_provers.pr_answer =
-                         Call_provers.StepLimitExceeded}} ->
-            (* Resource limit was hit, the model is not useful *)
-            None
-        | Some { Session_itp.proof_state =
-                  Some ({Call_provers.pr_answer = _} as r)} ->
-          Some r.Call_provers.pr_model
+        match Opt.map (Session_itp.get_proof_attempt_node s) unproved_pa with
+        | Some ({ Session_itp.parent; proof_state = Some pr } as pa) ->
+            if pr.Call_provers.pr_answer = Call_provers.StepLimitExceeded then
+              (* Resource limit was hit, the model is not useful *)
+              None
+            else
+              let open Counterexample in
+              let open Call_provers in
+              let th = Session_itp.find_th s pa.Session_itp.parent in
+              let pm = Pmodule.restore_module (Theory.restore_theory (Session_itp.theory_name th)) in
+              let env = c.Controller_itp.controller_env in
+              let sort_models = prioritize_last_model in
+              let model = Opt.map fst (select_model ~sort_models env pm pr.pr_models) in
+              let model_clean = Opt.map (new Gnat_counterexamples.clean)#model model in
+              model_clean
         | _ -> None
       in
-      let manual_info =
-        match unproved_pa with
-        | None -> None
-        | Some pa -> Gnat_manual.manual_proof_info s pa in
+      let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
       Gnat_report.Not_Proved (unproved_task, model, manual_info) in
   Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
 

@@ -28,6 +28,25 @@ let get_field_attr attr =
   | ["field"; _; s] -> Some s
   | _ -> None
 
+let for_field clean (f, v) =
+  let prefixes = ["us_split_fields"; "us_split_discrs";
+                  "__split_discrs"; "__split_fields"] in
+  if List.exists (fun s -> Strings.has_prefix s f) prefixes then
+    match v with
+    | Record fs ->
+        let for_field (f, v) =
+          Opt.bind (clean#value v) @@ fun v ->
+          Some (f, v) in
+        Lists.map_filter for_field fs
+    | _ ->
+        Opt.get_def [] @@
+        Opt.bind (clean#value v) @@ fun v -> Some [f, v]
+  else if Strings.has_prefix "rec__ext" f then
+    []
+  else
+    Opt.get_def [] @@
+    Opt.bind (clean#value v) @@ fun v -> Some [f, v]
+
 (* The returned [fields] are the strings S in attributes [field:N:S], which have
    to be removed from the model element name *)
 let collect_attrs a (men_attrs, fields) = match get_field_attr a with
@@ -40,36 +59,18 @@ let correct_name f = Str.global_replace (Str.regexp_string f) ""
 (** Clean values by a) replacing records according to [only_first_field2] and
    simplifying discriminant records b) removing unparsed values, in which the
    function returns [None]. *)
-let clean = object (self)
+class clean = object (self)
   inherit Model_parser.clean as super
 
-  method record fs =
-    if only_first_field2 (List.map fst fs) then
-      self#value (snd (List.hd fs))
-    else
-      let for_field (f, v) =
-        let prefixes = ["us_split_fields"; "us_split_discrs";
-                        "__split_discrs"; "__split_fields"] in
-        if List.exists (fun s -> Strings.has_prefix s f) prefixes then
-          match v with
-          | Record fs ->
-              let for_field (f, v) =
-                Opt.bind (self#value v) @@ fun v ->
-                Some (f, v) in
-              Lists.map_filter for_field fs
-          | _ ->
-              Opt.get_def [] @@
-              Opt.bind (self#value v) @@ fun v -> Some [f, v]
-        else if Strings.has_prefix "rec__ext" f then
-          []
-        else
-          Opt.get_def [] @@
-          Opt.bind (self#value v) @@ fun v -> Some [f, v] in
-      match List.concat (List.map for_field fs) with
+  method! record fs =
+    let field_names, field_values = List.split fs in
+    if only_first_field2 field_names then
+      self#value (List.hd field_values)
+    else match List.concat (List.map (for_field self) fs) with
       | [] -> None
       | fs -> Some (Record fs)
 
-  method element me =
+  method! element me =
     let men_attrs, fields =
       Sattr.fold collect_attrs me.me_name.men_attrs (Sattr.empty, []) in
     let men_name = List.fold_right correct_name fields me.me_name.men_name in
