@@ -73,6 +73,8 @@ val float_of_binary : model_float_binary -> model_float
 
 val print_model_value : Format.formatter -> model_value -> unit
 
+val debug_force_binary_floats : Debug.flag
+(** Print all floats using bitvectors in JSON output for models *)
 
 (*
 ***************************************************************
