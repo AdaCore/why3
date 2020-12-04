@@ -13,6 +13,10 @@ open Format
 open Wstdlib
 open Rc
 
+let debug = Debug.register_info_flag "whyconf"
+  ~desc:"Print@ debugging@ messages@ about@ whyconf."
+
+
 (* magicnumber for the configuration :
   - 0 before the magic number
   - 1 when no loadpath meant default loadpath
@@ -776,13 +780,17 @@ let merge_config config filename =
   let provers = List.fold_left
     (fun provers (fp, section) ->
       Mprover.mapi (fun p c  ->
+        Debug.dprintf debug "Whyconf: handling prover modifiers for %a@." print_prover p;
         if not (filter_prover fp p) then c
         else
-          let opt = get_stringl ~default:[] section "option" in
-          let drv = get_stringl ~default:[] section "driver" in
-          { c with
+          begin
+            Debug.dprintf debug "Whyconf: prover modifiers found for %a@." print_prover p;
+            let opt = get_stringl ~default:[] section "option" in
+            let drv = get_stringl ~default:[] section "driver" in
+            { c with
             extra_options = opt @ c.extra_options;
-            extra_drivers = drv @ c.extra_drivers })
+            extra_drivers = drv @ c.extra_drivers }
+          end)
         provers
     ) config.provers prover_modifiers in
   let provers,shortcuts =
@@ -802,9 +810,6 @@ let merge_config config filename =
   let editors = List.fold_left load_editor editors (get_family rc "editor") in
   { config with main = main; provers = provers; strategies = strategies;
     prover_shortcuts = shortcuts; editors = editors }
-
-let _debug = Debug.register_info_flag "whyconf"
-  ~desc:"Print@ debugging@ messages@ about@ whyconf."
 
 let save_config config =
   let filename = config.conf_file in
