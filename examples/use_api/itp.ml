@@ -54,7 +54,7 @@ let provers =
   Whyconf.Mprover.fold
     (fun _ p acc ->
       try
-        let d = Driver.load_driver env p.Whyconf.driver [] in
+        let d = Driver.load_driver env p.Whyconf.driver p.Whyconf.extra_drivers in
         (p,d)::acc
       with e ->
         let p = p.Whyconf.prover in

@@ -49,7 +49,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 let alt_ergo_driver : Driver.driver =
   try
     Printexc.record_backtrace true;
-    Whyconf.load_driver main env alt_ergo.Whyconf.driver []
+    Whyconf.load_driver main env alt_ergo.Whyconf.driver alt_ergo.Whyconf.extra_drivers
   with e ->
     let s = Printexc.get_backtrace () in
     eprintf "Failed to load driver for alt-ergo: %a@.%s@."

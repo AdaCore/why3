@@ -307,9 +307,18 @@ end
 (** Loading drivers with relative names *)
 
 val load_driver : main -> Env.env -> string -> string list -> Driver.driver
-(** wrapper for loading a driver from a file that may be relative to the datadir.
-    See [Driver.load_driver_absolute]
-*)
+(** [load_driver main env driver extra_drivers] loads the driver
+   [driver], in the context if the confifguration
+
+   [driver] and [extra-drivers] are file names. Each fiel name [f] of
+   these is assumed an absolute file name, unless it denotes a file
+   that exists in the current directory, or contains a slash or a dot
+   character. Otherwise, it is assumed to be relative to the current
+   [datadir] fields of [main], and in that case a [".drv"] is also
+   appended
+
+   This function is a wrapper to the lower level function
+   [Driver.load_driver_absolute] *)
 
 val unknown_to_known_provers  :
   config_prover Mprover.t -> prover ->
