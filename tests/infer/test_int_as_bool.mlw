@@ -1,0 +1,24 @@
+module M
+
+
+use int.Int
+use ref.Ref
+
+val x : ref int
+val c : ref int
+
+val random () : int
+writes {}
+ensures { 0 <= result <= 1}
+
+let f [@infer:Polyhedra:2] () : unit
+  requires { !x = 1 }
+  requires { !c = 0 }
+  = [@vc:divergent]
+
+  while !x = 1 && !c < 29 do
+    c := !c + 1;
+    x := random ();
+  done
+
+end

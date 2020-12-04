@@ -205,7 +205,7 @@ let build_path_function retty pat mask postconds (startlabel, preconds, body) : 
   (id,false,Expr.RKnone, [arg], Some retty, pat, mask, spec, body)
 
 
-let translate_letcfg (id,args,retty,pat,mask,spec,locals,block,blocks) =
+let translate_cfg_fundef (id,args,retty,pat,mask,spec,locals,block,blocks) =
   Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
   Debug.dprintf debug "return type is `%a`@." pp_pty retty;
   let funs = translate_cfg spec.sp_pre block blocks in
@@ -226,40 +226,34 @@ let translate_letcfg (id,args,retty,pat,mask,spec,locals,block,blocks) =
   let body =
     mk_expr ~loc (Eattr(divergent_attr,body))
   in
-  let f =
-    Efun(args, Some retty, pat, mask, spec, body)
-  in
-  Dlet (id,false,Expr.RKnone,mk_expr ~loc:id.id_loc f)
+  (id,false,Expr.RKnone, args, Some retty, pat, mask, spec, body)
 
-let translate_decl d acc =
+let translate_letcfg d =
+  let loc = Loc.dummy_position in
+  let (id, ghost, rk, args, retty, pat, mask, spec, body) = translate_cfg_fundef d in
+
+  Dlet (id, ghost, rk, mk_expr ~loc (Efun (args, retty, pat, mask, spec, body)))
+
+let translate_reccfg ds =
+  let translated_fundefs = List.map translate_cfg_fundef ds in
+
+  Drec translated_fundefs
+
+(* mk_expr ~loc:id.id_loc *)
+let rec translate_decl d acc =
   match d with
   | Dmlw_decl d -> d :: acc
-  | Dletcfg l -> List.fold_right (fun d acc -> (translate_letcfg d)::acc) l acc
+  | Dletcfg d -> (translate_letcfg d)::acc
+  | Dreccfg l -> translate_reccfg l :: acc
+  | Cfg_ast.Dscope (l, b, i, ds) -> Ptree.Dscope (l, b, i, List.fold_right translate_decl ds []) :: acc
 
 let translate (m,dl) =
   (m,List.fold_right translate_decl dl [])
 
 let read_channel env _path file c =
-  let f : Cfg_ast.cfg_file =
-    try
-      Cfg_lexer.parse_channel file c
-    with Loc.Located(loc,e) ->
-      Format.eprintf "%a%a@." Loc.report_position loc Exn_printer.exn_printer e;
-      exit 1
-  in
-  Debug.dprintf debug "%s parsed successfully.@." file;
+  let f : Cfg_ast.cfg_file = Cfg_lexer.parse_channel file c in
   let ptree = Modules (List.map translate f) in
-  let mm = try
-      Typing.type_mlw_file env [] (file ^ ".mlw") ptree
-    with
-      Loc.Located(loc,e) ->
-      let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
-      Format.eprintf "%a%s@." Loc.report_position loc msg;
-      Debug.dprintf debug "%a@."
-        (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
-        ptree;
-      exit 1
-  in
+  let mm = Typing.type_mlw_file env [] (file ^ ".mlw") ptree in
   Debug.dprintf debug "%a@." Mlw_printer.pp_mlw_file ptree;
   mm
 

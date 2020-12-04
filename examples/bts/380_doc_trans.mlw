@@ -18,7 +18,7 @@ module Transitivity
 
   axiom ac: a = c
   axiom cb: c = b
-  axiom transitivity : forall x y z:int. x = y -> y = z -> x = z
+  lemma transitivity : forall x y z:int. x = y -> y = z -> x = z
   goal G : a = b
 end
 
@@ -31,7 +31,7 @@ module Transitivity2
 
   axiom ac: a = c
   axiom cb: c = b
-  axiom t : forall x y z k:int. k = k -> x = y -> y = z -> x = z
+  lemma t : forall x y z k:int. k = k -> x = y -> y = z -> x = z
   goal G : a = b
 end
 
@@ -96,7 +96,7 @@ module Hide
 
   use int.Int
   val constant y : int
-  axiom h: forall x. x = 1 + 1
+  lemma h: forall x. x = 1 + 1
 
   goal G: y - (1 + 1) = (1+1) - (1+ 1)
 
@@ -152,7 +152,7 @@ end
 
 module Remove
 
-  axiom h: true
+  lemma h: true
 
   goal G: true
 
@@ -248,7 +248,7 @@ module Unfold
 
   predicate p (x: int) = x <= 22
 
-  axiom h: forall x. p x -> p (x - 1)
+  lemma h: forall x. p x -> p (x - 1)
 
   goal G: p 21
 

@@ -1,256 +1,392 @@
 Strongest Postcondition
-bench/ce/ref_mono.mlw Ref ref1'vc: Valid
-bench/ce/ref_mono.mlw Ref prefix !'vc: Valid
-bench/ce/ref_mono.mlw Ref infix :='vc: Valid
-bench/ce/ref_mono.mlw M test_post'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 7, characters 30-55:
+Goal Postcondition from verification condition ref1'vc.
+Prover result is: valid.
+
+File "bench/ce/ref_mono.mlw", line 9, characters 29-40:
+Goal Postcondition from verification condition prefix !'vc.
+Prover result is: valid.
+
+File "bench/ce/ref_mono.mlw", line 11, characters 38-44:
+Goal Postcondition from verification condition infix :='vc.
+Prover result is: valid.
+
+File "bench/ce/ref_mono.mlw", line 21, characters 14-25:
+Goal Postcondition from verification condition test_post'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
-    y,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:21], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    y [@at:'Old:loc:bench/ce/ref_mono.mlw:21] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 11:
-    y, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    y [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 20:
-    x, [[@introduced]] = {"type" : "Integer" , "val" : "1" }
-    y,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:21], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@introduced] = {"type": "Integer", "val": "1"}
+    y [@at:'Old:loc:bench/ce/ref_mono.mlw:21] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 21:
-    x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
-    "val" : "1" }
-    old y,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:21], [@field:0:contents], [@introduced], [@model_trace:y]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "1"}
+    old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:21]
+      [@field:0:contents] [@introduced] [@model_trace:y] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 23:
-    y, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    y [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
-bench/ce/ref_mono.mlw M test_post2'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 27, characters 14-29:
+Goal Postcondition from verification condition test_post2'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
-    y,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:27], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    y [@at:'Old:loc:bench/ce/ref_mono.mlw:27] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 11:
-    y, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "42" } }] } }
+    y [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 25:
-    x, [[@introduced]] = {"type" : "Integer" , "val" : "43" }
-    y,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:27], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@introduced] = {"type": "Integer", "val": "43"}
+    y [@at:'Old:loc:bench/ce/ref_mono.mlw:27] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 27:
-    x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
-    "val" : "43" }
-    y, [[@field:0:contents], [@introduced], [@model_trace:y]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "42" } }] } }
-    old y,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:27], [@field:0:contents], [@introduced], [@model_trace:y]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "43"}
+    y [@field:0:contents] [@introduced] [@model_trace:y] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+    old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:27]
+      [@field:0:contents] [@introduced] [@model_trace:y] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 29:
-    y, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "42" } }] } }
+    y [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
 
-bench/ce/ref_mono.mlw M incr'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 38, characters 12-36:
+Goal Postcondition from verification condition incr'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
-    y,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-1" } }] } }
+    y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 11:
-    y, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    y [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 35:
-    y,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-1" } }] } }
+    y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 37:
-    x23,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x23 [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 38:
-    x23, [[@field:0:contents], [@introduced], [@model_trace:x23]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "2" } }] } }
-    old x23,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced], [@model_trace:x23]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    old y,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced], [@model_trace:y]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-1" } }] } }
+    x23 [@field:0:contents] [@introduced] [@model_trace:x23] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+    old x23 [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
+      [@field:0:contents] [@introduced] [@model_trace:x23] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
+      [@field:0:contents] [@introduced] [@model_trace:y] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 40:
-    y, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    y [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 41:
-    x23, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "1" } }] } }
+    x23 [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 42:
-    x23, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "2" } }] } }
+    x23 [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 
-bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 51, characters 14-36:
+Goal Loop invariant init from verification condition test_loop'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 35:
-    y,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }] } }
+    y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-2"}}]}}
   Line 38:
-    old x,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@at:L:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    x,
-    [[@at:M:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
+      [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 44:
-    x,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@at:L:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
+      [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 48:
-    x,
-    [[@at:M:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 51:
-    x at L,
-    [[@at:L], [@at:L:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced], [@model_trace:x]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    x at M,
-    [[@at:M], [@at:M:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced], [@model_trace:x]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x at L [@at:L] [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x at M [@at:M] [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
-bench/ce/ref_mono.mlw M test_loop'vc: Valid
-bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 52, characters 12-14:
+Goal Loop variant decrease from verification condition test_loop'vc.
+Prover result is: valid.
+
+File "bench/ce/ref_mono.mlw", line 51, characters 14-36:
+Goal Loop invariant preservation from verification condition test_loop'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
-    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "1" } }] } }
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 11:
-    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 35:
-    y,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }] } }
+    y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-2"}}]}}
   Line 38:
-    old x,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@at:L:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    x,
-    [[@at:M:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
+      [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 44:
-    x,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@at:L:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
+      [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 48:
-    x,
-    [[@at:M:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 50:
-    [previous iteration] x, [[@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "1" } }] } }
+    [before iteration] x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 51:
-    x at L,
-    [[@at:L], [@at:L:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced], [@model_trace:x]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    x at M,
-    [[@at:M], [@at:M:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced], [@model_trace:x]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    [current iteration] x,
-    [[@field:0:contents], [@introduced], [@model_trace:x]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x at L [@at:L] [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x at M [@at:M] [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    [current iteration] x [@field:0:contents] [@introduced]
+      [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 53:
-    [current iteration] x, [[@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    [current iteration] x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
-bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/ref_mono.mlw", line 45, characters 12-23:
+Goal Postcondition from verification condition test_loop'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
-    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 35:
-    y,
-    [[@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-3" } }] } }
+    y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-3"}}]}}
   Line 38:
-    old x,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@at:'Old:loc:bench/ce/ref_mono.mlw:45], [@at:L:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    x,
-    [[@at:M:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-1" } }] } }
+    old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
+      [@at:'Old:loc:bench/ce/ref_mono.mlw:45]
+      [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 44:
-    x,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:38], [@at:'Old:loc:bench/ce/ref_mono.mlw:45], [@at:L:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
+      [@at:'Old:loc:bench/ce/ref_mono.mlw:45]
+      [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 45:
-    x, [[@field:0:contents], [@introduced], [@model_trace:x]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    old x,
-    [[@at:'Old], [@at:'Old:loc:bench/ce/ref_mono.mlw:45], [@field:0:contents], [@introduced], [@model_trace:x]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:45]
+      [@field:0:contents] [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 48:
-    x,
-    [[@at:M:loc:bench/ce/ref_mono.mlw:51], [@field:0:contents], [@introduced]] =
-    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-1" } }] } }
+    x [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
+      [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 50:
-    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }] } }
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 

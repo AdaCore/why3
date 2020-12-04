@@ -35,12 +35,17 @@ cfgfile:
 ;
 
 cfgmodule:
-  | MODULE id=attrs(uident_nq) dl=cfgdecl* END
+  | id=module_head_parsing_only dl=cfgdecl* END
     { (id,dl) }
 
 cfgdecl:
-  | module_decl_parsing_only { Dmlw_decl $1 }
-  | LET CFG dl=with_list1(recdefn) { Dletcfg dl }
+  | scope_head_parsing_only cfgdecl* END
+      { let loc,import,qid = $1 in (Cfg_ast.Dscope(loc,import,qid,$2))}
+  | IMPORT uqualid { (Dmlw_decl (Dimport $2)) }
+  | d = pure_decl | d = prog_decl | d = meta_decl { Dmlw_decl d }
+  | use_clone_parsing_only { Dmlw_decl $1 }
+  | LET CFG f=recdefn { Dletcfg f }
+  | LET REC CFG dl=with_list1(recdefn) { Dreccfg dl }
 ;
 
 recdefn:
@@ -57,11 +62,11 @@ vardecls:
 ;
 
 vardecl:
-  | g=ghost VAR vl=attrs(lident_nq)* COLON t=ty SEMICOLON
+  | g=ghost_opt VAR vl=attrs(lident_nq)* COLON t=ty SEMICOLON
     { List.map (fun id -> (g,id,t)) vl }
 ;
 
-ghost:
+ghost_opt:
   | /* epsilon */ { false }
   | GHOST         { true }
 

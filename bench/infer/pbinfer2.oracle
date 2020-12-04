@@ -1,3 +1,20 @@
+CFG size: 101 nodes, 107 hyperedges
+Time elapsed 1.590225s
 ### Debug: inferred invariants ###
-(contents e = False /\ contents d = False) /\ contents c = False
+(((contents a2 = False /\ contents b = False \/
+   (((contents x1 = False /\ contents x2 = False) /\ contents b = contents a2) /\
+    contents x3 = contents a2) /\
+   True = contents a2 \/
+   (True = contents x3 /\ contents x1 = False) /\ contents x2 = False) /\
+  contents e = False) /\
+ contents d = False) /\
+contents c = False
 ###
+File bench/infer/pbinfer2.mlw:
+Verification condition to_true'vc.
+Prover result is: valid (0.00s, 0 steps).
+
+File bench/infer/pbinfer2.mlw:
+Verification condition pgmtest'vc.
+Prover result is: valid (0.01s, 22 steps).
+

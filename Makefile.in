@@ -76,6 +76,12 @@ ifeq (@OCAMLBEST@,opt)
 #DEPFLAGS += -native
 endif
 
+ifeq (@OCAMLBEST@,opt)
+SHAREDBEST=cmxs
+else
+SHAREDBEST=cma
+endif
+
 ifeq (@LATEX@,rubber)
    LATEXCOMP=rubber --warn all --pdf
    LATEXCLEAN=rubber --pdf --clean
@@ -121,7 +127,7 @@ EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE
 
 WARNINGS = A-4-9-41-44-45-50-52@5@8@48
 
-FLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
+FLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -thread $(INCLUDES)
 OFLAGS = $(FLAGS)
 BFLAGS = $(FLAGS)
 
@@ -213,9 +219,8 @@ LIBGENERATED = src/util/config.ml \
 	       src/parser/parser_messages.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
-	       src/driver/parse_smtv2_model_parser.mli src/driver/parse_smtv2_model_parser.ml \
-	       src/driver/parse_smtv2_model_lexer.ml \
-	       src/session/compress.ml src/session/xml.ml \
+         src/driver/sexp.ml \
+				 src/session/compress.ml src/session/xml.ml \
 	       src/session/strategy_parser.ml
 
 LIB_UTIL = mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
@@ -234,13 +239,10 @@ LIB_CORE = ident ty term pattern decl coercion theory \
 	   task pretty dterm env trans printer model_parser
 
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
-		whyconf autodetection \
-		smt2_model_defs parse_smtv2_model_parser \
-		collect_data_model parse_smtv2_model_lexer parse_smtv2_model \
-		parse_smtv2_model
+		whyconf autodetection smtv2_model_defs collect_data_model sexp smtv2_model_parser
 
 LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
-          pinterp
+          pinterp counterexample
 
 ifeq (@enable_infer@,yes)
 LIB_INFER = o2oterm domain infer_why3 quant_domain union_find disjunctive_term_domain uf_domain infer_cfg infer_loop
@@ -249,7 +251,8 @@ endif
 LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
               c ocaml cakeml
 
-LIB_PARSER = ptree glob typing parser_messages parser typing report lexer mlw_printer
+LIB_PARSER = ptree ptree_helpers glob typing \
+		parser_messages parser typing report lexer mlw_printer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper detect_polymorphism reduction_engine compute \
@@ -271,7 +274,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		rec_logic gnat_split_conj gnat_split_disj gnat_trivial \
 		eliminate_unused_hypo eliminate_literal induction induction_pr \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
-		matching reflection
+		induction induction_pr matching reflection
 
 LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
@@ -349,27 +352,24 @@ endif
 PARSERS=src/parser/parser_common.mly src/parser/parser.mly
 
 src/parser/parser_messages.ml: src/parser/handcrafted.messages
-	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
-	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --update-errors \
-	src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
-	diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; \
-	RET_CODE=$$?; \
-	if [ $$RET_CODE -ne 0 ]; then \
-		echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
+	@rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
+	@$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --update-errors \
+		src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
+	@if  ! diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; then \
+			echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
 contains an updated version that must be checked before replacing 'src/parser/handcrafted.messages'"; \
 		exit 1; \
 	fi
-	rm -f src/parser/handcrafted.messages.temp
+	@rm -f src/parser/handcrafted.messages.temp
 	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --compile-errors \
-	src/parser/handcrafted.messages > src/parser/parser_messages.ml.tmp
-	mv src/parser/parser_messages.ml.tmp src/parser/parser_messages.ml
+		src/parser/handcrafted.messages > src/parser/parser_messages.ml
 
 clean::
 	rm -f src/parser/parser_messages.ml.tmp src/parser/handcrafted.messages.temp
 
 # debug optimisation ppx
 
-ifeq (no,yes)
+ifeq (@enable_ppx@,yes)
 src/util/ppx_debug_optim: src/util/debug_optim.ml
 	$(SHOW) 'Linking $@'
 	$(HIDE) $(OCAMLFIND) opt -package compiler-libs.common -linkpkg src/util/debug_optim.ml -o $@
@@ -652,46 +652,26 @@ $(TOOLSDEP) $(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
 
 $(TOOLSDEP): $(TOOLSGENERATED)
 
-byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.byte)
-opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.opt)
-
-bin:
-	mkdir bin
+byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.cma)
+opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.cmxs)
 
 bin/why3.opt: $(WHY3CMXA) src/tools/main.cmx
 bin/why3.byte: $(WHY3CMA) src/tools/main.cmo
-bin/why3config.opt: $(WHY3CMXA) src/tools/why3config.cmx
-bin/why3config.byte: $(WHY3CMA) src/tools/why3config.cmo
-bin/why3execute.opt: $(WHY3CMXA) src/tools/why3execute.cmx
-bin/why3execute.byte: $(WHY3CMA) src/tools/why3execute.cmo
-bin/why3extract.opt: $(WHY3CMXA) src/tools/why3extract.cmx
-bin/why3extract.byte: $(WHY3CMA) src/tools/why3extract.cmo
-bin/why3prove.opt: $(WHY3CMXA) src/tools/why3prove.cmx
-bin/why3prove.byte: $(WHY3CMA) src/tools/why3prove.cmo
-bin/why3realize.opt: $(WHY3CMXA) src/tools/why3realize.cmx
-bin/why3realize.byte: $(WHY3CMA) src/tools/why3realize.cmo
-bin/why3replay.opt: $(WHY3CMXA) src/tools/why3replay.cmx
-bin/why3replay.byte: $(WHY3CMA) src/tools/why3replay.cmo
-bin/why3wc.opt: $(WHY3CMXA) src/tools/why3wc.cmx
-bin/why3wc.byte: $(WHY3CMA) src/tools/why3wc.cmo
+
+$(TOOLS_BIN:%=bin/%.cma):  bin/%.cma:  src/tools/%.cmo
+$(TOOLS_BIN:%=bin/%.cmxs): bin/%.cmxs: src/tools/%.cmx
 
 uninstall-bin::
 	rm -f $(BINDIR)/why3$(EXE)
-	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE))
+	rm -f $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 
 install-bin::
 	$(MKDIR_P) $(BINDIR)
 	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
-	$(INSTALL) bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
-	$(INSTALL) bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
-	$(INSTALL) bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
-	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
-	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
-	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
+	$(INSTALL_DATA) $(TOOLS_BIN:%=bin/%.$(SHAREDBEST)) $(TOOLDIR)
 
-install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
+install_local:: bin/why3 $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 
 bin/%:	bin/%.@OCAMLBEST@
 	ln -sf $(notdir $<) $@
@@ -715,25 +695,6 @@ GENERATED += $(TOOLSGENERATED)
 
 clean::
 	rm -f bin/why3*
-
-##############
-# test targets
-##############
-
-%.gui: %.why bin/why3ide.opt
-	bin/why3ide.opt $*.why
-
-%: %.mlw bin/why3.opt
-	bin/why3.opt $*.mlw
-
-%: %.why bin/why3.opt
-	bin/why3.opt $*.why
-
-%.gui: %.mlw bin/why3ide.opt
-	bin/why3ide.opt $*.mlw
-
-%.type: %.mlw bin/why3ide.opt
-	bin/why3.opt --type-only $*.mlw
 
 ############
 # GNATWhy3 #
@@ -829,8 +790,6 @@ clean::
 .PHONY: install_spark2014 install_spark2014_dev
 
 install_spark2014_dev: install_spark2014
-	# copying why3ide is optional, so this line is allowed to fail
-	-cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
 	$(MKDIR_P) $(DATADIR)/why3/images
 	for i in share/images/*.rc; do \
 	     d=`basename $$i .rc`; \
@@ -860,12 +819,15 @@ install_spark2014: install-bin
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -f lib/why3server$(EXE) $(BINDIR)/why3server$(EXE)
 	cp -f lib/why3cpulimit$(EXE) $(BINDIR)/why3cpulimit$(EXE)
-	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
-	cp -f bin/gnat_server.@OCAMLBEST@ $(BINDIR)/gnat_server$(EXE)
-	cp -f bin/why3realize.@OCAMLBEST@ $(BINDIR)/why3realize$(EXE)
-	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
-	cp -f bin/why3session.@OCAMLBEST@ $(BINDIR)/why3session$(EXE)
+	cp -f bin/gnatwhy3.$(OCAMLBEST) $(BINDIR)/gnatwhy3$(EXE)
+	cp -f bin/gnat_server.$(OCAMLBEST) $(BINDIR)/gnat_server$(EXE)
+	cp -f bin/why3.$(OCAMLBEST) $(BINDIR)/why3$(EXE)
+	cp -f bin/why3realize.$(SHAREDBEST) $(BINDIR)/
+	cp -f bin/why3config.$(SHAREDBEST) $(BINDIR)/
+	cp -f bin/why3session.$(SHAREDBEST) $(BINDIR)/
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
+	# copying why3ide is optional, so this line is allowed to fail
+	-cp -f bin/why3ide.$(SHAREDBEST) $(BINDIR)/
 	cp -rf lib/coq $(DATADIR)/why3/libs
 
 ##########
@@ -886,7 +848,7 @@ gallery-simple:
 	  if echo $$f | grep -q -e '\(_vc_sp\|^bignum\)$$'; then continue; fi; \
 	  echo "exporting $$f"; \
 	  mkdir -p $(GALLERYDIR)/$$f; \
-	  WHY3CONFIG="" ../bin/why3session.@OCAMLBEST@ html $$x -o $(GALLERYDIR)/$$f; \
+	  WHY3CONFIG="" ../bin/why3.@OCAMLBEST@ session html $$x -o $(GALLERYDIR)/$$f; \
 	  cp $$f.mlw $(GALLERYDIR)/$$f/; \
 	  rm -f $(GALLERYDIR)/$$f/$$f.zip; \
 	  git archive --format=zip -o $(GALLERYDIR)/$$f/$$f.zip HEAD $$f.mlw $$f; \
@@ -900,7 +862,7 @@ gallery-subs:
 	  echo "exporting examples/$$d"; \
 	  mkdir -p $(GALLERYDIR)/$$d; \
 	  cd examples/$$d; \
-	  WHY3CONFIG="" ../../bin/why3doc.@OCAMLBEST@ --no-stdlib --no-load-default-plugins -L ../../stdlib -L . --stdlib-url http://why3.lri.fr/stdlib/ --debug ignore_unused_vars *.mlw -o $(GALLERYDIR)/$$d; \
+	  WHY3CONFIG="" ../../bin/why3.@OCAMLBEST@ doc --no-stdlib --no-load-default-plugins -L ../../stdlib -L . --stdlib-url http://why3.lri.fr/stdlib/ --debug ignore_unused_vars *.mlw -o $(GALLERYDIR)/$$d; \
 	  cd ..; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
 	  git archive --format=zip -o $(GALLERYDIR)/$$d/$$d.zip HEAD $$d; \
@@ -936,7 +898,7 @@ IDE_FILES = gtkcompat
 ifeq (@enable_statmemprof@,yes)
 IDE_FILES += statmemprof
 
-bin/why3ide.opt bin/why3ide.byte: EXTPKGS += @STATMEMPROFPKG@
+bin/why3ide.cmxs bin/why3ide.cma: EXTPKGS += @STATMEMPROFPKG@
 endif
 
 IDE_FILES += gconfig ide_utils why3ide
@@ -953,24 +915,13 @@ $(IDEDEP): $(IDEGENERATED)
 
 # build targets
 
-byte: bin/why3ide.byte
-opt:  bin/why3ide.opt
+byte: bin/why3ide.cma
+opt:  bin/why3ide.cmxs
 
-bin/why3ide.opt bin/why3ide.byte: EXTINCLUDES += @LABLGTKINCLUDE@
-bin/why3ide.opt bin/why3ide.byte: EXTLIBS += @LABLGTKLIB@
-bin/why3ide.opt bin/why3ide.byte: EXTPKGS += @LABLGTKPKG@
-bin/why3ide.byte: BLINKFLAGS += -custom
+bin/why3ide.cmxs bin/why3ide.cma: FLAGS += $(addprefix -package ,@LABLGTKPKG@) -dontlink "$(EXTPKGS)" -linkpkg
 
-ifeq (@enable_ocamlfind@,yes)
-bin/why3ide.opt bin/why3ide.byte: FLAGS += -thread
-endif
-
-bin/why3ide.opt: $(WHY3CMXA) src/ide/resetgc.o $(IDECMX)
-bin/why3ide.byte: $(WHY3CMA) src/ide/resetgc.o $(IDECMO)
-
-src/ide/resetgc.o: src/ide/resetgc.c
-	$(SHOW) 'Ocamlc   $<'
-	$(HIDE)$(OCAMLC) -c -ccopt "-Wall -o $@" $<
+bin/why3ide.cmxs: $(IDECMX)
+bin/why3ide.cma:  $(IDECMO)
 
 # depend and clean targets
 
@@ -982,17 +933,17 @@ depend: $(IDEDEP)
 
 CLEANDIRS += src/ide
 
-ide: bin/why3ide.@OCAMLBEST@
+ide: bin/why3ide.$(SHAREDBEST)
 
 uninstall-ide:
-	rm -f $(TOOLDIR)/why3ide$(EXE)
+	rm -f $(TOOLDIR)/why3ide.$(SHAREDBEST)
 	rm -rf $(DATADIR)/why3/images
 
 uninstall:: uninstall-ide
 
 install-ide:
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3ide.@OCAMLBEST@ $(TOOLDIR)/why3ide$(EXE)
+	$(INSTALL_DATA) bin/why3ide.$(SHAREDBEST) $(TOOLDIR)
 	$(MKDIR_P) $(DATADIR)/why3/images
 	for i in share/images/*.rc; do \
 	     d=`basename $$i .rc`; \
@@ -1004,7 +955,7 @@ install-ide:
 
 install:: install-ide
 
-install_local:: bin/why3ide
+install_local:: bin/why3ide.$(SHAREDBEST)
 
 ifeq (@GTKVERSION@,2)
 src/ide/gtkcompat.ml: src/ide/gtkcompat2.ml Makefile
@@ -1034,11 +985,11 @@ $(WEBSERVDEP) $(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
 
 # build targets
 
-byte: bin/why3webserver.byte
-opt:  bin/why3webserver.opt
+byte: bin/why3webserver.cma
+opt:  bin/why3webserver.cmxs
 
-bin/why3webserver.opt: $(WHY3CMXA) $(WEBSERVCMX)
-bin/why3webserver.byte: $(WHY3CMA) $(WEBSERVCMO)
+bin/why3webserver.cmxs: $(WEBSERVCMX)
+bin/why3webserver.cma:  $(WEBSERVCMO)
 
 # depend and clean targets
 
@@ -1051,13 +1002,13 @@ depend: $(WEBSERVDEP)
 CLEANDIRS += src/ide
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3webserver$(EXE)
+	rm -f $(TOOLDIR)/why3webserver.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3webserver.@OCAMLBEST@ $(TOOLDIR)/why3webserver$(EXE)
+	$(INSTALL_DATA) bin/why3webserver.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3webserver
+install_local:: bin/why3webserver.$(SHAREDBEST)
 
 
 ###############
@@ -1080,11 +1031,11 @@ $(SESSIONDEP) $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
 
 # build targets
 
-byte: bin/why3session.byte
-opt:  bin/why3session.opt
+byte: bin/why3session.cma
+opt:  bin/why3session.cmxs
 
-bin/why3session.opt: $(WHY3CMXA) $(SESSIONCMX)
-bin/why3session.byte: $(WHY3CMA) $(SESSIONCMO)
+bin/why3session.cmxs: $(SESSIONCMX)
+bin/why3session.cma:  $(SESSIONCMO)
 
 # depend and clean targets
 
@@ -1097,13 +1048,13 @@ depend: $(SESSIONDEP)
 CLEANDIRS += src/why3session
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3session$(EXE)
+	rm -f $(TOOLDIR)/why3session.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3session.@OCAMLBEST@ $(TOOLDIR)/why3session$(EXE)
+	$(INSTALL_DATA) bin/why3session.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3session
+install_local:: bin/why3session.$(SHAREDBEST)
 
 ###############
 # Why3 Shell
@@ -1121,11 +1072,11 @@ $(SHELLDEP) $(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
 
 # build targets
 
-byte: bin/why3shell.byte
-opt:  bin/why3shell.opt
+byte: bin/why3shell.cma
+opt:  bin/why3shell.cmxs
 
-bin/why3shell.opt: $(WHY3CMXA) $(SHELLCMX)
-bin/why3shell.byte: $(WHY3CMA) $(SHELLCMO)
+bin/why3shell.cmxs: $(SHELLCMX)
+bin/why3shell.cma:  $(SHELLCMO)
 
 # depend and clean targets
 
@@ -1136,13 +1087,13 @@ endif
 depend: $(SHELLDEP)
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3shell$(EXE)
+	rm -f $(TOOLDIR)/why3shell.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3shell.@OCAMLBEST@ $(TOOLDIR)/why3shell$(EXE)
+	$(INSTALL_DATA) bin/why3shell.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3shell
+install_local:: bin/why3shell.$(SHAREDBEST)
 
 ####################
 # Coq realizations
@@ -1151,12 +1102,9 @@ install_local:: bin/why3shell
 COQVERSIONSPECIFIC=
 
 COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
-COQVERSIONSPECIFICSOURCES=$(addsuffix .@coq_compat_version@, $(COQVERSIONSPECIFICTARGETS))
 
-$(COQVERSIONSPECIFICTARGETS): $(COQVERSIONSPECIFICSOURCES)
-	for i in $(COQVERSIONSPECIFIC); do \
-		cp lib/coq/$$i.@coq_compat_version@ lib/coq/$$i ; \
-	done
+$(COQVERSIONSPECIFICTARGETS): %: %.@coq_compat_version@
+	cp $< $@
 
 clean::
 	rm -f $(COQVERSIONSPECIFICTARGETS)
@@ -1194,9 +1142,6 @@ COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
 COQLIBS_BV_FILES = Pow2int BV_Gen
 COQLIBS_BV = $(addprefix lib/coq/bv/, $(COQLIBS_BV_FILES))
 
-COQLIBS_SPARK_FILES = SPARK_Integer_Arithmetic SPARK_Raising_Order
-COQLIBS_SPARK = $(addprefix lib/coq/spark/, $(COQLIBS_SPARK_FILES))
-
 ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
@@ -1206,7 +1151,7 @@ COQLIBS_IEEEFLOAT_FILES = RoundingMode GenericFloat Float32 Float64
 COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 endif
 
-COQLIBS_FOR_DRIVERS_FILES =
+COQLIBS_FOR_DRIVERS_FILES = ComputerOfEuclideanDivision
 COQLIBS_FOR_DRIVERS = $(addprefix lib/coq/for_drivers/, $(COQLIBS_FOR_DRIVERS_FILES))
 
 COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT) $(COQLIBS_FOR_DRIVERS)
@@ -1265,41 +1210,41 @@ update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number upd
 
 LOCAL_STDLIB=-L stdlib --no-stdlib --no-load-default-plugins
 
-update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/int.mlw
-	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T int.$$f -o $(GENERATED_PREFIX_COQ)/int/; done
+update-coq-int: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/int.mlw
+	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T int.$$f -o $(GENERATED_PREFIX_COQ)/int/; done
 
-update-coq-bool: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/bool.mlw
-	for f in $(COQLIBS_BOOL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T bool.$$f -o $(GENERATED_PREFIX_COQ)/bool/; done
+update-coq-bool: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/bool.mlw
+	for f in $(COQLIBS_BOOL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T bool.$$f -o $(GENERATED_PREFIX_COQ)/bool/; done
 
-update-coq-real: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/real.mlw
-	for f in $(COQLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T real.$$f -o $(GENERATED_PREFIX_COQ)/real/; done
+update-coq-real: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/real.mlw
+	for f in $(COQLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T real.$$f -o $(GENERATED_PREFIX_COQ)/real/; done
 
-update-coq-number: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/number.mlw
-	for f in $(COQLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T number.$$f -o $(GENERATED_PREFIX_COQ)/number/; done
+update-coq-number: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/number.mlw
+	for f in $(COQLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T number.$$f -o $(GENERATED_PREFIX_COQ)/number/; done
 
-update-coq-set: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/set.mlw
-	for f in $(COQLIBS_SET_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T set.$$f -o $(GENERATED_PREFIX_COQ)/set/; done
+update-coq-set: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/set.mlw
+	for f in $(COQLIBS_SET_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T set.$$f -o $(GENERATED_PREFIX_COQ)/set/; done
 
-update-coq-map: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/map.mlw
-	for f in $(COQLIBS_MAP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T map.$$f -o $(GENERATED_PREFIX_COQ)/map/; done
+update-coq-map: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/map.mlw
+	for f in $(COQLIBS_MAP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T map.$$f -o $(GENERATED_PREFIX_COQ)/map/; done
 
-update-coq-list: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/list.mlw
-	for f in $(COQLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T list.$$f -o $(GENERATED_PREFIX_COQ)/list/; done
+update-coq-list: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/list.mlw
+	for f in $(COQLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T list.$$f -o $(GENERATED_PREFIX_COQ)/list/; done
 
-update-coq-option: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/option.mlw
-	for f in $(COQLIBS_OPTION_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T option.$$f -o $(GENERATED_PREFIX_COQ)/option/; done
+update-coq-option: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/option.mlw
+	for f in $(COQLIBS_OPTION_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T option.$$f -o $(GENERATED_PREFIX_COQ)/option/; done
 
-update-coq-bv: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/bv.mlw
-	for f in $(COQLIBS_BV_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T bv.$$f -o $(GENERATED_PREFIX_COQ)/bv/; done
+update-coq-bv: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/bv.mlw
+	for f in $(COQLIBS_BV_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T bv.$$f -o $(GENERATED_PREFIX_COQ)/bv/; done
 
-update-coq-for-drivers: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/for_drivers.mlw
-	for f in $(COQLIBS_FOR_DRIVERS_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T for_drivers.$$f -o $(GENERATED_PREFIX_COQ)/for_drivers/; done
+update-coq-for-drivers: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/for_drivers.mlw
+	for f in $(COQLIBS_FOR_DRIVERS_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T for_drivers.$$f -o $(GENERATED_PREFIX_COQ)/for_drivers/; done
 
-update-coq-ieee_float: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/ieee_float.mlw
-	for f in $(COQLIBS_IEEEFLOAT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T ieee_float.$$f -o $(GENERATED_PREFIX_COQ)/ieee_float/; done
+update-coq-ieee_float: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/ieee_float.mlw
+	for f in $(COQLIBS_IEEEFLOAT_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T ieee_float.$$f -o $(GENERATED_PREFIX_COQ)/ieee_float/; done
 
-update-coq-fp: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/floating_point.mlw
-	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T floating_point.$$f -o $(GENERATED_PREFIX_COQ)/floating_point/; done
+update-coq-fp: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/coq-realizations.aux stdlib/floating_point.mlw
+	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T floating_point.$$f -o $(GENERATED_PREFIX_COQ)/floating_point/; done
 
 ifeq (@enable_coq_libs@,yes)
 
@@ -1388,12 +1333,12 @@ PVSLIBS_FP = $(addprefix lib/pvs/floating_point/, $(PVSLIBS_FP_ALL_FILES))
 PVSLIBS_FILES = $(PVSLIBS_INT) $(PVSLIBS_REAL) $(PVSLIBS_LIST) \
                 $(PVSLIBS_NUMBER) $(PVSLIBS_FP)
 
-update-pvs: bin/why3realize.@OCAMLBEST@ drivers/pvs-realizations.aux
-	for f in $(PVSLIBS_INT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
-	for f in $(PVSLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T real.$$f -o lib/pvs/real/; done
-	for f in $(PVSLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T list.$$f -o lib/pvs/list/; done
-	for f in $(PVSLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T number.$$f -o lib/pvs/number/; done
-	for f in $(PVSLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T floating_point.$$f -o lib/pvs/floating_point/; done
+update-pvs: bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/pvs-realizations.aux
+	for f in $(PVSLIBS_INT_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
+	for f in $(PVSLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T real.$$f -o lib/pvs/real/; done
+	for f in $(PVSLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T list.$$f -o lib/pvs/list/; done
+	for f in $(PVSLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T number.$$f -o lib/pvs/number/; done
+	for f in $(PVSLIBS_FP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D drivers/pvs-realize.drv -T floating_point.$$f -o lib/pvs/floating_point/; done
 
 drivers/pvs-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
@@ -1459,14 +1404,11 @@ clean::
 ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy Why3_Map.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
-ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
 
 ISABELLEREALIZEDRV=drivers/isabelle@ISABELLEVERSION@-realize.drv
 
-$(ISABELLEVERSIONSPECIFICTARGETS): $(ISABELLEVERSIONSPECIFICSOURCES)
-	for i in $(ISABELLEVERSIONSPECIFIC); do \
-		cp lib/isabelle/$$i.@ISABELLEVERSION@ lib/isabelle/$$i ; \
-	done
+$(ISABELLEVERSIONSPECIFICTARGETS): %: %.@ISABELLEVERSION@
+	cp $< $@
 
 clean::
 	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
@@ -1532,59 +1474,59 @@ $(GENERATED_PREFIX_ISABELLE)/realizations.@ISABELLEVERSION@: $(ISABELLELIBS)
 
 update-isabelle: $(GENERATED_PREFIX_ISABELLE)/realizations.@ISABELLEVERSION@
 
-$(ISABELLELIBS_INT): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+$(ISABELLELIBS_INT): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/int.mlw
 	$(SHOW) "Generating Isabelle realization for int.$(notdir $(basename $@))"
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/int
-	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T int.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/int/
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T int.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/int/
 
-$(ISABELLELIBS_BOOL): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+$(ISABELLELIBS_BOOL): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/bool.mlw
 	$(SHOW) "Generating Isabelle realization for bool.$(notdir $(basename $@))"
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/bool
-	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T bool.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bool/
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T bool.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bool/
 
-$(ISABELLELIBS_REAL): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+$(ISABELLELIBS_REAL): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/real.mlw
 	$(SHOW) "Generating Isabelle realization for real.$(notdir $(basename $@))"
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/real
-	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T real.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/real/
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T real.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/real/
 
-$(ISABELLELIBS_NUMBER): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+$(ISABELLELIBS_NUMBER): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/number.mlw
 	$(SHOW) "Generating Isabelle realization for number.$(notdir $(basename $@))"
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/number
-	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T number.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/number/
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T number.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/number/
 
-$(ISABELLELIBS_SET): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+$(ISABELLELIBS_SET): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/set.mlw
 	$(SHOW) "Generating Isabelle realization for set.$(notdir $(basename $@))"
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/set
-	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T set.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/set/
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T set.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/set/
 
-$(ISABELLELIBS_MAP): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+$(ISABELLELIBS_MAP): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/map.mlw
 	$(SHOW) "Generating Isabelle realization for map.$(notdir $(basename $@))"
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/map
-	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T map.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/map/
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T map.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/map/
 
-$(ISABELLELIBS_LIST): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+$(ISABELLELIBS_LIST): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/list.mlw
 	$(SHOW) "Generating Isabelle realization for list.$(notdir $(basename $@))"
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/list
-	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T list.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/list/
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T list.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/list/
 
-$(ISABELLELIBS_OPTION): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+$(ISABELLELIBS_OPTION): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/option.mlw
 	$(SHOW) "Generating Isabelle realization for option.$(notdir $(basename $@))"
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/option
-	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T option.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/option/
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T option.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/option/
 
-$(ISABELLELIBS_BV): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
+$(ISABELLELIBS_BV): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/bv.mlw
 	$(SHOW) "Generating Isabelle realization for bv.$(notdir $(basename $@))"
 	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/bv
-	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bv/
+	$(HIDE)WHY3CONFIG="" bin/why3.@OCAMLBEST@ realize $(LOCAL_STDLIB) -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bv/
 
 ifeq (@enable_isabelle_libs@,yes)
 
@@ -1707,11 +1649,11 @@ GENERATED += $(PRETTYPRINTGENERATED)
 
 # build targets
 
-byte: bin/why3pp.byte
-opt:  bin/why3pp.opt
+byte: bin/why3pp.cma
+opt:  bin/why3pp.cmxs
 
-bin/why3pp.opt: $(WHY3CMXA) $(PRETTYPRINTCMX)
-bin/why3pp.byte: $(WHY3CMA) $(PRETTYPRINTCMO)
+bin/why3pp.cmxs: $(PRETTYPRINTCMX)
+bin/why3pp.cma:  $(PRETTYPRINTCMO)
 
 # depend and clean targets
 
@@ -1722,13 +1664,13 @@ endif
 depend: $(PRETTYPRINTDEP)
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3pp(EXE)
+	rm -f $(TOOLDIR)/why3pp.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3pp.@OCAMLBEST@ $(TOOLDIR)/why3pp$(EXE)
+	$(INSTALL_DATA) bin/why3pp.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3pp
+install_local:: bin/why3pp.$(SHAREDBEST)
 
 #########
 # why3doc
@@ -1750,11 +1692,11 @@ $(WHY3DOCDEP): $(WHY3DOCGENERATED)
 
 # build targets
 
-byte: bin/why3doc.byte
-opt:  bin/why3doc.opt
+byte: bin/why3doc.cma
+opt:  bin/why3doc.cmxs
 
-bin/why3doc.opt: $(WHY3CMXA) $(WHY3DOCCMX)
-bin/why3doc.byte: $(WHY3CMA) $(WHY3DOCCMO)
+bin/why3doc.cmxs: $(WHY3DOCCMX)
+bin/why3doc.cma:  $(WHY3DOCCMO)
 
 # depend and clean targets
 
@@ -1768,13 +1710,13 @@ CLEANDIRS += src/why3doc
 GENERATED += $(WHY3DOCGENERATED)
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3doc$(EXE)
+	rm -f $(TOOLDIR)/why3doc.$(SHAREDBEST)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3doc.@OCAMLBEST@ $(TOOLDIR)/why3doc$(EXE)
+	$(INSTALL_DATA) bin/why3doc.$(SHAREDBEST) $(TOOLDIR)
 
-install_local:: bin/why3doc
+install_local:: bin/why3doc.$(SHAREDBEST)
 
 #########
 # trywhy3
@@ -1917,7 +1859,7 @@ src/trywhy3/%.cmi: src/trywhy3/%.mli
 
 $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo alt_ergo_worker.cmo): BFLAGS += -package js_of_ocaml
 
-$(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml.ppx
+$(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 -include $(TRYWHY3DEP)
@@ -1940,7 +1882,7 @@ CLEANDIRS += src/trywhy3
 
 ifeq (@enable_web_ide@,yes)
 
-JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
+JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml-ppx \
         -I src/ide
 
 src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma
@@ -1954,8 +1896,8 @@ src/ide/why3_js.js: src/ide/why3_js.byte
 
 web_ide: src/ide/why3_js.js
 
-opt: bin/why3webserver.opt
-byte: bin/why3webserver.byte src/ide/why3_js.cmo
+opt: bin/why3webserver.cmxs
+byte: bin/why3webserver.cma src/ide/why3_js.cmo
 
 endif
 
@@ -1965,21 +1907,29 @@ endif
 
 .PHONY: bench test
 
-bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
-  share/Makefile.config bin/why3extract.@OCAMLBEST@
+bench:: bin/why3.@OCAMLBEST@ bin/why3config.$(SHAREDBEST) plugins $(TOOLS) \
+  share/Makefile.config bin/why3extract.$(SHAREDBEST)
 	@echo "=== Check API examples ==="
 	$(MAKE) bench-api
 	@echo "=== Check examples ==="
-	bash bench/bench ".@OCAMLBEST@"
+	bash bench/bench -suffix ".@OCAMLBEST@"
 	@echo "=== Check parsing messages ==="
 	bench/parsing-bench
 	@echo ""
 	@echo "=== Checking extraction ==="
 	$(MAKE) test-ocaml-extraction
 
-APITESTS=logic transform clone mlw_tree mlw_tree1 mlw_expr create_session counterexample
+APITESTS=logic transform clone mlw_tree mlw_expr create_session counterexample
+
+ifeq (@enable_infer@,yes)
+	APITESTS += mlw_tree_infer_invs
+endif
 
 bench-api: $(addprefix test-api-, $(APITESTS))
+
+clean::
+	rm -rf bench/infer/*.out
+	rm -rf bench/check-ce/*.out
 
 ###############
 # test targets
@@ -2014,9 +1964,9 @@ test-api-%: test-api-%.@OCAMLBEST@
 #	ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) $? examples/test_shape.ml
 
 
-test-ocaml-extraction: bin/why3.opt bin/why3extract.opt
+test-ocaml-extraction: bin/why3.opt bin/why3extract.cmxs
 	@echo "driver ocaml64"
-	@bin/why3extract.opt -D ocaml64 -L tests \
+	@bin/why3.opt extract -D ocaml64 -L tests \
 	  test_extraction.TestExtraction -o tests/test-extraction/test.ml
 ifeq (@enable_zarith@,yes)
 	@$(OCAMLOPT) @BIGINTINCLUDE@ -I tests/test-extraction/ zarith.cmxa \
@@ -2098,12 +2048,12 @@ MODULESTODOC = \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task core/trans core/pretty core/printer \
 	core/model_parser \
-	parser/typing parser/mlw_printer \
+	parser/ptree_helpers parser/typing parser/mlw_printer \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
 	session/session_itp session/controller_itp \
 	session/itp_communication session/itp_server \
-	mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc
+	mlw/counterexample mlw/pinterp mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc
 
 MODULESMLTODOC = parser/ptree
 
@@ -2197,11 +2147,11 @@ STDLIBS = \
 STDLIBFILES = $(patsubst %,stdlib/%.mlw, $(STDLIBS))
 
 # TODO: remove the hack about int.mlw once it has become builtin
-stdlibdoc: $(STDLIBFILES) bin/why3doc.@OCAMLBEST@
+stdlibdoc: $(STDLIBFILES) bin/why3.@OCAMLBEST@ bin/why3doc.$(SHAREDBEST)
 	mkdir -p doc/stdlibdoc
 	sed -e "s/use Int/use int.Int/" stdlib/int.mlw > int.mlw
 	rm -f doc/stdlibdoc/style.css
-	WHY3CONFIG="" bin/why3doc.@OCAMLBEST@ $(LOCAL_STDLIB) \
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ doc $(LOCAL_STDLIB) \
           -o doc/stdlibdoc --title="Why3 Standard Library" \
 	  $(subst stdlib/int.mlw,int.mlw,$(STDLIBFILES))
 	rm int.mlw
@@ -2240,10 +2190,6 @@ clean::
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
-# src/tools/why3pretty.cmx: %.cmx: %.ml
-# 	$(SHOW) 'Ocamlopt $<'
-# 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
-
 %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $(CMIHACK) $<
@@ -2269,14 +2215,13 @@ clean::
 	$(HIDE)$(MENHIR) --table --explain --strict $<
 
 src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
-	$(SHOW) 'Menhir $<'
+	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser $^
 
-plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: plugins/cfg/cfg_parser.mly
-	$(SHOW) 'Menhir $<'
+plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
+	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --base plugins/cfg/cfg_parser \
-		--external-tokens Cfg_tokens \
-		src/parser/parser_common.mly $^
+		--external-tokens Cfg_tokens $^
 
 
 %.dep: %.ml %.mli
@@ -2289,11 +2234,11 @@ plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: plugins/cfg/cfg_parser.mly
 	        echo '$*.cmx : $*.cmi'; \
 	        echo '$*.cmi : $*.cmo') $(TOTARGET)
 
-bin/%.opt: | bin
+bin/%.opt:
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/%.byte: | bin
+bin/%.byte:
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
@@ -2339,11 +2284,6 @@ otags-vi:
 
 wc:
 	ocamlwc -p src/*.ml* src/*/*.ml*
-
-# rule for ocp
-
-ocp:
-	 $(MAKE) all OCAMLC=ocp-ocamlc.opt OCAMLOPT=ocp-ocamlopt.opt
 
 #dep: depend
 #	cat .depend* | ocamldot | dot -Tpdf > dep.pdf
@@ -2404,6 +2344,9 @@ clean::
 
 config.status: configure
 	./config.status --recheck
+
+configure: configure.in
+	autoconf -f
 
 ###################
 # clean and depend

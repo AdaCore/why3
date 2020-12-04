@@ -16,7 +16,7 @@ is as simple as
 
     opam install why3
 
-Then jump to :numref:`provers` to install external provers.
+Then jump to :numref:`sec.provers` to install external provers.
 
 Installation via Docker
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,7 +120,7 @@ Installation is performed (as super-user if needed) using
 
 Installation can be tested as follows:
 
-#. install some external provers (see :numref:`provers` below)
+#. install some external provers (see :numref:`sec.provers` below)
 
 #. run :option:`why3 config --detect`
 
@@ -139,8 +139,8 @@ Installation can be tested as follows:
 Local Use, Without Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It is not mandatory to install Why3 into system directories. Why3 can be
-configured and compiled for local use as follows:
+Installing Why3 is not mandatory. It can be configured in a way such that
+it can be used from its compilation directory:
 
 ::
 
@@ -148,7 +148,7 @@ configured and compiled for local use as follows:
     make
 
 The Why3 executable files are then available in the subdirectory :file:`bin/`.
-This directory can be added in your :envvar:`PATH`.
+This directory can be added to your :envvar:`PATH`.
 
 .. _sec.installlib:
 
@@ -176,7 +176,7 @@ Removing installation can be done using
     make uninstall
     make uninstall-lib
 
-.. _provers:
+.. _sec.provers:
 
 Installing External Provers
 ---------------------------

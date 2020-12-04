@@ -61,8 +61,10 @@ type printer_mapping = {
   (* List of attributes corresponding to a printed constants (that was on the
      immediate term, not inside the ident) *)
   set_str: Sattr.t Mstr.t
-
 }
+
+(** Return the union of projections and fields of a printer_mapping *)
+val list_projs : printer_mapping -> ident Mstr.t
 
 type printer_args = {
   env        : Env.env;

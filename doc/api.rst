@@ -30,7 +30,7 @@ piece of OCaml code for building the formula ``true \/ false``.
 
 The library uses the common type ``term`` both for terms (i.e.,
 expressions that produce a value of some particular type) and formulas
-(i.e., boolean-valued expressions).
+(i.e., Boolean-valued expressions).
 
 Such a formula can be printed using the module ``Pretty`` providing
 pretty-printers.
@@ -513,10 +513,14 @@ The examples of this section are available in the file
 :file:`examples/use_api/mlw_tree.ml` of the distribution.
 
 The first step is to build an environment as already illustrated in
-:numref:`sec.api.callingprovers`, and open the OCaml module ``Ptree``
-(“parse tree”) which contains most of the OCaml functions we need in
-this section, and is documented `here
-<http://why3.lri.fr/api/Ptree.html>`_.
+:numref:`sec.api.callingprovers`, open the OCaml module ``Ptree``
+(“parse tree”) which contains the type constructors for the parsing
+trees, and finally the OCaml module ``Ptree_helpers`` which contains
+helpers for building those trees and a more concise and friendly
+manner than the low-level constructors. The latter two OCaml modules
+are documented in the online API documentation, respectively for
+`Ptree <http://why3.lri.fr/api/Ptree.html>`_ and
+`Ptree_helpers <http://why3.lri.fr/api/Ptree_helpers.html>`_.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
@@ -539,17 +543,13 @@ The Ocaml code that programmatically builds it is as follows.
    :end-before: END{code1}
 
 Most of the code is not using directly the ``Ptree`` constructors but
-instead makes uses of the helper functions that are given below. Notice
-``mk_ident`` which builds an identifier (``Ptree.ident``) without any
-attributes nor any location and ``use_import`` which lets us import some
-other modules and in particular the ones from the standard library. At
-the end, our module is no more than the identifier and a list of two
-declarations (``Ptree.decl list``).
-
-.. literalinclude:: ../examples/use_api/mlw_tree.ml
-   :language: ocaml
-   :start-after: BEGIN{helper1}
-   :end-before: END{helper1}
+instead makes uses of the helper functions that are given in the
+``Ptree_helpers`` module. Notice ``ident`` which builds an
+identifier (type ``Ptree.ident``) optionally with attributes and location
+and ``use`` which lets us import some other modules and in
+particular the ones from the standard library. At the end, our module
+is no more than the identifier and a list of two declarations
+(``Ptree.decl list``).
 
 We want now to build a program equivalent to the following code in
 concrete Why3 syntax.
@@ -606,6 +606,41 @@ file.
    :start-after: BEGIN{getmodules}
    :end-before: END{getmodules}
 
+Alternative, top-down, construction of parsing trees
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The way we build our modules above is somehow bottom-up: builds the
+terms and the program expressions, then the declarations that contain
+them, then the modules containing the latter declarations. An
+alternative provided by other helpers is to build those modules in a
+top-down way, which may be more natural since this the order they
+occur in the concrete syntax. We show below how to construct a similar
+list of module as above, with only the last module for
+conciseness:
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{topdownf}
+   :end-before: END{topdownf}
+
+The construction above is functional, in the sense that the ``uc``
+variable holds the necessary data for the modules under
+construction. For simplicity it is also possible to use an imperative
+variant which transparently handles the state of modules under
+construction.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{topdowni}
+   :end-before: END{topdowni}
+
+Beware though that the latter approach is not thread-safe and cannot
+be used in re-entrant manner.
+
+
+Using the parsing trees
+~~~~~~~~~~~~~~~~~~~~~~~
+
 Module ``Mlw_printer`` provides functions to print elements of ``Ptree``
 in concrete whyml syntax.
 
@@ -660,47 +695,65 @@ while loop and an attribute that triggers the inference of loop
 invariants during VC generation. For more information about the
 inference of loop invariants refer to :numref:`sec.installinferloop`
 and :numref:`sec.runwithinferloop`. The examples shown below are
-available in the file :file:`examples/use_api/mlw_tree1.ml`.
+available in the file :file:`examples/use_api/mlw_tree_infer_invs.ml`.
 
 We build an environment and define the some helper functions exactly
 as in :numref:`sec.build_untyped`. Additionally we create two other
 helper functions as follows:
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{helper2}
    :end-before: END{helper2}
 
 Our goal is now to build a program equivalent to the following. Note
-that the let declaration contains an attribute ``[@infer]`` which will
+that the let declaration contains an attribute :why3:attribute:`[@infer]` which will
 trigger the inference of loop invariants during VC generation (make
 sure that the why3 library was compiled with support for `infer-loop`,
 see :numref:`sec.installinferloop` for more information).
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{source1}
    :end-before: END{source1}
 
 The OCaml code that builds such a module is shown below.
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{code1}
    :end-before: END{code1}
 
-The debugging flags mentioned in :numref:`sec.runwithinferloop` can be
-enabled using the API as follows (the line(s) corresponding to the
-desired flag(s) should be uncommented).
+Optionally, the debugging flags mentioned in
+:numref:`sec.runwithinferloop` can be enabled by using the API as
+follows (the line(s) corresponding to the desired flag(s) should be
+uncommented).
 
-.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
    :language: ocaml
    :start-after: BEGIN{flags}
    :end-before: END{flags}
 
+Another option is to register a function to be executed immediately
+after the invariants are inferred. The function should have type
+``(expr * term) list -> unit``, where ``expr`` corresponds to a while
+loop and ``term`` to the respective inferred invariant. The function
+can be registered using the function ``Infer_loop.register_hook``.
+
+In the following example a sequence of three functions are
+registered. The first function will write the invariants to the
+standard output, the second to a file named `inferred_invs.out`, and
+the third will save the inferred invariants in ``inv_terms``.
+
+.. literalinclude:: ../examples/use_api/mlw_tree_infer_invs.ml
+   :language: ocaml
+   :start-after: BEGIN{inv_hook}
+   :end-before: END{inv_hook}
+
 Finally the code for closing the modules, printing it to the standard
 output, typing it, and so on is exactly the same as in the previous
-section, thus we omit it in here.
+section, thus we omit it in here. Note that in practice, the
+invariants are only inferred when invoking ``Typing.type_mlw_file``.
 
 .. _sec.build_typed:
 
@@ -783,7 +836,7 @@ program AST node in this attribute; this helps them to parse and display
 the results given by Why3. The locations are also necessary as every
 counterexamples values with no location will not be displayed. For example,
 an assignment of the source language such as the following will probably
-trigger the creation of an ident (for the left value) in a user
+trigger the creation of an identifier (for the left value) in a user
 subsequent tasks:
 
 ::
@@ -801,7 +854,7 @@ The example becomes the following:
    :end-before: END{ce_declarepropvars}
 
 In the above, we defined a
-proposition ident with a location and a ``model_trace``.
+proposition identifier with a location and a ``model_trace``.
 
 Attributes in formulas
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -835,3 +888,13 @@ the JSON output as follows:
    :language: ocaml
    :start-after: BEGIN{ce_callprover}
    :end-before: END{ce_callprover}
+
+
+..
+   The following is supposed to be a comment for Sphinx
+   Local Variables:
+   mode: flyspell
+   ispell-local-dictionary: "american"
+   End:
+   LocalWords:  prover provers untyped disjunction programmatically invariants
+   LocalWords:  uncommented OCaml AST

@@ -37,9 +37,7 @@ let print_status fmt st =
   | Undone            -> fprintf fmt "Undone"
   | Scheduled         -> fprintf fmt "Scheduled"
   | Running           -> fprintf fmt "Running"
-  | Done r            ->
-      fprintf fmt "Done(%a)"
-        (Call_provers.print_prover_result ~json_model:false) r
+  | Done r            -> fprintf fmt "Done(%a)" (Call_provers.print_prover_result ~json:false) r
   | Interrupted       -> fprintf fmt "Interrupted"
   | Detached          -> fprintf fmt "Detached"
   | InternalFailure e ->
@@ -297,7 +295,7 @@ type sched_pa_rec =
     spa_limit    : Call_provers.resource_limit;
     spa_pr_scr   : string option;
     spa_callback : (proof_attempt_status -> unit);
-    spa_ores     : Call_provers.prover_result option;
+    spa_ores     : Call_provers.prover_result option
   }
 
 let scheduled_proof_attempts : sched_pa_rec Queue.t = Queue.create ()
@@ -422,10 +420,8 @@ let build_prover_call spa =
     let inplace = config_pr.Whyconf.in_place in
     let interactive = config_pr.Whyconf.interactive in
     try
-      let call =
-        Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
-                        ~limit ~interactive driver task
-      in
+      let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
+          ~limit ~interactive driver task in
       let pa =
         { tp_session  = c.controller_session;
           tp_id       = spa.spa_id;
@@ -1079,8 +1075,8 @@ let print_report fmt (r: report) =
   match r with
   | Result (new_r, old_r) ->
     Format.fprintf fmt "new_result = %a, old_result = %a@."
-      (Call_provers.print_prover_result ~json_model:false) new_r
-      (Call_provers.print_prover_result ~json_model:false) old_r
+      (Call_provers.print_prover_result ~json:false) new_r
+      (Call_provers.print_prover_result ~json:false) old_r
   | CallFailed e ->
     Format.fprintf fmt "Callfailed %a@." Exn_printer.exn_printer e
   | Replay_interrupted ->
@@ -1091,7 +1087,7 @@ let print_report fmt (r: report) =
     Format.fprintf fmt "No edited file@."
   | No_former_result new_r ->
     Format.fprintf fmt "new_result = %a, no former result@."
-      (Call_provers.print_prover_result ~json_model:false) new_r
+      (Call_provers.print_prover_result ~json:false) new_r
 
 (* TODO to be removed when we have a better way to print *)
 let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
@@ -1277,7 +1273,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                   | Done res ->
                      assert (res.Call_provers.pr_answer = Call_provers.Valid);
                      Debug.dprintf debug "Bisecting: %a.@."
-                       (Call_provers.print_prover_result ~json_model:false) res
+                       (Call_provers.print_prover_result ~json:false) res
                   end
                 in
                 schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification

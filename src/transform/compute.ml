@@ -64,7 +64,7 @@ let normalize_hyp_or_goal ?pr_norm ?step_limit engine : Task.task Trans.tlist  =
   Trans.decl_l (fun d ->
     match d.d_node with
     | Dprop (Pgoal, pr, t) when pr_norm = None ->
-        let t = normalize ?step_limit ~limit:!compute_max_steps engine t in
+        let t = normalize ?step_limit ~limit:!compute_max_steps engine Mvs.empty t in
         begin match t.t_node with
         | Ttrue -> []
         | _ ->
@@ -72,7 +72,7 @@ let normalize_hyp_or_goal ?pr_norm ?step_limit engine : Task.task Trans.tlist  =
             [[d]]
         end
     | Dprop (k, pr, t) when Opt.fold (fun _ -> pr_equal pr) false pr_norm ->
-      let t = normalize ?step_limit:step_limit ~limit:!compute_max_steps engine t in
+      let t = normalize ?step_limit:step_limit ~limit:!compute_max_steps engine Mvs.empty t in
       let d = Decl.create_prop_decl k pr t in
       [[d]]
     | _ -> [[d]]) None
@@ -117,12 +117,12 @@ let normalize_goal_transf_few env =
 let () =
   Trans.register_env_transform_l "compute_in_goal" normalize_goal_transf_all
   ~desc:"Perform@ computations@ in@ the@ goal,@ also@ using@ \
-    the@ automatically@ derived@ rules)."
+    the@ automatically@ derived@ rules."
 
 let () =
   Trans.register_env_transform_l "compute_specified" normalize_goal_transf_few
   ~desc:"Perform@ computations@ in@ the@ goal,@ only@ using@ \
-    the@ user-specified@ rules)."
+    the@ user-specified@ rules."
 
 let normalize_hyp step_limit pr_norm env =
   let p = { compute_defs = true;
@@ -170,7 +170,7 @@ let simplify check_ls env : 'a Trans.trans =
     Trans.decl (fun d ->
       match d.d_node with
       | Dprop (k, pr, t) ->
-          let t = normalize ~step_limit:(1024*1024) ~limit:(1024*1024) engine t in
+          let t = normalize ~step_limit:(1024*1024) ~limit:(1024*1024) engine Mvs.empty t in
           let d = Decl.create_prop_decl k pr t in
           [d]
       | _ -> [d]) None

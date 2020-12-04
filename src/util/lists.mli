@@ -59,6 +59,9 @@ val find_nth : ('a -> bool) -> 'a list -> int
     satifies the predicate [p]. [raise Not_found] if no element of [l]
     verify the predicate *)
 
+val drop_while : ('a -> bool) -> 'a list -> 'a list
+(** [drop_while p l] drops the initial elements of [l] that satisty [p] *)
+
 val first_nth : ('a -> 'b option) -> 'a list -> int * 'b
 (** The combinaison of {!list_first} and {!list_find_nth}. *)
 

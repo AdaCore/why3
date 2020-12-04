@@ -84,6 +84,7 @@ val nothing : 'a pp
 val string : string pp
 val float : float pp
 val int : int pp
+val bool : bool pp
 val constant_string : string -> unit pp
 val formatted : formatter -> formatted -> unit
 val constant_formatted : formatted -> unit pp

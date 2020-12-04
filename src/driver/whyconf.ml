@@ -971,6 +971,7 @@ let load_default_config_if_needed config =
   if config.main.load_default_config then add_builtin_provers config else config
 
 module Args = struct
+  let first_arg = ref 1
   let opt_config = ref None
   let opt_extra = ref []
   let opt_loadpath = ref []
@@ -1024,7 +1025,7 @@ module Args = struct
 
   let initialize ?(extra_help="") options default usage =
     let options = all_options options usage extra_help in
-    Getopt.parse_all options default Sys.argv;
+    Getopt.parse_all ~i:!first_arg options default Sys.argv;
     complete_initialization ()
 
   let exit_with_usage ?(exit_code=1) ?(extra_help="") options usage =

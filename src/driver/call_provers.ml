@@ -17,7 +17,7 @@ let debug = Debug.register_info_flag "call_prover"
          and@ keep@ temporary@ files."
 
 let debug_attrs = Debug.register_info_flag "print_model_attrs"
-  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
+    ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in@ CE@ model."
 
 (* BEGIN{proveranswer} anchor for automatic documentation, do not remove *)
 type prover_answer =
@@ -38,7 +38,7 @@ type prover_result = {
   pr_output : string;
   pr_time   : float;
   pr_steps  : int;		(* -1 if unknown *)
-  pr_model  : model;
+  pr_models : (prover_answer * model) list;
 }
 (* END{proverresult} anchor for automatic documentation, do not remove *)
 
@@ -141,18 +141,18 @@ type prover_result_parser = {
   prp_timeregexps : timeregexp list;
   prp_stepregexps : stepregexp list;
   prp_exitcodes   : (int * prover_answer) list;
-  prp_model_parser : Model_parser.model_parser;
+  prp_model_parser : model_parser;
 }
 
 let print_prover_answer fmt = function
-  | Valid -> fprintf fmt "Valid"
-  | Invalid -> fprintf fmt "Invalid"
-  | Timeout -> fprintf fmt "Timeout"
-  | OutOfMemory -> fprintf fmt "Out Of Memory"
-  | StepLimitExceeded -> fprintf fmt "Step limit exceeded"
-  | Unknown s -> fprintf fmt "Unknown (%s)" s
-  | Failure s -> fprintf fmt "Failure (%s)" s
-  | HighFailure -> fprintf fmt "HighFailure"
+  | Valid -> fprintf fmt "valid"
+  | Invalid -> fprintf fmt "invalid"
+  | Timeout -> fprintf fmt "timeout"
+  | OutOfMemory -> fprintf fmt "out@ of@ memory"
+  | StepLimitExceeded -> fprintf fmt "step@ limit@ exceeded"
+  | Unknown s -> fprintf fmt "unknown@ (%s)" s
+  | Failure s -> fprintf fmt "failure@ (%s)" s
+  | HighFailure -> fprintf fmt "high failure"
 
 let print_prover_status fmt = function
   | Unix.WSTOPPED n -> fprintf fmt "stopped by signal %d" n
@@ -162,21 +162,35 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result ~json_model fmt {pr_answer = ans; pr_status = status;
-                                         pr_output = out; pr_time   = t;
-                                         pr_steps  = s;   pr_model  = m} =
-  let print_attrs = Debug.test_flag debug_attrs in
-  fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
-  if not (Model_parser.is_model_empty m) then begin
-    fprintf fmt "\nCounter-example model:";
-    if json_model then
-      Model_parser.print_model ~print_attrs fmt m
-    else
-      Model_parser.print_model_human ~print_attrs fmt m
-  end;
-  if ans == HighFailure then
-    fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
-      print_prover_status status out
+let print_prover_result ?(json=false) fmt r =
+  let open Json_base in
+  let print_json_model fmt (a,m) =
+    fprintf fmt "@[@[<hv1>{%a;@ %a}@]}@]"
+      (print_json_field "model"
+         (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int)) m
+      (print_json_field "answer" print_prover_answer) a
+  in
+  if json then
+    let print_model fmt (a,m) =
+      if not (is_model_empty m) then
+          print_json_model fmt (a,m)
+      else print_json fmt Null in
+    fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a;@ %a@]}@]"
+      (print_json_field "answer" print_json)
+      (String (asprintf "%a" print_prover_answer r.pr_answer))
+      (print_json_field "time" print_json) (Float r.pr_time)
+      (print_json_field "step" print_json) (Int r.pr_steps)
+      (* TODO not sure if models should be printed here *)
+      (print_json_field "ce-models" (list print_model)) r.pr_models
+      (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
+  else
+    let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
+    fprintf fmt "@[<v>@[<hov2>Prover@ result@ is:@ @{<bold %s>%a@}@ (%.2fs%a).@]"
+      color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
+    if r.pr_answer == HighFailure then
+      fprintf fmt "@ Prover exit status: %a@\nProver output:@\n%s@\n"
+        print_prover_status r.pr_status r.pr_output;
+    fprintf fmt "@]"
 
 let rec grep out l = match l with
   | [] ->
@@ -204,7 +218,7 @@ let craft_efficient_re l =
 
 let debug_print_model ~print_attrs model =
   Debug.dprintf debug "Call_provers: %a@."
-    (Model_parser.print_model ?me_name_trans:None ~print_attrs) model
+    (print_model ~filter_similar:false ?me_name_trans:None ~print_attrs) model
 
 type answer_or_model = Answer of prover_answer | Model of string
 
@@ -224,66 +238,48 @@ let analyse_result exit_result res_parser printer_mapping out =
       exit_result
   in
 
-  let rec analyse saved_model saved_res l =
+  let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        if saved_res = None then
-          (HighFailure, saved_model)
-        else
-          (Opt.get saved_res, saved_model)
+        Opt.get_def HighFailure saved_res, List.rev saved_models
     | Answer res1 :: (Answer res2 :: tl as tl1) ->
        Debug.dprintf debug "Call_provers: two consecutive answers: %a %a@."
           print_prover_answer res1 print_prover_answer res2;
        begin
          match res1,res2 with
          | Unknown _, Unknown "resourceout" ->
-            analyse saved_model saved_res (Answer StepLimitExceeded :: tl)
+            analyse saved_models saved_res (Answer StepLimitExceeded :: tl)
          | Unknown _, Unknown "timeout" ->
-            analyse saved_model saved_res (Answer Timeout :: tl)
+            analyse saved_models saved_res (Answer Timeout :: tl)
          | (Unknown _, Unknown "")| (_, Unknown "(not unknown!)") ->
-            analyse saved_model saved_res (Answer res1 :: tl)
+            analyse saved_models saved_res (Answer res1 :: tl)
          | Unknown "", Unknown _ ->
-            analyse saved_model saved_res tl1
+            analyse saved_models saved_res tl1
          | Unknown s1, Unknown s2 ->
-            analyse saved_model saved_res (Answer (Unknown (s1 ^ " + " ^ s2)) :: tl)
+            analyse saved_models saved_res (Answer (Unknown (s1 ^ " + " ^ s2)) :: tl)
          | _,_ ->
-            analyse saved_model saved_res tl1
+            analyse saved_models saved_res tl1
        end
-    | Answer res :: Model model :: tl ->
+    | Answer res :: Model model_str :: tl ->
         if res = Valid then
-          (Valid, None)
+          (Valid, [])
         else
           (* get model if possible *)
-          let m = res_parser.prp_model_parser model printer_mapping in
+          let m = res_parser.prp_model_parser printer_mapping model_str in
           Debug.dprintf debug "Call_provers: model:@.";
           debug_print_model ~print_attrs:false m;
-          (* TODO remove this use_incremental_choice when choice of the model
-             in incremental mode gives satisfying results *)
-          let use_incremental_choice = false in
-          let m =
-            if is_model_empty m then saved_model else
-              match res with
-              | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") ->
-                  (* we keep the previous model if it was there *)
-                  if use_incremental_choice then
-                    Some (Opt.get_def m saved_model)
-                  else
-                    Some m
-              | _ -> Some m
-          in
-          analyse m (Some res) tl
+          analyse ((res, m) :: saved_models) (Some res) tl
     | Answer res :: tl ->
         if res = Valid then
-          (Valid, None)
+          (Valid, [])
         else
-          analyse saved_model (Some res) tl
-    | Model _fail :: tl -> analyse saved_model saved_res tl
+          analyse saved_models (Some res) tl
+    | Model _fail :: tl -> analyse saved_models saved_res tl
   in
 
-  analyse None None result_list
+  analyse [] None result_list
 
 let backup_file f = f ^ ".save"
-
 
 let parse_prover_run res_parser signaled time out exitcode limit ~printer_mapping =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
@@ -292,14 +288,13 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
      value is meaningless for Why3 anyway (e.g. some windows status codes). If
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
-  let ans, model =
+  let ans, models =
     let exit_result =
       if signaled then [Answer HighFailure] else
       try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
       with Not_found -> []
     in analyse_result exit_result res_parser printer_mapping out
   in
-  let model = match model with Some s -> s | None -> default_model in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def (time) (grep_time out res_parser.prp_timeregexps) in
   let steps = Opt.get_def (-1) (grep_steps out res_parser.prp_stepregexps) in
@@ -320,7 +315,7 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
     pr_output = out;
     pr_time   = time;
     pr_steps  = steps;
-    pr_model  = model;
+    pr_models = models;
   }
 
 let actualcommand command limit file =
@@ -419,8 +414,8 @@ let handle_answer answer =
       let out = read_and_delete_file out_file in
       let ret = exit_code in
       let printer_mapping = save.printer_mapping in
-      let ans = parse_prover_run save.res_parser
-          timeout time out ret save.limit ~printer_mapping in
+      let ans = parse_prover_run save.res_parser timeout time out ret
+          save.limit ~printer_mapping in
       id, Some ans
   | Started id ->
       id, None
@@ -435,8 +430,7 @@ type prover_call =
   | ServerCall of server_id
   | EditorCall of int
 
-let call_on_file ~command ~limit ~res_parser ~printer_mapping
-                 ?(inplace=false) fin =
+let call_on_file ~command ~limit ~res_parser ~printer_mapping ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, _ =
     actualcommand ~cleanup:true ~inplace command limit fin in
@@ -498,7 +492,7 @@ let editor_result ret = {
   pr_output = "";
   pr_time   = 0.0;
   pr_steps  = 0;
-  pr_model  = Model_parser.default_model;
+  pr_models = [];
 }
 
 let query_call = function
@@ -529,7 +523,7 @@ let rec wait_on_call = function
       editor_result ret
 
 let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
-                   ~gen_new_file ?(inplace=false) buffer =
+    ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
       Filename.open_temp_file "why_" ("_" ^ filename)

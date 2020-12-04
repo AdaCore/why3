@@ -28,7 +28,10 @@ let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
-let opt_json = ref false
+let opt_json : [< `All | `Values ] option ref = ref None
+let opt_check_ce_model = ref false
+let opt_rac_prover = ref None
+let opt_ce_check_verbosity = ref None
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -119,8 +122,17 @@ let option_list =
     "<file> specify a prover's driver (conflicts with -P)";
     Key ('o', "output"), Hnd1 (AString, fun s -> opt_output := Some s),
     "<dir> print the selected goals to separate files in <dir>";
-    KLong "json", Hnd0 (fun () -> opt_json := true),
-    " print counterexamples in JSON format";
+    KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
+    " check the counter-examples using runtime assertion checking (RAC)";
+    KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
+    "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
+    "with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
+    Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
+    "<lvl> verbosity level for interpretation log of counterexample solver model";
+    KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
+    " print values of prover model in JSON format (backwards compatiblity with --json)";
+    KLong "json", Hnd0 (fun () -> opt_json := Some `All),
+    " print output in JSON format";
     KLong "print-theory", Hnd0 (fun () -> opt_print_theory := true),
     " print selected theories";
     KLong "print-namespace", Hnd0 (fun () -> opt_print_namespace := true),
@@ -225,22 +237,71 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
+let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
+  match json with
+  | Some `All ->
+    let open Json_base in
+    let print_loc fmt (loc, fname) =
+      match loc with
+      | None -> fprintf fmt "{%a}" (print_json_field "filename" print_json) (String fname)
+      | Some loc -> Pretty.print_json_loc fmt loc in
+    let print_term fmt (loc, fname, goal_name, expls) =
+      fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+        (print_json_field "loc" print_loc) (loc, fname)
+        (print_json_field "goal_name" print_json) (String goal_name)
+        (print_json_field "explanations" print_json) (List (List.map (fun s -> String s) expls)) in
+    fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+      (print_json_field "term" print_term) (loc, fname, goal_name, expls)
+      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:true)) res
+  | None | Some `Values as json ->
+    ( match loc with
+      | None -> fprintf fmt "File %s:@\n" fname
+      | Some loc -> Loc.report_position fmt loc );
+    ( if expls = [] then
+        fprintf fmt "@[<hov>Verification@ condition@ @{<bold>%s@}.@]" goal_name
+      else
+        let expls = String.capitalize_ascii (String.concat ", " expls) in
+        fprintf fmt
+          "@[<hov>Goal@ @{<bold>%s@}@ from@ verification@ condition@ @{<bold>%s@}.@]"
+          expls goal_name );
+    fprintf fmt "@\n";
+    Call_provers.print_prover_result ~json:false fmt res;
+    (match ce with
+     | Some ce ->
+        Counterexample.print_counterexample ?verb_lvl:!opt_ce_check_verbosity
+          ~check_ce:!opt_check_ce_model ?json fmt ce
+     | None -> ());
+    fprintf fmt "@\n"
+
 let unproved = ref false
 
-let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
+let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
+  let open Call_provers in
   let limit =
-    { Call_provers.empty_limit with
-      Call_provers.limit_time = timelimit;
+    { empty_limit with
+      limit_time = timelimit;
       limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
-        let call =
-          Driver.prove_task ~command ~limit drv task in
-        let res = Call_provers.wait_on_call call in
-        printf "%s %s %s: %a@." fname tname
-          (task_goal task).Decl.pr_name.Ident.id_string
-          (Call_provers.print_prover_result ~json_model:!opt_json) res;
-        if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
+        let call = Driver.prove_task ~command ~limit drv task in
+        let res = wait_on_call call in
+        let reduce_config =
+          let trans = "compute_in_goal" and prover = !opt_rac_prover in
+          Pinterp.rac_reduce_config_lit config env ~trans ?prover () in
+        let models =
+          let clean = new Model_parser.clean in
+          List.map (fun (r, m) -> r, clean#model m) res.pr_models in
+        let ce = Counterexample.select_model
+                   ?verb_lvl:!opt_ce_check_verbosity
+                   ~check:!opt_check_ce_model
+                   ~reduce_config env (Pmodule.restore_module th)
+                   models in
+        let t = task_goal_fmla task in
+        let expls = Termcode.get_expls_fmla t in
+        let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
+        printf "%a@." (print_result ?json:!opt_json)
+          (fname, t.Term.t_loc, goal_name, expls, res, ce);
+        if res.pr_answer <> Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task
     | Some dir, _ -> output_task drv fname tname th task dir
@@ -256,7 +317,7 @@ let do_tasks env drv fname tname th task =
       List.rev_append (Trans.apply tr task) acc) [] tasks)
   in
   let tasks = List.fold_left apply [task] trans in
-  List.iter (do_task drv fname tname th) tasks
+  List.iter (do_task env drv fname tname th) tasks
 
 let do_theory env drv fname tname th glist elist =
   if !opt_print_theory then
@@ -341,6 +402,9 @@ let do_input env drv = function
 
 let () =
   try
+    if Util.terminal_has_color then (
+      set_formatter_tag_functions Util.ansi_color_tags;
+      set_mark_tags true );
     let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue;

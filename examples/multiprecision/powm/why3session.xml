@@ -7,6 +7,7 @@
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="5" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="powm.mlw"/>
 <theory name="Powm" proved="true">
@@ -2686,12 +2687,12 @@
    <goal name="getbits&#39;vc.83.1" expl="equality hypothesis" proved="true">
    <transf name="rewrite" proved="true" arg1="Ensures">
     <goal name="getbits&#39;vc.83.1.0" expl="equality hypothesis" proved="true">
-    <transf name="replace" proved="true" arg1="res" arg2="(mod o2 o)">
+    <transf name="replace" proved="true" arg1="res" arg2="(mod o1 o)">
      <goal name="getbits&#39;vc.83.1.0.0" expl="equality hypothesis" proved="true">
-     <proof prover="1"><result status="valid" time="6.35"/></proof>
+     <proof prover="1" timelimit="10" memlimit="1000"><result status="valid" time="6.17"/></proof>
      </goal>
      <goal name="getbits&#39;vc.83.1.0.1" expl="equality hypothesis" proved="true">
-     <proof prover="0"><result status="valid" time="0.03" steps="87919"/></proof>
+     <proof prover="5"><result status="valid" time="0.12" steps="198350"/></proof>
      </goal>
     </transf>
     </goal>

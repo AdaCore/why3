@@ -1,0 +1,16 @@
+
+module M1
+  use int.Int
+
+  val constant v1: int (* CE f1'vc: -1 *)
+
+  let f1 () : int
+    ensures { result = 0 }
+  = v1
+
+  val ref v2: int (* CE f2'vc: 2 *)
+
+  let f2 () : int
+    ensures { result = 0 }
+  = v2
+end

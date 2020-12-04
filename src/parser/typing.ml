@@ -1170,6 +1170,10 @@ and drec_defn muc denv fdl =
   Dexpr.drec_defn denv (List.map prep fdl)
 
 
+let type_expr_in_muc muc ?(denv=Dexpr.denv_empty) expr =
+  let e = dexpr muc denv expr in
+  Dexpr.expr e
+
 (** Typing declarations *)
 
 open Pdecl

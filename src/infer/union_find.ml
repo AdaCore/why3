@@ -60,6 +60,8 @@ let intersect l1 l2 =
   | t::q -> do_inter t q l2
   | [] -> []
 
+
+(* join [[1;2;3];[4;5]] [[2];[4;5;6];[7]] = [[2];[4;5];[1];[3];[6];[7]] *)
 let join a b =
   let c = List.fold_left (fun l k ->
       List.fold_left (fun l k' ->

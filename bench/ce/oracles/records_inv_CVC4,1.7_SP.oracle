@@ -1,156 +1,266 @@
 Strongest Postcondition
-bench/ce/records_inv.mlw M r'vc: Valid
-bench/ce/records_inv.mlw M record_match_eval_test1'vc: Timeout or Unknown
-Counter-example model:
+File bench/ce/records_inv.mlw:
+Verification condition r'vc.
+Prover result is: valid.
+
+File "bench/ce/records_inv.mlw", line 16, characters 14-24:
+Goal Postcondition from verification condition record_match_eval_test1'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 15:
-    x, [[@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : true } }] } }
+    x [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 16:
-    result, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
+    result [@introduced] = {"type": "Integer", "val": "0"}
 
-bench/ce/records_inv.mlw M record_match_eval_test1'vc: Valid
-bench/ce/records_inv.mlw M record_match_eval_test2'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/records_inv.mlw", line 16, characters 14-24:
+Goal Postcondition from verification condition record_match_eval_test1'vc.
+Prover result is: valid.
+
+File "bench/ce/records_inv.mlw", line 24, characters 14-24:
+Goal Postcondition from verification condition record_match_eval_test2'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 23:
-    x, [[@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 24:
-    x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-bench/ce/records_inv.mlw M record_match_eval_test3'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/records_inv.mlw", line 31, characters 9-25:
+Goal Precondition from verification condition record_match_eval_test3'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 28:
-    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } } }] } }
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 31:
     the check fails with all inputs
 
-bench/ce/records_inv.mlw M record_match_eval_test3'vc: Valid
-bench/ce/records_inv.mlw M record_match_eval_test4'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/records_inv.mlw", line 29, characters 14-18:
+Goal Postcondition from verification condition record_match_eval_test3'vc.
+Prover result is: valid.
+
+File "bench/ce/records_inv.mlw", line 36, characters 9-26:
+Goal Precondition from verification condition record_match_eval_test4'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 33:
-    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } } }] } }
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 36:
     the check fails with all inputs
 
-bench/ce/records_inv.mlw M record_match_eval_test4'vc: Valid
-bench/ce/records_inv.mlw M record_match_eval_test44'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/records_inv.mlw", line 34, characters 14-22:
+Goal Postcondition from verification condition record_match_eval_test4'vc.
+Prover result is: valid.
+
+File "bench/ce/records_inv.mlw", line 42, characters 9-26:
+Goal Precondition from verification condition record_match_eval_test44'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 39:
-    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } } }] } }
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 42:
     the check fails with all inputs
 
-bench/ce/records_inv.mlw M record_match_eval_test44'vc: Valid
-bench/ce/records_inv.mlw M record_match_eval_test44'vc: Valid
-bench/ce/records_inv.mlw M test_record_match_eval_test5'vc: Timeout or Unknown
-Counter-example model:
+File "bench/ce/records_inv.mlw", line 43, characters 13-22:
+Goal Assertion from verification condition record_match_eval_test44'vc.
+Prover result is: valid.
+
+File "bench/ce/records_inv.mlw", line 40, characters 14-22:
+Goal Postcondition from verification condition record_match_eval_test44'vc.
+Prover result is: valid.
+
+File "bench/ce/records_inv.mlw", line 51, characters 9-26:
+Goal Precondition from verification condition
+test_record_match_eval_test5'vc.
+Prover result is: timeout or unknown.
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 46:
-    re, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } } }] } }
+    re [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 48:
-    x, [[@field:0:contents], [@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } } }] } }
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 51:
     the check fails with all inputs
 
-bench/ce/records_inv.mlw M test_record_match_eval_test5'vc: Valid
-bench/ce/records_inv.mlw Mutable record_match_eval_test1'vc: Unknown (sat)
-Counter-example model:
+File "bench/ce/records_inv.mlw", line 49, characters 14-26:
+Goal Postcondition from verification condition
+test_record_match_eval_test5'vc.
+Prover result is: valid.
+
+File "bench/ce/records_inv.mlw", line 66, characters 14-24:
+Goal Postcondition from verification condition record_match_eval_test1'vc.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 65:
-    x, [[@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : true } }] } }
+    x [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 66:
-    result, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
+    result [@introduced] = {"type": "Integer", "val": "0"}
 
-bench/ce/records_inv.mlw Mutable record_match_eval_test1'vc: Valid
-bench/ce/records_inv.mlw Mutable record_match_eval_test2'vc: Unknown (sat)
-Counter-example model:
+File "bench/ce/records_inv.mlw", line 66, characters 14-24:
+Goal Postcondition from verification condition record_match_eval_test1'vc.
+Prover result is: valid.
+
+File "bench/ce/records_inv.mlw", line 74, characters 14-24:
+Goal Postcondition from verification condition record_match_eval_test2'vc.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 73:
-    x, [[@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 74:
-    x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-bench/ce/records_inv.mlw Mutable record_match_eval_test3'vc: Unknown (sat)
-Counter-example model:
+File "bench/ce/records_inv.mlw", line 79, characters 14-17:
+Goal Postcondition from verification condition record_match_eval_test3'vc.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 78:
-    x, [[@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 79:
-    x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 81:
-    x, [[@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
-bench/ce/records_inv.mlw Mutable record_match_eval_test4'vc: Unknown (sat)
-Counter-example model:
+File "bench/ce/records_inv.mlw", line 84, characters 14-22:
+Goal Postcondition from verification condition record_match_eval_test4'vc.
+Prover result is: unknown (sat).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
 File records_inv.mlw:
   Line 83:
-    x, [[@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 84:
-    x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 86:
-    x, [[@introduced]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : ".my_field_f" ,
-    "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
-    "value" : {"type" : "Boolean" , "val" : false } }] } }
+    x [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 

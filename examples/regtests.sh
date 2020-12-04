@@ -55,7 +55,7 @@ run_dir () {
     for f in $LIST; do
         d=`dirname $f`
         printf "Replaying $d ... "
-        if ../bin/why3replay.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP ; then
+        if ../bin/why3.opt replay -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP ; then
             printf "OK"
             cat $TMP $TMPERR
             success=`expr $success + 1`
@@ -82,6 +82,7 @@ echo ""
 run_dir . ""
 run_dir double_wp "-L double_wp"
 run_dir avl "-L avl"
+run_dir c_cursor "-L c_cursor"
 run_dir foveoos11-cm ""
 run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 run_dir verifythis_2016_matrix_multiplication "-L verifythis_2016_matrix_multiplication"

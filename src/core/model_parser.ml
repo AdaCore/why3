@@ -27,112 +27,26 @@ let debug = Debug.register_info_flag "model_parser"
 ****************************************************************
 *)
 
-type float_type =
-  | Plus_infinity
-  | Minus_infinity
-  | Plus_zero
-  | Minus_zero
-  | Not_a_number
-  | Float_value of string * string * string
-  | Float_hexa of string * float
-
-type repr = BinRepr | HexaRepr
-
-let interp_float ?(interp = true) b eb sb =
-  let convert (r : repr) s =
-    (* Convert number of less than 63 bits TODO *)
-    match r with
-    | BinRepr when String.length s <= 62 -> int_of_string ("0b" ^ s)
-    | HexaRepr when String.length s <= 15 -> int_of_string ("0x" ^ s)
-    | _ -> (* Too big to fit into an integer *) raise Exit in
-  let rec pow x n =
-    assert (n <= 63) ;
-    match n with p when p <= 0 -> 1 | 1 -> x | p -> x * pow x (p - 1) in
-  let get_repr s len =
-    if String.sub s 0 2 = "#b" then (BinRepr, String.sub s 2 (len - 2), len - 2)
-    else if String.sub s 0 2 = "#x" then
-      (HexaRepr, String.sub s 2 (len - 2), (len - 2) * 4)
-    else raise Exit in
-  let pad_with_zeros width s =
-    let s_len = String.length s in
-    let filled =
-      let len = width - s_len in
-      if len <= 0 then "" else String.make len '0' in
-    filled ^ s in
-  let only_zeros s =
-    (* Check that there is only 0 in the string *)
-    let b = ref true in
-    for i = 0 to String.length s - 1 do
-      b := !b && s.[i] = '0'
-    done ;
-    !b in
-  try
-    (* We don't interpret when this is disable *)
-    if not interp then raise Exit ;
-    let is_neg =
-      match b with "#b0" -> false | "#b1" -> true | _ -> raise Exit in
-    let eb_len = String.length eb in
-    let sb_len = String.length sb in
-    if eb_len < 2 || sb_len < 2 then raise Exit ;
-    let eb_repr, eb, eb_size = get_repr eb eb_len in
-    let sb_repr, sb, sb_size = get_repr sb sb_len in
-    (* Values for the type of float obtained *)
-    (* Exponent bias *)
-    let exp_bias = pow 2 (eb_size - 1) - 1 in
-    (* Maximum exponent value *)
-    let max_exp = pow 2 eb_size - 1 in
-    (* Length of the hexadecimal representation (after the ".") *)
-    let length_of_number =
-      if sb_size mod 4 = 0 then sb_size / 4 else (sb_size / 4) + 1 in
-    (* Compute exponent (int) and mantissa (string of hexa) *)
-    let exp = convert eb_repr eb in
-    let mant_base16 =
-      let c = convert sb_repr sb in
-      let c =
-        (* The hex value is used after the decimal point. So we need to adjust
-           it to the number of binary elements there are.
-           Example in 32bits: significand is 23 bits, and the hexadecimal
-           representation will have a multiple of 4 bits (ie 24). So, we need to
-           multiply by two to account the difference. *)
-        if sb_repr = BinRepr then
-          let adjust = 4 - (sb_size mod 4) in
-          (* No adjustment needed *)
-          if adjust = 4 then c else pow 2 adjust * c
-        else c in
-      pad_with_zeros length_of_number (Format.asprintf "%x" c) in
-    match exp with
-    | 0 (* subnormals and zero *) ->
-        (* Case for zero *)
-        if only_zeros mant_base16 then if is_neg then Minus_zero else Plus_zero
-        else
-          (* Subnormals *)
-          let s =
-            (if is_neg then "-" else "")
-            ^ "0x0." ^ mant_base16 ^ "p-" ^ string_of_int exp_bias in
-          Float_hexa (s, float_of_string s)
-    | e when e = max_exp (* infinities and NaN *) ->
-        if only_zeros mant_base16 then
-          if is_neg then Minus_infinity else Plus_infinity
-        else Not_a_number
-    | _ (* Normal floats *) ->
-        let exp = exp - exp_bias in
-        let s =
-          (if is_neg then "-" else "")
-          ^ "0x1." ^ mant_base16 ^ "p" ^ string_of_int exp in
-        Float_hexa (s, float_of_string s)
-  with Exit -> Float_value (b, eb, sb)
+type model_int = { int_value: BigInt.t; int_verbatim: string }
+type model_dec = { dec_int: BigInt.t; dec_frac: BigInt.t; dec_verbatim: string }
+type model_frac = { frac_nom: BigInt.t; frac_den: BigInt.t; frac_verbatim: string }
+type model_bv = { bv_value: BigInt.t; bv_length: int; bv_verbatim: string }
+type model_float_binary = { sign: model_bv; exp: model_bv; mant: model_bv }
+type model_float =
+  | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
+  | Float_number of {hex: string option; binary: model_float_binary}
 
 type model_value =
-  | String of string
-  | Integer of string
-  | Decimal of (string * string)
-  | Fraction of (string * string)
-  | Float of float_type
   | Boolean of bool
+  | String of string
+  | Integer of model_int
+  | Float of model_float
+  | Bitvector of model_bv
+  | Decimal of model_dec
+  | Fraction of model_frac
   | Array of model_array
   | Record of model_record
   | Proj of model_proj
-  | Bitvector of string
   | Apply of string * model_value list
   | Unparsed of string
 
@@ -157,7 +71,82 @@ let array_add_element ~array ~index ~value =
   let arr_index = {arr_index_key= index; arr_index_value= value} in
   {arr_others= array.arr_others; arr_indices= arr_index :: array.arr_indices}
 
-let convert_float_value f =
+let pad_with_zeros width s =
+  let filled =
+    let len = width - String.length s in
+    if len <= 0 then "" else String.make len '0' in
+  filled ^ s
+
+(* (-) integer . fractional e (-) exponent *)
+(* ?%d+.%d*E-?%d+ *)
+(* 0X-?%x+.%x*P-?%d+ *)
+
+let float_of_binary binary =
+  try
+    let open BigInt in
+    let {sign; mant; exp} = binary in
+    let exp_bias = pred (pow_int_pos 2 (exp.bv_length - 1)) in
+    let exp_max = pred (pow_int_pos 2 exp.bv_length) in
+    let frac_len = (* Length of the hexadecimal representation (after the ".") *)
+      if mant.bv_length mod 4 = 0
+      then mant.bv_length / 4
+      else (mant.bv_length / 4) + 1 in
+    let is_neg = match to_int sign.bv_value with 0 -> false | 1 -> true | _ -> raise Exit in
+    (* Compute exponent (int) and frac (string of hexa) *)
+    let frac =
+      (* The hex value is used after the decimal point. So we need to adjust
+         it to the number of binary elements there are.
+         Example in 32bits: significand is 23 bits, and the hexadecimal
+         representation will have a multiple of 4 bits (ie 24). So, we need to
+         multiply by two to account the difference. *)
+      if Strings.has_prefix "#b" mant.bv_verbatim then
+        let adjust = 4 - (mant.bv_length mod 4) in
+        if adjust = 4 then
+          mant.bv_value (* No adjustment needed *)
+        else
+          mul (pow_int_pos 2 adjust) mant.bv_value
+      else
+        mant.bv_value in
+    let frac = pad_with_zeros frac_len (Format.sprintf "%x" (to_int frac)) in
+    if eq exp.bv_value zero then (* subnormals and zero *)
+      (* Case for zero *)
+      if eq mant.bv_value zero then
+        if is_neg then Minus_zero else Plus_zero
+      else
+        (* Subnormals *)
+        let hex = Format.asprintf "%t0x0.%sp-%s"
+            (fun fmt -> if is_neg then Pp.string fmt "-")
+            frac (to_string exp_bias) in
+        Float_number {hex= Some hex; binary}
+    else if eq exp.bv_value exp_max (* infinities and NaN *) then
+      if eq mant.bv_value zero then
+        if is_neg then Minus_infinity else Plus_infinity
+      else Not_a_number
+    else
+      let exp = sub exp.bv_value exp_bias in
+      let hex = Format.asprintf "%t0x1.%sp%s"
+          (fun fmt -> if is_neg then Pp.string fmt "-")
+          frac (to_string exp) in
+      Float_number {hex= Some hex; binary}
+  with Exit ->
+    Float_number {hex= None; binary}
+
+let binary_of_bigint d =
+  let open BigInt in
+  if lt d zero then invalid_arg "bin_of_int";
+  if eq d zero then "0" else
+    let rec loop acc d =
+      if eq d zero then acc else
+        let d, m = computer_div_mod d (of_int 2) in
+        loop (BigInt.to_string m :: acc) d in
+    String.concat "" (loop [] d)
+
+let binary_of_bv bv =
+  let b = binary_of_bigint bv.bv_value in
+  let p = String.make (bv.bv_length-String.length b) '0' in
+  Printf.sprintf "#b%s%s" p b
+
+let convert_float_value ?(force_binary_bv=false) f =
   match f with
   | Plus_infinity ->
       let m = Mstr.add "cons" (Json_base.String "Plus_infinity") Mstr.empty in
@@ -174,16 +163,22 @@ let convert_float_value f =
   | Not_a_number ->
       let m = Mstr.add "cons" (Json_base.String "Not_a_number") Mstr.empty in
       Json_base.Record m
-  | Float_value (b, eb, sb) ->
+  | Float_number {binary= {sign; exp; mant}} when force_binary_bv ->
       let m = Mstr.add "cons" (Json_base.String "Float_value") Mstr.empty in
-      let m = Mstr.add "sign" (Json_base.String b) m in
-      let m = Mstr.add "exponent" (Json_base.String eb) m in
-      let m = Mstr.add "significand" (Json_base.String sb) m in
+      let m = Mstr.add "sign" (Json_base.String (binary_of_bv sign)) m in
+      let m = Mstr.add "exponent" (Json_base.String (binary_of_bv exp)) m in
+      let m = Mstr.add "significand" (Json_base.String (binary_of_bv mant)) m in
       Json_base.Record m
-  | Float_hexa (s, f) ->
+  | Float_number {hex= Some hex} ->
       let m = Mstr.add "cons" (Json_base.String "Float_hexa") Mstr.empty in
-      let m = Mstr.add "str_hexa" (Json_base.String s) m in
-      let m = Mstr.add "value" (Json_base.Float f) m in
+      let m = Mstr.add "str_hexa" (Json_base.String hex) m in
+      let m = Mstr.add "value" (Json_base.Float (float_of_string hex)) m in
+      Json_base.Record m
+  | Float_number {binary= {sign; exp; mant}} ->
+      let m = Mstr.add "cons" (Json_base.String "Float_value") Mstr.empty in
+      let m = Mstr.add "sign" (Json_base.String sign.bv_verbatim) m in
+      let m = Mstr.add "exponent" (Json_base.String exp.bv_verbatim) m in
+      let m = Mstr.add "significand" (Json_base.String mant.bv_verbatim) m in
       Json_base.Record m
 
 let rec convert_model_value value : Json_base.json =
@@ -192,30 +187,29 @@ let rec convert_model_value value : Json_base.json =
       let m = Mstr.add "type" (Json_base.String "String") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String s) m in
       Json_base.Record m
-  | Integer s ->
+  | Integer r ->
       let m = Mstr.add "type" (Json_base.String "Integer") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String s) m in
+      let m = Mstr.add "val" (Json_base.String (BigInt.to_string r.int_value)) m in
       Json_base.Record m
   | Float f ->
       let m = Mstr.add "type" (Json_base.String "Float") Mstr.empty in
       let m = Mstr.add "val" (convert_float_value f) m in
       Json_base.Record m
-  | Decimal (int_part, fract_part) ->
+  | Decimal d ->
       let m = Mstr.add "type" (Json_base.String "Decimal") Mstr.empty in
-      let m =
-        Mstr.add "val" (Json_base.String (int_part ^ "." ^ fract_part)) m in
+      let m = Mstr.add "val" (Json_base.String (Format.sprintf "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac))) m in
       Json_base.Record m
-  | Fraction (num, den) ->
+  | Fraction f ->
       let m = Mstr.add "type" (Json_base.String "Fraction") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String (num ^ "/" ^ den)) m in
+      let m = Mstr.add "val" (Json_base.String (Format.sprintf "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den))) m in
       Json_base.Record m
   | Unparsed s ->
       let m = Mstr.add "type" (Json_base.String "Unparsed") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String s) m in
       Json_base.Record m
-  | Bitvector v ->
-      let m = Mstr.add "type" (Json_base.String "Bv") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String v) m in
+  | Bitvector bv ->
+      let m = Mstr.add "type" (Json_base.String "Integer") Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String (BigInt.to_string bv.bv_value)) m in
       Json_base.Record m
   | Boolean b ->
       let m = Mstr.add "type" (Json_base.String "Boolean") Mstr.empty in
@@ -292,8 +286,10 @@ let print_float_human fmt f =
   | Plus_zero -> fprintf fmt "+0"
   | Minus_zero -> fprintf fmt "-0"
   | Not_a_number -> fprintf fmt "NaN"
-  | Float_value (b, eb, sb) -> fprintf fmt "float_bits(%s,%s,%s)" b eb sb
-  | Float_hexa (s, f) -> fprintf fmt "%s (%g)" s f
+  | Float_number {hex= Some hex} ->
+      fprintf fmt "%s (%g)" hex (float_of_string hex)
+  | Float_number {binary= {sign; exp; mant}} ->
+      fprintf fmt "float_bits(%s,%s,%s)" sign.bv_verbatim exp.bv_verbatim mant.bv_verbatim
 
 let rec print_array_human fmt (arr : model_array) =
   let print_others fmt v =
@@ -313,7 +309,7 @@ and print_record_human fmt r =
       (* Special pretty printing for record with only one element *)
       fprintf fmt "%a" print_model_value_human value
   | _ ->
-      fprintf fmt "@[%a@]"
+      fprintf fmt "@[<hv1>%a@]"
         (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
            (fun fmt (f, v) ->
              fprintf fmt "@[%s =@ %a@]" f print_model_value_human v))
@@ -323,40 +319,19 @@ and print_proj_human fmt p =
   let s, v = p in
   fprintf fmt "@[{%s =>@ %a}@]" s print_model_value_human v
 
-and print_integer fmt (i : string) =
-  (* TODO This conversion is adhoc plus it is not the most efficient. But it
-     should be ok as we use this only for display. *)
-  let print_big_int fmt (bn : BigInt.t) =
-    let to_hexa n = sprintf "%X" n in
-    let base = BigInt.of_int 16 in
-    let rec convert_big_int_hexa (bn : BigInt.t) : string =
-      if BigInt.lt bn base then to_hexa (BigInt.to_int bn)
-      else
-        let q, r = BigInt.euclidean_div_mod bn base in
-        convert_big_int_hexa q ^ to_hexa (BigInt.to_int r) in
-    fprintf fmt "%s (%s0x%s)" (BigInt.to_string bn)
-      (if BigInt.sign bn >= 0 then "" else "-")
-      (convert_big_int_hexa (BigInt.abs bn)) in
-  let bn = BigInt.of_string i in
-  try
-    let i = BigInt.to_int bn in
-    if i >= 0 then fprintf fmt "%d (0x%X)" i i
-    else fprintf fmt "%d (-0x%X)" i (-i)
-  with Failure _ (* "int_of_big_int" *) -> print_big_int fmt bn
-
-and print_bv fmt (bv : string) =
+and print_bv fmt (bv : model_bv) =
   (* TODO Not implemented yet. Ideally, fix the differentiation made in the
      parser between Bv_int and Bv_sharp -> convert Bv_int to Bitvector not
      Integer. And print Bv_int exactly like Bv_sharp.
   *)
-  Format.fprintf fmt "%s" bv
+  fprintf fmt "%s" bv.bv_verbatim
 
 and print_model_value_human fmt (v : model_value) =
   match v with
   | String s -> Constant.print_string_def fmt s
-  | Integer s -> print_integer fmt s
-  | Decimal (s1, s2) -> fprintf fmt "%s" (s1 ^ "." ^ s2)
-  | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
+  | Integer i -> fprintf fmt "%s (%s)" (BigInt.to_string i.int_value) i.int_verbatim
+  | Decimal d -> fprintf fmt "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac)
+  | Fraction f -> fprintf fmt "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den)
   | Float f -> print_float_human fmt f
   | Boolean b -> fprintf fmt "%b" b
   | Apply (s, []) -> fprintf fmt "%s" s
@@ -400,7 +375,7 @@ type model_element = {
 }
 
 let split_model_trace_name mt_name =
-  (* Mt_name is of the form "name[@type[@*]]". Return (name, type) *)
+  (* Mt_name is of the form "name[@kind[@*]]". Return (name, kind) *)
   let splitted = Strings.bounded_split '@' mt_name 3 in
   match splitted with
   | [] -> mt_name, Other
@@ -408,75 +383,14 @@ let split_model_trace_name mt_name =
   | name :: "result" :: _ -> name, Result
   | name :: _ :: _ -> name, Other
 
-(* Elements that are of record with only one field in the source code, are
-   simplified by eval_match in wp generation. So, this allows to reconstruct
-   their value (using the "field" attribute that were added). *)
-let readd_one_fields ~attrs value =
-  (* Small function that insert in a sorted list *)
-  let rec insert_sorted (n, name) l =
-    match l with
-    | (n1, _) :: _ when n1 < n -> (n, name) :: l
-    | (n1, name1) :: tl -> (n1, name1) :: insert_sorted (n, name) tl
-    | [] -> [(n, name)] in
-  (* l is the list of ordered field_names *)
-  let l =
-    Sattr.fold
-      (fun x l ->
-        match Ident.extract_field x with
-        | None -> l
-        | Some (n, field_name) -> insert_sorted (n, field_name) l)
-      attrs [] in
-  match Ident.get_model_trace_attr ~attrs with
-  | mtrace ->
-      let attrs = Sattr.remove mtrace attrs in
-      (* Special cases for 'Last and 'First. TODO: Should be avoided here but
-         there is no simple way. *)
-      if Strings.ends_with mtrace.attr_string "'Last" then
-        let new_mtrace = Strings.remove_suffix "'Last" mtrace.attr_string in
-        let new_mtrace =
-          List.fold_left
-            (fun acc (_, field_name) -> acc ^ field_name)
-            new_mtrace l in
-        let new_mtrace = new_mtrace ^ "'Last" in
-        let attrs = Sattr.add (create_attribute new_mtrace) attrs in
-        (attrs, value)
-      else if Strings.ends_with mtrace.attr_string "'First" then
-        let new_mtrace = Strings.remove_suffix "'First" mtrace.attr_string in
-        let new_mtrace =
-          List.fold_left
-            (fun acc (_, field_name) -> acc ^ field_name)
-            new_mtrace l in
-        let new_mtrace = new_mtrace ^ "'First" in
-        let attrs = Sattr.add (create_attribute new_mtrace) attrs in
-        (attrs, value)
-      else
-        (* General case *)
-        ( Sattr.add mtrace attrs
-        , List.fold_left
-            (fun v (_, field_name) -> Record [(field_name, v)])
-            value l )
-  | exception Not_found ->
-      (* No model trace attribute present, same as general case *)
-      ( attrs
-      , List.fold_left
-          (fun v (_, field_name) -> Record [(field_name, v)])
-          value l )
-
 let create_model_element ~name ~value ~attrs =
-  let (name, kind) = split_model_trace_name name in
-  let me_name = {men_name=name; men_kind=kind; men_attrs=attrs} in
-  {me_name; me_value=value; me_location=None; me_term=None}
+  let name, kind = split_model_trace_name name in
+  let me_name = {men_name= name; men_kind= kind; men_attrs= attrs} in
+  {me_name; me_value= value; me_location= None; me_term= None}
 
-let construct_name name attrs : model_element_name =
-  let (name, kind) = split_model_trace_name name in
-  {men_name=name; men_kind=kind; men_attrs=attrs}
-
-(*
-let print_location fmt m_element =
-    match m_element.me_location with
-    | None -> fprintf fmt "\"no location\""
-    | Some loc -> Loc.report_position fmt loc
-*)
+let create_model_element_name name attrs : model_element_name =
+  let name, kind = split_model_trace_name name in
+  {men_name= name; men_kind= kind; men_attrs= attrs}
 
 (*
 ***************************************************************
@@ -504,18 +418,47 @@ let map_filter_model_elements f m =
   {m with model_files}
 
 
-let empty_model = Mstr.empty
 let empty_model_file = Mint.empty
-let is_model_empty model = model.model_files = empty_model
+let empty_model_files = Mstr.empty
+let is_model_empty m = Mstr.is_empty m.model_files
 
-let default_model =
-  {vc_term_loc=None; vc_term_attrs=Sattr.empty; model_files=empty_model}
+let empty_model =
+  {vc_term_loc=None; vc_term_attrs=Sattr.empty; model_files=empty_model_files}
+
+let set_model_files model model_files =
+  { model with model_files }
 
 let get_model_elements m =
-  List.concat
-    (List.concat (List.map Mint.values (Mstr.values m.model_files)))
+  List.(concat (concat (map Mint.values (Mstr.values m.model_files))))
 
-type model_parser = string -> printer_mapping -> model
+let get_model_term_loc m = m.vc_term_loc
+let get_model_term_attrs m = m.vc_term_attrs
+
+let get_model_element model name loc =
+  let aux me =
+    me.me_name.men_name = name &&
+    Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
+
+let get_model_element_value model name loc =
+  let aux me =
+    me.me_name.men_name = name &&
+    Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
+
+let get_model_element_by_id model id =
+  match id.id_loc with
+  | None -> None
+  | Some loc ->
+      let name = id.id_string in
+      let name = Ident.get_model_trace_string ~name ~attrs:id.id_attrs in
+      get_model_element_value model name loc
+
+let get_model_element_by_loc model loc =
+  let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
+  List.find_opt aux (get_model_elements model)
+
+type model_parser = printer_mapping -> string -> model
 type raw_model_parser = printer_mapping -> string -> model_element list
 
 (*
@@ -541,41 +484,59 @@ let fix_loc_kind ~at_loc name =
 let cmp_attrs a1 a2 =
   String.compare a1.attr_string a2.attr_string
 
-let print_model_element ~at_loc ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
+let print_model_element ?(print_locs=false) ~at_loc ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message -> fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
       let m_element = {m_element with me_name=fix_loc_kind ~at_loc m_element.me_name} in
-      fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]"
-        (me_name_trans m_element.me_name)
+      fprintf fmt "@[<hv2>@[<hov2>%s%t%t =@]@ %a@]" (me_name_trans m_element.me_name)
         (fun fmt ->
            if print_attrs then
-             fprintf fmt ",@ [%a]"
-               (Pp.print_list Pp.comma Pretty.print_attr)
+             fprintf fmt " %a" Pp.(print_list space Pretty.print_attr)
                (List.sort cmp_attrs (Sattr.elements m_element.me_name.men_attrs)))
+        (fun fmt ->
+           if print_locs then fprintf fmt " (%a)"
+               (Pp.print_option_or_default "NO LOC "Pretty.print_loc) m_element.me_location)
         print_model_value m_element.me_value
 
-let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
+let similar_model_element_names me_nm1 me_nm2 =
+  (* TODO Add an efficient version of symmetric difference to extset *)
+  let symm_diff = Sattr.diff (Sattr.union me_nm1.men_attrs me_nm2.men_attrs)
+                    (Sattr.inter me_nm1.men_attrs me_nm2.men_attrs) in
+  Ident.get_model_trace_string ~name:me_nm1.men_name ~attrs:me_nm1.men_attrs
+  = Ident.get_model_trace_string ~name:me_nm2.men_name ~attrs:me_nm2.men_attrs
+  && Sattr.for_all (fun x ->
+         not (Strings.has_prefix "at" x.attr_string)) symm_diff
+
+(* TODO optimize *)
+let rec filter_duplicated l =
+  let exist_similar a l = List.exists (fun x ->
+    similar_model_element_names a.me_name x.me_name) l in
+  match l with
+  | [] | [_] -> l
+  | me :: l when exist_similar me l -> filter_duplicated l
+  | me :: l -> me :: filter_duplicated l
+
+let print_model_elements ~filter_similar ~at_loc ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
+  let m_elements =
+    if filter_similar then filter_duplicated m_elements else m_elements in
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ~at_loc ~print_attrs ~print_model_value
+       (print_model_element ?print_locs:None ~at_loc ~print_attrs ~print_model_value
           ~me_name_trans))
     m_elements
 
-let print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt filename model_file =
+let print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_trans fmt (filename, model_file) =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths. *)
   let filename = Filename.basename filename in
-  fprintf fmt "@[<v 0>File %s:@\n" filename ;
-  Mint.iter
-    (fun line m_elements ->
-      fprintf fmt "  @[<v 2>Line %d:@\n" line ;
-      print_model_elements ~at_loc:(filename, line) ~print_attrs
-        ~print_model_value ~me_name_trans fmt m_elements ;
-      fprintf fmt "@]@\n")
-    model_file ;
-  fprintf fmt "@]"
+  let pp fmt (line, m_elements) =
+    fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
+      (print_model_elements ~filter_similar ?sep:None ~at_loc:(filename, line) ~print_attrs
+         ~print_model_value ~me_name_trans) m_elements in
+  fprintf fmt "@[<v 0>File %s:@ %a@]" filename
+    Pp.(print_list space pp) (Mint.bindings model_file)
 
 let why_name_trans {men_kind; men_name} =
   match men_kind with
@@ -583,7 +544,7 @@ let why_name_trans {men_kind; men_name} =
   | Old -> "old "^men_name
   | At l -> men_name^" at "^l
   (* | Loop_before -> "[before loop] "^men_name *)
-  | Loop_previous_iteration -> "[previous iteration] "^men_name
+  | Loop_previous_iteration -> "[before iteration] "^men_name
   | Loop_current_iteration -> "[current iteration] "^men_name
   | _ -> men_name
 
@@ -593,16 +554,16 @@ let json_name_trans {men_kind; men_name} =
   | Old -> "old "^men_name
   | _ -> men_name
 
-let print_model ~print_attrs ?(me_name_trans = why_name_trans)
+let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
     ~print_model_value fmt model =
-  Mstr.iter (print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt)
-    model.model_files
+  Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_trans)
+    fmt (Mstr.bindings model.model_files)
 
-let print_model_human ?(me_name_trans = why_name_trans) fmt model =
-  print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
+let print_model_human ?(filter_similar = true) ?(me_name_trans = why_name_trans) fmt model =
+  print_model ~filter_similar ~me_name_trans ~print_model_value:print_model_value_human fmt model
 
-let print_model ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
-  print_model ~print_attrs ~me_name_trans ~print_model_value fmt model
+let print_model ?(filter_similar = true) ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
+  print_model ~filter_similar ~print_attrs ~me_name_trans ~print_model_value fmt model
 
 let get_model_file model filename =
   Mstr.find_def empty_model_file filename model
@@ -652,7 +613,7 @@ let interleave_line ~filename ~print_attrs start_comment end_comment
     let model_elements = Mint.find line_number model_file in
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
-        (print_model_elements ~sep:Pp.semi ~at_loc:(filename, line_number)
+        (print_model_elements ~filter_similar:true ~sep:Pp.semi ~at_loc:(filename, line_number)
            ~print_attrs ~print_model_value:print_model_value_human ~me_name_trans)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
@@ -752,7 +713,7 @@ let print_model_element_json me_name_to_str fmt me =
     | Other -> fprintf fmt "%a" Json_base.string "other"
     | Loop_before -> fprintf fmt "%a" Json_base.string "before_loop"
     | Loop_previous_iteration ->
-        fprintf fmt "%a" Json_base.string "previous_iteration"
+        fprintf fmt "%a" Json_base.string "before_iteration"
     | Loop_current_iteration ->
         fprintf fmt "%a" Json_base.string "current_iteration" in
   let print_name fmt = Json_base.string fmt (me_name_to_str me.me_name) in
@@ -763,6 +724,7 @@ let print_model_element_json me_name_to_str fmt me =
       ("value", print_value) ; ("kind", print_kind) ]
 
 let print_model_elements_json me_name_to_str fmt model_elements =
+  let model_elements = filter_duplicated model_elements in
   Json_base.list (print_model_element_json me_name_to_str) fmt model_elements
 
 let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
@@ -844,42 +806,31 @@ let fix_kind at_loc vc_attrs me =
         | _ -> me.me_name.men_kind) in
   {me with me_name={me.me_name with men_kind}}
 
-let add_to_model ?vc_term_attrs model model_element =
+let add_to_model ?vc_term_attrs model_element model =
   match model_element.me_location with
   | None -> model
   | Some pos ->
       let filename, line_number, _, _ = Loc.get pos in
       let model_file = get_model_file model filename in
       let elements = get_elements model_file line_number in
-      let el = model_element.me_name in
-      (* This removes elements that are duplicated *)
-      let found_elements =
-        List.find_all
-          (fun x ->
-            let xme = x.me_name in
-            Ident.get_model_trace_string ~name:xme.men_name ~attrs:xme.men_attrs
-            = Ident.get_model_trace_string ~name:el.men_name ~attrs:el.men_attrs
-            &&
-            (* TODO Add an efficient version of symmetric difference to extset *)
-            let symm_diff =
-              Sattr.diff
-                (Sattr.union x.me_name.men_attrs el.men_attrs)
-                (Sattr.inter x.me_name.men_attrs el.men_attrs) in
-            Sattr.for_all
-              (fun x -> not (Strings.has_prefix "at" x.attr_string))
-              symm_diff)
-          elements in
       let model_element =
         match vc_term_attrs with
         | Some vc_term_attrs ->
             fix_kind (filename, line_number) vc_term_attrs model_element
         | None -> model_element in
-      let elements =
-        if found_elements <> [] then elements else model_element :: elements in
+      let el = model_element.me_name in
+      (* This removes elements that are duplicated *)
+      let found_elements =
+        List.exists (fun x ->
+            similar_model_element_names x.me_name el
+            && pos = Opt.get_def Loc.dummy_position x.me_location)
+          elements in
+      let elements = if found_elements then elements
+                     else model_element :: elements in
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 
-let recover_name list_projs pm raw_name =
+let recover_name pm list_projs raw_name =
   let name, attrs =
     try
       let t = Mstr.find raw_name pm.queried_terms in
@@ -889,43 +840,64 @@ let recover_name list_projs pm raw_name =
     with Not_found ->
       let id = Mstr.find raw_name list_projs in
       (id.id_string, id.id_attrs) in
-  construct_name (get_model_trace_string ~name ~attrs) attrs
+  create_model_element_name (get_model_trace_string ~name ~attrs) attrs
 
-let rec replace_projection (const_function : string -> string) model_value =
-  match model_value with
+(** [replace_projection const_function mv] replaces record names, projections, and application callees
+   in [mv] using [const_function] *)
+let rec replace_projection (const_function : string -> string) =
+  let const_function s = try const_function s with Not_found -> s in
+  function
   | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
-   |String _ | Unparsed _ ->
-      model_value
+  | String _ | Unparsed _ as mv -> mv
+  | Record fs ->
+      let aux (f, mv) = const_function f, replace_projection const_function mv in
+      Record (List.map aux fs)
+  | Proj (f, mv) ->
+      Proj (const_function f, replace_projection const_function mv)
   | Array a -> Array (replace_projection_array const_function a)
-  | Record r ->
-      let r =
-        List.map
-          (fun (field_name, value) ->
-            let field_name =
-              try const_function field_name with Not_found -> field_name in
-            (field_name, replace_projection const_function value))
-          r in
-      Record r
-  | Proj p ->
-      let proj_name, value = p in
-      let proj_name =
-        try const_function proj_name with Not_found -> proj_name in
-      Proj (proj_name, replace_projection const_function value)
   | Apply (s, l) ->
-      let s = try const_function s with Not_found -> s in
-      Apply (s, List.map (fun v -> replace_projection const_function v) l)
+      Apply (const_function s, List.map (replace_projection const_function) l)
 
 and replace_projection_array const_function a =
-  let {arr_others= others; arr_indices= arr_index_list} = a in
-  let others = replace_projection const_function others in
-  let arr_index_list =
-    List.map
-      (fun ind ->
-        let {arr_index_key= key; arr_index_value= value} = ind in
-        let value = replace_projection const_function value in
-        {arr_index_key= key; arr_index_value= value})
-      arr_index_list in
-  {arr_others= others; arr_indices= arr_index_list}
+  let for_index a =
+    let arr_index_value = replace_projection const_function a.arr_index_value in
+    {a with arr_index_value} in
+  {arr_others= replace_projection const_function a.arr_others;
+   arr_indices= List.map for_index a.arr_indices}
+
+(* Elements that are of record with only one field in the source code, are
+   simplified by eval_match in wp generation. So, this allows to reconstruct
+   their value (using the "field" attribute that were added). *)
+let read_one_fields ~attrs value =
+  let field_names =
+    let fields = Lists.map_filter Ident.extract_field (Sattr.elements attrs) in
+    List.sort (fun (d1, _) (d2, _) -> d2 - d1) fields in
+  let add_record v (_, f) = Record [f, v] in
+  match Ident.get_model_trace_attr ~attrs with
+  | mtrace -> (
+      let attrs = Sattr.remove mtrace attrs in
+      (* Special cases for 'Last and 'First. TODO: Should be avoided here but
+         there is no simple way. *)
+      try
+        let new_mtrace =
+          Strings.remove_suffix "'Last" mtrace.attr_string ^
+          String.concat "" (List.map snd field_names) ^
+          "'Last" in
+        let new_attr = create_attribute new_mtrace in
+        Sattr.add new_attr attrs, value
+      with Not_found ->
+      try
+        let new_mtrace =
+          Strings.remove_suffix "'First" mtrace.attr_string ^
+          String.concat "" (List.map snd field_names) ^
+          "'First" in
+        let new_attr = create_attribute new_mtrace in
+        Sattr.add new_attr attrs, value
+      with Not_found -> (* General case *)
+        Sattr.add mtrace attrs, List.fold_left add_record value field_names )
+  | exception Not_found ->
+      (* No model trace attribute present, same as general case *)
+      attrs, List.fold_left add_record value field_names
 
 let internal_loc t =
   match t.t_node with
@@ -933,95 +905,80 @@ let internal_loc t =
   | Tapp (ls, []) -> ls.ls_name.id_loc
   | _ -> None
 
-let default_remove_field ((attrs, v) : Sattr.t * model_value) = (attrs, v)
-let remove_field_fun = ref None
-let register_remove_field f = remove_field_fun := Some f
+let remove_field : (Sattr.t * model_value -> Sattr.t * model_value) ref = ref (fun x -> x)
+let register_remove_field f = remove_field := f
 
-let build_model_rec raw_model pm list_projs =
-  List.fold_left
-    (fun model raw_element ->
-      let raw_element_name = raw_element.me_name.men_name in
-      try
-        let t = Mstr.find raw_element_name pm.queried_terms in
-        let attrs = Sattr.union raw_element.me_name.men_attrs t.t_attrs in
-        let name, attrs =
-          match t.t_node with
-          | Tapp (ls, []) ->
-              (ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs)
-          | _ -> ("", attrs) in
-        let raw_element_value = raw_element.me_value in
-        (* Replace projections with their real name *)
-        let raw_element_value =
-          replace_projection
-            (fun x -> (recover_name list_projs pm x).men_name)
-            raw_element_value in
-        (* Remove some specific record field related to the front-end language.
-           This function is registered. *)
-        let attrs, raw_element_value =
-          Opt.get_def default_remove_field !remove_field_fun
-            (attrs, raw_element_value) in
-        (* Transform value flattened by eval_match (one field record) back to
-           records *)
-        let attrs, raw_element_value =
-          readd_one_fields ~attrs raw_element_value in
-        let model_element =
-          { me_name= construct_name (get_model_trace_string ~name ~attrs) attrs
-          ; me_value= raw_element_value
-          ; me_location= t.t_loc
-          ; me_term= Some t } in
-        let model = add_to_model ~vc_term_attrs:pm.Printer.vc_term_attrs model model_element in
-        let model =
-          match internal_loc t with
-          | None -> model
-          | me_location -> add_to_model ~vc_term_attrs:pm.Printer.vc_term_attrs model {model_element with me_location} in
-        (* Here we create the same element for all its possible locations (given
-           by attribute vc:written).
-        *)
-        Sattr.fold
-          (fun attr model ->
-            let loc = Ident.extract_written_loc attr in
-            if loc = None then model
-            else add_to_model ~vc_term_attrs:pm.Printer.vc_term_attrs model {model_element with me_location=loc})
-          attrs model
-      with Not_found -> model)
-    Mstr.empty raw_model
+(** Build the model by replacing projections and restore single field records in the model
+   elements, and adding the element at all relevant locations *)
+let build_model_rec pm (elts: model_element list) : model_files =
+  let add_with_loc ~vc_term_attrs model_elt loc model =
+    match loc with
+    | None -> model
+    | me_location -> add_to_model ~vc_term_attrs {model_elt with me_location} model in
+  let list_projs = list_projs pm and vc_term_attrs = pm.Printer.vc_term_attrs in
+  let process_me me =
+    assert (me.me_location = None && me.me_term = None);
+    let aux t =
+      let attrs = Sattr.union me.me_name.men_attrs t.t_attrs in
+      let name, attrs = match t.t_node with
+        | Tapp (ls, []) -> ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
+        | _ -> "", attrs in
+      (* Replace projections with their real name *)
+      let me_value = replace_projection
+          (fun s -> (recover_name pm list_projs s).men_name)
+          me.me_value in
+      (* Remove some specific record field related to the front-end language.
+         This function is registered. *)
+      let attrs, me_value = !remove_field (attrs, me_value) in
+      (* Transform value flattened by eval_match (one field record) back to records *)
+      let attrs, me_value = read_one_fields ~attrs me_value in
+      let me_name = create_model_element_name (get_model_trace_string ~name ~attrs) attrs in
+      {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
+    Opt.map aux (Mstr.find_opt me.me_name.men_name pm.queried_terms) in
+  (** Add a model element at the relevant locations *)
+  let add_model_elt model me =
+    let model = add_to_model ~vc_term_attrs me model in
+    let model = add_with_loc ~vc_term_attrs me (internal_loc (Opt.get me.me_term)) model in
+    let add_written_loc a =
+      add_with_loc ~vc_term_attrs me (Ident.extract_written_loc a) in
+    Sattr.fold add_written_loc me.me_name.men_attrs model in
+  List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
 
-let handle_contradictory_vc model_files vc_term_loc =
+let handle_contradictory_vc pm model_files =
   (* The VC is contradictory if the location of the term that triggers VC
      was collected, model_files is not empty, and there are no model elements
      in this location.
      If this is the case, add model element saying that VC is contradictory
      to this location. *)
-  if model_files = empty_model then
+  if Mstr.is_empty model_files then
     (* If the counterexample model was not collected, then model_files
        is empty and this does not mean that VC is contradictory. *)
     model_files
-  else
-    match vc_term_loc with
+  else match pm.Printer.vc_term_loc with
     | None -> model_files
     | Some pos ->
         let filename, line_number, _, _ = Loc.get pos in
         let model_file = get_model_file model_files filename in
-        let model_elements = get_elements model_file line_number in
-        if model_elements = [] then
-          (* The vc is contradictory, add special model element  *)
-          let me_name =
-            { men_name= "the check fails with all inputs"
-            ; men_kind= Error_message
-            ; men_attrs= Sattr.empty } in
-          let me =
-            { me_name
-            ; me_value= Unparsed ""
-            ; me_location= Some pos
-            ; me_term= None } in
-          add_to_model model_files me
-        else model_files
+        match get_elements model_file line_number with
+        | [] ->
+            (* The vc is contradictory, add special model element  *)
+            let me = {
+              me_name= {
+                men_name= "the check fails with all inputs";
+                men_kind= Error_message;
+                men_attrs= Sattr.empty;
+              };
+              me_value= Unparsed "";
+              me_location= Some pos;
+              me_term= None;
+            } in
+            add_to_model me model_files
+        | _ -> model_files
 
-let build_model raw_model pm : model =
-  let list_projs = Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_projections pm.list_fields in
-  let model_files = build_model_rec raw_model pm list_projs in
-  let model_files = handle_contradictory_vc model_files pm.Printer.vc_term_loc in
-  { model_files; vc_term_loc = pm.Printer.vc_term_loc; vc_term_attrs = pm.Printer.vc_term_attrs }
+let build_model pm raw_model =
+  let model_files = build_model_rec pm raw_model in
+  let model_files = handle_contradictory_vc pm model_files in
+  { model_files; vc_term_loc= pm.Printer.vc_term_loc; vc_term_attrs= pm.Printer.vc_term_attrs }
 
 (*
 ***************************************************************
@@ -1056,7 +1013,7 @@ let model_for_positions_and_decls model ~positions =
   (* Start with empty model and add locations from model that
      are in locations *)
   let model_filtered =
-    List.fold_left (add_loc model.model_files) empty_model positions in
+    List.fold_left (add_loc model.model_files) empty_model_files positions in
   (* For each file add mapping corresponding to the first line of the
      counter-example from model to model_filtered.
      This corresponds to function declarations *)
@@ -1100,7 +1057,60 @@ let spark_filter_model (m: model) =
     model_files = files;
     vc_term_attrs = m.vc_term_attrs }
 
+let opt_bind_any os f =
+  f (Lists.map_filter (fun x -> x) os)
 
+let opt_bind_all os f =
+  if List.for_all Opt.inhabited os then
+    f (List.map Opt.get os)
+  else None
+
+class clean = object (self)
+  method model m =
+    map_filter_model_elements self#element m
+  method element me =
+    if me.me_name.men_kind = Error_message then
+      (* Keep unparsed values for error messages *)
+      Some me
+    else
+      Opt.bind (self#value me.me_value) @@ fun me_value ->
+      Some {me with me_value}
+  method value v = match v with
+    | Unparsed s    -> self#unparsed s | String v      -> self#string v
+    | Integer v     -> self#integer v  | Decimal v     -> self#decimal v
+    | Fraction v    -> self#fraction v | Float v       -> self#float v
+    | Boolean v     -> self#boolean v  | Bitvector v   -> self#bitvector v
+    | Proj (p, v)   -> self#proj p v   | Apply (s, vs) -> self#apply s vs
+    | Array a       -> self#array a    | Record fs     -> self#record fs
+  method unparsed _ = None
+  method string v = Some (String v)
+  method integer v = Some (Integer v)
+  method decimal v = Some (Decimal v)
+  method fraction v = Some (Fraction v)
+  method float v = Some (Float v)
+  method boolean v = Some (Boolean v)
+  method bitvector v = Some (Bitvector v)
+  method proj p v =
+    Opt.bind (self#value v) @@ fun v ->
+    Some (Proj (p, v))
+  method apply s vs =
+    opt_bind_all (List.map self#value vs) @@ fun vs ->
+    Some (Apply (s, vs))
+  method array a =
+    let clean_arr_index ix =
+      Opt.bind (self#value ix.arr_index_key) @@ fun key ->
+      Opt.bind (self#value ix.arr_index_value) @@ fun value ->
+      Some {arr_index_key= key; arr_index_value= value} in
+    Opt.bind (self#value a.arr_others) @@ fun others ->
+    opt_bind_any (List.map clean_arr_index a.arr_indices) @@ fun indices ->
+    Some (Array {arr_others= others; arr_indices= indices})
+  method record fs =
+    let clean_field (f, v) =
+      Opt.bind (self#value v) @@ fun v ->
+      Some (f, v) in
+    opt_bind_all (List.map clean_field fs) @@ fun fs ->
+    Some (Record fs)
+end
 
 (*
 ***************************************************************
@@ -1119,10 +1129,10 @@ let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s) ;
   Hstr.replace model_parsers s (desc, p)
 
-let lookup_model_parser s input pm =
+let lookup_model_parser s pm input =
   let _, raw_model_parser = Hstr.find_exn model_parsers (UnknownModelParser s) s in
-  let raw_model = raw_model_parser pm input in
-  build_model raw_model pm
+  let raw_model = raw_model_parser pm input in (* For example, Smtv2_model_parser.parse for "smtv2" *)
+  build_model pm raw_model
 
 let list_model_parsers () =
   Hstr.fold (fun k (desc, _) acc -> (k, desc) :: acc) model_parsers []

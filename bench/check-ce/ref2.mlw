@@ -1,0 +1,7 @@
+
+use ref.Ref
+
+let f () =
+  let x = ref 1 in
+  x := 2;
+  assert { false }

@@ -13,6 +13,8 @@
 
 val arg_extra_expl_prefix : string * Arg.spec * string
 
+val get_expls_fmla : Term.term -> string list
+
 val opt_extra_expl_prefix : Getopt.opt
 
 val goal_expl_task:

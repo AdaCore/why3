@@ -46,12 +46,23 @@ type real_constant = {
 }
 [@@deriving sexp_of]
 
-let compare_real { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 } { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } =
-  let c = BigInt.compare s1 s2 in
-  if c <> 0 then c else
-  let c = BigInt.compare p21 p22 in
-  if c <> 0 then c else
-  BigInt.compare p51 p52
+let compare_real ?(structural=true) { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 }
+                                    { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } =
+  if structural then
+    let c = BigInt.compare s1 s2 in
+    if c <> 0 then c else
+    let c = BigInt.compare p21 p22 in
+    if c <> 0 then c else
+    BigInt.compare p51 p52
+  else
+    let p2_min,p5_min = BigInt.min p21 p22, BigInt.min p51 p52 in
+    let v1 = BigInt.pow_int_pos_bigint 2 (BigInt.sub p21 p2_min) in
+    let v1 = BigInt.mul v1 (BigInt.pow_int_pos_bigint 5 (BigInt.sub p51 p5_min)) in
+    let v1 = BigInt.mul s1 v1 in
+    let v2 = BigInt.pow_int_pos_bigint 2 (BigInt.sub p22 p2_min) in
+    let v2 = BigInt.mul v2 (BigInt.pow_int_pos_bigint 5 (BigInt.sub p52 p5_min)) in
+    let v2 = BigInt.mul s2 v2 in
+    BigInt.compare v1 v2
 
 let neg_int { il_kind; il_int = i } =
   { il_kind; il_int = BigInt.minus i }

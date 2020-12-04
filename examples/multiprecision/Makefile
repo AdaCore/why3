@@ -12,10 +12,12 @@ else
   endif
 endif
 
-ifdef GMP_DIR
-  CFLAGS = $(shell sed -n -e 's/^CFLAGS = \(.*\)/\1/p' $(GMP_DIR)/Makefile)
-else
-  CFLAGS = -march=native -O2 -fomit-frame-pointer
+ifndef CFLAGS
+  ifdef GMP_DIR
+    CFLAGS = $(shell sed -n -e 's/^CFLAGS = \(.*\)/\1/p' $(GMP_DIR)/Makefile)
+  else
+    CFLAGS = -march=native -O2 -fomit-frame-pointer
+  endif
 endif
 
 ifdef GMP_LIB
@@ -73,25 +75,25 @@ no_INCLUDES =
 INCLUDES = $($(OVERLAY)_INCLUDES)
 
 build/libwmp.a: $(EXTRACTED)
-	cd build; gcc $(CFLAGS) $(INCLUDES:%=-include ../overlays/%) -c $(CFILES)
+	cd build; $(CC) $(CFLAGS) $(INCLUDES:%=-include ../overlays/%) -c $(CFILES)
 	ar rcs $@ $(addprefix build/,$(CFILES:.c=.o))
 
 build/tests: tests.c build/libwmp.a
-	gcc $(CFLAGS) tests.c -Irandom -Lbuild -lm -lwmp -lgmp -o $@
+	$(CC) $(CFLAGS) tests.c -Irandom -Lbuild -lm -lwmp -lgmp -o $@
 
 build/minitests: tests.c build/libwmp.a
-	gcc $(CFLAGS) -DCOMPARE_MINI tests.c -Irandom -Imini-gmp -Lbuild -lm -lwmp -o $@
+	$(CC) $(CFLAGS) -DCOMPARE_MINI tests.c -Irandom -Imini-gmp -Lbuild -lm -lwmp -o $@
 
 UPPER = $(shell echo $* | tr [:lower:] [:upper:])
 
 build/why3%bench: tests.c build/libwmp.a
-	gcc $(CFLAGS) -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Iinclude -Irandom -Lbuild -lm -lwmp -lgmp -o $@
+	$(CC) $(CFLAGS) -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Iinclude -Irandom -Lbuild -lm -lwmp -lgmp -o $@
 
 build/gmp%bench: tests.c build/libwmp.a
-	gcc $(CFLAGS) $(GMPFLAGS) -DTEST_GMP -DTEST_$(UPPER) tests.c -Iinclude -Irandom -lm -lgmp -o $@
+	$(CC) $(CFLAGS) $(GMPFLAGS) -DTEST_GMP -DTEST_$(UPPER) tests.c -Iinclude -Irandom -lm -lgmp -o $@
 
 build/minigmp%bench: tests.c build/libwmp.a
-	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -lm -o $@
+	$(CC) $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -lm -o $@
 
 BENCHS = toomb sqrtrem millerrabin toomu add mul div powm toomm
 

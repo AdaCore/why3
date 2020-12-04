@@ -15,15 +15,4 @@ module While6
 		done;
 		!i
 
-	let b2[@infer:oct](_:int) : int
-	ensures { result = 102 }
-	=
-		let i = ref 0 in
-		i := 0;
-		while !i < 100 do
-		variant { 10 - !i }
-			i := !i + 6;
-		done;
-		!i
-
 end

@@ -29,6 +29,9 @@ module type INFERCFG = sig
   val empty_context  : unit -> context
   val start_cfg      : unit -> cfg
 
+  val cfg_size  : cfg -> int * int
+  (** (number of nodes, number of hyperedges) *)
+
   val put_expr_in_cfg   : cfg -> context -> ?ret:vsymbol option -> expr ->
                          control_points
   val put_expr_with_pre : cfg -> context -> expr -> term list ->
@@ -99,7 +102,9 @@ module Make(E: sig
        apron variable). *)
     variable_mapping: (Apron.Var.t, term) Hashtbl.t;
 
-  }
+    }
+
+  let cfg_size cfg = (cfg.control_point_count, cfg.hedge_count)
 
   let debug_fmt =
     if Debug.test_flag infer_print_cfg then
@@ -294,7 +299,7 @@ module Make(E: sig
          Mpv.fold_left forget_and_constraints (fun_id, fun_id) cty_oldies in
 
        let constraints = List.map (remove_eps ~ret manpk) cty_post
-                         |> List.fold_left t_and t_true
+                         |> List.fold_left t_and_simp t_true
                          |> QDom.meet_term manpk in
 
        let begin_cp = new_node_cfg cfg expr ~lbl:"exec bgn" in
@@ -451,7 +456,13 @@ module Make(E: sig
        new_hedge_cfg cfg e_end end_match
          (fun _ abs -> abs) ~lbl:"exn e normal termination";
        e_begin, end_match, !additional_exn @ e_exn
-    | Eassert _ | Eabsurd -> (* FIXME: maybe they could be taken into account *)
+    | Eassert (kind,term) when kind <> Check ->
+       let begin_cp = new_node_cfg cfg expr ~lbl:"assert bgn" in
+       let end_cp   = new_node_cfg cfg expr ~lbl:"assert end" in
+       let constraints = QDom.meet_term manpk term in
+       new_hedge_cfg cfg begin_cp end_cp (fun _ -> constraints);
+       begin_cp, end_cp, []
+    | Eassert _ | Eabsurd ->
        let node = new_node_cfg cfg expr in
        node, node, []
     | Eghost e -> put_expr_in_cfg ~ret cfg manpk e
@@ -587,16 +598,32 @@ module Make(E: sig
     let manager = get_fixpoint_man cfg manpk in
     let compare_no_closured = PSHGraph.stdcompare.PSHGraph.comparev in
     let sinit = PSette.singleton compare_no_closured 0 in
-    let make_strategy is_active =
+    let init_t = Unix.times () in
+    (* standard strategy *)
+    let initial_strategy =
       Fixpoint.make_strategy_default
-        ~widening_start:E.widening
-        ~widening_descend:(max (E.widening/2) 2)
-        ~priority:(PSHGraph.Filter is_active)
         ~vertex_dummy
         ~hedge_dummy
         cfg.psh_graph sinit in
-    let output = Fixpoint.analysis_guided manager
-                   cfg.psh_graph sinit make_strategy in
+    let output = Fixpoint.analysis_std manager
+                   cfg.psh_graph sinit initial_strategy in
+
+    (* uses the technique of Gopan and Reps published in Static
+       Anlaysis Symposium, SAS'2007 *)
+    (* let make_strategy is_active =
+     *   Fixpoint.make_strategy_default
+     *     ~widening_start:E.widening
+     *     ~widening_descend:(max (E.widening/2) 2)
+     *     ~priority:(PSHGraph.Filter is_active)
+     *     ~vertex_dummy
+     *     ~hedge_dummy
+     *     cfg.psh_graph sinit in
+     * let output = Fixpoint.analysis_guided manager
+     *                cfg.psh_graph sinit make_strategy in *)
+
+    let end_t = Unix.times () in
+    Format.eprintf "Time elapsed %fs@."
+      Unix.(end_t.tms_utime -. init_t.tms_utime);
 
     if Debug.test_flag infer_print_ai_result then begin
         Format.printf "output=%a@." (Fixpoint.print_output manager) output;

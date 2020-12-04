@@ -24,6 +24,10 @@
 #include <string.h>
 #include <sys/wait.h>
 
+#if defined(__OpenBSD__) && !defined(RLIMIT_AS)
+#define RLIMIT_AS RLIMIT_DATA
+#endif
+
 static int wallclock_timelimit = 60;
 static int showtime = 0, hidetime = 0;
 

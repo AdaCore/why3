@@ -7,7 +7,7 @@ Reference Manuals for the Why3 Tools
 
 This chapter details the usage of each of the command-line tools
 provided by the Why3 environment. The main command is :program:`why3`; it acts
-as an entry-point to all the features of Why3. It is invoked as such
+as an entry-point to all the features of Why3. It is invoked as follows:
 
 ::
 
@@ -16,42 +16,42 @@ as an entry-point to all the features of Why3. It is invoked as such
 The following commands are available:
 
 :why3:tool:`config`
-    manages the user’s configuration, including the detection of
+    Manage the user's configuration, including the detection of
     installed provers.
 
 :why3:tool:`doc`
-    produces HTML versions of Why3 source codes.
+    Render a WhyML file as HTML.
 
 :why3:tool:`execute`
-    performs a symbolic execution of WhyML input files.
+    Perform a symbolic execution of a WhyML file.
 
 :why3:tool:`extract`
-    generates an OCaml program corresponding to WhyML input files.
+    Generate an OCaml program corresponding to a WhyML file.
 
 :why3:tool:`ide`
-    provides a graphical interface to display goals and to run provers
+    Provide a graphical interface to display goals and to run provers
     and transformations on them.
 
 :why3:tool:`pp`
-    pretty-prints WhyML definitions (formatting :file:`.mlw` files
+    Pretty-print WhyML definitions (formatting :file:`.mlw` files
     or printing inductive definitions to LaTeX).
 
 :why3:tool:`prove`
-    reads WhyML input files and calls provers, on the command-line.
+    Read a WhyML input file and call provers, on the command-line.
 
 :why3:tool:`realize`
-    generates interactive proof skeletons for Why3 input files.
+    Generate the skeleton of an interactive proof for a WhyML file.
 
 :why3:tool:`replay`
-    replays the proofs stored in a session, for regression test
+    Replay the proofs stored in a session, for regression test
     purposes.
 
 :why3:tool:`session`
-    dumps various informations from a proof session, and possibly
+    Dump various informations from a proof session, and possibly
     modifies the session.
 
 :why3:tool:`wc`
-    gives some token statistics about WhyML source files.
+    Give some token statistics about a WhyML file.
 
 All these commands are also available as standalone executable files, if
 needed.
@@ -142,7 +142,7 @@ prover, or with different options.
 The :why3:tool:`config` command also detects the :index:`plugins <plugin>` installed in the Why3
 plugins directory (e.g., :file:`/usr/local/lib/why3/plugins`).
 
-If the user’s configuration file is already present, :why3:tool:`config` will
+If the user's configuration file is already present, :why3:tool:`config` will
 only reset unset variables to default value, but will not try to detect
 provers and plugins. Options :option:`--detect-provers` and
 :option:`--detect-plugins` can be used in that case.
@@ -236,6 +236,10 @@ The :why3:tool:`prove` command executes the following steps:
    given, print each generated task using the format specified in the
    selected driver.
 
+#. Derive a validated counterexample using runtime-assertion checking, if option
+   :option:`--check-ce` is given and the selected prover generated a
+   counterexample, .
+
 Prover Results
 ~~~~~~~~~~~~~~
 
@@ -295,16 +299,72 @@ Options
    explanations. The option can be used several times to specify
    several prefixes.
 
-Getting Potential Counterexamples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. option:: --check-ce
 
-That feature is presented in details in :numref:`sec.idece`, which should
-be read first.
+   Validate the counterexample using runtime-assertion checking. Only applicable
+   when the prover selected by :option:`--prover` is configured to generate a
+   counterexample.
 
-Counterexamples are also displayed by the :why3:tool:`prove` command when
-one selects a prover with the ``counterexamples`` alternative. The
-output is currently done in a JSON syntax (this may change in the
-future).
+.. option:: --rac-prover=<p>
+
+   Use prover *p* for the runtime-assertion checking during the validation of
+   counterexamples, when term reduction is insufficient (which is always tried
+   first). The prover *p* is the name or shortcut of a prover, with optional,
+   comma-separated time limit and memory limit, e.g. ``cvc4,2,1000``.
+
+Generating potential counterexamples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When the selected prover has alternative `counterexample`, the prover is
+instructed to generate a model, and Why3 elaborates the model into a potential
+counterexample. The potential counterexample associates source locations and
+variables to values. The generation and display of potential counterexamples is
+presented in details in :numref:`sec.idece`.
+
+Generating validated counterexamples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A validated counterexample can be requested using option :option:`--check-ce`.
+The validated counterexample is derived by executing the relevant function using
+runtime assertion checking (RAC) [#ce-split]_. The potential counterexample
+serves as an oracle for values that are not or cannot be computed in the RAC
+execution (e.g., arguments to the relevant function or ``any``-expressions).
+
+The validated counterexample is a trace of the RAC execution, with one of the
+following qualifications:
+
+*The program does not comply to the verification goal:*
+
+   The validated counterexample is the trace of an execution that resulted in
+   the violation of an assertion.
+  
+*The contracts of some function or loop are underspecified:*
+
+   The validated counterexample is the trace of an abstract execution, which
+   resulted in the violation of an assertion. In an abstract execution, function
+   calls and loops are not executed. Their results and assignments are instead
+   chosen according to the contracts (function postcondition or loop invariants)
+   by picking them from the potential counterexample.
+
+*The program does not comply to the verification goal, or the contracts of some loop or function are too weak:*
+
+   Either of the above cases.
+
+*Sorry, we don't have a good counterexample for you :(*
+
+   The RAC execution did not violate any assertions. The execution trace does not
+   constitute a validated counterexample, and the potential counterexample is invalid, so
+   no counterexample is shown.
+
+*The counterexample model could not be verified:*
+
+   The validated counterexample could not be derived because RAC execution was incomplete.
+   The potential counterexample is instead shown with a warning.
+
+.. [#ce-split] The relevant function is generally only defined, when the
+   counterexample is not generated for the VC of the complete program, for
+   example by applying a split transformation using
+   ``--apply-transform=split_vc``.
 
 .. why3:tool:: ide
 .. _sec.ideref:
@@ -330,18 +390,13 @@ session. For convenience, if there is only one anonymous argument, it
 can be an existing file and in this case the session directory is
 obtained by removing the extension from the file name.
 
-We describe the actions of the various menus and buttons of the
-interface.
-
 .. _sec.ideref.session:
 
 Session
 ~~~~~~~
 
-Why3 stores in a session the way you achieve to prove goals that come
-from a file (:file:`.why`), from weakest-precondition (:file:`.mlw`) or by other
-means. A session stores which file you prove, by applying which
-transformations, by using which prover. A proof attempt records the
+The session stores the transformations you performed on each verification
+condition, as well as the provers you ran. Such a proof attempt records the
 complete name of a prover (name, version, optional attribute), the time
 limit and memory limit given, and the result of the prover. The result
 of the prover is the same as when you run the :why3:tool:`prove` command. It
@@ -406,84 +461,84 @@ replaced by a context menu activited by clicking the right mouse button,
 while cursor is on a given row of the proof session tree.
 
 *Prover list*
-    lists the detected provers. Note that you can hide some provers
+    List the detected provers. Note that you can hide some provers
     of that list using :menuselection:`File --> Preferences`, tab :guilabel:`Provers`.
 
 *Strategy list*
-    lists the set of known strategies.
+    List the set of known strategies.
 
 :guilabel:`Edit`
-    starts an editor on the selected task.
+    Start an editor on the selected task.
 
 :guilabel:`Replay valid obsolete proofs`
-    all proof nodes below the selected nodes that are obsolete but whose
+    All proof nodes below the selected nodes that are obsolete but whose
     former status was Valid are replayed.
 
 :guilabel:`Replay all obsolete proofs`
-    all proof nodes below the selected nodes that are obsolete are
+    All proof nodes below the selected nodes that are obsolete are
     replayed.
 
 :guilabel:`Clean node`
-    removes any unsuccessful proof attempt for which there is another
+    Remove any unsuccessful proof attempt for which there is another
     successful proof attempt for the same goal.
 
 :guilabel:`Remove node`
-    removes a proof attempt or a transformation.
+    Remove a proof attempt or a transformation.
 
 :guilabel:`Interrupt`
-    cancels all the proof attempts currently scheduled or running.
+    Cancel all the proof attempts currently scheduled or running.
 
 Global Menus
 ~~~~~~~~~~~~
 
 Menu :menuselection:`File`
     :menuselection:`--> Add File to session`
-        adds a file in the current proof session.
+        Add a file to the current proof session.
 
     :menuselection:`--> Preferences`
-        opens a window for modifying preferred configuration parameters,
+        Open a window for modifying preferred configuration parameters,
         see details below.
 
     :menuselection:`--> Save session`
-        saves current session state on disk. The policy to decide when
+        Save current session state on disk. The policy to decide when
         to save the session is configurable, as described in the
         preferences below.
 
     :menuselection:`--> Save files`
-        saves edited soruce files on disk.
+        Save edited source files on disk.
 
     :menuselection:`--> Save session and files`
-        saves both current session state and edited files on disk.
+        Save both current session state and edited files on disk.
 
     :menuselection:`--> Save all and Refresh session`
-        save session and edited files, and refresh the current session
+        Save session and edited files, and refresh the current session
         tree.
 
     :menuselection:`--> Quit`
-        exits the GUI.
+        Exit the GUI.
 
 Menu :menuselection:`Tools`
     :menuselection:`--> Strategies`
-        provides a set of actions that are performed on the
-        selected goal(s):
+        Provide a set of actions that are performed on the
+        selected goals:
 
         :menuselection:`--> Split VC`
-            splits the current goal into subgoals.
+            Split the current goal into subgoals.
 
         :menuselection:`--> Auto level 0`
-            is a basic proof search strategy that applies a few provers
+            Perform a basic proof search strategy that applies a few provers
             on the goal with a short time limit.
 
         :menuselection:`--> Auto level 1`
-            is the same as level 0 but with a longer time limit.
+            This is the same as level 0 but with a longer time limit.
 
         :menuselection:`--> Auto level 2`
-            is a strategy that first applies a few provers on the goal
+            This strategy first applies a few provers on the goal
             with a short time limit, then splits the goal and tries
             again on the subgoals.
 
         :menuselection:`--> Auto level 3`
-            is a strategy more elaborate than level 2m that attempts
+            This strategy is more elaborate than level 2. It attempts
             to apply a few transformations that are typically
             useful. It also tries the provers with a larger time
             limit. It also tries more provers.
@@ -493,18 +548,18 @@ Menu :menuselection:`Tools`
         design strategies of your own.
 
     :menuselection:`--> Provers`
-        provide a menu item for each detected prover. Clicking on such
-        an item starts the corresponding prover on the selected goal(s).
+        Provide a menu item for each detected prover. Clicking on such
+        an item starts the corresponding prover on the selected goals.
         To start a prover with a different time limit, you may either
         change the default time limit in the Preferences, or using the
         text command field and type the prover name followed by the time
         limit.
 
     :menuselection:`--> Transformations`
-        gives access to all the known transformations.
+        Give access to all the known transformations.
 
     :menuselection:`--> Edit`
-        starts an editor on the selected task.
+        Start an editor on the selected task.
 
         For automatic provers, this shows the file sent to the
         prover.
@@ -514,80 +569,80 @@ Menu :menuselection:`Tools`
         be retrieved later even if the goal was modified.
 
     :menuselection:`--> Replay valid obsolete proofs`
-        replays all the obsolete proofs below the current node whose
+        Replay all the obsolete proofs below the current node whose
         former state was Valid.
 
     :menuselection:`--> Replay all obsolete proofs`
-        replays all the obsolete proofs below the current node.
+        Replay all the obsolete proofs below the current node.
 
     :menuselection:`--> Clean node`
-        removes any unsuccessful proof attempt for which there is
+        Remove any unsuccessful proof attempt for which there is
         another successful proof attempt for the same goal.
 
     :menuselection:`--> Remove node`
-        removes a proof attempt or a transformation.
+        Remove a proof attempt or a transformation.
 
     :menuselection:`--> Mark obsolete`
-        marks all the proof as obsolete. This makes it possible to replay every
+        Mark all the proof as obsolete. This makes it possible to replay every
         proof.
 
     :menuselection:`--> Interrupt`
-        cancels all the proof attempts currently scheduled or running.
+        Cancel all the proof attempts currently scheduled or running.
 
     :menuselection:`--> Bisect`
-        performs a reduction of the context for the the current selected
+        Reduce the size of the context for the the selected
         proof attempt, which must be a Valid one.
 
     :menuselection:`--> Focus`
-        focus the tree session view to the current node.
+        Focus the tree session view to the current node.
 
     :menuselection:`--> Unfocus`
-        undoes the Focus action.
+        Undo the Focus action.
 
     :menuselection:`--> Copy`
-        marks the proof sub-tree for copy/past action.
+        Mark the proof sub-tree for copy/past action.
 
     :menuselection:`--> Paste`
-        pastes the previously selected sub-tree under the current node.
+        Paste the previously selected sub-tree under the current node.
 
 Menu :menuselection:`View`
     :menuselection:`--> Enlarge font`
-        selects a large font.
+        Select a large font.
 
     :menuselection:`--> Reduce font`
-        selects a smaller font.
+        Select a smaller font.
 
     :menuselection:`--> Collapse proved goals`
-        closes all the rows of the tree view that are proved.
+        Close all the rows of the tree view that are proved.
 
-    :menuselection:`--> Expand All`
-        expands all the rows of the tree view.
+    :menuselection:`--> Expand all`
+        Expand all the rows of the tree view.
 
     :menuselection:`--> Collapse under node`
-        closes all the rows of the tree view under the given node that
+        Close all the rows of the tree view under the given node that
         are proved.
 
     :menuselection:`--> Expand below node`
-        expands the children below the current node.
+        Expand the children below the current node.
 
     :menuselection:`--> Expand all below node`
-        expands the whole subtree of the current node.
+        Expand the whole subtree of the current node.
 
     :menuselection:`--> Go to parent node`
-        moves to the parent of the current node.
+        Move to the parent of the current node.
 
     :menuselection:`--> Go to first child`
-        moves to the first child of the current node.
+        Move to the first child of the current node.
 
     :menuselection:`--> Select next unproven goal`
-        moves to the next unproven goal after the current node.
+        Move to the next unproven goal after the current node.
 
 Menu :menuselection:`Help`
     :menuselection:`--> Legend`
-        explains the meaning of the various icons.
+        Explain the meaning of the various icons.
 
     :menuselection:`--> About`
-        gives some information about this software.
+        Give some information about this software.
 
 Command-line interface
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -766,19 +821,19 @@ The counterexamples can contain values of various types.
 
 -  Integer or real variables are displayed in decimal.
 
--  Bitvectors are displayed in hexadecimal
+-  Bitvectors are displayed in hexadecimal.
 
 -  Integer range types are displayed in a specific notation showing
-   their projection to integers
+   their projection to integers.
 
 -  Floating-point numbers are displayed both under a decimal
    approximation and an exact hexadecimal value. The special values
-   ``+oo``, ``-oo`` and ``NaN`` may occur too.
+   ``+oo``, ``-oo``, and ``NaN`` may occur too.
 
 -  Values from algebraic types and record types are displayed as in the
-   Why3 syntax
+   Why3 syntax.
 
--  Map values are displayed in a specific syntax detailed below
+-  Map values are displayed in a specific syntax detailed below.
 
 To detail the display of map values, consider the following code with a
 trivially false postcondition:
@@ -875,9 +930,9 @@ replay is run anyway, as with the replay button in the IDE. Then, the
 session file will be updated if both
 
 -  all the replayed proof attempts give the same result as what is
-   stored in the session
+   stored in the session,
 
--  every goals are proved.
+-  all the goals are proved.
 
 In other cases, you can use the IDE to update the session, or use the
 option :option:`--force` described below.
@@ -991,16 +1046,16 @@ The invocation of this program is done under the form
 The available subcommands are as follows:
 
 :why3:tool:`session info`
-    prints information and statistics about sessions.
+    Print information and statistics about sessions.
 
 :why3:tool:`session latex`
-    outputs session contents in LaTeX format.
+    Output session contents in LaTeX format.
 
 :why3:tool:`session html`
-    outputs session contents in HTML format.
+    Output session contents in HTML format.
 
 :why3:tool:`session update`
-    updates session contents.
+    Update session contents.
 
 The first three commands do not modify the sessions, whereas the last
 modify them.
@@ -1128,7 +1183,7 @@ The specific options are
 
    Use the ``longtable`` environment instead of ``tabular``.
 
-.. option :: -e <elem>
+.. option:: -e <elem>
 
    Produce a table for the given element, which is either a file, a
    theory or a root goal. The element must be specified using its path
@@ -1196,8 +1251,8 @@ Command ``html``
 .. program:: why3 session html
 
 The :program:`why3 session html` command produces a summary of the proof session in HTML syntax.
-There are two styles of output: ‘table’ and ‘simpletree’. The default is
-‘table’.
+There are two styles of output: ``table`` and ``simpletree``. The default is
+``table``.
 
 The file generated is named :file:`why3session.html` and is written in the
 session directory by default (see option :option:`-o` to override this
@@ -1210,7 +1265,7 @@ default).
 
    HTML table produced for the HelloProof example
 
-The style ‘table’ outputs the contents of the session as a table,
+The style ``table`` outputs the contents of the session as a table,
 similar to the LaTeX output above. :numref:`fig.html` is the HTML table
 produced for the ‘HelloProof’ example, as typically shown in a Web
 browser. The gray cells filled with ``---`` just mean that the prover was
@@ -1218,7 +1273,7 @@ not run on the corresponding goal. Green background means the result was
 “Valid”, other cases are in orange background. The red background for a
 goal means that the goal was not proved.
 
-The style ‘simpletree’ displays the contents of the session under the
+The style ``simpletree`` displays the contents of the session under the
 form of tree, similar to the tree view in the IDE. It uses only basic
 HTML tags such as ``<ul>`` and ``<li>``.
 
@@ -1325,7 +1380,7 @@ Typesetting textual comments
 
 Some constructs are interpreted:
 
--  ``{c text}`` interprets character *c* as some typesetting command:
+-  :samp:`\\{{c} {text}}` interprets character *c* as some typesetting command:
 
    ``1``-``6``
        a heading of level 1 to 6 respectively
@@ -1380,8 +1435,8 @@ specified using the ``--output`` option.
 
 .. option:: --prefix=<prefix>
 
-   Set the prefix for LaTeX commands when using ``--output=latex`` to *<prefix>*. The
-   default is ``WHY``.
+   Set the prefix for LaTeX commands when using ``--output=latex``. The
+   default prefix is ``WHY``.
 
 For the LaTeX output, the typesetting of variables, record fields, and
 functions can be configured by LaTeX commands. Dummy definitions of these
@@ -1397,26 +1452,73 @@ The ``execute`` Command
 
 .. program:: why3 execute
 
-Why3 can symbolically execute programs written using the WhyML language
-(extension :file:`.mlw`).
+Why3 can execute expressions in the context of a WhyML program (extension
+:file:`.mlw`).
 
 ::
 
-   why3 execute [options] file module.ident
+   why3 execute [options] <file> <expr>
 
-The first argument is the file where to read the code to execute. The
-second argument is a qualified identifier which denote a program
-function from that file. The latter function must have only `()` as
-argument.
 
-There are no specific options apart from the options common to all
-Why3 commands.
+`file` is a WhyML file, and `expr` is a WhyML expression. Using option
+``--use=<M>`` the definitions from module `M` are added to the context for
+executing `expr`. For example, the following command executes ``Mod1.f 42``
+defined in ``myfile.mlw``:
+
+::
+
+   why3 execute myfile.mlw --use=Mod1 'f 42'
 
 Upon completion of the execution, the value of the result is displayed
 on the standard input. Additionally, values of the global mutable
 variables modified by that function are displayed too.
 
 See more details and examples of use in :numref:`sec.execute`.
+
+Runtime assertion checking (RAC)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The execution can be instructed using option :option:`--rac` to check the
+validity of the program annotations that are encountered during the execution.
+This includes the validation of assertions, function contracts, and loop
+invariants [#no-function-invars]_.
+
+There are two strategies to check the validity of an annotation: First, the term
+is reduced using the Why3 transformation ``compute_in_goal``. The annotation is
+valid when the result of the reduction is `true` and invalid when the result is
+`false`. When the transformation cannot reduce the term to a trivial term, and
+when a RAC prover is given using option :option:`--rac-prover`, prover `p`
+is used to verify the term.
+
+When a program annotation is found to be wrong during the execution, the
+execution stops and reports the contradiction. Normally, the execution continues
+when an annotation cannot be checked (when the term can neither be reduced nor
+proven), but fails when option `--rac-fail-cannot-check` is given.
+
+Options
+~~~~~~~
+
+.. option:: --use=<Mod>
+
+   Add the definitions from `Mod` to the execution context.
+
+.. option:: --rac
+
+   Check the validity of program annotations encountered during the execution.
+
+.. option:: --rac-prover=<p>
+
+   Use the prover `p` to check assertions in RAC when term reduction is
+   insufficient, with optional, comma-separated time and memory limit (e.g.
+   ``cvc4,2,1000``).
+
+.. option:: --rac-fail-cannot-reduce
+
+   Instruct the RAC execution to fail when an annotation cannot be checked.
+   Normally the execution continues normally when an annotation cannot be
+   checked.
+
+.. [#no-function-invars] RAC for function invariants aren't supported yet.
 
 .. why3:tool:: extract
 .. _sec.why3extract:

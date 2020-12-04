@@ -1,15 +1,25 @@
+CFG size: 11 nodes, 11 hyperedges
+Time elapsed 0.000603s
 ### Debug: inferred invariants ###
 y = 10 /\ 10 = y
 ###
+CFG size: 11 nodes, 11 hyperedges
+Time elapsed 0.000000s
 ### Debug: inferred invariants ###
 (y1 = 10 /\ y1 <= 10) /\ 10 <= y1
 ###
+CFG size: 11 nodes, 11 hyperedges
+Time elapsed 0.000000s
 ### Debug: inferred invariants ###
 y2 = 10 /\ 10 = y2
 ###
+CFG size: 14 nodes, 14 hyperedges
+Time elapsed 0.000000s
 ### Debug: inferred invariants ###
 ((y3 = 10 /\ k = 42) /\ 10 = y3) /\ 42 = k
 ###
+CFG size: 14 nodes, 14 hyperedges
+Time elapsed 0.001806s
 ### Debug: inferred invariants ###
 ((((((((y4 = 10 /\ k1 = 42) /\ k1 <= 42) /\ k1 <= (32 + y4)) /\
      (y4 + k1) <= 52) /\
@@ -19,6 +29,32 @@ y2 = 10 /\ 10 = y2
  y4 <= 10) /\
 10 <= y4
 ###
+CFG size: 14 nodes, 14 hyperedges
+Time elapsed 0.000299s
 ### Debug: inferred invariants ###
 ((y5 = 10 /\ k2 = 42) /\ 42 = k2) /\ 10 = y5
 ###
+File bench/infer/auto_cst1.mlw:
+Verification condition b'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/auto_cst1.mlw:
+Verification condition b2'vc.
+Prover result is: unknown () (0.03s).
+
+File bench/infer/auto_cst1.mlw:
+Verification condition b3'vc.
+Prover result is: unknown () (0.00s).
+
+File bench/infer/auto_cst1.mlw:
+Verification condition c'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/auto_cst1.mlw:
+Verification condition c2'vc.
+Prover result is: unknown () (0.02s).
+
+File bench/infer/auto_cst1.mlw:
+Verification condition c3'vc.
+Prover result is: unknown () (0.02s).
+

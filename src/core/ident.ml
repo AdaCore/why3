@@ -197,9 +197,13 @@ let id_user ?(attrs = Sattr.empty) nm loc =
 let id_attr id attrs =
   create_ident id.id_string attrs id.id_loc
 
-let id_clone ?(attrs = Sattr.empty) id =
+let id_clone ?loc ?(attrs = Sattr.empty) id =
   let aa = Sattr.union attrs id.id_attrs in
-  create_ident id.id_string aa id.id_loc
+  let loc = match loc with
+    | None -> id.id_loc
+    | Some _ -> loc
+  in
+  create_ident id.id_string aa loc
 
 let id_derive ?(attrs = Sattr.empty) nm id =
   let aa = Sattr.union attrs id.id_attrs in
@@ -447,7 +451,7 @@ let compute_model_trace_field pj d =
 let extract_field attr =
   try
     match Strings.bounded_split ':' attr.attr_string 3 with
-    | "field" :: n :: [field_name] -> Some (int_of_string n, field_name)
+    | ["field"; n; field_name] -> Some (int_of_string n, field_name)
     | _ -> None
   with
   | _ -> None

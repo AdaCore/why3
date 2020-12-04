@@ -205,9 +205,10 @@ omega.
 subst n0.
 auto with zarith.
 intro; rewrite IHv;auto.
-intuition; auto with zarith.
+destruct H.
+left; auto with zarith.
 right.
-rewrite Zpos_P_of_succ_nat in H0.
+rewrite Zpos_P_of_succ_nat in H.
 omega.
 Qed.
 

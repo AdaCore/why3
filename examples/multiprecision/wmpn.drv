@@ -33,43 +33,28 @@ end
 blacklist "binverttab"
 
 module mach.int.UInt64GMP
-  interface
-"\ntypedef unsigned __int128 uint128_t;\
-\n\
-\nstruct __mul64_double_result\
-\n{ uint64_t __field_0;\
-\n  uint64_t __field_1;\
-\n};\
-\n\
-\nstatic inline struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)\
-\n{\
-\n  uint128_t z = (uint128_t)x * (uint128_t)y;\
-\n  struct __mul64_double_result result = { z, z >> 64 };\
-\n  return result;\
-\n}\
-\n\
-\nstatic inline uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)\
-\n{\
-\n  return (((uint128_t)uh << 64) | ul) / d;\
-\n}\
-"
-
-(* "
-static struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
-{
-  struct __mul64_double_result result;
-  umul_ppmm(result.__field_1,result.__field_0,x,y);
-  return result;
-}
-
-static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
-{
-  uint64_t q;
-  uint64_t _dummy __attribute__((unused));
-  udiv_qrnnd(q,_dummy,uh,ul,d);
-  return q;
-}
-" *)
+  interface "\
+    \ntypedef unsigned __int128 uint128_t;\
+    \n\
+    \nstruct __mul64_double_result {\
+    \n  uint64_t __field_0;\
+    \n  uint64_t __field_1;\
+    \n};\
+    \n\
+    \nstatic inline struct __mul64_double_result\
+    \nmul64_double(uint64_t x, uint64_t y)\
+    \n{\
+    \n  uint128_t z = (uint128_t)x * (uint128_t)y;\
+    \n  struct __mul64_double_result result = { z, z >> 64 };\
+    \n  return result;\
+    \n}\
+    \n\
+    \nstatic inline uint64_t\
+    \ndiv64_2by1(uint64_t ul, uint64_t uh, uint64_t d)\
+    \n{\
+    \n  return (((uint128_t)uh << 64) | ul) / d;\
+    \n}\
+  "
 
   syntax val mul_double "mul64_double"
   syntax val div2by1 "div64_2by1"
@@ -99,7 +84,7 @@ module ptralias.Alias
     \n};\
     \n\
     \nstatic inline struct __open_sep_result\
-    \nopen_sep (uint64_t *r, uint64_t *x, int32_t sx, uint64_t *y, int32_t sy)\
+    \nopen_sep (uint64_t *r, uint64_t *x, uint64_t *y)\
     \n{\
     \n  struct __open_sep_result result;\
     \n  result.__field_0 = r;\
@@ -109,7 +94,7 @@ module ptralias.Alias
     \n}\
     \n\
     \nstatic inline struct __open_rx_result\
-    \nopen_rx (uint64_t *x, int32_t sx, uint64_t *y, int32_t sy)\
+    \nopen_rx (uint64_t *x, uint64_t *y)\
     \n{\
     \n  struct __open_rx_result result;\
     \n  result.__field_0 = x;\
@@ -119,7 +104,7 @@ module ptralias.Alias
     \n}\
     \n\
     \nstatic inline struct __open_shift_sep_result\
-    \nopen_shift_sep (uint64_t *r, uint64_t *x, int32_t sz)\
+    \nopen_shift_sep (uint64_t *r, uint64_t *x)\
     \n{\
     \n  struct __open_shift_sep_result result;\
     \n  result.__field_0 = r;\
@@ -131,9 +116,9 @@ module ptralias.Alias
   syntax val open_sep "open_sep"
   syntax val open_rx "open_rx"
   syntax val open_shift_sep "open_shift_sep"
-  syntax val close_sep "IGNORE3(%1,%2,%4)" prec 1 15 15 15
-  syntax val close_rx "IGNORE3(%1,%2,%4)" prec 1 15 15 15
-  syntax val close_shift_sep "IGNORE2(%1,%2)" prec 1 15 15
+  syntax val close_sep "IGNORE3(%1, %2, %3)" prec 1 15 15 15
+  syntax val close_rx "IGNORE2(%1, %2)" prec 1 15 15
+  syntax val close_shift_sep "IGNORE2(%1, %2)" prec 1 15 15
 
 end
 

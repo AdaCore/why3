@@ -1267,9 +1267,18 @@ let open_post_with t q = match q.t_node with
   | Teps bf -> t_open_bound_with t bf
   | _ -> invalid_arg "Ity.open_post_with"
 
-let clone_post_result q = match q.t_node with
-  | Teps bf -> t_clone_bound_id bf
+let clone_post_result ?loc ?attrs q =
+  match q.t_node with
+  | Teps bf -> t_clone_bound_id ?loc ?attrs bf
   | _ -> invalid_arg "Ity.clone_post_result"
+
+let default_result_name = "result"
+
+let result_id ?loc ?attrs ?(ql=[]) () : preid =
+  match ql with
+  | q :: _ -> clone_post_result ?loc ?attrs q
+  | _ -> id_fresh ?loc ?attrs default_result_name
+
 
 let annot_attr = Ident.create_attribute "vc:annotation"
 let break_attr = Ident.create_attribute "vc:break_me"
@@ -1474,7 +1483,7 @@ let cty_apply c vl args res =
 
 let cty_tuple args =
   let ty = ty_tuple (List.map (fun v -> v.pv_vs.vs_ty) args) in
-  let vs = create_vsymbol (id_fresh "result") ty in
+  let vs = create_vsymbol (result_id ()) ty in
   let tl = List.map (fun v -> t_var v.pv_vs) args in
   let post = create_post vs (t_equ (t_var vs) (t_tuple tl)) in
   let mask = mask_reduce (MaskTuple (List.map mask_of_pv args)) in
@@ -1488,7 +1497,7 @@ let cty_exec_post_raw c =
   let ity = List.fold_right (fun a ity ->
     ity_func a.pv_ity ity) c.cty_args c.cty_result in
   let al = List.map (fun a -> a.pv_vs) c.cty_args in
-  let res = create_vsymbol (id_fresh "result") (ty_of_ity ity) in
+  let res = create_vsymbol (result_id ()) (ty_of_ity ity) in
   let res_al = t_func_app_l (t_var res) (List.map t_var al) in
   let oldies = Mpv.fold (fun {pv_vs = o} {pv_vs = v} s ->
     Mvs.add o (t_var v) s) c.cty_oldies Mvs.empty in
@@ -1712,7 +1721,7 @@ let print_spec args pre post xpost oldies eff fmt ity =
   let print_post fmt q =
     let v, q = open_post q in
     let n = asprintf "%a" print_vs v in
-    if n = "result" || t_v_occurs v q = 0 then
+    if n = default_result_name || t_v_occurs v q = 0 then
       fprintf fmt "@\nensures  { @[%a@] }" print_term q else
       fprintf fmt "@\nreturns  { %s ->@ @[%a@] }" n print_term q;
     forget_var v in

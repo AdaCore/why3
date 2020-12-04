@@ -20,7 +20,8 @@ why3:
 	make -C ../..
 
 extract: why3 dir
-	$(WHY3) extract -D cursor.drv -D c -L . -o build/ptrcursor.c ccursor.PtrCursor
+	$(WHY3) extract -D cursor.drv -D c -L . --recursive --modular \
+		--interface --debug=c_no_error_msgs -o build/ ccursor.PtrCursor
 
 cfiles: extract
 	gcc -Wall -g -pedantic -Wno-unused-function -std=c11 build/ptrcursor.c -Ibuild -o build/tests

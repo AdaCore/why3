@@ -772,6 +772,9 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let add_frz v frz = ity_frz_regs frz v.pv_ity in
   let frz = Spv.fold add_frz reads Sreg.empty in
   let add_write reg fs m =
+    if Spv.is_empty fs && not reg.reg_its.its_private then m else
+    Mreg.add reg fs m in
+  let add_write reg fs m =
     let add_fd fd s = Spv.add (Mpv.find_def fd fd cl.fd_table) s in
     (* add old mutable fields to the effect *)
     let fs = Spv.fold add_fd fs Spv.empty in
@@ -781,8 +784,7 @@ let clone_cty cl sm ?(drop_decr=false) cty =
     let smf_reg = Spv.of_list reg.reg_its.its_mfields in
     let smf_ref = Spv.fold add_fd smf_reg Spv.empty in
     let fs = Spv.union fs (Spv.diff smf_reg' smf_ref) in
-    let m = if Spv.is_empty fs && not s'.its_private
-            then m else Mreg.add reg' fs m in
+    let m = add_write reg' fs m in
     (* add new non-mutable fields to the effect *)
     let sof_reg' = Spv.of_list s'.its_ofields in
     let sof_reg = Spv.of_list reg.reg_its.its_ofields in
@@ -794,7 +796,7 @@ let clone_cty cl sm ?(drop_decr=false) cty =
       Spv.fold add_ofd ofds m
     and add_ofd_reg m r = if Sreg.mem r frz then m else
       add_ofds r (Spv.of_list r.reg_its.its_ofields)
-        (Mreg.add r (Spv.of_list r.reg_its.its_mfields) m) in
+        (add_write r (Spv.of_list r.reg_its.its_mfields) m) in
     add_ofds reg' (Spv.diff sof_reg' sof_ref) m in
   let writes = Mreg.fold add_write cty.cty_effect.eff_writes Mreg.empty in
   let add_reset reg s = Sreg.add (clone_reg cl reg) s in

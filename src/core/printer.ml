@@ -82,6 +82,9 @@ type printer_mapping = {
   set_str: Sattr.t Mstr.t
 }
 
+let list_projs pm =
+  Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_projections pm.list_fields
+
 type printer_args = {
   env        : Env.env;
   prelude    : prelude;

@@ -6,7 +6,15 @@ module Option
 
   let predicate is_none (o: option 'a)
     ensures { result <-> o = None }
-  =
-    match o with None -> true | Some _ -> false end
+  = match o with None -> true | Some _ -> false end
+
+end
+
+module Map
+
+  use Option
+
+  function map (f: 'a -> 'b) (o: option 'a) : option 'b
+  = match o with None -> None | Some x -> Some (f x) end
 
 end

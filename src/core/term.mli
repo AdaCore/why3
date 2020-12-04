@@ -144,6 +144,34 @@ and term_quant
 
 and trigger = term list list
 
+(** {2 Generic term equality} *)
+
+(**   flags enable comparison of the respective feature:
+  - [trigger]: triggers in qauntified terms
+  - [attr]: attributes
+  - [loc]: source locations
+  - [const]: when false constants of the same mathematical
+  value are considered equal
+*)
+
+val t_hash_generic : trigger:bool -> attr:bool -> term -> int
+val t_compare_generic :
+  trigger:bool -> attr:bool -> loc:bool -> const:bool
+               -> term -> term -> int
+val t_equal_generic :
+  trigger:bool -> attr:bool -> loc:bool -> const:bool
+               -> term -> term -> bool
+
+val mterm_generic :
+  trigger:bool -> attr:bool -> loc:bool -> const:bool
+               -> (module (Extmap.S with type key = term))
+val sterm_generic :
+  trigger:bool -> attr:bool -> loc:bool -> const:bool
+               -> (module (Extset.S with type M.key = term))
+val hterm_generic :
+  trigger:bool -> attr:bool -> loc:bool -> const:bool
+               -> (module (Exthtbl.S with type key = term))
+
 (** {2 Term equality modulo alpha-equivalence} *)
 
 val t_equal_strict : term -> term -> bool
@@ -151,7 +179,7 @@ val t_compare_strict : term -> term -> int
 val t_hash_strict : term -> int
 
 module Mterm_strict : Extmap.S with type key = term
-module Sterm_strict : Extset.S with module M = Mterm_strict
+module Sterm_strict : Extset.S with type M.key = term
 module Hterm_strict : Exthtbl.S with type key = term
 
 (** {2 Term equality modulo alpha-equivalence, attributes, triggers, and locations} *)
@@ -161,7 +189,7 @@ val t_compare : term -> term -> int
 val t_hash : term -> int
 
 module Mterm : Extmap.S with type key = term
-module Sterm : Extset.S with module M = Mterm
+module Sterm : Extset.S with type M.key = term
 module Hterm : Exthtbl.S with type key = term
 
 (** {2 Bindings} *)
@@ -182,7 +210,8 @@ val t_open_bound_with : term -> term_bound -> term
 (** [t_open_bound_with t tb] opens the binding [tb] and immediately
     replaces the corresponding bound variable with [t] *)
 
-val t_clone_bound_id : term_bound -> preid
+val t_clone_bound_id :
+  ?loc:Loc.position -> ?attrs:Sattr.t -> term_bound -> preid
 
 (** open bindings with optimized closing callbacks *)
 

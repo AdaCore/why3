@@ -237,7 +237,7 @@ let induction_on_hyp attr b h list_hyp_opt =
 let () = wrap_and_register
     ~desc:"induction_arg_pr <name>@ \
       performs@ 'induction_pr'@ on@ the@ given@ premise. Optional@ <with_gen>@ \
-      arguments@ are@ the@ elements@ to@ be@ generalized@."
+      arguments@ are@ the@ elements@ to@ be@ generalized."
     "induction_arg_pr"
     (Tprsymbol (Topt ("with_gen", Tlist Ttrans_l)))
     (induction_on_hyp attr_ind true)
@@ -245,7 +245,7 @@ let () = wrap_and_register
 let () = wrap_and_register
     ~desc:"inversion_arg_pr <name>@ \
       performs@ 'inversion_pr'@ on@ the@ given@ premise. Optional@ <with_gen>@ \
-      arguments@ are@ the@ elements@ to@ be@ generalized@."
+      arguments@ are@ the@ elements@ to@ be@ generalized."
     "inversion_arg_pr"
     (Tprsymbol (Topt ("with_gen", Tlist Ttrans_l)))
     (induction_on_hyp attr_inv false)

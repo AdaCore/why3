@@ -1,6 +1,20 @@
+CFG size: 23 nodes, 23 hyperedges
+Time elapsed 0.021012s
 ### Debug: inferred invariants ###
-(0 = 0 /\ 0 <= contents i) /\ contents i <= 10
+((12 = contents i \/ contents i <= 10) /\ 0 <= contents i) /\
+contents i <= 12
 ###
+CFG size: 23 nodes, 23 hyperedges
+Time elapsed 0.099081s
 ### Debug: inferred invariants ###
-contents i1 <= 10 /\ 0 <= contents i1
+((12 <= contents i1 \/ contents i1 <= 10) /\ contents i1 <= 12) /\
+0 <= contents i1
 ###
+File bench/infer/neg1.mlw:
+Verification condition b'vc.
+Prover result is: unknown () (0.04s).
+
+File bench/infer/neg1.mlw:
+Verification condition b2'vc.
+Prover result is: unknown () (0.00s).
+

@@ -288,6 +288,8 @@ val set_family  : config -> string -> Rc.family  -> config
 
 module Args : sig
 
+  val first_arg : int ref
+
   val all_options : Getopt.opt list -> string -> string -> Getopt.opt list
 
   val initialize :

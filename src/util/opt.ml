@@ -52,3 +52,7 @@ let map_fold f acc x = match x with
   | Some x -> let acc, x = f acc x in acc, Some x
 
 let for_all p = function | None -> true  | Some x -> p x
+
+let bind o k = match o with
+  | Some x -> k x
+  | None -> None

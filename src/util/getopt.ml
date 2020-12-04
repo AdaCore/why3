@@ -118,6 +118,8 @@ let rec parse_kind : type a. string -> a arg -> (a -> unit) -> string -> int -> 
     | i -> f i
     | exception Failure _ -> fail ()
 
+exception NeedArg of (string -> unit)
+
 let parse_short opts arg =
   let len = String.length arg in
   assert (len >= 2);
@@ -131,18 +133,15 @@ let parse_short opts arg =
         | HndOpt (_, f) -> f None
         | Hnd1 _ ->
             raise (GetoptFailure (sprintf "option -%c requires an argument" key))
-      done;
-      None
+      done
   | HndOpt (k, f) ->
       if len = 2 then f None
-      else parse_kind (String.sub arg 0 2) k (fun x -> f (Some x)) arg 2;
-      None
+      else parse_kind (String.sub arg 0 2) k (fun x -> f (Some x)) arg 2
   | Hnd1 (k, f) ->
       if len = 2 then
-        Some (fun x -> parse_kind arg k f x 0)
+        raise (NeedArg (fun x -> parse_kind arg k f x 0))
       else
-        let () = parse_kind (String.sub arg 0 2) k f arg 2 in
-        None
+        parse_kind (String.sub arg 0 2) k f arg 2
 
 let parse_long opts arg =
   let pos, value =
@@ -152,36 +151,38 @@ let parse_long opts arg =
   let key = String.sub arg 2 (pos - 2) in
   match find_long opts key, value with
   | Hnd0 f, None -> f ()
+  | Hnd0 _, Some _ ->
+      raise (GetoptFailure (sprintf "option --%s does not expect an argument" key))
   | HndOpt (_, f), None -> f None
   | HndOpt (k, f), Some i ->
       parse_kind (String.sub arg 0 pos) k (fun x -> f (Some x)) arg i
+  | Hnd1 (k, f), None ->
+      raise (NeedArg (fun x -> parse_kind arg k f x 0))
   | Hnd1 (k, f), Some i ->
       parse_kind (String.sub arg 0 pos) k f arg i
-  | Hnd0 _, Some _
-  | Hnd1 _, None ->
-      raise (GetoptFailure (sprintf "option --%s requires an argument" key))
 
 let parse_one opts args i =
   let nargs = Array.length args in
   assert (0 <= i && i < nargs);
   let arg = args.(i) in
   let len = String.length arg in
-  if len < 2 || arg.[0] <> '-' then
-    i
-  else if arg.[1] = '-' then
-    if len = 2 then i (* exit on '--' *)
-    else
-      let () = parse_long opts arg in
-      i + 1
-  else
-    let i = i + 1 in
-    match parse_short opts arg with
-    | Some f ->
-        if i = nargs then
-          raise (GetoptFailure (sprintf "option -%c requires an argument" arg.[1]));
-        f (args.(i));
+  let is_opt =
+    if len < 2 || arg.[0] <> '-' then None
+    else if arg.[1] <> '-' then Some parse_short
+    else if len = 2 then None (* '--' *)
+    else Some parse_long in
+  match is_opt with
+  | None -> i
+  | Some parse ->
+      try
+        parse opts arg;
         i + 1
-    | None -> i
+      with
+      | NeedArg f ->
+          if i + 1 = nargs then
+            raise (GetoptFailure (sprintf "option %s requires an argument" arg));
+          f (args.(i + 1));
+          i + 2
 
 let handle_exn args err =
   if Array.length args <> 0 then
