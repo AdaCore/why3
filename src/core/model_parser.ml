@@ -147,7 +147,10 @@ let binary_of_bv bv =
   let p = String.make (bv.bv_length-String.length b) '0' in
   Printf.sprintf "#b%s%s" p b
 
-let convert_float_value ?(force_binary_bv=false) f =
+let debug_force_binary_floats = Debug.register_flag "model_force_binary_floats"
+    ~desc:"Print all floats using bitvectors in JSON output for models"
+
+let convert_float_value f =
   match f with
   | Plus_infinity ->
       let m = Mstr.add "cons" (Json_base.String "Plus_infinity") Mstr.empty in
@@ -164,7 +167,7 @@ let convert_float_value ?(force_binary_bv=false) f =
   | Not_a_number ->
       let m = Mstr.add "cons" (Json_base.String "Not_a_number") Mstr.empty in
       Json_base.Record m
-  | Float_number {binary= {sign; exp; mant}} when force_binary_bv ->
+  | Float_number {binary= {sign; exp; mant}} when Debug.test_flag debug_force_binary_floats ->
       let m = Mstr.add "cons" (Json_base.String "Float_value") Mstr.empty in
       let m = Mstr.add "sign" (Json_base.String (binary_of_bv sign)) m in
       let m = Mstr.add "exponent" (Json_base.String (binary_of_bv exp)) m in
