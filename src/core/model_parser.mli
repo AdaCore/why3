@@ -9,8 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Wstdlib
-
 (** {1 Counter-example model values} *)
 
 type model_int = { int_value: BigInt.t; int_verbatim: string }

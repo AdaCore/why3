@@ -340,7 +340,7 @@ module Hprover = Whyconf.Hprover
    to the time or mem limits, we adapt these limits when we replay a
    proof *)
 
-let adapt_limits ~interactive ~use_steps limits a =
+let _adapt_limits ~interactive ~use_steps limits a =
   let t, m, s =
     let timelimit = limits.Call_provers.limit_time in
     let memlimit = limits.Call_provers.limit_mem in

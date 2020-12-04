@@ -361,7 +361,7 @@ let actualcommand ~cleanup ~inplace command limit file =
     if inplace then Sys.rename (backup_file file) file;
     raise e
 
-let adapt_limits limit on_timelimit =
+let _adapt_limits limit on_timelimit =
   if limit.limit_time = empty_limit.limit_time then limit
   else
     { limit with limit_time =

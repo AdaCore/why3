@@ -26,7 +26,7 @@ let rec unfold_foralls axiom =
 
 let get_def_elt axiom =
   match axiom.t_node with
-  | Tquant (Tforall,tq) ->
+  | Tquant (Tforall,_tq) ->
     (* look for axioms defining (without recursion) a term with one of
        the following patterns *)
     (* let args,_,t = t_open_quant tq in *)
@@ -86,7 +86,7 @@ let collect_defs ignore = Trans.fold (fun hd acc ->
     end
   | _ -> acc) ([],[])
 
-let replace_defs (ids,defs) =
+let replace_defs (_ids,defs) =
   Trans.decl (fun d -> match d.d_node with
       | Dparam l ->
         begin try
@@ -106,7 +106,7 @@ let replace_defs (ids,defs) =
           with Not_found -> [d]
 
         end
-      | Dprop (Paxiom,v,t) when List.exists (fun def -> t_equal t def.axiom) defs ->
+      | Dprop (Paxiom,_v,t) when List.exists (fun def -> t_equal t def.axiom) defs ->
         if Debug.test_flag debug then
           Format.printf "[fold_defs]@ remove@ axiom@ %a@." Pretty.print_term t;
         []

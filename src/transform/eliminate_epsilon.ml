@@ -122,7 +122,7 @@ let to_elim el t = match el with
       vl = [] || t.t_ty = None
 
 let rec lift_f el acc t0 =
-  let elim_eps_eq t1 fb t2 =
+  let _elim_eps_eq t1 fb t2 =
       let vs, f = t_open_bound fb in
       if canonicalize vs f <> Nothing then
         match t1.t_node with
