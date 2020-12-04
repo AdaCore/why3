@@ -50,6 +50,17 @@ integer (e.g., ``-555``), a boolean (``true``, ``false``), or a string
 are thus allowed to occur several times inside a given section. In that
 case, the relative order of these associations matters.
 
+Extra Configuration Files
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to the main configuration file, Why3 commands accept the
+option :option:`why3 --extra-config` to read one or more files
+containing additional configuration option. It allows the user to pass
+extra declarations in prover drivers, as illustrated in
+:numref:`sec.apiextradrivers`, including declarations for
+realizations, as illustrated in :numref:`sec.realizations`.
+
+
 .. _sec.drivers:
 
 Drivers for External Provers
@@ -91,6 +102,59 @@ figures: :numref:`fig.drv.smt` shows the drivers files for SMT
 solvers, :numref:`fig.drv.tptp` for TPTP solvers, :numref:`fig.drv.coq`
 for Coq, :numref:`fig.drv.isabelle` for Isabelle/HOL,
 and :numref:`fig.drv.pvs` for PVS.
+
+.. _sec.apiextradrivers:
+
+Adding extra drivers for user theories
+--------------------------------------
+
+It is possible for the users to augment the system drivers with extra
+information for their own declared theories. The processus is
+described by the following example.
+
+First, we define a new theory in a file :file:`bvmisc.mlw`, containing
+
+.. code-block:: whyml
+
+  theory T
+  use bv.BV8
+  use bv.BV16
+  function lsb BV16.t : BV8.t (** least significant bits *)
+  function msb BV16.t : BV8.t (** most significant bits *)
+  end
+
+For such a theory, it is a good idea to declare specific translation
+rules for provers that have a built-in bit-vector support, such as Z3
+and CVC4 in this example. To do so, we write a extension driver file,
+:file:`my.drv`, containing
+
+.. code-block:: whyml
+
+  theory bvmisc.T
+  syntax function lsb "((_ extract 7 0) %1)"
+  syntax function msb "((_ extract 15 8) %1)"
+  end
+
+Now to tell Why3 that we would like this driver extension when calling
+Z3 or CVC4, we write an extra configuration file, :file:`my.conf`,
+containing
+
+.. code-block::
+
+  [prover_modifiers]
+  prover = "CVC4"
+  driver = "my.drv"
+
+  [prover_modifiers]
+  prover = "Z3"
+  driver = "my.drv"
+
+Finally, to make the whole thing work, we have to call any Why3 command
+with the additional option :option:`why3 --extra-config`, such as
+
+.. code-block::
+
+  why3 --extra-config=my.conf prove myfile.mlw
 
 .. _sec.transformations:
 
