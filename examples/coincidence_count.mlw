@@ -30,7 +30,7 @@ module CoincidenceCount
     drop a n == add a[n] (drop a (n+1))
 
   predicate increasing (a: array int) =
-    forall i j: int. 0 <= i < j < length a -> a[i] < a[j]
+    forall i j. 0 <= i < j < length a -> a[i] < a[j]
 
   function cc (a b: array int) : int =
     cardinal (inter (setof a) (setof b))
@@ -48,27 +48,27 @@ module CoincidenceCount
     requires { increasing b }
     ensures  { result = cc a b }
   =
-    let i = ref 0 in
-    let j = ref 0 in
-    let c = ref 0 in
-    while !i < length a && !j < length b do
-      invariant { 0 <= !i <= length a }
-      invariant { 0 <= !j <= length b }
-      invariant { !c + cardinal (inter (drop a !i) (drop b !j)) = cc a b }
-      variant   { length a + length b - !i - !j }
-      if a[!i] < b[!j] then
+    let ref i = 0 in
+    let ref j = 0 in
+    let ref c = 0 in
+    while i < length a && j < length b do
+      invariant { 0 <= i <= length a }
+      invariant { 0 <= j <= length b }
+      invariant { c + cardinal (inter (drop a i) (drop b j)) = cc a b }
+      variant   { length a + length b - i - j }
+      if a[i] < b[j] then
         incr i
-      else if a[!i] > b[!j] then
+      else if a[i] > b[j] then
         incr j
       else begin
-        assert { inter (drop a !i) (drop b !j) ==
-                 add a[!i] (inter (drop a (!i+1)) (drop b (!j+1))) };
-        assert { not (mem a[!i] (drop a (!i+1))) };
+        assert { inter (drop a i) (drop b j) ==
+                 add a[i] (inter (drop a (i+1)) (drop b (j+1))) };
+        assert { not (mem a[i] (drop a (i+1))) };
         incr i;
         incr j;
         incr c
       end
     done;
-    !c
+    c
 
 end
