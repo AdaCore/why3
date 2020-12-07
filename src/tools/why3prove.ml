@@ -288,14 +288,9 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let reduce_config =
           let trans = "compute_in_goal" and prover = !opt_rac_prover in
           Pinterp.rac_reduce_config_lit config env ~trans ?prover () in
-        let models =
-          let clean = new Model_parser.clean in
-          List.map (fun (r, m) -> r, clean#model m) res.pr_models in
-        let ce = Counterexample.select_model
-                   ?verb_lvl:!opt_ce_check_verbosity
-                   ~check:!opt_check_ce_model
-                   ~reduce_config env (Pmodule.restore_module th)
-                   models in
+        let pm = Pmodule.restore_module th in
+        let ce = Counterexample.select_model ~check:!opt_check_ce_model
+            ?verb_lvl:!opt_ce_check_verbosity ~reduce_config env pm res.pr_models in
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in

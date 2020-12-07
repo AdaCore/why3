@@ -175,8 +175,7 @@ let report_messages c obj =
               let env = c.Controller_itp.controller_env in
               let sort_models = prioritize_last_model in
               let model = Opt.map fst (select_model ~sort_models env pm pr.pr_models) in
-              let model_clean = Opt.map (new Gnat_counterexamples.clean)#model model in
-              model_clean
+              model
         | _ -> None
       in
       let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
@@ -234,6 +233,7 @@ let save_session_and_exit c signum =
 let _ =
   if Gnat_config.debug then Debug.(set_flag (lookup_flag "gnat_ast"));
   Debug.set_flag Model_parser.debug_force_binary_floats;
+  Model_parser.customize_clean (new Gnat_counterexamples.clean);
   Util.init_timing ();
   try
     let c = Gnat_objectives.init_cont () in

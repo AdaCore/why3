@@ -410,16 +410,17 @@ type model = {
   vc_term_attrs: Sattr.t;
 }
 
-let map_filter_model_elements f m =
+let map_filter_model_files f =
   let f_list elts =
     match Lists.map_filter f elts with
     | [] -> None | l -> Some l in
   let f_files mf =
     let mf = Mint.map_filter f_list mf in
     if Mint.is_empty mf then None else Some mf in
-  let model_files = Mstr.map_filter f_files m.model_files in
-  {m with model_files}
+  Mstr.map_filter f_files
 
+let map_filter_model_elements f m =
+  {m with model_files= map_filter_model_files f m.model_files}
 
 let empty_model_file = Mint.empty
 let empty_model_files = Mstr.empty
@@ -460,9 +461,6 @@ let get_model_element_by_id model id =
 let get_model_element_by_loc model loc =
   let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
   List.find_opt aux (get_model_elements model)
-
-type model_parser = printer_mapping -> string -> model
-type raw_model_parser = printer_mapping -> string -> model_element list
 
 (*
 ***************************************************************
@@ -947,7 +945,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     Sattr.fold add_written_loc me.me_name.men_attrs model in
   List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
 
-let handle_contradictory_vc pm model_files =
+let handle_contradictory_vc vc_term_loc model_files =
   (* The VC is contradictory if the location of the term that triggers VC
      was collected, model_files is not empty, and there are no model elements
      in this location.
@@ -957,7 +955,7 @@ let handle_contradictory_vc pm model_files =
     (* If the counterexample model was not collected, then model_files
        is empty and this does not mean that VC is contradictory. *)
     model_files
-  else match pm.Printer.vc_term_loc with
+  else match vc_term_loc with
     | None -> model_files
     | Some pos ->
         let filename, line_number, _, _ = Loc.get pos in
@@ -978,51 +976,11 @@ let handle_contradictory_vc pm model_files =
             add_to_model me model_files
         | _ -> model_files
 
-let build_model pm raw_model =
-  let model_files = build_model_rec pm raw_model in
-  let model_files = handle_contradictory_vc pm model_files in
-  { model_files; vc_term_loc= pm.Printer.vc_term_loc; vc_term_attrs= pm.Printer.vc_term_attrs }
-
 (*
 ***************************************************************
-**  Filtering the model
+** Model cleaning
 ***************************************************************
 *)
-
-let add_loc orig_model new_model position =
-  (* Add a given location from orig_model to new_model *)
-  let file_name, line_num, _, _ = Loc.get position in
-  let orig_model_file = get_model_file orig_model file_name in
-  let new_model_file = get_model_file new_model file_name in
-  if Mint.mem line_num new_model_file then
-    (* the location already is in new_model *)
-    new_model
-  else
-    try
-      (* get the location from original model *)
-      let line_map = Mint.find line_num orig_model_file in
-      (* add the location to new model *)
-      let new_model_file = Mint.add line_num line_map new_model_file in
-      Mstr.add file_name new_model_file new_model
-    with Not_found -> new_model
-
-let add_first_model_line filename model_file model =
-  let line_num, cnt_info = Mint.min_binding model_file in
-  let mf = get_model_file model filename in
-  let mf = Mint.add line_num cnt_info mf in
-  Mstr.add filename mf model
-
-let model_for_positions_and_decls model ~positions =
-  (* Start with empty model and add locations from model that
-     are in locations *)
-  let model_filtered =
-    List.fold_left (add_loc model.model_files) empty_model_files positions in
-  (* For each file add mapping corresponding to the first line of the
-     counter-example from model to model_filtered.
-     This corresponds to function declarations *)
-  let model_filtered =
-    Mstr.fold add_first_model_line model.model_files model_filtered in
-  {model with model_files= model_filtered}
 
 let opt_bind_any os f =
   f (Lists.map_filter (fun x -> x) os)
@@ -1033,8 +991,6 @@ let opt_bind_all os f =
   else None
 
 class clean = object (self)
-  method model m =
-    map_filter_model_elements self#element m
   method element me =
     if me.me_name.men_kind = Error_message then
       (* Keep unparsed values for error messages *)
@@ -1079,27 +1035,81 @@ class clean = object (self)
     Some (Record fs)
 end
 
+let clean = ref (new clean)
+
+let customize_clean c = clean := (c :> clean)
+
+(*
+***************************************************************
+**  Filtering the model
+***************************************************************
+*)
+
+let add_loc orig_model new_model position =
+  (* Add a given location from orig_model to new_model *)
+  let file_name, line_num, _, _ = Loc.get position in
+  let orig_model_file = get_model_file orig_model file_name in
+  let new_model_file = get_model_file new_model file_name in
+  if Mint.mem line_num new_model_file then
+    (* the location already is in new_model *)
+    new_model
+  else
+    try
+      (* get the location from original model *)
+      let line_map = Mint.find line_num orig_model_file in
+      (* add the location to new model *)
+      let new_model_file = Mint.add line_num line_map new_model_file in
+      Mstr.add file_name new_model_file new_model
+    with Not_found -> new_model
+
+let add_first_model_line filename model_file model =
+  let line_num, cnt_info = Mint.min_binding model_file in
+  let mf = get_model_file model filename in
+  let mf = Mint.add line_num cnt_info mf in
+  Mstr.add filename mf model
+
+let model_for_positions_and_decls model ~positions =
+  (* Start with empty model and add locations from model that
+     are in locations *)
+  let model_filtered =
+    List.fold_left (add_loc model.model_files) empty_model_files positions in
+  (* For each file add mapping corresponding to the first line of the
+     counter-example from model to model_filtered.
+     This corresponds to function declarations *)
+  let model_filtered =
+    Mstr.fold add_first_model_line model.model_files model_filtered in
+  {model with model_files= model_filtered}
+
 (*
 ***************************************************************
 ** Registering model parser
 ***************************************************************
 *)
 
+type model_parser = printer_mapping -> string -> model
+type raw_model_parser = printer_mapping -> string -> model_element list
+
+let model_parser (raw: raw_model_parser) : model_parser =
+  fun ({Printer.vc_term_loc; vc_term_attrs} as pm) str ->
+  raw pm str |> (* For example, Smtv2_model_parser.parse for "smtv2" *)
+  build_model_rec pm |>
+  map_filter_model_files !clean#element |>
+  handle_contradictory_vc pm.Printer.vc_term_loc |>
+  fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
+
 exception KnownModelParser of string
 exception UnknownModelParser of string
 
-type reg_model_parser = Pp.formatted * raw_model_parser
+type reg_model_parser = Pp.formatted * model_parser
 
 let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 
 let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s) ;
-  Hstr.replace model_parsers s (desc, p)
+  Hstr.replace model_parsers s (desc, model_parser p)
 
-let lookup_model_parser s pm input =
-  let _, raw_model_parser = Hstr.find_exn model_parsers (UnknownModelParser s) s in
-  let raw_model = raw_model_parser pm input in (* For example, Smtv2_model_parser.parse for "smtv2" *)
-  build_model pm raw_model
+let lookup_model_parser s =
+  snd (Hstr.find_exn model_parsers (UnknownModelParser s) s)
 
 let list_model_parsers () =
   Hstr.fold (fun k (desc, _) acc -> (k, desc) :: acc) model_parsers []
