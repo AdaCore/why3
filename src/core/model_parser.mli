@@ -295,10 +295,9 @@ val model_for_positions_and_decls : model ->
 ***************************************************************
 *)
 
-(** Method clean#model cleans a model from unparsed values (except for elements of kind
-   error messag). The cleaning can be extended by method overriding. *)
+(** Method clean#model cleans a model from unparsed values and handles contradictory VCs
+   ("the check fails with all inputs"). *)
 class clean : object
-  method model : model -> model
   method element : model_element -> model_element option
   method value : model_value -> model_value option
   method unparsed : string -> model_value option
@@ -316,6 +315,9 @@ class clean : object
   method undefined : model_value option
 end
 
+val customize_clean : #clean -> unit
+(** Customize the class used to clean the values in the model. *)
+
 (*
 ***************************************************************
 ** Registering model parser
@@ -323,9 +325,9 @@ end
 *)
 
 type model_parser = Printer.printer_mapping -> string -> model
-(** Parses the input string into model elements, estabilishes
-    a mapping between these elements and mapping from printer
-    and builds model data structure.*)
+(** Parses the input string into model elements, estabilishes a mapping between these
+   elements and mapping from printer and builds model data structure. The model still has
+   to be cleaned using [clean]. *)
 
 type raw_model_parser = Printer.printer_mapping -> string -> model_element list
 
