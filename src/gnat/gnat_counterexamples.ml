@@ -56,6 +56,14 @@ let collect_attrs a (men_attrs, fields) = match get_field_attr a with
 (* Correct a model element name by a field string *)
 let correct_name f = Str.global_replace (Str.regexp_string f) ""
 
+(* Filtering the model to remove elements that are not understood by gnat2why
+   (sole purpose is to reduce the size of the output). *)
+let in_spark (e: model_element) =
+  let name = e.me_name.men_name in
+  (* Names that do not begin with either '.' or a number are not recognized by
+     gnat2why *)
+  String.length name > 0 && (name.[0] = '.' || (name.[0] <= '9' && name.[0] >= '0'))
+
 (** Clean values by a) replacing records according to [only_first_field2] and
    simplifying discriminant records b) removing unparsed values, in which the
    function returns [None]. *)
@@ -75,5 +83,7 @@ class clean = object (self)
       Sattr.fold collect_attrs me.me_name.men_attrs (Sattr.empty, []) in
     let men_name = List.fold_right correct_name fields me.me_name.men_name in
     let me_name = {me.me_name with men_name; men_attrs} in
-    super#element {me with me_name}
+    match super#element {me with me_name} with
+    | Some me as res when in_spark me -> res
+    | _ -> None
 end
