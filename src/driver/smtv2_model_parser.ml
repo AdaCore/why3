@@ -259,16 +259,14 @@ module FromSexp = struct
         Some (n, Function (al, make_local al t))
     | _ -> None
 
-  let rec model = function
+  let model = function
     | [] ->
         None
-    | List (Atom "model" :: decls) :: rest ->
-        (* if rest <> [] then Warning.emit "Ignore trailing garbage following model"; *)
-        if rest <> [] then Warning.emit "Ignore trailing garbage following model: %a" pp_sexp (List rest);
+    | [List (Atom "model" :: decls)] | [List decls] ->
         Some (Mstr.of_list (Lists.map_filter decl decls))
-    | sexp :: rest ->
-        Warning.emit "Ignore leading garbage before model: %a" pp_sexp sexp;
-        model rest
+    | _ ->
+        failwith ("Cannot read S-expression as model: " ^
+                  "must be a single list `(model ...)` or `(...)`")
 end
 
 (* Parses the model returned by CVC4 and Z3. *)
