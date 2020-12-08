@@ -56,6 +56,12 @@ let collect_attrs a (men_attrs, fields) = match get_field_attr a with
 (* Correct a model element name by a field string *)
 let correct_name f = Str.global_replace (Str.regexp_string f) ""
 
+let clean_name men =
+  let men_attrs, fields =
+    Sattr.fold collect_attrs men.men_attrs (Sattr.empty, []) in
+  let men_name = List.fold_right correct_name fields men.men_name in
+  {men with men_name; men_attrs}
+
 (* Filtering the model to remove elements that are not understood by gnat2why
    (sole purpose is to reduce the size of the output). *)
 let in_spark (e: model_element) =
@@ -79,10 +85,7 @@ class clean = object (self)
       | fs -> Some (Record fs)
 
   method! element me =
-    let men_attrs, fields =
-      Sattr.fold collect_attrs me.me_name.men_attrs (Sattr.empty, []) in
-    let men_name = List.fold_right correct_name fields me.me_name.men_name in
-    let me_name = {me.me_name with men_name; men_attrs} in
+    let me_name = clean_name me.me_name in
     match super#element {me with me_name} with
     | Some me as res when in_spark me -> res
     | _ -> None
