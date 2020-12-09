@@ -326,11 +326,13 @@ let rac_prover ~command driver limit =
 type rac_reduce_config = {
   rac_trans: Task.task Trans.tlist option;
   rac_prover: rac_prover option;
+  rac_try_negate: bool;
 }
 
-let rac_reduce_config ?trans:rac_trans ?prover:rac_prover () = {rac_trans; rac_prover}
+let rac_reduce_config ?trans:rac_trans ?prover:rac_prover ?try_negate:(rac_try_negate=false) () =
+  {rac_trans; rac_prover; rac_try_negate}
 
-let rac_reduce_config_lit config env ?trans ?prover () =
+let rac_reduce_config_lit config env ?trans ?prover ?try_negate () =
   let trans =
     let aux s = Trans.lookup_transform_l s env in
     Opt.map aux trans in
@@ -350,7 +352,7 @@ let rac_reduce_config_lit config env ?trans ?prover () =
       let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
       rac_prover ~command driver limit in
     Opt.map aux prover in
-  rac_reduce_config ?trans ?prover ()
+  rac_reduce_config ?trans ?prover ?try_negate ()
 
 (* Interpretation log *)
 
@@ -1542,12 +1544,29 @@ let check_term_dispatch (Rac_prover {command; driver; limit}) task =
   let open Call_provers in
   let call = Driver.prove_task ~command ~limit driver task in
   let res = wait_on_call call in
-  Debug.dprintf debug_rac_check_sat "Check term dispatch answer: %a@."
+  Debug.dprintf debug_rac_check_sat "@[<h>Check term dispatch answer: %a@]@."
     print_prover_answer res.pr_answer;
   match res.pr_answer with
   | Valid -> Some true
   | Invalid -> Some false
   | _ -> None
+
+let negate_goal task =
+  let open Task in
+  let tdecl, task = task_separate_goal task in
+  match tdecl.Theory.td_node with
+  | Theory.Decl Decl.{d_node= Dprop (Pgoal,p,t)} ->
+      add_prop_decl task Decl.Pgoal p (t_not t)
+  | _ -> failwith "negate_goal"
+
+let check_term_dispatch ~try_negate rp task =
+  match check_term_dispatch rp task with
+  | None when try_negate ->
+      Debug.dprintf debug_rac_check_sat "Try negation.@.";
+      let task = negate_goal task in
+      let res = check_term_dispatch rp task in
+      Opt.map (fun b -> not b) res
+  | r -> r
 
 let check_term ?vsenv ctx t =
   Debug.dprintf debug_rac_check_sat "@[<hv2>Check term: %a@]@." print_term t;
@@ -1558,9 +1577,10 @@ let check_term ?vsenv ctx t =
          (fun trans -> check_term_compute ctx.c_env trans task)) in
   let res =
     if res = None then (* ... then try solving using a prover *)
+      let try_negate = ctx.c_env.rac.rac_reduce.rac_try_negate in
       Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Dispatched: %b.@." b; b)
         (Opt.bind ctx.c_env.rac.rac_reduce.rac_prover
-           (fun rp -> check_term_dispatch rp task))
+           (fun rp -> check_term_dispatch ~try_negate rp task))
     else res in
   match res with
   | Some true ->
@@ -1570,7 +1590,7 @@ let check_term ?vsenv ctx t =
       raise (Contr (ctx, t))
   | None ->
       let msg = "cannot be evaluated" in
-      Debug.dprintf debug_rac_check_term_result "%a: %a@." report_cntr_title (ctx, msg) print_term t;
+      Debug.dprintf debug_rac_check_term_result "@[<hv2>%a:@ %a@]@." report_cntr_title (ctx, msg) print_term t;
       if not ctx.c_env.rac.skip_cannot_compute then
         cannot_compute "%a" report_cntr_title (ctx, msg)
 
