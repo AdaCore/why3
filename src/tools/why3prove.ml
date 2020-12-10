@@ -405,7 +405,7 @@ let () =
     if Util.terminal_has_color then (
       set_formatter_tag_functions Util.ansi_color_tags;
       set_mark_tags true );
-    let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
+    let load (f,ef) = load_driver_raw (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue;
     if !unproved then exit 2

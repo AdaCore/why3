@@ -306,10 +306,18 @@ end
 
 (** Loading drivers with relative names *)
 
-val load_driver : main -> Env.env -> string -> string list -> Driver.driver
-(** wrapper for loading a driver from a file that may be relative to the datadir.
-    See [Driver.load_driver_absolute]
-*)
+val load_driver_raw : main -> Env.env -> string -> string list -> Driver.driver
+(** [load_driver_raw main env file extras] loads the driver in file
+   [file] and with additional drivers in list [extras], in the context
+   of the configuration [main] and environment [env].  This function
+   is a wrapper to the lower level function
+   [Driver.load_driver_absolute] *)
+
+val load_driver : main -> Env.env -> config_prover -> Driver.driver
+(** [load_driver main env p] loads the driver for prover [p],
+   in the context of the configuration [main] and environment [env].
+   This function is a wrapper to the lower level function
+   [load_driver_raw] *)
 
 val unknown_to_known_provers  :
   config_prover Mprover.t -> prover ->

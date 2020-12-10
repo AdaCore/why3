@@ -126,7 +126,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 (* loading the Alt-Ergo driver *)
 let alt_ergo_driver : Driver.driver =
   try
-    Whyconf.load_driver main env alt_ergo.Whyconf.driver []
+    Whyconf.load_driver main env alt_ergo
   with e ->
     eprintf "Failed to load driver for alt-ergo: %a@."
       Exn_printer.exn_printer e;

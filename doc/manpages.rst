@@ -69,7 +69,7 @@ particular, option :option:`--help` displays the usage and options.
 
 .. option:: --extra-config=<file>
 
-   Read additional configuration from the given file.
+   Read additional configuration from the given file. See :numref:`sec.whyconffile`.
 
 .. option:: --list-debug-flags
 
@@ -337,7 +337,7 @@ following qualifications:
 
    The validated counterexample is the trace of an execution that resulted in
    the violation of an assertion.
-  
+
 *The contracts of some function or loop are underspecified:*
 
    The validated counterexample is the trace of an abstract execution, which

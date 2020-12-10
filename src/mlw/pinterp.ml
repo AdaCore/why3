@@ -348,8 +348,7 @@ let rac_reduce_config_lit config env ?trans ?prover () =
         | _ -> failwith "RAC reduce prover config must have format <prover shortcut>[,<time limit>[,<mem limit>]]" in
       let prover = Whyconf.filter_one_prover config (Whyconf.parse_filter_prover name) in
       let command = String.concat " " (prover.Whyconf.command :: prover.Whyconf.extra_options) in
-      let driver = Whyconf.load_driver (Whyconf.get_main config)
-          env prover.Whyconf.driver prover.Whyconf.extra_drivers in
+      let driver = Whyconf.load_driver (Whyconf.get_main config) env prover in
       let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
       rac_prover ~command driver limit in
     Opt.map aux prover in

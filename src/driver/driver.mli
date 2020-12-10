@@ -16,11 +16,15 @@
 type driver
 
 val load_driver_absolute :  Env.env -> string -> string list -> driver
-(** loads a driver from a file
-    @param env    environment to interpret theories
+(** [load_driver_absolute env f extras] loads the driver from a file
+   [f], completed with extra files from list [extras], in the context
+   of the environment [env]
+
+    @param env environment to interpret theories
     @param string driver file name (absolute path name)
     @param string list additional driver files containing only theories
-*)
+
+ *)
 
 (** {2 Use a driver} *)
 
