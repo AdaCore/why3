@@ -74,7 +74,7 @@ let opt_driver =
     eprintf "Realization driver (-D) is required.@.";
     exit 1
   | f::ef ->
-    Whyconf.load_driver (Whyconf.get_main config) env f ef
+    Whyconf.load_driver_raw (Whyconf.get_main config) env f ef
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

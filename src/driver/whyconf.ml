@@ -1033,7 +1033,7 @@ let absolute_driver_file main s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
   else Filename.concat main.datadir (Filename.concat "drivers" (s ^ ".drv"))
 
-let load_driver main env file extras =
+let load_driver_raw main env file extras =
   let file = absolute_driver_file main file in
   try
     Driver.load_driver_absolute env file extras
@@ -1042,6 +1042,7 @@ let load_driver main env file extras =
             file Exn_printer.exn_printer e;
     exit 1
 
+let load_driver main env p = load_driver_raw main env p.driver p.extra_drivers
 
 let unknown_to_known_provers provers pu =
   Mprover.fold (fun pk _ (others,name,version) ->
