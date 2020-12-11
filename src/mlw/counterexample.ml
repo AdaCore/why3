@@ -23,7 +23,6 @@ let debug_check_ce = Debug.register_info_flag "check-ce"
 
 (** Result of checking solvers' counterexample models *)
 
-(** See output of [print_ce_summary_title] for details *)
 type ce_summary =
   | NCCE of Log.exec_log
   | SWCE of Log.exec_log
