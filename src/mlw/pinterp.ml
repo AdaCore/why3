@@ -1764,7 +1764,7 @@ let set_constr v1 v2 =
 let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
   let pv = restore_pv vs in
   if pv_affected wrt pv then (
-    Debug.dprintf debug_trace_exec "@[<h>%tVAR %a is written in loop %a@]@."
+    Debug.dprintf debug_trace_exec "@[<h>%tVAR %a is written in loop/function call %a@]@."
       pp_indent print_pv pv
       (Pp.print_option print_loc') pv.pv_vs.vs_name.id_loc;
     let pv = Mpv.find_def pv pv vars_map in
@@ -2352,7 +2352,13 @@ let eval_rs rac env pm rs =
     let id = pv.pv_vs.vs_name in
     let name = string_or_model_trace id in
     match rac.get_value ~name ?loc:id.id_loc pv.pv_ity with
-    | Some v -> v
+    | Some v ->
+       Debug.dprintf debug_rac_values
+         "@[<h>Value imported for %a at %a: %a@]@."
+         print_decoded name
+         (Pp.print_option_or_default "NOLOC" print_loc') id.id_loc
+         print_value v;
+       v
     | None ->
        let v = default_value_of_type env mod_known pv.pv_ity in
        Debug.dprintf debug_rac_values

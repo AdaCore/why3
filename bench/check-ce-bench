@@ -66,6 +66,9 @@ check_nondet () {
         # "bench/check-ce/EXAMPLE2.mlw")
         #     nondet=true
         #     nondet_types="Integer";;
+        "bench/check-ce/anonymous5.mlw")
+            nondet=true
+            nondet_types="Integer";;
         *)
             nondet=false
             nondet_types="";;
@@ -105,7 +108,11 @@ run () {
      | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
      > "$f.out"
     str_out=$(cat "$f.out"|remove_solver_details)
-    str_oracle=$(cat "$oracle_file"|remove_solver_details)
+    if [ -e "$oracle_file" ]; then
+        str_oracle=$(cat "$oracle_file"|remove_solver_details)
+    else
+        str_oracle=""
+    fi
     if [ "$str_oracle" = "$str_out" ] ; then
         echo "ok"
     else
