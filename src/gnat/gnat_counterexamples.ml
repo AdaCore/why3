@@ -25,7 +25,7 @@ let only_first_field1 str =
     | _ :: "" :: "content" :: rest | _ :: "content" :: rest
     | "split_fields" :: rest | "split_discrs" :: rest -> aux rest
     | _ -> false in
-  not (String.equal str "") && aux Str.(split (regexp "__") str)
+  not (String.equal str "") && aux Re.Str.(split (regexp "__") str)
 
 (** Decide for a list of field names of a record to replace the record with the
     value of the first field. *)
@@ -96,7 +96,7 @@ let collect_attrs a (men_attrs, fields) = match get_field_attr a with
   | _ -> Sattr.add a men_attrs, fields
 
 (* Correct a model element name by a field string *)
-let correct_name f = Str.global_replace (Str.regexp_string f) ""
+let correct_name f = Re.Str.global_replace (Re.Str.regexp_string f) ""
 
 let clean_element me =
   opt_bind (clean_value me.me_value) @@ fun me_value ->
