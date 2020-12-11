@@ -108,7 +108,7 @@ run () {
      | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
      > "$f.out"
     str_out=$(cat "$f.out"|remove_solver_details)
-    if [ -r "$oracle_file" ]; then
+    if [ -e "$oracle_file" ]; then
         str_oracle=$(cat "$oracle_file"|remove_solver_details)
     else
         str_oracle=""
