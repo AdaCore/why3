@@ -1389,30 +1389,45 @@ let bind_fun rs cexp (task, ls_mv) =
 
 let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
-  let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
-  let task = List.fold_left use_export task Theory.[builtin_theory; bool_theory; highord_theory] in
-  let task = add_param_decl task ls_undefined in
+  let th = env.pmodule.Pmodule.mod_theory in
   let lsenv =
     let aux1 rs v mls =
       match rs.rs_logic with
       | RLls ls -> Mls.add ls v mls
       | _ -> mls in
     Mrs.fold aux1 env.rsenv Mls.empty in
-  (* Add known declarations *)
-  let add_known _ decl task =
+  let add_used task td =
+    let open Theory in
+    match td.td_node with
+    | Use th ->
+        Task.use_export task th
+    | Clone (th, sm) ->
+        let inst_df = Decl.Paxiom in
+        let inst_pr = Decl.Mpr.map (fun _ -> Decl.Paxiom) sm.sm_pr in
+        let inst =
+          {inst_df; inst_pr; inst_ty= sm.sm_ty; inst_ts= sm.sm_ts; inst_ls= sm.sm_ls } in
+        Task.clone_export task th inst
+    | _ -> task in
+  let add_known used id decl (task, ls_mt, ls_mv) =
+    if Mid.mem id used then (task, ls_mt, ls_mv) else
     match decl.d_node with
-    | Dprop (Pgoal, _, _) -> task
-    | Dprop (Plemma, prs, t) ->
-        add_decl task (create_prop_decl Paxiom prs t)
     | Dparam ls when Mls.contains lsenv ls ->
         (* Take value from lsenv (i.e. env.rsenv) for declaration *)
         let vsenv, t = term_of_value env [] (Mls.find ls lsenv) in
         let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
         let t = t_ty_subst ls_mt ls_mv t in
         let decl = Decl.make_ls_defn ls [] t in
-        add_decl task (create_logic_decl [decl])
-    | _ -> add_decl task decl in
-  let task = Mid.fold add_known env.th_known task in
+        add_decl task (create_logic_decl [decl]), ls_mt, ls_mv
+    | Dprop (Plemma, prs, t) ->
+        add_decl task (create_prop_decl Paxiom prs t), ls_mt, ls_mv
+    | Dprop (Pgoal, _, _) -> task, ls_mt, ls_mv
+    | _ -> add_decl task decl, ls_mt, ls_mv in
+  let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
+  let task = List.fold_left add_used task th.Theory.th_decls in
+  let used = Task.used_symbols (Task.used_theories task) in
+  let task, ls_mt, ls_mv =
+    Mid.fold (add_known used) th.Theory.th_known (task, ls_mt, ls_mv) in
+  let task = add_param_decl task ls_undefined in
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env) env.vsenv (task, ls_mt, ls_mv) in
