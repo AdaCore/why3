@@ -78,13 +78,13 @@ val select_model :
   ?sort_models:sort_models -> Env.env -> pmodule ->
   (Call_provers.prover_answer * model) list ->
   (model * ce_summary) option
-(** [select ~check ~conservative ~reduce_config env pm ml] chooses a
-    model from [ml]. [check] is set to false by default and indicates if
-    interpretation should be used to select the model. [reduce_config] is
-    set to [rac_reduce_config ()] by default and is only used if
-    [check=true]. Different priorizations of solver models can be
-    selected by [sort_models], which is [prioritize_first_good_model] by
-    default. *)
+(** [select ~check ~conservative ~reduce_config env pm ml] chooses a model from
+    [ml]. [check] is set to false by default and indicates if interpretation
+    should be used to select the model. [reduce_config] is set to
+    [rac_reduce_config ()] by default and is only used if [check=true]. Different
+    priorizations of solver models can be selected by [sort_models], which is by
+    default [prioritize_first_good_model] if [check] and
+    [prioritize_last_non_empty_model] otherwise. *)
 
 val prioritize_first_good_model : sort_models
 (** If there is any model that can be verified by counterexample
@@ -94,7 +94,7 @@ val prioritize_first_good_model : sort_models
     Otherwise prioritize the last, non-empty model in the incremental
     list, but penalize bad models. *)
 
-val prioritize_last_model : sort_models
+val prioritize_last_non_empty_model : sort_models
 (** Do not consider the result of checking the counterexample model, but
     just priotize the last, non-empty model in the incremental list of
     models created by the prover (as done before 2020) *)

@@ -419,15 +419,15 @@ type sort_models =
   (int * Call_provers.prover_answer * model * check_model_result * ce_summary) list ->
   (int * Call_provers.prover_answer * model * check_model_result * ce_summary) list
 
-let prioritize_last_model: sort_models =
+let prioritize_last_non_empty_model: sort_models = fun models ->
   let open Util in
   let compare = cmp [
       cmptr (fun (i,_,_,_,_) -> -i) (-);
     ] in
-  List.sort compare
+  List.filter (fun (_,_,m,_,_) -> not (is_model_empty m))
+    (List.sort compare models)
 
-let prioritize_first_good_model: sort_models =
-  fun models ->
+let prioritize_first_good_model: sort_models = fun models ->
   let open Util in
   let good_models, other_models =
     let is_good (_,_,_,_,s) = match s with
@@ -472,19 +472,24 @@ let print_dbg_model selected_ix fmt (i,_,_,mr,s) =
         (print_ce_summary_title ?check_ce:None) s
 
 let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
-    ?(sort_models=prioritize_first_good_model) env pmodule models =
+    ?sort_models env pmodule models =
+  let sort_models = Opt.get_def
+      (if check then prioritize_first_good_model
+       else prioritize_last_non_empty_model) sort_models in
   let check_model =
     if check then check_model reduce_config env pmodule
     else fun _ -> Cannot_check_model {reason="not checking CE model"} in
+  let models = (* Keep at most one empty model *)
+    let found_empty = ref false in
+    let p (_,m) =
+      if is_model_empty m then
+        if !found_empty then false
+        else (found_empty := true; true)
+      else true in
+    List.filter p models in
   let models =
     let add_index i (r,m) = i,r,m in
     List.mapi add_index models in
-  let models =
-    let not_empty (i,_,m) =
-      let res = is_model_empty m in
-      if res then Debug.dprintf debug_check_ce "Model %d is empty@." i;
-      not res in
-    List.filter not_empty models in
   let models =
     let add_check_model_result (i,r,m) =
       Debug.dprintf debug_check_ce "Check model %d (%a)@." i
