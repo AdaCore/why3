@@ -1590,8 +1590,10 @@ let check_term ?vsenv ctx t =
       raise (Contr (ctx, t))
   | None ->
       let msg = "cannot be evaluated" in
-      Debug.dprintf debug_rac_check_term_result "@[<hv2>%a:@ %a@]@." report_cntr_title (ctx, msg) print_term t;
-      if not ctx.c_env.rac.skip_cannot_compute then
+      Debug.dprintf debug_rac_check_term_result "%a@." report_cntr_head (ctx, msg, t);
+      if ctx.c_env.rac.skip_cannot_compute then
+        Warning.emit "%a@." report_cntr_head (ctx, msg, t)
+      else
         cannot_compute "%a" report_cntr_title (ctx, msg)
 
 let check_terms ctx = List.iter (check_term ctx)

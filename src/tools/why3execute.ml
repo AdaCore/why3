@@ -120,17 +120,24 @@ let do_input f =
     let res = eval_global_fundef rac env pmod [] expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
-  with | Contr (ctx, term) ->
-          Pretty.forget_all ();
-          printf "%a@." report_cntr_body (ctx, term) ;
-          exit 1
-       | CannotCompute reason ->
-          printf "RAC terminated because %s@." reason.reason
-       | Failure msg ->
-          printf "failure: %s@." msg
-       | RACStuck (_, l) ->
-          printf "RAC, with the counterexample model cannot continue after %a@."
-            (Pp.print_option Pretty.print_loc') l
+  with
+  | Contr (ctx, term) ->
+      Pretty.forget_all ();
+      eprintf "%a@." report_cntr (ctx, term);
+      exit 1
+  | CannotCompute reason ->
+      eprintf "RAC terminated because %s@." reason.reason;
+      exit 2
+  | RACStuck (_, l) ->
+      (* TODO Remove this case when value origins (default vs model) can be distinguished
+         in RAC *)
+      eprintf "RAC cannot continue after %a@."
+        (Pp.print_option Pretty.print_loc') l;
+      exit 2
+  | Failure msg ->
+      eprintf "failure: %s@." msg;
+      exit 1
+
 
 let () =
   try
