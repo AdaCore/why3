@@ -130,17 +130,6 @@ let option_list =
     "<file> specify a prover's driver (conflicts with -P)";
     Key ('o', "output"), Hnd1 (AString, fun s -> opt_output := Some s),
     "<dir> print the selected goals to separate files in <dir>";
-    KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
-    " check the counter-examples using runtime assertion checking (RAC)";
-    KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
-    "<prover> use <prover> to check assertions in RAC when term reduction is insufficient,
-    with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
-    Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
-    "<lvl> verbosity level for interpretation log of counterexample solver model";
-    KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
-    " print values of prover model in JSON format (backwards compatiblity with --json)";
-    KLong "json", Hnd0 (fun () -> opt_json := Some `All),
-    " print output in JSON format";
     KLong "print-theory", Hnd0 (fun () -> opt_print_theory := true),
     " print selected theories";
     KLong "print-namespace", Hnd0 (fun () -> opt_print_namespace := true),
@@ -149,7 +138,22 @@ let option_list =
       "parse_only" (KLong "parse-only") " stop after parsing";
     Debug.Args.desc_shortcut
       "type_only" (KLong "type-only") " stop after type checking";
-    Termcode.opt_extra_expl_prefix
+    Termcode.opt_extra_expl_prefix;
+    KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
+    " check counterexamples using runtime assertion checking\n\
+     (RAC)";
+    KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
+    "<prover> use <prover> to check assertions in RAC when term\n\
+     reduction is insufficient, with optional, comma-\n\
+     separated time and memory limit (e.g. 'cvc4,2,1000')";
+    Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
+    "<lvl> verbosity level for interpretation log of counterexam-\n\
+     ple solver model";
+    KLong "json", Hnd0 (fun () -> opt_json := Some `All),
+    " print output in JSON format";
+    KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
+    " print values of prover model in JSON format (back-\n\
+     wards compatiblity with --json)";
   ]
 
 let config, _, env =
