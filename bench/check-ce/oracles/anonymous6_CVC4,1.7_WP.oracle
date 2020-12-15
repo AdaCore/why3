@@ -1,6 +1,6 @@
 File "bench/check-ce/anonymous6.mlw", line 6, characters 18-27:
 Goal Postcondition from verification condition f'vc.
-Prover result is: valid (0.03s, 1516 steps).
+Prover result is: valid (0.01s, 1097 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 <check-ce>Validating model:
@@ -24,7 +24,8 @@ Prover result is: valid (0.03s, 1516 steps).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15, taking default.
-<rac-values>Value imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -47,7 +48,7 @@ Prover result is: valid (0.03s, 1516 steps).
                     contents = 0
                 Line 6:
                   Concrete execution of anonymous function with args:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous6.mlw", line 6, characters 18-27)
@@ -66,14 +67,14 @@ Prover result is: valid (0.03s, 1516 steps).
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 6:
                   Abstract execution of anonymous function with args:
-                    z = (ref'mk 0)
-                  z = (ref'mk 0)
+                    z = {contents= 0}
+                  z = {contents= 0}
                   result = ()
                   Execution got stuck, Assume postcondition of anonymous function with:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 <check-ce>Validating model:
           File anonymous6.mlw:
@@ -96,7 +97,8 @@ Prover result is: valid (0.03s, 1516 steps).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15, taking default.
-<rac-values>Value imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
+<rac-values>Value imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40:
+              {contents= 3}
 <rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -119,7 +121,7 @@ Prover result is: valid (0.03s, 1516 steps).
                     contents = 0
                 Line 6:
                   Concrete execution of anonymous function with args:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -138,15 +140,15 @@ Prover result is: valid (0.03s, 1516 steps).
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 6:
                   Abstract execution of anonymous function with args:
-                    z = (ref'mk 0)
-                  z = (ref'mk 3)
+                    z = {contents= 0}
+                  z = {contents= 3}
                   result = ()
                 Line 7:
                   Property failure, Assertion with:
-                    z = (ref'mk 3)
+                    z = {contents= 3}
 <check-ce>Check model 2 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 <check-ce>Validating model:
           File anonymous6.mlw:
@@ -169,7 +171,8 @@ Prover result is: valid (0.03s, 1516 steps).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15, taking default.
-<rac-values>Value imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: (ref'mk 3)
+<rac-values>Value imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40:
+              {contents= 3}
 <rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -192,7 +195,7 @@ Prover result is: valid (0.03s, 1516 steps).
                     contents = 0
                 Line 6:
                   Concrete execution of anonymous function with args:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -211,15 +214,15 @@ Prover result is: valid (0.03s, 1516 steps).
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 6:
                   Abstract execution of anonymous function with args:
-                    z = (ref'mk 0)
-                  z = (ref'mk 3)
+                    z = {contents= 0}
+                  z = {contents= 3}
                   result = ()
                 Line 7:
                   Property failure, Assertion with:
-                    z = (ref'mk 3)
+                    z = {contents= 3}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
@@ -229,7 +232,7 @@ Prover result is: valid (0.03s, 1516 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous6.mlw", line 7, characters 10-15:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6611 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6105 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -247,13 +250,13 @@ File anonymous6.mlw:
   Line 5:
     Abstract execution of ref with args:
       contents = 0
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 6:
     Abstract execution of anonymous function with args:
-      z = (ref'mk 0)
-    z = (ref'mk 3)
+      z = {contents= 0}
+    z = {contents= 3}
     result = ()
   Line 7:
     Property failure, Assertion with:
-      z = (ref'mk 3)
+      z = {contents= 3}
 

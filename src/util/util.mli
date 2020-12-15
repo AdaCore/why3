@@ -80,13 +80,17 @@ val ttrue : 'a -> bool
 type 'a cmptr
 (** A comparator for values of type ['a] **)
 
-val cmptr : ('a -> 'b) -> ('b -> 'b -> int) -> 'a cmptr
+type 'a compare = 'a -> 'a -> int
+
+val cmptr : ('a -> 'b) -> 'b compare -> 'a cmptr
 (** Create a comparator by a projection and a comparison function between projected values *)
 
-val cmp : 'a cmptr list -> 'a -> 'a -> int
+val cmptr_direct : 'a compare -> 'a cmptr
+
+val cmp : 'a cmptr list -> 'a compare
 (** Create a comparison function using lexical order defined by a list of comparators *)
 
-val cmp_lists : 'a cmptr list -> 'a list -> 'a list -> int
+val cmp_lists : 'a cmptr list -> 'a list compare
 (** Create a comparison function for lists using lexical order defined by a list of comparators *)
 
 (** {3 ANSI terminal colors} *)

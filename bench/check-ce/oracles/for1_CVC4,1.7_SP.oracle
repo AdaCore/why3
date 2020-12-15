@@ -1,10 +1,10 @@
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.04s, 878 steps).
+Prover result is: valid (0.01s, 878 steps).
 
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.02s, 1191 steps).
+Prover result is: valid (0.01s, 1191 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
 <check-ce>Validating model:
@@ -28,7 +28,8 @@ Prover result is: valid (0.02s, 1191 steps).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/for1.mlw", line 5, characters 16-17, taking default.
-<rac-values>Value imported for x at "bench/check-ce/for1.mlw", line 6, characters 4-74: (ref'mk 0)
+<rac-values>Value imported for x at "bench/check-ce/for1.mlw", line 6, characters 4-74:
+              {contents= 0}
 <rac-values>No value for i at "bench/check-ce/for1.mlw", line 6, characters 8-9, taking default 2.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -53,18 +54,18 @@ Prover result is: valid (0.02s, 1191 steps).
                   Concrete execution of loop
                 Line 8:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (+) with args:
                     _ = 1
                     _ = 1
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                 Line 3:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -83,14 +84,14 @@ Prover result is: valid (0.02s, 1191 steps).
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 6:
                   Abstract execution of loop
-                  x = (ref'mk 0)
+                  x = {contents= 0}
                   i = 2
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                 Line 4:
                   Property failure, Postcondition of f with:
                     result = 0
@@ -116,7 +117,8 @@ Prover result is: valid (0.02s, 1191 steps).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/for1.mlw", line 5, characters 16-17, taking default.
-<rac-values>Value imported for x at "bench/check-ce/for1.mlw", line 6, characters 4-74: (ref'mk 0)
+<rac-values>Value imported for x at "bench/check-ce/for1.mlw", line 6, characters 4-74:
+              {contents= 0}
 <rac-values>No value for i at "bench/check-ce/for1.mlw", line 6, characters 8-9, taking default 2.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -141,18 +143,18 @@ Prover result is: valid (0.02s, 1191 steps).
                   Concrete execution of loop
                 Line 8:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (+) with args:
                     _ = 1
                     _ = 1
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                 Line 3:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -171,14 +173,14 @@ Prover result is: valid (0.02s, 1191 steps).
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 6:
                   Abstract execution of loop
-                  x = (ref'mk 0)
+                  x = {contents= 0}
                   i = 2
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                 Line 4:
                   Property failure, Postcondition of f with:
                     result = 0
@@ -204,7 +206,8 @@ Prover result is: valid (0.02s, 1191 steps).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/for1.mlw", line 5, characters 16-17, taking default.
-<rac-values>Value imported for x at "bench/check-ce/for1.mlw", line 6, characters 4-74: (ref'mk 0)
+<rac-values>Value imported for x at "bench/check-ce/for1.mlw", line 6, characters 4-74:
+              {contents= 0}
 <rac-values>No value for i at "bench/check-ce/for1.mlw", line 6, characters 8-9, taking default 2.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -229,18 +232,18 @@ Prover result is: valid (0.02s, 1191 steps).
                   Concrete execution of loop
                 Line 8:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (+) with args:
                     _ = 1
                     _ = 1
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                 Line 3:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -259,14 +262,14 @@ Prover result is: valid (0.02s, 1191 steps).
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 6:
                   Abstract execution of loop
-                  x = (ref'mk 0)
+                  x = {contents= 0}
                   i = 2
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                 Line 4:
                   Property failure, Postcondition of f with:
                     result = 0
@@ -297,14 +300,14 @@ File for1.mlw:
   Line 5:
     Abstract execution of ref with args:
       contents = 0
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 6:
     Abstract execution of loop
-    x = (ref'mk 0)
+    x = {contents= 0}
     i = 2
   Line 10:
     Concrete execution of contents with args:
-      arg = (ref'mk 0)
+      arg = {contents= 0}
   Line 4:
     Property failure, Postcondition of f with:
       result = 0

@@ -48,6 +48,7 @@ type model_value =
   | Record of model_record
   | Proj of model_proj
   | Apply of string * model_value list
+  | Undefined
   | Unparsed of string
 
 and arr_index = {arr_index_key: model_value; arr_index_value: model_value}
@@ -146,7 +147,10 @@ let binary_of_bv bv =
   let p = String.make (bv.bv_length-String.length b) '0' in
   Printf.sprintf "#b%s%s" p b
 
-let convert_float_value ?(force_binary_bv=false) f =
+let debug_force_binary_floats = Debug.register_flag "model_force_binary_floats"
+    ~desc:"Print all floats using bitvectors in JSON output for models"
+
+let convert_float_value f =
   match f with
   | Plus_infinity ->
       let m = Mstr.add "cons" (Json_base.String "Plus_infinity") Mstr.empty in
@@ -163,7 +167,7 @@ let convert_float_value ?(force_binary_bv=false) f =
   | Not_a_number ->
       let m = Mstr.add "cons" (Json_base.String "Not_a_number") Mstr.empty in
       Json_base.Record m
-  | Float_number {binary= {sign; exp; mant}} when force_binary_bv ->
+  | Float_number {binary= {sign; exp; mant}} when Debug.test_flag debug_force_binary_floats ->
       let m = Mstr.add "cons" (Json_base.String "Float_value") Mstr.empty in
       let m = Mstr.add "sign" (Json_base.String (binary_of_bv sign)) m in
       let m = Mstr.add "exponent" (Json_base.String (binary_of_bv exp)) m in
@@ -231,6 +235,9 @@ let rec convert_model_value value : Json_base.json =
       Json_base.Record m
   | Record r -> convert_record r
   | Proj p -> convert_proj p
+  | Undefined ->
+      let m = Mstr.add "type" (Json_base.String "Undefined") Mstr.empty in
+      Json_base.Record m
 
 and convert_array a =
   let m_others =
@@ -343,6 +350,7 @@ and print_model_value_human fmt (v : model_value) =
   | Record r -> print_record_human fmt r
   | Proj p -> print_proj_human fmt p
   | Bitvector s -> print_bv fmt s
+  | Undefined -> fprintf fmt "UNDEFINED"
   | Unparsed s -> fprintf fmt "%s" s
 
 (*
@@ -407,16 +415,17 @@ type model = {
   vc_term_attrs: Sattr.t;
 }
 
-let map_filter_model_elements f m =
+let map_filter_model_files f =
   let f_list elts =
     match Lists.map_filter f elts with
     | [] -> None | l -> Some l in
   let f_files mf =
     let mf = Mint.map_filter f_list mf in
     if Mint.is_empty mf then None else Some mf in
-  let model_files = Mstr.map_filter f_files m.model_files in
-  {m with model_files}
+  Mstr.map_filter f_files
 
+let map_filter_model_elements f m =
+  {m with model_files= map_filter_model_files f m.model_files}
 
 let empty_model_file = Mint.empty
 let empty_model_files = Mstr.empty
@@ -457,9 +466,6 @@ let get_model_element_by_id model id =
 let get_model_element_by_loc model loc =
   let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
   List.find_opt aux (get_model_elements model)
-
-type model_parser = printer_mapping -> string -> model
-type raw_model_parser = printer_mapping -> string -> model_element list
 
 (*
 ***************************************************************
@@ -848,7 +854,7 @@ let rec replace_projection (const_function : string -> string) =
   let const_function s = try const_function s with Not_found -> s in
   function
   | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
-  | String _ | Unparsed _ as mv -> mv
+  | String _ | Undefined | Unparsed _ as mv -> mv
   | Record fs ->
       let aux (f, mv) = const_function f, replace_projection const_function mv in
       Record (List.map aux fs)
@@ -944,7 +950,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     Sattr.fold add_written_loc me.me_name.men_attrs model in
   List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
 
-let handle_contradictory_vc pm model_files =
+let handle_contradictory_vc vc_term_loc model_files =
   (* The VC is contradictory if the location of the term that triggers VC
      was collected, model_files is not empty, and there are no model elements
      in this location.
@@ -954,7 +960,7 @@ let handle_contradictory_vc pm model_files =
     (* If the counterexample model was not collected, then model_files
        is empty and this does not mean that VC is contradictory. *)
     model_files
-  else match pm.Printer.vc_term_loc with
+  else match vc_term_loc with
     | None -> model_files
     | Some pos ->
         let filename, line_number, _, _ = Loc.get pos in
@@ -975,10 +981,70 @@ let handle_contradictory_vc pm model_files =
             add_to_model me model_files
         | _ -> model_files
 
-let build_model pm raw_model =
-  let model_files = build_model_rec pm raw_model in
-  let model_files = handle_contradictory_vc pm model_files in
-  { model_files; vc_term_loc= pm.Printer.vc_term_loc; vc_term_attrs= pm.Printer.vc_term_attrs }
+(*
+***************************************************************
+** Model cleaning
+***************************************************************
+*)
+
+let opt_bind_any os f =
+  f (Lists.map_filter (fun x -> x) os)
+
+let opt_bind_all os f =
+  if List.for_all Opt.inhabited os then
+    f (List.map Opt.get os)
+  else None
+
+class clean = object (self)
+  method element me =
+    if me.me_name.men_kind = Error_message then
+      (* Keep unparsed values for error messages *)
+      Some me
+    else
+      Opt.bind (self#value me.me_value) @@ fun me_value ->
+      Some {me with me_value}
+  method value v = match v with
+    | Unparsed s    -> self#unparsed s | String v      -> self#string v
+    | Integer v     -> self#integer v  | Decimal v     -> self#decimal v
+    | Fraction v    -> self#fraction v | Float v       -> self#float v
+    | Boolean v     -> self#boolean v  | Bitvector v   -> self#bitvector v
+    | Proj (p, v)   -> self#proj p v   | Apply (s, vs) -> self#apply s vs
+    | Array a       -> self#array a    | Record fs     -> self#record fs
+    | Undefined     -> self#undefined
+  method unparsed _ = None
+  method string v = Some (String v)
+  method integer v = Some (Integer v)
+  method decimal v = Some (Decimal v)
+  method fraction v = Some (Fraction v)
+  method float v = Some (Float v)
+  method boolean v = Some (Boolean v)
+  method bitvector v = Some (Bitvector v)
+  method proj p v =
+    Opt.bind (self#value v) @@ fun v ->
+    Some (Proj (p, v))
+  method apply s vs =
+    opt_bind_all (List.map self#value vs) @@ fun vs ->
+    Some (Apply (s, vs))
+  method array a =
+    let clean_arr_index ix =
+      Opt.bind (self#value ix.arr_index_key) @@ fun key ->
+      Opt.bind (self#value ix.arr_index_value) @@ fun value ->
+      Some {arr_index_key= key; arr_index_value= value} in
+    Opt.bind (self#value a.arr_others) @@ fun others ->
+    opt_bind_any (List.map clean_arr_index a.arr_indices) @@ fun indices ->
+    Some (Array {arr_others= others; arr_indices= indices})
+  method record fs =
+    let clean_field (f, v) =
+      Opt.bind (self#value v) @@ fun v ->
+      Some (f, v) in
+    opt_bind_all (List.map clean_field fs) @@ fun fs ->
+    Some (Record fs)
+  method undefined = Some Undefined
+end
+
+let clean = ref (new clean)
+
+let customize_clean c = clean := (c :> clean)
 
 (*
 ***************************************************************
@@ -1021,82 +1087,36 @@ let model_for_positions_and_decls model ~positions =
     Mstr.fold add_first_model_line model.model_files model_filtered in
   {model with model_files= model_filtered}
 
-let opt_bind_any os f =
-  f (Lists.map_filter (fun x -> x) os)
-
-let opt_bind_all os f =
-  if List.for_all Opt.inhabited os then
-    f (List.map Opt.get os)
-  else None
-
-class clean = object (self)
-  method model m =
-    map_filter_model_elements self#element m
-  method element me =
-    if me.me_name.men_kind = Error_message then
-      (* Keep unparsed values for error messages *)
-      Some me
-    else
-      Opt.bind (self#value me.me_value) @@ fun me_value ->
-      Some {me with me_value}
-  method value v = match v with
-    | Unparsed s    -> self#unparsed s | String v      -> self#string v
-    | Integer v     -> self#integer v  | Decimal v     -> self#decimal v
-    | Fraction v    -> self#fraction v | Float v       -> self#float v
-    | Boolean v     -> self#boolean v  | Bitvector v   -> self#bitvector v
-    | Proj (p, v)   -> self#proj p v   | Apply (s, vs) -> self#apply s vs
-    | Array a       -> self#array a    | Record fs     -> self#record fs
-  method unparsed _ = None
-  method string v = Some (String v)
-  method integer v = Some (Integer v)
-  method decimal v = Some (Decimal v)
-  method fraction v = Some (Fraction v)
-  method float v = Some (Float v)
-  method boolean v = Some (Boolean v)
-  method bitvector v = Some (Bitvector v)
-  method proj p v =
-    Opt.bind (self#value v) @@ fun v ->
-    Some (Proj (p, v))
-  method apply s vs =
-    opt_bind_all (List.map self#value vs) @@ fun vs ->
-    Some (Apply (s, vs))
-  method array a =
-    let clean_arr_index ix =
-      Opt.bind (self#value ix.arr_index_key) @@ fun key ->
-      Opt.bind (self#value ix.arr_index_value) @@ fun value ->
-      Some {arr_index_key= key; arr_index_value= value} in
-    Opt.bind (self#value a.arr_others) @@ fun others ->
-    opt_bind_any (List.map clean_arr_index a.arr_indices) @@ fun indices ->
-    Some (Array {arr_others= others; arr_indices= indices})
-  method record fs =
-    let clean_field (f, v) =
-      Opt.bind (self#value v) @@ fun v ->
-      Some (f, v) in
-    opt_bind_all (List.map clean_field fs) @@ fun fs ->
-    Some (Record fs)
-end
-
 (*
 ***************************************************************
 ** Registering model parser
 ***************************************************************
 *)
 
+type model_parser = printer_mapping -> string -> model
+type raw_model_parser = printer_mapping -> string -> model_element list
+
+let model_parser (raw: raw_model_parser) : model_parser =
+  fun ({Printer.vc_term_loc; vc_term_attrs} as pm) str ->
+  raw pm str |> (* For example, Smtv2_model_parser.parse for "smtv2" *)
+  build_model_rec pm |>
+  map_filter_model_files !clean#element |>
+  handle_contradictory_vc pm.Printer.vc_term_loc |>
+  fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
+
 exception KnownModelParser of string
 exception UnknownModelParser of string
 
-type reg_model_parser = Pp.formatted * raw_model_parser
+type reg_model_parser = Pp.formatted * model_parser
 
 let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 
 let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s) ;
-  Hstr.replace model_parsers s (desc, p)
+  Hstr.replace model_parsers s (desc, model_parser p)
 
-let lookup_model_parser s pm input =
-  let _, raw_model_parser = Hstr.find_exn model_parsers (UnknownModelParser s) s in
-  let raw_model = raw_model_parser pm input in (* For example, Smtv2_model_parser.parse for "smtv2" *)
-  build_model pm raw_model
+let lookup_model_parser s =
+  snd (Hstr.find_exn model_parsers (UnknownModelParser s) s)
 
 let list_model_parsers () =
   Hstr.fold (fun k (desc, _) acc -> (k, desc) :: acc) model_parsers []

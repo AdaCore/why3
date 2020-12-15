@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.00s, 50 steps).
+Prover result is: valid (0.01s, 50 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Validating model:
@@ -55,7 +55,7 @@ Prover result is: valid (0.00s, 50 steps).
                     y = 0
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -65,7 +65,7 @@ Prover result is: valid (0.00s, 50 steps).
                     y = 0
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -87,19 +87,19 @@ Prover result is: valid (0.00s, 50 steps).
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 6:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 7:
                   Abstract execution of loop
-                  x1 = (ref'mk 0)
-                  x2 = (ref'mk 0)
+                  x1 = {contents= 0}
+                  x2 = {contents= 0}
                   i = 2
                 Line 8:
                   Execution got stuck, Invariant after last iteration with:
-                    x1 = (ref'mk 0)
+                    x1 = {contents= 0}
                     i = 2
 <check-ce>Check model 1 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Validating model:
@@ -132,9 +132,11 @@ Prover result is: valid (0.00s, 50 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/for.mlw", line 5, characters 15-16, taking default.
 <rac-values>No value for result at "bench/check-ce/for.mlw", line 6, characters 15-16, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-1))
+<rac-values>Value imported for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125:
+              {contents= (-1)}
 <rac-values>No value for x2 at "bench/check-ce/for.mlw", line 7, characters 2-125, taking default.
-<rac-values>Value imported for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
+<rac-values>Value imported for i at "bench/check-ce/for.mlw", line 7, characters 6-7:
+              0
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -167,7 +169,7 @@ Prover result is: valid (0.00s, 50 steps).
                     y = 0
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -177,7 +179,7 @@ Prover result is: valid (0.00s, 50 steps).
                     y = 0
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -199,15 +201,15 @@ Prover result is: valid (0.00s, 50 steps).
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 6:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 7:
                   Abstract execution of loop
-                  x1 = (ref'mk (-1))
-                  x2 = (ref'mk 0)
+                  x1 = {contents= (-1)}
+                  x2 = {contents= 0}
                   i = 0
                 Line 9:
                   Concrete execution of (=) with args:
@@ -215,13 +217,13 @@ Prover result is: valid (0.00s, 50 steps).
                     y = 0
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk (-1))
+                    arg = {contents= (-1)}
                   Concrete execution of (+) with args:
                     _ = (-1)
                     _ = 1
                 Line 8:
                   Property failure, Loop invariant preservation with:
-                    x1 = (ref'mk 0)
+                    x1 = {contents= 0}
                     i = 1
 <check-ce>Check model 2 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Validating model:
@@ -254,9 +256,11 @@ Prover result is: valid (0.00s, 50 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/for.mlw", line 5, characters 15-16, taking default.
 <rac-values>No value for result at "bench/check-ce/for.mlw", line 6, characters 15-16, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: (ref'mk (-1))
+<rac-values>Value imported for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125:
+              {contents= (-1)}
 <rac-values>No value for x2 at "bench/check-ce/for.mlw", line 7, characters 2-125, taking default.
-<rac-values>Value imported for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
+<rac-values>Value imported for i at "bench/check-ce/for.mlw", line 7, characters 6-7:
+              0
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -289,7 +293,7 @@ Prover result is: valid (0.00s, 50 steps).
                     y = 0
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -299,7 +303,7 @@ Prover result is: valid (0.00s, 50 steps).
                     y = 0
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -321,15 +325,15 @@ Prover result is: valid (0.00s, 50 steps).
                 Line 5:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 6:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 7:
                   Abstract execution of loop
-                  x1 = (ref'mk (-1))
-                  x2 = (ref'mk 0)
+                  x1 = {contents= (-1)}
+                  x2 = {contents= 0}
                   i = 0
                 Line 9:
                   Concrete execution of (=) with args:
@@ -337,13 +341,13 @@ Prover result is: valid (0.00s, 50 steps).
                     y = 0
                 Line 10:
                   Concrete execution of contents with args:
-                    arg = (ref'mk (-1))
+                    arg = {contents= (-1)}
                   Concrete execution of (+) with args:
                     _ = (-1)
                     _ = 1
                 Line 8:
                   Property failure, Loop invariant preservation with:
-                    x1 = (ref'mk 0)
+                    x1 = {contents= 0}
                     i = 1
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
@@ -354,7 +358,7 @@ Prover result is: valid (0.00s, 50 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout (1.00s, 7883306 steps).
+Prover result is: timeout (1.00s, 7595562 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -372,15 +376,15 @@ File for.mlw:
   Line 5:
     Abstract execution of ref with args:
       contents = 0
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 6:
     Abstract execution of ref with args:
       contents = 0
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 7:
     Abstract execution of loop
-    x1 = (ref'mk (-1))
-    x2 = (ref'mk 0)
+    x1 = {contents= (-1)}
+    x2 = {contents= 0}
     i = 0
   Line 9:
     Concrete execution of (=) with args:
@@ -388,13 +392,13 @@ File for.mlw:
       y = 0
   Line 10:
     Concrete execution of contents with args:
-      arg = (ref'mk (-1))
+      arg = {contents= (-1)}
     Concrete execution of (+) with args:
       _ = (-1)
       _ = 1
   Line 8:
     Property failure, Loop invariant preservation with:
-      x1 = (ref'mk 0)
+      x1 = {contents= 0}
       i = 1
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:

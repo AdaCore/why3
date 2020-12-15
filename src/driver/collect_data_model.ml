@@ -385,7 +385,7 @@ and model_array ?(arr_indices=[]) lf pv_table = function
       model_array ~arr_indices lf pv_table a
 
 and model_value_of_def lf pv_table = function
-  | Noelement -> raise No_value
+  | Noelement -> Model_parser.Unparsed "NOELEMENT"
   | Function (_, t) | Term t ->
       model_value lf pv_table t
 

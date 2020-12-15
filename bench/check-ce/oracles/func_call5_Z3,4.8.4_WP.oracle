@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Goal Postcondition from verification condition g1'vc.
-Prover result is: valid (0.00s, 26 steps).
+Prover result is: valid (0.02s, 26 steps).
 
 File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
 Goal Precondition from verification condition f1'vc.
@@ -73,11 +73,11 @@ Prover result is: valid (0.01s, 83 steps).
                 Line 13:
                   Abstract execution of g1 with args:
                     y = 1
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 8:
                   Execution got stuck, Assume postcondition of g1 with:
                     y = 1
-                    result = (ref'mk 0)
+                    result = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Validating model:
           File func_call5.mlw:
@@ -151,11 +151,11 @@ Prover result is: valid (0.01s, 83 steps).
                 Line 13:
                   Abstract execution of g1 with args:
                     y = 1
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 8:
                   Execution got stuck, Assume postcondition of g1 with:
                     y = 1
-                    result = (ref'mk 0)
+                    result = {contents= 0}
 <check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Validating model:
           File func_call5.mlw:
@@ -229,11 +229,11 @@ Prover result is: valid (0.01s, 83 steps).
                 Line 13:
                   Abstract execution of g1 with args:
                     y = 1
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 8:
                   Execution got stuck, Assume postcondition of g1 with:
                     y = 1
-                    result = (ref'mk 0)
+                    result = {contents= 0}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
@@ -243,7 +243,7 @@ Prover result is: valid (0.01s, 83 steps).
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
 Goal Assertion from verification condition f1'vc.
-Prover result is: timeout (1.00s, 5891461 steps).
+Prover result is: timeout (1.00s, 6420307 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -288,7 +288,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 20:
                   Property failure, Assertion with:
                     x = 2
-                    z = (ref'mk 3)
+                    z = {contents= 3}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 16, characters 18-29)
               File int.mlw:
                 Line 13:
@@ -305,11 +305,11 @@ Sorry, we don't have a good counterexample for you :(
                 Line 19:
                   Abstract execution of g2 with args:
                     y = 2
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 16:
                   Execution got stuck, Assume postcondition of g2 with:
                     y = 2
-                    result = (ref'mk 0)
+                    result = {contents= 0}
 <check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 20, characters 11-17)
 <check-ce>Validating model:
           File func_call5.mlw:
@@ -350,7 +350,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 20:
                   Property failure, Assertion with:
                     x = 2
-                    z = (ref'mk 3)
+                    z = {contents= 3}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 16, characters 18-29)
               File int.mlw:
                 Line 13:
@@ -367,11 +367,11 @@ Sorry, we don't have a good counterexample for you :(
                 Line 19:
                   Abstract execution of g2 with args:
                     y = 2
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 16:
                   Execution got stuck, Assume postcondition of g2 with:
                     y = 2
-                    result = (ref'mk 0)
+                    result = {contents= 0}
 <check-ce>Models:
 - Selected model 1 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
@@ -379,7 +379,7 @@ Sorry, we don't have a good counterexample for you :(
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
 Goal Assertion from verification condition f2'vc.
-Prover result is: timeout (1.00s, 6415579 steps).
+Prover result is: timeout (1.00s, 7666733 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -408,5 +408,5 @@ File func_call5.mlw:
   Line 20:
     Property failure, Assertion with:
       x = 2
-      z = (ref'mk 3)
+      z = {contents= 3}
 

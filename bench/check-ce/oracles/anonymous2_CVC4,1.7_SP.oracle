@@ -42,7 +42,7 @@
                 Line 5:
                   x = 0
                   Execution of main function f's body with env:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                     x = 0
                     zero = 0
                     one = 1
@@ -67,7 +67,7 @@
                 Line 5:
                   x = 0
                   Execution of main function f's body with env:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                     x = 0
                     zero = 0
                     one = 1
@@ -99,7 +99,8 @@
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
 <rac-values>Value imported for x at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
-<rac-values>Value imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -120,7 +121,7 @@
                 Line 5:
                   x = 1
                   Execution of main function f's body with env:
-                    z = (ref'mk 1)
+                    z = {contents= 1}
                     x = 1
                     zero = 0
                     one = 1
@@ -128,7 +129,7 @@
                   Concrete execution of h with args:
                     y = 1
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -152,18 +153,18 @@
                 Line 5:
                   x = 1
                   Execution of main function f's body with env:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                     x = 1
                     zero = 0
                     one = 1
                 Line 8:
                   Abstract execution of h with args:
                     y = 1
-                  z = (ref'mk 0)
+                  z = {contents= 0}
                   result = ()
                 Line 9:
                   Property failure, Assertion with:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
 <check-ce>Check model 2 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
 <check-ce>Validating model:
           File anonymous2.mlw:
@@ -189,7 +190,8 @@
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
 <rac-values>Value imported for x at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
-<rac-values>Value imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -210,7 +212,7 @@
                 Line 5:
                   x = 1
                   Execution of main function f's body with env:
-                    z = (ref'mk 1)
+                    z = {contents= 1}
                     x = 1
                     zero = 0
                     one = 1
@@ -218,7 +220,7 @@
                   Concrete execution of h with args:
                     y = 1
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -242,18 +244,18 @@
                 Line 5:
                   x = 1
                   Execution of main function f's body with env:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                     x = 1
                     zero = 0
                     one = 1
                 Line 8:
                   Abstract execution of h with args:
                     y = 1
-                  z = (ref'mk 0)
+                  z = {contents= 0}
                   result = ()
                 Line 9:
                   Property failure, Assertion with:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
@@ -263,7 +265,7 @@
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous2.mlw", line 9, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6026 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6026 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -283,16 +285,16 @@ File anonymous2.mlw:
   Line 5:
     x = 1
     Execution of main function f's body with env:
-      z = (ref'mk 0)
+      z = {contents= 0}
       x = 1
       zero = 0
       one = 1
   Line 8:
     Abstract execution of h with args:
       y = 1
-    z = (ref'mk 0)
+    z = {contents= 0}
     result = ()
   Line 9:
     Property failure, Assertion with:
-      z = (ref'mk 0)
+      z = {contents= 0}
 

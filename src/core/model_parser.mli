@@ -37,6 +37,7 @@ type model_value =
   | Record of model_record
   | Proj of model_proj
   | Apply of string * model_value list
+  | Undefined
   | Unparsed of string
 
 and arr_index = {arr_index_key: model_value; arr_index_value: model_value}
@@ -73,6 +74,8 @@ val float_of_binary : model_float_binary -> model_float
 
 val print_model_value : Format.formatter -> model_value -> unit
 
+val debug_force_binary_floats : Debug.flag
+(** Print all floats using bitvectors in JSON output for models *)
 
 (*
 ***************************************************************
@@ -292,10 +295,9 @@ val model_for_positions_and_decls : model ->
 ***************************************************************
 *)
 
-(** Method clean#model cleans a model from unparsed values (except for elements of kind
-   error messag). The cleaning can be extended by method overriding. *)
+(** Method clean#model cleans a model from unparsed values and handles contradictory VCs
+   ("the check fails with all inputs"). *)
 class clean : object
-  method model : model -> model
   method element : model_element -> model_element option
   method value : model_value -> model_value option
   method unparsed : string -> model_value option
@@ -310,7 +312,11 @@ class clean : object
   method apply : string -> model_value list -> model_value option
   method array : model_array -> model_value option
   method record : model_record -> model_value option
+  method undefined : model_value option
 end
+
+val customize_clean : #clean -> unit
+(** Customize the class used to clean the values in the model. *)
 
 (*
 ***************************************************************
@@ -319,9 +325,9 @@ end
 *)
 
 type model_parser = Printer.printer_mapping -> string -> model
-(** Parses the input string into model elements, estabilishes
-    a mapping between these elements and mapping from printer
-    and builds model data structure.*)
+(** Parses the input string into model elements, estabilishes a mapping between these
+   elements and mapping from printer and builds model data structure. The model still has
+   to be cleaned using [clean]. *)
 
 type raw_model_parser = Printer.printer_mapping -> string -> model_element list
 
