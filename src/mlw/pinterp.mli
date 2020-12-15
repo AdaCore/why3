@@ -175,13 +175,12 @@ val rac_config :
 
 (** Context for the interpreter *)
 type env = private {
-  mod_known   : Pdecl.known_map;
-  th_known    : Decl.known_map;
-  funenv      : cexp Mrs.t;
-  vsenv       : value Mvs.t;
-  rsenv       : value Mrs.t; (* global constants *)
-  env         : Env.env;
-  rac         : rac_config;
+  pmodule : Pmodule.pmodule;
+  funenv  : cexp Mrs.t;
+  vsenv   : value Mvs.t;
+  rsenv   : value Mrs.t; (* global constants *)
+  env     : Env.env;
+  rac     : rac_config;
 }
 
 (** Result of the interpreter **)
@@ -210,8 +209,7 @@ exception RACStuck of env * Loc.position option
 val eval_global_fundef :
   rac_config ->
   Env.env ->
-  Pdecl.known_map ->
-  Decl.known_map ->
+  Pmodule.pmodule ->
   (rsymbol * cexp) list ->
   expr ->
   result * value Mvs.t * value Mrs.t

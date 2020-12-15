@@ -101,6 +101,8 @@ let do_input f =
   let prog_parsed = Lexer.parse_expr lb in
   let expr = Typing.type_expr_in_muc muc prog_parsed in
 
+  let pmod = Pmodule.close_module muc in
+
   (* execute expression *)
   let open Pinterp in
   Opt.iter init_real !prec;
@@ -111,8 +113,7 @@ let do_input f =
         rac_reduce_config_lit config env ~trans ?prover () in
       let skip_cannot_compute = not !opt_rac_fail_cannot_check in
       rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute ~reduce () in
-    let res = eval_global_fundef rac env
-        muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
+    let res = eval_global_fundef rac env pmod [] expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
   with | Contr (ctx, term) ->

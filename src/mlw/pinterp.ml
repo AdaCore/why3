@@ -699,18 +699,17 @@ let rac_config ~do_rac ~abstract:rac_abstract
   {do_rac; rac_abstract; rac_reduce; log_uc= Log.empty_log_uc ();
    get_value; skip_cannot_compute }
 
-type env =
-  { mod_known   : Pdecl.known_map;
-    th_known    : Decl.known_map;
-    funenv      : cexp Mrs.t;
-    vsenv       : value Mvs.t;
-    rsenv       : value Mrs.t; (* global constants *)
-    env         : Env.env;
-    rac         : rac_config;
-  }
+type env = {
+  pmodule : Pmodule.pmodule;
+  funenv  : cexp Mrs.t;
+  vsenv   : value Mvs.t;
+  rsenv   : value Mrs.t; (* global constants *)
+  env     : Env.env;
+  rac     : rac_config;
+}
 
-let default_env env rac mod_known th_known =
-  { mod_known; th_known; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty }
+let default_env env rac pmodule =
+  { pmodule; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty }
 
 let register_used_value env loc id value =
   Log.log_val env.rac.log_uc id (snapshot value) loc
@@ -1128,7 +1127,7 @@ let find_definition env (rs: rsymbol) =
   (* then try if it is a local function *)
   try LocalFunction ([], Mrs.find rs env.funenv) with Not_found ->
   (* else look for a global function *)
-  find_global_definition env.mod_known rs
+  find_global_definition env.pmodule.Pmodule.mod_known rs
 
 (** Convert a value into a term. The first component of the result are additional bindings
    from closures. *)
@@ -1420,7 +1419,7 @@ let get_value_for_quant_var env vs =
       let value =
         if value <> None then value else
           if bind_univ_quant_vars_default then (
-            let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
+            let v = default_value_of_type env.env env.pmodule.Pmodule.mod_known (ity_of_ty vs.vs_ty) in
             Debug.dprintf debug_rac_values
               "Use default value for all-quantified variable %a: %a@."
               print_vs vs print_value v;
@@ -1683,7 +1682,7 @@ let exec_pure ~loc env ls pvs =
   else if ls_equal ls fs_func_app then
     failwith "Pure function application not yet implemented"
   else
-    match Decl.find_logic_definition env.th_known ls with
+    match Decl.find_logic_definition env.pmodule.Pmodule.mod_theory.Theory.th_known ls with
     | Some defn ->
         let vs, t = Decl.open_ls_defn defn in
         let args = List.map (get_pvs env) pvs in
@@ -1717,7 +1716,7 @@ let get_and_register_value env ?def ?ity vs loc =
          print_decoded name print_loc' loc print_value v; v
     | None ->
        let v = match def with
-         | None -> default_value_of_type env.env env.mod_known ity
+         | None -> default_value_of_type env.env env.pmodule.Pmodule.mod_known ity
          | Some v -> v in
        Debug.dprintf debug_rac_values
          "@[<h>No value for %s at %a, taking default%t.@]@." name print_loc' loc
@@ -1819,7 +1818,9 @@ and eval_expr' env e =
       | Cany ->
          register_any_call env e.e_loc None Mvs.empty;
          exec_call_abstract ?loc:e.e_loc env cty [] e.e_ity
-      | Capp (rs, pvsl) when Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.mod_known) = Some true ->
+      | Capp (rs, pvsl) when
+          Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.pmodule.Pmodule.mod_known)
+          = Some true ->
           assert (cty.cty_args = [] && pvsl = []);
           let v = Mrs.find rs env.rsenv in
           (* check_posts "Exec postcondition" e.e_loc env v cty.cty_post; *)
@@ -2320,18 +2321,16 @@ let bind_globals ?rs_main mod_known env =
   let mod_known, _ = Mid.fold is_before mod_known (Mid.empty, false) in
   Mid.fold eval_global mod_known env
 
-let eval_global_fundef rac env mod_known th_known locals e =
+let eval_global_fundef rac env pmodule locals e =
   get_builtin_progs env ;
-  let env = default_env env rac mod_known th_known in
-  let env = bind_globals mod_known env in
+  let env = default_env env rac pmodule in
+  let env = bind_globals pmodule.Pmodule.mod_known env in
   let env = add_local_funs locals env in
   let res = eval_expr env e in
   res, env.vsenv, env.rsenv
 
 let eval_rs rac env pm rs =
   let open Pmodule in
-  let mod_known = pm.mod_known in
-  let th_known = pm.mod_theory.Theory.th_known in
   let get_value (pv: pvsymbol) =
     let id = pv.pv_vs.vs_name in
     let name = string_or_model_trace id in
@@ -2344,14 +2343,14 @@ let eval_rs rac env pm rs =
          print_value v;
        v
     | None ->
-       let v = default_value_of_type env mod_known pv.pv_ity in
+       let v = default_value_of_type env pm.mod_known pv.pv_ity in
        Debug.dprintf debug_rac_values
          "@[<h>Missing value for parameter %a, continue with default value %a.@]@."
          print_pv pv print_value v;
        v in
   get_builtin_progs env ;
-  let env = default_env env rac mod_known th_known in
-  let env = bind_globals ~rs_main:rs mod_known env in
+  let env = default_env env rac pm in
+  let env = bind_globals ~rs_main:rs pm.mod_known env in
   let env = multibind_pvs ~register:(register_used_value env rs.rs_name.id_loc)
       rs.rs_cty.cty_args (List.map get_value rs.rs_cty.cty_args) env in
   register_exec_main env rs;
