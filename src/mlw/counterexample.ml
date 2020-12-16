@@ -524,7 +524,7 @@ let rec model_value v =
   let open Value in
   let id_name {id_string= name; id_attrs= attrs} =
     Ident.get_model_trace_string ~name ~attrs in
-  match v.v_desc with
+  match v_desc v with
   | Vnum i -> Integer { int_value= i; int_verbatim= BigInt.to_string i }
   | Vstring s -> String s
   | Vbool b -> Boolean b

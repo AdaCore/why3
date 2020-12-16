@@ -23,8 +23,9 @@ type float_mode
 type big_float
 
 module rec Value : sig
-  type value = private {v_desc: value_desc; v_ty: Ty.ty}
-  and value_desc =
+  type value
+  type field
+  type value_desc = private
     | Vconstr of rsymbol * field list
     | Vnum of BigInt.t
     | Vreal of Big_real.real
@@ -38,13 +39,13 @@ module rec Value : sig
     | Vpurefun of Ty.ty (* keys *) * value Mv.t * value
     | Vterm of term (* ghost values *)
     | Vundefined
-  and field = Field of value ref
 end
 and Mv : Extmap.S with type key = Value.value
 
 open Value
 
 val v_ty : value -> Ty.ty
+val v_desc : value -> value_desc
 
 (** non defensive API for building [value]s: there are no checks that
    [ity] is compatible with the [value] being built *)
