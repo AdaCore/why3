@@ -211,8 +211,8 @@ let rec import_model_value known th_known ity v =
           let field_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
           let field_names, field_values = List.split r in
           let itys = List.map (fun f -> Mstr.find f field_itys) field_names in
-          let fields = List.map2 (import_model_value known th_known) itys field_values in
-          constr_value ity rs fields
+          let vs = List.map2 (import_model_value known th_known) itys field_values in
+          constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
           check_not_nonfree def;
           let matching_name rs = String.equal rs.rs_name.id_string s in
@@ -220,7 +220,7 @@ let rec import_model_value known th_known ity v =
           let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
               rs.rs_cty.cty_args in
           let vs = List.map2 (import_model_value known th_known) itys vs in
-          constr_value ity rs vs
+          constr_value ity rs [] vs
       | Proj (p, x) ->
           let is_proj id _ = id.id_string = p in
           let ls = try
@@ -541,11 +541,11 @@ let rec model_value v =
         arr_indices= List.mapi aux (Array.to_list a);
         arr_others= Undefined;
       }
-  | Vconstr (rs, fs) -> (
+  | Vconstr (rs, frs, fs) -> (
       let vs = List.map (fun f -> model_value (field_get f)) fs in
       if Strings.has_suffix "'mk" rs.rs_name.id_string then
         (* same test for record-ness as in smtv2.ml *)
-        let ns = List.map (fun pv -> id_name pv.pv_vs.vs_name) rs.rs_cty.cty_args in
+        let ns = List.map (fun rs -> rs.rs_name.id_string) frs in
         Record (List.combine ns vs)
       else
         Apply (id_name rs.rs_name, vs) )

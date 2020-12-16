@@ -26,7 +26,7 @@ module rec Value : sig
   type value
   type field
   type value_desc = private
-    | Vconstr of rsymbol * field list
+    | Vconstr of rsymbol * rsymbol list * field list
     | Vnum of BigInt.t
     | Vreal of Big_real.real
     | Vfloat_mode of float_mode
@@ -56,7 +56,7 @@ val range_value : ity -> BigInt.t -> value
 val string_value : string -> value
 val bool_value : bool -> value
 val proj_value : ity -> lsymbol -> value -> value
-val constr_value : ity -> rsymbol -> value list -> value
+val constr_value : ity -> rsymbol -> rsymbol list -> value list -> value
 val purefun_value : result_ity:ity -> arg_ity:ity -> value Mv.t -> value -> value
 val unit_value : value
 val undefined_value : ity -> value

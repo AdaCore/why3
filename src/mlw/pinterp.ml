@@ -34,6 +34,7 @@ let debug_rac_check_sat =
     ~desc:"satisfiability of terms in rac"
 (* print debug information when checking the satisfiability of terms
    during rac *)
+
 let debug_rac_check_term_result =
   Debug.register_info_flag "rac-check-term-result"
     ~desc:"print the result when terms are checked for validity"
@@ -102,7 +103,7 @@ let mode_to_string m =
 module rec Value : sig
   type value = {v_desc: value_desc; v_ty: ty}
   and value_desc =
-    | Vconstr of rsymbol * field list
+    | Vconstr of rsymbol * rsymbol list * field list
     | Vnum of BigInt.t
     | Vreal of Big_real.real
     | Vfloat_mode of float_mode
@@ -120,7 +121,7 @@ module rec Value : sig
 end = struct
   type value = {v_desc: value_desc; v_ty: ty}
   and value_desc =
-    | Vconstr of rsymbol * field list
+    | Vconstr of rsymbol * rsymbol list * field list
     | Vnum of BigInt.t
     | Vreal of Big_real.real
     | Vfloat_mode of float_mode
@@ -149,7 +150,7 @@ end = struct
     | Vproj (ls1, v1), Vproj (ls2, v2) ->
         cmp [cmptr fst ls_compare; cmptr snd compare_values] (ls1, v1) (ls2, v2)
     | Vproj _, _ -> -1 | _, Vproj _ -> 1
-    | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
+    | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
         let field_get (Field f) = !f in
         let cmp_fields = cmp_lists [cmptr field_get compare_values] in
         cmp [cmptr fst rs_compare; cmptr snd cmp_fields] (rs1, fs1) (rs2, fs2)
@@ -213,12 +214,12 @@ let string_value s = value ty_str (Vstring s)
 let bool_value b = value ty_bool (Vbool b)
 let proj_value ity ls v =
   value (ty_of_ity ity) (Vproj (ls, v))
-let constr_value ity rs vl =
-  value (ty_of_ity ity) (Vconstr (rs, List.map field vl))
+let constr_value ity rs fs vl =
+  value (ty_of_ity ity) (Vconstr (rs, fs, List.map field vl))
 let purefun_value ~result_ity ~arg_ity mv v =
   value (ty_of_ity result_ity) (Vpurefun (ty_of_ity arg_ity, mv, v))
 let unit_value =
-  value (ty_tuple []) (Vconstr (Expr.rs_void, []))
+  value (ty_tuple []) (Vconstr (Expr.rs_void, [], []))
 let undefined_value ity =
   value (ty_of_ity ity) Vundefined
 
@@ -247,13 +248,13 @@ let rec print_value fmt v =
         print_vs vs print_expr e
   | Vproj (ls, v) ->
       fprintf fmt "{%a => %a}" print_ls ls print_value v
-  | Vconstr (rs, vs) ->
+  | Vconstr (rs, fs, vs) ->
       if is_rs_tuple rs then
         fprintf fmt "@[<hv1>(%a)@]" (Pp.print_list Pp.comma print_field) vs
       else if Strings.has_suffix "'mk" rs.rs_name.id_string then
-        let print_field fmt (f, v) = fprintf fmt "@[%s=@ %a@]" f print_field v in
+        let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
         fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
-          (List.combine (List.map (fun pv -> pv.pv_vs.vs_name.id_string) rs.rs_cty.cty_args) vs)
+          (List.combine fs vs)
   | Varray a ->
       fprintf fmt "@[[%a]@]"
         (Pp.print_list Pp.semi print_value)
@@ -269,7 +270,7 @@ and print_field fmt f = print_value fmt (field_get f)
 
 let rec snapshot v =
   let v_desc = match v.v_desc with
-    | Vconstr (rs, fs) -> Vconstr (rs, List.map snapshot_field fs)
+    | Vconstr (rs, fs, vs) -> Vconstr (rs, fs, List.map snapshot_field vs)
     | Vfun (cl, vs, e) -> Vfun (Mvs.map snapshot cl, vs, e)
     | Vpurefun (ty, mv, v) ->
         let mv = Mv.(fold (fun k v -> add (snapshot k) (snapshot v)) mv empty) in
@@ -981,7 +982,7 @@ let built_in_modules () =
               with e -> cannot_compute "array could not be made: %a" Exn_printer.exn_printer e )
           | _ -> assert false);
       "empty", (fun _ args -> match args with
-          | [{v_desc= Vconstr(_, [])}] ->
+          | [{v_desc= Vconstr(_, _, [])}] ->
               (* we know by typing that the constructor
                   will be the Tuple0 constructor *)
               let ty = ty_app ts [ty_var (tv_of_string "a")] in
@@ -1055,9 +1056,9 @@ let rec default_value_of_type env known ity : value =
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
   | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
   | Ityapp (ts, _, _) when its_equal ts its_str -> value ty (Vstring "")
-  | Ityapp(ts,ityl1,_) when is_ts_tuple ts.its_ts ->
+  | Ityapp (ts,ityl1,_) when is_ts_tuple ts.its_ts ->
       let vs = List.map (default_value_of_type env known) ityl1 in
-      constr_value ity (rs_tuple (List.length ityl1)) vs
+      constr_value ity (rs_tuple (List.length ityl1)) [] vs
   | Ityapp (its, l1, l2)
   | Ityreg {reg_its= its; reg_args= l1; reg_regs= l2} ->
       if is_array_its env its then
@@ -1067,12 +1068,12 @@ let rec default_value_of_type env known ity : value =
             let zero_in_range = BigInt.(le r.Number.ir_lower zero && le zero r.Number.ir_upper) in
             let n = if zero_in_range then BigInt.zero else r.Number.ir_lower in
             range_value ity n
-        | {Pdecl.itd_constructors= rs :: _} ->
+        | {Pdecl.itd_constructors= rs :: _; itd_fields= fs} ->
             let subst = its_match_regs its l1 l2 in
             let ityl = List.map (fun pv -> pv.pv_ity) rs.rs_cty.cty_args in
             let tyl = List.map (ity_full_inst subst) ityl in
             let vs = List.map (default_value_of_type env known) tyl in
-            constr_value ity rs vs
+            constr_value ity rs fs vs
         | {Pdecl.itd_constructors= []} ->
             (* if its.its_private then
              *   (\* There is no constructor so we can just invent a Vconstr,
@@ -1718,7 +1719,7 @@ let rec matching env (v : value) p =
   | Pas (p, vs) -> matching (bind_vs vs v env) v p
   | Papp (ls, pl) -> (
       match v.v_desc with
-      | Vconstr ({rs_logic= RLls ls2}, tl) ->
+      | Vconstr ({rs_logic= RLls ls2}, _, tl) ->
           if ls_equal ls ls2 then
             List.fold_left2 matching env (List.map field_get tl) pl
           else if ls2.ls_constr > 0 then
@@ -1800,7 +1801,7 @@ let get_and_register_value env ?def ?ity vs loc =
 let rec set_fields fs1 fs2 =
   let set_field f1 f2 =
     match (field_get f1).v_desc, (field_get f2).v_desc with
-    | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
+    | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
         assert (rs_equal rs1 rs2);
         set_fields fs1 fs2
     | _ -> field_set f1 (field_get f2) in
@@ -1808,7 +1809,7 @@ let rec set_fields fs1 fs2 =
 
 let set_constr v1 v2 =
   match v1.v_desc, v2.v_desc with
-   | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
+   | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
        assert (rs_equal rs1 rs2);
        set_fields fs1 fs2;
    | _ -> failwith "set_constr"
@@ -1902,22 +1903,18 @@ and eval_expr' env e =
           exec_call ?loc:e.e_loc env rs pvsl e.e_ity
     end
   | Eassign l ->
-      List.iter
-        (fun (pvs, rs, value) ->
-          let cstr, args =
-            match (get_pvs env pvs).v_desc with
-            | Vconstr (cstr, args) -> cstr, args
-            | _ -> assert false in
-          let rec search_and_assign constr_args args =
-            match constr_args, args with
-            | pv :: pvl, Field r :: vl ->
-                if pv_equal pv (fd_of_rs rs) then
-                  r := get_pvs env value
-                else
-                  search_and_assign pvl vl
-            | _ -> assert false in
-          search_and_assign cstr.rs_cty.cty_args args)
-        l ;
+      let search_and_assign (pvs, rs, v) =
+        let rss, fs =
+          match (get_pvs env pvs).v_desc with
+          | Vconstr (_, rs, args) -> rs, args
+          | _ -> assert false in
+        let maybe_assign rs' f =
+          if rs_equal rs' rs then (
+            field_set f (get_pvs env v);
+            raise Exit) in
+        try List.iter2 maybe_assign rss fs
+        with Exit -> () in
+      List.iter search_and_assign l;
       Normal unit_value
   | Elet (ld, e2) -> (
     match ld with
@@ -2272,19 +2269,19 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                 ( match f rs arg_vs with
                   | Some v -> Normal v
                   | None -> cannot_compute "cannot compute builtin" )
-            | Constructor _ ->
+            | Constructor its_def ->
                 check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
                 let mt = List.fold_left2 ty_match Mtv.empty
                     (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
                 let ty = ty_inst mt (ty_of_ity ity_result) in
-                let fs = List.map field arg_vs in
-                Normal (value ty (Vconstr (rs, fs)))
+                let vs = List.map field arg_vs in
+                Normal (value ty (Vconstr (rs, its_def.Pdecl.itd_fields, vs)))
             | Projection _d -> (
                 check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
                 match rs.rs_field, arg_vs with
-                | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
+                | Some pv, [{v_desc= Vconstr (cstr, _, args)}] ->
                     let rec search constr_args args =
                       match constr_args, args with
                       | pv2 :: pvl, v :: vl ->
