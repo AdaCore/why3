@@ -1176,14 +1176,18 @@ let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * t
       let ty_x = ty_inst ty_mt x.v_ty in
       let t = t_equ (fs_app ls [t_var vs] ty_x) t_x in
       vsenv, t_eps (t_close_bound vs t)
-  | Vconstr (rs, fs) ->
-      if rs_kind rs = RKfunc then
-        let term_of_field vsenv f = term_of_value ~ty_mt env vsenv (field_get f) in
-        let vsenv, fs = Lists.map_fold_left term_of_field vsenv fs in
-        vsenv, fs_app (ls_of_rs rs) fs v_ty
-      else (* TODO bench/ce/{record_one_field,record_inv}.mlw/CVC4/WP *)
-        kasprintf failwith "Cannot construct term for constructor \
-                            %a that is not a function" print_rs rs
+  | Vconstr (rs, field_rss, fs) -> (
+      let term_of_field vsenv f = term_of_value ~ty_mt env vsenv (field_get f) in
+      let vsenv, fs = Lists.map_fold_left term_of_field vsenv fs in
+      match rs_kind rs with
+      | RKfunc -> vsenv, fs_app (ls_of_rs rs) fs v_ty
+      | RKnone when Strings.has_suffix "'mk" rs.rs_name.id_string ->
+          let vs = create_vsymbol (id_fresh "v") v_ty in
+          let for_field rs = t_equ (t_app_infer (ls_of_rs rs) [t_var vs]) in
+          let t = t_and_l (List.map2 for_field field_rss fs) in
+          vsenv, t_eps (t_close_bound vs t)
+      | _ -> kasprintf failwith "Cannot construct term for constructor \
+                                 %a that is not a function" print_rs rs )
   | Vfun (cl, arg, e) ->
       (* TERM: fun arg -> t *)
       let t = Opt.get_exn (Failure "Cannot convert function body to term")
