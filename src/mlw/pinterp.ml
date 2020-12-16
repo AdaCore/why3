@@ -1588,7 +1588,9 @@ let check_term_dispatch ~try_negate rp task =
       Opt.map (fun b -> not b) res
   | r -> r
 
+(* The callee must ensure that RAC is enabled. *)
 let check_term ?vsenv ctx t =
+  if not ctx.c_env.rac.do_rac then failwith "ceck_term with RAC disabled";
   Debug.dprintf debug_rac_check_sat "@[<hv2>Check term: %a@]@." print_term t;
   let task, _ = task_of_term ?vsenv ctx.c_env t in
   let res = (* Try checking the term using computation first ... *)
