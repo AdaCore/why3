@@ -1890,7 +1890,10 @@ and eval_expr' env e =
           | _ -> failwith "many args for exec fun" (* TODO *) )
       | Cany ->
          register_any_call env e.e_loc None Mvs.empty;
-         exec_call_abstract ?loc:e.e_loc env cty [] e.e_ity
+         if env.rac.do_rac then
+           exec_call_abstract ?loc:e.e_loc env cty [] e.e_ity
+         else (* We must check postconditions for abstract exec *)
+           cannot_compute "cannot evaluate any-value with RAC disabled"
       | Capp (rs, pvsl) when
           Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.pmodule.Pmodule.mod_known)
           = Some true ->
@@ -2259,9 +2262,13 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                     let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
                     eval_expr env' body
                 | Cany ->
-                    check_pre_and_register_call ~any_function:true Log.ExecAbstract;
-                    let rs_name,cty = rs.rs_name, rs.rs_cty in
-                    exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
+                    if env.rac.do_rac then (
+                      check_pre_and_register_call ~any_function:true Log.ExecAbstract;
+                      let rs_name,cty = rs.rs_name, rs.rs_cty in
+                      exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result )
+                    else (* We can't check the postcondition *)
+                      cannot_compute "cannot apply an any-function %a with RAC disabled"
+                        print_rs rs
                 | Cpur _ -> assert false (* TODO ? *) )
             | Builtin f ->
                 check_pre_and_register_call Log.ExecConcrete;
@@ -2294,7 +2301,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
             | exception Not_found ->
                 cannot_compute "definition of routine %s could not be found"
                   rs.rs_name.id_string in
-      ( match res with
+      if env.rac.do_rac then (
+        match res with
         | Normal v ->
             let desc = cntr_desc "Postcondition" rs.rs_name in
             check_posts desc loc env v rs.rs_cty.cty_post
@@ -2351,10 +2359,13 @@ let bind_globals ?rs_main mod_known env =
     | Some v -> register_used_value env id.id_loc id v; v
     | None ->
        match opt_e with
-       | None ->
-          let v = default_value_of_type env.env mod_known ity in
-          register_used_value env id.id_loc id v; v
-       | Some e ->
+         | None ->
+             if env.rac.do_rac then (
+               let v = default_value_of_type env.env mod_known ity in
+               register_used_value env id.id_loc id v; v )
+             else
+               cannot_compute "any-value with RAC disabled"
+         | Some e ->
           let env' = {env with rac= {env.rac with rac_abstract= false}} in
           register_const_init env id.id_loc id;
           match eval_expr env' e with
@@ -2376,7 +2387,8 @@ let bind_globals ?rs_main mod_known env =
           | Cany -> None | Cfun e -> Some e
           | _ -> failwith "eval_globals: program constant cexp" in
         let v = get_value rs.rs_name opt_e ce.c_cty.cty_result in
-        check_assume_posts (cntr_ctx "Any postcondition" env) v ce.c_cty.cty_post;
+        if env.rac.do_rac then
+          check_assume_posts (cntr_ctx "Any postcondition" env) v ce.c_cty.cty_post;
         bind_rs rs v env )
     | _ -> env in
   let is_before id d (env, found_rs) =
