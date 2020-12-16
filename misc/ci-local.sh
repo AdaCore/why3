@@ -34,6 +34,7 @@ do
         ce-bench)
             bin/why3 config --detect
             bench/ce-bench
+            bench/check-ce-bench
             ;;
         nightly-bench-reduced)
             bin/why3 config --detect
