@@ -1603,20 +1603,30 @@ let vc env kn tuc d = match d.pd_node with
       List.fold_right2 add rdl fl []
   | PDtype tdl ->
       let env = lazy (mk_env env kn tuc []) in
-      let add_witness d vcl =
+      let add_witness d wit vcl =
         let env = Lazy.force env in
-        let add_fd (mv,ldl) fd e =
+        let pre_pattern =
+          List.map (fun fd ->
+              let fd = fd_of_rs fd in
+              let id = id_clone fd.pv_vs.vs_name in
+              PPvar(id,fd.pv_ghost))
+            d.itd_fields in
+        let pre_pattern =
+          PPapp(Expr.rs_tuple (List.length d.itd_fields), pre_pattern)
+        in
+        let vars, pattern =
+          Expr.create_prog_pattern pre_pattern wit.e_ity wit.e_mask
+        in
+        let add_fd mv fd =
           let fd = fd_of_rs fd in
-          let id = id_clone fd.pv_vs.vs_name in
-          let ld, v = let_var id ~ghost:fd.pv_ghost e in
-          Mvs.add fd.pv_vs (t_var v.pv_vs) mv, ld::ldl in
-        let mv, ldl = List.fold_left2 add_fd
-          (Mvs.empty, []) d.itd_fields d.itd_witness in
+          let pv = Mstr.find fd.pv_vs.vs_name.id_string vars in
+          Mvs.add fd.pv_vs (t_var pv.pv_vs) mv in
+        let mv = List.fold_left add_fd Mvs.empty d.itd_fields in
         let e = List.fold_right (fun f e ->
           let f = vc_expl None Sattr.empty expl_type_inv (t_subst mv f) in
           let ld, _ = let_var (id_fresh "_") (e_assert Assert f) in
           e_let ld e) d.itd_invariant e_void in
-        let e = List.fold_right e_let ldl e in
+        let e = e_match wit [pattern,e] Mxs.empty in
         let c = c_fun [] [] [] Mxs.empty Mpv.empty e in
         let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
         add_vc_decl env d.itd_its.its_ts.ts_name f vcl in
@@ -1629,8 +1639,10 @@ let vc env kn tuc d = match d.pd_node with
         let f = t_exists_close_simp vl [] f in
         add_vc_decl env d.itd_its.its_ts.ts_name f vcl in
       let add_itd d vcl =
-        if d.itd_witness <> [] then add_witness d vcl else
-        if d.itd_invariant <> [] then add_invariant d vcl else
-        vcl in
+        match d.itd_witness, d.itd_invariant with
+        | Some wit, _ -> add_witness d wit vcl
+        | None, _::_ -> add_invariant d vcl
+        | None, [] -> vcl
+      in
       List.fold_right add_itd tdl []
   | _ -> []

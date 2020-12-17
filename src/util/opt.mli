@@ -42,3 +42,5 @@ val compare : ('a -> 'b -> int) -> 'a option -> 'b option -> int
 val map_fold : ('a -> 'b -> 'a * 'b) -> 'a -> 'b option -> 'a * 'b option
 
 val bind : 'a option -> ('a -> 'b option) -> 'b option
+
+val exists : ('a -> bool) -> 'a option -> bool

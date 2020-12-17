@@ -1,7 +1,9 @@
 :x: marks a potential source of incompatibility
 
 Input Formats
-  * the MLCFG front end now supports recursive CFG functions and scope declarations.
+  * the MLCFG front end now supports recursive CFG functions and scope
+    declarations.
+  * Witness expression for type invariant is generalized (#286,!428)
 
 Tools
   * command-line options now follow the getopt standard;

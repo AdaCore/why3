@@ -1198,8 +1198,75 @@ let check_public ~loc d name =
     Loc.errorm ~loc "%s types cannot be abstract, private, or mutable" name;
   if d.td_inv <> [] then
     Loc.errorm ~loc "%s types cannot have invariants" name;
-  if d.td_wit <> [] then
+  if d.td_wit <> None then
     Loc.errorm ~loc "%s types cannot have witnesses" name
+
+let type_wit muc nms fl dwit =
+  let convert_record loc tl =
+    let add_w m (q,e) =
+      let v = try match q with
+        | Qident x -> Mstr.find x.id_str nms
+        | Qdot _ -> raise Not_found
+        with Not_found -> Loc.errorm ~loc:(qloc q)
+                            "Unknown field %a" print_qualid q in
+      let e = if v.pv_ghost then
+          { expr_desc = Ptree.Eghost e; expr_loc = e.expr_loc }
+        else e
+      in
+      try Mpv.add_new Exit v e m
+      with Exit ->
+         Loc.errorm ~loc:(qloc q)
+           "Field present twice %a" print_qualid q
+    in
+    let wit = List.fold_left add_w Mpv.empty tl in
+    let wit =
+      List.map (fun (_,v) -> try Mpv.find v wit with
+          | _ -> Loc.errorm ~loc
+                   "Missing field %s" v.pv_vs.vs_name.id_string) fl in
+    Etuple wit
+  in
+  let rec convert e =
+    let add_loc expr_desc = { expr_desc; expr_loc = e.expr_loc } in
+    match e.expr_desc with
+    | Ptree.Eref | Etrue | Efalse | Ptree.Econst _ | Eident _
+    | Easref _
+    | Eidapp (_, _)
+    | Eapply (_, _) | Einfix (_, _, _) | Einnfix (_, _, _)
+    | Efun  (_, _, _, _, _, _) | Eany (_, _, _, _, _, _)
+    | Etuple _
+    | Eupdate (_, _) | Ptree.Eassign _
+    | Ptree.Ewhile (_, _, _, _) | Eand (_, _)
+    | Eor (_, _) | Enot _ | Ptree.Eabsurd | Ptree.Epure _
+    | Eidpur _
+    | Ptree.Eraise (_, _)
+    | Ptree.Efor (_, _, _, _, _, _) | Ptree.Eassert (_, _) ->
+        (* Those cases can't be the resulting tuple to convert *)
+        e
+    | Ptree.Escope (a, e) -> add_loc @@ Ptree.Escope (a, convert e)
+    | Ptree.Eexn (a, b, c, e) -> add_loc @@ Ptree.Eexn (a, b, c, convert e)
+    | Ptree.Eoptexn (a, c, e) -> add_loc @@ Ptree.Eoptexn (a, c, convert e)
+    | Ptree.Ematch (e, brl, exnl) ->
+        let brl = List.map (fun (a,e) -> (a,convert e)) brl in
+        let exnl = List.map (fun (a,b,e) -> (a,b,convert e)) exnl in
+        add_loc @@ Ptree.Ematch (e, brl, exnl)
+    | Erec (a, e) -> add_loc @@ Erec(a, convert e)
+    | Elabel (a, e) -> add_loc @@ Elabel(a, convert e)
+    | Eattr (a, e) -> add_loc @@ Eattr(a, convert e)
+    | Ptree.Eghost e -> add_loc @@ Ptree.Eghost (convert e)
+    | Ecast (e, b) -> add_loc @@ Ecast (convert e, b)
+    | Esequence (e1, e2) -> add_loc @@ Esequence(e1,convert e2)
+    | Ptree.Eif  (e1, e2, e3) -> add_loc @@ Ptree.Eif(e1, convert e2, convert e3)
+    | Ptree.Elet (a, b, c, d, e) -> add_loc @@ Ptree.Elet (a,b,c,d,convert e)
+    | Erecord tl -> add_loc @@ convert_record e.expr_loc tl
+  in
+  let e = convert dwit in
+  let de = dexpr muc denv_empty e in
+  let ity = Ity.ity_tuple @@ List.map (fun (_,v) -> v.pv_ity) fl in
+  let dity = dity_of_ity ity in
+  let de = Dexpr.dexpr ?loc:de.de_loc (DEcast (de, dity)) in
+  let de = expr ~keep_loc:true ~ughost:false de in
+  de
+
 
 let add_types muc tdl =
   let add m ({td_ident = {id_str = x}; td_loc = loc} as d) =
@@ -1285,21 +1352,7 @@ let add_types muc tdl =
             let gvars = List.fold_left add_fd Mstr.empty fl in
             let type_inv f = type_fmla_pure muc gvars Dterm.denv_empty f in
             let inv = List.map type_inv d.td_inv in
-            let add_w m (q,e) =
-              let v = try match q with
-                | Qident x -> Mstr.find x.id_str nms
-                | Qdot _ -> raise Not_found
-              with Not_found -> Loc.errorm ~loc:(qloc q)
-                "Unknown field %a" print_qualid q in
-              let dity = dity_of_ity v.pv_ity in
-              let de = dexpr muc denv_empty e in
-              let de = Dexpr.dexpr ?loc:de.de_loc (DEcast (de, dity)) in
-              Mpv.add v (expr ~keep_loc:true ~ughost:true de) m in
-            let wit = List.fold_left add_w Mpv.empty d.td_wit in
-            let wit = if d.td_wit = [] then [] else
-              List.map (fun (_,v) -> try Mpv.find v wit with
-                | _ -> Loc.errorm ?loc:v.pv_vs.vs_name.Ident.id_loc
-                  "Missing field %s" v.pv_vs.vs_name.id_string) fl in
+            let wit = Opt.map (type_wit muc nms fl) d.td_wit in
             let itd = create_plain_record_decl ~priv ~mut id args fl inv wit in
             Hstr.add hts x itd.itd_its; Hstr.add htd x itd
         end

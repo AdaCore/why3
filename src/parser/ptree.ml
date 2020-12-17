@@ -218,7 +218,8 @@ and expr_desc =
   | Eexn of ident * pty * Ity.mask * expr
   (** local declaration of an exception *)
   | Eoptexn of ident * Ity.mask * expr
-  (** TODO: document *)
+  (** local declaration of optionally used exception, used by why3 for builtin
+     exceptions *)
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (** [for] loop *)
   | Eassert of Expr.assertion_kind * term
@@ -283,7 +284,7 @@ type type_decl = {
   td_vis    : visibility; (** visibility, for records only *)
   td_mut    : bool;       (** mutability, for records or abstract types *)
   td_inv    : invariant;  (** invariant, for records only *)
-  td_wit    : (qualid * expr) list;  (** witness for the invariant *)
+  td_wit    : expr option;  (** witness for the invariant *)
   td_def    : type_def;
 }
 [@@deriving sexp_of]

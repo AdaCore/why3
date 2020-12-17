@@ -322,7 +322,7 @@ let find_rs pm loc =
     | PDtype ds ->
        let in_tdef td =
          List.exists in_t td.itd_invariant ||
-         List.exists in_e td.itd_witness in
+         Opt.exists in_e td.itd_witness in
        let find_td td = (* TODO *)
          if in_tdef td then Warning.emit "Can't check CE for VC from \
                                           type definitions :(";
