@@ -13,20 +13,20 @@ module BinarySearch
 
   exception Not_found (* raised to signal a search failure *)
 
-  let binary_search (a : array int) (v : int) : int
-    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+  let binary_search (a: array int) (v: int) : int
+    requires { forall i1 i2. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
-    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+    raises   { Not_found -> forall i. 0 <= i < length a -> a[i] <> v }
   =
-    let l = ref 0 in
-    let u = ref (length a - 1) in
-    while !l <= !u do
-      invariant { 0 <= !l /\ !u < length a }
+    let ref l = 0 in
+    let ref u = length a - 1 in
+    while l <= u do
+      invariant { 0 <= l /\ u < length a }
       invariant {
-        forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
-      variant { !u - !l }
-      let m = !l + div (!u - !l) 2 in
-      assert { !l <= m <= !u };
+        forall i. 0 <= i < length a -> a[i] = v -> l <= i <= u }
+      variant { u - l }
+      let m = l + div (u - l) 2 in
+      assert { l <= m <= u };
       if a[m] < v then
         l := m + 1
       else if a[m] > v then
@@ -49,22 +49,21 @@ module BinarySearchAnyMidPoint
 
   exception Not_found (* raised to signal a search failure *)
 
-  val midpoint (l:int) (u:int) : int
+  val midpoint (l: int) (u: int) : int
     requires { l <= u } ensures { l <= result <= u }
 
-  let binary_search (a :array int) (v : int) : int
-    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+  let binary_search (a: array int) (v: int) : int
+    requires { forall i1 i2. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
-    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+    raises   { Not_found -> forall i. 0 <= i < length a -> a[i] <> v }
   =
-    let l = ref 0 in
-    let u = ref (length a - 1) in
-    while !l <= !u do
-      invariant { 0 <= !l /\ !u < length a }
-      invariant {
-        forall i : int. 0 <= i < length a -> a[i] = v -> !l <= i <= !u }
-      variant { !u - !l }
-      let m = midpoint !l !u in
+    let ref l = 0 in
+    let ref u = length a - 1 in
+    while l <= u do
+      invariant { 0 <= l /\ u < length a }
+      invariant { forall i. 0 <= i < length a -> a[i] = v -> l <= i <= u }
+      variant { u - l }
+      let m = midpoint l u in
       if a[m] < v then
         l := m + 1
       else if a[m] > v then
@@ -89,26 +88,26 @@ module BinarySearchBranchless
 
   exception Not_found (* raised to signal a search failure *)
 
-  let binary_search (a : array int) (v : int) : int
-    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+  let binary_search (a: array int) (v: int) : int
+    requires { forall i1 i2. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
-    ensures  { forall i : int. result < i < length a -> a[i] <> v }
-    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+    ensures  { forall i. result < i < length a -> a[i] <> v }
+    raises   { Not_found -> forall i. 0 <= i < length a -> a[i] <> v }
   =
-    let l = ref 0 in
-    let s = ref (length a) in
-    if !s = 0 then raise Not_found;
-    while !s > 1 do
-      invariant { 0 <= !l /\ !l + !s <= length a /\ !s >= 1 }
+    let ref l = 0 in
+    let ref s = length a in
+    if s = 0 then raise Not_found;
+    while s > 1 do
+      invariant { 0 <= l /\ l + s <= length a /\ s >= 1 }
       invariant {
-        forall i : int. 0 <= i < length a -> a[i] = v -> a[!l] <= v /\ i < !l + !s }
-      variant { !s }
-      let h = div !s 2 in
-      let m = !l + h in
-      l := if a[m] > v then !l else m;
-      s := !s - h;
+        forall i. 0 <= i < length a -> a[i] = v -> a[l] <= v /\ i < l + s }
+      variant { s }
+      let h = div s 2 in
+      let m = l + h in
+      l := if a[m] > v then l else m;
+      s := s - h;
     done;
-    if a[!l] = v then !l
+    if a[l] = v then l
     else raise Not_found
 
 end
@@ -124,22 +123,19 @@ module BinarySearchInt32
 
   exception Not_found   (* raised to signal a search failure *)
 
-  let binary_search (a : array int32) (v : int32) : int32
-    requires { forall i1 i2 : int. 0 <= i1 <= i2 < a.length ->
-               a[i1] <= a[i2] }
+  let binary_search (a: array int32) (v: int32) : int32
+    requires { forall i1 i2. 0 <= i1 <= i2 < a.length -> a[i1] <= a[i2] }
     ensures  { 0 <= result < a.length /\ a[result] = v }
-    raises   { Not_found ->
-                 forall i:int. 0 <= i < a.length -> a[i] <> v }
+    raises   { Not_found -> forall i. 0 <= i < a.length -> a[i] <> v }
   =
-    let l = ref 0 in
-    let u = ref (length a - 1) in
-    while !l <= !u do
-      invariant { 0 <= !l /\ !u < a.length }
-      invariant { forall i : int. 0 <= i < a.length ->
-                  a[i] = v -> !l <= i <= !u }
-      variant   { !u - !l }
-      let m = !l + (!u - !l) / 2 in
-      assert { !l <= m <= !u };
+    let ref l = 0 in
+    let ref u = length a - 1 in
+    while l <= u do
+      invariant { 0 <= l /\ u < a.length }
+      invariant { forall i. 0 <= i < a.length -> a[i] = v -> l <= i <= u }
+      variant   { u - l }
+      let m = l + (u - l) / 2 in
+      assert { l <= m <= u };
       if a[m] < v then
         l := m + 1
       else if a[m] > v then
@@ -169,19 +165,19 @@ module BinarySearchBoolean
     ensures  { a[result] = 1 }
     ensures  { forall i. 0 <= i < result -> a[i] = 0 }
  =
-    let lo = ref 0 in
-    let hi = ref (length a - 1) in
-    while !lo < !hi do
-      invariant { 0 <= !lo <= !hi < a.length }
-      invariant { a[!hi] = 1 }
-      invariant { forall i. 0 <= i < !lo -> a[i] = 0 }
-      variant   { !hi - !lo }
-      let mid = !lo + div (!hi - !lo) 2 in
+    let ref lo = 0 in
+    let ref hi = length a - 1 in
+    while lo < hi do
+      invariant { 0 <= lo <= hi < a.length }
+      invariant { a[hi] = 1 }
+      invariant { forall i. 0 <= i < lo -> a[i] = 0 }
+      variant   { hi - lo }
+      let mid = lo + div (hi - lo) 2 in
       if a[mid] = 1 then
         hi := mid
       else
         lo := mid + 1
     done;
-    !lo
+    lo
 
 end

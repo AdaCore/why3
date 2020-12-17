@@ -16,6 +16,8 @@ Require BuiltIn.
 Require HighOrd.
 Require int.Int.
 
+Require Import ClassicalEpsilon.
+
 (* Why3 goal *)
 Definition fset : forall (a:Type), Type.
 Proof.
@@ -23,6 +25,16 @@ intros.
 (* "apply (sig Cardinal.is_finite)." is not possible: a is not Why3Type *) 
 apply (sig (fun (f: a -> bool) => exists l: List.list a, List.NoDup l /\ forall e, List.In e l <-> f e = true)).
 Defined.
+
+Global Instance set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (fset a).
+Proof.
+intros.
+split.
+exists (fun _ => false).
+exists nil. split; [ apply List.NoDup_nil | intuition; discriminate H ].
+intros x y.
+apply excluded_middle_informative.
+Qed.
 
 (* Why3 goal *)
 Definition mem {a:Type} {a_WT:WhyType a} : a -> fset a -> Prop.

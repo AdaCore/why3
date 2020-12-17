@@ -30,8 +30,16 @@ let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
 let opt_json : [< `All | `Values ] option ref = ref None
 let opt_check_ce_model = ref false
+let opt_print_original_model = ref false
+let opt_print_derived_model = ref false
 let opt_rac_prover = ref None
 let opt_ce_check_verbosity = ref None
+
+let () = (* Instead of additional command line parameters *)
+  if Opt.get_def "" (Sys.getenv_opt "WHY3PRINTORIGINALMODEL") = "yes" then
+    opt_print_original_model := true;
+  if Opt.get_def "" (Sys.getenv_opt "WHY3PRINTDERIVEDMODEL") = "yes" then
+    opt_print_derived_model := true
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -122,17 +130,6 @@ let option_list =
     "<file> specify a prover's driver (conflicts with -P)";
     Key ('o', "output"), Hnd1 (AString, fun s -> opt_output := Some s),
     "<dir> print the selected goals to separate files in <dir>";
-    KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
-    " check the counter-examples using runtime assertion checking (RAC)";
-    KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
-    "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
-    "with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
-    Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
-    "<lvl> verbosity level for interpretation log of counterexample solver model";
-    KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
-    " print values of prover model in JSON format (backwards compatiblity with --json)";
-    KLong "json", Hnd0 (fun () -> opt_json := Some `All),
-    " print output in JSON format";
     KLong "print-theory", Hnd0 (fun () -> opt_print_theory := true),
     " print selected theories";
     KLong "print-namespace", Hnd0 (fun () -> opt_print_namespace := true),
@@ -141,7 +138,22 @@ let option_list =
       "parse_only" (KLong "parse-only") " stop after parsing";
     Debug.Args.desc_shortcut
       "type_only" (KLong "type-only") " stop after type checking";
-    Termcode.opt_extra_expl_prefix
+    Termcode.opt_extra_expl_prefix;
+    KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
+    " check counterexamples using runtime assertion checking\n\
+     (RAC)";
+    KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
+    "<prover> use <prover> to check assertions in RAC when term\n\
+     reduction is insufficient, with optional, comma-\n\
+     separated time and memory limit (e.g. 'cvc4,2,1000')";
+    Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
+    "<lvl> verbosity level for interpretation log of counterexam-\n\
+     ple solver model";
+    KLong "json", Hnd0 (fun () -> opt_json := Some `All),
+    " print output in JSON format";
+    KLong "json-model-values", Hnd0 (fun () -> opt_json := Some `Values),
+    " print values of prover model in JSON format (back-\n\
+     wards compatiblity with --json)";
   ]
 
 let config, _, env =
@@ -296,6 +308,20 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
         printf "%a@." (print_result ?json:!opt_json)
           (fname, t.Term.t_loc, goal_name, expls, res, ce);
+        let print_model fmt m =
+          let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
+          if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
+          else Model_parser.print_model (* json values *) fmt m ~print_attrs in
+        let print_other_models (m, ce_summary) =
+          match ce_summary with
+            | Counterexample.(NCCE log | SWCE log | NCCE_SWCE log) ->
+                if !opt_print_original_model then
+                  printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
+                if !opt_print_derived_model then
+                  printf "@[<v>Derived model:@\n%a@]@\n@." print_model
+                    (Counterexample.model_of_exec_log ~original_model:m log)
+            | _ -> () in
+        Opt.iter print_other_models ce;
         if res.pr_answer <> Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task
@@ -400,7 +426,7 @@ let () =
     if Util.terminal_has_color then (
       set_formatter_tag_functions Util.ansi_color_tags;
       set_mark_tags true );
-    let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
+    let load (f,ef) = load_driver_raw (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue;
     if !unproved then exit 2

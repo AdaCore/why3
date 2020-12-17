@@ -46,19 +46,16 @@ let option_list =
     "<format> select input format (default: \"why\")";
     KLong "real", Hnd1 (APair (',', AInt, APair (',', AInt, AInt)),
       fun (i1, (i2, i3)) -> prec := Some (i1, i2, i3)),
-    "<emin>,<emax>,<prec> set format used for real computations\n\
-     (e.g., -148,128,24 for float32)";
+    "<emin>,<emax>,<prec> set format used for real computations (e.g.,\n\
+     -148,128,24 for float32)";
     KLong "rac", Hnd0 (fun () -> opt_enable_rac := true),
     " enable runtime assertion checking (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
-    "<prover> use <prover> to check assertions in RAC when term reduction is insufficient, "^
-    "with optional, comma-separated time and memory limit (e.g. 'cvc4,2,1000')";
+    "<prover> use <prover> to check assertions in RAC when term\n\
+     reduction is insufficient, with optional, comma-\n\
+     separated time and memory limit (e.g. 'cvc4,2,1000')";
     KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_fail_cannot_check := true),
     " Fail when a assertion cannot be checked";
-    KLong "dispatch", Hnd1 (APair ('/', APair ('.', AString, AString),
-    APair ('.', AString, AString)), fun _arg -> eprintf "Dispatch currently not supported"; exit 1),
-    ("<f.M>/<g.N> Dispatch access to module <f.M> to module <g.N> (useful to\n\
-      provide an implementation for a module with abstract types or values)");
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
     "<qualified_module> use module in the execution";
   ]

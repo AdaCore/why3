@@ -13,6 +13,10 @@ open Format
 open Wstdlib
 open Rc
 
+let debug = Debug.register_info_flag "whyconf"
+  ~desc:"Print@ debugging@ messages@ about@ whyconf."
+
+
 (* magicnumber for the configuration :
   - 0 before the magic number
   - 1 when no loadpath meant default loadpath
@@ -786,15 +790,18 @@ let merge_config config filename =
   let provers = List.fold_left
     (fun provers (fp, section) ->
       Mprover.mapi (fun p c  ->
+        Debug.dprintf debug "Whyconf: handling prover modifiers for %a@." print_prover p;
         if not (filter_prover fp p) then c
-        else
+        else begin
+          Debug.dprintf debug "Whyconf: prover modifiers found for %a@." print_prover p;
           let opt = get_stringl ~default:[] section "option" in
           let drv = get_stringl ~default:[] section "driver" in
           let bcmd = get_stringl ~default:[] section "build_command" in
           { c with
             extra_options = opt @ c.extra_options;
             extra_drivers = drv @ c.extra_drivers;
-            build_commands = bcmd @ c.build_commands })
+            build_commands = bcmd @ c.build_commands }
+        end)
         provers
     ) config.provers prover_modifiers in
   let provers,shortcuts =
@@ -814,9 +821,6 @@ let merge_config config filename =
   let editors = List.fold_left load_editor editors (get_family rc "editor") in
   { config with main = main; provers = provers; strategies = strategies;
     prover_shortcuts = shortcuts; editors = editors }
-
-let _debug = Debug.register_info_flag "whyconf"
-  ~desc:"Print@ debugging@ messages@ about@ whyconf."
 
 let save_config config =
   let filename = config.conf_file in
@@ -1040,9 +1044,16 @@ let absolute_driver_file main s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
   else Filename.concat main.datadir (Filename.concat "drivers" (s ^ ".drv"))
 
-let load_driver main env file extras =
+let load_driver_raw main env file extras =
   let file = absolute_driver_file main file in
-  Driver.load_driver_absolute env file extras
+  try
+    Driver.load_driver_absolute env file extras
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "Fatal error while loading driver file '%s': %a@."
+            file Exn_printer.exn_printer e;
+    exit 1
+
+let load_driver main env p = load_driver_raw main env p.driver p.extra_drivers
 
 let unknown_to_known_provers provers pu =
   Mprover.fold (fun pk _ (others,name,version) ->

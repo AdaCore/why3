@@ -1,10 +1,10 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.01s, 859 steps).
+Prover result is: valid (0.02s, 859 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: valid (0.01s, 1260 steps).
+Prover result is: valid (0.02s, 1260 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Goal Loop invariant preservation from verification condition f'vc.
@@ -45,8 +45,10 @@ Prover result is: valid (0.02s, 1193 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/while1.mlw", line 6, characters 16-17, taking default.
 <rac-values>No value for result at "bench/check-ce/while1.mlw", line 7, characters 16-17, taking default.
-<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 0)
-<rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 0)
+<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113:
+              {contents= 0}
+<rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113:
+              {contents= 0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -74,51 +76,51 @@ Prover result is: valid (0.02s, 1193 steps).
                 Line 8:
                   Concrete execution of loop
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (<) with args:
                     _ = 0
                     _ = 2
                 Line 11:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                 Line 8:
                   Concrete execution of loop
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (<) with args:
                     _ = 1
                     _ = 2
                 Line 11:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (+) with args:
                     _ = 1
                     _ = 1
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (+) with args:
                     _ = 1
                     _ = 1
                 Line 8:
                   Concrete execution of loop
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                   Concrete execution of (<) with args:
                     _ = 2
                     _ = 2
                 Line 14:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/while1.mlw", line 8, characters 4-113)
@@ -137,29 +139,29 @@ Prover result is: valid (0.02s, 1193 steps).
                 Line 6:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 7:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 8:
                   Abstract execution of loop
-                  x = (ref'mk 0)
-                  i = (ref'mk 0)
+                  x = {contents= 0}
+                  i = {contents= 0}
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (<) with args:
                     _ = 0
                     _ = 2
                 Line 11:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -200,8 +202,10 @@ Prover result is: valid (0.02s, 1193 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/while1.mlw", line 6, characters 16-17, taking default.
 <rac-values>No value for result at "bench/check-ce/while1.mlw", line 7, characters 16-17, taking default.
-<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 0)
-<rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 2)
+<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113:
+              {contents= 0}
+<rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113:
+              {contents= 2}
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -229,51 +233,51 @@ Prover result is: valid (0.02s, 1193 steps).
                 Line 8:
                   Concrete execution of loop
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (<) with args:
                     _ = 0
                     _ = 2
                 Line 11:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                 Line 8:
                   Concrete execution of loop
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (<) with args:
                     _ = 1
                     _ = 2
                 Line 11:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (+) with args:
                     _ = 1
                     _ = 1
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (+) with args:
                     _ = 1
                     _ = 1
                 Line 8:
                   Concrete execution of loop
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                   Concrete execution of (<) with args:
                     _ = 2
                     _ = 2
                 Line 14:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -292,23 +296,23 @@ Prover result is: valid (0.02s, 1193 steps).
                 Line 6:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 7:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 8:
                   Abstract execution of loop
-                  x = (ref'mk 0)
-                  i = (ref'mk 2)
+                  x = {contents= 0}
+                  i = {contents= 2}
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                   Concrete execution of (<) with args:
                     _ = 2
                     _ = 2
                 Line 14:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                 Line 5:
                   Property failure, Postcondition of f with:
                     result = 0
@@ -347,8 +351,10 @@ Prover result is: valid (0.02s, 1193 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/while1.mlw", line 6, characters 16-17, taking default.
 <rac-values>No value for result at "bench/check-ce/while1.mlw", line 7, characters 16-17, taking default.
-<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 0)
-<rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: (ref'mk 2)
+<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113:
+              {contents= 0}
+<rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113:
+              {contents= 2}
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -376,51 +382,51 @@ Prover result is: valid (0.02s, 1193 steps).
                 Line 8:
                   Concrete execution of loop
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (<) with args:
                     _ = 0
                     _ = 2
                 Line 11:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
                 Line 8:
                   Concrete execution of loop
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (<) with args:
                     _ = 1
                     _ = 2
                 Line 11:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (+) with args:
                     _ = 1
                     _ = 1
                 Line 12:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 1)
+                    arg = {contents= 1}
                   Concrete execution of (+) with args:
                     _ = 1
                     _ = 1
                 Line 8:
                   Concrete execution of loop
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                   Concrete execution of (<) with args:
                     _ = 2
                     _ = 2
                 Line 14:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                 Line 4:
                   Execution of main function terminated normally
             - Abstract: good model (Abstract RAC confirms the counter-example)
@@ -439,23 +445,23 @@ Prover result is: valid (0.02s, 1193 steps).
                 Line 6:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 7:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 8:
                   Abstract execution of loop
-                  x = (ref'mk 0)
-                  i = (ref'mk 2)
+                  x = {contents= 0}
+                  i = {contents= 2}
                   Concrete execution of contents with args:
-                    arg = (ref'mk 2)
+                    arg = {contents= 2}
                   Concrete execution of (<) with args:
                     _ = 2
                     _ = 2
                 Line 14:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                 Line 5:
                   Property failure, Postcondition of f with:
                     result = 0
@@ -468,7 +474,7 @@ Prover result is: valid (0.02s, 1193 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Goal Postcondition from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.03s, 6037 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6037 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -486,23 +492,23 @@ File while1.mlw:
   Line 6:
     Abstract execution of ref with args:
       contents = 0
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 7:
     Abstract execution of ref with args:
       contents = 0
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 8:
     Abstract execution of loop
-    x = (ref'mk 0)
-    i = (ref'mk 2)
+    x = {contents= 0}
+    i = {contents= 2}
     Concrete execution of contents with args:
-      arg = (ref'mk 2)
+      arg = {contents= 2}
     Concrete execution of (<) with args:
       _ = 2
       _ = 2
   Line 14:
     Concrete execution of contents with args:
-      arg = (ref'mk 0)
+      arg = {contents= 0}
   Line 5:
     Property failure, Postcondition of f with:
       result = 0

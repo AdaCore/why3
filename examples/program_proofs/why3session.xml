@@ -4,7 +4,6 @@
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.4.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Eprover" version="2.0" timelimit="10" steplimit="0" memlimit="1000"/>
@@ -40,7 +39,6 @@
  <proof prover="0"><result status="valid" time="0.06" steps="69"/></proof>
  </goal>
  <goal name="eval_unit" proved="true">
- <proof prover="2"><result status="timeout" time="10.00"/></proof>
  <proof prover="3"><result status="valid" time="0.16" steps="32886"/></proof>
  </goal>
  <goal name="shorten&#39;vc" expl="VC for shorten" proved="true">
@@ -131,6 +129,16 @@
 <theory name="RecursiveIterative" proved="true">
  <goal name="square_fib&#39;vc" expl="VC for square_fib" proved="true">
  <proof prover="0"><result status="valid" time="0.04" steps="56"/></proof>
+ </goal>
+</theory>
+<theory name="SlopeSearch" proved="true">
+ <goal name="slope_search&#39;vc" expl="VC for slope_search" proved="true">
+ <proof prover="0"><result status="valid" time="0.07" steps="163"/></proof>
+ </goal>
+</theory>
+<theory name="CanyonSearch" proved="true">
+ <goal name="canyon_search&#39;vc" expl="VC for canyon_search" proved="true">
+ <proof prover="0"><result status="valid" time="0.15" steps="531"/></proof>
  </goal>
 </theory>
 </file>

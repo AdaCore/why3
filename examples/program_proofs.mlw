@@ -250,3 +250,70 @@ module RecursiveIterative
     x
 
 end
+
+(* chapter 13 *)
+module SlopeSearch
+
+  use int.Int
+  use ref.Refint
+  use matrix.Matrix
+
+  let slope_search (a: matrix int) (key: int) : (m: int, n: int)
+    requires { forall i j j'. 0 <= i < a.rows -> 0 <= j <= j' < a.columns ->
+               get a i j <= get a i j' }
+    requires { forall i i' j. 0 <= i <= i' < a.rows -> 0 <= j < a.columns ->
+               get a i j <= get a i' j }
+    requires { exists i j. 0 <= i < a.rows && 0 <= j < a.columns &&
+               get a i j = key }
+    ensures  { 0 <= m < a.rows && 0 <= n < a.columns && get a m n = key }
+  = let ref m = 0 in
+    let ref n = a.columns - 1 in
+    while get a m n <> key do
+      invariant { 0 <= m < a.rows && 0 <= n < a.columns }
+      invariant { exists i j.
+                  m <= i < a.rows && 0 <= j <= n && get a i j = key }
+      variant { a.rows - m + n }
+      if get a m n < key then
+        incr m
+      else
+        decr n
+    done;
+    m, n
+
+end
+
+module CanyonSearch
+
+  use int.Int
+  use ref.Refint
+  use array.Array
+
+  let function dist (x y: int) : int =
+    if x < y then y - x else x - y
+
+  let canyon_search (a b: array int) : (d: int)
+    requires { length a > 0 && length b > 0 }
+    requires { forall i i'. 0 <= i <= i' < length a -> a[i] <= a[i'] }
+    requires { forall j j'. 0 <= j <= j' < length b -> b[j] <= b[j'] }
+    ensures  { exists i j. 0 <= i < length a && 0 <= j < length b &&
+               d = dist a[i] b[j] }
+    ensures  { forall i j. 0 <= i < length a -> 0 <= j < length b ->
+               d <= dist a[i] b[j] }
+  = let ref m = 0 in
+    let ref n = 0 in
+    let ref d = dist a[0] b[0] in
+    while m < length a && n < length b do
+      invariant { 0 <= m <= length a && 0 <= n <= length b }
+      invariant { exists i j. 0 <= i < length a && 0 <= j < length b &&
+                  d = dist a[i] b[j] }
+      invariant { forall i j. 0 <= i < length a -> 0 <= j < length b ->
+                  d <= dist a[i] b[j] || (m <= i && n <= j) }
+      variant { length a - m + length b - n }
+      if dist a[m] b[n] < d then d <- dist a[m] b[n];
+      if a[m] < b[n] then incr m
+      else if a[m] > b[n] then incr n
+      else return 0
+    done;
+    d
+
+end
