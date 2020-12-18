@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.02s, 2283 steps).
+Prover result is: valid (0.03s, 1545 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Validating model:
@@ -27,7 +27,8 @@ Prover result is: valid (0.02s, 2283 steps).
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -48,7 +49,7 @@ Prover result is: valid (0.02s, 2283 steps).
                 Line 10:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 1)
+                    z = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
@@ -58,7 +59,7 @@ Prover result is: valid (0.02s, 2283 steps).
                     _ = ()
                 Line 8:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -82,7 +83,7 @@ Prover result is: valid (0.02s, 2283 steps).
                 Line 10:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -90,12 +91,12 @@ Prover result is: valid (0.02s, 2283 steps).
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
-                  z = (ref'mk 0)
+                  z = {contents= 0}
                   result = ()
                 Line 7:
                   Execution got stuck, Assume postcondition of g with:
-                    z = (ref'mk 0)
-                    z = (ref'mk 0)
+                    z = {contents= 0}
+                    z = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Validating model:
           File func_call.mlw:
@@ -139,7 +140,8 @@ Prover result is: valid (0.02s, 2283 steps).
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6:
+              {contents= 2}
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -160,7 +162,7 @@ Prover result is: valid (0.02s, 2283 steps).
                 Line 10:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 1)
+                    z = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
@@ -170,7 +172,7 @@ Prover result is: valid (0.02s, 2283 steps).
                     _ = ()
                 Line 8:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -194,7 +196,7 @@ Prover result is: valid (0.02s, 2283 steps).
                 Line 10:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
                     _ = ()
                     zero = 0
                     one = 1
@@ -202,11 +204,11 @@ Prover result is: valid (0.02s, 2283 steps).
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
-                  z = (ref'mk 2)
+                  z = {contents= 2}
                   result = ()
                 Line 13:
                   Property failure, Assertion with:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
 <check-ce>Check model 2 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Validating model:
           File func_call.mlw:
@@ -250,7 +252,8 @@ Prover result is: valid (0.02s, 2283 steps).
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
+<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6:
+              {contents= 2}
 <rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -271,7 +274,7 @@ Prover result is: valid (0.02s, 2283 steps).
                 Line 10:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 1)
+                    z = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
@@ -281,7 +284,7 @@ Prover result is: valid (0.02s, 2283 steps).
                     _ = ()
                 Line 8:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -305,7 +308,7 @@ Prover result is: valid (0.02s, 2283 steps).
                 Line 10:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
                     _ = ()
                     zero = 0
                     one = 1
@@ -313,11 +316,11 @@ Prover result is: valid (0.02s, 2283 steps).
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
-                  z = (ref'mk 2)
+                  z = {contents= 2}
                   result = ()
                 Line 13:
                   Property failure, Assertion with:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
@@ -327,7 +330,7 @@ Prover result is: valid (0.02s, 2283 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 5873215 steps).
+Prover result is: timeout (1.00s, 8033241 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -347,7 +350,7 @@ File func_call.mlw:
   Line 10:
     _ = ()
     Execution of main function f's body with env:
-      z = (ref'mk 2)
+      z = {contents= 2}
       _ = ()
       zero = 0
       one = 1
@@ -355,9 +358,9 @@ File func_call.mlw:
     Concrete execution of Tuple0 with args:
     Abstract execution of g with args:
       _ = ()
-    z = (ref'mk 2)
+    z = {contents= 2}
     result = ()
   Line 13:
     Property failure, Assertion with:
-      z = (ref'mk 2)
+      z = {contents= 2}
 

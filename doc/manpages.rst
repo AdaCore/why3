@@ -69,7 +69,7 @@ particular, option :option:`--help` displays the usage and options.
 
 .. option:: --extra-config=<file>
 
-   Read additional configuration from the given file.
+   Read additional configuration from the given file. See :numref:`sec.whyconffile`.
 
 .. option:: --list-debug-flags
 
@@ -337,7 +337,7 @@ following qualifications:
 
    The validated counterexample is the trace of an execution that resulted in
    the violation of an assertion.
-  
+
 *The contracts of some function or loop are underspecified:*
 
    The validated counterexample is the trace of an abstract execution, which
@@ -1487,8 +1487,8 @@ There are two strategies to check the validity of an annotation: First, the term
 is reduced using the Why3 transformation ``compute_in_goal``. The annotation is
 valid when the result of the reduction is `true` and invalid when the result is
 `false`. When the transformation cannot reduce the term to a trivial term, and
-when a RAC prover is given using option :option:`--rac-prover`, prover `p`
-is used to verify the term.
+when a RAC prover is given using option :option:`--rac-prover`, the prover is
+used to verify the term.
 
 When a program annotation is found to be wrong during the execution, the
 execution stops and reports the contradiction. Normally, the execution continues

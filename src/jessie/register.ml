@@ -59,7 +59,7 @@ let get_prover config env acc (short, name) =
   (* loading the driver *)
   let driver : Why3.Driver.driver =
     try
-      Why3.Whyconf.load_driver (Why3.Whyconf.get_main config) env prover.Whyconf.driver []
+      Why3.Whyconf.load_driver (Why3.Whyconf.get_main config) env prover
     with e ->
       ACSLtoWhy3.Self.fatal "Failed to load driver for %s: %a@." name
         Exn_printer.exn_printer e

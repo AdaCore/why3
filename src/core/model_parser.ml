@@ -48,6 +48,7 @@ type model_value =
   | Record of model_record
   | Proj of model_proj
   | Apply of string * model_value list
+  | Undefined
   | Unparsed of string
 
 and arr_index = {arr_index_key: model_value; arr_index_value: model_value}
@@ -234,6 +235,9 @@ let rec convert_model_value value : Json_base.json =
       Json_base.Record m
   | Record r -> convert_record r
   | Proj p -> convert_proj p
+  | Undefined ->
+      let m = Mstr.add "type" (Json_base.String "Undefined") Mstr.empty in
+      Json_base.Record m
 
 and convert_array a =
   let m_others =
@@ -346,6 +350,7 @@ and print_model_value_human fmt (v : model_value) =
   | Record r -> print_record_human fmt r
   | Proj p -> print_proj_human fmt p
   | Bitvector s -> print_bv fmt s
+  | Undefined -> fprintf fmt "UNDEFINED"
   | Unparsed s -> fprintf fmt "%s" s
 
 (*
@@ -849,7 +854,7 @@ let rec replace_projection (const_function : string -> string) =
   let const_function s = try const_function s with Not_found -> s in
   function
   | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
-  | String _ | Unparsed _ as mv -> mv
+  | String _ | Undefined | Unparsed _ as mv -> mv
   | Record fs ->
       let aux (f, mv) = const_function f, replace_projection const_function mv in
       Record (List.map aux fs)
@@ -1005,6 +1010,7 @@ class clean = object (self)
     | Boolean v     -> self#boolean v  | Bitvector v   -> self#bitvector v
     | Proj (p, v)   -> self#proj p v   | Apply (s, vs) -> self#apply s vs
     | Array a       -> self#array a    | Record fs     -> self#record fs
+    | Undefined     -> self#undefined
   method unparsed _ = None
   method string v = Some (String v)
   method integer v = Some (Integer v)
@@ -1033,6 +1039,7 @@ class clean = object (self)
       Some (f, v) in
     opt_bind_all (List.map clean_field fs) @@ fun fs ->
     Some (Record fs)
+  method undefined = Some Undefined
 end
 
 let clean = ref (new clean)

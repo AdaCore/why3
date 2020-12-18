@@ -1034,12 +1034,12 @@ single_expr_:
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
       let e = mk_expr (Efor ($2, $4, $5, $6, $8, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
-| FOR pattern IN seq_expr WITH uident iterator
+| FOR pattern IN seq_expr WITH uqualid iterator
   DO loop_annotation loop_body DONE
     { let id_b = mk_id break_id $startpos($8) $endpos($8) in
       let id_c = mk_id continue_id $startpos($8) $endpos($8) in
       let mk d = mk_expr d $startpos $endpos in
-      let q s = Qdot (Qident $6, mk_id s $startpos($6) $endpos($6)) in
+      let q s = Qdot ($6, mk_id s $startpos($6) $endpos($6)) in
       let next = mk (Eidapp (q "next", [mk (Eident (Qident $7))])) in
       let e = mk (simplify_let_pattern Expr.RKnone next $2 $10) in
       let e = { e with expr_desc = Eoptexn (id_c, Ity.MaskVisible, e) } in

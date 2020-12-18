@@ -43,7 +43,7 @@ let provers =
   Whyconf.Mprover.fold
     (fun _ p acc ->
       try
-        let d = Whyconf.load_driver main env p.Whyconf.driver [] in
+        let d = Whyconf.load_driver main env p in
         (p,d)::acc
       with e ->
         let p = p.Whyconf.prover in

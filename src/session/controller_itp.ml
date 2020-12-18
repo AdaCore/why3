@@ -116,7 +116,7 @@ let load_drivers c =
   let provers = Whyconf.get_provers config in
   let main = Whyconf.get_main config in
   Whyconf.Mprover.iter (fun _ p ->
-      let d = Whyconf.load_driver main env p.Whyconf.driver [] in
+      let d = Whyconf.load_driver main env p in
       Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d))
     provers
 

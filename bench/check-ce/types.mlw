@@ -1,7 +1,0 @@
-module M0
-  use int.Int
-  type t = { contents[@model_trace:]: int }
-  (* Empty model trace on the field doesn't seem to have an effect *)
-  let test (x: t) =
-    assert { x.contents <> 42 }
-end

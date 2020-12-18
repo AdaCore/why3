@@ -20,10 +20,10 @@ module Bag
 
   (** equality of bags *)
 
-  predicate eq_bag (a b: bag 'a) =
+  predicate (==) (a b: bag 'a) =
     forall x:'a. nb_occ x a = nb_occ x b
 
-  axiom bag_extensionality: forall a b: bag 'a. eq_bag a b -> a = b
+  axiom bag_extensionality: forall a b: bag 'a. a == b -> a = b
 
   (** basic constructors of bags *)
 
@@ -46,13 +46,13 @@ module Bag
   lemma occ_singleton_neq:
     forall x y: 'a. x <> y -> nb_occ y (singleton x) = 0
 
+  (** union *)
+
   function union (bag 'a) (bag 'a) : bag 'a
 
   axiom occ_union:
     forall x: 'a, a b: bag 'a.
     nb_occ x (union a b) = nb_occ x a + nb_occ x b
-
-  (** `union` is commutative, associative with identity `empty_bag` *)
 
   lemma Union_comm: forall a b: bag 'a. union a b = union b a
 
@@ -78,7 +78,7 @@ module Bag
   lemma occ_add_neq: forall b: bag 'a, x y: 'a.
     x <> y -> nb_occ y (add x b) = nb_occ y b
 
-  (** cardinality of bags *)
+  (** cardinality *)
 
   function card (bag 'a): int
 
@@ -90,7 +90,7 @@ module Bag
   axiom Card_union: forall x y: bag 'a. card (union x y) = card x + card y
   lemma Card_add: forall x: 'a, b: bag 'a. card (add x b) = 1 + card b
 
-  (** bag difference *)
+  (** difference *)
 
   use int.MinMax
 
@@ -109,6 +109,14 @@ module Bag
 
   lemma Add_diff: forall b: bag 'a, x:'a.
     mem x b -> add x (diff b (singleton x)) = b
+
+  (** intersection *)
+
+  function inter (a b: bag 'a) : bag 'a
+
+  axiom inter:
+    forall x: 'a, a b: bag 'a.
+    nb_occ x (inter a b) = min (nb_occ x a) (nb_occ x b)
 
   (** arbitrary element *)
 

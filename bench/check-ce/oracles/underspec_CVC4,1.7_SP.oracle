@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid (0.05s, 1403 steps).
+Prover result is: valid (0.04s, 1016 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Validating model:
@@ -33,9 +33,11 @@ Prover result is: valid (0.05s, 1403 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 14, characters 17-18, taking default.
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 15, characters 17-18, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: (ref'mk 0)
+<rac-values>Value imported for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139:
+              {contents= 0}
 <rac-values>No value for x2 at "bench/check-ce/underspec.mlw", line 16, characters 4-139, taking default.
-<rac-values>Value imported for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 0
+<rac-values>Value imported for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9:
+              0
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -68,7 +70,7 @@ Prover result is: valid (0.05s, 1403 steps).
                     y = 0
                 Line 19:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -78,7 +80,7 @@ Prover result is: valid (0.05s, 1403 steps).
                     y = 0
                 Line 21:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -100,15 +102,15 @@ Prover result is: valid (0.05s, 1403 steps).
                 Line 14:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 15:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 16:
                   Abstract execution of loop
-                  x1 = (ref'mk 0)
-                  x2 = (ref'mk 0)
+                  x1 = {contents= 0}
+                  x2 = {contents= 0}
                   i = 0
                 Line 18:
                   Concrete execution of (=) with args:
@@ -116,7 +118,7 @@ Prover result is: valid (0.05s, 1403 steps).
                     y = 0
                 Line 19:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -153,9 +155,11 @@ Prover result is: valid (0.05s, 1403 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 14, characters 17-18, taking default.
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 15, characters 17-18, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: (ref'mk (-1))
+<rac-values>Value imported for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139:
+              {contents= (-1)}
 <rac-values>No value for x2 at "bench/check-ce/underspec.mlw", line 16, characters 4-139, taking default.
-<rac-values>Value imported for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 0
+<rac-values>Value imported for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9:
+              0
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -188,7 +192,7 @@ Prover result is: valid (0.05s, 1403 steps).
                     y = 0
                 Line 19:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -198,7 +202,7 @@ Prover result is: valid (0.05s, 1403 steps).
                     y = 0
                 Line 21:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -220,15 +224,15 @@ Prover result is: valid (0.05s, 1403 steps).
                 Line 14:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 15:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 16:
                   Abstract execution of loop
-                  x1 = (ref'mk (-1))
-                  x2 = (ref'mk 0)
+                  x1 = {contents= (-1)}
+                  x2 = {contents= 0}
                   i = 0
                 Line 18:
                   Concrete execution of (=) with args:
@@ -236,13 +240,13 @@ Prover result is: valid (0.05s, 1403 steps).
                     y = 0
                 Line 19:
                   Concrete execution of contents with args:
-                    arg = (ref'mk (-1))
+                    arg = {contents= (-1)}
                   Concrete execution of (+) with args:
                     _ = (-1)
                     _ = 1
                 Line 17:
                   Property failure, Loop invariant preservation with:
-                    x1 = (ref'mk 0)
+                    x1 = {contents= 0}
                     i = 1
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Validating model:
@@ -275,9 +279,11 @@ Prover result is: valid (0.05s, 1403 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 14, characters 17-18, taking default.
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 15, characters 17-18, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: (ref'mk (-1))
+<rac-values>Value imported for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139:
+              {contents= (-1)}
 <rac-values>No value for x2 at "bench/check-ce/underspec.mlw", line 16, characters 4-139, taking default.
-<rac-values>Value imported for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 0
+<rac-values>Value imported for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9:
+              0
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -310,7 +316,7 @@ Prover result is: valid (0.05s, 1403 steps).
                     y = 0
                 Line 19:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -320,7 +326,7 @@ Prover result is: valid (0.05s, 1403 steps).
                     y = 0
                 Line 21:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -342,15 +348,15 @@ Prover result is: valid (0.05s, 1403 steps).
                 Line 14:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 15:
                   Abstract execution of ref with args:
                     contents = 0
-                  result = (ref'mk 0)
+                  result = {contents= 0}
                 Line 16:
                   Abstract execution of loop
-                  x1 = (ref'mk (-1))
-                  x2 = (ref'mk 0)
+                  x1 = {contents= (-1)}
+                  x2 = {contents= 0}
                   i = 0
                 Line 18:
                   Concrete execution of (=) with args:
@@ -358,13 +364,13 @@ Prover result is: valid (0.05s, 1403 steps).
                     y = 0
                 Line 19:
                   Concrete execution of contents with args:
-                    arg = (ref'mk (-1))
+                    arg = {contents= (-1)}
                   Concrete execution of (+) with args:
                     _ = (-1)
                     _ = 1
                 Line 17:
                   Property failure, Loop invariant preservation with:
-                    x1 = (ref'mk 0)
+                    x1 = {contents= 0}
                     i = 1
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
@@ -375,7 +381,7 @@ Prover result is: valid (0.05s, 1403 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6755 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6176 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -393,15 +399,15 @@ File underspec.mlw:
   Line 14:
     Abstract execution of ref with args:
       contents = 0
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 15:
     Abstract execution of ref with args:
       contents = 0
-    result = (ref'mk 0)
+    result = {contents= 0}
   Line 16:
     Abstract execution of loop
-    x1 = (ref'mk (-1))
-    x2 = (ref'mk 0)
+    x1 = {contents= (-1)}
+    x2 = {contents= 0}
     i = 0
   Line 18:
     Concrete execution of (=) with args:
@@ -409,22 +415,22 @@ File underspec.mlw:
       y = 0
   Line 19:
     Concrete execution of contents with args:
-      arg = (ref'mk (-1))
+      arg = {contents= (-1)}
     Concrete execution of (+) with args:
       _ = (-1)
       _ = 1
   Line 17:
     Property failure, Loop invariant preservation with:
-      x1 = (ref'mk 0)
+      x1 = {contents= 0}
       i = 1
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: valid (0.03s, 1643 steps).
+Prover result is: valid (0.02s, 1208 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.02s, 1582 steps).
+Prover result is: valid (0.02s, 1134 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Validating model:
@@ -469,7 +475,8 @@ Prover result is: valid (0.02s, 1582 steps).
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8: (ref'mk 0)
+<rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8:
+              {contents= 0}
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -490,7 +497,7 @@ Prover result is: valid (0.02s, 1582 steps).
                 Line 44:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 1)
+                    z = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
@@ -500,7 +507,7 @@ Prover result is: valid (0.02s, 1582 steps).
                     _ = ()
                 Line 42:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -524,7 +531,7 @@ Prover result is: valid (0.02s, 1582 steps).
                 Line 44:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 0)
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -532,12 +539,12 @@ Prover result is: valid (0.02s, 1582 steps).
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
-                  z = (ref'mk 0)
+                  z = {contents= 0}
                   result = ()
                 Line 41:
                   Execution got stuck, Assume postcondition of g with:
-                    z = (ref'mk 0)
-                    z = (ref'mk 0)
+                    z = {contents= 0}
+                    z = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Validating model:
           File underspec.mlw:
@@ -581,7 +588,8 @@ Prover result is: valid (0.02s, 1582 steps).
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8: (ref'mk 2)
+<rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8:
+              {contents= 2}
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -602,7 +610,7 @@ Prover result is: valid (0.02s, 1582 steps).
                 Line 44:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 1)
+                    z = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
@@ -612,7 +620,7 @@ Prover result is: valid (0.02s, 1582 steps).
                     _ = ()
                 Line 42:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -636,7 +644,7 @@ Prover result is: valid (0.02s, 1582 steps).
                 Line 44:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
                     _ = ()
                     zero = 0
                     one = 1
@@ -644,11 +652,11 @@ Prover result is: valid (0.02s, 1582 steps).
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
-                  z = (ref'mk 2)
+                  z = {contents= 2}
                   result = ()
                 Line 47:
                   Property failure, Assertion with:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Validating model:
           File underspec.mlw:
@@ -692,7 +700,8 @@ Prover result is: valid (0.02s, 1582 steps).
 <check-ce>Interpreting abstractly
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
 <rac-values>Missing value for parameter _1, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8: (ref'mk 2)
+<rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8:
+              {contents= 2}
 <rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
@@ -713,7 +722,7 @@ Prover result is: valid (0.02s, 1582 steps).
                 Line 44:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 1)
+                    z = {contents= 1}
                     _ = ()
                     zero = 0
                     one = 1
@@ -723,7 +732,7 @@ Prover result is: valid (0.02s, 1582 steps).
                     _ = ()
                 Line 42:
                   Concrete execution of contents with args:
-                    arg = (ref'mk 0)
+                    arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
@@ -747,7 +756,7 @@ Prover result is: valid (0.02s, 1582 steps).
                 Line 44:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
                     _ = ()
                     zero = 0
                     one = 1
@@ -755,11 +764,11 @@ Prover result is: valid (0.02s, 1582 steps).
                   Concrete execution of Tuple0 with args:
                   Abstract execution of g with args:
                     _ = ()
-                  z = (ref'mk 2)
+                  z = {contents= 2}
                   result = ()
                 Line 47:
                   Property failure, Assertion with:
-                    z = (ref'mk 2)
+                    z = {contents= 2}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
@@ -769,7 +778,7 @@ Prover result is: valid (0.02s, 1582 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (unknown + incomplete) (0.05s, 6620 steps).
+Prover result is: unknown (unknown + incomplete) (0.04s, 6083 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -789,7 +798,7 @@ File underspec.mlw:
   Line 44:
     _ = ()
     Execution of main function f's body with env:
-      z = (ref'mk 2)
+      z = {contents= 2}
       _ = ()
       zero = 0
       one = 1
@@ -797,9 +806,9 @@ File underspec.mlw:
     Concrete execution of Tuple0 with args:
     Abstract execution of g with args:
       _ = ()
-    z = (ref'mk 2)
+    z = {contents= 2}
     result = ()
   Line 47:
     Property failure, Assertion with:
-      z = (ref'mk 2)
+      z = {contents= 2}
 

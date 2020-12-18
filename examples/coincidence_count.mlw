@@ -30,7 +30,7 @@ module CoincidenceCount
     drop a n == add a[n] (drop a (n+1))
 
   predicate increasing (a: array int) =
-    forall i j: int. 0 <= i < j < length a -> a[i] < a[j]
+    forall i j. 0 <= i < j < length a -> a[i] < a[j]
 
   function cc (a b: array int) : int =
     cardinal (inter (setof a) (setof b))
@@ -48,27 +48,95 @@ module CoincidenceCount
     requires { increasing b }
     ensures  { result = cc a b }
   =
-    let i = ref 0 in
-    let j = ref 0 in
-    let c = ref 0 in
-    while !i < length a && !j < length b do
-      invariant { 0 <= !i <= length a }
-      invariant { 0 <= !j <= length b }
-      invariant { !c + cardinal (inter (drop a !i) (drop b !j)) = cc a b }
-      variant   { length a + length b - !i - !j }
-      if a[!i] < b[!j] then
+    let ref i = 0 in
+    let ref j = 0 in
+    let ref c = 0 in
+    while i < length a && j < length b do
+      invariant { 0 <= i <= length a }
+      invariant { 0 <= j <= length b }
+      invariant { c + cardinal (inter (drop a i) (drop b j)) = cc a b }
+      variant   { length a - i + length b - j }
+      if a[i] < b[j] then
         incr i
-      else if a[!i] > b[!j] then
+      else if a[i] > b[j] then
         incr j
       else begin
-        assert { inter (drop a !i) (drop b !j) ==
-                 add a[!i] (inter (drop a (!i+1)) (drop b (!j+1))) };
-        assert { not (mem a[!i] (drop a (!i+1))) };
+        assert { inter (drop a i) (drop b j) ==
+                 add a[i] (inter (drop a (i+1)) (drop b (j+1))) };
+        assert { not (mem a[i] (drop a (i+1))) };
         incr i;
         incr j;
         incr c
       end
     done;
-    !c
+    c
+
+end
+
+(** Variant using bags, from Rustan Leino's book "Program Proofs" *)
+
+module CoincidenceCountBag
+
+  use int.Int
+  use array.Array
+  use ref.Refint
+  use bag.Bag
+
+  predicate increasing (a: array int) =
+    forall i j. 0 <= i < j < length a -> a[i] <= a[j]
+
+  let rec ghost function bagofsub (a: array 'a) (lo hi: int) : bag 'a
+    requires { 0 <= lo <= hi <= length a } variant { hi - lo }
+  = if lo >= hi then empty_bag else add a[lo] (bagofsub a (lo + 1) hi)
+
+  function bagof (a: array 'a) : bag 'a =
+    bagofsub a 0 (length a)
+
+  function drop (a: array 'a) (i: int) : bag 'a =
+    bagofsub a i (length a)
+
+  lemma not_mem_inter_r:
+    forall a: array int, i: int, s: bag int. 0 <= i < length a ->
+    not (mem a[i] s) -> inter (drop a i) s == inter (drop a (i+1)) s
+
+  lemma not_mem_inter_l:
+    forall a: array int, i: int, s: bag int. 0 <= i < length a ->
+    not (mem a[i] s) -> inter s (drop a i) == inter s (drop a (i+1))
+
+  let rec lemma bagofincreasing (a: array int) (i x: int)
+    requires { increasing a }
+    requires { 0 <= i < length a }
+    requires { x < a[i] }
+    ensures  { not (mem x (drop a i)) }
+    variant  { length a - i }
+  = if i < length a - 1 then bagofincreasing a (i+1) x
+
+  let coincidence_count (a b: array int) : int
+    requires { increasing a }
+    requires { increasing b }
+    ensures  { result = card (inter (bagof a) (bagof b)) }
+  =
+    let ref i = 0 in
+    let ref j = 0 in
+    let ref c = 0 in
+    while i < length a && j < length b do
+      invariant { 0 <= i <= length a }
+      invariant { 0 <= j <= length b }
+      invariant { c + card (inter (drop a i) (drop b j))
+                  = card (inter (bagof a) (bagof b)) }
+      variant   { length a - i + length b - j }
+      if a[i] < b[j] then
+        incr i
+      else if a[i] > b[j] then
+        incr j
+      else begin
+        assert { inter (drop a i) (drop b j) ==
+                 add a[i] (inter (drop a (i+1)) (drop b (j+1))) };
+        incr i;
+        incr j;
+        incr c
+      end
+    done;
+    c
 
 end
