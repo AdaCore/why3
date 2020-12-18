@@ -197,14 +197,34 @@ that expects an argument of a mutable type will accept an argument of
 the corresponding snapshot type as long as it is not modified by the
 function.
 
-Logical expressions: terms and formulas
----------------------------------------
+Logical expressions
+-------------------
+
+A significant part of a typical WhyML source file is occupied by
+non-executable logical content intended for specification and proof:
+function contracts, assertions, definitions of logical functions and
+predicates, axioms, lemmas, etc.
+
+
+.. rubric:: Terms and Formulas
+
+Logical expressions are called *terms*. Boolean terms are called
+*formulas*. Internally, Why3 distinguishes the proper formulas (produced
+by predicate symbols, propositional connectives and quantifiers) and the
+terms of type ``bool`` (produced by Boolean variables and logical
+functions that return ``bool``). However, this distinction is not
+enforced on the syntactical level, and Why3 will perform the necessary
+conversions behind the scenes.
+
+The syntax of WhyML terms is given in :token:`term`.
+
 
 .. productionlist::
     term0: `integer`   ; integer constant
         : | `real`   ; real constant
         : | "true" | "false"   ; Boolean constant
         : | "()"   ; empty tuple
+        : | `string` ; string constant
         : | `qualid`   ; qualified identifier
         : | `qualifier`? "(" `term` ")"   ; term in a scope
         : | `qualifier`? "begin" `term` "end"   ; idem
@@ -217,6 +237,8 @@ Logical expressions: terms and formulas
         : | `term` "[" `term` ".." `term` "]" "'"*   ; collection slice
         : | `term` "[" `term` ".." "]" "'"*   ; right-open slice
         : | `term` "[" ".." `term` "]" "'"*   ; left-open slice
+        : | "[|" (`term` "=>" `term` ";")* ("_" "=>" `term`)? "|]" ; function literal
+        : | "[|" (`term` ";")+ "|]" ; function literal (domain over nat)
         : | `term` `term`+   ; application
         : | `prefix_op` `term`   ; prefix operator
         : | `term` `infix_op_4` `term`   ; infix operator 4
@@ -266,20 +288,7 @@ Logical expressions: terms and formulas
     trigger: `term` ("," `term`)*
 
 
-A significant part of a typical WhyML source file is occupied by
-non-executable logical content intended for specification and proof:
-function contracts, assertions, definitions of logical functions and
-predicates, axioms, lemmas, etc.
-
-Logical expressions are called *terms*. Boolean terms are called
-*formulas*. Internally, Why3 distinguishes the proper formulas (produced
-by predicate symbols, propositional connectives and quantifiers) and the
-terms of type ``bool`` (produced by Boolean variables and logical
-functions that return ``bool``). However, this distinction is not
-enforced on the syntactical level, and Why3 will perform the necessary
-conversions behind the scenes.
-
-The syntax of WhyML terms is given in :token:`term`.  The various
+The various
 constructs have the following priorities and associativities, from
 lowest to greatest priority:
 
@@ -338,9 +347,17 @@ example, ``(-)`` refers to the binary subtraction and ``(-_)`` to the
 unary negation. Tight operators cannot be used as infix operators, and
 thus do not require disambiguation.
 
+.. _rubric.collections_syntax:
+
+.. index:: bracket; syntax
+.. index:: collections; syntax; function literals
+.. rubric:: Specific syntax for collections
+
 In addition to prefix and infix operators, WhyML supports several mixfix
 bracket operators to manipulate various collection types: dictionaries,
-arrays, sequences, etc. Bracket operators do not have any predefined
+arrays, sequences, etc.
+
+Bracket operators do not have any predefined
 meaning and may be used to denote access and update operations for
 various user-defined collection types. We can introduce multiple bracket
 operations in the same scope by disambiguating them with primes after
@@ -357,8 +374,21 @@ with normal identifiers, names with a letter after a prime, such as
 ``(+)'spec``, can only be introduced by Why3, and not by the user in a
 WhyML source.
 
-.. index:: at
-.. index:: old
+WhyML provides a special syntax for `function literals`. The term
+``[|t1 => u1; ...; tn => un; _ => default|]``, where ``t1, ..., tn``
+have some type ``t`` and ``u1, ..., un, default`` some type ``u``,
+represents a total function of the form ``fun x -> if x = t1 then u1
+else if ... else if x = tn then un else default``. The default value
+can be omitted in which case the last value will be taken as the
+default value. For instance, the function literal ``[|t1 => u1|]``
+represents the term ``fun x -> if x = t1 then u1 else u1``. When the
+domain of the function ranges over an initial sequence of the natural
+numbers it is possible to write ``[|t1;t2;t3|]`` as a shortcut for
+``[|0 => t1; 1 => t2; 2 => t3|]``.  Function literals cannot be empty.
+
+.. index:: at; syntax
+.. index:: old; syntax
+.. rubric:: Refering to past program states using "at" and "old" operators
 
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
@@ -378,6 +408,7 @@ can be put over a parenthesised term, and the parentheses can be omitted
 if the term is a record or a record update.
 
 .. index:: &&, ||, by, so
+.. rubric:: Non-standard connectives
 
 The propositional connectives in WhyML formulas are listed in
 :token:`term`. The non-standard connectives — asymmetric
@@ -430,6 +461,11 @@ instead: ``A <-> B <-> C`` is transformed into a conjunction of
 ``A <-> B`` and ``B <-> C``. To reduce ambiguity, WhyML forbids to place
 a non-parenthesised implication at the right-hand side of an
 equivalence: ``A <-> B -> C`` is rejected.
+
+.. index:: conditionals; syntax
+.. index:: let; syntax
+.. index:: pattern-matching; syntax
+.. rubric:: Conditionals, "let" bindings and pattern-matching
 
 .. productionlist::
   term: `term0`
@@ -509,6 +545,7 @@ conjunction and disjunction, respectively.
         : | `real`   ; real constant
         : | "true" | "false"   ; Boolean constant
         : | "()"   ; empty tuple
+        : | `string` ; string constant
         : | `qualid`   ; identifier in a scope
         : | `qualifier`? "(" `expr` ")"   ; expression in a scope
         : | `qualifier`? "begin" `expr` "end"   ; idem
@@ -521,6 +558,8 @@ conjunction and disjunction, respectively.
         : | `expr` "[" `expr` ".." `expr` "]" "'"*   ; collection slice
         : | `expr` "[" `expr` ".." "]" "'"*   ; right-open slice
         : | `expr` "[" ".." `expr` "]" "'"*   ; left-open slice
+        : | "[|" (`expr` "=>" `expr` ";")* ("_" "=>" `expr`)? "|]" ; function literal
+        : | "[|" (`expr` ";")+ "|]" ; function literal (domain over nat)
         : | `expr` `expr`+   ; application
         : | `prefix_op` `expr`   ; prefix operator
         : | `expr` `infix_op_4` `expr`   ; infix operator 4
@@ -579,7 +618,6 @@ conjunction and disjunction, respectively.
     invariant: "invariant" "{" `term` "}"   ; loop and type invariant
     variant: "variant" "{" `variant_term` ("," `variant_term`)* "}"   ; termination variant
     variant_term: `term` ("with" `lqualid`)?   ; variant term + WF-order
-
 
 .. index:: ghost expressions
 .. rubric:: Ghost expressions
@@ -690,6 +728,32 @@ within annotations. A different name can be specified, using syntax
 
 Constructions ``break`` and ``continue`` can be used in for each
 loops, with the expected semantics.
+
+.. index:: collections; syntax; function literals
+.. rubric:: Function literals
+
+Function literals can be written in expressions the same way as they
+are in terms but there are a few subtleties that one must bear in
+mind. First of all, if the domain of the literal is of type ``t`` then
+an equality infix operator ``=`` should exist. For instance, the
+literal ``[|t1 => u1|]`` with ``t1`` of type ``t``, is only considered
+well typed if the infix operator ``=`` of type ``t -> t -> bool`` is
+visible in the current scope. This problem does not exist in terms
+because the equality in terms is polymorphic.
+
+Second, the function literal expression ``[|t1 => u1; t2 => u2; _ =>
+u3|]`` will be translated into the following expression:
+
+.. code-block:: whyml
+
+    let def'e = u3 in
+    let d'i1 = t2 in
+    let r'i1 = u2 in
+    let d'i0 = t1 in
+    let r'i0 = u1 in
+    fun x'x -> if x'x = d'i0 then r'i0 else
+               if x'x = d'i1 then r'i1 else
+               def'e
 
 Modules
 -------

@@ -347,6 +347,8 @@ let proxy_attr = create_attribute "mlw:proxy_symbol"
 
 let useraxiom_attr = create_attribute "useraxiom"
 
+let funlit = create_attribute "funlit"
+
 let model_projected_attr = create_attribute "model_projected"
 let model_vc_post_attr = create_attribute "model_vc_post"
 

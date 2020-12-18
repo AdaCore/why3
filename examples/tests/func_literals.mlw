@@ -1,0 +1,58 @@
+use int.Int
+use seq.Seq
+
+goal g1:
+  let a = [| 0 => 1 |] in
+  let b = [| 1 => 2 |] in
+  1 = a 1 <> b 1 = 2
+
+goal g2:
+  let a = [| 0 => 1; 1 => 42 |] in
+  let b = [| 1 => 2; 9 => 42 |] in
+  forall x y. x > 1 && y > 1 -> a x = b y
+
+goal g3:
+  let a = [| 0 => 1; 1 => 2 |] in
+  let b = [| 0 => 1; 1 => -2 |] in
+  a 0 = b 0     /\
+  a 1 = - (b 1) /\
+  a 2 = - (b 3) /\
+  a 3 = - (b 3) /\
+  a 3 <> b 3
+
+goal g4: [|1|] = [|1|]
+
+let seq_ok1 (_: int): seq int
+  ensures { result = create 4 [|0;1;2;3|] }
+= create 4 [|0;1;2;3|]
+
+let seq_ok2 (_: int): seq int
+  ensures { result == create 4 [|0;1;2;3|] }
+= create 4 [|0;1;2;3|]
+
+let seq_ok3 (default: int) : seq int
+  ensures { result = create 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]}
+= create 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]
+
+let seq_ok4 (default: int) : seq int
+  ensures { result == create 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]}
+= create 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]
+
+use array.Init
+use array.ToSeq
+
+let array_ok1 (_: int): array int
+  ensures { to_seq result = create 4 [|0;1;2;3|] }
+= init 4 [|0;1;2;3|]
+
+let array_ok2 (_: int): array int
+  ensures { to_seq result == create 4 [|0;1;2;3|] }
+= init 4 [|0;1;2;3|]
+
+let array_ok3 (default: int) : array int
+  ensures { to_seq result = create 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]}
+= init 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]
+
+let array_ok4 (default: int) : array int
+  ensures { to_seq result == create 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]}
+= init 4 [|0 => 0; 1 => 1; 2 => 2; 3 => 3; _ => default |]

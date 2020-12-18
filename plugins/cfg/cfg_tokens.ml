@@ -68,6 +68,7 @@ type token =
   | LET
   | LEMMA
   | LEFTSQ
+  | LEFTSQBAR
   | LEFTPAR
   | LEFTBRC
   | LARROW
@@ -90,6 +91,7 @@ type token =
   | EXPORT
   | EXISTS
   | EXCEPTION
+  | EQUALARROW
   | EQUAL
   | EPSILON
   | EOF
@@ -115,6 +117,7 @@ type token =
   | BREAK
   | BEGIN
   | BARBAR
+  | BARRIGHTSQ
   | BAR
   | AXIOM
   | ATTRIBUTE of (string)

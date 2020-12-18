@@ -31,8 +31,8 @@ let compare_const ?(structural=true) c1 c2 =
   | _, _ ->
       Pervasives.compare c1 c2
 
-let int_const n =
-  ConstInt { il_kind = ILitUnk; il_int = n }
+let int_const ?(il_kind=ILitUnk) n =
+  ConstInt { il_kind; il_int = n }
 
 let int_const_of_int n =
   int_const (BigInt.of_int n)
