@@ -297,12 +297,18 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
     | None, Some command ->
         let call = Driver.prove_task ~command ~limit drv task in
         let res = wait_on_call call in
-        let reduce_config =
-          let trans = "compute_in_goal" and prover = !opt_rac_prover in
-          Pinterp.rac_reduce_config_lit config env ~trans ?prover () in
-        let pm = Pmodule.restore_module th in
-        let ce = Counterexample.select_model ~check:!opt_check_ce_model
-            ?verb_lvl:!opt_ce_check_verbosity ~reduce_config env pm res.pr_models in
+        let ce =
+          if res.pr_models <> [] then
+            match Pmodule.restore_module th with
+            | pm ->
+               let trans = "compute_in_goal" and prover = !opt_rac_prover in
+               let reduce_config =
+                 Pinterp.rac_reduce_config_lit config env ~trans ?prover () in
+               Counterexample.select_model
+                 ~check:!opt_check_ce_model ~reduce_config
+                 ?verb_lvl:!opt_ce_check_verbosity env pm res.pr_models
+            | exception Not_found -> None
+          else None in
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
