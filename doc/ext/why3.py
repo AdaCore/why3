@@ -31,8 +31,8 @@ class WhyMLLexer(RegexLexer):
             (r"[^\W\d][\w']*", Name),
             (r'\bresult\b', Name.Builtin.Pseudo),
 
-            (r'-?\d\d*(.\d*)?([eE][+-]?\d\d*)', Number.Float),
-            (r'-?0[xX][\da-fA-F][\da-fA-F]*(.[\da-fA-F]*)?([pP][+-]?\d\d*)', Number.Float),
+            (r'-?\d\d*([.]\d*)?([eE][+-]?\d\d*)', Number.Float),
+            (r'-?0[xX][\da-fA-F][\da-fA-F]*([.][\da-fA-F]*)?([pP][+-]?\d\d*)', Number.Float),
             (r'0[xX][\da-fA-F][\da-fA-F_]*', Number.Hex),
             (r'0[oO][0-7][0-7_]*', Number.Oct),
             (r'0[bB][01][01_]*', Number.Bin),
