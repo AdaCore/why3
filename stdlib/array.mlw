@@ -295,6 +295,11 @@ module ArrayPermut
     exchange a1 a2 i j -> l <= i < u -> l <= j < u ->
     0 <= l -> u <= length a1 -> permut_sub a1 a2 l u
 
+  lemma permut_sub_trans:
+    forall a1 a2 a3: array 'a, l u: int.
+    0 <= l -> u <= length a1 -> permut_sub a1 a2 l u ->
+    permut_sub a2 a3 l u -> permut_sub a1 a3 l u
+
   (** we can always enlarge the interval *)
   lemma permut_sub_weakening:
     forall a1 a2: array 'a, l1 u1 l2 u2: int.
