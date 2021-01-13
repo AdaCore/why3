@@ -376,8 +376,20 @@ globals:
 <rac-check-term-result>Precondition of update is ok at "examples/tests/rac.mlw", line 297, characters 4-20
                        - Defined at "examples/tests/rac.mlw", line 287, characters 15-31
 <rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 290, characters 22-28
-<rac-check-term-result>Postcondition of update is ok at "examples/tests/rac.mlw", line 297, characters 4-20
-                       - Defined at "examples/tests/rac.mlw", line 288, characters 14-77
+<rac-check-term-result>Postcondition of update cannot be evaluated: forall j:
+                                                                    int.
+                                                                    0 < j /\
+                                                                    j
+                                                                    < 
+                                                                    length r ->
+                                                                    not 
+                                                                    j = i ->
+                                                                    (
+                                                                    elts r
+                                                                    @ j)
+                                                                    = (
+                                                                    elts r1
+                                                                    @ j)
 <rac-check-term-result>Postcondition of update is ok at "examples/tests/rac.mlw", line 297, characters 4-20
                        - Defined at "examples/tests/rac.mlw", line 289, characters 14-26
 <rac-check-term-result>Assertion is ok at "examples/tests/rac.mlw", line 298, characters 13-29
@@ -402,13 +414,16 @@ globals:
 <rac-check-term-result>Postcondition of Tuple0 is ok at "command line expression to execute", line 1, characters 6-8
 <rac-check-term-result>Postcondition of t'mk is ok at "examples/tests/rac.mlw", line 320, characters 12-27
 <rac-check-term-result>Postcondition of f is ok at "examples/tests/rac.mlw", line 317, characters 22-25
-<rac-check-term-result>Postcondition of map_update is ok at "examples/tests/rac.mlw", line 317, characters 11-29
-<rac-check-term-result>Postcondition of f is ok at "examples/tests/rac.mlw", line 323, characters 11-14
+<rac-check-term-result>Postcondition of map_update cannot be evaluated: 
+result = map_update f i x
+<rac-check-term-result>Postcondition of f cannot be evaluated: result1
+                                                               = f1 arg
 <rac-check-term-result>Postcondition of (=) is ok at "examples/tests/rac.mlw", line 314, characters 23-28
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 314, characters 41-44
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 323, characters 11-16
-<rac-check-term-result>Postcondition of f is ok at "examples/tests/rac.mlw", line 323, characters 4-7
+<rac-check-term-result>Postcondition of f cannot be evaluated: result2
+                                                               = f1 arg
 <rac-check-term-result>Postcondition of (=) is ok at "examples/tests/rac.mlw", line 314, characters 23-28
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 323, characters 4-9
@@ -433,12 +448,14 @@ globals:
 <rac-check-term-result>Postcondition of Tuple0 is ok at "command line expression to execute", line 1, characters 6-8
 <rac-check-term-result>Postcondition of array'mk is ok at "examples/tests/rac.mlw", line 353, characters 12-48
 <rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 354, characters 23-29
-<rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 355, characters 14-20
+<rac-check-term-result>Postcondition of elts cannot be evaluated: result
+                                                                  = elts arg
 <rac-check-term-result>Postcondition of (=) is ok at "examples/tests/rac.mlw", line 354, characters 53-58
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 354, characters 72-75
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 355, characters 14-22
-<rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 355, characters 4-10
+<rac-check-term-result>Postcondition of elts cannot be evaluated: result1
+                                                                  = elts arg
 <rac-check-term-result>Postcondition of (=) is ok at "examples/tests/rac.mlw", line 354, characters 53-58
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 355, characters 4-12
@@ -454,15 +471,18 @@ globals:
 <rac-check-term-result>Postcondition of make is ok at "examples/tests/rac.mlw", line 358, characters 12-21
                        - Defined at "examples/tests/rac.mlw", line 335, characters 14-55
 <rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 346, characters 27-33
-<rac-check-term-result>Postcondition of map_update is ok at "examples/tests/rac.mlw", line 346, characters 16-37
-<rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 341, characters 41-47
+<rac-check-term-result>Postcondition of map_update cannot be evaluated: 
+result = map_update f i x
+<rac-check-term-result>Postcondition of elts cannot be evaluated: result1
+                                                                  = elts arg
 <rac-check-term-result>Postcondition of (=) is ok at "examples/tests/rac.mlw", line 339, characters 23-28
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 339, characters 41-44
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 341, characters 41-49
 <rac-check-term-result>Postcondition of ([]) is ok at "examples/tests/rac.mlw", line 360, characters 10-14
                        - Defined at "examples/tests/rac.mlw", line 341, characters 41-49
-<rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 341, characters 41-47
+<rac-check-term-result>Postcondition of elts cannot be evaluated: result2
+                                                                  = elts arg
 <rac-check-term-result>Postcondition of (=) is ok at "examples/tests/rac.mlw", line 339, characters 23-28
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 341, characters 41-49
@@ -486,8 +506,10 @@ globals:
                        - Defined at "examples/tests/rac.mlw", line 341, characters 41-49
 <rac-check-term-result>Assertion is ok at "examples/tests/rac.mlw", line 366, characters 13-18
 <rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 346, characters 27-33
-<rac-check-term-result>Postcondition of map_update is ok at "examples/tests/rac.mlw", line 346, characters 16-37
-<rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 341, characters 41-47
+<rac-check-term-result>Postcondition of map_update cannot be evaluated: 
+result = map_update f i x
+<rac-check-term-result>Postcondition of elts cannot be evaluated: result1
+                                                                  = elts arg
 <rac-check-term-result>Postcondition of (=) is ok at "examples/tests/rac.mlw", line 339, characters 23-28
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 339, characters 41-44
@@ -495,14 +517,16 @@ globals:
 <rac-check-term-result>Postcondition of ([]) is ok at "examples/tests/rac.mlw", line 368, characters 12-16
                        - Defined at "examples/tests/rac.mlw", line 341, characters 41-49
 <rac-check-term-result>Assertion is ok at "examples/tests/rac.mlw", line 369, characters 13-18
-<rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 341, characters 41-47
+<rac-check-term-result>Postcondition of elts cannot be evaluated: result2
+                                                                  = elts arg
 <rac-check-term-result>Postcondition of (=) is ok at "examples/tests/rac.mlw", line 339, characters 23-28
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 341, characters 41-49
 <rac-check-term-result>Postcondition of ([]) is ok at "examples/tests/rac.mlw", line 370, characters 12-16
                        - Defined at "examples/tests/rac.mlw", line 341, characters 41-49
 <rac-check-term-result>Assertion is ok at "examples/tests/rac.mlw", line 371, characters 13-19
-<rac-check-term-result>Postcondition of elts is ok at "examples/tests/rac.mlw", line 341, characters 41-47
+<rac-check-term-result>Postcondition of elts cannot be evaluated: result3
+                                                                  = elts arg
 <rac-check-term-result>Postcondition of (=) is ok at "examples/tests/rac.mlw", line 339, characters 23-28
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac-check-term-result>Postcondition of (@) is ok at "examples/tests/rac.mlw", line 339, characters 41-44
@@ -573,8 +597,10 @@ globals:
                                                                    = v
 <rac-check-term-result>Postcondition of make is ok at "examples/tests/rac.mlw", line 389, characters 12-21
                        - Defined at "WHY3DATA/stdlib/array.mlw", line 55, characters 14-31
-<rac-check-term-result>Precondition of ([]<-) is ok at "examples/tests/rac.mlw", line 390, characters 4-14
-                       - Defined at "WHY3DATA/stdlib/array.mlw", line 31, characters 45-62
+<rac-check-term-result>Precondition of ([]<-) cannot be evaluated: 0 <= i /\
+                                                                   i
+                                                                   < 
+                                                                   length a
 <rac-check-term-result>Postcondition of ([]<-) cannot be evaluated: elts a
                                                                     = 
                                                                     set
@@ -590,8 +616,9 @@ globals:
                                                                  < length a2
 <rac-check-term-result>Postcondition of ([]) is ok at "examples/tests/rac.mlw", line 391, characters 10-14
                        - Defined at "WHY3DATA/stdlib/array.mlw", line 24, characters 15-28
-<rac-check-term-result>Precondition of ([]) is ok at "examples/tests/rac.mlw", line 391, characters 4-8
-                       - Defined at "WHY3DATA/stdlib/array.mlw", line 23, characters 45-62
+<rac-check-term-result>Precondition of ([]) cannot be evaluated: 0 <= i1 /\
+                                                                 i1
+                                                                 < length a2
 <rac-check-term-result>Postcondition of ([]) is ok at "examples/tests/rac.mlw", line 391, characters 4-8
                        - Defined at "WHY3DATA/stdlib/array.mlw", line 24, characters 15-28
 <rac-check-term-result>Postcondition of Tuple2 is ok at "examples/tests/rac.mlw", line 391, characters 4-14
