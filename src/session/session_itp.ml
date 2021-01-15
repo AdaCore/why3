@@ -544,7 +544,7 @@ open Format
 open Ident
 
 let print_proof_attempt fmt pa =
-  fprintf fmt "%a tl=%d %a"
+  fprintf fmt "@[<h>%a tl=%d %a@]"
           Whyconf.print_prover pa.prover
           pa.limit.Call_provers.limit_time
           (Pp.print_option (Call_provers.print_prover_result ~json:false))

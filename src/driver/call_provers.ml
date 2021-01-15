@@ -145,14 +145,14 @@ type prover_result_parser = {
 }
 
 let print_prover_answer fmt = function
-  | Valid -> fprintf fmt "valid"
-  | Invalid -> fprintf fmt "invalid"
-  | Timeout -> fprintf fmt "timeout"
-  | OutOfMemory -> fprintf fmt "out@ of@ memory"
-  | StepLimitExceeded -> fprintf fmt "step@ limit@ exceeded"
-  | Unknown s -> fprintf fmt "unknown@ (%s)" s
-  | Failure s -> fprintf fmt "failure@ (%s)" s
-  | HighFailure -> fprintf fmt "high failure"
+  | Valid -> fprintf fmt "Valid"
+  | Invalid -> fprintf fmt "Invalid"
+  | Timeout -> fprintf fmt "Timeout"
+  | OutOfMemory -> fprintf fmt "Out@ of@ memory"
+  | StepLimitExceeded -> fprintf fmt "Step@ limit@ exceeded"
+  | Unknown s -> fprintf fmt "Unknown@ (%s)" s
+  | Failure s -> fprintf fmt "Failure@ (%s)" s
+  | HighFailure -> fprintf fmt "High failure"
 
 let print_prover_status fmt = function
   | Unix.WSTOPPED n -> fprintf fmt "stopped by signal %d" n
@@ -163,14 +163,13 @@ let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
 let print_prover_result ?(json=false) fmt r =
-  let open Json_base in
-  let print_json_model fmt (a,m) =
-    fprintf fmt "@[@[<hv1>{%a;@ %a}@]}@]"
-      (print_json_field "model"
-         (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int)) m
-      (print_json_field "answer" print_prover_answer) a
-  in
   if json then
+    let open Json_base in
+    let print_json_model fmt (a,m) =
+      fprintf fmt "@[@[<hv1>{%a;@ %a}@]}@]"
+        (print_json_field "model"
+           (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int)) m
+        (print_json_field "answer" print_prover_answer) a in
     let print_model fmt (a,m) =
       if not (is_model_empty m) then
           print_json_model fmt (a,m)
@@ -185,12 +184,11 @@ let print_prover_result ?(json=false) fmt r =
       (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
   else
     let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
-    fprintf fmt "@[<v>@[<hov2>Prover@ result@ is:@ @{<bold %s>%a@}@ (%.2fs%a).@]"
+    fprintf fmt "@{<bold %s>%a@}@ (%.2fs%a)"
       color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
     if r.pr_answer == HighFailure then
-      fprintf fmt "@ Prover exit status: %a@\nProver output:@\n%s@\n"
-        print_prover_status r.pr_status r.pr_output;
-    fprintf fmt "@]"
+      fprintf fmt ",@\nProver@ exit@ status:@ %a@\nprover@ output:@\n%s@\n"
+        print_prover_status r.pr_status r.pr_output
 
 let rec grep out l = match l with
   | [] ->

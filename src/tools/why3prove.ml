@@ -280,8 +280,8 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
         fprintf fmt
           "@[<hov>Goal@ @{<bold>%s@}@ from@ verification@ condition@ @{<bold>%s@}.@]"
           expls goal_name );
-    fprintf fmt "@\n";
-    Call_provers.print_prover_result ~json:false fmt res;
+    fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
+      (Call_provers.print_prover_result ~json:false) res;
     (match ce with
      | Some ce ->
         Counterexample.print_counterexample ?verb_lvl:!opt_ce_check_verbosity

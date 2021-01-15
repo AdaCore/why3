@@ -55,7 +55,7 @@ nondet_types=""
 remove_solver_details () {
     sed 's/[0-9]\+\.[0-9]\+s//g' \
   | sed 's/[0-9]\+ steps//g' \
-  | sed 's/Timeout.*$\|Unknown (unknown).*$\|Unknown (incomplete).*$\|Unknown (unknown + incomplete).*$\|Unknown (unknown + interrupted).*$/Timeout or Unknown/'
+  | sed 's/Timeout.*$\|Unknown (unknown).*$\|Unknown (incomplete).*$\|Unknown (unknown + incomplete).*$\|Unknown (unknown + interrupted).*$/Timeout or unknown/'
 }
 
 check_nondet () {
