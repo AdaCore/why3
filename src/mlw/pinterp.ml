@@ -1960,9 +1960,10 @@ and eval_expr' env e =
             eval_expr e;
             let i = i + 1 in
             assert3 {I};
-            abort2
+            let i = b + 1 in
+            assert4* {I}
           end else begin
-            assert4* {I} (* i is already equal to 'b + 1' *)
+            assert5* {I} (* i is already equal to 'b + 1' *)
           end
         end else ()
 
@@ -1973,11 +1974,12 @@ and eval_expr' env e =
         3 - if assert3 fails, then we have a real counterexample
             (invariant does not hold after iteration)
         4 - if assert4 fails, then we have a false counterexample
+            (invariant does not hold for the execution to continue
+             after the loop)
+        5 - if assert5 fails, then we have a false counterexample
             (invariant does not hold for the execution to continue)
-        5 - abort1: we have a false counterexample
-            (value assigned to i is not compatible with loop range)
-        6 - abort2: we have a false counterexample
-            (the abstract rac cannot continue from this state) *)
+        6 - abort1: we have a false counterexample
+            (value assigned to i is not compatible with loop range) *)
       register_loop env e.e_loc Log.ExecAbstract;
       try
         let a = big_int_of_value (get_pvs env pvs1) in
@@ -2012,9 +2014,14 @@ and eval_expr' env e =
                 (* assert3 *)
                 if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                register_stucked env e.e_loc
-                  "Cannot continue after arbitrary iteration" Mid.empty;
-                raise (RACStuck (env,e.e_loc))
+                let env = bind_vs i.pv_vs (value ty_int (Vnum (suc b))) env in
+                (* assert4 *)
+                let ctx = cntr_ctx "Assume loop invariant with (b+1)" env in
+                check_assume_terms ctx inv;
+                Normal unit_value
+                (* register_stucked env e.e_loc
+                 *   "Cannot continue after arbitrary iteration" Mid.empty;
+                 * raise (RACStuck (env,e.e_loc)) *)
             | r -> r
           end
           else begin
