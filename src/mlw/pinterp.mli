@@ -23,9 +23,10 @@ type float_mode
 type big_float
 
 module rec Value : sig
-  type value = private {v_desc: value_desc; v_ty: Ty.ty}
-  and value_desc =
-    | Vconstr of rsymbol * field list
+  type value
+  type field
+  type value_desc = private
+    | Vconstr of rsymbol * rsymbol list * field list
     | Vnum of BigInt.t
     | Vreal of Big_real.real
     | Vfloat_mode of float_mode
@@ -38,13 +39,13 @@ module rec Value : sig
     | Vpurefun of Ty.ty (* keys *) * value Mv.t * value
     | Vterm of term (* ghost values *)
     | Vundefined
-  and field = Field of value ref
 end
 and Mv : Extmap.S with type key = Value.value
 
 open Value
 
 val v_ty : value -> Ty.ty
+val v_desc : value -> value_desc
 
 (** non defensive API for building [value]s: there are no checks that
    [ity] is compatible with the [value] being built *)
@@ -55,7 +56,7 @@ val range_value : ity -> BigInt.t -> value
 val string_value : string -> value
 val bool_value : bool -> value
 val proj_value : ity -> lsymbol -> value -> value
-val constr_value : ity -> rsymbol -> value list -> value
+val constr_value : ity -> rsymbol -> rsymbol list -> value list -> value
 val purefun_value : result_ity:ity -> arg_ity:ity -> value Mv.t -> value -> value
 val unit_value : value
 val undefined_value : ity -> value
@@ -135,15 +136,16 @@ type rac_reduce_config
    not progress. *)
 
 val rac_reduce_config :
-  ?trans:Task.task Trans.tlist ->
-  ?prover:rac_prover ->
+  ?trans:Task.task Trans.tlist -> ?prover:rac_prover -> ?try_negate:bool ->
   unit -> rac_reduce_config
 
-(** [rac_reduce_config_lit cnf env ?trans ?prover ()] configures the term reduction of
-   RAC. [trans] is the name of a transformation (usually "compute_in_goal"). [prover] is a
-   prover string with optional, space-sparated time limit and memory limit. *)
+(** [rac_reduce_config_lit cnf env ?trans ?prover ?try_negate ()] configures the term
+   reduction of RAC. [trans] is the name of a transformation (usually "compute_in_goal").
+   [prover] is a prover string with optional, space-sparated time limit and memory limit.
+   And with [~try_negate:true] the negated term is dispatched to the prover if the prover
+   didn't return a result for the positive form. *)
 val rac_reduce_config_lit :
-  Whyconf.config -> Env.env -> ?trans:string -> ?prover:string ->
+  Whyconf.config -> Env.env -> ?trans:string -> ?prover:string -> ?try_negate:bool ->
   unit -> rac_reduce_config
 
 type import_value = ?name:string -> ?loc:Loc.position -> ity -> value option
@@ -175,13 +177,12 @@ val rac_config :
 
 (** Context for the interpreter *)
 type env = private {
-  mod_known   : Pdecl.known_map;
-  th_known    : Decl.known_map;
-  funenv      : cexp Mrs.t;
-  vsenv       : value Mvs.t;
-  rsenv       : value Mrs.t; (* global constants *)
-  env         : Env.env;
-  rac         : rac_config;
+  pmodule : Pmodule.pmodule;
+  funenv  : cexp Mrs.t;
+  vsenv   : value Mvs.t;
+  rsenv   : value Mrs.t; (* global constants *)
+  env     : Env.env;
+  rac     : rac_config;
 }
 
 (** Result of the interpreter **)
@@ -210,8 +211,7 @@ exception RACStuck of env * Loc.position option
 val eval_global_fundef :
   rac_config ->
   Env.env ->
-  Pdecl.known_map ->
-  Decl.known_map ->
+  Pmodule.pmodule ->
   (rsymbol * cexp) list ->
   expr ->
   result * value Mvs.t * value Mrs.t

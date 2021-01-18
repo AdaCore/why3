@@ -217,11 +217,12 @@ replay_without_shape () {
 execute () {
     pgm="bin/why3$suffix execute"
     echo -n "  ${@:1}... "
-    # Run why3execute and discard warnings from the reduction engine
-    if $pgm "$@" > /dev/null 2> >(grep -v '$warning: reduction of term'); then
+    # Run why3execute, discard warnings from the reduction engine
+    # Remove `[ $? -eq 2 ]` when value origins (default vs model) can be distinguished in RAC
+    if ($pgm "$@" || [ $? -eq 2 ] ) > /dev/null 2> >(grep -v '$warning: reduction of term'); then
         echo "ok"
     else
-        echo "execution test failed! $?"
+        echo "execution test failed!"
         echo $pgm "$@"
         $pgm "$@"
         exit 1

@@ -330,7 +330,7 @@ module ArrayExec
 
   let empty () : array 'a = {length= 0; elts= fun _ -> any 'a}
 
-  let function make (n: int) (v: 'a) : array 'a
+  let make (n: int) (v: 'a) : array 'a
     ensures { result.length = n }
     ensures { forall i. 0 <= i < n -> result.elts i = v }
   = {length= n; elts= fun _ -> v}
