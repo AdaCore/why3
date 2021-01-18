@@ -28,13 +28,13 @@
  <goal name="create&#39;vc" expl="VC for create" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="53"/></proof>
  </goal>
- <goal name="ListCursor.create&#39;vc" expl="VC for create" proved="true">
+ <goal name="ListCursor.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="35"/></proof>
  </goal>
- <goal name="ListCursor.C.next&#39;vc" expl="VC for next" proved="true">
+ <goal name="ListCursor.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="68"/></proof>
  </goal>
- <goal name="ListCursor.C.has_next&#39;vc" expl="VC for has_next" proved="true">
+ <goal name="ListCursor.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="13"/></proof>
  </goal>
 </theory>
@@ -90,13 +90,13 @@
  </goal>
 </theory>
 <theory name="TestListCursorLink" proved="true">
- <goal name="TestListCursor.ListCursor.create&#39;vc" expl="VC for create" proved="true">
+ <goal name="TestListCursor.ListCursor.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="40"/></proof>
  </goal>
- <goal name="TestListCursor.ListCursor.C.next&#39;vc" expl="VC for next" proved="true">
+ <goal name="TestListCursor.ListCursor.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.03" steps="71"/></proof>
  </goal>
- <goal name="TestListCursor.ListCursor.C.has_next&#39;vc" expl="VC for has_next" proved="true">
+ <goal name="TestListCursor.ListCursor.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
 </theory>
@@ -113,27 +113,27 @@
  <goal name="next&#39;vc" expl="VC for next" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="75"/></proof>
  </goal>
- <goal name="ArrayCursor.create&#39;vc" expl="VC for create" proved="true">
+ <goal name="ArrayCursor.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="29"/></proof>
  </goal>
- <goal name="ArrayCursor.C.next&#39;vc" expl="VC for next" proved="true">
+ <goal name="ArrayCursor.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="next&#39;vc.0" expl="precondition" proved="true">
+  <goal name="next&#39;refn&#39;vc.0" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="next&#39;vc.0.0" expl="precondition" proved="true">
+   <goal name="next&#39;refn&#39;vc.0.0" expl="precondition" proved="true">
    <proof prover="4"><result status="valid" time="0.03" steps="7"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="next&#39;vc.1" expl="postcondition" proved="true">
+  <goal name="next&#39;refn&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="next&#39;vc.2" expl="postcondition" proved="true">
+  <goal name="next&#39;refn&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="50"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="ArrayCursor.C.has_next&#39;vc" expl="VC for has_next" proved="true">
+ <goal name="ArrayCursor.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="13"/></proof>
  </goal>
 </theory>
@@ -170,17 +170,17 @@
  </transf>
  </goal>
  <goal name="harness1&#39;vc" expl="VC for harness1" proved="true">
- <proof prover="5"><result status="valid" time="0.16" steps="25839"/></proof>
+ <proof prover="5"><result status="valid" time="0.16" steps="25927"/></proof>
  </goal>
 </theory>
 <theory name="TestArrayCursorLink" proved="true">
- <goal name="TestArrayCursor.ArrayCursor.create&#39;vc" expl="VC for create" proved="true">
+ <goal name="TestArrayCursor.ArrayCursor.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
  </goal>
- <goal name="TestArrayCursor.ArrayCursor.C.next&#39;vc" expl="VC for next" proved="true">
+ <goal name="TestArrayCursor.ArrayCursor.C.next&#39;refn&#39;vc" expl="VC for next&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="46"/></proof>
  </goal>
- <goal name="TestArrayCursor.ArrayCursor.C.has_next&#39;vc" expl="VC for has_next" proved="true">
+ <goal name="TestArrayCursor.ArrayCursor.C.has_next&#39;refn&#39;vc" expl="VC for has_next&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
  </goal>
 </theory>

@@ -33,6 +33,7 @@ let opt_check_ce_model = ref false
 let opt_print_original_model = ref false
 let opt_print_derived_model = ref false
 let opt_rac_prover = ref None
+let opt_rac_try_negate = ref false
 let opt_ce_check_verbosity = ref None
 
 let () = (* Instead of additional command line parameters *)
@@ -146,6 +147,9 @@ let option_list =
     "<prover> use <prover> to check assertions in RAC when term\n\
      reduction is insufficient, with optional, comma-\n\
      separated time and memory limit (e.g. 'cvc4,2,1000')";
+    KLong "rac-try-negate", Hnd0 (fun () -> opt_rac_try_negate := true),
+    " try checking the negated term using the RAC prover when\n\
+     the prover is defined and didn't give a result";
     Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
     "<lvl> verbosity level for interpretation log of counterexam-\n\
      ple solver model";
@@ -276,8 +280,8 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
         fprintf fmt
           "@[<hov>Goal@ @{<bold>%s@}@ from@ verification@ condition@ @{<bold>%s@}.@]"
           expls goal_name );
-    fprintf fmt "@\n";
-    Call_provers.print_prover_result ~json:false fmt res;
+    fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
+      (Call_provers.print_prover_result ~json:false) res;
     (match ce with
      | Some ce ->
         Counterexample.print_counterexample ?verb_lvl:!opt_ce_check_verbosity
@@ -301,12 +305,13 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
           if res.pr_models <> [] then
             match Pmodule.restore_module th with
             | pm ->
-               let trans = "compute_in_goal" and prover = !opt_rac_prover in
                let reduce_config =
-                 Pinterp.rac_reduce_config_lit config env ~trans ?prover () in
-               Counterexample.select_model
-                 ~check:!opt_check_ce_model ~reduce_config
-                 ?verb_lvl:!opt_ce_check_verbosity env pm res.pr_models
+                 Pinterp.rac_reduce_config_lit config env
+                   ~trans:"compute_in_goal" ?prover:!opt_rac_prover
+                   ~try_negate:!opt_rac_try_negate () in
+               Counterexample.select_model ~reduce_config
+                 ~check:!opt_check_ce_model ?verb_lvl:!opt_ce_check_verbosity
+                 env pm res.pr_models
             | exception Not_found -> None
           else None in
         let t = task_goal_fmla task in

@@ -1,4 +1,55 @@
-<check-ce>Model 0 is empty
+<check-ce>Check model 0 ("bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+<check-ce>Validating model:
+          
+<check-ce>Interpreting concretly
+<rac-values>Missing value for parameter x, continue with default value 0.
+<check-ce>Interpreting abstractly
+<rac-values>Missing value for parameter x, continue with default value 0.
+<rac-values>No value for result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28, taking default.
+<check-ce>Result of checking model 0:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File anonymous1.mlw:
+                Line 4:
+                  x = 0
+                  Execution of main function f's body with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Concrete execution of h with args:
+                    y = 0
+                  Concrete execution of (+) with args:
+                    _ = 0
+                    _ = 2
+                Line 6:
+                  Property failure, Assertion with:
+                    x = 0
+                    w = 2
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous1.mlw", line 5, characters 20-25)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                Line 14:
+                  Constant one initialization
+              File anonymous1.mlw:
+                Line 4:
+                  x = 0
+                  Execution of main function f's body with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Abstract execution of h with args:
+                    y = 0
+                  result = 0
+                  Execution got stuck, Assume postcondition of h with:
+                    y = 0
+                    result = 0
 <check-ce>Check model 1 ("bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
 <check-ce>Validating model:
           File anonymous1.mlw:
@@ -112,13 +163,15 @@
                     y = 0
                     result = 0
 <check-ce>Models:
-- Selected model 1 (Concrete: good model, Abstract: bad model)
+- Selected model 0 (Concrete: good model, Abstract: bad model)
+    Summary: The program does not comply to the verification goal
+- Checked model 1 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
 - Checked model 2 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
 Goal Assertion from verification condition f'vc.
-Prover result is: unknown (sat) (0.00s, 655 steps).
+Prover result is: Unknown (sat) (0.03s, 655 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
