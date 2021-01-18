@@ -143,7 +143,7 @@ let print_proof_attempt fmt pa_id =
   match pa.node_proof with
   | None -> fprintf fmt "%s" pa.node_name
   | Some _pr ->
-    fprintf fmt "%s %a"
+    fprintf fmt "@[<h>%s %a@]"
       pa.node_name
       (Pp.print_option (Call_provers.print_prover_result ~json:false))
       (get_result pa.node_proof)
