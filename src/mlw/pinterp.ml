@@ -1951,20 +1951,19 @@ and eval_expr' env e =
         let a = eval_expr e1 in
         let b = eval_expr e2 in
         if a <= b + 1 then begin
-          (let i = a in assert1 {I});
+          bind_vs i a;
+          assert1 {I};
           assign_written_vars_with_ce;
           let i = get_and_register_value ~def:(b+1) i in
           if not (a <= i <= b + 1) then abort1;
           if a <= i <= b then begin
             assert2* { I };
             eval_expr e;
-            let i = i + 1 in
+            bind_vs i (i + 1) in
             assert3 {I};
-            let i = b + 1 in
-            assert4* {I}
-          end else begin
-            assert5* {I} (* i is already equal to 'b + 1' *)
-          end
+            bind_vs i (b + 1);
+          end;
+          assert4* {I}
         end else ()
 
         1 - if assert1 fails, then we have a real counterexample
@@ -1974,11 +1973,8 @@ and eval_expr' env e =
         3 - if assert3 fails, then we have a real counterexample
             (invariant does not hold after iteration)
         4 - if assert4 fails, then we have a false counterexample
-            (invariant does not hold for the execution to continue
-             after the loop)
-        5 - if assert5 fails, then we have a false counterexample
             (invariant does not hold for the execution to continue)
-        6 - abort1: we have a false counterexample
+        5 - abort1: we have a false counterexample
             (value assigned to i is not compatible with loop range) *)
       register_loop env e.e_loc Log.ExecAbstract;
       try
@@ -2019,9 +2015,6 @@ and eval_expr' env e =
                 let ctx = cntr_ctx "Assume loop invariant with (b+1)" env in
                 check_assume_terms ctx inv;
                 Normal unit_value
-                (* register_stucked env e.e_loc
-                 *   "Cannot continue after arbitrary iteration" Mid.empty;
-                 * raise (RACStuck (env,e.e_loc)) *)
             | r -> r
           end
           else begin
