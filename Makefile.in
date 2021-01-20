@@ -213,6 +213,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/util/rc.ml src/util/lexlib.ml src/util/mysexplib.ml \
 	       src/util/json_parser.mli src/util/json_parser.ml \
 	       src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
+	       src/util/dynlink_wrapper.ml \
 	       src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/parser/parser_messages.ml \
@@ -226,7 +227,7 @@ LIB_UTIL = mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl diffmap \
 	   hashcons wstdlib exn_printer getopt \
 	   json_base json_parser json_lexer \
-	   debug loc lexlib print_tree \
+	   debug loc lexlib print_tree dynlink_wrapper \
 	   cmdline warning sysutil rc plugin bigInt number constant vector pqueue
 
 ifeq (@enable_re@,no)
@@ -307,6 +308,14 @@ $(LIBDEP) $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
+
+ifeq (@new_dynlink@,yes)
+src/util/dynlink_wrapper.ml: src/util/dynlink_new.ml Makefile
+	cp $< $@
+else
+src/util/dynlink_wrapper.ml: src/util/dynlink_old.ml Makefile
+	cp $< $@
+endif
 
 # Mlmpfr
 

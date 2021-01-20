@@ -215,6 +215,9 @@ echo "ocaml version is $OCAMLVERSION"
 AX_VERSION_GE([$OCAMLVERSION], 4.05.0, [],
   [AC_MSG_ERROR(You need Objective Caml 4.05.0 or higher.)])
 
+AX_VERSION_GE([$OCAMLVERSION], 4.08.0, [new_dynlink=yes], [new_dynlink=no])
+AC_SUBST(new_dynlink)
+
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
 OCAMLLIB=`$OCAMLC -where | tr -d '\\r'`
