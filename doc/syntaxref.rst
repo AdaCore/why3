@@ -671,8 +671,8 @@ The “for” loop of Why3 has the following general form:
     for v=e1 to e2 do invariant { i } e3 done
 
 Here, ``v`` is a variable identifier, that is bound by the loop
-statement and of type ``integer`` ; ``e1`` and ``e2`` are program
-expressions of type ``integer``, and ``e3`` is an expression of type
+statement and of type ``int`` ; ``e1`` and ``e2`` are program
+expressions of type ``int``, and ``e3`` is an expression of type
 ``unit``. The variable ``v`` may occur both in ``i`` and ``e3``, and
 is not mutable. The execution of such a loop amounts to first evaluate
 ``e1`` and ``e2`` to values ``n1`` and ``n2``. If ``n1 >= n2`` then
