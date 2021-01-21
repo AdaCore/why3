@@ -8,7 +8,7 @@ module FromSexp = struct
 
   let is_name_start = function
     | '_' | 'a'..'z' | 'A'..'Z'
-    | '@' | '#' -> true
+    | '@' | '#' | '$' -> true
     | _ -> false
 
 
