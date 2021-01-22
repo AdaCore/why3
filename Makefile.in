@@ -546,8 +546,10 @@ lib/plugins/hypothesis_selection.cmxs: EXTINCLUDES += -I @OCAMLGRAPHLIB@
 lib/plugins/hypothesis_selection.cmo:  EXTINCLUDES += -I @OCAMLGRAPHLIB@
 lib/plugins/hypothesis_selection.cmxs: EXTLIBS += graph.cmxa
 lib/plugins/hypothesis_selection.cmo:  EXTOBJS += graph.cmo
-lib/plugins/hypothesis_selection.cmxs: EXTPKGS += ocamlgraph
-lib/plugins/hypothesis_selection.cmo:  EXTPKGS += ocamlgraph
+ifeq (@enable_ocamlfind@,yes)
+lib/plugins/hypothesis_selection.cmxs: FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
+lib/plugins/hypothesis_selection.cmo:  FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
+endif
 endif
 
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
