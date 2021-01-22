@@ -116,7 +116,7 @@ let command cur =
   Whyconf.Args.first_arg := argi;
   try
     Dynlink.allow_unsafe_modules true;
-    Dynlink.loadfile cmd;
+    Dynlink_wrapper.loadfile cmd;
     exit 0
   with Dynlink.Error e ->
     Printf.eprintf "Failed to load %s: %s\n%!" cmd (Dynlink.error_message e);
