@@ -33,6 +33,7 @@ extensions = [
     'sphinxcontrib.bibtex',
     'why3'
 ]
+bibtex_bibfiles = ['manual.bib']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
