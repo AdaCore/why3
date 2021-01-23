@@ -373,8 +373,10 @@ end
 module mach.onetime.OneTime
   syntax type t      "int"
   syntax val  to_int "Z.of_int"
-  syntax val  zero   "0"
-  syntax val  one    "1"
+  syntax val  zero   "0 (*%1*)"
+  syntax val  one    "1 (*%1*)"
+    (* note: it is safe to ignore the argument of `zero` and `one`, of
+       type unit, thanks to the A-normal form of WhyML code. *)
   syntax val  succ   "%1 + 1"   prec 8 8 7
   syntax val  pred   "%1 - 1"   prec 8 8 7
   syntax val  lt     "%1 < %2"  prec 11 11 10
@@ -384,6 +386,7 @@ module mach.onetime.OneTime
   syntax val  eq     "%1 = %2"  prec 11 11 10
   syntax val  ne     "%1 <> %2" prec 11 11 10
 
+  syntax val to_peano "%1"
   syntax val transfer "%1"
   syntax val neg      "-%1"     prec 5 4
   syntax val abs      "abs"
