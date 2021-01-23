@@ -740,7 +740,7 @@ module Print = struct
       match cs_args with
       | [] -> fprintf fmt "@[<hov 4>| %a@]" (print_uident info) id
       | l -> fprintf fmt "@[<hov 4>| %a of %a@]" (print_uident info) id
-               (print_list star (print_ty ~use_quote:true ~paren:false info)) l in
+               (print_list star (print_ty ~use_quote:true ~paren:true info)) l in
     let print_field fmt (is_mutable, id, ty) =
       fprintf fmt "%s%a: @[%a@];" (if is_mutable then "mutable " else "")
         (print_lident info) id (print_ty ~use_quote:true ~paren:false info) ty in

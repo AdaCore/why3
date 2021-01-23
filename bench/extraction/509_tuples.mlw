@@ -1,0 +1,7 @@
+type pos = (unit, unit)
+type t = Range pos pos
+
+let merge (a b: t) : t
+= let Range x y = a in
+  let Range w z = b in
+  Range x z
