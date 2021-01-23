@@ -27,7 +27,7 @@ do
             make web_ide src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js
             ;;
         doc)
-            #make doc # disabled during Sphinx migration
+            make predoc
             make stdlibdoc
             make apidoc
             ;;

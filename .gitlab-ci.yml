@@ -44,21 +44,25 @@ sphinx-image:
   tags:
     - docker
 
-.build_template:
+build-system:
   stage: build
+  variables:
+    COMPILER: system
   script:
     - misc/ci-local.sh
   extends: .docker_template
 
-build-system:
-  variables:
-    COMPILER: system
-  extends: .build_template
-
 build-latest:
+  stage: build
   variables:
     COMPILER: latest
-  extends: .build_template
+  script:
+    - misc/ci-local.sh doc
+  artifacts:
+    paths:
+      - doc/generated
+    expire_in: 1 day
+  extends: .docker_template
 
 bench-system:
   variables:
@@ -159,10 +163,12 @@ deploy:
     - shell
 
 doc:
-  stage: build
+  stage: test
   image: "$SPHINX_IMAGE"
+  dependencies:
+    - build-latest
   script:
-    - make -f doc.Makefile public/index.html
+    - sphinx-build -W --keep-going -b html doc public
   artifacts:
     paths:
       - public

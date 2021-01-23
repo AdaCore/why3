@@ -1518,9 +1518,7 @@ Library ``int``: mathematical integers
 The ``int`` library contains several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.int`.
 
-.. %EXECUTE bin/why3 pp --output=dep stdlib/int.mlw | tred > doc/stdlib-dot/library-int.dot
-
-.. graphviz:: stdlib-dot/library-int.dot
+.. graphviz:: generated/library-int.dot
    :caption: Module dependencies in library ``int``.
    :name: fig.lib.int
 
@@ -1548,9 +1546,7 @@ Library ``array``: array data structure
 The ``array`` library contains several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.array`.
 
-.. %EXECUTE bin/why3 pp --output=dep stdlib/array.mlw | tred > doc/stdlib-dot/library-array.dot
-
-.. graphviz:: stdlib-dot/library-array.dot
+.. graphviz:: generated/library-array.dot
    :caption: Module dependencies in library ``array``.
    :name: fig.lib.array
 
