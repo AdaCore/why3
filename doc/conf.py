@@ -76,9 +76,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-nitpicky = True
-nitpick_ignore = [('envvar','PATH')]
-
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -164,6 +161,13 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+
+# -- Specific options -----------------------------------------------------
+
+nitpicky = True
+nitpick_ignore = [('envvar','PATH')]
+
+bibtex_bibfiles = ['manual.bib']
 highlight_language = 'none'
 numfig = True
 
