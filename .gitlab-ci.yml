@@ -40,6 +40,7 @@ sphinx-image:
 
 .docker_template:
   image: "$BUILD_IMAGE"
+  dependencies: []
   tags:
     - docker
 
@@ -157,24 +158,29 @@ deploy:
   tags:
     - shell
 
-.sphinx_template:
-  image: "$SPHINX_IMAGE"
-  tags:
-    - docker
-
 doc:
   stage: build
-  script:
-    - make -f doc.Makefile public/index.html
-  extends: .sphinx_template
-
-pages:
-  stage: deploy
+  image: "$SPHINX_IMAGE"
   script:
     - make -f doc.Makefile public/index.html
   artifacts:
     paths:
       - public
+    expire_in: 1 day
+  tags:
+    - docker
+
+pages:
+  stage: deploy
+  dependencies:
+    - doc
+  script:
+    - echo "Already in public/"
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 day
   only:
     - master
-  extends: .sphinx_template
+  tags:
+    - docker
