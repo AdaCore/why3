@@ -292,41 +292,41 @@ The various
 constructs have the following priorities and associativities, from
 lowest to greatest priority:
 
-+---------------------------------+-----------------+
-| construct                       | associativity   |
-+=================================+=================+
-| ``if then else`` / ``let in``   | –               |
-+---------------------------------+-----------------+
-| attribute                       | –               |
-+---------------------------------+-----------------+
-| cast                            | –               |
-+---------------------------------+-----------------+
-| ``->`` / ``<->``                | right           |
-+---------------------------------+-----------------+
-| ``by`` / ``so``                 | right           |
-+---------------------------------+-----------------+
-| ``\/`` / ``||``                 | right           |
-+---------------------------------+-----------------+
-| ``/\`` / ``&&``                 | right           |
-+---------------------------------+-----------------+
-| ``not``                         | –               |
-+---------------------------------+-----------------+
-| infix-op level 1                | left            |
-+---------------------------------+-----------------+
-| infix-op level 2                | left            |
-+---------------------------------+-----------------+
-| infix-op level 3                | left            |
-+---------------------------------+-----------------+
-| infix-op level 4                | left            |
-+---------------------------------+-----------------+
-| prefix-op                       | –               |
-+---------------------------------+-----------------+
-| function application            | left            |
-+---------------------------------+-----------------+
-| brackets / ternary brackets     | –               |
-+---------------------------------+-----------------+
-| bang-op                         | –               |
-+---------------------------------+-----------------+
++------------------------------------+-----------------+
+| construct                          | associativity   |
++====================================+=================+
+| ``if then else`` / ``let in``      | –               |
++------------------------------------+-----------------+
+| attribute                          | –               |
++------------------------------------+-----------------+
+| cast                               | –               |
++------------------------------------+-----------------+
+| ``->`` / ``<->`` / ``by`` / ``so`` | right           |
++------------------------------------+-----------------+
+| ``\/`` / ``||``                    | right           |
++------------------------------------+-----------------+
+| ``/\`` / ``&&``                    | right           |
++------------------------------------+-----------------+
+| ``not``                            | –               |
++------------------------------------+-----------------+
+| infix-op level 1                   | right           |
++------------------------------------+-----------------+
+| ``at`` / ``old``                   | –               |
++------------------------------------+-----------------+
+| infix-op level 2                   | left            |
++------------------------------------+-----------------+
+| infix-op level 3                   | left            |
++------------------------------------+-----------------+
+| infix-op level 4                   | left            |
++------------------------------------+-----------------+
+| prefix-op                          | –               |
++------------------------------------+-----------------+
+| function application               | left            |
++------------------------------------+-----------------+
+| brackets / ternary brackets        | –               |
++------------------------------------+-----------------+
+| bang-op                            | –               |
++------------------------------------+-----------------+
 
 For example, as was mentioned above,
 tight operators have the highest precedence of all operators, so that
@@ -334,11 +334,12 @@ tight operators have the highest precedence of all operators, so that
 ``!p.x`` denotes the field ``x`` of a record stored in the reference
 ``p``.
 
+Infix operators from groups 2-4 are left-associative. Infix operators
+from group 1 are right-associative and can be chained. For example, the
+term ``0 <= i < j < length a`` is parsed as the conjunction of three
+inequalities ``0 <= i``, ``i < j``, and ``j < length a``.
 Note that infix symbols of level 1 include equality (``=``) and
 disequality (``<>``).
-
-Note the curryfied syntax for function application, though partial
-application is not allowed (rejected at typing).
 
 An operator in parentheses acts as an identifier referring to that
 operator, for example, in a definition. To distinguish between prefix
@@ -346,6 +347,14 @@ and infix operators, an underscore symbol is appended at the end: for
 example, ``(-)`` refers to the binary subtraction and ``(-_)`` to the
 unary negation. Tight operators cannot be used as infix operators, and
 thus do not require disambiguation.
+
+As with normal identifiers, we can put a qualifier over a parenthesised
+operator, e.g., ``Map.S.([]) m i``. Also, as noted above, a qualifier
+can be put over a parenthesised term, and the parentheses can be omitted
+if the term is a record or a record update.
+
+Note the curryfied syntax for function application, though partial
+application is not allowed (rejected at typing).
 
 .. _rubric.collections_syntax:
 
@@ -388,7 +397,7 @@ numbers it is possible to write ``[|t1;t2;t3|]`` as a shortcut for
 
 .. index:: at; syntax
 .. index:: old; syntax
-.. rubric:: Refering to past program states using "at" and "old" operators
+.. rubric:: The "at" and "old" operators
 
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
@@ -396,16 +405,6 @@ past moment of execution (see the next section for details). These
 operators have higher precedence than the infix operators from group 1
 (:token:`infix_op_1`): ``old i > j`` is parsed as ``(old i) > j`` and not as
 ``old (i > j)``.
-
-Infix operators from groups 2-4 are left-associative. Infix operators
-from group 1 are non-associative and can be chained. For example, the
-term ``0 <= i < j < length a`` is parsed as the conjunction of three
-inequalities ``0 <= i``, ``i < j``, and ``j < length a``.
-
-As with normal identifiers, we can put a qualifier over a parenthesised
-operator, e.g., ``Map.S.([]) m i``. Also, as noted above, a qualifier
-can be put over a parenthesised term, and the parentheses can be omitted
-if the term is a record or a record update.
 
 .. index:: &&, ||, by, so
 .. rubric:: Non-standard connectives
@@ -649,17 +648,17 @@ includes applications of infix operators, with the only exception of
 lazy operators ``&&`` and ``||`` which evaluate from left to right,
 lazily.
 
-.. index:: specification clauses
+.. index:: past program states
 .. index:: at
 .. index:: old
-.. rubric:: Specification clauses
+.. index:: label
+.. rubric:: Referring to past program states using "at" and "old" operators
 
-The syntax for specification clauses in programs is given in
-:token:`spec`.  Within specifications, terms are extended with
-constructs `old` and `at`.  Within a postcondition, `old t` refers to
-the value of term `t` in the prestate. Within the scope of a code mark
-`L`, the term `at t L` refers to the value of term `t` at the program
-point corresponding to `L`.
+Within specifications, terms are extended with
+constructs ``old`` and ``at``.  Within a postcondition, ``old t`` refers to
+the value of term ``t`` in the prestate. Within the scope of a code label
+``L``, introduced with ``label L in ...``, the term ``at t L`` refers to the
+value of term ``t`` at the program point corresponding to ``L``.
 
 .. index:: for loop, invariant; for loop
 .. rubric:: The “for” loop
