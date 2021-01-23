@@ -235,7 +235,7 @@ extract () {
     shift
     for f in $dir/*.mlw; do
         printf "  $f... "
-        if ($pgm $@ $f -o bench_test.ml && ocaml -noinit bench_test.ml) > /dev/null 2> /dev/null; then
+        if ($pgm $@ $f -o bench_test.ml && ocamlfind ocamlc -c -package zarith bench_test.ml) > /dev/null 2> /dev/null; then
             echo "ok"
         else
             echo "extract test failed!"

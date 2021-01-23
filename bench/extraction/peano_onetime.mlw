@@ -1,0 +1,26 @@
+
+(* check OCaml extraction of Peano and OneTime integers *)
+
+use mach.peano.Peano
+
+let test_peano () =
+  let low = zero in
+  let high = succ (succ (succ (abs (neg one)))) in
+  let x = add one one low high in
+  let y = sub x x low high in
+  let z = mul one y low high in
+  lt x y && le y z && gt z z && ge x z && eq x x && ne y z,
+  add one (of_int 2 low high) low high
+
+use mach.onetime.OneTime
+
+let test_onetime () =
+  let x = succ (zero ()) in
+  let y = add x (one ()) in
+  let z = abs (neg (pred (transfer y))) in
+  let t = to_peano y in
+  let a, b = split z t in
+  lt x y && le y z && gt z z && ge x z && eq x x && ne y z,
+  sub a b
+
+
