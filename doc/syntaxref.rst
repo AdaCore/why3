@@ -636,9 +636,92 @@ of the ternary bracket operator ``([]<-)`` and cannot be used in a
 multiple assignment.
 
 .. index:: auto-dereference
+.. index:: reference
 .. rubric:: Auto-dereference: simplified usage of mutable variables
 
-TODO: put here what is currently in the release notes.
+Some syntactic sugar is provided to ease the use of mutable variables
+(aka references), in such a way that the bang character is no more
+needed to access the value of a reference, in both logic and programs.
+This syntactic sugar summarized in the following table.
+
++-------------------------+-------------------------------+
+| auto-dereference syntax | desugared to                  |
++=========================+===============================+
+| ``let &x = ... in``     | ``let (x: ref ...) = ... in`` |
++-------------------------+-------------------------------+
+| ``f x``                 | ``f x.contents``              |
++-------------------------+-------------------------------+
+| ``x <- ...``            | ``x.contents <- ...``         |
++-------------------------+-------------------------------+
+| ``let ref x = ...``     | ``let &x = ref ...``          |
++-------------------------+-------------------------------+
+
+Notice that
+
+- the ``&`` marker adds the typing constraint ``(x: ref ...)``;
+- top-level ``let/val ref`` and ``let/val &`` are allowed;
+- auto-dereferencing works in logic, but such variables
+  cannot be introduced inside logical terms.
+
+Here is an example:
+
+.. code-block:: whyml
+
+    let ref x = 0 in while x < 100 do invariant { 0 <= x <= 100 } x <- x + 1 done
+
+That syntactic sugar is further extended to pattern matching, function
+parameters, and reference passing, as follows.
+
++----------------------------------+-----------------------------------------------------+
+| auto-dereference syntax          | desugared to                                        |
++==================================+=====================================================+
+| ``match e with (x,&y) -> y end`` | ``match e with (x,(y: ref ...)) -> y.contents end`` |
++----------------------------------+-----------------------------------------------------+
+| .. code-block:: whyml            | .. code-block:: whyml                               |
+|                                  |                                                     |
+|    let incr (&x: ref int) =      |    let incr (x: ref int) =                          |
+|      x <- x + 1                  |      x.contents <- x.contents + 1                   |
+|                                  |                                                     |
+|    let f () =                    |    let f () =                                       |
+|      let ref x = 0 in            |      let x = ref 0 in                               |
+|      incr x;                     |      incr x;                                        |
+|      x                           |      x.contents                                     |
++----------------------------------+-----------------------------------------------------+
+| ``let incr (ref x: int) ...``    | ``let incr (&x: ref int) ...``                      |
++----------------------------------+-----------------------------------------------------+
+
+The type annotation is not required. Let-functions with such formal
+parameters also prevent the actual argument from auto-dereferencing when
+used in logic. Pure logical symbols cannot be declared with such
+parameters.
+
+Auto-dereference suppression does not work in the middle of a relation
+chain: in ``0 < x :< 17``, ``x`` will be dereferenced even if ``(:<)``
+expects a ref-parameter on the left.
+
+Finally, that syntactic sugar applies to the caller side:
+
++-------------------------+-----------------------+
+| auto-dereference syntax | desugared to          |
++=========================+=======================+
+| .. code-block:: whyml   | .. code-block:: whyml |
+|                         |                       |
+|    let f () =           |    let f () =         |
+|      let ref x = 0 in   |      let x = ref 0 in |
+|      g &x               |      g x              |
++-------------------------+-----------------------+
+
+The ``&`` marker can only be attached to a variable. Works in logic.
+
+Ref-binders and ``&``-binders in variable declarations, patterns, and
+function parameters do not require importing ``ref.Ref``. Any example
+that does not use references inside data structures can be rewritten by
+using ref-binders, without importing ``ref.Ref``.
+
+Explicit use of type symbol ``ref``, program function ``ref``, or field
+``contents`` requires importing ``ref.Ref`` or ``why3.Ref.Ref``.
+Operations ``(:=)`` and ``(!)`` require importing ``ref.Ref``.
+Note that operation ``(:=)`` is fully subsumed by direct assignment ``(<-)``.
 
 .. index:: evaluation order
 .. rubric:: Evaluation order
