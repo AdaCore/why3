@@ -656,9 +656,36 @@ lazily.
 
 Within specifications, terms are extended with
 constructs ``old`` and ``at``.  Within a postcondition, ``old t`` refers to
-the value of term ``t`` in the prestate. Within the scope of a code label
-``L``, introduced with ``label L in ...``, the term ``at t L`` refers to the
+the value of term ``t`` in the pre-state. Within the scope of a code label
+``L``, introduced with ``label L in ...``, the term ``t at L`` refers to the
 value of term ``t`` at the program point corresponding to ``L``.
+
+Note that ``old`` can be used in annotations contained in the function
+body as well (assertions, loop invariants), with the exact same meaning: it
+refers to the pre-state of the function. In particular, ``old t`` in
+a loop invariant does not refer to the program point right before the
+loop but to the function entry.
+
+Whenever ``old t`` or ``t at L`` refers to a program point at which
+the term ``t`` does not make sense , because ``t`` mentions variables
+that do not exist at this point, Why3 emits a warning ``this
+`at'/`old' operator is never used`` and the operator ``old``/``at`` is
+ignored. For instance, the following code
+
+.. code-block:: whyml
+
+    let x = ref 0 in assert { old !x = !x }
+
+emits a warning and is provable, as it amounts to proving `0=0`.
+Similarly, if ``old t`` or ``t at L`` refers to a term ``t`` that is
+immutable, Why3 emits the same warning and ignores the operator.
+
+Caveat: Whenever the term ``t`` contains several variables, some of
+them being meaningful at the corresponding program point but others
+not being in scope or being immutable, there is *no warning* and the
+operator ``old``/``at`` is applied where it makes sense and ignored
+elsewhere. This is convenient when writing terms such as ``old a[i]``
+where ``a`` makes sense in the pre-state but ``i`` does not.
 
 .. index:: for loop, invariant; for loop
 .. rubric:: The “for” loop
