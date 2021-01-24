@@ -230,23 +230,23 @@ execute () {
 }
 
 extract () {
-    pgm="bin/why3$suffix extract"
     dir=$1
-    shift
+    dst=$2
     for f in $dir/*.mlw; do
         printf "  $f... "
-        if ($pgm $@ $f -o bench_test.ml && ocamlfind ocamlc -c -package zarith bench_test.ml) > /dev/null 2> /dev/null; then
+        g=$(basename -s.mlw $f).$dst
+        if make -C $dir $g > /dev/null 2> /dev/null; then
             echo "ok"
         else
             echo "extract test failed!"
-            echo $pgm $@ $f
-            $pgm $@ $f -o bench_test.ml
-            ocaml -noinit bench_test.ml
-            rm -f bench_test.ml
+            make -C $dir clean > /dev/null
+            echo make -C $dir $g
+            make -C $dir $g
+            make -C $dir clean > /dev/null
             exit 1
         fi
     done
-    rm -f bench_test.ml
+    make -C $dir clean > /dev/null
 }
 
 extract_and_run () {
@@ -603,7 +603,7 @@ fi
 
 if enabled extraction; then
 echo "=== Checking extraction to OCaml ==="
-extract bench/extraction -D ocaml64
+extract bench/extraction cmo
 extract_and_run examples/euler001 euler001.ml 1000000
 extract_and_run examples/gcd gcd.ml 6 15
 extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml
