@@ -522,7 +522,7 @@ module Log : Log = struct
            (if Mvs.is_empty mvs then "" else " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
     | Exec_loop k ->
-        fprintf fmt "@[<h2>%s execution of loop@]" (exec_kind_to_string k)
+        fprintf fmt "@[<h2>%s iteration of the loop@]" (exec_kind_to_string k)
     | Exec_main (rs, mvs, mrs) ->
         fprintf fmt "@[<h2>Execution of main function %a's body with env:%a%a@]"
           print_decoded rs.rs_name.id_string
@@ -1692,6 +1692,46 @@ let check_posts desc loc env v posts =
     register_failure ctx.c_env t.t_loc ctx.c_desc mid;
     raise e
 
+(** [oldify_variant env var] returns a pair [old_ts, oldies] where [old_ts] are
+    the variant terms where all free variables have been replaced by fresh
+    variables, and [oldies] is a mapping from the fresh variables in [old_ts] to
+    snapshots of the current values of the original variables in [env]. *)
+let oldify_variant env var =
+  let ts = List.map fst var in
+  let free_vs = Mvs.keys (List.fold_left t_freevars Mvs.empty ts) in
+  let aux vs (subst, oldies) =
+    let vs' = create_vsymbol (id_clone vs.vs_name) vs.vs_ty in
+    let v = snapshot (Mvs.find vs env.vsenv) in
+    Mvs.add vs (t_var vs') subst, Mvs.add vs' v oldies in
+  let subst, oldies =
+    List.fold_right aux free_vs (Mvs.empty, Mvs.empty) in
+  let old_ts = List.map (t_subst subst) ts in
+  old_ts, oldies
+
+(** [mk_variant_term env old_ts var] creates a term that represents the validity
+    of variant [var], where [old_ts] are the oldified variant terms. *)
+let mk_variant_term env =
+  let {Pmodule.mod_theory= {Theory.th_export= ns}} =
+    Pmodule.read_module env.env ["int"] "Int" in
+  let ls_int_le = Theory.ns_find_ls ns [Ident.op_infix "<="] in
+  let ls_int_lt = Theory.ns_find_ls ns [Ident.op_infix "<"] in
+  let rec loop old_ts var =
+    match old_ts, var with
+    | [], [] -> t_false
+    | old_t :: old_ts, (t, opt_op) :: var ->
+        let t_here =
+          match opt_op with
+          | Some op -> ps_app op [t; old_t]
+          | None ->
+              match (t_type t).ty_node with
+              | Tyapp (ts, _) when ts_equal ts ts_int ->
+                  t_and (ps_app ls_int_le [t_nat_const 0; old_t])
+                    (ps_app ls_int_lt [t; old_t])
+              | _ -> cannot_compute "loop variant implemented only for int" in
+        t_or t_here (t_and (t_equ old_t t) (loop old_ts var))
+    | _ -> assert false in
+  loop
+
 (* EXPRESSION EVALUATION *)
 
 (* Assuming the real is given in pow2 and pow5 *)
@@ -1997,27 +2037,38 @@ and eval_expr' env e =
            Irred e )
       | r -> r
     end
-  | Ewhile (cond, inv, _var, e1) -> begin
+  | Ewhile (e1, inv, var, e2) ->
       register_loop env e.e_loc Log.ExecConcrete;
-      (* TODO variants *)
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
-      match eval_expr env cond with
-      | Normal v ->
-          if is_true v then (
-            match eval_expr env e1 with
-            | Normal _ ->
-                if env.rac.do_rac then
-                  check_terms (cntr_ctx "Loop invariant preservation" env) inv ;
-                eval_expr env e
-            | r -> r )
-          else if is_false v then
-            Normal unit_value
-          else (
+      let rec loop () =
+        let opt_old_variant =
+          if env.rac.do_rac then Some (oldify_variant env var) else None in
+        match eval_expr env e1 with
+        | Normal v ->
+            if is_true v then (* condition true *)
+              match eval_expr env e2 with
+              | Normal _ -> (* body executed normally *)
+                  if env.rac.do_rac then
+                    check_terms (cntr_ctx "Loop invariant preservation" env) inv;
+                  if env.rac.do_rac then (
+                    let old_ts, oldies = Opt.get opt_old_variant in
+                    let vsenv =
+                      Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
+                    let env = {env with vsenv} in
+                    check_term
+                      (cntr_ctx "Loop variant decrease" ?trigger_loc:e.e_loc env)
+                      (mk_variant_term env old_ts var) );
+                  loop ()
+              | r -> r
+            else if is_false v then (* condition false *)
+              Normal unit_value
+            else (
             Warning.emit "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
               print_value v ;
             Irred e )
-      | r -> r end
+        | r -> r in
+      loop ()
   | Efor (i, (pvs1, dir, pvs2), _ii, inv, e1) when env.rac.rac_abstract -> begin
       (* TODO what to do with _ii? *)
       (* arbitrary execution of an iteartion taken from the counterexample
