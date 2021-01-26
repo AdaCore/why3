@@ -248,7 +248,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
-    x [@field:0:contents] [@introduced] =
+    x [@field:0:contents] [@introduced]
+      [@loop:bench/ce/ref_mono.mlw:50:2:96] =
       {"type": "Record",
        "val":
         {"Field":
@@ -296,7 +297,8 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "107"}}]}}
   Line 50:
-    [before iteration] x [@field:0:contents] [@introduced] =
+    [before iteration] x [@field:0:contents] [@introduced]
+      [@loop:bench/ce/ref_mono.mlw:50:2:96] =
       {"type": "Record",
        "val":
         {"Field":
@@ -334,7 +336,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
-    x [@field:0:contents] [@introduced] =
+    x [@field:0:contents] [@introduced]
+      [@loop:bench/ce/ref_mono.mlw:50:2:96] =
       {"type": "Record",
        "val":
         {"Field":
@@ -371,7 +374,8 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-400"}}]}}
   Line 45:
-    x [@field:0:contents] [@introduced] [@model_trace:x] =
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_mono.mlw:50:2:96]
+      [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
@@ -390,7 +394,8 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "399"}}]}}
   Line 50:
-    x [@field:0:contents] [@introduced] =
+    x [@field:0:contents] [@introduced]
+      [@loop:bench/ce/ref_mono.mlw:50:2:96] =
       {"type": "Record",
        "val":
         {"Field":
