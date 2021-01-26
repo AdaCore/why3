@@ -1,0 +1,23 @@
+
+use int.Int
+
+let f () diverges =
+  let ref x = 0 in
+  [@loop1]
+  while x < 10 do x <- x + 3 done;
+  [@loop2]
+  while x < 100 do x <- x + 7 done;
+  [@loop3]
+  while x < 1000 do x <- x + 10; assert { x < 200 } done
+
+
+
+val h (ref y:int) : unit
+  writes { y }
+  ensures { y > old y }
+
+let g () =
+  let ref x = 0 in
+  [@call1] h x;
+  [@call2] h x;
+  assert { x < 200 }
