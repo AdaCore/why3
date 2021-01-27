@@ -94,6 +94,9 @@ decide_fail () {
         # Inconsistent results in CI
         "bench/ce/jlamp0_CVC4,1.7_WP")
            is_xfail=integer_values;;
+        # Inconsistent results in CI
+        "bench/ce/array_mono_Z3,4.8.4_WP")
+           is_xfail=full;;
         *) is_xfail=none;;
     esac
 }
