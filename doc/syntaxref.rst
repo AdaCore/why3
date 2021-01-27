@@ -864,6 +864,57 @@ u3|]`` will be translated into the following expression:
                if x'x = d'i1 then r'i1 else
                def'e
 
+.. index:: any expression
+.. rubric:: The ``any`` expression
+
+The general form of the ``any`` expression is the following.
+
+.. code-block:: whyml
+
+  any <type> <contract>
+
+This expression non-deterministically evaluates to a value of the
+given type that satisfies the contract. For example, the code
+
+.. code-block:: whyml
+
+  let x = any int ensures { 0 <= result < 100 } in
+  ...
+
+will give to ``x`` any non-negative integer value smaller than 100.
+
+As for contracts on functions, it is allowed to name the result or
+even give a pattern for it. For example the following expression
+returns a pair of integers which first component is smaller than the
+second.
+
+.. code-block:: whyml
+
+  any (int,int) returns { (a,b) -> a <= b }
+
+Notice that an ``any`` expression is not supposed to have side effects
+nor raise exceptions, hence its contract cannot include any
+``writes`` or ``raises`` clauses.
+
+To ensure that this construction is safe, it is mandatory to show that
+there is always at least one possible value to return. It means that
+the VC generator produces a proof obligation of form
+
+.. code-block:: whyml
+
+   exists result:<type>. <post-condition>
+
+In that respect, notice the difference with the construct
+
+.. code-block:: whyml
+
+  val x:<type> <contract> in x
+
+which will not generate any proof obligation, meaning that the
+existence of the value ``x`` is taken for granted.
+
+
+
 Modules
 -------
 
