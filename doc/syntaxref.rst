@@ -206,7 +206,8 @@ function contracts, assertions, definitions of logical functions and
 predicates, axioms, lemmas, etc.
 
 
-.. rubric:: Terms and Formulas
+Terms and Formulas
+^^^^^^^^^^^^^^^^^^
 
 Logical expressions are called *terms*. Boolean terms are called
 *formulas*. Internally, Why3 distinguishes the proper formulas (produced
@@ -360,7 +361,9 @@ application is not allowed (rejected at typing).
 
 .. index:: bracket; syntax
 .. index:: collections; syntax; function literals
-.. rubric:: Specific syntax for collections
+
+Specific syntax for collections
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In addition to prefix and infix operators, WhyML supports several mixfix
 bracket operators to manipulate various collection types: dictionaries,
@@ -397,7 +400,9 @@ numbers it is possible to write ``[|t1;t2;t3|]`` as a shortcut for
 
 .. index:: at; syntax
 .. index:: old; syntax
-.. rubric:: The "at" and "old" operators
+
+The "at" and "old" operators
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
@@ -407,7 +412,9 @@ operators have higher precedence than the infix operators from group 1
 ``old (i > j)``.
 
 .. index:: &&, ||, by, so
-.. rubric:: Non-standard connectives
+
+Non-standard connectives
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The propositional connectives in WhyML formulas are listed in
 :token:`term`. The non-standard connectives — asymmetric
@@ -464,7 +471,9 @@ equivalence: ``A <-> B -> C`` is rejected.
 .. index:: conditionals; syntax
 .. index:: let; syntax
 .. index:: pattern-matching; syntax
-.. rubric:: Conditionals, "let" bindings and pattern-matching
+
+Conditionals, "let" bindings and pattern-matching
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. productionlist::
   term: `term0`
@@ -619,7 +628,9 @@ conjunction and disjunction, respectively.
     variant_term: `term` ("with" `lqualid`)?   ; variant term + WF-order
 
 .. index:: ghost expressions
-.. rubric:: Ghost expressions
+
+Ghost expressions
+^^^^^^^^^^^^^^^^^
 
 Keyword ``ghost`` marks the expression as ghost code added for
 verification purposes. Ghost code is removed from the final code
@@ -627,7 +638,9 @@ intended for execution, and thus cannot affect the computation of the
 program results nor the content of the observable memory.
 
 .. index:: assignment expressions
-.. rubric:: Assignment expressions
+
+Assignment expressions
+^^^^^^^^^^^^^^^^^^^^^^
 
 Assignment updates in place a mutable record field or an element of a
 collection. The former can be done simultaneously on a tuple of values:
@@ -637,7 +650,9 @@ multiple assignment.
 
 .. index:: auto-dereference
 .. index:: reference
-.. rubric:: Auto-dereference: simplified usage of mutable variables
+
+Auto-dereference: simplified usage of mutable variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Some syntactic sugar is provided to ease the use of mutable variables
 (aka references), in such a way that the bang character is no more
@@ -724,7 +739,9 @@ Operations ``(:=)`` and ``(!)`` require importing ``ref.Ref``.
 Note that operation ``(:=)`` is fully subsumed by direct assignment ``(<-)``.
 
 .. index:: evaluation order
-.. rubric:: Evaluation order
+
+Evaluation order
+^^^^^^^^^^^^^^^^
 
 In applications, arguments are evaluated from right to left. This
 includes applications of infix operators, with the only exception of
@@ -735,7 +752,9 @@ lazily.
 .. index:: at
 .. index:: old
 .. index:: label
-.. rubric:: Referring to past program states using "at" and "old" operators
+
+Referring to past program states using "at" and "old" operators
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Within specifications, terms are extended with
 constructs ``old`` and ``at``.  Within a postcondition, ``old t`` refers to
@@ -771,7 +790,9 @@ elsewhere. This is convenient when writing terms such as ``old a[i]``
 where ``a`` makes sense in the pre-state but ``i`` does not.
 
 .. index:: for loop, invariant; for loop
-.. rubric:: The “for” loop
+
+The “for” loop
+^^^^^^^^^^^^^^
 
 The “for” loop of Why3 has the following general form:
 
@@ -805,7 +826,9 @@ It is also possible for ``v`` to be an integer range type (see
 :numref:`sec.range_types`) instead of an integer.
 
 .. index:: for each loop, invariant; for each loop
-.. rubric:: The “for each” loop
+
+The “for each” loop
+^^^^^^^^^^^^^^^^^^^
 
 The “for each” loop of Why3 has the following syntax:
 
@@ -839,7 +862,9 @@ Constructions ``break`` and ``continue`` can be used in for each
 loops, with the expected semantics.
 
 .. index:: collections; syntax; function literals
-.. rubric:: Function literals
+
+Function literals
+^^^^^^^^^^^^^^^^^
 
 Function literals can be written in expressions the same way as they
 are in terms but there are a few subtleties that one must bear in
@@ -865,7 +890,9 @@ u3|]`` will be translated into the following expression:
                def'e
 
 .. index:: any expression
-.. rubric:: The ``any`` expression
+
+The ``any`` expression
+^^^^^^^^^^^^^^^^^^^^^^
 
 The general form of the ``any`` expression is the following.
 
