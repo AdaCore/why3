@@ -133,7 +133,9 @@ let remove_id_attr s id =
   {id with id_ats= List.filter p id.id_ats}
 
 let pp_attr fmt = function
-  | ATstr att -> fprintf fmt "[@%s]" att.Ident.attr_string
+  | ATstr att ->
+     (* `%@` prints a single `@` *)
+     fprintf fmt "[%@%s]" att.Ident.attr_string
   | ATpos loc ->
       let filename, line, bchar, echar = Loc.get loc in
       fprintf fmt "[#%S %d %d %d]%a" filename line bchar echar

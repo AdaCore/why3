@@ -1601,7 +1601,8 @@ let xprinter = create_ident_printer []
 let forget_reg r = forget_id rprinter r.reg_name
 
 let print_reg_name fmt r =
-  fprintf fmt "@@%s" (id_unique rprinter r.reg_name)
+  (* `%@` prints a single `@` *)
+  fprintf fmt "%@%s" (id_unique rprinter r.reg_name)
 
 let print_args pr fmt tl = if tl <> [] then
   fprintf fmt "@ %a" (Pp.print_list Pp.space pr) tl

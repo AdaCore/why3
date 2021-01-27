@@ -179,7 +179,9 @@ let print_id_real info fmt id =
     let th = get_th_name th.Theory.th_name in
     let id = id_unique ipr id in
     if path = "" then fprintf fmt "%s.%s" th id
-    else fprintf fmt "%s@@%s.%s" path th id
+    else
+      (* `%@` prints a single `@` *)
+      fprintf fmt "%s%@%s.%s" path th id
   with Not_found ->
     print_id fmt id
 

@@ -164,7 +164,10 @@ let forget_all () =
   if do_forget_all then forget_all tprinter;
   if do_forget_all then forget_all pprinter
 
-let print_attr fmt a = fprintf fmt "[@%s]" a.attr_string
+let print_attr fmt a =
+  (* `%@` prints a single `@` *)
+  fprintf fmt "[%@%s]" a.attr_string
+
 let print_attrs = print_iter1 Sattr.iter space print_attr
 
 let print_loc fmt l =

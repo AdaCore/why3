@@ -159,9 +159,9 @@ let print_report ses (id,p,l,r) =
        | C.Replay_interrupted ->
           printf "@[<h>replay interrupted@]@."
        | C.Edited_file_absent f ->
-          printf "[@<h>proof script absent (%s)@]@." f
+          printf "@[<h>proof script absent (%s)@]@." f
        | C.Prover_not_installed ->
-          printf "[@<h>not installed@]@."
+          printf "@[<h>not installed@]@."
      end
   | _ ->
      let res =
