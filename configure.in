@@ -116,6 +116,12 @@ AC_ARG_ENABLE(hypothesis-selection,
     AS_HELP_STRING([--disable-hypothesis-selection], [do not support hypothesis selection]),,
     enable_hypothesis_selection=yes)
 
+# stackify
+
+AC_ARG_ENABLE(stackify,
+    AS_HELP_STRING([--disable-stackify], [disable structure reconstruction algorithm for MLCFG]),,
+    enable_stackify=yes)
+
 # documentation
 
 AC_ARG_ENABLE(doc,
@@ -721,6 +727,39 @@ else
    OCAMLGRAPHLIB=
 fi
 
+if test "$enable_stackify" = yes; then
+   DIR=
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query ocamlgraph)
+      if test -n "$DIR"; then
+         echo "ocamlfind found ocamlgraph in $DIR"
+         OCAMLGRAPHLIB="$DIR"
+      else
+         ocamlfind_ocamlgraph=no
+      fi
+   fi
+   if test -z "$DIR"; then
+      OCAMLGRAPHLIB="+ocamlgraph"
+      DIR="$OCAMLLIB/ocamlgraph"
+      AC_CHECK_FILE($DIR/graph.cma,,enable_stackify=no)
+   fi
+   AC_CHECK_FILE($DIR/graph.cmi,,enable_stackify=no)
+   if test "$enable_stackify" = no; then
+      reason_stackify=" (ocamlgraph not found)"
+      AC_MSG_WARN([Lib ocamlgraph not found, stackify disabled.])
+   elif test "$ocamlfind_ocamlgraph" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find ocamlgraph)"
+   fi
+fi
+
+if test "$enable_stackify" = yes; then
+   META_OCAMLGRAPH="ocamlgraph"
+else
+   META_OCAMLGRAPH=
+   OCAMLGRAPHLIB=
+fi
+
 # checking for js_of_ocaml
 if test "$enable_js_of_ocaml" != yes; then
    reason_js_of_ocaml=" (disabled by user)"
@@ -1133,6 +1172,7 @@ AC_SUBST(ISABELLE)
 AC_SUBST(ISABELLEVERSION)
 
 AC_SUBST(enable_hypothesis_selection)
+AC_SUBST(enable_stackify)
 
 AC_SUBST(enable_doc)
 AC_SUBST(enable_pdf_doc)
@@ -1206,6 +1246,7 @@ echo "    Web IDE                 : $enable_web_ide$reason_web_ide"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
+echo "    Stackify                : $enable_stackify$reason_stackify"
 echo "    Invariant inference(exp): $enable_infer$reason_infer"
 echo "    Frama-C support         : $enable_frama_c$reason_frama_c"
 if test "$enable_frama_c" = yes ; then

@@ -1,0 +1,14 @@
+module SimpleLoop
+use int.Int
+let cfg simple_loop () : int =
+var x : int;
+{ x <- 0; goto L0 }
+L0 { x<- 3; switch (x < 10)
+			| True -> goto R
+			| False -> goto L1
+			end
+}
+L1 { x <- 10; goto L0 }
+S { return x }
+R { x <- x + 1; goto S }
+end

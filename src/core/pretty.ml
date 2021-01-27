@@ -362,8 +362,9 @@ and print_app pri ls fmt tl =
       fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
         s (print_lterm 8) t1
   | Ident.SNprefix s, [t1] ->
-      fprintf fmt (protect_on (pri > 5) "@[%s %a@]")
-        s (print_lterm 6) t1
+      let lspace p = if p.[0] = '*' then " " else "" in
+      fprintf fmt (protect_on (pri > 5) "@[%s%s %a@]")
+        (lspace s) s (print_lterm 6) t1
   | Ident.SNinfix s, [t1;t2] ->
       fprintf fmt (protect_on (pri > 5) "@[%a@ %s %a@]")
         (print_lterm 6) t1 s (print_lterm 6) t2
