@@ -213,7 +213,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File record_one_field.mlw:
   Line 13:
-    x [@introduced] =
+    x [@introduced] [@loop:bench/ce/record_one_field.mlw:55:2:96]
+      [@vc:written:55:2:96:bench/ce/record_one_field.mlw] =
       {"proj_name": "contents",
        "type": "Proj",
        "value": {"type": "Integer", "val": "3"}}
@@ -249,7 +250,9 @@ File record_one_field.mlw:
        "type": "Proj",
        "value": {"type": "Integer", "val": "2"}}
   Line 55:
-    [before iteration] x [@introduced] =
+    [before iteration] x [@introduced]
+      [@loop:bench/ce/record_one_field.mlw:55:2:96]
+      [@vc:written:55:2:96:bench/ce/record_one_field.mlw] =
       {"proj_name": "contents",
        "type": "Proj",
        "value": {"type": "Integer", "val": "3"}}
@@ -281,7 +284,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File record_one_field.mlw:
   Line 13:
-    x [@introduced] =
+    x [@introduced] [@loop:bench/ce/record_one_field.mlw:55:2:96]
+      [@vc:written:55:2:96:bench/ce/record_one_field.mlw] =
       {"proj_name": "contents",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
@@ -309,7 +313,8 @@ File record_one_field.mlw:
        "type": "Proj",
        "value": {"type": "Integer", "val": "-2"}}
   Line 50:
-    x [@introduced] [@model_trace:x] =
+    x [@introduced] [@loop:bench/ce/record_one_field.mlw:55:2:96]
+      [@model_trace:x] [@vc:written:55:2:96:bench/ce/record_one_field.mlw] =
       {"proj_name": "contents",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
@@ -324,7 +329,8 @@ File record_one_field.mlw:
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
   Line 55:
-    x [@introduced] =
+    x [@introduced] [@loop:bench/ce/record_one_field.mlw:55:2:96]
+      [@model_trace:x] [@vc:written:55:2:96:bench/ce/record_one_field.mlw] =
       {"proj_name": "contents",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
