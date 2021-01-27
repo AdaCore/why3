@@ -86,7 +86,7 @@ Prover result is: Valid (0.04s, 1016 steps).
                     _ = 1
                 Line 13:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+            - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -122,8 +122,8 @@ Prover result is: Valid (0.04s, 1016 steps).
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
-                Line 16:
-                  Execution got stuck, Cannot continue after arbitrary iteration with:
+                Line 13:
+                  Execution of main function terminated normally
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Validating model:
           File underspec.mlw:
@@ -381,7 +381,7 @@ Prover result is: Valid (0.04s, 1016 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6176 steps).
+Prover result is: Unknown (unknown + incomplete) (0.05s, 6176 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -778,7 +778,7 @@ Prover result is: Valid (0.02s, 1134 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Goal Assertion from verification condition f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6083 steps).
+Prover result is: Unknown (unknown + incomplete) (0.05s, 6083 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:

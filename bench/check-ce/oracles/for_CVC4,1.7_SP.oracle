@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: Valid (0.05s, 1016 steps).
+Prover result is: Valid (0.04s, 1016 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Validating model:
@@ -86,7 +86,7 @@ Prover result is: Valid (0.05s, 1016 steps).
                     _ = 1
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/for.mlw", line 7, characters 2-125)
+            - Abstract: bad model (Abstract RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -122,8 +122,8 @@ Prover result is: Valid (0.05s, 1016 steps).
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
-                Line 7:
-                  Execution got stuck, Cannot continue after arbitrary iteration with:
+                Line 4:
+                  Execution of main function terminated normally
 <check-ce>Check model 1 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Validating model:
           File for.mlw:
@@ -381,7 +381,7 @@ Prover result is: Valid (0.05s, 1016 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6176 steps).
+Prover result is: Unknown (unknown + incomplete) (0.05s, 6176 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
