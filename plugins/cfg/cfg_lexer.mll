@@ -39,12 +39,13 @@
          share/vim/syntax/why3.vim
        *)
       [
-    "cfg", CFG;
-    "goto", GOTO;
-    "var", VAR;
-    "switch", SWITCH;
+        "cfg", CFG;
+        "goto", GOTO;
+        "var", VAR;
+        "switch", SWITCH;
+        "return", TERM_RETURN;
+        "absurd", TERM_ABSURD;
         "abstract", ABSTRACT;
-        "absurd", ABSURD;
         "alias", ALIAS;
         "any", ANY;
         "as", AS;
@@ -104,7 +105,6 @@
         "rec", REC;
         "ref", REF; (* contextual *)
         "requires", REQUIRES;
-        "return", RETURN;
         "returns", RETURNS;
         "scope", SCOPE;
         "so", SO;
