@@ -769,8 +769,7 @@ a loop invariant does not refer to the program point right before the
 loop but to the function entry.
 
 Whenever ``old t`` or ``t at L`` refers to a program point at which
-the term ``t`` does not make sense , because ``t`` mentions variables
-that do not exist at this point, Why3 emits a warning ``this
+none of the variables in ``t`` is defined, Why3 emits a warning ``this
 `at'/`old' operator is never used`` and the operator ``old``/``at`` is
 ignored. For instance, the following code
 
@@ -785,7 +784,7 @@ immutable, Why3 emits the same warning and ignores the operator.
 Caveat: Whenever the term ``t`` contains several variables, some of
 them being meaningful at the corresponding program point but others
 not being in scope or being immutable, there is *no warning* and the
-operator ``old``/``at`` is applied where it makes sense and ignored
+operator ``old``/``at`` is applied where it is defined and ignored
 elsewhere. This is convenient when writing terms such as ``old a[i]``
 where ``a`` makes sense in the pre-state but ``i`` does not.
 
