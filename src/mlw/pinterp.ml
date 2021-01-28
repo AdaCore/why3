@@ -366,7 +366,7 @@ module type Log = sig
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
-    | Exec_loop of exec_kind
+    | Iter_loop of exec_kind
     | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -388,7 +388,7 @@ module type Log = sig
                       Loc.position option -> unit
   val log_any_call : log_uc -> rsymbol option -> value Mvs.t ->
                      Loc.position option -> unit
-  val log_exec_loop : log_uc -> exec_kind -> Loc.position option -> unit
+  val log_iter_loop : log_uc -> exec_kind -> Loc.position option -> unit
   val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Mrs.t ->
                       Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
@@ -412,7 +412,7 @@ module Log : Log = struct
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
-    | Exec_loop of exec_kind
+    | Iter_loop of exec_kind
     | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -451,8 +451,8 @@ module Log : Log = struct
   let log_any_call log_uc rs mvs loc =
     log_entry log_uc (Exec_any (rs,mvs)) loc
 
-  let log_exec_loop log_uc kind loc =
-    log_entry log_uc (Exec_loop kind) loc
+  let log_iter_loop log_uc kind loc =
+    log_entry log_uc (Iter_loop kind) loc
 
   let log_exec_main log_uc rs mvs mrs loc =
     log_entry log_uc (Exec_main (rs,mvs,mrs)) loc
@@ -521,8 +521,8 @@ module Log : Log = struct
            (Pp.print_option Pp.string) (Opt.map (fun rs -> rs.rs_name.id_string) rs)
            (if Mvs.is_empty mvs then "" else " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
-    | Exec_loop k ->
-        fprintf fmt "@[<h2>%s iteration of the loop@]" (exec_kind_to_string k)
+    | Iter_loop k ->
+        fprintf fmt "@[<h2>%s iteration of loop@]" (exec_kind_to_string k)
     | Exec_main (rs, mvs, mrs) ->
         fprintf fmt "@[<h2>Execution of main function %a's body with env:%a%a@]"
           print_decoded rs.rs_name.id_string
@@ -591,10 +591,10 @@ module Log : Log = struct
                   | None -> Null)
               (print_json_field "args" (list (print_key_value vs2string)))
               (Mvs.bindings mvs)
-        | Exec_loop kind ->
+        | Iter_loop kind ->
             fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-          (print_json_field "kind" print_json) (string "EXEC_LOOP")
-          (print_json_field "exec" print_json_kind) kind
+              (print_json_field "kind" print_json) (string "ITER_LOOP")
+              (print_json_field "exec" print_json_kind) kind
         | Exec_main (rs,mvs,mrs) ->
            let mid = Mvs.fold (fun vs v mid -> Mid.add vs.vs_name v mid) mvs Mid.empty in
            let mid = Mrs.fold (fun rs v mid -> Mid.add rs.rs_name v mid) mrs mid in
@@ -632,7 +632,7 @@ module Log : Log = struct
             | Val_assumed _ | Const_init _ | Exec_main _ -> true
             | Exec_call _ | Exec_pure _ | Exec_any _
                  when verb_lvl > 1 -> true
-            | Exec_loop _ when verb_lvl > 2 -> true
+            | Iter_loop _ when verb_lvl > 2 -> true
             | Exec_failed _ | Exec_stucked _ | Exec_ended
                  when verb_lvl > 3 -> true
             | _ -> false) entry_log in
@@ -729,8 +729,8 @@ let register_pure_call env loc ls kind =
 let register_any_call env loc rs mvs =
   Log.log_any_call env.rac.log_uc rs mvs loc
 
-let register_loop env loc kind =
-  Log.log_exec_loop env.rac.log_uc kind loc
+let register_iter_loop env loc kind =
+  Log.log_iter_loop env.rac.log_uc kind loc
 
 let register_exec_main env rs =
   Log.log_exec_main env.rac.log_uc rs env.vsenv env.rsenv rs.rs_name.id_loc
@@ -1993,7 +1993,7 @@ and eval_expr' env e =
         Irred e )
     | r -> r )
   | Ewhile (cond, inv, _var, e1) when env.rac.rac_abstract -> begin
-      (* arbitrary execution of an iteartion taken from the counterexample
+      (* arbitrary execution of an iteration taken from the counterexample
 
         while e1 do invariant {I} e2 done
         ~>
@@ -2010,9 +2010,9 @@ and eval_expr' env e =
             (invariant does not hold after iteration)
         * stop the interpretation here - raise RACStuck *)
       (* assert1 *)
-      register_loop env e.e_loc Log.ExecAbstract;
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
+      register_iter_loop env e.e_loc Log.ExecAbstract;
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
         (Mvs.keys env.vsenv);
       (* assert2 *)
@@ -2020,12 +2020,14 @@ and eval_expr' env e =
       match eval_expr env cond with
       | Normal v ->
          if is_true v then begin
+             register_iter_loop env e.e_loc Log.ExecConcrete;
              match eval_expr env e1 with
              | Normal _ ->
                 if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
                 (* the execution cannot continue from here *)
-                register_stucked env e.e_loc "Cannot continue after arbitrary iteration" Mid.empty;
+                register_stucked env e.e_loc
+                  "Cannot continue after arbitrary iteration" Mid.empty;
                 raise (RACStuck (env,e.e_loc))
              | r -> r
            end
@@ -2038,15 +2040,15 @@ and eval_expr' env e =
       | r -> r
     end
   | Ewhile (e1, inv, var, e2) ->
-      register_loop env e.e_loc Log.ExecConcrete;
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
-      let rec loop () =
+      let rec iter () =
         let opt_old_variant =
           if env.rac.do_rac then Some (oldify_variant env var) else None in
         match eval_expr env e1 with
         | Normal v ->
-            if is_true v then (* condition true *)
+            if is_true v then ( (* condition true *)
+              register_iter_loop env e.e_loc Log.ExecConcrete;
               match eval_expr env e2 with
               | Normal _ -> (* body executed normally *)
                   if env.rac.do_rac then
@@ -2059,16 +2061,16 @@ and eval_expr' env e =
                     check_term
                       (cntr_ctx "Loop variant decrease" ?trigger_loc:e.e_loc env)
                       (mk_variant_term env old_ts var) );
-                  loop ()
+                  iter ()
               | r -> r
-            else if is_false v then (* condition false *)
+            ) else if is_false v then (* condition false *)
               Normal unit_value
             else (
-            Warning.emit "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
+              Warning.emit "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
               print_value v ;
             Irred e )
         | r -> r in
-      loop ()
+      iter ()
   | Efor (i, (pvs1, dir, pvs2), _ii, inv, e1) when env.rac.rac_abstract -> begin
       (* TODO what to do with _ii? *)
       (* arbitrary execution of an iteartion taken from the counterexample
@@ -2102,13 +2104,13 @@ and eval_expr' env e =
             (invariant does not hold for the execution to continue)
         5 - abort1: we have a false counterexample
             (value assigned to i is not compatible with loop range) *)
-      register_loop env e.e_loc Log.ExecAbstract;
       try
         let a = big_int_of_value (get_pvs env pvs1) in
         let b = big_int_of_value (get_pvs env pvs2) in
         let le, suc = match dir with
           | To -> BigInt.le, BigInt.succ
           | DownTo -> BigInt.ge, BigInt.pred in
+        register_iter_loop env e.e_loc Log.ExecAbstract;
         (* assert1 *)
         if le a (suc b) then begin
           if env.rac.do_rac then begin
@@ -2127,6 +2129,7 @@ and eval_expr' env e =
             register_stucked env e.e_loc msg mid;
             raise (RACStuck (env,e.e_loc)) end;
           if le a i_bi && le i_bi b then begin
+            register_iter_loop env e.e_loc Log.ExecAbstract;
             (* assert2 *)
             let ctx = cntr_ctx "Assume loop invariant" env in
             check_assume_terms ctx inv;
@@ -2156,18 +2159,21 @@ and eval_expr' env e =
       with NotNum -> Irred e
     end
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) -> (
-    register_loop env e.e_loc Log.ExecConcrete;
+    let le, suc =
+      match dir with
+      | To -> BigInt.le, BigInt.succ
+      | DownTo -> BigInt.ge, BigInt.pred in
     try
       let a = big_int_of_value (get_pvs env pvs1) in
       let b = big_int_of_value (get_pvs env pvs2) in
-      let le, suc =
-        match dir with
-        | To -> BigInt.le, BigInt.succ
-        | DownTo -> BigInt.ge, BigInt.pred in
+      ( if env.rac.do_rac then
+          let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
+          check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
       let rec iter i =
         Debug.dprintf debug_trace_exec "[interp] for loop with index = %s@."
           (BigInt.to_string i) ;
-        if le i b then
+        if le i b then (
+          register_iter_loop env e.e_loc Log.ExecConcrete;
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum i)) env in
           match eval_expr env' e1 with
           | Normal _ ->
@@ -2175,11 +2181,9 @@ and eval_expr' env e =
                 check_terms (cntr_ctx "Loop invariant preservation" env') inv ;
               iter (suc i)
           | r -> r
-        else
-          Normal unit_value in
-      ( if env.rac.do_rac then
-          let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
-          check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
+        ) else
+          Normal unit_value
+        in
       iter a
     with NotNum -> Irred e )
   | Ematch (e0, ebl, el) -> (
