@@ -31,14 +31,16 @@ The following counterexample model has not been verified
 File records_inv.mlw:
   Line 23:
     x [@introduced] =
-      {"proj_name": ".my_field_f",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "2"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "2"}}]}}
   Line 24:
     x [@introduced] [@model_trace:x] =
-      {"proj_name": ".my_field_f",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "2"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "2"}}]}}
 
 File "bench/ce/records_inv.mlw", line 31, characters 9-25:
 Goal Precondition from verification condition record_match_eval_test3'vc.
