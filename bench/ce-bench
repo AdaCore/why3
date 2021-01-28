@@ -97,6 +97,9 @@ decide_fail () {
         # Inconsistent results in CI
         "bench/ce/array_mono_Z3,4.8.4_WP")
            is_xfail=full;;
+        # Inconsistent results in CI
+        "bench/ce/array_mono_Z3,4.8.4_SP")
+           is_xfail=full;;
         *) is_xfail=none;;
     esac
 }
