@@ -102,6 +102,7 @@ let opt_parser = ref None
 let opt_prover = ref None
 let opt_output = ref None
 let opt_timelimit = ref None
+let opt_stepslimit = ref None
 let opt_memlimit = ref None
 let opt_command = ref None
 let opt_task = ref None
@@ -121,6 +122,8 @@ let option_list =
     "<format> select input format (default: \"why\")";
     Key ('t', "timelimit"), Hnd1 (AInt, fun i -> opt_timelimit := Some i),
     "<sec> set the prover's time limit (default=10, no limit=0)";
+    Key ('s', "stepslimit"), Hnd1 (AInt, fun i -> opt_stepslimit := Some i),
+    "<steps> set the prover's step limit (default: no limit)";
     Key ('m', "memlimit"), Hnd1 (AInt, fun i -> opt_memlimit := Some i),
     "<MiB> set the prover's memory limit (default: no limit)";
     Key ('a', "apply-transform"), Hnd1 (AString, add_opt_trans),
@@ -188,6 +191,10 @@ let () = try
       eprintf "Option '-t'/'--timelimit' requires a prover.@.";
       exit 1
     end;
+    if !opt_stepslimit <> None then begin
+      eprintf "Option '-t'/'--stepslimit' requires a prover.@.";
+      exit 1
+    end;
     if !opt_memlimit <> None then begin
       eprintf "Option '-m'/'--memlimit' requires a prover.@.";
       exit 1
@@ -204,8 +211,8 @@ let () = try
   | Some s ->
     let filter_prover = Whyconf.parse_filter_prover s in
     let prover = Whyconf.filter_one_prover config filter_prover in
-    opt_command :=
-      Some (String.concat " " (prover.command :: prover.extra_options));
+    let with_steps = !opt_stepslimit <> None in
+    opt_command := Some (Whyconf.get_complete_command prover ~with_steps);
     opt_driver := Some (prover.driver, prover.extra_drivers)
   | None ->
       ()
@@ -228,6 +235,8 @@ let timelimit = match !opt_timelimit with
   | None -> 10
   | Some i when i <= 0 -> 0
   | Some i -> i
+
+let stepslimit = Opt.get_def 0 !opt_stepslimit
 
 let memlimit = match !opt_memlimit with
   | None -> 0
@@ -294,9 +303,9 @@ let unproved = ref false
 let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
   let open Call_provers in
   let limit =
-    { empty_limit with
-      limit_time = timelimit;
-      limit_mem = memlimit } in
+    { limit_time = timelimit;
+      limit_mem = memlimit;
+      limit_steps = stepslimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
         let call = Driver.prove_task ~command ~limit drv task in
