@@ -168,121 +168,14 @@
                   Execution got stuck, Assume postcondition of (!) with:
                     r = {contents= 3}
                     result = 0
-<check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
-<check-ce>Validating model:
-          File jlamp0.mlw:
-            Line 6:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-            Line 8:
-              b =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "3"}}]}}
-            Line 11:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "3"}}]}}
-            Line 12:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "3"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 8:
-                  b = {contents= 3}
-                  Execution of main function p1's body with env:
-                    a = {contents= 3}
-                    b = {contents= 3}
-                    zero = 0
-                    one = 1
-                Line 11:
-                  Concrete execution of (!) with args:
-                    r = {contents= 3}
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents with args:
-                    arg = {contents= 3}
-              File jlamp0.mlw:
-                Line 11:
-                  Concrete execution of (!) with args:
-                    r = {contents= 0}
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-              File jlamp0.mlw:
-                Line 11:
-                  Concrete execution of (+) with args:
-                    _ = 0
-                    _ = 3
-                  Concrete execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 3
-                Line 12:
-                  Property failure, Assertion with:
-                    a = {contents= 3}
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 8:
-                  b = {contents= 3}
-                  Execution of main function p1's body with env:
-                    a = {contents= 0}
-                    b = {contents= 3}
-                    zero = 0
-                    one = 1
-                Line 11:
-                  Abstract execution of (!) with args:
-                    r = {contents= 3}
-                  result = 0
-              Unknown location:
-                  Execution got stuck, Assume postcondition of (!) with:
-                    r = {contents= 3}
-                    result = 0
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
 - Selected model 1 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: bad model)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Goal Assertion from verification condition p1'vc.
-Prover result is: Timeout (1.00s, 7748141 steps).
+Prover result is: Step limit exceeded (0.98s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -550,169 +443,14 @@ File jlamp0.mlw:
                   Execution got stuck, Assume postcondition of (!) with:
                     r = {contents= 3}
                     result = 0
-<check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
-<check-ce>Validating model:
-          File jlamp0.mlw:
-            Line 6:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "7"}}]}}
-            Line 8:
-              b =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "3"}}]}}
-            Line 10:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "9"}}]}}
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "9"}}]}}
-            Line 11:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "10"}}]}}
-            Line 13:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "9"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 7}
-                Line 8:
-                  b = {contents= 3}
-                  Execution of main function p1's body with env:
-                    a = {contents= 9}
-                    b = {contents= 3}
-                    zero = 0
-                    one = 1
-                Line 11:
-                  Concrete execution of (!) with args:
-                    r = {contents= 3}
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents with args:
-                    arg = {contents= 3}
-              File jlamp0.mlw:
-                Line 11:
-                  Concrete execution of (!) with args:
-                    r = {contents= 7}
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents with args:
-                    arg = {contents= 7}
-              File jlamp0.mlw:
-                Line 11:
-                  Concrete execution of (+) with args:
-                    _ = 7
-                    _ = 3
-                  Concrete execution of (:=) with args:
-                    r = {contents= 7}
-                    v = 10
-                Line 13:
-                  Concrete execution of (!) with args:
-                    r = {contents= 10}
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents with args:
-                    arg = {contents= 10}
-              File jlamp0.mlw:
-                Line 13:
-                  Concrete execution of (>=) with args:
-                    x = 10
-                    y = 10
-                  Concrete execution of (!) with args:
-                    r = {contents= 10}
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents with args:
-                    arg = {contents= 10}
-              File jlamp0.mlw:
-                Line 13:
-                  Concrete execution of (-) with args:
-                    x = 10
-                    y = 1
-              File int.mlw:
-                Line 23:
-                  Concrete execution of (-_) with args:
-                    _ = 1
-                  Concrete execution of (+) with args:
-                    _ = 10
-                    _ = (-1)
-              File jlamp0.mlw:
-                Line 13:
-                  Concrete execution of (:=) with args:
-                    r = {contents= 10}
-                    v = 9
-                Line 10:
-                  Property failure, Postcondition of p1 with:
-                    a = {contents= 9}
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 7}
-                Line 8:
-                  b = {contents= 3}
-                  Execution of main function p1's body with env:
-                    a = {contents= 7}
-                    b = {contents= 3}
-                    zero = 0
-                    one = 1
-                Line 11:
-                  Abstract execution of (!) with args:
-                    r = {contents= 3}
-                  result = 0
-              Unknown location:
-                  Execution got stuck, Assume postcondition of (!) with:
-                    r = {contents= 3}
-                    result = 0
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
 - Selected model 1 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: bad model)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: Timeout (1.00s, 6427114 steps).
+Prover result is: Step limit exceeded (0.80s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -986,140 +724,14 @@ File jlamp0.mlw:
                   Execution got stuck, Assume postcondition of (!) with:
                     r = {contents= 3}
                     result = 0
-<check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
-<check-ce>Validating model:
-          File jlamp0.mlw:
-            Line 6:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            Line 8:
-              b =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "3"}}]}}
-            Line 10:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "5"}}]}}
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "5"}}]}}
-            Line 11:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "5"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 2}
-                Line 8:
-                  b = {contents= 3}
-                  Execution of main function p1's body with env:
-                    a = {contents= 5}
-                    b = {contents= 3}
-                    zero = 0
-                    one = 1
-                Line 11:
-                  Concrete execution of (!) with args:
-                    r = {contents= 3}
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents with args:
-                    arg = {contents= 3}
-              File jlamp0.mlw:
-                Line 11:
-                  Concrete execution of (!) with args:
-                    r = {contents= 2}
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents with args:
-                    arg = {contents= 2}
-              File jlamp0.mlw:
-                Line 11:
-                  Concrete execution of (+) with args:
-                    _ = 2
-                    _ = 3
-                  Concrete execution of (:=) with args:
-                    r = {contents= 2}
-                    v = 5
-                Line 13:
-                  Concrete execution of (!) with args:
-                    r = {contents= 5}
-              File ref.mlw:
-                Line 18:
-                  Concrete execution of contents with args:
-                    arg = {contents= 5}
-              File jlamp0.mlw:
-                Line 13:
-                  Concrete execution of (>=) with args:
-                    x = 5
-                    y = 10
-                  Concrete execution of Tuple0 with args:
-                Line 10:
-                  Property failure, Postcondition of p1 with:
-                    a = {contents= 5}
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 2}
-                Line 8:
-                  b = {contents= 3}
-                  Execution of main function p1's body with env:
-                    a = {contents= 2}
-                    b = {contents= 3}
-                    zero = 0
-                    one = 1
-                Line 11:
-                  Abstract execution of (!) with args:
-                    r = {contents= 3}
-                  result = 0
-              Unknown location:
-                  Execution got stuck, Assume postcondition of (!) with:
-                    r = {contents= 3}
-                    result = 0
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
 - Selected model 1 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: bad model)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: Timeout (1.00s, 8128132 steps).
+Prover result is: Step limit exceeded (1.03s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1363,112 +975,14 @@ File jlamp0.mlw:
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-<check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-<check-ce>Validating model:
-          File jlamp0.mlw:
-            Line 6:
-              a =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-            Line 20:
-              c =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "1"}}]}}
-            Line 22:
-              c =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "1"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
-              {contents= 1}
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Concrete execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                Line 21:
-                  Concrete execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
-            - Abstract: good model (Abstract RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Abstract execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                  c = {contents= 1}
-                  result = ()
-                Line 21:
-                  Abstract execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
 - Checked model 1 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: Timeout (1.00s, 7779523 steps).
+Prover result is: Step limit exceeded (0.80s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1505,7 +1019,7 @@ File jlamp0.mlw:
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: Valid (0.01s, 221 steps).
+Prover result is: Valid (0.00s, 221 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>Validating model:
@@ -1654,7 +1168,7 @@ Prover result is: Valid (0.01s, 221 steps).
                    "val":
                     {"Field":
                       [{"field": "contents",
-                        "value": {"type": "Integer", "val": "4"}}]}}
+                        "value": {"type": "Integer", "val": "2"}}]}}
               Line 25:
                 a =
                   {"type": "Record",
@@ -1741,153 +1255,14 @@ Prover result is: Valid (0.01s, 221 steps).
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-<check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
-<check-ce>Validating model:
-          File ref.mlw:
-            Line 18:
-              c =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            File jlamp0.mlw:
-              Line 6:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "0"}}]}}
-              Line 20:
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "1"}}]}}
-              Line 21:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "3"}}]}}
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "2"}}]}}
-              Line 24:
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "4"}}]}}
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "4"}}]}}
-              Line 25:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "5"}}]}}
-              Line 26:
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "4"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
-              {contents= 1}
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Concrete execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                Line 21:
-                  Concrete execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
-            - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Abstract execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                  c = {contents= 1}
-                  result = ()
-                Line 21:
-                  Abstract execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
 - Checked model 1 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Goal Loop variant decrease from verification condition p2'vc.
-Prover result is: Timeout (1.00s, 7673860 steps).
+Prover result is: Step limit exceeded (0.88s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -2142,147 +1517,14 @@ File jlamp0.mlw:
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-<check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-<check-ce>Validating model:
-          File ref.mlw:
-            Line 18:
-              c =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "10"}}]}}
-            File jlamp0.mlw:
-              Line 6:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "0"}}]}}
-              Line 20:
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "1"}}]}}
-              Line 21:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "3"}}]}}
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "10"}}]}}
-              Line 22:
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "12"}}]}}
-              Line 25:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "13"}}]}}
-              Line 26:
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "12"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
-              {contents= 1}
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Concrete execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                Line 21:
-                  Concrete execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
-            - Abstract: good model (Abstract RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Abstract execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                  c = {contents= 1}
-                  result = ()
-                Line 21:
-                  Abstract execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
 - Checked model 1 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: Timeout (1.00s, 7190761 steps).
+Prover result is: Step limit exceeded (0.90s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -2537,147 +1779,14 @@ File jlamp0.mlw:
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-<check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
-<check-ce>Validating model:
-          File ref.mlw:
-            Line 18:
-              c =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            File jlamp0.mlw:
-              Line 6:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "0"}}]}}
-              Line 20:
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "1"}}]}}
-              Line 21:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "9"}}]}}
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "2"}}]}}
-              Line 23:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "11"}}]}}
-              Line 25:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "11"}}]}}
-              Line 26:
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "4"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
-              {contents= 1}
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Concrete execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                Line 21:
-                  Concrete execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
-            - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Abstract execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                  c = {contents= 1}
-                  result = ()
-                Line 21:
-                  Abstract execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
 - Checked model 1 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: Timeout (1.00s, 7417171 steps).
+Prover result is: Step limit exceeded (0.89s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -2929,139 +2038,14 @@ File jlamp0.mlw:
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-<check-ce>Check model 2 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
-<check-ce>Validating model:
-          File ref.mlw:
-            Line 18:
-              c =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "11"}}]}}
-            File jlamp0.mlw:
-              Line 6:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "0"}}]}}
-              Line 19:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "3"}}]}}
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "3"}}]}}
-              Line 20:
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "1"}}]}}
-              Line 21:
-                a =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "3"}}]}}
-                c =
-                  {"type": "Record",
-                   "val":
-                    {"Field":
-                      [{"field": "contents",
-                        "value": {"type": "Integer", "val": "11"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10:
-              {contents= 1}
-<rac-values>No value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Concrete execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                Line 21:
-                  Concrete execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
-            - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File jlamp0.mlw:
-                Line 6:
-                  a = {contents= 0}
-                Line 15:
-                  Constant c initialization
-                  (abstract) execution of any function
-                  result = {contents= 0}
-                Line 17:
-                  _ = ()
-                  Execution of main function p2's body with env:
-                    a = {contents= 0}
-                    c = {contents= 1}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Abstract execution of (:=) with args:
-                    r = {contents= 0}
-                    v = 1
-                  c = {contents= 1}
-                  result = ()
-                Line 21:
-                  Abstract execution of loop
-                Line 22:
-                  Property failure, Loop invariant initialization with:
-                    c = {contents= 1}
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
 - Checked model 1 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Goal Postcondition from verification condition p2'vc.
-Prover result is: Timeout (1.00s, 7746551 steps).
+Prover result is: Step limit exceeded (0.83s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
