@@ -216,12 +216,9 @@ module Complexity
   =
     let ref lo = 0 in
     let ref hi = length a in
-    let ref r = -1 in
     while lo < hi do
       invariant { 0 <= lo <= hi <= length a }
-      invariant { r = - 1 &&
-                  (forall i. 0 <= i < lo || hi <= i < length a -> a[i] <> v)
-               || 0 <= r < length a && a[r] = v }
+      invariant { forall i. 0 <= i < lo || hi <= i < length a -> a[i] <> v }
       invariant { (time - old time) + f (hi - lo) <= f (length a) }
       variant   { hi - lo }
       let mid = lo + div (hi - lo) 2 in
@@ -229,12 +226,10 @@ module Complexity
         lo <- mid + 1
       else if a[mid] > v then
         hi <- mid
-      else begin
-        r <- mid;
-        lo <- hi;
-      end;
+      else
+        return mid;
       time <- time + 1
     done;
-    r
+    -1
 
 end
