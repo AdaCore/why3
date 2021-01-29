@@ -62,34 +62,30 @@
               
             - Abstract: don't know (Abstract RAC terminated because Precondition of (+) cannot be evaluated)
               
-<check-ce>Check model 2 ("bench/check-ce/tuple1.mlw", line 7, characters 14-19)
-<check-ce>Validating model:
-          
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74, taking default.
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: don't know (Concrete RAC terminated because Assume postcondition of anonymous function cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Assume postcondition of anonymous function cannot be evaluated)
-              
 <check-ce>Models:
 - Checked model 0 (Concrete: don't know, Abstract: don't know)
     Summary: The following counterexample model has not been verified
     (Concrete RAC terminated because Assume postcondition of anonymous function cannot be evaluated)
-- Checked model 1 (Concrete: don't know, Abstract: don't know)
+- Selected model 1 (Concrete: don't know, Abstract: don't know)
     Summary: The following counterexample model has not been verified
     (Concrete RAC terminated because Precondition of (+) cannot be evaluated)
-- Selected model 2 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Assume postcondition of anonymous function cannot be evaluated)
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-19:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: Timeout (1.00s, 2327465 steps).
+Prover result is: Step limit exceeded (0.14s).
 The following counterexample model could not be verified
-  (Concrete RAC terminated because Assume postcondition of anonymous function cannot be evaluated):
-
+  (Concrete RAC terminated because Precondition of (+) cannot be evaluated):
+File int.mlw:
+  Line 432:
+    max_int = {int63'int => 4611686018427387903 (4611686018427387903)}
+  Line 434:
+    min_int = {int63'int => -4611686018427387904 (-4611686018427387904)}
+File tuple1.mlw:
+  Line 6:
+    a = {int63'int => 0 (0)}
+    b = {int63'int => 0 (0)}
+  Line 7:
+    a = {int63'int => 0 (0)}
+    b = {int63'int => 0 (0)}
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-23:
 Goal Integer overflow from verification condition swap'vc.
