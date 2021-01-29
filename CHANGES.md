@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 1.4.0, March 13, 2021
+-----------------------------
+
 WhyML
   * sub-namespaces are now allowed in `for each` loops; see Section 7.4.7 of the manual
   * function literals are now supported; see Sections 7.3.2 and 7.4.9 of the manual
@@ -34,7 +37,7 @@ Tools
 IDE
   * native keyboard modifiers are now used on macOS
   * `why3 ide` in the Docker image can now be used through a web browser
-    instead of a X server; see Section 5.1.2 of the manual
+    instead of an X server; see Section 5.1.2 of the manual
 
 Input Formats
   * a new front-end named MLCFG was added; it supports unstructured program codes,
@@ -89,6 +92,8 @@ Additional bug fixes
   * fixed SMT translation of negative floating-point literals
   * fixed set of reserved symbols for SMT solvers
   * restored `hypothesis_selection` transformation
+  * fixed unsoundness of transformations `case` and `destruct` in presence
+    of polymorphic formulas
 
 Version 1.3.3, September 11, 2020
 ---------------------------------
