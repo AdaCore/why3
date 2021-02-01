@@ -71,21 +71,21 @@
     (Concrete RAC terminated because Precondition of (+) cannot be evaluated)
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-19:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: Step limit exceeded (0.13s).
+Prover result is: Step limit exceeded (0.12s).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of (+) cannot be evaluated):
 File int.mlw:
   Line 432:
-    max_int = {int63'int => 4611686018427387903 (4611686018427387903)}
+    max_int = {int63'int => 4611686018427387903 (0X3FFFFFFFFFFFFFFF)}
   Line 434:
-    min_int = {int63'int => -4611686018427387904 (-4611686018427387904)}
+    min_int = {int63'int => -4611686018427387904 (-0X4000000000000000)}
 File tuple1.mlw:
   Line 6:
-    a = {int63'int => 0 (0)}
-    b = {int63'int => 0 (0)}
+    a = {int63'int => 0}
+    b = {int63'int => 0}
   Line 7:
-    a = {int63'int => 0 (0)}
-    b = {int63'int => 0 (0)}
+    a = {int63'int => 0}
+    b = {int63'int => 0}
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-23:
 Goal Integer overflow from verification condition swap'vc.

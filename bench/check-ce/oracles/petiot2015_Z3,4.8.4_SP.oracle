@@ -1,10 +1,10 @@
 File "bench/check-ce/petiot2015.mlw", line 16, characters 18-35:
 Goal Variant decrease from verification condition max_rgf'vc.
-Prover result is: Valid (0.02s, 256 steps).
+Prover result is: Valid (0.03s, 256 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 16, characters 18-35:
 Goal Precondition from verification condition max_rgf'vc.
-Prover result is: Valid (0.02s, 9669 steps).
+Prover result is: Valid (0.03s, 9669 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 16, characters 18-35:
 Goal Precondition from verification condition max_rgf'vc.
@@ -20,11 +20,11 @@ Prover result is: Valid (0.01s, 260 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 25, characters 43-60:
 Goal Loop invariant init from verification condition g'vc.
-Prover result is: Valid (0.00s, 64 steps).
+Prover result is: Valid (0.01s, 64 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 26, characters 6-15:
 Goal Index in array bounds from verification condition g'vc.
-Prover result is: Valid (0.00s, 10920 steps).
+Prover result is: Valid (0.01s, 10920 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 24, characters 18-28)
 <check-ce>Validating model:
@@ -148,11 +148,11 @@ The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of g cannot be evaluated):
 File petiot2015.mlw:
   Line 18:
-    i = 1 (1)
+    i = 1
   Line 23:
-    [current iteration] k = 2 (2)
+    [current iteration] k = 2
   Line 24:
-    [current iteration] k = 2 (2)
+    [current iteration] k = 2
 
 <check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 25, characters 43-60)
 <check-ce>Validating model:
@@ -274,11 +274,11 @@ The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of g cannot be evaluated):
 File petiot2015.mlw:
   Line 18:
-    i = 1 (1)
+    i = 1
   Line 23:
-    [current iteration] k = 2 (2)
+    [current iteration] k = 2
   Line 25:
-    [current iteration] j = 1 (1)
+    [current iteration] j = 1
 
 File "bench/check-ce/petiot2015.mlw", line 21, characters 39-56:
 Goal Postcondition from verification condition g'vc.
@@ -290,7 +290,7 @@ Prover result is: Valid (0.01s, 11571 steps).
 
 File bench/check-ce/petiot2015.mlw:
 Goal Out of loop bounds from verification condition g'vc.
-Prover result is: Valid (0.02s, 11613 steps).
+Prover result is: Valid (0.00s, 11613 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 38, characters 18-40:
 Goal Loop invariant init from verification condition f'vc.
@@ -298,7 +298,7 @@ Prover result is: Valid (0.01s, 10672 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 40, characters 17-23:
 Goal Index in array bounds from verification condition f'vc.
-Prover result is: Valid (0.02s, 10889 steps).
+Prover result is: Valid (0.01s, 10889 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 40, characters 9-13:
 Goal Index in array bounds from verification condition f'vc.
@@ -306,7 +306,7 @@ Prover result is: Valid (0.01s, 10885 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 191 steps).
+Prover result is: Valid (0.00s, 191 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
@@ -314,7 +314,7 @@ Prover result is: Valid (0.01s, 126 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 44, characters 12-16:
 Goal Index in array bounds from verification condition f'vc.
-Prover result is: Valid (0.02s, 11072 steps).
+Prover result is: Valid (0.01s, 11072 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 44, characters 4-20:
 Goal Index in array bounds from verification condition f'vc.
@@ -380,14 +380,14 @@ Prover result is: Valid (0.01s, 11373 steps).
     (Concrete RAC terminated because Precondition of f cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 45, characters 4-9:
 Goal Precondition from verification condition f'vc.
-Prover result is: Step limit exceeded (1.23s).
+Prover result is: Step limit exceeded (1.18s).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of f cannot be evaluated):
 File petiot2015.mlw:
   Line 37:
-    i = 176 (176)
+    i = 176 (0XB0)
   Line 45:
-    i = 176 (176)
+    i = 176 (0XB0)
 
 <check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 46, characters 37-54)
 <check-ce>Validating model:
@@ -433,18 +433,18 @@ File petiot2015.mlw:
     (Concrete RAC terminated because Precondition of f cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 46, characters 37-54:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (1.28s).
+Prover result is: Step limit exceeded (1.19s).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of f cannot be evaluated):
 File petiot2015.mlw:
   Line 37:
-    i = 401 (401)
+    i = 401 (0X191)
   Line 46:
-    j = 0 (0)
+    j = 0
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.00s, 164 steps).
+Prover result is: Valid (0.01s, 164 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 34, characters 6-105)
 <check-ce>Validating model:
@@ -488,14 +488,14 @@ Prover result is: Valid (0.00s, 164 steps).
     (Concrete RAC terminated because Precondition of f cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Step limit exceeded (1.55s).
+Prover result is: Step limit exceeded (1.44s).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of f cannot be evaluated):
 File petiot2015.mlw:
   Line 34:
     the check fails with all inputs
   Line 37:
-    i = 55 (55)
+    i = 55 (0X37)
 
 File "bench/check-ce/petiot2015.mlw", line 39, characters 16-17:
 Goal Loop variant decrease from verification condition f'vc.
@@ -507,7 +507,7 @@ Prover result is: Valid (0.01s, 11145 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.00s, 174 steps).
+Prover result is: Valid (0.01s, 174 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
@@ -527,7 +527,7 @@ Prover result is: Valid (0.01s, 11222 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 45, characters 4-9:
 Goal Precondition from verification condition f'vc.
-Prover result is: Valid (0.00s, 487 steps).
+Prover result is: Valid (0.01s, 487 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 46, characters 37-54:
 Goal Assertion from verification condition f'vc.
@@ -535,7 +535,7 @@ Prover result is: Valid (0.01s, 11229 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.00s, 163 steps).
+Prover result is: Valid (0.01s, 163 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
