@@ -300,17 +300,11 @@ let print_float_human fmt f =
 
 let print_integer fmt (i: BigInt.t) =
   pp_print_string fmt (BigInt.to_string i);
-  (* Print hex representation only when they aren't redundant: *)
   if BigInt.(gt (abs i) (of_int 9)) then
-    if BigInt.(le (of_int min_int) i && le i (of_int max_int)) then
-      let i = BigInt.to_int i in
-      fprintf fmt " (%t0x%X)"
-        (fun fmt -> if i < 0 then pp_print_string fmt "-")
-        (abs i)
-    else
-      fprintf fmt " (%t0x%a)"
-        (fun fmt -> if BigInt.sign i < 0 then pp_print_string fmt "-")
-        (Number.print_in_base 16 None) (BigInt.abs i)
+    (* Print hex representation only when it isn't redundant *)
+    fprintf fmt " (%t0X%a)"
+      (fun fmt -> if BigInt.sign i < 0 then pp_print_string fmt "-")
+      (Number.print_in_base 16 None) (BigInt.abs i)
 
 let rec print_array_human fmt (arr : model_array) =
   let print_others fmt v =
