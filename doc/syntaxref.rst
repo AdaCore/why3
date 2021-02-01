@@ -595,6 +595,8 @@ conjunction and disjunction, respectively.
         : | "while" `expr` "do" `invariant`* `variant`? `expr` "done"   ; while loop
         : | "for" `lident` "=" `expr` ("to" | "downto") `expr` "do" `invariant`* `expr` "done"   ; for loop
         : | "for" `pattern` "in" `expr` "with" `uident` ("as" `lident_nq`)? "do"  `invariant`* `variant`? `expr` "done" ; for each loop
+        : | "break" `lident`?   ; loop break
+        : | "continue" `lident`?   ; loop continue
         : | ("assert" | "assume" | "check") "{" `term` "}"   ; assertion
         : | "raise" `uqualid` `expr`?   ; exception raising
         : | "raise" "(" `uqualid` `expr`? ")"
@@ -857,8 +859,28 @@ As shown above, the iterator is named ``it``. It can be referred to
 within annotations. A different name can be specified, using syntax
 ``with S as x do``.
 
-Constructions ``break`` and ``continue`` can be used in for each
-loops, with the expected semantics.
+.. index:: while loop, for loop, break, continue
+
+Break & Continue
+^^^^^^^^^^^^^^^^
+
+
+The ``break`` and ``continue`` statements can be used in ``while``,
+``for`` and ``for-each`` loops, with the expected semantics. The
+statements take an optional identifier which can be used to break
+out of nested loops. This identifier can be defined using ``label``
+like in the following example:
+
+.. code-block:: whyml
+
+    label A in
+    while true do
+      variant...
+      while true do
+        variant..
+        break A (* abort the outer loop *)
+      done
+    done
 
 .. index:: collections; syntax; function literals
 
