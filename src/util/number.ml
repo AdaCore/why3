@@ -176,7 +176,7 @@ let char_of_int i =
 let print_in_base radix digits fmt i =
   assert (BigInt.ge i BigInt.zero);
   let digits = Opt.get_def 1 digits in
-  let is_small_int = BigInt.(le (of_int min_int) i && le i (of_int max_int)) in
+  let is_small_int = BigInt.is_int i in
   if is_small_int && radix = 8 then
     Format.fprintf fmt "%0*o" digits (BigInt.to_int i)
   else if is_small_int && radix = 10 then
