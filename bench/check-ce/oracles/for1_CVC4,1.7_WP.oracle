@@ -51,13 +51,16 @@ Prover result is: Valid (0.02s, 1191 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of loop
+                  Concrete iteration of loop
                 Line 8:
                   Concrete execution of contents with args:
                     arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
+                Line 6:
+                  Concrete iteration of loop
+                Line 8:
                   Concrete execution of contents with args:
                     arg = {contents= 1}
                   Concrete execution of (+) with args:
@@ -86,7 +89,7 @@ Prover result is: Valid (0.02s, 1191 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 6:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x = {contents= 0}
                   i = 2
                 Line 10:
@@ -140,13 +143,16 @@ Prover result is: Valid (0.02s, 1191 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of loop
+                  Concrete iteration of loop
                 Line 8:
                   Concrete execution of contents with args:
                     arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
+                Line 6:
+                  Concrete iteration of loop
+                Line 8:
                   Concrete execution of contents with args:
                     arg = {contents= 1}
                   Concrete execution of (+) with args:
@@ -175,7 +181,7 @@ Prover result is: Valid (0.02s, 1191 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 6:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x = {contents= 0}
                   i = 2
                 Line 10:
@@ -229,13 +235,16 @@ Prover result is: Valid (0.02s, 1191 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of loop
+                  Concrete iteration of loop
                 Line 8:
                   Concrete execution of contents with args:
                     arg = {contents= 0}
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
+                Line 6:
+                  Concrete iteration of loop
+                Line 8:
                   Concrete execution of contents with args:
                     arg = {contents= 1}
                   Concrete execution of (+) with args:
@@ -264,7 +273,7 @@ Prover result is: Valid (0.02s, 1191 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 6:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x = {contents= 0}
                   i = 2
                 Line 10:
@@ -302,7 +311,7 @@ File for1.mlw:
       contents = 0
     result = {contents= 0}
   Line 6:
-    Abstract execution of loop
+    Abstract iteration of loop
     x = {contents= 0}
     i = 2
   Line 10:
@@ -314,5 +323,5 @@ File for1.mlw:
 
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 1005 steps).
+Prover result is: Valid (0.02s, 1005 steps).
 

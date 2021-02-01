@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: Valid (0.02s, 96 steps).
+Prover result is: Valid (0.03s, 96 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: Valid (0.02s, 1788 steps).
+Prover result is: Valid (0.00s, 1788 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Validating model:
@@ -58,12 +58,12 @@ Prover result is: Valid (0.02s, 1788 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 8:
-                  Concrete execution of loop
                   Concrete execution of contents with args:
                     arg = {contents= 0}
                   Concrete execution of (<) with args:
                     _ = 0
                     _ = 2
+                  Concrete iteration of loop
                 Line 11:
                   Concrete execution of contents with args:
                     arg = {contents= 0}
@@ -83,12 +83,12 @@ Prover result is: Valid (0.02s, 1788 steps).
                     _ = 0
                     _ = 1
                 Line 8:
-                  Concrete execution of loop
                   Concrete execution of contents with args:
                     arg = {contents= 1}
                   Concrete execution of (<) with args:
                     _ = 1
                     _ = 2
+                  Concrete iteration of loop
                 Line 11:
                   Concrete execution of contents with args:
                     arg = {contents= 1}
@@ -108,7 +108,6 @@ Prover result is: Valid (0.02s, 1788 steps).
                     _ = 1
                     _ = 1
                 Line 8:
-                  Concrete execution of loop
                   Concrete execution of contents with args:
                     arg = {contents= 2}
                   Concrete execution of (<) with args:
@@ -142,7 +141,7 @@ Prover result is: Valid (0.02s, 1788 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 8:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x1 = {contents= 0}
                   x2 = {contents= 0}
                   i = {contents= 0}
@@ -151,6 +150,7 @@ Prover result is: Valid (0.02s, 1788 steps).
                   Concrete execution of (<) with args:
                     _ = 0
                     _ = 2
+                  Concrete iteration of loop
                 Line 11:
                   Concrete execution of contents with args:
                     arg = {contents= 0}
@@ -256,12 +256,12 @@ Prover result is: Valid (0.02s, 1788 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 8:
-                  Concrete execution of loop
                   Concrete execution of contents with args:
                     arg = {contents= 0}
                   Concrete execution of (<) with args:
                     _ = 0
                     _ = 2
+                  Concrete iteration of loop
                 Line 11:
                   Concrete execution of contents with args:
                     arg = {contents= 0}
@@ -281,12 +281,12 @@ Prover result is: Valid (0.02s, 1788 steps).
                     _ = 0
                     _ = 1
                 Line 8:
-                  Concrete execution of loop
                   Concrete execution of contents with args:
                     arg = {contents= 1}
                   Concrete execution of (<) with args:
                     _ = 1
                     _ = 2
+                  Concrete iteration of loop
                 Line 11:
                   Concrete execution of contents with args:
                     arg = {contents= 1}
@@ -306,7 +306,6 @@ Prover result is: Valid (0.02s, 1788 steps).
                     _ = 1
                     _ = 1
                 Line 8:
-                  Concrete execution of loop
                   Concrete execution of contents with args:
                     arg = {contents= 2}
                   Concrete execution of (<) with args:
@@ -340,7 +339,7 @@ Prover result is: Valid (0.02s, 1788 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 8:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x1 = {contents= (-2)}
                   x2 = {contents= 0}
                   i = {contents= 0}
@@ -349,6 +348,7 @@ Prover result is: Valid (0.02s, 1788 steps).
                   Concrete execution of (<) with args:
                     _ = 0
                     _ = 2
+                  Concrete iteration of loop
                 Line 11:
                   Concrete execution of contents with args:
                     arg = {contents= 0}
@@ -406,7 +406,7 @@ File while.mlw:
       contents = 0
     result = {contents= 0}
   Line 8:
-    Abstract execution of loop
+    Abstract iteration of loop
     x1 = {contents= (-2)}
     x2 = {contents= 0}
     i = {contents= 0}
@@ -415,6 +415,7 @@ File while.mlw:
     Concrete execution of (<) with args:
       _ = 0
       _ = 2
+    Concrete iteration of loop
   Line 11:
     Concrete execution of contents with args:
       arg = {contents= 0}
@@ -440,9 +441,9 @@ File while.mlw:
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: Valid (0.00s, 1785 steps).
+Prover result is: Valid (0.01s, 1785 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Valid (0.00s, 1720 steps).
+Prover result is: Valid (0.01s, 1720 steps).
 
