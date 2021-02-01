@@ -298,6 +298,20 @@ let print_float_human fmt f =
   | Float_number {binary= {sign; exp; mant}} ->
       fprintf fmt "float_bits(%s,%s,%s)" sign.bv_verbatim exp.bv_verbatim mant.bv_verbatim
 
+let print_integer fmt (i: BigInt.t) =
+  pp_print_string fmt (BigInt.to_string i);
+  (* Print hex representation only when they aren't redundant: *)
+  if BigInt.(gt (abs i) (of_int 9)) then
+    if BigInt.(le (of_int min_int) i && le i (of_int max_int)) then
+      let i = BigInt.to_int i in
+      fprintf fmt " (%t0x%X)"
+        (fun fmt -> if i < 0 then pp_print_string fmt "-")
+        (abs i)
+    else
+      fprintf fmt " (%t0x%a)"
+        (fun fmt -> if BigInt.sign i < 0 then pp_print_string fmt "-")
+        (Number.print_in_base 16 None) (BigInt.abs i)
+
 let rec print_array_human fmt (arr : model_array) =
   let print_others fmt v =
     fprintf fmt "@[others =>@ %a@]" print_model_value_human v in
@@ -336,7 +350,7 @@ and print_bv fmt (bv : model_bv) =
 and print_model_value_human fmt (v : model_value) =
   match v with
   | String s -> Constant.print_string_def fmt s
-  | Integer i -> fprintf fmt "%s (%s)" (BigInt.to_string i.int_value) i.int_verbatim
+  | Integer i -> print_integer fmt i.int_value
   | Decimal d -> fprintf fmt "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac)
   | Fraction f -> fprintf fmt "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den)
   | Float f -> print_float_human fmt f
