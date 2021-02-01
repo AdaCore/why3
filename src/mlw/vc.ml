@@ -219,6 +219,12 @@ let wp_case t bl =
 let wp_forall vl wp = t_forall_close_simp vl [] wp
 let sp_exists vl sp = t_exists_close_simp vl [] sp
 
+(**)
+let t_let_close_simp v t f =
+  if relevant_for_counterexample v.vs_name then t_let_close v t f else
+    t_let_close_simp v t f
+(**)
+
 let wp_let v t wp =
   if pv_is_unit v then t_subst_single v.pv_vs t_void wp
                   else t_let_close_simp v.pv_vs t wp
