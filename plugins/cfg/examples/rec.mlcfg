@@ -18,14 +18,8 @@ with g (y:int) : unit
 =
   {
   switch (y=0)
-  | True -> goto R
-  | False -> goto L
+  | True -> return ()
+  | False -> return f (y-1)
   end
   }
-  R { return () }
-  L {
-    return f (y-1)
-  }
-
-
 end

@@ -119,7 +119,7 @@ let translate_cfg preconds block (blocks : (label * block) list) =
       let branches =
         List.map
           (fun (pat, l) ->
-            let e = translate_goto startlabel (t :: visited_terms) l in
+            let e = translate_term startlabel (t :: visited_terms) l in
             (pat,e))
           cases
       in

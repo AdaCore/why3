@@ -351,9 +351,9 @@ Each block is ended by one of the following terminators:
   .. parsed-literal::
 
      switch (*e*)
-     | *pat*:sub:`1` -> goto `L`:sub:`1`
+     | *pat*:sub:`1` -> *terminator*:sub:`1`
      ...
-     | *pat*:sub:`k` -> goto `L`:sub:`k`
+     | *pat*:sub:`k` -> *terminator*:sub:`k`
      end
 
 - a ``return`` statement: :samp:`return *expr*`
@@ -378,7 +378,7 @@ The extension of syntax is described by the following rules.
     : | "absurd"
     : | "goto" `:ident`
     : | "switch" "(" `:expr` ")" `switch_case`* "end"
-    switch_case: "|" `:pattern` "->" `block`
+    switch_case: "|" `:pattern` "->" `:terminator`
 
 
 
@@ -453,7 +453,7 @@ label ``L2`` to node ``do``.
     i <- i + 1;
     switch (i < length a)
     | True  -> goto L2
-    | False -> goto R
+    | False -> return (m, ind)
     end
   }
   L2 {
@@ -461,9 +461,6 @@ label ``L2`` to node ``do``.
     | True  -> goto L
     | False -> goto L1
     end
-  }
-  R {
-    return (m, ind)
   }
 
 The consecutive invariants act as a single cut in the generation of VCs.

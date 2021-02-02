@@ -37,7 +37,7 @@ and cfg_term_desc =
   (** return from a cfg *)
   | CFGabsurd
   (** unreachable *)
-and switch_branch = Ptree.pattern * label
+and switch_branch = Ptree.pattern * cfg_term
 (** pattern -> regular WhyML expression ; goto ident *)
 
 and block = (cfg_instr list * cfg_term)

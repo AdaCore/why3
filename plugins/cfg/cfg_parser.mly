@@ -91,14 +91,9 @@ instr:
     { mk_cfginstr (CFGinvariant [$2,$4]) $startpos $endpos }
 ;
 
-goto :
-  | GOTO uident
-    { $2 }
-;
-
 terminator :
-  | goto
-    { mk_cfgterm (CFGgoto $1) $startpos $endpos }
+  | GOTO uident
+    { mk_cfgterm (CFGgoto $2) $startpos $endpos }
   | SWITCH LEFTPAR contract_expr RIGHTPAR cases END
     { mk_cfgterm (CFGswitch ($3,$5)) $startpos $endpos }
   | TERM_RETURN contract_expr
@@ -108,8 +103,8 @@ terminator :
 ;
 
 cases:
-  | BAR match_case(goto)
+  | BAR match_case(terminator)
     { [$2] }
-  | BAR match_case(goto) cases
+  | BAR match_case(terminator) cases
     { $2 :: $3 }
 ;

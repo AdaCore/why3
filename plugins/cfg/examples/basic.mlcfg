@@ -74,11 +74,9 @@ let cfg cfg_finite_loop (x:int) : int
   y <- y + 1;
   switch (y <= x)
   | True -> goto L
-  | False -> goto R
+  | False -> return y
   end
   }
-  R { return y }
-
 
 let main () =
   let _ = cfgassert 42 in
