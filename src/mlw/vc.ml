@@ -221,8 +221,16 @@ let sp_exists vl sp = t_exists_close_simp vl [] sp
 
 (**)
 let t_let_close_simp v t f =
-  if relevant_for_counterexample v.vs_name then t_let_close v t f else
-    t_let_close_simp v t f
+  if relevant_for_counterexample v.vs_name then
+    begin
+      (* Format.eprintf "[Vc.t_let_close_simp] %a -> no simp@." Pretty.print_vs v; *)
+      t_let_close v t f
+    end
+  else
+    begin
+      (* Format.eprintf "[Vc.t_let_close_simp] %a -> simp@." Pretty.print_vs v; *)
+      t_let_close_simp v t f
+    end
 (**)
 
 let wp_let v t wp =

@@ -136,10 +136,16 @@ let let_map fn env t1 tb =
      into (forall x. (x = True <-> f) -> h) ? *)
   (**)
   if relevant_for_counterexample x.vs_name then
-    t_let t1 (close x t2)
+    begin
+      (* Format.eprintf "[Eval_match.let_map] %a -> no simp@." Pretty.print_vs x; *)
+      t_let t1 (close x t2)
+    end
   else
-  (**)
-  t_let_simp t1 (close x t2)
+    (**)
+    begin
+      (* Format.eprintf "[Eval_match.let_map] %a -> simp@." Pretty.print_vs x; *)
+      t_let_simp t1 (close x t2)
+    end
 
 let branch_map fn env t1 bl =
   let mk_b b =
