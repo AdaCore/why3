@@ -72,3 +72,4 @@ val pow_int_pos_bigint : int -> t -> t
 val of_string : string -> t
 val to_string : t -> string
 val to_int : t -> int
+val is_int : t -> bool
