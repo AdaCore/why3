@@ -831,3 +831,14 @@ Loop variant decrease has failed at "examples/tests/rac.mlw", line 507, characte
 - Term: p (2 - contents i) (2 - contents i1) \/
         (2 - contents i1) = (2 - contents i) /\ false
 - Variables: i -> {contents= (-2)}, i1 -> {contents= (-1)}
+
+* TestUInt64
+** TestUInt64.test
+<rac-check-term-result>Postcondition of (+) is ok at "WHY3DATA/stdlib/mach/int.mlw", line 567, characters 29-43
+<rac-check-term-result>Postcondition of Tuple0 is ok at "command line expression to execute", line 1, characters 5-7
+<rac-check-term-result>Precondition of (-) has failed at "examples/tests/rac.mlw", line 515, characters 16-21
+                       - Defined at "WHY3DATA/stdlib/mach/int.mlw", line 67, characters 40-57
+Precondition of (-) has failed at "examples/tests/rac.mlw", line 515, characters 16-21
+- Defined at "WHY3DATA/stdlib/mach/int.mlw", line 67, characters 40-57
+- Term: in_bounds (a - b)
+- Variables: a -> 0, b -> 1
