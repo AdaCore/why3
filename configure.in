@@ -896,6 +896,9 @@ if test "$enable_coq_support" = yes; then
       8.12*)
          coq_compat_version="COQ812"
          ;;
+      8.13*)
+         coq_compat_version="COQ813"
+         ;;
       *)
          enable_coq_support=no
          AC_MSG_WARN(You need Coq 8.6 or later; Coq discarded)
