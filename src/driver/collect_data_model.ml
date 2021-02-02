@@ -344,13 +344,13 @@ and bind_prover_vars_tree table tr pv_table = match tr with
    projections from fields so that projections cannot be reconstructed into a
    record. *)
 
-let rec model_value lf pv_table = function
+let rec model_value pm pv_table = function
   | Sval v -> v
-  | Apply (s, ts) -> Model_parser.Apply (s, List.map (model_value lf pv_table) ts)
-  | Array a -> Model_parser.Array (model_array lf pv_table a)
-  | To_array t -> Model_parser.Array (model_array lf pv_table (array_of_term pv_table t))
-  | Record (_n, l) -> Model_parser.Record (List.map (map_snd (model_value lf pv_table)) l)
-  | Prover_var v -> model_value_of_tree lf pv_table (Mstr.find_exn No_value v pv_table)
+  | Apply (s, ts) -> Model_parser.Apply (s, List.map (model_value pm pv_table) ts)
+  | Array a -> Model_parser.Array (model_array pm pv_table a)
+  | To_array t -> Model_parser.Array (model_array pm pv_table (array_of_term pv_table t))
+  | Record (_n, l) -> Model_parser.Record (List.map (map_snd (model_value pm pv_table)) l)
+  | Prover_var v -> model_value_of_tree pm pv_table (Mstr.find_exn No_value v pv_table)
   | Function_var _ -> raise No_value
   | Var _ -> raise No_value
   | Ite _ -> raise No_value
@@ -374,35 +374,39 @@ and array_of_term pv_table = function
       | _ -> Aconst t )
   | t -> Aconst t
 
-and model_array ?(arr_indices=[]) lf pv_table = function
+and model_array ?(arr_indices=[]) lp pv_table = function
   | Avar _ -> raise No_value
-  | Aconst t -> Model_parser.{ arr_indices; arr_others= model_value lf pv_table t }
+  | Aconst t -> Model_parser.{ arr_indices; arr_others= model_value lp pv_table t }
   | Astore (a, t1, t2) ->
       let arr_indices = Model_parser.{
-          arr_index_key= model_value lf pv_table t1;
-          arr_index_value= model_value lf pv_table t2;
+          arr_index_key= model_value lp pv_table t1;
+          arr_index_value= model_value lp pv_table t2;
         } :: arr_indices in
-      model_array ~arr_indices lf pv_table a
+      model_array ~arr_indices lp pv_table a
 
-and model_value_of_def lf pv_table = function
+and model_value_of_def pm pv_table = function
   | Noelement -> Model_parser.Unparsed "NOELEMENT"
   | Function (_, t) | Term t ->
-      model_value lf pv_table t
+      model_value pm pv_table t
 
-and model_value_of_tree lf pv_table = function
-  | Leaf t -> model_value_of_def lf pv_table t
-  | Node fs -> match Mstr.bindings fs with
-      | [] -> raise No_value
-      | [f, t] ->
-          Model_parser.Proj (f, model_value_of_tree lf pv_table t)
-      | fs ->
-          if List.for_all (fun (x, _) -> Mstr.mem x lf) fs then
-            Model_parser.Record (List.map (map_snd (model_value_of_tree lf pv_table)) fs)
-          else
-            Model_parser.Proj (map_snd (model_value_of_tree lf pv_table) (List.hd fs))
+and model_value_of_tree pm pv_table = function
+  | Leaf t -> model_value_of_def pm pv_table t
+  | Node fs ->
+      (* Create a record if all (and any) fields are marked as record fields
+         (marked by [meta_record_def] as listed in [pm.list_fields]), otherwise
+         create a projection if there is a projection field, otherwise fail. *)
+      let fs = Mstr.bindings fs in
+      if fs = [] then
+        raise No_value
+      else if List.for_all (fun (f, _) -> Mstr.mem f pm.list_fields) fs then
+        Model_parser.Record
+          (List.map (map_snd (model_value_of_tree pm pv_table)) fs)
+      else match List.find (fun (f, _) -> Mstr.mem f pm.list_projections) fs with
+        | f, t -> Model_parser.Proj (f, model_value_of_tree pm pv_table t)
+        | exception Not_found -> raise No_value
 
 let model_element pm pv_table (name, tr)  =
-  match model_value_of_tree pm.list_fields pv_table tr with
+  match model_value_of_tree pm pv_table tr with
   | value ->
       let attrs = Mstr.find_def Ident.Sattr.empty name pm.set_str in
       Some (Model_parser.create_model_element ~name ~value ~attrs)

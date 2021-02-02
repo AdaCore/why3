@@ -11,19 +11,22 @@ The following counterexample model has not been verified
 File array_mono.mlw:
   Line 16:
     a [@introduced] =
-      {"proj_name": "length",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
   Line 35:
     a [@introduced] =
-      {"proj_name": "length",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
   Line 36:
     a [@introduced] [@model_trace:a] =
-      {"proj_name": "length",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
 
 File "bench/ce/array_mono.mlw", line 41, characters 4-14:
 Goal Index in array bounds from verification condition f2'vc.

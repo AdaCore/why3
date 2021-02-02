@@ -206,12 +206,15 @@ let rec import_model_value known th_known ity v =
           let rs = match def.Pdecl.itd_constructors with
             | [rs] -> rs
             | _ -> failwith "import_model_value: type with not exactly one constructors" in
-          let assoc_ity rs =
-            get_field_name rs, ity_full_inst subst (fd_of_rs rs).pv_ity in
-          let field_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
-          let field_names, field_values = List.split r in
-          let itys = List.map (fun f -> Mstr.find f field_itys) field_names in
-          let vs = List.map2 (import_model_value known th_known) itys field_values in
+          let aux field_rs =
+            let field_name = get_field_name field_rs in
+            let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
+            match List.assoc field_name r with
+            | v -> import_model_value known th_known field_ity v
+            | exception Not_found ->
+                (* TODO Better create a default value? Requires an [Env.env]. *)
+                undefined_value ity in
+          let vs = List.map aux def.Pdecl.itd_fields in
           constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
           check_not_nonfree def;
