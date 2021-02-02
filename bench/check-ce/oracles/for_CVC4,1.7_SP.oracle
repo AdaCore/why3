@@ -63,7 +63,7 @@ Prover result is: Valid (0.04s, 1016 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 7:
-                  Concrete execution of loop
+                  Concrete iteration of loop
                 Line 9:
                   Concrete execution of (=) with args:
                     x = 0
@@ -74,6 +74,8 @@ Prover result is: Valid (0.04s, 1016 steps).
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
+                Line 7:
+                  Concrete iteration of loop
                 Line 9:
                   Concrete execution of (=) with args:
                     x = 1
@@ -108,10 +110,11 @@ Prover result is: Valid (0.04s, 1016 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 7:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x1 = {contents= 0}
                   x2 = {contents= 0}
                   i = 0
+                  Abstract iteration of loop
                 Line 9:
                   Concrete execution of (=) with args:
                     x = 0
@@ -185,7 +188,7 @@ Prover result is: Valid (0.04s, 1016 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 7:
-                  Concrete execution of loop
+                  Concrete iteration of loop
                 Line 9:
                   Concrete execution of (=) with args:
                     x = 0
@@ -196,6 +199,8 @@ Prover result is: Valid (0.04s, 1016 steps).
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
+                Line 7:
+                  Concrete iteration of loop
                 Line 9:
                   Concrete execution of (=) with args:
                     x = 1
@@ -230,10 +235,11 @@ Prover result is: Valid (0.04s, 1016 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 7:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x1 = {contents= (-1)}
                   x2 = {contents= 0}
                   i = 0
+                  Abstract iteration of loop
                 Line 9:
                   Concrete execution of (=) with args:
                     x = 0
@@ -309,7 +315,7 @@ Prover result is: Valid (0.04s, 1016 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 7:
-                  Concrete execution of loop
+                  Concrete iteration of loop
                 Line 9:
                   Concrete execution of (=) with args:
                     x = 0
@@ -320,6 +326,8 @@ Prover result is: Valid (0.04s, 1016 steps).
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
+                Line 7:
+                  Concrete iteration of loop
                 Line 9:
                   Concrete execution of (=) with args:
                     x = 1
@@ -354,10 +362,11 @@ Prover result is: Valid (0.04s, 1016 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 7:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x1 = {contents= (-1)}
                   x2 = {contents= 0}
                   i = 0
+                  Abstract iteration of loop
                 Line 9:
                   Concrete execution of (=) with args:
                     x = 0
@@ -381,7 +390,7 @@ Prover result is: Valid (0.04s, 1016 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.05s, 6176 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6176 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -405,10 +414,11 @@ File for.mlw:
       contents = 0
     result = {contents= 0}
   Line 7:
-    Abstract execution of loop
+    Abstract iteration of loop
     x1 = {contents= (-1)}
     x2 = {contents= 0}
     i = 0
+    Abstract iteration of loop
   Line 9:
     Concrete execution of (=) with args:
       x = 0

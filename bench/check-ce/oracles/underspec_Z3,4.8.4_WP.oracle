@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: Valid (0.01s, 50 steps).
+Prover result is: Valid (0.02s, 50 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Validating model:
@@ -48,7 +48,7 @@ Prover result is: Valid (0.01s, 50 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 16:
-                  Concrete execution of loop
+                  Concrete iteration of loop
                 Line 18:
                   Concrete execution of (=) with args:
                     x = 0
@@ -59,6 +59,8 @@ Prover result is: Valid (0.01s, 50 steps).
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
+                Line 16:
+                  Concrete iteration of loop
                 Line 18:
                   Concrete execution of (=) with args:
                     x = 1
@@ -93,7 +95,7 @@ Prover result is: Valid (0.01s, 50 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 16:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x1 = {contents= 0}
                   x2 = {contents= 0}
                   i = 2
@@ -162,7 +164,7 @@ Prover result is: Valid (0.01s, 50 steps).
                   Concrete execution of ref'mk with args:
                     contents = 0
                 Line 16:
-                  Concrete execution of loop
+                  Concrete iteration of loop
                 Line 18:
                   Concrete execution of (=) with args:
                     x = 0
@@ -173,6 +175,8 @@ Prover result is: Valid (0.01s, 50 steps).
                   Concrete execution of (+) with args:
                     _ = 0
                     _ = 1
+                Line 16:
+                  Concrete iteration of loop
                 Line 18:
                   Concrete execution of (=) with args:
                     x = 1
@@ -207,10 +211,11 @@ Prover result is: Valid (0.01s, 50 steps).
                     contents = 0
                   result = {contents= 0}
                 Line 16:
-                  Abstract execution of loop
+                  Abstract iteration of loop
                   x1 = {contents= (-1)}
                   x2 = {contents= 0}
                   i = 0
+                  Abstract iteration of loop
                 Line 18:
                   Concrete execution of (=) with args:
                     x = 0
@@ -232,7 +237,7 @@ Prover result is: Valid (0.01s, 50 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Step limit exceeded (1.02s).
+Prover result is: Step limit exceeded (0.86s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -256,10 +261,11 @@ File underspec.mlw:
       contents = 0
     result = {contents= 0}
   Line 16:
-    Abstract execution of loop
+    Abstract iteration of loop
     x1 = {contents= (-1)}
     x2 = {contents= 0}
     i = 0
+    Abstract iteration of loop
   Line 18:
     Concrete execution of (=) with args:
       x = 0
@@ -497,7 +503,7 @@ Prover result is: Valid (0.01s, 1545 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (0.77s).
+Prover result is: Step limit exceeded (0.73s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
