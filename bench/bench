@@ -42,6 +42,16 @@ enabled () {
     test -z "$only" -o "$only" = "$1"
 }
 
+simple_test() {
+    if ! "$@" > /dev/null 2> /dev/null; then
+        echo "failed!"
+        echo "$@"
+        "$@"
+        exit 1
+    fi
+    echo "ok"
+}
+
 # TODO: remove the hack about int.mlw once it has become builtin
 goods () {
     pgm="bin/why3$suffix prove"
@@ -49,21 +59,21 @@ goods () {
     test -d $1 || exit 1
     rm -f bench_errors
     for f in $1/*.[wm][hl][yw] ; do
-	printf "  $f... "
+        printf "  $f... "
         opts="$2"
         if test $f = stdlib/int.mlw; then opts="$2 --type-only"; fi
-	# running Why
-	if ! $pgm $opts $f > /dev/null 2> bench_error; then
-	    echo "FAILED!"
+        # running Why
+        if ! $pgm $opts $f > /dev/null 2> bench_error; then
+            echo "failed!"
 #            echo "env: WHY3DATA='$WHY3DATA'"
             echo "invocation: $pgm $opts $f" | tee -a bench_errors
             cat bench_error | tee -a bench_errors
             ERROR=yes
-	elif test -s bench_error; then
+        elif test -s bench_error; then
             echo "warning!"
             cat bench_error
         else
-	    echo "ok"
+            echo "ok"
         fi
     done
     rm -f bench_error
@@ -79,13 +89,8 @@ plugins () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.$3 ; do
-	printf "  $f... "
-	if ! $pgm $2 $f > /dev/null 2>&1; then
-	    echo "FAILED!"
-            echo "invocation: $pgm $2 $f"
-	    exit 1
-	fi
-	echo "ok"
+        printf "  $f... "
+        simple_test $pgm $2 $f
     done
 }
 
@@ -93,14 +98,14 @@ bads () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.[wm][hl][yw] ; do
-	printf "  $f... "
-	if $pgm $2 $f > /dev/null 2>&1; then
-	    echo "SHOULD FAIL!"
-#            echo "env: WHY3DATA='$WHY3DATA'"
-            echo "invocation: $pgm $2 $f"
-	    exit 1
-	fi
-	echo "ok"
+        printf "  $f... "
+        if $pgm $2 $f > /dev/null 2>&1; then
+            echo "failed! (should have an error)"
+            echo $pgm $2 $f
+            $pgm $2 $f
+            exit 1
+        fi
+        echo "ok"
     done
 }
 
@@ -109,18 +114,20 @@ warns () {
     test -d $1 || exit 1
     rm -f bench_errors
     for f in $1/*.[wm][hl][yw] ; do
-	printf "  $f... "
-	if ! $pgm $2 $f > /dev/null 2>bench_errors; then
-            echo "FAILED!"
-            echo "invocation: $pgm $2 $f"
+        printf "  $f... "
+        if ! $pgm $2 $f > /dev/null 2>bench_errors; then
+            echo "failed!"
+            echo $pgm $2 $f
+            $pgm $2 $f
             exit 1
         fi
         if ! test -s bench_errors; then
-            echo "SHOULD HAVE A WARNING !"
-            echo "invocation: $pgm $2 $f"
+            echo "failed! (should have a warning)"
+            echo $pgm $2 $f
+            $pgm $2 $f
             exit 1
         fi
-	echo "ok"
+        echo "ok"
     done
 }
 
@@ -131,14 +138,14 @@ drivers () {
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
         if [[ $f == drivers/c.drv ]]; then continue; fi
         if [[ $f == drivers/cakeml.drv ]]; then continue; fi
-	printf "  $f... "
-	# running Why
-	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f - > /dev/null; then
-	    echo "why FAILED"
+        printf "  $f... "
+        # running Why
+        if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f - > /dev/null; then
+            echo "failed!"
             echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f -
-	    exit 1
-	fi
-	echo "ok"
+            exit 1
+        fi
+        echo "ok"
     done
 }
 
@@ -147,14 +154,8 @@ valid_goals () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
-	printf "  $f... "
-        if ! $pgm -t 15 -P alt-ergo $2 $f > /dev/null 2>&1; then
-            echo "FAILED!"
-            echo "$pgm -t 15 -P alt-ergo $2 $f"
-            $pgm -t 15 -P alt-ergo $2 $f
-	    exit 1
-       fi
-       echo "ok"
+        printf "  $f... "
+        simple_test $pgm -t 15 -P alt-ergo $2 $f
     done
 }
 
@@ -163,15 +164,14 @@ invalid_goals () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
-	printf "  $f... "
-	if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
-	    echo "invalid test $f failed!"
-	    echo "$pgm -P alt-ergo $f"
-	    $pgm -t 3 -P alt-ergo $f
-	    exit 1
-        else
-	    echo "ok"
-       fi
+        printf "  $f... "
+        if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
+            echo "failed!"
+            echo $pgm -t 3 -P alt-ergo $f
+            $pgm -t 3 -P alt-ergo $f
+            exit 1
+        fi
+        echo "ok"
     done
 }
 
@@ -180,35 +180,26 @@ replay () {
     test -d $1 || exit 1
     for f in $1/*/; do
         printf "  $f... "
-        if $pgm $2 $f > /dev/null 2> /dev/null; then
-            echo "ok"
-        else
-            echo "replay test failed!"
-            echo $pgm $2 $f
-            $pgm $2 $f
-            exit 1
-        fi
+        simple_test $pgm $2 $f
     done
 }
 
 replay_without_shape () {
-    pgm="bin/why3$suffix replay"; test=$1
+    pgm="bin/why3$suffix replay"
+    test=$1
     test -d "$test" || exit 1
-    echo -n "Replay $test with shapes... "
-    if $pgm "$test" > /dev/null 2>&1; then
-        echo "OK."
-    else
-        echo "Failure!"
-        exit 1
-    fi
-    echo -n "Replay $test without shapes... "
+    printf "  $test with shapes... "
+    simple_test $pgm "$test"
+    printf "  $test without shapes... "
     noshapes=$(mktemp -d -p $(dirname "$test") "$(basename "$test")-without-shapes.XXXXXXXX")
     cp "$test/why3session.xml" "$noshapes"
     if $pgm "$noshapes" > /dev/null 2>&1 ; then
-        echo "OK."
+        echo "ok"
         rm -rf "$noshapes"
     else
-        echo "Failure!"
+        echo "failed!"
+        echo $pgm $noshapes
+        $pgm "$noshapes"
         rm -rf "$noshapes"
         exit 1
     fi
@@ -216,13 +207,13 @@ replay_without_shape () {
 
 execute () {
     pgm="bin/why3$suffix execute"
-    echo -n "  ${@:1}... "
+    printf "  ${@:1}... "
     # Run why3execute, discard warnings from the reduction engine
     # Remove `[ $? -eq 2 ]` when value origins (default vs model) can be distinguished in RAC
     if ($pgm "$@" || [ $? -eq 2 ] ) > /dev/null 2> >(grep -v '$warning: reduction of term'); then
         echo "ok"
     else
-        echo "execution test failed!"
+        echo "failed!"
         echo $pgm "$@"
         $pgm "$@"
         exit 1
@@ -238,7 +229,7 @@ extract () {
         if make -C $dir $g > /dev/null 2> /dev/null; then
             echo "ok"
         else
-            echo "extract test failed!"
+            echo "failed!"
             make -C $dir clean > /dev/null
             echo make -C $dir $g
             make -C $dir $g
@@ -379,14 +370,8 @@ extract_and_test_c () {
 
 list_stuff () {
     pgm="bin/why3$suffix"
-    printf '  %s ' "$1"
-    if $pgm $1 > /dev/null; then
-        echo "ok"
-    else
-        echo "$pgm $1 FAIL"
-        $pgm $1
-        exit 1
-    fi
+    printf "  $1... "
+    simple_test $pgm $1
 }
 
 test_mlw_printer () {
@@ -662,8 +647,8 @@ echo ""
 fi
 
 if enabled realizations; then
-echo "=== Checking realizations ==="
-bench/check_realizations.sh || exit $?
+    echo "=== Checking realizations ==="
+    bench/check_realizations.sh || exit $?
 fi
 
 if enabled mlwprinter; then
