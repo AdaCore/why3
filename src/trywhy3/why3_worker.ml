@@ -312,46 +312,45 @@ let why3_parse_theories theories =
      List.iter (fun i -> why3_prove i) subs
     ) theories
 
+let why3_execute_one m rs =
+  let open Expr in
+  let open Pinterp in
+  let e_unit = e_exec (c_app (rs_tuple 0) [] [] (Ity.ity_tuple [])) in
+  let (let_defn,pv) = let_var (Ident.id_fresh "o") e_unit in
+  let e_rs_unit = e_exec (c_app rs [pv] [] rs.rs_cty.Ity.cty_result) in
+  let expr = e_let let_defn e_rs_unit in
+  let result =
+    try
+      let reduce = rac_reduce_config_lit config env ~trans:"compute_in_goal" () in
+      let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
+      let res = eval_global_fundef rac_config env m [] expr in
+      asprintf "returns %a" (report_eval_result expr) res
+    with
+    | Contr (ctx, term) ->
+        asprintf "has failed: %a" report_cntr_body (ctx, term)
+    | CannotCompute r ->
+        asprintf "cannot compute (%s)" r.reason
+    | RACStuck (_, l) ->
+        asprintf "got stuck at %a"
+          (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
+  let {Theory.th_name = th} = m.Pmodule.mod_theory in
+  let mod_name = th.Ident.id_string in
+  let mod_loc = Opt.get_def Loc.dummy_position th.Ident.id_loc in
+  (mod_loc, mod_name ^ ".main " ^ result)
+
 let why3_execute modules =
-    let mods =
-      Wstdlib.Mstr.fold
-        (fun _ m acc ->
-           let {Theory.th_name= th} = m.Pmodule.mod_theory in
-           let mod_name = th.Ident.id_string in
-           let mod_loc = Opt.get_def Loc.dummy_position th.Ident.id_loc in
-           let fun_name = "main" in
-           try
-             let open Expr in
-             let open Pinterp in
-             let e_unit = e_exec (c_app (rs_tuple 0) [] [] (Ity.ity_tuple [])) in
-             let (let_defn,pv) = let_var (Ident.id_fresh "o") e_unit in
-
-             let rs = Pmodule.ns_find_rs m.Pmodule.mod_export [mod_name; fun_name] in
-             let e_rs_unit = e_exec (c_app rs [pv] [] rs.rs_cty.Ity.cty_result) in
-             let expr = e_let let_defn e_rs_unit in
-
-             let result =
-               try
-                 let reduce =
-                   let trans = "compute_in_goal" and prover = None in
-                   rac_reduce_config_lit config env ~trans ?prover () in
-                 let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
-                 let res = eval_global_fundef rac_config env m [] expr in
-                 asprintf "%a@." (report_eval_result expr) res
-               with
-               | Contr (ctx, term) -> asprintf "%a@." report_cntr (ctx, term)
-               | CannotCompute r -> asprintf "Cannot compute (%s)" r.reason
-               | RACStuck (_, l) -> asprintf "Got stuck at %a" (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
-             (mod_loc, mod_name ^ ".main() returns " ^ result)
-             :: acc
-           with Not_found -> acc)
-        modules [] in
-    let result =
-      if mods = [] then
-        Error "No main function found"
-      else
-        let s = List.sort (fun (l1,_) (l2,_) -> Loc.compare l2 l1) mods in
-        Result (List.rev_map snd s) in
+  let mods =
+    Wstdlib.Mstr.fold (fun _ m acc ->
+        match Pmodule.ns_find_rs m.Pmodule.mod_export ["main"] with
+        | rs -> why3_execute_one m rs :: acc
+        | exception Not_found -> acc)
+      modules [] in
+  let result =
+    if mods = [] then
+      Error "No main function found"
+    else
+      let s = List.sort (fun (l1,_) (l2,_) -> Loc.compare l2 l1) mods in
+      Result (List.rev_map snd s) in
   W.send result
 
 
