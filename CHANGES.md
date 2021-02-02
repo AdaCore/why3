@@ -1,42 +1,66 @@
 :x: marks a potential source of incompatibility
 
-Documentation
-  * Why3 modes for editors (Section 5.3)
-  * Why3-specific configuration for shells (Section 5.4)
-  * detailed explanations on semantics of various WhyML statements
-    (Section 7.4)
-  * detailed explanations on WhyML module system (Section 7.5)
-  * explanations on how users can customize drivers (Section 12.5)
-
 WhyML
-  * allow sub-namespace in `for each` loops. See manual Section 7.4.7.
-  * function literals. See manual Sections 7.3.2 and 7.4.9.
+  * sub-namespaces are now allowed in `for each` loops; see Section 7.4.7 of the manual
+  * function literals are now supported; see Sections 7.3.2 and 7.4.9 of the manual
 
-Input Formats
-  * new MLCFG front-end language for unstructured program codes,
-    including goto statements. See manual Section 9.3
-  * micro-C/Python: fixed translation of <> and not
+Standard library
+  * added lemma `permut_sub_trans` to `array.ArrayPermut`
+  * added function `inter` (intersection) to `bag.Bag`
+  * added a new theory `option.Map`
+  * added a precondition to `string.OCaml.([])`
+  * added functions `set`, `init`, `sub` to `mach.array.ArrayInt63`
+  * moved OCaml exception `Invalid_argument` to `ocaml.Exceptions` :x:
+  * added function `length` in `mach.c.String`
+  * added functions `sdiv` and `srem` to `bv`
+  * added signed operations to `mach.bv`
+  * added missing module for double-precision floats to `mach.floats`
 
 Tools
   * command-line options now follow the getopt standard;
-    in particular, long options start with `--`
+    in particular, long options start with `--` :x:
   * binaries `why3config`, `why3prove`, etc, no longer exist;
     they are now plugins that can be loaded only using the main `why3` binary,
-    e.g., `why3 config`
-  * runtime assertion checking for `why3 execute` and for the validation of
-    counterexamples in `why3 prove`. See manual Section 6.8.1.
-  * automatic inference of loop invariants. See manual Section 8.5.
+    e.g., `why3 config` :x:
+  * `why3 config` now uses subcommands instead of options;
+    in particular, prover detection is performed using `why3 config detect`
+    and manual prover addition is performed using `why3 config add-prover`;
+    see Section 6.1 of the manual :x:
+  * `why3 execute` now provides runtime assertion checking; see Section 6.8.1 of the manual
+  * runtime assertion checking is also used to validate counterexamples in `why3 prove`
+  * loop invariants can now be inferred automatically; see Section 8.5 of the manual
+  * JSON output of counterexamples was modified :x:
 
-GTK-based IDE
-  * use native modifiers on macOS
+IDE
+  * native keyboard modifiers are now used on macOS
+  * `why3 ide` in the Docker image can now be used through a web browser
+    instead of a X server; see Section 5.1.2 of the manual
+
+Input Formats
+  * a new front-end named MLCFG was added; it supports unstructured program codes,
+    including `goto` statements; see Section 9.3 of the manual
+  * translation of `<>` and `not` have been fixed for micro-C and Python
+
+Extraction
+  * allowed transitive inclusion (`export`) of interfaces and preludes
+  * added `remove module` for drivers to exclude modules
+  * added C extraction of strings
+  * improved handling of C header files
+  * added support of `blacklist` to C extraction
+  * fixed extraction of partially applied functions
+  * fixed OCaml extraction of nested tuples
+  * fixed OCaml extraction of `OneTime` integers
 
 Web interface TryWhy3
   * `?lang=foo` can now be used to select an input format other than WhyML;
     the input format can also be changed dynamically using a combobox
+  * `?code=foo` can now be used to fill the editor with some code;
+    the encoded string can be retrieved by clicking the "Copy URL" button
   * examples are no longer embedded; only files mentioned
-    in `examples/index.txt` are considered
+    in `examples/index.txt` are considered :x:
+  * Alt-Ergo workers can now be stopped without losing the session
 
-Provers support
+Provers
   * support for PVS 7.1 (released Apr 30, 2020)
   * support for Z3 4.8.7 (released Nov 19, 2019)
   * support for Z3 4.8.8 (released May 9, 2020)
@@ -47,36 +71,24 @@ Provers support
   * support for Coq 8.13.0 (released Jan 7, 2021)
   * support for CVC4 1.8 (released Jun 19, 2020)
 
-Generation of counterexamples
-  * various improvements
-  x changes in the display of counterexamples
-  x changes in the JSON output format
-  x changes in the API. See manual Section 4.10.
+Documentation
+  * Why3 modes for editors (Section 5.3)
+  * Why3-specific configuration for shells (Section 5.4)
+  * detailed explanations on semantics of various WhyML statements (Section 7.4)
+  * detailed explanations on WhyML module system (Section 7.5)
+  * explanations on how users can customize drivers (Section 12.5)
 
 API
-  * new helpers for easier production of parse trees. See manual Section 4.9
+  * helpers were added to ease production of parse trees; see Section 4.9 of the manual
+  * generation of counterexamples was changed; see Section 4.10 of the manual :x:
 
-Standard library
-  * new lemma permut_sub_trans in array.ArrayPermut
-  * added intersection (function `inter`) in bag.Bag
-  * added a new theory option.Map
-  * added a precondition to string.OCaml.([])
-  * added mach.array,ArrayInt63.{set,init,sub}
-  * OCaml exception Invalid_argument moved to ocaml.Exceptions
-  * added a function length in mach.c.String
-  * added functions sdiv and srem in library `bv` for bit-vectors in logic
-  * added signed operations in library `mach.bv` for bit-vectors in
-    programs. Fixed some contracts.
-  * added missing module for double-precision floats in the library
-    `mach.floats`for IEEE-754-based floating-point operations
-
-Various additional bug fixes
-  * fixed bug in OCaml extraction (#509)
-  * fixed bug when `why3 prove` is called on a DIMACS file (#524)
-  * fixed micro-Python parser when no newline at end of file
-  * fixed SMT translation of negative floating-point literals (#548)
-  * fixed set of reserved symbols for SMT solvers (#461)
-
+Additional bug fixes
+  * fixed `why3 prove` when called on a DIMACS file
+  * improved detection of out-of-range values in `why3 execute`
+  * fixed micro-Python parser when there is no newline at end of file
+  * fixed SMT translation of negative floating-point literals
+  * fixed set of reserved symbols for SMT solvers
+  * restored `hypothesis_selection` transformation
 
 Version 1.3.3, September 11, 2020
 ---------------------------------
@@ -160,8 +172,8 @@ API
   * indices of array are now `model_value` for counterexamples :x:
   * ITP constructor `Task` now contains the location of the goal :x:
   * ITP constructor `Source_and_ce` has now 3 arguments instead of 2 :x:
-  * ITP constructors `File_contents` and `Source_and_ce` has a new argument for
-    the file format :x:
+  * ITP constructors `File_contents` and `Source_and_ce` have a new argument
+    for the file format :x:
   * ITP constructor `File_contents` has a new boolean argument for
     interpretation of the file in the IDE as `read_only` :x:
   * new ITP constructor `Ident_notif_loc` :x:
