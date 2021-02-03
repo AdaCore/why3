@@ -126,7 +126,7 @@ let do_input f =
       eprintf "%a@." report_cntr (ctx, term);
       exit 1
   | CannotCompute reason ->
-      eprintf "RAC terminated because %s@." reason.reason;
+      eprintf "Execution terminated because %s@." reason.reason;
       exit 2
   | RACStuck (_, l) ->
       (* TODO Remove this case when value origins (default vs model) can be distinguished

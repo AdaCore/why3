@@ -2332,7 +2332,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
                 ( match f rs arg_vs with
                   | Some v -> Normal v
-                  | None -> cannot_compute "cannot compute builtin" )
+                  | None -> cannot_compute "cannot compute result of builtin %a"
+                              Ident.print_decoded rs.rs_name.id_string )
             | Constructor its_def ->
                 check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
