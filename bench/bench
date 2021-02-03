@@ -405,7 +405,7 @@ rac () {
     for func in $@; do
         echo "** $mod.$func"
         echo -n " $func" >&2
-        bin/why3"$suffix" execute --rac --rac-prover=cvc4 \
+        bin/why3"$suffix" execute --rac --rac-prover=cvc4 --rac-try-negate \
                 --debug=rac-check-term-result \
                 "${RACARGS[@]}" "$file" --use="$mod" "$func ()" 2>&1 |\
             sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" |\
