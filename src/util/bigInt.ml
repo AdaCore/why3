@@ -39,8 +39,7 @@ let gt = gt_big_int
 let le = le_big_int
 let ge = ge_big_int
 
-let euclidean_div_mod x y =
-  if sign y = 0 then zero, zero else quomod_big_int x y
+let euclidean_div_mod x y = quomod_big_int x y
 
 let euclidean_div x y = fst (euclidean_div_mod x y)
 let euclidean_mod x y = snd (euclidean_div_mod x y)
