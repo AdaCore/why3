@@ -2410,7 +2410,7 @@ and exec_call_abstract ?loc ?rs_name env cty arg_pvs ity_result =
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 let bind_globals ?rs_main mod_known env =
-  let get_value id opt_e ity =
+  let get_value env id opt_e ity =
     let name = string_or_model_trace id in
     match env.rac.get_value ~name ?loc:id.id_loc ity with
     | Some v -> register_used_value env id.id_loc id v; v
@@ -2436,14 +2436,14 @@ let bind_globals ?rs_main mod_known env =
   let eval_global _ d env =
     match d.pd_node with
     | PDlet (LDvar (pv, e)) ->
-        let v = get_value pv.pv_vs.vs_name (Some e) e.e_ity in
+        let v = get_value env pv.pv_vs.vs_name (Some e) e.e_ity in
         bind_vs pv.pv_vs v env
     | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
         assert (ce.c_cty.cty_args = []);
         let opt_e = match ce.c_node with
           | Cany -> None | Cfun e -> Some e
           | _ -> failwith "eval_globals: program constant cexp" in
-        let v = get_value rs.rs_name opt_e ce.c_cty.cty_result in
+        let v = get_value env rs.rs_name opt_e ce.c_cty.cty_result in
         if env.rac.do_rac then
           check_assume_posts (cntr_ctx "Any postcondition" env) v ce.c_cty.cty_post;
         bind_rs rs v env )
