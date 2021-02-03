@@ -110,11 +110,13 @@ let simpl_mul _ls t1 t2 _ty =
   raise Undetermined
 
 let simpl_div _ls t1 t2 _ty =
+  if is_zero t2 then raise Undetermined;
   if is_zero t1 then t1 else
   if is_one t2 then t1 else
   raise Undetermined
 
 let simpl_mod _ls t1 t2 _ty =
+  if is_zero t2 then raise Undetermined;
   if is_zero t1 then t1 else
   if is_one t2 then Int (BigInt.zero) else
   raise Undetermined
