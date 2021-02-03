@@ -20,11 +20,14 @@ module Fib
       invariant I1 { 0 <= i <= n };
       invariant I2 { x = fib i /\ y = fib (i + 1) };
       switch (i = n)
-      | True  -> x
-      | False -> y <- x + y; x <- y - x; i <- i + 1; goto L1
+      | True  -> return x
+      | False -> goto L2
       end
     }
-
+    L2 {
+      y <- x + y; x <- y - x; i <- i + 1;
+      goto L1
+    }
 end
 
 module Fact
@@ -48,9 +51,9 @@ module Fact
       invariant I1 { 0 <= x <= x0 };
       invariant I2 { fact x * y = fact x0 };
       switch (x <= 0)
-      | True  -> y
-      | False -> y <- x * y; x <- x - 1; goto L1
+      | True  -> return y
+      | False -> goto L1
       end
     }
-
+    L2 { y <- x * y; x <- x - 1; goto L1 }
 end

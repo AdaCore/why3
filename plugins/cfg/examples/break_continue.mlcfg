@@ -38,11 +38,15 @@ module BreakContinue
       i <- i + 1;
       switch (mod i 2 = 0)
       | True  -> goto Loop (* continue *)
-      | False -> x <- x + i; goto Loop
+      | False -> goto Loop
       end
     }
+    L2 {
+     x <- x + i;
+     goto Loop
+    }
     Break {
-      x
+      return x
     }
 
 end

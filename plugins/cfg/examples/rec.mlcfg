@@ -8,7 +8,7 @@ let rec cfg f (x : int) : unit
   variant { 2 * x + 1 }
 =
   {
-  g x
+  return g x
   }
 
 
@@ -18,13 +18,8 @@ with g (y:int) : unit
 =
   {
   switch (y=0)
-  | True -> ()
-  | False -> goto L
+  | True -> return ()
+  | False -> return f (y-1)
   end
   }
-  L {
-    f (y-1)
-  }
-
-
 end

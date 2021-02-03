@@ -19,22 +19,28 @@ type cfg_instr = {
     cfg_instr_desc : cfg_instr_desc;
     cfg_instr_loc  : Loc.position;
   }
-
+and cfg_term = {
+    cfg_term_desc : cfg_term_desc;
+    cfg_term_loc : Loc.position;
+  }
 and cfg_instr_desc =
-  | CFGgoto of label
-  (** goto a label "goto L" *)
-  | CFGswitch of Ptree.expr * switch_branch list
-  (** pattern-matching *)
   | CFGinvariant of (ident * Ptree.term) list
   (** named invariants *)
   | CFGexpr of Ptree.expr
   (** any other regular WhyML expressions *)
-
-and switch_branch = Ptree.pattern * block
+and cfg_term_desc =
+  | CFGgoto of label
+  (** goto a label "goto L" *)
+  | CFGswitch of Ptree.expr * switch_branch list
+  (** pattern-matching *)
+  | CFGreturn of Ptree.expr
+  (** return from a cfg *)
+  | CFGabsurd
+  (** unreachable *)
+and switch_branch = Ptree.pattern * cfg_term
 (** pattern -> regular WhyML expression ; goto ident *)
 
-and block = cfg_instr list
-
+and block = (cfg_instr list * cfg_term)
 
 type cfg_fundef =
   ident * Ptree.binder list * Ptree.pty * Ptree.pattern * Ity.mask * Ptree.spec *

@@ -9,7 +9,7 @@ let cfg cfgassert (x:int) : int
   =
   {
   assert { x >= 0 };
-  x+1;
+  return x+1
   }
 
 
@@ -24,7 +24,7 @@ let cfg cfggoto (x:int) : int
   }
   L {
   y <- y+1;
-  y
+  return y
   }
 
 let cfg cfg_inv (x:int) : int
@@ -38,7 +38,7 @@ let cfg cfg_inv (x:int) : int
   y <- y + 1;
   invariant J { y >= 1} ;
   y <- y + 1;
-  y
+  return y
   }
 
 
@@ -49,13 +49,13 @@ let cfg cfg_infinite_loop (x:int) : int
   var y:int;
   {
   y <- 0;
-  goto L;
+  goto L
   }
   L {
   y <- y + 1;
   invariant I { exists z. y = z+z+1 };
   y <- y + 1;
-  goto L;
+  goto L
   }
 
 
@@ -66,7 +66,7 @@ let cfg cfg_finite_loop (x:int) : int
   var y:int;
   {
   y <- 0;
-  goto L;
+  goto L
   }
   L {
   y <- y + 1;
@@ -74,10 +74,9 @@ let cfg cfg_finite_loop (x:int) : int
   y <- y + 1;
   switch (y <= x)
   | True -> goto L
-  | False -> y
+  | False -> return y
   end
   }
-
 
 let main () =
   let _ = cfgassert 42 in
