@@ -22,7 +22,7 @@ let f (n min max:BV32.t) : BV32.t
    ensures { ule min result /\ ule result max }
    (* ensures { BV32.t'int min <= BV32.t'int result  <= BV32.t'int max } *)
 =
-  let _x = add_check min max in
-  if lt_check n min then min else if gt_check n max then max else n
+  let _x = uadd_check min max in
+  if ult_check n min then min else if ugt_check n max then max else n
 
 end
