@@ -147,10 +147,11 @@ type float_format = {
 
 exception NonRepresentableFloat of real_constant
 
-val compute_float : real_constant -> float_format -> BigInt.t * BigInt.t
+val compute_float : real_constant -> float_format -> bool * BigInt.t * BigInt.t
 (** [compute_float c fp] checks that [c] is a float literal
-    representable in the format [fp]. Returns a pair [e,s] with
-    [s] the significand (without the hidden bit), and [e] the biased
+    representable in the format [fp]. Returns a triple [s,e,m] with
+    [s] the sign (true if negative, false if positive)
+    [m] the significand (without the hidden bit), and [e] the biased
     exponent. Raises [NonRepresentableFloat c] exception otherwise. *)
 
 val check_float : real_constant -> float_format -> unit
