@@ -268,6 +268,72 @@ stored in the configuration. The :why3:tool:`session` command performs move or
 copy operations on proof attempts in a fine-grained way, using filters,
 as detailed in :numref:`sec.why3session`.
 
+
+.. _sec.installeditormodes:
+
+Configure Editors for editing WhyML sources
+-------------------------------------------
+
+The Why3 distributions come with some configuration files for Emacs and for Vim.
+These files are typically installed in the shared data directory,
+which is given by
+
+  ::
+
+     why3 --print-datadir
+
+Emacs
+~~~~~
+
+The Why3 distributions come with a mode for Emacs in a file
+:file:`why3.el`. That file is typically found in sub-directory
+:file:`emacs`. Under OPAM, this file is installed in a shared
+directory :file:`emacs/site-lisp` for all OPAM packages. Here is a
+sample Emacs-Lisp code that can be added to your :file:`.emacs`
+configuration file.
+
+  ::
+
+     (setq why3-share (if (boundp 'why3-share) why3-share (ignore-errors (car (process-lines "why3" "--print-datadir")))))
+     (setq why3el
+      (let ((f (expand-file-name "emacs/why3.elc" why3-share)))
+        (if (file-readable-p f) f
+          (let ((f (expand-file-name "emacs/site-lisp/why3.elc" opam-share)))
+            (if (file-readable-p f) f nil)))))
+     (when why3el
+       (require 'why3)
+       (autoload 'why3-mode why3el "Major mode for Why3." t)
+       (setq auto-mode-alist (cons '("\\.mlw$" . why3-mode) auto-mode-alist)))
+
+Vim
+~~~
+
+Some configuration files are present in the share data directory, under sub-directory :file:`vim`.
+
+
+.. _sec.installshellmodes:
+
+Configure Shells for auto-completion of Why3 command arguments
+--------------------------------------------------------------
+
+Some configuration files for shells are distributed in the shared data directory,
+which is given by ``why3 --print-data-dir``.
+
+There are configuration files for ``bash`` and ``zsh``.
+
+The configuration for ``bash`` can be made from Why3 sources using
+
+  ::
+
+     sudo make install-bash
+
+or directly doing
+
+  ::
+
+     sudo /usr/bin/install -c `why3 --print-datadir`/bash/why3 /etc/bash_completion.d
+
+
 .. _sec.installinferloop:
 
 Inference of Loop Invariants
