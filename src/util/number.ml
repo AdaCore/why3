@@ -464,9 +464,6 @@ let compute_float c fp =
   (* get [s] and [e] such that "c = s * 2 ^ e" *)
   let s, e = float_parser c in
 
-  Format.eprintf "[compute_float] s = %s e = %s@."
-       (BigInt.to_string s) (BigInt.to_string e);
-
   (* if s = 0 stop now *)
   if eq s zero then
     false, zero, zero (* FIXME: could return -0.0 sometimes ? *)
