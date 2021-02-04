@@ -358,8 +358,8 @@ let syntax_float_literal s fp fmt c =
       else
         None
     in
-    let e,m = Number.compute_float c fp in
-    let m,sg = if BigInt.lt m BigInt.zero then BigInt.abs m, BigInt.one else m, BigInt.zero in
+    let sign,e,m = Number.compute_float c fp in
+    let sg = if sign then BigInt.one else BigInt.zero in
     match s.[b] with
     | 's' -> Number.print_in_base base digits fmt sg
     | 'e' -> Number.print_in_base base digits fmt e

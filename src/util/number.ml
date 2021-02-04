@@ -463,13 +463,19 @@ let compute_float c fp =
 
   (* get [s] and [e] such that "c = s * 2 ^ e" *)
   let s, e = float_parser c in
-  let s, e = ref s, ref e in
+
+  Format.eprintf "[compute_float] s = %s e = %s@."
+       (BigInt.to_string s) (BigInt.to_string e);
 
   (* if s = 0 stop now *)
-  if eq !s zero then
-    zero, zero
+  if eq s zero then
+    false, zero, zero (* FIXME: could return -0.0 sometimes ? *)
 
-  else begin
+  else
+    begin
+    let sign = lt s zero in
+    let s, e = ref (abs s), ref e in
+
 
     (* if s is too big or e is too small, try to remove trailing zeros
        in s and incr e *)
@@ -500,7 +506,7 @@ let compute_float c fp =
         (to_string !s) (to_string (sub emax one)) (print_in_base 2 (Some (to_int eb))) zero
       (print_in_base 2 (Some (to_int (sub sb one)))) !s;
 
-      zero, !s
+      sign, zero, !s
 
     end else begin
       (* normal case *)
@@ -526,7 +532,7 @@ let compute_float c fp =
       assert (le zero fs && lt fs (pow_int_pos_bigint 2 (sub sb one))
               && le zero fe && lt fe (sub (pow_int_pos_bigint 2 eb) one));
 
-      fe, fs
+      sign, fe, fs
     end
   end
 
@@ -580,4 +586,3 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Integer literal %a is out of range"
               (print_int_constant full_support) c
   | _ -> raise exn)
-
