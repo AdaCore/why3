@@ -71,7 +71,7 @@ val print_counterexample :
 (** {2 Model selection} *)
 
 type sort_models
-(** Sort solver models in [select_model]. *)
+(** Sort prover models in [select_model]. *)
 
 val select_model :
   ?verb_lvl:int -> ?check:bool -> ?reduce_config:rac_reduce_config ->
@@ -82,22 +82,29 @@ val select_model :
     [ml]. [check] is set to false by default and indicates if interpretation
     should be used to select the model. [reduce_config] is set to
     [rac_reduce_config ()] by default and is only used if [check=true]. Different
-    priorizations of solver models can be selected by [sort_models], which is by
+    priorizations of prover models can be selected by [sort_models], which is by
     default [prioritize_first_good_model] if [check] and
     [prioritize_last_non_empty_model] otherwise. *)
 
 val prioritize_first_good_model : sort_models
 (** If there is any model that can be verified by counterexample
     checking, prioritize NCCE over SWCE over NCCE_SWCE, and prioritize
-    simpler models from the incremental list produced by the prover.mi_df
+    simpler models from the incremental list produced by the prover.
 
     Otherwise prioritize the last, non-empty model in the incremental
     list, but penalize bad models. *)
 
 val prioritize_last_non_empty_model : sort_models
-(** Do not consider the result of checking the counterexample model, but
-    just priotize the last, non-empty model in the incremental list of
-    models created by the prover (as done before 2020) *)
+(** Do not consider the result of checking the counterexample model, but just
+    priotize the last, non-empty model in the incremental list of models. *)
+
+(** {3 Compatibility} *)
+
+val select_model_last_non_empty :
+  (Call_provers.prover_answer * model) list -> model option
+(** Select the last, non-empty model in the incremental list of models as done
+    before 2020. Same behaviour as
+    [select_model ~check:false ~sort_models:prioritize_last_non_empty_model]. *)
 
 (** {2 Conversion to [Model_parser.model] }*)
 
