@@ -143,6 +143,119 @@ This updates the contents of file :file:`aqueue.ml` as follows:
 This new version of the code is now accepted by the OCaml compiler
 (provided the ``ZArith`` library is available, as above).
 
+Extraction of Functors
+''''''''''''''''''''''
+
+WhyML and OCaml are both dialects of the ML-family, sharing many syntactic and
+semantics traits. Yet their module systems differ significantly.
+A WhyML program is a list of modules, a module is a list of top-level
+declarations, and declarations can be organized within *scopes*, the WhyML unit
+for namespaces management. In particular, there is no support for sub-modules in
+Why3, nor a dedicated syntactic construction for functors. The latter are
+represented, instead, as modules containing only abstract symbols
+:cite:`paskevich20isola`. One must follow exactly this programming pattern when
+it comes to extract an OCaml functor from a Why3 proof. Let us consider the
+following (excerpt) of a WhyML module implementing binary search
+trees:
+
+.. code-block:: whyml
+
+    module BST
+      scope Make
+        scope Ord
+          type t
+          val compare : t -> t -> int
+        end
+
+        type elt = Ord.t
+
+        type t = E | N t elt t
+
+        use int.Int
+
+        let rec insert (x: elt) (t: t)
+        = match t with
+          | E -> N E x E
+          | N l y r ->
+              if Ord.compare x y > 0 then N l y (insert x r)
+              else N (insert x l) y r
+          end
+      end
+    end
+
+For the sake of simplicity, we omit here behavioral specification. Assuming the
+above example is contained in a file named :file:`bst.mlw`, one can
+readily extract it into OCaml, as follows:
+
+.. code-block:: console
+
+    > why3 extract -D ocaml64 bst.mlw --modular -o .
+
+This produces the following functorial implementation:
+
+.. code-block:: ocaml
+
+    module Make (Ord: sig type t
+      val compare : t -> t -> Z.t end) =
+    struct
+      type elt = Ord.t
+
+      type t =
+      | E
+      | N of t * Ord.t * t
+
+      let rec insert (x: Ord.t) (t: t) : t =
+        match t with
+        | E -> N (E, x, E)
+        | N (l, y, r) ->
+            if Z.gt (Ord.compare x y) Z.zero
+            then N (l, y, insert x r)
+            else N (insert x l, y, r)
+    end
+
+The extracted code features the functor ``Make`` parameterized with a
+module containing the abstract type ``t`` and function
+``compare``. This is similar to the OCaml standard library when it
+comes to data structures parameterized by an order relation, *e.g.*,
+the ``Set`` and ``Map`` modules.
+
+From the result of the extraction, one understands that scope ``Make``
+is turned into a functor, while the nested scope ``Ord`` is extracted
+as the functor argument. In summary, for a WhyML implementation of the
+form
+
+.. code-block:: whyml
+
+    module M
+      scope A
+        scope X ... end
+        scope Y ... end
+        scope Z ... end
+      end
+      ...
+    end
+
+contained in file :file:`f.mlw`, the Why3 extraction engine produces the
+following OCaml code:
+
+.. code-block:: ocaml
+
+    module A (X: ...) (Y: ...) (Z: ...) = struct
+      ...
+    end
+
+and prints it into file :file:`f__M.ml`. In order for functor extraction
+to succeed, scopes ``X``, ``Y``, and ``Z`` can only contain
+non-defined programming symbols, *i.e.*, abstract type declarations,
+function signatures, and exception declarations. If ever a scope mixes
+non-defined and defined symbols, or if there is no surrounding scope
+such as ``Make``, the extraction will complain about
+the presence of non-defined symbols that cannot be extracted.
+
+It is worth noting that extraction of functors only works for
+*modular* extraction (*i.e.* with command-line option :option:`--modular`).
+
+
 Custom Extraction Drivers
 '''''''''''''''''''''''''
 
