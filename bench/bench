@@ -58,7 +58,7 @@ goods () {
     ERROR=
     test -d $1 || exit 1
     rm -f bench_errors
-    for f in $1/*.[wm][hl][yw] ; do
+    for f in $1/*.{why,mlw,mlcfg} ; do
         printf "  $f... "
         opts="$2"
         if test $f = stdlib/int.mlw; then opts="$2 --type-only"; fi
@@ -83,15 +83,6 @@ goods () {
         rm bench_errors
         exit 1
     fi
-}
-
-plugins () {
-    pgm="bin/why3$suffix prove"
-    test -d $1 || exit 1
-    for f in $1/*.$3 ; do
-        printf "  $f... "
-        simple_test $pgm $2 $f
-    done
 }
 
 plugin_bads () {
@@ -429,6 +420,7 @@ goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
 goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
 goods examples/in_progress
+goods bench/plugins/mlcfg
 echo ""
 fi
 

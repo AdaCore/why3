@@ -43,8 +43,8 @@
         "goto", GOTO;
         "var", VAR;
         "switch", SWITCH;
-        "return", TERM_RETURN;
-        "absurd", TERM_ABSURD;
+        "absurd", ABSURD;
+        "return", RETURN;
         "abstract", ABSTRACT;
         "alias", ALIAS;
         "any", ANY;
