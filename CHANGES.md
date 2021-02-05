@@ -3,6 +3,7 @@
 Input Formats
   * the MLCFG front end now supports recursive CFG functions and scope declarations.
   * Allows subnamespace in `for in`
+  * micro-C/Python: fixed translation of <> and not
 
 Tools
   * command-line options now follow the getopt standard;
@@ -31,6 +32,11 @@ Provers
 Standard library
   * new lemma permut_sub_trans in array.ArrayPermut
   * added intersection (function `inter`) in bag.Bag
+  * added a new theory option.Map
+  * added a precondition to string.OCaml.([])
+  * added mach.array,ArrayInt63.{set,init,sub}
+  * OCaml exception Invalid_argument moved to ocaml.Exceptions
+  * added a function length in mach.c.String
 
 Bug fixes
   * fixed bug in OCaml extraction (#509)
