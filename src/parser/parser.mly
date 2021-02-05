@@ -122,6 +122,13 @@ module_decl:
     }
 | use_clone { () }
 
+module_decl_parsing_only:
+| scope_head_parsing_only module_decl_parsing_only* END
+    { let loc,import,qid = $1 in (Dscope(loc,import,qid,$2))}
+| IMPORT uqualid { (Dimport $2) }
+| d = pure_decl | d = prog_decl | d = meta_decl { d }
+| use_clone_parsing_only { $1 }
+
 (* Do not open inside another module *)
 
 mlw_module_no_decl:
