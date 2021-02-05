@@ -1,14 +1,13 @@
 (* Why drivers for Alt-Ergo: common part *)
 
 printer "alt-ergo"
-filename "%f-%t-%g.why"
 
-valid "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:Valid"
-invalid "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:Invalid"
-unknown "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:I don't know" ""
-timeout "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:Timeout"
+valid "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Valid"
+invalid "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Invalid"
+unknown "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?I don't know" ""
+timeout "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Timeout"
 timeout "^Timeout$"
-steplimitexceeded "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:Steps limit reached"
+steplimitexceeded "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Steps limit reached"
 outofmemory "Fatal error: out of memory"
 outofmemory "Fatal error: exception Stack_overflow"
 fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
