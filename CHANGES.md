@@ -28,6 +28,15 @@ Provers
   * support for AltErgo 2.3.3 (released Aug 19, 2020)
   * support for Coq 8.13.0 (released Jan 7, 2021)
 
+Standard library
+  * new lemma permut_sub_trans in array.ArrayPermut
+  * added intersection (function `inter`) in bag.Bag
+
+Bug fixes
+  * fixed bug in OCaml extraction (#509)
+  * fixed bug when `why3 prove` is called on a DIMACS file (#524)
+  * fixed micro-Python parser when no newline at end of file
+
 Version 1.3.3, September 11, 2020
 ---------------------------------
 
