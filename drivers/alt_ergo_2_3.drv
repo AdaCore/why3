@@ -1,8 +1,8 @@
-(* Driver for Alt-Ergo versions >= 2.4.0 *)
+(* Driver for Alt-Ergo versions 2.3.x *)
 
-prelude "(* this is the prelude for Alt-Ergo, version >= 2.4.0 *)"
+prelude "(* this is the prelude for Alt-Ergo, versions 2.3.x *)"
 
-filename "%f-%t-%g.ae"
+filename "%f-%t-%g.why"
 
 transformation "inline_trivial"
 
@@ -19,3 +19,6 @@ transformation "simplify_formula"
 
 import "alt_ergo_common.drv"
 import "no-bv.gen"
+
+(* additional regexp for detection of answers, needed for alt-ergo <= 0.99 *)
+valid "^Inconsistent assumption$"
