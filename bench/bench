@@ -94,6 +94,21 @@ plugins () {
     done
 }
 
+plugin_bads () {
+    pgm="bin/why3$suffix prove"
+    test -d $1 || exit 1
+    for f in $1/*.$3 ; do
+        printf "  $f... "
+        if $pgm $2 $f > /dev/null 2>&1; then
+            echo "failed! (should have an error)"
+            echo $pgm $2 $f
+            $pgm $2 $f
+            exit 1
+        fi
+        echo "ok"
+    done
+}
+
 bads () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
@@ -436,6 +451,7 @@ bads bench/typing/bad --type-only
 bads bench/programs/bad-typing --type-only
 warns bench/programs/warn-typing --type-only
 goods bench/typing/x-bad --type-only
+plugin_bads tests/cfg/bad --parse-only mlcfg
 echo ""
 fi
 
@@ -466,6 +482,7 @@ goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
 goods examples/in_progress
 plugins tests/python --type-only py
 plugins tests/microc --type-only c
+plugins tests/cfg --type-only mlcfg
 echo ""
 fi
 
