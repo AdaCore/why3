@@ -451,7 +451,7 @@ bads bench/typing/bad --type-only
 bads bench/programs/bad-typing --type-only
 warns bench/programs/warn-typing --type-only
 goods bench/typing/x-bad --type-only
-plugin_bads tests/cfg/bad --parse-only mlcfg
+plugin_bads bench/plugins/mlcfg/bad --parse-only mlcfg
 echo ""
 fi
 
@@ -482,7 +482,6 @@ goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
 goods examples/in_progress
 plugins tests/python --type-only py
 plugins tests/microc --type-only c
-plugins tests/cfg --type-only mlcfg
 echo ""
 fi
 
@@ -650,6 +649,7 @@ replay examples/double_wp "-L examples/double_wp --merging-only"
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
 replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_vars"
 #replay examples/in_progress --merging-only
+replay examples/mlcfg --merging-only
 echo ""
 fi
 
