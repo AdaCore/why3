@@ -122,6 +122,11 @@ run_dir logic ""
 run_dir bitvectors "-L bitvectors"
 echo ""
 
+echo "=== MLCFG ==="
+echo ""
+run_dir mlcfg ""
+echo ""
+
 echo "Summary       : $success/$total"
 echo "Sessions size : "`wc -cl $sessions | tail -1`
 echo "Shapes   size : "`wc -cl $shapes | tail -1`
