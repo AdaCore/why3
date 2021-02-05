@@ -365,7 +365,8 @@
 
 No entry points here, see `parser.mly`
 
-The implicit/shared entry point is `module_decl_parsing_only`
+The implicit/shared entry points are `module_head_parsing_only`,
+`scope_head_parsing_only` and `use_clone_parsing_only`
 
 See also `plugins/cfg/cfg_parser.mly`
 
@@ -376,14 +377,6 @@ See also `plugins/cfg/cfg_parser.mly`
 %public module_head_parsing_only:
 | THEORY attrs(uident_nq)  { $2 }
 | MODULE attrs(uident_nq)  { $2 }
-
-
-%public module_decl_parsing_only:
-| scope_head_parsing_only module_decl_parsing_only* END
-    { let loc,import,qid = $1 in (Dscope(loc,import,qid,$2))}
-| IMPORT uqualid { (Dimport $2) }
-| d = pure_decl | d = prog_decl | d = meta_decl { d }
-| use_clone_parsing_only { $1 }
 
 %public scope_head_parsing_only:
 | SCOPE boption(IMPORT) attrs(uident_nq)
