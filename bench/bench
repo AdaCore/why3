@@ -480,8 +480,6 @@ goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
 goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
 goods examples/in_progress
-plugins tests/python --type-only py
-plugins tests/microc --type-only c
 echo ""
 fi
 
@@ -639,6 +637,8 @@ replay examples/logic --merging-only
 replay examples --merging-only
 replay examples/foveoos11-cm --merging-only
 replay examples/WP_revisited --merging-only
+replay examples/microc --merging-only
+replay examples/python --merging-only
 replay examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps --merging-only"
 replay examples/bitvectors "-L examples/bitvectors --merging-only"
 replay examples/avl "-L examples/avl --merging-only"

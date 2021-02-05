@@ -44,6 +44,7 @@ while m < len(a):
         #@ variant   k
         a[k] = a[k-1]
         k = k - 1
+        #@ assert occurrence(x, a[k <- x]) == occurrence(x, photo)
     a[k] = x
     m = m + 1
 
