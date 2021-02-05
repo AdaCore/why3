@@ -80,6 +80,8 @@ run_dir () {
 echo "=== Programs already ported === MUST REPLAY AND ALL GOALS PROVED ==="
 echo ""
 run_dir . ""
+run_dir microc ""
+run_dir python ""
 run_dir double_wp "-L double_wp"
 run_dir avl "-L avl"
 run_dir c_cursor "-L c_cursor"
