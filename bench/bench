@@ -258,129 +258,78 @@ extract () {
 extract_and_run () {
     dir=$1
     shift
-    prg=$1
-    shift
-    printf "  $dir... "
-    rm -f $dir/$prg
-    printf "clean... "
-    if BENCH=yes make -C $dir clean > /dev/null; then
-        printf "extract... "
-        if BENCH=yes make -C $dir extract > /dev/null; then
-            printf "compile... "
-            if BENCH=yes make -C $dir > /dev/null; then
-                printf "execute... "
-                if $dir/main.opt "$@" > /dev/null; then
-                    printf "doc... "
-                    if BENCH=yes make -C $dir doc > /dev/null; then
-                        echo "ok"
-                    else
-                        echo "documentation failed!"
-                        echo BENCH=yes make -C $dir doc
-                        BENCH=yes make -C $dir doc
-                        exit 1
-                    fi
-                else
-                    echo "execution failed!"
-                    echo $dir/main.opt "$@"
-                    $dir/main.opt "$@"
-                    exit 1
-                fi
-            else
-                echo "compilation failed!"
-                echo BENCH=yes make -C $dir
-                BENCH=yes make -C $dir
-                exit 1
-            fi
-        else
-            echo "extract failed!"
-            echo BENCH=yes make -C $dir extract
-            BENCH=yes make -C $dir extract
-            exit 1
-        fi
-    else
-        echo "clean failed!"
-        echo BENCH=yes make -C $dir clean
-        BENCH=yes make -C $dir clean
+    make="make BENCH=yes -C $dir"
+    printf "  $dir... clean... "
+    if ! $make clean > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make clean
+        $make clean
         exit 1
     fi
-}
-
-extract_and_test_wmp () {
-    dir=$1
-    shift
-    printf "  $dir... "
-    printf "clean... "
-    if BENCH=yes make -C $dir clean > /dev/null; then
-        printf "extract... "
-        if BENCH=yes make -C $dir extract > /dev/null; then
-            printf "compile... "
-            if BENCH=yes make -C $dir build/tests > /dev/null; then
-                printf "execute... "
-                if $dir/build/tests > /dev/null; then
-                    echo "ok"
-                else
-                    echo "execution failed!"
-                    echo $dir/build/tests
-                    $dir/build/tests
-                    exit 1
-                fi
-            else
-                echo "compilation failed!"
-                echo BENCH=yes make -C $dir
-                BENCH=yes make -C $dir
-                exit 1
-            fi
-        else
-            echo "extract failed!"
-            echo BENCH=yes make -C $dir extract
-            BENCH=yes make -C $dir extract
-            exit 1
-        fi
-    else
-        echo "clean failed!"
-        echo BENCH=yes make -C $dir clean
-        BENCH=yes make -C $dir clean
+    printf "extract... "
+    if ! $make extract > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make extract
+        $make extract
         exit 1
     fi
+    printf "compile... "
+    if ! $make > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make
+        $make
+        exit 1
+    fi
+    printf "execute... "
+    if ! $dir/main.opt "$@" > /dev/null 2>&1; then
+        echo "failed!"
+        echo $dir/main.opt "$@"
+        $dir/main.opt "$@"
+        exit 1
+    fi
+    printf "doc... "
+    if ! $make doc > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make doc
+        $make doc
+        exit 1
+    fi
+    echo "ok"
 }
 
 extract_and_test_c () {
     dir=$1
     shift
-    printf "  $dir... "
-    printf "clean... "
-    if BENCH=yes make -C $dir clean > /dev/null; then
-        printf "extract... "
-        if BENCH=yes make -C $dir extract > /dev/null; then
-            printf "compile... "
-            if BENCH=yes make -C $dir cfiles > /dev/null; then
-                printf "execute... "
-                if BENCH=yes make -C $dir tests > /dev/null; then
-                    echo "ok"
-                else
-                    echo "execution failed!"
-                    echo BENCH=yes make -C $dir tests
-                    BENCH=yes make -C $dir tests
-                    exit 1
-                fi
-            else
-                echo "compilation failed!"
-                echo BENCH=yes make -C $dir cfiles
-                BENCH=yes make -C $dir cfiles
-                exit 1
-            fi
-        else
-            echo "extract failed!"
-            echo BENCH=yes make -C $dir extract
-            BENCH=yes make -C $dir extract
-            exit 1
-        fi
-    else
-        echo "clean failed!"
-        echo BENCH=yes make -C $dir clean
-        BENCH=yes make -C $dir clean
+    make="make BENCH=yes -C $dir"
+    printf "  $dir... clean... "
+    if ! $make clean > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make clean
+        $make clean
         exit 1
     fi
+    printf "extract... "
+    if ! $make extract > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make extract
+        $make extract
+        exit 1
+    fi
+    printf "compile... "
+    if ! $make build/tests > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make build/tests
+        $make build/tests
+        exit 1
+    fi
+    printf "execute... "
+    if ! $dir/build/tests > /dev/null 2>&1; then
+        echo "failed!"
+        echo $dir/build/tests
+        $dir/build/tests
+        exit 1
+    fi
+    echo "ok"
 }
 
 list_stuff () {
@@ -607,16 +556,17 @@ fi
 if enabled extraction; then
 echo "=== Checking extraction to OCaml ==="
 extract bench/extraction cmo
-extract_and_run examples/euler001 euler001.ml 1000000
-extract_and_run examples/gcd gcd.ml 6 15
-extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml
-extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
-extract_and_run examples/defunctionalization defunctionalization.ml
-extract_and_run examples/sudoku sudoku.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
+extract_and_run bench/extraction/test
+extract_and_run examples/euler001 1000000
+extract_and_run examples/gcd 6 15
+extract_and_run examples/vstte10_max_sum
+extract_and_run examples/vstte12_combinators "((((K K) K) K) K)"
+extract_and_run examples/defunctionalization
+extract_and_run examples/sudoku 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
 echo ""
 
 echo "=== Checking extraction to C ==="
-extract_and_test_wmp examples/multiprecision
+extract_and_test_c examples/multiprecision
 extract_and_test_c examples/c_cursor
 echo ""
 fi

@@ -1809,9 +1809,6 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.$(SHAREDBEST) plugins $(TOOLS) \
 	bash bench/bench -suffix ".@OCAMLBEST@"
 	@echo "=== Check parsing messages ==="
 	bench/parsing-bench
-	@echo ""
-	@echo "=== Checking extraction ==="
-	$(MAKE) test-ocaml-extraction
 
 APITESTS=logic transform clone mlw_tree mlw_expr create_session counterexample
 
@@ -1857,17 +1854,6 @@ test-api-%: test-api-%.@OCAMLBEST@
 #test-shape: lib/why3/why3.cma
 #	ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) $? examples/test_shape.ml
 
-
-test-ocaml-extraction: bin/why3.opt bin/why3extract.cmxs
-	@echo "driver ocaml64"
-	@bin/why3.opt extract -D ocaml64 -L tests \
-	  test_extraction.TestExtraction -o tests/test-extraction/test.ml
-ifeq (@enable_zarith@,yes)
-	@$(OCAMLOPT) @BIGINTINCLUDE@ -I tests/test-extraction/ zarith.cmxa \
-	  tests/test-extraction/test.ml tests/test-extraction/main.ml \
-          -o tests/test-extraction/a.out
-	@tests/test-extraction/a.out
-endif
 
 ################
 # documentation
