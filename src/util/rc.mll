@@ -205,10 +205,10 @@ let get_value read ?default section key =
       | None -> raise (MissingField key)
       | Some v -> v
 
-let get_valueo read section key =
+let get_valueo read ?default section key =
   try
     Some (get_value read section key)
-  with MissingField _ -> None
+  with MissingField _ -> default
 
 let get_valuel read ?default section key =
   try

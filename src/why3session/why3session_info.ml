@@ -422,7 +422,7 @@ let print_hist stats =
 (****** run on all files  ******)
 
 let run () =
-  let _,_,_ = Whyconf.Args.complete_initialization () in
+  let _,_ = Whyconf.Args.complete_initialization () in
   let stats = new_proof_stats () in
   let r0 = ref [] and r1 = ref [] in
   iter_files (run_one stats r0 r1);

@@ -452,7 +452,7 @@ let run_one fname =
   print_latex_statistics !opt_style (table ()) dir ses
 
 let run () =
-  let _,_,_ = Whyconf.Args.complete_initialization () in
+  let _,_ = Whyconf.Args.complete_initialization () in
   iter_files run_one
 
 

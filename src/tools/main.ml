@@ -125,7 +125,7 @@ let command cur =
 let () = try
   let i = Getopt.parse_many option_list Sys.argv 1 in
   if i < Array.length Sys.argv then command i;
-  let config,_,_ = Args.complete_initialization () in
+  let config,_ = Args.complete_initialization () in
 
   (* listings *)
 

@@ -54,7 +54,7 @@ let option_list =
     "<dir> write the realizations to <dir>";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =

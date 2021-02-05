@@ -10,14 +10,16 @@
 (********************************************************************)
 
 val debug: Debug.flag
+
+(* If true make the autodetection verbose *)
 val is_config_command: bool ref
 
 (** Lists prover family names from detection config *)
 val list_prover_families : unit -> string list
 
 (** Adds a new prover executable *)
-val add_prover_binary :
-  Whyconf.config -> string -> string -> string -> Whyconf.config
+(* val add_prover_binary :
+ *   Whyconf.config -> string -> string -> string -> Whyconf.config *)
 
 type autodetection_result
 

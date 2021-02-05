@@ -143,7 +143,7 @@ let usage_str = sprintf
 
 
 let () =
-    let config, _base_config, env =
+    let config, env =
       Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
     in
     let dir =

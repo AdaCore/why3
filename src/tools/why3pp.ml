@@ -481,7 +481,7 @@ let deps_file fmt header filename f =
   if header then fprintf fmt "}@."
 
 
-let _, _, _ =
+let _, _ =
   Whyconf.Args.initialize spec add_filename_then_path usage_msg
 
 let () =

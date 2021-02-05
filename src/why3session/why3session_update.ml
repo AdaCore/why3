@@ -36,7 +36,7 @@ let do_action ~env ~session action =
      Sys.rename src dst
 
 let run_update () =
-  let _,_,env = Whyconf.Args.complete_initialization () in
+  let _,env = Whyconf.Args.complete_initialization () in
   iter_files
     (fun fname ->
      let session = read_session fname in

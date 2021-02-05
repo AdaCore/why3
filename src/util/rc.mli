@@ -76,7 +76,7 @@ val get_family : t -> string -> family
 
 val get_simple_family : t -> string -> simple_family
 (** [get_simple_family rc name] return all the sections of the simple
-    family [name] in [rc]
+    family [name] in [rc]. [] if none are present.
     @raise ExtraParameters if [name] also corresponds to family in [rc]
 *)
 
@@ -108,7 +108,7 @@ val get_int : ?default:int -> section -> string -> int
     @raise Multiple_value if the key appears multiple time.
 *)
 
-val get_into : section -> string -> int option
+val get_into : ?default:int -> section -> string -> int option
 
 val get_intl : ?default:int list -> section -> string -> int list
 (** [get_intl ~default section key] one key to many value
@@ -137,7 +137,7 @@ val get_bool : ?default:bool -> section -> string -> bool
 val get_booll : ?default:bool list -> section -> string -> bool list
 (** Same as {!get_intl} but on bool *)
 
-val get_boolo : section -> string -> bool option
+val get_boolo : ?default:bool -> section -> string -> bool option
 
 val set_bool : ?default:bool -> section -> string -> bool -> section
 (** Same as {!set_int} but on bool *)
@@ -152,7 +152,7 @@ val get_string : ?default:string -> section -> string -> string
 val get_stringl : ?default:string list -> section -> string -> string list
 (** Same as {!get_intl} but on string *)
 
-val get_stringo : section -> string -> string option
+val get_stringo : ?default:string -> section -> string -> string option
 
 val set_string : ?escape_eol:bool -> ?default:string -> section -> string -> string -> section
 (** Same as {!set_int} but on string. [escape_eol] indicates if special

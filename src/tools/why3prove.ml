@@ -163,7 +163,7 @@ let option_list =
      wards compatiblity with --json)";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let opt_driver = ref (match !opt_driver with
@@ -444,7 +444,7 @@ let do_input env drv = function
 let () =
   try
     if Util.terminal_has_color then (
-      set_formatter_tag_functions Util.ansi_color_tags;
+      Format.set_formatter_tag_functions Util.ansi_color_tags;
       set_mark_tags true );
     let load (f,ef) = load_driver_raw (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in

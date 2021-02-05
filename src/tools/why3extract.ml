@@ -79,7 +79,7 @@ let option_list =
     "<file|dir> destination of extracted code";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =
