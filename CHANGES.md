@@ -2,6 +2,7 @@
 
 Input Formats
   * the MLCFG front end now supports recursive CFG functions and scope declarations.
+  * Allows subnamespace in `for in`
 
 Tools
   * command-line options now follow the getopt standard;
