@@ -418,6 +418,12 @@ let check_model reduce env pm model =
             Pretty.print_loc' loc in
         Cannot_check_model {reason}
 
+let select_model_last_non_empty models =
+  let models = List.filter (fun (_,m) -> not (is_model_empty m)) models in
+  match List.rev models with
+  | (_,m) :: _ -> Some m
+  | [] -> None
+
 type sort_models =
   (int * Call_provers.prover_answer * model * check_model_result * ce_summary) list ->
   (int * Call_provers.prover_answer * model * check_model_result * ce_summary) list
