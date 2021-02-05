@@ -11,6 +11,8 @@ Tools
   * binaries `why3config`, `why3prove`, etc, no longer exist;
     they are now plugins that can be loaded only using the main `why3` binary,
     e.g., `why3 config`
+  * runtime assertion checking for `why3 execute` and for the validation of
+    counterexamples in `why3 prove`
 
 IDE
   * use native modifiers on macOS
