@@ -1,0 +1,19 @@
+
+
+use bv.BV32
+
+
+goal udiv_42_17 : udiv (42:t) (17:t) = (2:t)
+
+goal urem_42_17 : urem (42:t) (17:t) = (8:t)
+
+goal sdiv_42_17 : sdiv (42:t) (17:t) = (2:t)
+
+goal srem_42_17 : srem (42:t) (17:t) = (8:t)
+
+
+constant m42 : t = sub (0:t) (42:t)
+
+goal sdiv_m42_17 : sdiv m42 (17:t) = sub (0:t) (2:t)
+
+goal srem_m42_17 : srem m42 (17:t) = sub (0:t) (8:t)
