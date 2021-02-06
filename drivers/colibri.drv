@@ -97,13 +97,13 @@ theory real.ExpLog
 end
 
 theory real.MinMax
-  syntax function min "(colibri_min %1 %2)"
-  syntax function max "(colibri_max %1 %2)"
+  syntax function min "(colibri_min_real %1 %2)"
+  syntax function max "(colibri_max_real %1 %2)"
 end
 
 theory int.MinMax
-  syntax function min "(colibri_min %1 %2)"
-  syntax function max "(colibri_max %1 %2)"
+  syntax function min "(colibri_min_int %1 %2)"
+  syntax function max "(colibri_max_int %1 %2)"
 end
 
 
@@ -113,12 +113,10 @@ end
 - colibri_floor
 - colibri_abs_int
 - colibri_abs_real
-- colibri_truncate
 - colibri_pow_real_int
 - colibri_max
 - colibri_min
 - is_int
-- to_int
 - to_real
 
 *)
