@@ -17,7 +17,6 @@ Require bool.Bool.
 Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
-Require int.ComputerDivision.
 Require bv.Pow2int.
 
 Local Parameter last_bit : nat.
