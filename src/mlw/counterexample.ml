@@ -127,15 +127,16 @@ let print_check_model_result ?verb_lvl fmt = function
         (print_full_verdict ?verb_lvl) r.concrete
         (print_full_verdict ?verb_lvl) r.abstract
 
-let ce_summary v_concrete v_abstract =
-  match v_concrete.verdict, v_abstract.verdict with
-  | Good_model, _          -> NCCE v_concrete.exec_log
-  | Bad_model , Good_model -> SWCE v_abstract.exec_log
-  | Dont_know , Good_model -> NCCE_SWCE v_abstract.exec_log
-  | Dont_know , Dont_know
-  | Dont_know , Bad_model  -> UNKNOWN v_concrete.reason
-  | Bad_model , Dont_know  -> UNKNOWN v_abstract.reason
-  | Bad_model , Bad_model  -> BAD_CE
+let ce_summary = function
+  | Cannot_check_model {reason} -> UNKNOWN reason
+  | Check_model_result r -> match r.concrete.verdict, r.abstract.verdict with
+    | Good_model, _          -> NCCE r.concrete.exec_log
+    | Bad_model , Good_model -> SWCE r.abstract.exec_log
+    | Dont_know , Good_model -> NCCE_SWCE r.abstract.exec_log
+    | Dont_know , Dont_know
+    | Dont_know , Bad_model  -> UNKNOWN r.concrete.reason
+    | Bad_model , Dont_know  -> UNKNOWN r.abstract.reason
+    | Bad_model , Bad_model  -> BAD_CE
 
 let print_counterexample ?verb_lvl ?check_ce ?json fmt (model,ce_summary) =
   fprintf fmt "@ @[<hov2>%a%t@]"
@@ -513,10 +514,7 @@ let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     List.map add_check_model_result models in
   let models =
     let add_ce_summary (i,r,m,mr) =
-      let summary = match mr with
-        | Cannot_check_model {reason} -> UNKNOWN reason
-        | Check_model_result r -> ce_summary r.concrete r.abstract in
-      i,r,m,mr,summary in
+      i,r,m,mr,ce_summary mr in
     List.map add_ce_summary models in
   let selected, selected_ix =
     match List.nth_opt (sort_models models) 0 with

@@ -59,6 +59,8 @@ type ce_summary =
   | BAD_CE (** Bad counterexample. *)
   | UNKNOWN of string (** The counterexample has not been verified. *)
 
+val ce_summary : check_model_result -> ce_summary
+
 val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 
 val print_ce_summary_kind : ce_summary Pp.pp
