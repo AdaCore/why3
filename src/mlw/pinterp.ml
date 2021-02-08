@@ -1533,11 +1533,11 @@ let rec trans_and_bind_quants env trans task =
     List.flatten (List.map (trans_and_bind_quants env trans) tasks)
 
 (** Compute the value of a term by using the (reduction) transformation *)
-let compute_term env t =
+let compute_term ?vsenv env t =
   match env.rac.rac_reduce.rac_trans with
   | None -> t
   | Some trans ->
-      let task, ls_mv = task_of_term env t in
+      let task, ls_mv = task_of_term ?vsenv env t in
       if t.t_ty = None then (* [t] is a formula *)
         match List.map Task.task_goal_fmla (trans_and_bind_quants env trans task) with
         | [] -> t_true
@@ -1834,22 +1834,76 @@ let print_result fmt = function
   | Excep (xs, v) -> fprintf fmt "EXC %a: %a" print_xs xs print_value v
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
 
-let get_and_register_value env ?def ?ity vs loc =
+let value_of_constant ty c =
+  let open Constant in
+  match c with
+  | ConstInt i -> value ty (Vnum i.Number.il_int)
+  | ConstStr s -> string_value s
+  | ConstReal _ -> failwith "not implemented: value_of_term real"
+
+let value_of_term known t =
+  let rec aux t =
+    let ty = Opt.get_exn Exit t.t_ty in
+    match t.t_node with
+    | Ttrue -> bool_value true
+    | Tfalse -> bool_value false
+    | Tconst c -> value_of_constant ty c
+    | Tapp (ls, ts)  ->
+        let rs = try restore_rs ls with Not_found -> raise Exit in
+        let fs = match (ity_of_ty ty).ity_node with
+          | Ityapp (its, _, _) | Ityreg {reg_its= its} ->
+              (Pdecl.find_its_defn known its).Pdecl.itd_fields
+          | _ -> raise Exit in
+        let vs = List.map aux ts in
+        value ty (Vconstr (rs, fs, List.map field vs))
+    | Tvar _ | Tif _ | Tlet _ | Tcase _ | Teps _
+    | Tquant _ | Tbinop _ | Tnot _ -> raise Exit in
+  try Some (aux t) with Exit -> None
+
+(* Find a postcondition of the form [ensures { result = t (/\ ...) }], compute_fraction
+    [t], and return it as a value. *)
+let try_eval_ensures env (posts, vsenv) =
+  let rec loop vs = function
+    | {t_node= Tapp (ls, [{t_node= Tvar vs'}; t])}
+      when ls_equal ls ps_equ && vs_equal vs vs' ->
+        value_of_term env.pmodule.Pmodule.mod_known (compute_term ~vsenv env t)
+    | {t_node= Tbinop (Tand, t1, t2)} ->
+        let res = loop vs t1 in
+        if res <> None then res else loop vs t2
+    | _ -> None in
+  let is_ensures_result = function
+    | {t_node= Teps tb} -> let vs, t = t_open_bound tb in loop vs t
+    | _ -> None in
+  try Some (Lists.first is_ensures_result posts) with Not_found -> None
+
+(** Get a value and register it in the execution log.
+    The value is retrieved by the first of the following ways which succeeds:
+    1) Reading it from the model, or env
+    2) evaluating the post-condition when it has the form [ensures = t], or else
+    3) using the specified default value, or else
+    3) use the default value of the type if it validates the postconditions. *)
+let get_and_register_value env ?def ?ity ?rs_name ?posts_vsenv vs loc =
   let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
   let name = string_or_model_trace vs.vs_name in
-  let value = match env.rac.get_value ~name ~loc ity with
-    | Some v ->
-       Debug.dprintf debug_rac_values
-         "@[<hv2>Value imported for %a at %a:@ @[%a@]@]@."
-         print_decoded name print_loc' loc print_value v; v
-    | None ->
-       let v = match def with
-         | None -> default_value_of_type env.env env.pmodule.Pmodule.mod_known ity
-         | Some v -> v in
-       Debug.dprintf debug_rac_values
-         "@[<h>No value for %s at %a, taking default%t.@]@." name print_loc' loc
-         (fun fmt -> if def <> None then fprintf fmt " %a" print_value v);
-       v in
+  let value, descr = match env.rac.get_value ~name ~loc ity with
+    | Some v -> v, "from model"
+    | None -> match Opt.bind posts_vsenv (try_eval_ensures env) with
+      | Some v -> v, "computed from post condition"
+      | None -> match def with
+        | Some v -> v, "given default"
+        | None ->
+            let v = default_value_of_type env.env env.pmodule.Pmodule.mod_known ity in
+            let posts = Opt.get_def [] (Opt.map fst posts_vsenv) in
+            match check_posts "default value" (Some loc) env v posts with
+            | _ -> v, "type default"
+            | exception Contr _ ->
+                cannot_compute "missing value for %a at %a" print_decoded name
+                  print_loc' loc in
+  Debug.dprintf debug_rac_values "@[<h>Value %s for %a%a at %a: %a@]@."
+    descr print_decoded name
+    (Pp.print_option
+       (fun fmt id -> fprintf fmt " of %a" print_decoded id.id_string)) rs_name
+    print_loc' loc print_value value;
   register_used_value env (Some loc) vs.vs_name value;
   value
 
@@ -2408,8 +2462,15 @@ and exec_call_abstract ?loc ?rs_name env cty arg_pvs ity_result =
   let asgn_wrt = assign_written_vars ~vars_map
                    cty.cty_effect.eff_writes loc_or_dummy env in
   List.iter asgn_wrt (Mvs.keys env.vsenv);
-  let res_v = get_and_register_value ~ity:ity_result env res
-                loc_or_dummy in
+  let posts_vsenv =
+    let aux pv =
+      let vsenv, t = term_of_value env [] (get_pvs env pv) in
+      if vsenv <> [] then raise Exit;
+      pv.pv_vs, t in
+    try Some (cty.cty_post, List.map aux arg_pvs)
+    with Exit -> None in
+  let res_v =
+    get_and_register_value ~ity:ity_result ?rs_name ?posts_vsenv env res loc_or_dummy in
   (* assert2 *)
   let msg = "Assume postcondition" in
   let msg = match rs_name with
