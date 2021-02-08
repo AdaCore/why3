@@ -72,3 +72,8 @@ val with_marker : ?msg:string -> Loc.position -> 'a Pp.pp -> 'a Pp.pp
 
     NOTE: This is currently implemented by a global reference and is
     therefore unsafe in threaded programs. *)
+
+val id_loc : unit -> Loc.position
+(** Create a unique dummy location *)
+
+val is_id_loc : Loc.position -> bool

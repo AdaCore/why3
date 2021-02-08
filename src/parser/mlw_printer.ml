@@ -13,16 +13,38 @@ open Format
 open Ptree
 
 let debug_print_ids = Debug.register_flag "mlw_printer_print_ids"
-    ~desc:"Print@ IDs@ (the@ line@ number@ of@ locations@ when@ the@ filename@ is@ empty)"
+    ~desc:"Print@ IDs@ of@ unique@ dummy@ locations"
 
 type 'a printers = { marked: 'a Pp.pp; closed: 'a Pp.pp }
 
 let marker = ref None
 
+let dummy_filename = "//id//"
+
+let id_loc_counter = ref 0
+
+let id_loc () =
+  incr id_loc_counter;
+  Loc.user_position dummy_filename !id_loc_counter 0 0
+
+let is_id_loc loc =
+  let f,_,_,_ = Loc.get loc in
+  f = dummy_filename
+
+let only_ids =
+  try Some (
+      Wstdlib.Sint.of_list (List.map int_of_string
+         (String.split_on_char ',' (Sys.getenv "WHY3MLWPRINTERIDS"))))
+  with Not_found | Failure _ -> None
+
+let print_only_id loc =
+  let f,l,_,_ = Loc.get loc in
+  f = dummy_filename && only_ids <> None && Wstdlib.Sint.mem l (Opt.get only_ids)
+
 let pp_loc_id fmt loc =
-  if Debug.test_flag debug_print_ids then
-    let f,l,_,_ = Loc.get loc in
-    if f = "" then fprintf fmt "(*%d*)" l
+  if Debug.test_flag debug_print_ids || print_only_id loc then
+    let f,id,bc,ec = Loc.get loc in
+    if f = dummy_filename && bc = 0 && ec = 0 then fprintf fmt "(*%d*)" id
 
 let with_marker ?(msg="XXX") loc pp fmt x =
   marker := Some (msg, loc);
