@@ -163,9 +163,8 @@ let check_not_nonfree its_def =
 
 let get_field_name rs =
   match get_model_element_name ~attrs:rs.rs_name.id_attrs with
+  | name -> if name = "" then rs.rs_name.id_string else name
   | exception Not_found -> rs.rs_name.id_string
-  | "" -> rs.rs_name.id_string
-  | name -> name
 
 (* let empty_model_trace attrs =
  *   try

@@ -32,16 +32,22 @@ type blacklist = string list
 
 type 'a pp = Pp.formatter -> 'a -> unit
 
+type field_info = {
+  field_name: string;
+  field_trace: string;
+  field_ident: ident option;
+}
+
 type printer_mapping = {
-  lsymbol_m     : string -> Term.lsymbol;
-  vc_term_loc   : Loc.position option;
-  vc_term_attrs : Sattr.t;
-  queried_terms : Term.term Mstr.t;
-  list_projections: Ident.ident Mstr.t;
-  list_fields: Ident.ident Mstr.t;
-  list_records: ((string * string) list) Mstr.t;
-  noarg_constructors: string list;
-  set_str: Sattr.t Mstr.t
+  lsymbol_m          : string -> Term.lsymbol;
+  vc_term_loc        : Loc.position option;
+  vc_term_attrs      : Sattr.t;
+  queried_terms      : Term.term Mstr.t;
+  list_projections   : Ident.ident Mstr.t;
+  list_fields        : Ident.ident Mstr.t;
+  list_records       : field_info list Mstr.t;
+  noarg_constructors : string list;
+  set_str            : Sattr.t Mstr.t
 }
 
 let list_projs pm =
