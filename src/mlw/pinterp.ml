@@ -1440,12 +1440,29 @@ let task_of_term ?(vsenv=[]) env t =
         add_decl task (create_prop_decl Paxiom prs t), ls_mt, ls_mv
     | Dprop (Pgoal, _, _) -> task, ls_mt, ls_mv
     | _ -> add_decl task decl, ls_mt, ls_mv in
+  let add_prog_const rs v (task, ls_mt, ls_mv) =
+    let is_undefined_constant ls =
+      let th_known = env.pmodule.Pmodule.mod_theory.Theory.th_known in
+      match Mid.find ls.ls_name th_known with
+      | Decl.{d_node = Dparam _} -> true
+      | _ -> false in
+    match rs.rs_logic with
+    | Expr.RLls ls when is_undefined_constant ls ->
+        let pr = create_prsymbol (id_fresh (asprintf "def_%a" print_rs rs)) in
+        let vsenv, t = term_of_value env [] v in
+        let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
+        let t = t_equ (t_app ls [] ls.ls_value) t in
+        let task = add_prop_decl task Paxiom pr t in
+        task, ls_mt, ls_mv
+    | _ -> task, ls_mt, ls_mv in
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
   let task = List.fold_left add_used task th.Theory.th_decls in
   let used = Task.used_symbols (Task.used_theories task) in
   let task, ls_mt, ls_mv =
     Mid.fold (add_known used) th.Theory.th_known (task, ls_mt, ls_mv) in
   let task = add_param_decl task ls_undefined in
+  let task, ls_mt, ls_mv =
+    Mrs.fold add_prog_const env.rsenv (task, ls_mt, ls_mv) in
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env) env.vsenv (task, ls_mt, ls_mv) in
