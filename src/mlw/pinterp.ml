@@ -2072,9 +2072,8 @@ and eval_expr' env e =
         eval_expr env e2
       else if is_false v then
         eval_expr env e3
-      else (
-        Warning.emit "@[[Exec] Cannot decide condition of if: @[%a@]@]@." print_value v ;
-        Irred e )
+      else
+        Irred e
     | r -> r )
   | Ewhile (cond, inv, _var, e1) when env.rac.rac_abstract -> begin
       (* arbitrary execution of an iteration taken from the counterexample
@@ -2117,10 +2116,8 @@ and eval_expr' env e =
            end
          else if is_false v then
            Normal unit_value
-         else (
-           Warning.emit "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
-             print_value v ;
-           Irred e )
+         else
+           Irred e
       | r -> r
     end
   | Ewhile (e1, inv, var, e2) ->
@@ -2149,10 +2146,8 @@ and eval_expr' env e =
               | r -> r
             ) else if is_false v then (* condition false *)
               Normal unit_value
-            else (
-              Warning.emit "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
-              print_value v ;
-            Irred e )
+            else
+              Irred e
         | r -> r in
       iter ()
   | Efor (i, (pvs1, dir, pvs2), _ii, inv, e1) when env.rac.rac_abstract -> begin
@@ -2310,9 +2305,7 @@ and eval_expr' env e =
       let t = compute_term env t in
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
-      Warning.emit "@[[Exec] unsupported expression: @[%a@]@]@."
-        print_expr e ;
-      Irred e
+      Irred e (* TODO stuck? *)
 
 and exec_match env t ebl =
   let rec iter ebl =
