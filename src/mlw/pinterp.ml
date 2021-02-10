@@ -1482,8 +1482,7 @@ let task_of_term ?(vsenv=[]) env t =
 let bind_univ_quant_vars = false
 let bind_univ_quant_vars_default = false
 
-let string_or_model_trace id =
-  Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
+let model_element_name_of_ident id = id.id_string
 
 (* Get the value of a vsymbol with env.rac.get_value or a default value *)
 let get_value_for_quant_var env vs =
@@ -1492,7 +1491,7 @@ let get_value_for_quant_var env vs =
   | Some loc ->
       let value =
         if bind_univ_quant_vars then
-          let name = string_or_model_trace vs.vs_name in
+          let name = model_element_name_of_ident vs.vs_name in
           let v = env.rac.get_value ~name ~loc (ity_of_ty vs.vs_ty) in
           (Opt.iter (fun v ->
                Debug.dprintf debug_rac_values
@@ -1901,7 +1900,7 @@ let try_eval_ensures env (posts, vsenv) =
     3) use the default value of the type if it validates the postconditions. *)
 let get_and_register_value env ?def ?ity ?rs_name ?posts_vsenv vs loc =
   let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
-  let name = string_or_model_trace vs.vs_name in
+  let name = model_element_name_of_ident vs.vs_name in
   let value, descr = match env.rac.get_value ~name ~loc ity with
     | Some v -> v, "from model"
     | None -> match Opt.bind posts_vsenv (try_eval_ensures env) with
@@ -2496,7 +2495,7 @@ let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 let bind_globals ?rs_main mod_known env =
   let get_value env id opt_e ity =
-    let name = string_or_model_trace id in
+    let name = model_element_name_of_ident id in
     match env.rac.get_value ~name ?loc:id.id_loc ity with
     | Some v -> register_used_value env id.id_loc id v; v
     | None ->
@@ -2558,7 +2557,7 @@ let eval_rs rac env pm rs =
   let open Pmodule in
   let get_value (pv: pvsymbol) =
     let id = pv.pv_vs.vs_name in
-    let name = string_or_model_trace id in
+    let name = model_element_name_of_ident id in
     match rac.get_value ~name ?loc:id.id_loc pv.pv_ity with
     | Some v ->
        Debug.dprintf debug_rac_values
