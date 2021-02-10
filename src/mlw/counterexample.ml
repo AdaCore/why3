@@ -404,9 +404,10 @@ let check_model reduce env pm model =
           let rac = rac_config ~do_rac:true ~abstract
                       ~skip_cannot_compute:false ~reduce ~get_value () in
           check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
+        let me_name_trans men = men.Model_parser.men_name in
         Debug.dprintf debug_check_ce
           "@[Validating model:@\n@[<hv2>%a@]@]@\n"
-          (print_model ~filter_similar:false ?me_name_trans:None ~print_attrs:false) model;
+          (print_model ~filter_similar:false ~me_name_trans ~print_attrs:true) model;
         Debug.dprintf debug_check_ce "@[Interpreting concretly@]@\n";
         let concrete = check_model_rs ~abstract:false in
         Debug.dprintf debug_check_ce "@[Interpreting abstractly@]@\n";

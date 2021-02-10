@@ -2518,12 +2518,14 @@ let bind_globals ?rs_main mod_known env =
                          print_decoded id.id_string
   in
   let open Pdecl in
-  let eval_global _ d env =
+  let eval_global id d env =
     match d.pd_node with
     | PDlet (LDvar (pv, e)) ->
+        Debug.dprintf debug_trace_exec "EVAL GLOBAL VAR %a@." print_decoded id.id_string;
         let v = get_value env pv.pv_vs.vs_name (Some e) e.e_ity in
         bind_vs pv.pv_vs v env
     | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
+        Debug.dprintf debug_trace_exec "EVAL GLOBAL SYM CONST %a@." print_decoded id.id_string;
         assert (ce.c_cty.cty_args = []);
         let opt_e = match ce.c_node with
           | Cany -> None | Cfun e -> Some e
