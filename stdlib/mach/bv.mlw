@@ -28,6 +28,8 @@ module BVCheck_Gen
   constant two_power_size : int
   constant two_power_size_minus_one : int
   constant zeros           : t
+  constant minus_one : t
+  constant min_sint : t
 
   function to_uint t   : int
   function to_int t   : int
@@ -143,7 +145,7 @@ module BVCheck_Gen
       either the dividend is not min_int or the divisor is not -1 *)
   val sdiv_check (a b:t) : t
     requires { [@expl:division by zero] b <> zeros}
-    requires { [@expl:signed division overflow check] b <> zeros}
+    requires { [@expl:signed division overflow check] a <> min_sint /\ b <> minus_one}
     ensures  { to_int result = CD.div (to_int a) (to_int b) }
     ensures  { result = sdiv a b }
 
@@ -199,11 +201,18 @@ end
 module BVCheck8
   use export bv.BV8
 
+  constant two_power_size_minus_one : int = 0x80
+  constant minus_one : t = 0xFF
+  constant min_sint : t = 0x80
+
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
+    function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
     function to_uint = t'int,
     function to_int = to_int,
     function of_int = of_int,
@@ -234,11 +243,18 @@ end
 module BVCheck16
   use export bv.BV16
 
+  constant two_power_size_minus_one : int = 0x8000
+  constant minus_one : t = 0xFFFF
+  constant min_sint : t = 0x8000
+
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
+    function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
     function to_uint = t'int,
     function to_int = to_int,
     function of_int = of_int,
@@ -268,11 +284,18 @@ end
 module BVCheck32
   use export bv.BV32
 
+  constant two_power_size_minus_one : int = 0x8000_0000
+  constant minus_one : t = 0xFFFF_FFFF
+  constant min_sint : t = 0x8000_0000
+
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
+    function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
     function to_uint = t'int,
     function to_int = to_int,
     function of_int = of_int,
@@ -302,11 +325,18 @@ end
 module BVCheck64
   use export bv.BV64
 
+  constant two_power_size_minus_one : int = 0x8000_0000_0000_0000
+  constant minus_one : t = 0xFFFF_FFFF_FFFF_FFFF
+  constant min_sint : t = 0x8000_0000_0000_0000
+
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
+    function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
     function to_uint = t'int,
     function to_int = to_int,
     function of_int = of_int,
