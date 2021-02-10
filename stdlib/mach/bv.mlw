@@ -145,7 +145,7 @@ module BVCheck_Gen
       either the dividend is not min_int or the divisor is not -1 *)
   val sdiv_check (a b:t) : t
     requires { [@expl:division by zero] b <> zeros}
-    requires { [@expl:signed division overflow check] a <> min_sint /\ b <> minus_one}
+    requires { [@expl:signed division overflow check] a <> min_sint \/ b <> minus_one}
     ensures  { to_int result = CD.div (to_int a) (to_int b) }
     ensures  { result = sdiv a b }
 
