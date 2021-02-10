@@ -26,7 +26,7 @@
 
 %start cfgfile
 %type <Cfg_ast.cfg_file> cfgfile
-%type <Cfg_ast.cfg_instr list> sequence
+%type <Cfg_ast.cfg_instr list * Cfg_ast.cfg_term> sequence
 %type <Cfg_ast.switch_branch list> cases
 
 %%
@@ -76,12 +76,12 @@ labelblock:
 ;
 
 block:
-  | LEFTBRC sequence terminator RIGHTBRC { ($2, $3) }
+  | LEFTBRC sequence RIGHTBRC { $2 }
 ;
 
 sequence:
-  | { [] }
-  | x=instr SEMICOLON xl = sequence { x :: xl }
+  | terminator { ([], $1) }
+  | x=instr SEMICOLON xl = sequence { (x :: fst xl, snd xl) }
 ;
 
 instr:
@@ -96,9 +96,9 @@ terminator :
     { mk_cfgterm (CFGgoto $2) $startpos $endpos }
   | SWITCH LEFTPAR contract_expr RIGHTPAR cases END
     { mk_cfgterm (CFGswitch ($3,$5)) $startpos $endpos }
-  | TERM_RETURN contract_expr
+  | RETURN contract_expr
     { mk_cfgterm (CFGreturn $2) $startpos $endpos }
-  | TERM_ABSURD
+  | ABSURD
     { mk_cfgterm CFGabsurd $startpos $endpos }
 ;
 
