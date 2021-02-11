@@ -209,7 +209,20 @@ let field_get (Field r) = r.contents
 let field_set (Field r) v = r := v
 
 let int_value n = value ty_int (Vnum n)
-let range_value ity n = value (ty_of_ity ity) (Vnum n)
+
+let range_value ity n =
+  begin match ity_components ity with
+  | { its_def = Range r }, _, _ ->
+      begin
+        try
+          Number.(check_range { il_kind = ILitUnk; il_int = n } r);
+        with Number.OutOfRange _ ->
+          cannot_compute "%s is out of range" (BigInt.to_string n)
+      end
+  | _ -> ()
+  end;
+  value (ty_of_ity ity) (Vnum n)
+
 let string_value s = value ty_str (Vstring s)
 let bool_value b = value ty_bool (Vbool b)
 let proj_value ity ls v =
@@ -853,7 +866,7 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
   with
   | Big_real.Undetermined ->
       (* Cannot decide interval comparison *)
-      cannot_compute "computetation on reals is undetermined"
+      cannot_compute "computation on reals is undetermined"
   | Mlmpfr_wrapper.Not_Implemented ->
       cannot_compute "mlmpfr wrapper is not implemented"
 
