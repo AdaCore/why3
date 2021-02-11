@@ -79,7 +79,9 @@ let is_range_ty ty =
   let its, _, _ = ity_components (ity_of_ty ty) in
   Ty.is_range_type_def its.its_def
 
-(* EXCEPTIONS *)
+(******************************************************************************)
+(*                              EXCEPTIONS                                    *)
+(******************************************************************************)
 
 exception NoMatch
 exception Undetermined
@@ -90,7 +92,9 @@ exception CannotFind of (Env.pathname * string * string)
 let cannot_compute f =
   kasprintf (fun reason -> raise (CannotCompute {reason})) f
 
-(* VALUES *)
+(******************************************************************************)
+(*                                VALUES                                      *)
+(******************************************************************************)
 
 type float_mode = Mlmpfr_wrapper.mpfr_rnd_t
 
@@ -325,7 +329,9 @@ let ty_app_arg ts ix ty = match ty.ty_node with
       flush stderr;
       kasprintf failwith "@[<h>ty_arg: not a type application of %a: %a@]" print_ts ts print_ty ty
 
-(* RESULT *)
+(******************************************************************************)
+(*                                 RESULT                                     *)
+(******************************************************************************)
 
 type result =
   | Normal of value
@@ -339,7 +345,9 @@ let print_logic_result fmt r =
       fprintf fmt "@[exception %s(@[%a@])@]" x.xs_name.id_string print_value v
   | Irred e -> fprintf fmt "@[Cannot execute expression@ @[%a@]@]" print_expr e
 
-(* ENV *)
+(******************************************************************************)
+(*                                  ENV                                       *)
+(******************************************************************************)
 
 type rac_prover = Rac_prover of {
     command: string;
@@ -381,7 +389,9 @@ let rac_reduce_config_lit config env ?trans ?prover ?try_negate () =
     Opt.map aux prover in
   rac_reduce_config ?trans ?prover ?try_negate ()
 
-(* Interpretation log *)
+(******************************************************************************)
+(*                             Execution log                                  *)
+(******************************************************************************)
 
 module type Log = sig
   type exec_kind = ExecAbstract | ExecConcrete
@@ -703,7 +713,9 @@ module Log : Log = struct
 
 end
 
-(** RAC configuration  *)
+(******************************************************************************)
+(*                              RAC configuration                             *)
+(******************************************************************************)
 
 type import_value = ?name:string -> ?loc:Loc.position -> ity -> value option
 
@@ -787,7 +799,9 @@ let bind_pvs ?register pv v_t env =
 let multibind_pvs ?register l tl env =
   List.fold_left2 (fun env pv v -> bind_pvs ?register pv v env) env l tl
 
-(* BUILTINS *)
+(******************************************************************************)
+(*                                BUILTINS                                    *)
+(******************************************************************************)
 
 let big_int_of_const i = i.Number.il_int
 let big_int_of_value v = match v.v_desc with Vnum i -> i | _ -> raise NotNum
@@ -1068,7 +1082,9 @@ let get_vs env vs =
 let get_pvs env pvs =
   get_vs env pvs.pv_vs
 
-(* DEFAULTS *)
+(******************************************************************************)
+(*                           TYPE DEFAULTS                                    *)
+(******************************************************************************)
 
 let is_array_its env its =
   let pm = Pmodule.read_module env ["array"] "Array" in
@@ -1112,7 +1128,9 @@ let rec default_value_of_type env known ity : value =
              * else *)
             value ty Vundefined
 
-(* ROUTINE DEFINITIONS *)
+(******************************************************************************)
+(*                           ROUTINE DEFINITIONS                              *)
+(******************************************************************************)
 
 type routine_defn =
   | Builtin of (rsymbol -> value list -> value option)
@@ -1155,6 +1173,10 @@ let find_definition env (rs: rsymbol) =
   try LocalFunction ([], Mrs.find rs env.funenv) with Not_found ->
   (* else look for a global function *)
   find_global_definition env.pmodule.Pmodule.mod_known rs
+
+(******************************************************************************)
+(*                            VALUES TO TERMS                                 *)
+(******************************************************************************)
 
 (** Convert a value into a term. The first component of the result are additional bindings
    from closures. *)
@@ -1282,7 +1304,9 @@ let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * t
  *   let vsenv, t_field = term_of_value env vsenv v' in
  *   vsenv, fs_app (ls_of_rs rs) [t_field] v.v_ty *)
 
-(* CONTRADICTION CONTEXT *)
+(******************************************************************************)
+(*                           CONTRADICTION CONTEXT                            *)
+(******************************************************************************)
 
 type cntr_ctx = {
   c_desc: string;
@@ -1336,7 +1360,9 @@ let cntr_ctx desc ?trigger_loc env =
     c_trigger_loc= trigger_loc;
     c_env= snapshot_env env}
 
-(* TERM EVALUATION *)
+(******************************************************************************)
+(*                                TERM TO TASK                                *)
+(******************************************************************************)
 
 (* Add declarations for additional term bindings in [vsenv] *)
 let bind_term (vs, t) (task, ls_mt, ls_mv) =
@@ -1475,6 +1501,10 @@ let task_of_term ?(vsenv=[]) env t =
       let prs = create_prsymbol (id_fresh "goal") in
       add_prop_decl task Pgoal prs (undef_pred_app t) in
   task, ls_mv
+
+(******************************************************************************)
+(*                                CHECK TERM                                  *)
+(******************************************************************************)
 
 (* Parameters for binding universally quantified variables to a value
    obtained with rac_config.get_value or the default value *)
@@ -1763,7 +1793,9 @@ let mk_variant_term env =
     | _ -> assert false in
   loop
 
-(* EXPRESSION EVALUATION *)
+(******************************************************************************)
+(*                           EXPRESSION EVALUATION                            *)
+(******************************************************************************)
 
 (* Assuming the real is given in pow2 and pow5 *)
 let compute_fraction {Number.rv_sig= i; Number.rv_pow2= p2; Number.rv_pow5= p5}
@@ -1856,6 +1888,10 @@ let print_result fmt = function
   | Excep (xs, v) -> fprintf fmt "EXC %a: %a" print_xs xs print_value v
   | Irred e -> fprintf fmt "IRRED: %a" (pp_limited print_expr) e
 
+(******************************************************************************)
+(*                                VALUE OF TERM                               *)
+(******************************************************************************)
+
 let value_of_constant ty c =
   let open Constant in
   match c with
@@ -1897,6 +1933,10 @@ let try_eval_ensures env (posts, vsenv) =
     | _ -> None in
   try Some (Lists.first is_ensures_result posts) with Not_found -> None
 
+(******************************************************************************)
+(*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
+(******************************************************************************)
+
 (** Get a value and register it in the execution log.
     The value is retrieved by the first of the following ways which succeeds:
     1) Reading it from the model, or env
@@ -1929,6 +1969,10 @@ let get_and_register_value env ?def ?ity ?rs_name ?posts_vsenv vs loc =
   register_used_value env (Some loc) vs.vs_name value;
   value
 
+(******************************************************************************)
+(*                              SIDE EFFECTS                                  *)
+(******************************************************************************)
+
 let rec set_fields fs1 fs2 =
   let set_field f1 f2 =
     match (field_get f1).v_desc, (field_get f2).v_desc with
@@ -1954,6 +1998,10 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
     let pv = Mpv.find_def pv pv vars_map in
     let value = get_and_register_value ~ity:pv.pv_ity env pv.pv_vs loc in
     set_constr (get_vs env vs) value )
+
+(******************************************************************************)
+(*                          EXPRESSION EVALUATION                             *)
+(******************************************************************************)
 
 let rec eval_expr env e =
   Debug.dprintf debug_trace_exec "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
@@ -2507,7 +2555,9 @@ and exec_call_abstract ?snapshot ?loc ?rs_name env cty arg_pvs ity_result =
   check_assume_posts ctx res_v cty.cty_post;
   Normal res_v
 
-(* GLOBAL EVALUATION *)
+(******************************************************************************)
+(*                             GLOBAL EVALUATION                              *)
+(******************************************************************************)
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
