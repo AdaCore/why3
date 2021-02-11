@@ -1426,16 +1426,17 @@ let task_of_term ?(vsenv=[]) env t =
           {inst_df; inst_pr; inst_ty= sm.sm_ty; inst_ts= sm.sm_ts; inst_ls= sm.sm_ls } in
         Task.clone_export task th inst
     | _ -> task in
-  let add_known used id decl (task, ls_mt, ls_mv) =
-    if Mid.mem id used then (task, ls_mt, ls_mv) else
+  let add_known _ decl (task, ls_mt, ls_mv) =
     match decl.d_node with
     | Dparam ls when Mls.contains lsenv ls ->
         (* Take value from lsenv (i.e. env.rsenv) for declaration *)
         let vsenv, t = term_of_value env [] (Mls.find ls lsenv) in
         let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
         let t = t_ty_subst ls_mt ls_mv t in
-        let decl = Decl.make_ls_defn ls [] t in
-        add_decl task (create_logic_decl [decl]), ls_mt, ls_mv
+        let ldecl = Decl.make_ls_defn ls [] t in
+        let decl = create_logic_decl [ldecl] in
+        let task = add_decl task decl in
+        task, ls_mt, ls_mv
     | Dprop (Plemma, prs, t) ->
         add_decl task (create_prop_decl Paxiom prs t), ls_mt, ls_mv
     | Dprop (Pgoal, _, _) -> task, ls_mt, ls_mv
@@ -1458,11 +1459,10 @@ let task_of_term ?(vsenv=[]) env t =
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
   let task = List.fold_left add_used task th.Theory.th_decls in
   let used = Task.used_symbols (Task.used_theories task) in
-  let task, ls_mt, ls_mv =
-    Mid.fold (add_known used) th.Theory.th_known (task, ls_mt, ls_mv) in
   let task = add_param_decl task ls_undefined in
-  let task, ls_mt, ls_mv =
-    Mrs.fold add_prog_const env.rsenv (task, ls_mt, ls_mv) in
+  let known_local = Mid.filter (fun id _ -> not (Mid.mem id used)) th.Theory.th_known in
+  let task, ls_mt, ls_mv = Mid.fold add_known known_local (task, ls_mt, ls_mv) in
+  let task, ls_mt, ls_mv = Mrs.fold add_prog_const env.rsenv (task, ls_mt, ls_mv) in
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env) env.vsenv (task, ls_mt, ls_mv) in
