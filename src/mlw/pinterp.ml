@@ -717,18 +717,18 @@ end
 (*                              RAC configuration                             *)
 (******************************************************************************)
 
-type import_value = ?name:string -> ?loc:Loc.position -> ity -> value option
+type get_value = ?loc:Loc.position -> ident -> ity -> value option
 
 type rac_config = {
   do_rac              : bool;
   rac_abstract        : bool;
   skip_cannot_compute : bool; (* skip if it cannot compute, when possible *)
   rac_reduce          : rac_reduce_config;
-  get_value           : import_value;
+  get_value           : get_value;
   log_uc              : Log.log_uc;
 }
 
-let default_get_value ?name:_ ?loc:_ _ = None
+let default_get_value ?loc:_ _ _ = None
 
 let rac_config ~do_rac ~abstract:rac_abstract
       ?(skip_cannot_compute=true)
@@ -1511,9 +1511,6 @@ let task_of_term ?(vsenv=[]) env t =
 let bind_univ_quant_vars = false
 let bind_univ_quant_vars_default = false
 
-let model_element_name_of_ident id =
-  Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
-
 (* Get the value of a vsymbol with env.rac.get_value or a default value *)
 let get_value_for_quant_var env vs =
   match vs.vs_name.id_loc with
@@ -1521,8 +1518,7 @@ let get_value_for_quant_var env vs =
   | Some loc ->
       let value =
         if bind_univ_quant_vars then
-          let name = model_element_name_of_ident vs.vs_name in
-          let v = env.rac.get_value ~name ~loc (ity_of_ty vs.vs_ty) in
+          let v = env.rac.get_value ~loc vs.vs_name (ity_of_ty vs.vs_ty) in
           (Opt.iter (fun v ->
                Debug.dprintf debug_rac_values
                  "Bind all-quantified variable %a to %a@."
@@ -1945,8 +1941,7 @@ let try_eval_ensures env (posts, vsenv) =
     3) use the default value of the type if it validates the postconditions. *)
 let get_and_register_value env ?def ?ity ?rs_name ?posts_vsenv vs loc =
   let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
-  let name = model_element_name_of_ident vs.vs_name in
-  let value, descr = match env.rac.get_value ~name ~loc ity with
+  let value, descr = match env.rac.get_value ~loc vs.vs_name ity with
     | Some v -> v, "from model"
     | None -> match Opt.bind posts_vsenv (try_eval_ensures env) with
       | Some v -> v, "computed from post condition"
@@ -1959,10 +1954,10 @@ let get_and_register_value env ?def ?ity ?rs_name ?posts_vsenv vs loc =
             match check_posts desc (Some loc) env v posts with
             | _ -> v, "type default"
             | exception Contr _ ->
-                cannot_compute "missing value for %a at %a" print_decoded name
+                cannot_compute "missing value for %a at %a" print_vs vs
                   print_loc' loc in
   Debug.dprintf debug_rac_values "@[<h>Value %s for %a%a at %a: %a@]@."
-    descr print_decoded name
+    descr print_vs vs
     (Pp.print_option
        (fun fmt id -> fprintf fmt " of %a" print_decoded id.id_string)) rs_name
     print_loc' loc print_value value;
@@ -2563,8 +2558,7 @@ let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 let bind_globals ?rs_main mod_known env =
   let get_value env id opt_e ity =
-    let name = model_element_name_of_ident id in
-    match env.rac.get_value ~name ?loc:id.id_loc ity with
+    match env.rac.get_value ?loc:id.id_loc id ity with
     | Some v ->
          Debug.dprintf debug_rac_values "Value from model for global %a: %a@."
            print_decoded id.id_string print_value v;
@@ -2636,14 +2630,12 @@ let eval_global_fundef rac env pmodule locals e =
 let eval_rs rac env pm rs =
   let open Pmodule in
   let get_value (pv: pvsymbol) =
-    let id = pv.pv_vs.vs_name in
-    let name = model_element_name_of_ident id in
-    match rac.get_value ~name ?loc:id.id_loc pv.pv_ity with
+    match rac.get_value pv.pv_vs.vs_name pv.pv_ity with
     | Some v ->
        Debug.dprintf debug_rac_values
          "@[<h>Value imported for %a at %a: %a@]@."
-         print_decoded name
-         (Pp.print_option_or_default "NOLOC" print_loc') id.id_loc
+         print_pv pv
+         (Pp.print_option_or_default "NOLOC" print_loc') pv.pv_vs.vs_name.id_loc
          print_value v;
        v
     | None ->

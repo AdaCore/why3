@@ -441,32 +441,31 @@ let get_model_elements m =
 let get_model_term_loc m = m.vc_term_loc
 let get_model_term_attrs m = m.vc_term_attrs
 
+(** [search_model_element ?file ?line m p] searches a model element [me] in
+    model [m], whose file is [file] and line is [line], and which fullfils
+    [p me]. *)
+let search_model_element ?file ?line m p =
+  let iter_line f line' mes = if line = None || line = Some line' then
+      List.iter f mes in
+  let iter_file f file' lines = if file = None || file = Some file' then
+      Mint.iter (iter_line f) lines in
+  let iter_files f = Mstr.iter (iter_file f) m.model_files in
+  Util.iter_first iter_files p
+
 let trace_by_id id =
   Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
 
 let trace_by_men men =
   Ident.get_model_trace_string ~name:men.men_name ~attrs:men.men_attrs
 
-let get_model_element model name loc =
-  let aux me =
-    trace_by_men me.me_name = name &&
-    Opt.equal Loc.equal me.me_location (Some loc) in
-  List.find_opt aux (get_model_elements model)
-
-let get_model_element_value model name loc =
-  let aux me =
-    trace_by_men me.me_name = name &&
-    Opt.equal Loc.equal me.me_location (Some loc) in
-  List.find_opt aux (get_model_elements model)
-
-let get_model_element_by_id model id =
-  match id.id_loc with
-  | None -> None
-  | Some loc -> get_model_element_value model (trace_by_id id) loc
-
-let get_model_element_by_loc model loc =
-  let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
-  List.find_opt aux (get_model_elements model)
+let search_model_element_for_id m ?loc id =
+  let oloc = if loc <> None then loc else id.id_loc in
+  let id_trace = trace_by_id id in
+  let p me =
+    if trace_by_men me.me_name = id_trace &&
+       Opt.equal Loc.equal me.me_location oloc
+    then Some me else None in
+  search_model_element m p
 
 (*
 ***************************************************************

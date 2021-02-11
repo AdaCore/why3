@@ -71,6 +71,13 @@ val ffalse : 'a -> bool
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
 
+(** [iter_first iter f] returns the first result of [f] that is inhabitated,
+    when applied on the elements encountered by iterator [iter]. Generalisation
+    of [Lists.first].
+
+    @raise Not_found if no such element is encountered by the iterator. *)
+val iter_first : (('a -> unit) -> 'b) -> ('a -> 'c option) -> 'c
+
 (** {3 Lexical comparison using projections}
 
     For example to lexically sort a list [l] of pairs [(int * string) list]:

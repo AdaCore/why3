@@ -21,14 +21,6 @@ open Model_parser
 let debug_check_ce = Debug.register_info_flag "check-ce"
     ~desc:"Debug@ info@ for@ --check-ce"
 
-(** [first2 iter f] returns the result of [f] that is inhabitated, when
-    applied on elements that the iterator [iter] receives. It raises [Not_found]
-    if no such element is encountered by the iterator. *)
-let first2 (type a) iter f =
-  let exception Found of a in
-  let f x y = match f x y with Some z -> raise (Found z) | None -> () in
-  try iter f; raise Not_found with Found z -> z
-
 (** Result of checking solvers' counterexample models *)
 
 type ce_summary =
@@ -225,12 +217,13 @@ let rec import_model_value known th_known ity v =
           constr_value ity rs [] vs
       | Proj (p, x) ->
           (* {p : ity -> ty_res => x: ty_res} : ITY *)
-          let search id = function
-            | Decl.{d_node= Dparam ls} when String.equal (trace_or_name id) p ->
-                Some ls
+          let search (id, decl) = match decl.Decl.d_node with
+            | Decl.Dparam ls when String.equal (trace_or_name id) p -> Some ls
             | _ -> None in
-          let ls = try first2 (fun f -> Mid.iter f th_known) search with
-              Not_found -> cannot_import "Projection %s not found" p in
+          let ls =
+            let iter f = Mid.iter (fun id x -> f (id, x)) th_known in
+            try Util.iter_first iter search with Not_found ->
+              cannot_import "Projection %s not found" p in
           let ty_res = match ls.ls_value with Some ty -> ty | None ->
             cannot_import "projection %a is predicate" Pretty.print_ls ls in
           let ty_arg = match ls.ls_args with [ty] -> ty | _ ->
@@ -263,19 +256,14 @@ let rec import_model_value known th_known ity v =
       | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
           cannot_import "implemented for value %a" print_model_value v
 
-let get_model_value m known th_known =
-  fun ?name ?loc ity : Value.value option ->
-  match loc with
-  | None -> None
-  | Some l ->
-     let ome = match name with
-       | None -> get_model_element_by_loc m l
-       | Some s -> get_model_element m s l in
-     match ome with
-     | None -> None
-     | Some me ->
-         try Some (import_model_value known th_known ity me.me_value) with
-           Exit -> None
+let get_value m known th_known =
+  fun ?loc id ity : Value.value option ->
+  let import_value me =
+    try Some (import_model_value known th_known ity me.me_value) with
+      Exit -> None in
+  match search_model_element_for_id m ?loc id with
+  | me -> import_value me
+  | exception Not_found -> None
 
 (** Check and select solver counterexample models *)
 
@@ -406,7 +394,7 @@ let check_model reduce env pm model =
      | Some rs ->
         let check_model_rs ~abstract =
           let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
-          let get_value = get_model_value model mod_known th_known in
+          let get_value = get_value model mod_known th_known in
           let rac = rac_config ~do_rac:true ~abstract
                       ~skip_cannot_compute:false ~reduce ~get_value () in
           check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
@@ -572,9 +560,9 @@ let model_of_exec_log ~original_model log =
   let me loc id value =
     let name = asprintf "%a" print_decoded id.id_string in
     let men_name = get_model_trace_string ~name ~attrs:id.id_attrs in
-    let men_kind = match get_model_element_by_id original_model id with
-      | Some me -> me.me_name.men_kind
-      | None -> Other in
+    let men_kind = match search_model_element_for_id original_model id with
+      | me -> me.me_name.men_kind
+      | exception Not_found -> Other in
     let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
     let me_value = model_value value in
     {me_name; me_value; me_location= Some loc; me_term= None} in
