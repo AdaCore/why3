@@ -45,6 +45,7 @@ Provers support
   * support for AltErgo 2.3.3 (released Aug 19, 2020)
   * support for AltErgo 2.4.0 (released Jan 22, 2021)
   * support for Coq 8.13.0 (released Jan 7, 2021)
+  * support for CVC4 1.8 (released Jun 19, 2020)
 
 Generation of counterexamples
   * various improvements
