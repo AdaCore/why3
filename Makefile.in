@@ -2125,7 +2125,7 @@ src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
 
 plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
 	$(SHOW) 'Menhir $^'
-	$(HIDE)$(MENHIR) --table --explain --base plugins/cfg/cfg_parser \
+	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser \
 		--external-tokens Cfg_tokens $^
 
 
