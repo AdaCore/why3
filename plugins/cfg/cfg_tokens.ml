@@ -34,8 +34,6 @@ type token =
   | RIGHTBRC
   | RETURNS
   | RETURN
-  | TERM_RETURN
-  | TERM_ABSURD
   | REQUIRES
   | REF
   | REC

@@ -22,7 +22,7 @@
 %}
 
 (* extra tokens *)
-%token CFG GOTO VAR SWITCH TERM_ABSURD TERM_RETURN
+%token CFG GOTO VAR SWITCH
 
 %start cfgfile
 %type <Cfg_ast.cfg_file> cfgfile
