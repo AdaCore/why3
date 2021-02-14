@@ -1182,7 +1182,6 @@ let editors_page c (notebook:GPack.notebook) =
             in
 	    (* Debug.dprintf debug "prover %a: selected editor '%s'@." *)
             (*   print_prover p data; *)
-            let provers = Whyconf.get_provers c.config in
             c.config <-
               Whyconf.User.update_prover_editor c.config
                 p data
