@@ -147,11 +147,12 @@ of calling provers, e.g., different versions of the same prover, or with
 different options.
 
 If the user's configuration file is already present, :why3:tool:`config` only
-modifies the ``[detected_prover]`` sections.
+modifies the ``[detected_binary]`` sections.
 
 If a supported prover is installed under a name that is not
 automatically recognized by :why3:tool:`config`, the :option:`--add-prover` option
-can be used to add a specified binary to the configuration.
+can be used to add a specified binary to the configuration by adding
+``[manual_binary]`` section.
 
 Options
 ~~~~~~~
@@ -160,10 +161,11 @@ Options
 
    Only show the expanded version of the configuraion file
 
-.. option:: --add-prover=<id>,<shortcut>,<file>
+.. option:: --add-prover=<known>,<shortcut>,<file>
 
-   Check the executable program ``<file>`` against the provers of family
-   ``<id>``, and register it as ``<shortcut>``.
+   Check the executable program ``<file>`` as if it was the known binary
+   ``<known>``, and register it as ``<shortcut>``. It removes previous manually
+   added binary with the same shortcut.
 
    Example: to add an Alt-Ergo
    executable :file:`/home/me/bin/alt-ergo-trunk`, one can type
@@ -174,7 +176,7 @@ Options
 
 .. option:: --list-prover-families
 
-   List families of provers, as used by option :option:`--add-prover`.
+   List the known prover binary name, as used by option :option:`--add-prover`.
 
 .. why3:tool:: prove
 .. _sec.why3prove:

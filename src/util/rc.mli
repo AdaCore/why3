@@ -126,8 +126,14 @@ val set_int : ?default:int -> section -> string -> int -> section
 *)
 
 val set_intl : ?default:int list -> section -> string -> int list -> section
-(** [set_int ?default section key lvalue] add the associations [key] to all the
-    [lvalue] in the section if value is not default.
+(** [set_intl ?default section key lvalue] add the associations [key] to all the
+    [lvalue] in the section if the value is not default.
+    Remove all former associations with this [key]
+*)
+
+val set_into : ?default:int -> section -> string -> int option -> section
+(** [set_int ?default section key value] add the associations [key] to
+    [value] in the section if value is not default or None.
     Remove all former associations with this [key]
 *)
 
@@ -145,6 +151,9 @@ val set_bool : ?default:bool -> section -> string -> bool -> section
 val set_booll : ?default:bool list -> section -> string -> bool list -> section
 (** Same as {!set_intl} but on bool *)
 
+val set_boolo : ?default:bool -> section -> string -> bool option -> section
+(** Same as {!set_into} but on bool *)
+
 
 val get_string : ?default:string -> section -> string -> string
 (** Same as {!get_int} but on string *)
@@ -160,6 +169,10 @@ val set_string : ?escape_eol:bool -> ?default:string -> section -> string -> str
 
 val set_stringl : ?escape_eol:bool -> ?default:string list ->
   section -> string -> string list -> section
+
+val set_stringo : ?escape_eol:bool -> ?default:string ->
+  section -> string -> string option -> section
+
 (** Same as {!set_intl} but on string *)
 
 (* val ident  : ?default:string      -> section -> string -> string *)

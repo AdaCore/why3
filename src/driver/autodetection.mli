@@ -14,8 +14,8 @@ val debug: Debug.flag
 (* If true make the autodetection verbose *)
 val is_config_command: bool ref
 
-(** Lists prover family names from detection config *)
-val list_prover_families : unit -> string list
+(** Lists binarires names looked for from detection config *)
+val list_binaries : unit -> string list
 
 (** Adds a new prover executable *)
 (* val add_prover_binary :
@@ -30,4 +30,16 @@ val run_auto_detection : Whyconf.config -> autodetection_result
 val generate_builtin_config : autodetection_result -> Whyconf.config -> Whyconf.config
 
 (** Replace the output of provers with the current one *)
-val generate_detected_config : autodetection_result -> Whyconf.detected_prover list
+val generate_detected_config : autodetection_result -> Whyconf.config -> Whyconf.config
+
+
+module Manual_binary: sig
+  type t = {
+    same_as  : string;
+    binary : string; (* custom executable *)
+    shortcut: string;
+  }
+
+  val add: Whyconf.config -> t -> Whyconf.config
+  (** Add the given manual binary to the user configuration and remove the previous one that had the same shortcut *)
+end

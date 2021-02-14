@@ -227,15 +227,6 @@ val get_strategies : config -> config_strategy Mstr.t
 
 val add_strategy : config -> config_strategy -> config
 
-(** detected provers *)
-type detected_prover = {
-  exec_name  : string;
-  version : string;
-}
-
-val set_detected_provers: config -> detected_prover list -> config
-val get_detected_provers: config -> detected_prover list
-
 (** filter prover *)
 type filter_prover
 
@@ -289,14 +280,14 @@ module User: sig
   val set_prover_upgrade_policy :
     config -> Mprover.key -> prover_upgrade_policy -> config
 
-  val set_detected_provers :
-    config -> detected_prover list -> config
-
   val remove_user_policy : config -> Mprover.key -> config
 
   val get_section : config -> string -> Rc.section option
   (** [get_section config name] Same as {!Rc.get_section} except name
       must not be "main" *)
+  val get_simple_family  : config -> string -> Rc.section list
+  (** [get_family config name] Same as {!Rc.get_simple_family} except name
+      must not be prover *)
   val get_family  : config -> string -> Rc.family
   (** [get_family config name] Same as {!Rc.get_family} except name
       must not be prover *)
@@ -304,6 +295,9 @@ module User: sig
   val set_section : config -> string -> Rc.section -> config
   (** [set_section config name] Same as {!Rc.set_section} except name
       must not be "main" *)
+  val set_simple_family  : config -> string -> Rc.section list  -> config
+  (** [set_simple_family config name] Same as {!Rc.set_simple_family} except name
+      must not be prover *)
   val set_family  : config -> string -> Rc.family  -> config
   (** [set_family config name] Same as {!Rc.set_family} except name
       must not be prover *)
@@ -357,6 +351,6 @@ val unknown_to_known_provers  :
 
 (** Internal, recursive functionality with Autodetection  *)
 
-val provers_from_detected_provers: (save_to:string -> detected_prover list -> config) ref
+val provers_from_detected_provers: (save_to:string -> Rc.t -> config) ref
 
 (** */ *)

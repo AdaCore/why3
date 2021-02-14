@@ -150,11 +150,6 @@ type config_editor = {
   editor_options : string list;
 }
 
-type detected_prover = {
-  exec_name  : string;
-  version : string;
-}
-
 (** Strategies *)
 
 type config_strategy = {
@@ -288,7 +283,6 @@ type config = {
   user_rc : Rc.t; (* from .why3.conf without extra_config *)
   main      : main;
   provers   : config_prover Mprover.t;
-  detected_provers : detected_prover list;
   prover_shortcuts : prover Mstr.t;
   editors   : config_editor Meditor.t;
   provers_upgrade_policy : prover_upgrade_policy Mprover.t;
@@ -370,17 +364,6 @@ module RC_load = struct
     with MissingField s ->
       Warning.emit "[Warning] cannot load a prover: missing field '%s'@." s;
       provers,shortcuts
-
-  let load_detected_prover acc section =
-    try
-      let v = {
-        exec_name = get_string section "exec_name";
-        version = get_string section "version"
-      } in
-      v::acc
-    with MissingField s ->
-      Warning.emit "[Warning] cannot load a detected_prover section: missing field '%s'@." s;
-      acc
 
   let load_shortcut acc section =
     try
@@ -497,10 +480,6 @@ module RC_load = struct
   let get_dirname filename =
     Filename.dirname (Sysutil.concat (Sys.getcwd ()) filename)
 
-  let load_detected_provers rc =
-    List.fold_left load_detected_prover
-      [] (get_simple_family rc "detected_prover")
-
   let config_from_rc config filename rc =
     let dirname = get_dirname filename in
     let main =
@@ -511,7 +490,6 @@ module RC_load = struct
     let provers = get_simple_family rc "prover" in
     let provers,shortcuts = List.fold_left load_prover
         (config.provers,config.prover_shortcuts) provers in
-    let detected_provers = load_detected_provers rc in
     let fam_shortcuts = get_simple_family rc "shortcut" in
     let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
     let editors = get_family rc "editor" in
@@ -524,7 +502,6 @@ module RC_load = struct
       user_rc    = rc;
       main      = main;
       provers   = provers;
-      detected_provers;
       prover_shortcuts = shortcuts;
       editors   = editors;
       provers_upgrade_policy = policy;
@@ -576,8 +553,7 @@ module RC_save = struct
     let section = empty_section in
     let section = set_prover_id section prover.prover in
     let section = set_string section "command" prover.command in
-    let section =
-      Opt.fold (fun s c -> set_string s "command_steps" c) section prover.command_steps
+    let section = set_stringo section "command_steps" prover.command_steps
     in
     let section = set_string section "driver" prover.driver in
     let section = set_string section "editor" prover.editor in
@@ -613,16 +589,6 @@ module RC_save = struct
   let set_provers rc provers =
     let family = Mprover.fold set_prover provers [] in
     set_simple_family rc "prover" family
-
-  let set_detected_prover prover =
-    let section = empty_section in
-    let section = set_string section "exec_name" prover.exec_name in
-    let section = set_string section "version" prover.version in
-    section
-
-  let set_detected_provers rc detected_provers =
-    let family = List.map set_detected_prover detected_provers in
-    set_simple_family rc "detected_prover" family
 
   let set_prover_shortcut prover shortcuts family =
     let section = empty_section in
@@ -727,7 +693,6 @@ let empty_config conf_file =
     user_rc = Rc.empty;
     main = empty_main;
     provers = Mprover.empty;
-    detected_provers = [];
     prover_shortcuts = Mstr.empty;
     editors = Meditor.empty;
     provers_upgrade_policy = Mprover.empty;
@@ -754,7 +719,6 @@ let read_config conf_file =
 
 let rc_of_config { main;
                    provers;
-                   detected_provers;
                    prover_shortcuts;
                    editors;
                    provers_upgrade_policy;
@@ -768,7 +732,6 @@ let rc_of_config { main;
   let rc = RC_save.set_provers_shortcuts rc prover_shortcuts provers in
   let rc = RC_save.set_editors rc editors in
   let rc = RC_save.set_policies rc provers_upgrade_policy in
-  let rc = RC_save.set_detected_provers rc detected_provers in
   rc
 
 (** filter prover *)
@@ -925,7 +888,6 @@ let save_config config =
 
 let get_main config = config.main
 let get_provers config = config.provers
-let get_detected_provers config = config.detected_provers
 let get_prover_config config prover =
   Mprover.find prover (get_provers config)
 let get_prover_shortcuts config = config.prover_shortcuts
@@ -987,22 +949,20 @@ module User = struct
      provers_upgrade_policy = m;
     }
 
-  let set_detected_provers config detected_provers =
-    (** kept simple because no auto upgrade policy *)
-    {config with
-     user_rc = RC_save.set_detected_provers config.user_rc detected_provers;
-     detected_provers;
-    }
-
   let get_section config name = assert (name <> "main");
     get_section config.user_rc name
+
+  let get_simple_family config name = assert (name <> "prover");
+    get_simple_family config.user_rc name
 
   let get_family config name = assert (name <> "prover");
     get_family config.user_rc name
 
-
   let set_section config name section = assert (name <> "main");
     {config with user_rc = set_section config.user_rc name section}
+
+  let set_simple_family config name section =
+    {config with user_rc = set_simple_family config.user_rc name section}
 
   let set_family config name section = assert (name <> "prover");
     {config with user_rc = set_family config.user_rc name section}
@@ -1014,11 +974,6 @@ let set_provers config ?shortcuts provers =
   {config with
    provers = provers;
    prover_shortcuts = shortcuts;
-  }
-
-let set_detected_provers config detected_provers =
-  {config with
-    detected_provers;
   }
 
 let set_prover_shortcuts config shortcuts =
@@ -1101,7 +1056,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | _ -> raise e)
 
 let provers_from_detected_provers :
-  (save_to:string -> detected_prover list -> config) ref =
+  (save_to:string -> Rc.t -> config) ref =
   ref (fun ~save_to:_ _ -> invalid_arg
           "provers_from_detected_provers: Must be filled by Autodetection")
 
@@ -1110,10 +1065,8 @@ let add_builtin_provers config = !provers_from_detected_provers config
 
 let init_config ?(extra_config=[]) ofile =
   let save_to,rc = read_config_rc ofile in
-  (* load detected provers from user configuration *)
-  let detected_provers = RC_load.load_detected_provers rc in
   (* Add the automatic provers, shortcuts, strategy, ... *)
-  let config = add_builtin_provers ~save_to detected_provers in
+  let config = add_builtin_provers ~save_to rc in
   (* load the user configuration, priority over automatic values *)
   let config = read_config_aux config save_to rc in
   (* Add extra-config *)

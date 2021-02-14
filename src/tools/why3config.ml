@@ -20,13 +20,13 @@ let show_config = ref false
    true <-> fallback *)
 let auto_fb = Array.length Sys.argv = 1
 
-let opt_list_prover_families = ref false
+let opt_list_binaries = ref false
 
 let save = ref true
 
 let set_oref r = (fun s -> r := Some s)
 
-(* let prover_bins = Queue.create () *)
+let prover_bins = Queue.create ()
 
 let plugins = Queue.create ()
 let add_plugin x = Queue.add x plugins
@@ -35,13 +35,16 @@ let spec =
   let open Getopt in
   [ Key ('C', "config"), Hnd1 (AString, set_oref conf_file),
     "<file> config file to create";
-    (* KLong "add-prover", Hnd1 (APair (',', AString, (APair (',', AString, AString))),
-     *   fun (id, (shortcut, name)) -> Queue.add (id, shortcut, name) prover_bins),
-     * "<id>,<shortcut>,<file> add a new prover executable"; *)
+    KLong "add-prover", Hnd1 (APair (',', AString, (APair (',', AString, AString))),
+                              fun (same_as, (shortcut, binary)) ->
+                                Queue.add {Autodetection.Manual_binary.same_as;
+                                           shortcut;
+                                           binary } prover_bins),
+    "<id>,<shortcut>,<file> add a new prover executable as if it was id";
     KLong "show-config", Hnd0 (fun () -> show_config := true),
     " show the expansion of the configuration";
-    KLong "list-prover-families", Hnd0 (fun () -> opt_list_prover_families := true),
-    " list known prover families";
+    KLong "list-binaries", Hnd0 (fun () -> opt_list_binaries := true),
+    " list name of binaries looked for";
     KLong "install-plugin", Hnd1 (AString, add_plugin),
     "<file> copy a plugin to the current library directory";
     KLong "dont-save", Hnd0 (fun () -> save := false),
@@ -78,11 +81,11 @@ let main () =
   (* Debug flag *)
   Debug.Args.set_flags_selected ();
 
-  if !opt_list_prover_families then begin
+  if !opt_list_binaries then begin
     opt_list := true;
-    printf "@[<hov 2>Known prover families:@\n%a@]@\n@."
+    printf "@[<hov 2>Binaries looked for:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
-      (List.sort String.compare (Autodetection.list_prover_families ()))
+      (List.sort String.compare (Autodetection.list_binaries ()))
   end;
 
   opt_list := Debug.Args.option_list () || !opt_list;
@@ -106,13 +109,11 @@ let main () =
           Whyconf.default_config f
     in
 
-    (* let config =
-     *   try Queue.fold add_prover_binary config prover_bins with Exit -> exit 1 in *)
+    let config = Queue.fold Autodetection.Manual_binary.add config prover_bins in
 
     let config =
       let env = Autodetection.run_auto_detection config in
-      let detected_provers = Autodetection.generate_detected_config env in
-      Whyconf.set_detected_provers config detected_provers
+      Autodetection.generate_detected_config env config
     in
     if !save then begin
       printf "Save config to %s@." (Whyconf.get_conf_file config);
