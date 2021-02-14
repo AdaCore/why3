@@ -35,6 +35,12 @@ let spec =
   let open Getopt in
   [ Key ('C', "config"), Hnd1 (AString, set_oref conf_file),
     "<file> config file to create";
+    KLong "detect-provers", Hnd0 (fun () -> ()),
+    " deprecated does nothing";
+    KLong "detect-plugins", Hnd0 (fun () -> ()),
+    " deprecated does nothing";
+    KLong "detect", Hnd0 (fun () -> ()),
+    " deprecated does nothing";
     KLong "add-prover", Hnd1 (APair (',', AString, (APair (',', AString, AString))),
                               fun (same_as, (shortcut, binary)) ->
                                 Queue.add {Autodetection.Manual_binary.same_as;
