@@ -997,25 +997,17 @@ let provers_page c (notebook:GPack.notebook) =
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
   in
   let page_pack = page#pack ~fill:true ~expand:true ?from:None ?padding:None in
-  let hbox = GPack.hbox ~packing:page_pack () in
-  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   let scrollview =
-  try
     GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
-      ~packing:hbox_pack ()
-  with Gtk.Error _ -> assert false
-  in let () = scrollview#set_shadow_type `OUT in
-  let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
-  let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
-  let hbox = GPack.hbox ~packing:vbox_pack () in
-  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
-  (* show/hide provers *)
+      ~packing:page_pack () in
+  let () = scrollview#set_shadow_type `OUT in
   let frame =
-    GBin.frame ~label:"Provers visible in the context menu" ~packing:hbox_pack ()
-  in
+    GBin.frame ~label:"Provers visible in the context menu"
+      ~packing:scrollview#add_with_viewport () in
   let provers_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:frame#add () in
+  provers_box#set_homogeneous true;
   let hidden_provers = Hashtbl.create 7 in
   Mprover.iter
     (fun _ p ->
@@ -1034,34 +1026,7 @@ let provers_page c (notebook:GPack.notebook) =
               Hashtbl.fold
               (fun l h acc -> if !h then l::acc else acc) hidden_provers [])
       in ())
-    (Whyconf.get_provers c.config);
-  (* default prover *)
-(*
-  let frame2 =
-    GBin.frame ~label:"Default prover" ~packing:hbox_pack () in
-  let provers_box =
-    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-      ~packing:frame2#add () in
-  let group =
-    let b =
-      GButton.radio_button ~label:"(none)" ~packing:provers_box#add
-                           ~active:(c.config.default_prover = "") () in
-    let (_ : GtkSignal.id) =
-      b#connect#toggled ~callback:(fun () -> c.config.default_prover <- "") in
-    b#group in
-  Mprover.iter
-    (fun _ p ->
-      let name = prover_parseable_format p.prover in
-      let label = Pp.string_of_wnl print_prover p.prover in
-      let b =
-        GButton.radio_button ~label ~group ~packing:provers_box#add
-                             ~active:(name = c.config.default_prover) () in
-      let (_ : GtkSignal.id) =
-        b#connect#toggled ~callback:(fun () -> c.config.default_prover <- name)
-      in ())
     (Whyconf.get_provers c.config)
- *)
-  ()
 
 (* Page "Uninstalled provers" *)
 
@@ -1114,7 +1079,7 @@ let colors_frame c (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"Colors" () in
   let page = GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) () in
-  let page_pack = page#pack ?fill:None ~expand:true ?from:None ?padding:None in
+  let page_pack = page#pack ?from:None ?expand:None ?fill:None ?padding:None in
   let frame = GBin.frame ~label:"Choosing colors" ~packing:page_pack () in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
   let box_pack = box#pack ?fill:None ?expand:None ?from:None ?padding:None in
@@ -1146,9 +1111,7 @@ let colors_frame c (notebook:GPack.notebook) =
             | _ -> false
           ) in
     () in
-  List.iter add_choice editable_colors;
-  let _ = GPack.vbox ~packing:page_pack () in
-  ()
+  List.iter add_choice editable_colors
 
 let editors_page c (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"Editors" () in
@@ -1157,11 +1120,9 @@ let editors_page c (notebook:GPack.notebook) =
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
   in
   let page_pack = page#pack ~fill:true ~expand:true ?from:None ?padding:None in
-  let hbox = GPack.hbox ~packing:page_pack () in
-  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   let scrollview =
     GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
-      ~packing:hbox_pack ()
+      ~packing:page_pack ()
   in
   let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
   let vbox_pack = vbox#pack ?fill:None ?expand:None ?from:None ?padding:None in
@@ -1248,7 +1209,9 @@ let preferences ~parent (c : t) =
     ~title:"Why3: preferences" ()
   in
   let vbox = dialog#vbox in
-  let notebook = GPack.notebook ~packing:vbox#add () in
+  let vbox_pack =
+    vbox#pack ?from:None ~expand:true ~fill:true ?padding:None in
+  let notebook = GPack.notebook ~packing:vbox_pack () in
   (* page "general settings" **)
   general_settings c notebook;
   (* page "appearance" **)
