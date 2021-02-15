@@ -664,9 +664,9 @@ let rec k_expr env lps e res xmap =
           (* Format.eprintf "[Vc.k_of_post] vv = %a, sp = %a@." print_pv_attr vv Pretty.print_term sp; *)
           let sp = t_subst sbs sp (* rename oldies *) in
           let rinv = if trusted then [] else
-            inv_of_pvs env e.e_loc (Spv.singleton v) in
+            inv_of_pvs env e.e_loc (Spv.singleton vv) in
           let k =
-            match term_of_post ~prop:false v.pv_vs sp with
+            match term_of_post ~prop:false vv.pv_vs sp with
             | Some (t, sp) ->
                Klet (vv, t_tag t, List.fold_right sp_and rinv sp)
             | None ->  Kval ([vv], List.fold_right sp_and rinv sp) in
