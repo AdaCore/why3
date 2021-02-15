@@ -50,9 +50,32 @@ let pv_is_unit v = ity_equal v.pv_ity ity_unit
 
 let pv_of_ity s ity = create_pvsymbol (id_fresh s) ity
 
-let res_of_post ity ql = create_pvsymbol (result_id ~ql ()) ity
 
-let res_of_cty cty = res_of_post cty.cty_result cty.cty_post
+(*
+let print_pv_attr fmt v =
+  Format.fprintf fmt "@[%a@ %a@]" Ity.print_pv v
+    Pretty.print_id_attrs v.pv_vs.vs_name
+ *)
+
+let model_trace_result_attributes = Sattr.singleton (create_model_trace_attr "result")
+
+
+let res_of_post loc ity ql =
+  (* Format.eprintf "[Vc.res_of_post] loc = %a@."
+   *   (Pp.print_option Loc.report_position) loc; *)
+  (* let s = Format.asprintf "%a'result" Ident.print_decoded id.id_string in *)
+  let attrs =
+    match loc with
+    | Some l ->
+       let a = create_model_result_call_loc_attr l in
+       Sattr.add a model_trace_result_attributes
+    | None -> model_trace_result_attributes
+  in
+  let pv = create_pvsymbol (result_id ~attrs ~ql ()) ity in
+  (* Format.eprintf "[Vc.res_of_post] pv = %a@." print_pv_attr pv; *)
+  pv
+
+let res_of_cty loc cty = res_of_post loc cty.cty_result cty.cty_post
 
 let proxy_of_expr =
   let attrs = Sattr.singleton proxy_attr in fun e ->
@@ -321,8 +344,8 @@ let wp_of_inv loc attrs expl pl =
 
 let wp_of_pre loc attrs pl = wp_of_inv loc attrs expl_pre pl
 
-let wp_of_post expl ity ql =
-  let v = res_of_post ity ql in let t = t_var v.pv_vs in
+let wp_of_post expl loc ity ql =
+  let v = res_of_post loc ity ql in let t = t_var v.pv_vs in
   let make q = vc_expl None Sattr.empty expl (open_post_with t q) in
   v, t_and_asym_l (List.map make ql)
 
@@ -339,9 +362,14 @@ let sp_of_inv loc attrs expl pl =
 
 let sp_of_pre pl = sp_of_inv None Sattr.empty expl_pre pl
 
-let sp_of_post loc attrs expl v ql = let t = t_var v.pv_vs in
+let sp_of_post loc attrs expl ?use_pv ity ql =
+  let v = match use_pv with
+    | Some v -> v
+    | None -> res_of_post loc ity ql
+  in
+  let t = t_var v.pv_vs in
   let push q = push_stop loc attrs expl (open_post_with t q) in
-  t_and_l (List.map push ql)
+  v, t_and_l (List.map push ql)
 
 (* definitions of local let-functions are inserted in the VC
    as premises for the subsequent code (in the same way as
@@ -349,7 +377,7 @@ let sp_of_post loc attrs expl v ql = let t = t_var v.pv_vs in
    logical definitions in Pdecl.create_let_decl) *)
 let cty_enrich_post c = match c with
   | {c_node = Cfun e; c_cty = cty} ->
-      let {pv_vs = u} = res_of_cty cty in
+      let {pv_vs = u} = res_of_cty e.e_loc cty in
       let prop = ty_equal u.vs_ty ty_bool in
       begin match term_of_expr ~prop e with
       | Some f ->
@@ -539,6 +567,7 @@ let add_loc_attr label loc attrs =
    - [i] is a positive int assigned at the catching site
    - [xres] names the value carried by the exception *)
 let rec k_expr env lps e res xmap =
+  (* Format.eprintf "[Vc.k_expr] res = %a@." print_pv_attr res; *)
   let loc = e.e_loc and eff = e.e_effect in
   let attrs = Sattr.diff e.e_attrs vc_attrs in
   let t_tag t = t_attr_set ?loc attrs t in
@@ -591,7 +620,7 @@ let rec k_expr env lps e res xmap =
         let xs_lost = Sxs.diff e1.e_effect.eff_raises xs_pass in
         let xq_lost = Mxs.set_inter cty.cty_xpost xs_lost in
         let xq_lost = Mxs.mapi (fun xs ql ->
-          let v = res_of_post xs.xs_ity ql in
+          let v = res_of_post loc xs.xs_ity ql in
           let xq = k_of_post expl_xpost v ql in
           (new_exn env, v), Kseq (xq, 0, bot)) xq_lost in
         (* complete xmap with new indices, then handle e1 *)
@@ -609,6 +638,7 @@ let rec k_expr env lps e res xmap =
         (* [ VC(ce) (if ce is a lambda executed in-place)
            | STOP pre
            | HAVOC ; [ ASSUME post | ASSUME xpost ; RAISE ] ] *)
+       (* Format.eprintf "[Vc.term_of_post/Eexec] res = %a@." print_pv_attr res; *)
         let p, (oldies, sbs) = match pre with
           (* for recursive calls, compute the 'variant decrease'
              precondition and rename the oldies to avoid clash *)
@@ -629,14 +659,19 @@ let rec k_expr env lps e res xmap =
         let pinv = if trusted then [] else inv_of_pvs env e.e_loc rds in
         let qinv = if trusted then [] else inv_of_pvs env e.e_loc aff in
         let k_of_post expl v ql =
-          let sp = sp_of_post loc attrs expl v ql in
+          (* Format.eprintf "[Vc.k_of_post] v = %a@." print_pv_attr v; *)
+          let vv, sp = sp_of_post loc attrs expl v.pv_ity ql in
+          (* Format.eprintf "[Vc.k_of_post] vv = %a, sp = %a@." print_pv_attr vv Pretty.print_term sp; *)
           let sp = t_subst sbs sp (* rename oldies *) in
           let rinv = if trusted then [] else
             inv_of_pvs env e.e_loc (Spv.singleton v) in
-          match term_of_post ~prop:false v.pv_vs sp with
-          | Some (t, sp) ->
-              Klet (v, t_tag t, List.fold_right sp_and rinv sp)
-          | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
+          let k =
+            match term_of_post ~prop:false v.pv_vs sp with
+            | Some (t, sp) ->
+               Klet (vv, t_tag t, List.fold_right sp_and rinv sp)
+            | None ->  Kval ([vv], List.fold_right sp_and rinv sp) in
+          Kseq(k,0,Klet(v, t_var vv.pv_vs, t_true))
+          in
         let k = k_of_post expl_post res cty.cty_post in
         (* in abstract blocks, exceptions without postconditions
            escape from the block into the outer code. Otherwise,
@@ -698,8 +733,9 @@ let rec k_expr env lps e res xmap =
           with Not_found -> acc in
         Kseq (Khavoc (Mreg.fold add_write wr Mreg.empty, loc, attrs), 0, k_unit res)
     | Elet (LDvar (v, e0), e1) ->
-        let k = k_expr env lps e1 res xmap in
-        Kseq (k_expr env lps e0 v xmap, 0, k)
+       let k = k_expr env lps e1 res xmap in
+       (* Format.eprintf "[Vc.k_expr/Elet] v = %a@." print_pv_attr v; *)
+       Kseq (k_expr env lps e0 v xmap, 0, k)
     | Elet ((LDsym _| LDrec _) as ld, e1) ->
         let k = k_expr env lps e1 res xmap in
         (* when we havoc the VC of a locally defined function,
@@ -720,8 +756,8 @@ let rec k_expr env lps e res xmap =
           | RLls _ -> assert false (* not applicable *)
           | RLnone -> vl, k
           | RLlemma ->
-              let v = res_of_cty c.c_cty and q = c.c_cty.cty_post in
-              let q = sp_of_post None Sattr.empty expl_post v q in
+             let (* v = res_of_cty loc c.c_cty and *) q = c.c_cty.cty_post in
+             let v, q = sp_of_post None Sattr.empty expl_post c.c_cty.cty_result q in
               let q = if pv_is_unit v
                 then t_subst_single v.pv_vs t_void q
                 else t_exists_close_simp [v.pv_vs] [] q in
@@ -729,7 +765,7 @@ let rec k_expr env lps e res xmap =
           | RLpv v ->
               let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
               let q = cty_exec_post (cty_enrich_post c) in
-              let q = sp_of_post None Sattr.empty expl_post v q in
+              let _, q = sp_of_post None Sattr.empty expl_post ~use_pv:v v.pv_ity q in
               v::vl, add_axiom c.c_cty q k in
         let vl, k = match ld with
           | LDrec rdl ->
@@ -922,10 +958,10 @@ let rec k_expr env lps e res xmap =
 
 and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
   (* ASSUME pre ; LET o = arg ; TRY e ; STOP post WITH STOP xpost *)
-  let res, q = wp_of_post expl_post cty.cty_result cty.cty_post in
+  let res, q = wp_of_post expl_post e.e_loc cty.cty_result cty.cty_post in
   let xq = complete_xpost cty e.e_effect xmap in
   let xq = Mxs.mapi (fun xs ql ->
-    let v, xq = wp_of_post expl_xpost xs.xs_ity ql in
+    let v, xq = wp_of_post expl_xpost e.e_loc xs.xs_ity ql in
     (new_exn env, v), xq) xq in
   let xmap = Mxs.set_union (Mxs.map fst xq) xmap in
   let rds = List.fold_right Spv.add cty.cty_args cty.cty_effect.eff_reads in
