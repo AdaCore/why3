@@ -813,7 +813,7 @@ let filter_one_prover whyconf fp =
 (** add extra config *)
 
 let add_extra_config config filename =
-  Format.eprintf "[Config] reading extra configuration file %s@." filename;
+  Debug.dprintf debug "reading extra configuration file %s@." filename;
   let dirname = RC_load.get_dirname filename in
   let rc = Rc.from_file filename in
   (* modify main *)
@@ -847,12 +847,12 @@ let add_extra_config config filename =
   (* add provers *)
   let provers = List.fold_left
     (fun provers (fp, section) ->
+      Debug.dprintf debug "handling prover modifiers for %a@." print_filter_prover fp;
       Mprover.mapi (fun p c  ->
-        Debug.dprintf debug "Whyconf: handling prover modifiers for %a@." print_prover p;
         if not (filter_prover fp p) then c
         else
           begin
-            Debug.dprintf debug "Whyconf: prover modifiers found for %a@." print_prover p;
+            Debug.dprintf debug "prover modifiers found for %a@." print_prover p;
             let opt = get_stringl ~default:[] section "option" in
             let drv = get_stringl ~default:[] section "driver" in
             { c with
