@@ -496,7 +496,7 @@ let check_support_library (data:Prover_autodetection_data.t) ver =
 exception Skip    (* prover is ignored *)
 exception Discard (* prover is recognized, but unusable *)
 
-let detect_exec env (data:Prover_autodetection_data.t) (p:Detected_binary.t) =
+let detect_exec_skip env (data:Prover_autodetection_data.t) (p:Detected_binary.t) =
   (* bad here means not good, it is not the same thing as a version
      of a prover with known problems *)
   let bad = List.exists (check_version p.version) data.versions_bad in
@@ -569,7 +569,7 @@ let detect_exec env data acc exec_name =
   let l = Mstr.find_def [] exec_name env.binaries in
   List.fold_left (fun acc p ->
       try
-        let prover_config = detect_exec env data p in
+        let prover_config = detect_exec_skip env data p in
         known_version env exec_name;
         add_prover_with_uniq_id prover_config acc
       with
@@ -585,7 +585,7 @@ let pp_versions =
   Pp.print_list Pp.comma
                 (Pp.print_pair_delim Pp.nothing Pp.nothing Pp.nothing Pp.string Pp.nothing)
 
-let detect_unknown env uv =
+let detect_unknown_skip env uv =
   let prover = uv.prover_config.prover in
   let ver = prover.prover_version in
   if uv.data.support_library <> "" && not (check_support_library uv.data ver) then raise Skip;
@@ -604,7 +604,9 @@ let detect_unknown env detected =
       match pc with
       | None -> acc
       | Some uv ->
-          add_prover_with_uniq_id (detect_unknown env uv) acc
+          try
+            add_prover_with_uniq_id (detect_unknown_skip env uv) acc
+          with Skip -> acc
     ) env.prover_unknown_version detected
 
 let convert_shortcuts env =
