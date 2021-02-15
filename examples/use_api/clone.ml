@@ -20,10 +20,9 @@ In particular, it tests the clone feature
 open Why3
 
 let () = Debug.set_flag Debug.stack_trace
-let config : Whyconf.config =
-  Whyconf.(load_default_config_if_needed (read_config None))
-let main : Whyconf.main = Whyconf.get_main config
-let env : Env.env = Env.create_env (Whyconf.loadpath main)
+let config = Whyconf.init_config None
+let main = Whyconf.get_main config
+let env = Env.create_env (Whyconf.loadpath main)
 open Ptree
 
 let () = Typing.open_file env [] (* empty pathname *)

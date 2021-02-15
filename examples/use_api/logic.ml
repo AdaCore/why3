@@ -78,9 +78,8 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 (* To call a prover, we need to access the Why configuration *)
 
 (* BEGIN{getconf} *)
-(* reads the config file *)
-let config : Whyconf.config =
-  Whyconf.(load_default_config_if_needed (read_config None))
+(* reads the default config file *)
+let config : Whyconf.config = Whyconf.init_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
