@@ -1441,7 +1441,7 @@ are:
 To examplify this basic programming language, we give below the default
 strategies that are attached to the default buttons of the IDE, assuming
 that the provers Alt-Ergo 2.3.0, CVC4 1.7 and Z3 4.8.4 were detected by
-the :option:`why3 config --detect` command
+the :why3:tool:`why3 config` command.
 
 Split_VC
     is bound to the 1-line strategy

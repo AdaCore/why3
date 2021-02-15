@@ -174,9 +174,9 @@ Options
 
       why3 config --add-prover=alt-ergo,new-ae,/home/me/bin/alt-ergo-trunk
 
-.. option:: --list-prover-families
+.. option:: --list-binaries
 
-   List the known prover binary name, as used by option :option:`--add-prover`.
+   List the known prover binary names, as used by option :option:`--add-prover`.
 
 .. why3:tool:: prove
 .. _sec.why3prove:
