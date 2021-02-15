@@ -115,12 +115,24 @@ let main () =
           Whyconf.default_config f
     in
 
-    let config = Queue.fold Autodetection.Manual_binary.add config prover_bins in
+    let prover_bins = Queue.fold (fun acc x -> x::acc) [] prover_bins in
+    let datas = Autodetection.read_auto_detection_data config in
 
     let config =
-      let env = Autodetection.run_auto_detection config in
-      Autodetection.generate_detected_config env config
+      match prover_bins with
+      | [] ->
+          let binaries = Autodetection.request_binaries_version config datas in
+          Autodetection.compute_builtin_prover binaries datas;
+          Autodetection.set_binaries_detected binaries config
+      | _ ->
+          let binaries =
+            Autodetection.request_manual_binaries_version datas prover_bins
+          in
+          Autodetection.compute_builtin_prover binaries datas;
+          let config = List.fold_left Autodetection.Manual_binary.add config prover_bins in
+          Autodetection.update_binaries_detected binaries config
     in
+
     if !save then begin
       printf "Save config to %s@." (Whyconf.get_conf_file config);
       save_config config

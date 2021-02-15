@@ -61,7 +61,7 @@ let print_info fmt =
 module Prover_autodetection_data = struct
   (* auto-detection of provers *)
   type prover_kind = ATP | ITP
-  type t =
+  type data =
     { kind : prover_kind;
       prover_id : string;
       prover_name : string;
@@ -82,6 +82,13 @@ module Prover_autodetection_data = struct
       use_at_auto_level : int;
       message : string option;
     }
+
+  type t = {
+    skeletons: data list;
+    (** Additional shortcuts *)
+    shortcuts: (Whyconf.filter_prover * string) list;
+    editors: Whyconf.config_editor Meditor.t;
+  }
 
   let prover_keys =
     let add acc k = Sstr.add k acc in
@@ -149,6 +156,27 @@ module Prover_autodetection_data = struct
     List.fold_left (fun acc shortcut ->
         (fp,shortcut)::acc
       ) acc shortcuts
+
+  let read_auto_detection_data main =
+    let filename = Filename.concat (Whyconf.datadir main)
+        "provers-detection-data.conf" in
+    try
+      let rc = Rc.from_file filename in
+      { skeletons = List.rev (load rc);
+        shortcuts =
+          List.fold_left load_prover_shortcut [] (get_family rc "shortcut");
+        editors =
+          List.fold_left (fun editors (id, section) ->
+              Meditor.add id (load_editor section) editors
+            ) Meditor.empty (get_family rc "editor")
+      }
+    with
+    | Failure _ ->
+        Loc.errorm "Syntax error in provers-detection-data.conf@."
+    | Not_found ->
+        Loc.errorm "provers-detection-data.conf not found at %s@." filename
+
+
 end
 
 module Detected_binary = struct
@@ -176,9 +204,13 @@ module Detected_binary = struct
       Warning.emit "[Warning] cannot load a detected_prover section: missing field '%s'@." s;
       acc
 
-  let load rc =
+  let load_rc rc =
     List.fold_left load_one
       [] (get_simple_family rc section_name)
+
+  let load rc =
+    List.fold_left load_one
+      [] (Whyconf.User.get_simple_family rc section_name)
 
   let set_one prover =
     let section = empty_section in
@@ -191,6 +223,10 @@ module Detected_binary = struct
   let set config detected_provers =
     let family = List.map set_one detected_provers in
     Whyconf.User.set_simple_family config section_name family
+
+  let add rc m =
+    let l = List.filter (fun x -> x.binary <> m.binary) (load rc) in
+    set rc (m::l)
 
 end
 
@@ -239,7 +275,7 @@ end
 
 type unknown_version = {
   exec_name:string;
-  data:Prover_autodetection_data.t;
+  data:Prover_autodetection_data.data;
   priority:int;
   shortcut:string;
   prover_config:config_prover;
@@ -273,35 +309,6 @@ let next_priority =
   fun () -> decr r; !r
 
 let highest_priority = 0
-
-let read_auto_detection_data main =
-  let filename = Filename.concat (Whyconf.datadir main)
-    "provers-detection-data.conf" in
-  try
-    let rc = Rc.from_file filename in
-    let shortcuts =
-      List.fold_left Prover_autodetection_data.load_prover_shortcut [] (get_family rc "shortcut") in
-    List.rev (Prover_autodetection_data.load rc), shortcuts
-  with
-    | Failure "lexing" ->
-        Loc.errorm "Syntax error in provers-detection-data.conf@."
-    | Not_found ->
-        Loc.errorm "provers-detection-data.conf not found at %s@." filename
-
-
-let read_editors main =
-  let filename = Filename.concat (Whyconf.datadir main)
-    "provers-detection-data.conf" in
-  try
-    let rc = Rc.from_file filename in
-    List.fold_left (fun editors (id, section) ->
-      Meditor.add id (Prover_autodetection_data.load_editor section) editors
-    ) Meditor.empty (get_family rc "editor")
-  with
-    | Failure "lexing" ->
-        Loc.errorm "Syntax error in provers-detection-data.conf@."
-    | Not_found ->
-        Loc.errorm "provers-detection-data.conf not found at %s@." filename
 
 let make_command =
   let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
@@ -468,7 +475,7 @@ let generate_auto_strategies env =
   in
   [split ; auto0 ; auto1 ; auto2 ; auto3]
 
-let check_support_library (data:Prover_autodetection_data.t) ver =
+let check_support_library (data:Prover_autodetection_data.data) ver =
   let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
   let replace s = match Re.Str.matched_group 1 s with
     | "l" -> Config.libdir
@@ -496,7 +503,7 @@ let check_support_library (data:Prover_autodetection_data.t) ver =
 exception Skip    (* prover is ignored *)
 exception Discard (* prover is recognized, but unusable *)
 
-let detect_exec_skip env (data:Prover_autodetection_data.t) (p:Detected_binary.t) =
+let detect_exec_skip env (data:Prover_autodetection_data.data) (p:Detected_binary.t) =
   (* bad here means not good, it is not the same thing as a version
      of a prover with known problems *)
   let bad = List.exists (check_version p.version) data.versions_bad in
@@ -614,30 +621,8 @@ let convert_shortcuts env =
     check_prover_auto_level env p; Mstr.add s p acc
   ) env.prover_shortcuts Mstr.empty
 
-
-type autodetection_result = env * Whyconf.config_prover Whyconf.Mprover.t
-
-let generate_builtin_config ((env,detected):autodetection_result) config =
-  let main = get_main config in
-  let shortcuts = convert_shortcuts env in
-  let config =
-    List.fold_left add_strategy config
-      (generate_auto_strategies env)
-  in
-  let config = set_editors config (read_editors main) in
-  let config = set_prover_shortcuts config shortcuts in
-  let config = set_provers config detected in
-  config
-
-let generate_detected_config ((env,_):autodetection_result) config =
-  let fold _ l acc = List.rev_append l acc in
-  let detected = Mstr.fold fold env.binaries [] in
-  Detected_binary.set config detected
-
-
-let run_auto_detection' env config l =
-  let provers = get_provers config in
-  let detected = List.fold_left (detect_prover env) provers l in
+let run_auto_detection' env l =
+  let detected = List.fold_left (detect_prover env) Mprover.empty l in
   let length_recognized = Mprover.cardinal detected in
   let detected = detect_unknown env detected in
   let length_detected = Mprover.cardinal detected in
@@ -649,10 +634,24 @@ let run_auto_detection' env config l =
     print_info "%d prover(s) added@." length_detected;
   detected
 
+let generate_builtin_config env datas detected config =
+  let shortcuts = convert_shortcuts env in
+  let config =
+    List.fold_left add_strategy config
+      (generate_auto_strategies env)
+  in
+  let config = set_editors config datas.Prover_autodetection_data.editors in
+  let config = set_prover_shortcuts config shortcuts in
+  let config = set_provers config detected in
+  config
+
+let read_auto_detection_data config =
+  let main = get_main config in
+  Prover_autodetection_data.read_auto_detection_data main
 
 let () =
   let provers_from_detected_provers ~save_to rc =
-    let provers_output = Detected_binary.load rc in
+    let provers_output = Detected_binary.load_rc rc in
     let binaries =
       List.fold_left (fun acc (p:Detected_binary.t) ->
                       Mstr.change (function
@@ -662,22 +661,20 @@ let () =
         Mstr.empty provers_output
     in
     let config = Whyconf.default_config save_to in
-    let main = get_main config in
-    let l,shortcuts = read_auto_detection_data main in
-    let env = create_env binaries shortcuts in
-    let detected = run_auto_detection' env config l in
-    generate_builtin_config (env,detected) config
+    let datas = read_auto_detection_data config in
+    let env = create_env binaries datas.shortcuts in
+    let detected = run_auto_detection' env datas.skeletons in
+    generate_builtin_config env datas detected config
   in
   Whyconf.provers_from_detected_provers :=
     provers_from_detected_provers
 
 let list_binaries () =
   let config = default_config "" in
-  let main = get_main config in
-  let l,_ = read_auto_detection_data main in
+  let datas = read_auto_detection_data config in
   let s = List.fold_left (fun s p ->
       List.fold_right Sstr.add p.Prover_autodetection_data.execs s)
-      Sstr.empty l
+      Sstr.empty datas.skeletons
   in
   Sstr.elements s
 
@@ -713,15 +710,36 @@ let detect_prover exec_name binary version_switch version_regexp =
     Debug.dprintf debug "command '%s' failed@." cmd;
     None
 
-let run_auto_detection config =
-  let main = get_main config in
-  let data,shortcuts = read_auto_detection_data main in
-  let binaries =
-    List.fold_left (fun acc (d:Prover_autodetection_data.t) ->
-        List.fold_left (fun acc exec_name ->
-            Mstr.add exec_name (d.version_switch,d.version_regexp) acc
-          ) acc d.execs
-      ) Mstr.empty data in
+let binaries_of_data data =
+  List.fold_left (fun acc (d:Prover_autodetection_data.data) ->
+      List.fold_left (fun acc exec_name ->
+          Mstr.add exec_name (d.version_switch,d.version_regexp) acc
+        ) acc d.execs
+    ) Mstr.empty data
+
+let detected_of_manuals ?(detected=Mstr.empty) binaries manuals =
+  List.fold_left (fun acc (x:Manual_binary.t) ->
+      match Mstr.find_opt x.same_as binaries with
+      | Some (switch, regexp) -> begin
+          match detect_prover x.same_as x.binary switch regexp with
+          | Some r ->
+              let r = { r with shortcut = Some x.shortcut } in
+              Mstr.add x.same_as
+                (r::(Mstr.find_def [] x.same_as detected))
+                detected
+          | None ->
+              Warning.emit "Version detection failed for manually added binary %s"
+                x.binary;
+              acc
+        end
+      | None ->
+          Warning.emit "No prover %s exists for configuring the manually added binary %s "
+            x.same_as x.binary;
+          acc
+    ) detected manuals
+
+let request_binaries_version config datas =
+  let binaries = binaries_of_data datas.Prover_autodetection_data.skeletons in
   let detected =
     Mstr.mapi_filter
       (fun exec_name (switch,regexp) ->
@@ -731,27 +749,27 @@ let run_auto_detection config =
   in
   (** manual prover *)
   let manuals = Manual_binary.load config in
-  let detected =
-    List.fold_left (fun acc (x:Manual_binary.t) ->
-        match Mstr.find_opt x.same_as binaries with
-        | Some (switch, regexp) -> begin
-            match detect_prover x.same_as x.binary switch regexp with
-            | Some r ->
-                let r = { r with shortcut = Some x.shortcut } in
-                Mstr.add x.same_as
-                  (r::(Mstr.find_def [] x.same_as detected))
-                  detected
-            | None ->
-                Warning.emit "Version detection failed for manually added binary %s"
-                  x.binary;
-                acc
-          end
-        | None ->
-            Warning.emit "No prover %s exists for configuring the manually added binary %s "
-              x.same_as x.binary;
-            acc
-      ) detected manuals
-  in
+  let detected = detected_of_manuals binaries ~detected manuals in
   (** *)
-  let env = create_env detected shortcuts in
-  env,run_auto_detection' env config data
+  detected
+
+let request_manual_binaries_version datas manuals =
+  let binaries = binaries_of_data datas.Prover_autodetection_data.skeletons in
+  let detected = detected_of_manuals binaries manuals in
+  detected
+
+let set_binaries_detected binaries config =
+  let fold _ l acc = List.rev_append l acc in
+  let detected = Mstr.fold fold binaries [] in
+  Detected_binary.set config detected
+
+let update_binaries_detected binaries config =
+  let fold _ l acc = List.rev_append l acc in
+  let detected = Mstr.fold fold binaries [] in
+  List.fold_left Detected_binary.add config detected
+
+
+let compute_builtin_prover detected datas =
+  let env = create_env detected datas.Prover_autodetection_data.shortcuts in
+  let _ = run_auto_detection' env datas.skeletons in
+  ()

@@ -21,17 +21,13 @@ val list_binaries : unit -> string list
 (* val add_prover_binary :
  *   Whyconf.config -> string -> string -> string -> Whyconf.config *)
 
-type autodetection_result
+module Prover_autodetection_data: sig
+  type t
+end
 
-(** Detect the provers *)
-val run_auto_detection : Whyconf.config -> autodetection_result
-
-(** Replace the provers by autodetected one *)
-val generate_builtin_config : autodetection_result -> Whyconf.config -> Whyconf.config
-
-(** Replace the output of provers with the current one *)
-val generate_detected_config : autodetection_result -> Whyconf.config -> Whyconf.config
-
+module Detected_binary: sig
+  type t
+end
 
 module Manual_binary: sig
   type t = {
@@ -43,3 +39,29 @@ module Manual_binary: sig
   val add: Whyconf.config -> t -> Whyconf.config
   (** Add the given manual binary to the user configuration and remove the previous one that had the same shortcut *)
 end
+
+val read_auto_detection_data: Whyconf.config -> Prover_autodetection_data.t
+
+(** Detect the provers *)
+val request_binaries_version :
+  Whyconf.config -> Prover_autodetection_data.t -> Detected_binary.t list Wstdlib.Mstr.t
+
+val request_manual_binaries_version :
+  Prover_autodetection_data.t -> Manual_binary.t list ->
+  Detected_binary.t list Wstdlib.Mstr.t
+
+val set_binaries_detected:
+  Detected_binary.t list Wstdlib.Mstr.t -> Whyconf.config -> Whyconf.config
+(** replace all the binaries detected by the given one in the configuration *)
+
+val update_binaries_detected:
+  Detected_binary.t list Wstdlib.Mstr.t -> Whyconf.config -> Whyconf.config
+(** replace or add only the binaries detected by the given one in the
+    configuration *)
+
+val compute_builtin_prover:
+  Detected_binary.t list Wstdlib.Mstr.t ->
+  Prover_autodetection_data.t ->
+  unit
+(** Compute the builtin prover. Only print errors if {!is_config_command} is
+   false *)
