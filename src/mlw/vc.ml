@@ -71,7 +71,7 @@ let res_of_post loc ity ql =
        Sattr.add a model_trace_result_attributes
     | None -> model_trace_result_attributes
   in
-  let pv = create_pvsymbol (result_id ~attrs ~ql ()) ity in
+  let pv = create_pvsymbol (result_id ?loc ~attrs ~ql ()) ity in
   (* Format.eprintf "[Vc.res_of_post] pv = %a@." print_pv_attr pv; *)
   pv
 
