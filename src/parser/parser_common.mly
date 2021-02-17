@@ -198,6 +198,89 @@
       | _ -> Loc.errorm ?loc "illegal kind qualifier" in
     unfold false d pat
 
+  let rec reduce_fun_lit f l default =
+    match default, l with
+    | Some t, []      -> t
+    | None  , [x]     -> f x (snd x)
+    | _     , x :: xs -> f x (reduce_fun_lit f xs default)
+    | None  , []      -> assert false (* should not happen *)
+
+  (* if tl = [] then default <> None *)
+  let term_fun_lit loc_begin loc_end (tl,default) =
+    let id_str = if tl = [] then "_" else "x'x" in
+    let id_var = { id_str; id_ats = []; id_loc = loc_begin } in
+    let var = { term_desc = Tident (Qident id_var); term_loc = loc_begin } in
+    (* if x = ... then ... else if x = .. then ... else ... *)
+    let add_term (t1,t2) t =
+      let eq_id = { id_str = Ident.op_equ; id_ats = [];
+                    id_loc = t1.term_loc } in
+      let v_eq_t1 = Tinfix (var,eq_id,t1) in
+      let v_eq_t1 = { term_desc = v_eq_t1; term_loc = t1.term_loc } in
+      { term_desc = Tif (v_eq_t1,t2,t);
+        term_loc = Loc.join t1.term_loc t.term_loc} in
+    let ifte = reduce_fun_lit add_term tl default in
+    (* fun x -> if x ... *)
+    let binder = (loc_begin, Some id_var, false, None) in
+    let desc = Ptree.Tquant (Dterm.DTlambda, [binder], [], ifte) in
+    let t = { term_desc = desc; term_loc = Loc.join loc_begin loc_end } in
+    Ptree.Tattr (Ptree.ATstr Ident.funlit, t)
+
+  (* if el = [] then default <> None *)
+  let expr_fun_lit loc_begin loc_end (el,default) =
+    let lit_loc = Loc.join loc_begin loc_end in
+    let var id expr_loc = {expr_desc = Eident (Qident id); expr_loc} in
+    let id ?(id_ats=[]) id_str id_loc = { id_str; id_ats; id_loc } in
+    let var_of_string ?(id_ats=[]) nm loc = var (id ~id_ats nm loc) loc in
+    let proxy_atr = ATstr Ident.proxy_attr in
+    (* proxy vars for the literal domain/range expressions *)
+    let domain_ranga_vars i (e1,e2) =
+      let i = string_of_int i in
+      var_of_string ~id_ats:[proxy_atr] ("d'i" ^ i) e1.expr_loc,
+      var_of_string ~id_ats:[proxy_atr] ("r'i" ^ i) e2.expr_loc in
+    let el_proxies = List.mapi domain_ranga_vars el in
+    let default_proxy =
+      Opt.map (fun d ->
+          var_of_string ~id_ats:[proxy_atr] "def'e" d.expr_loc) default in
+    (* fun x -> if ... *)
+    let fun_id_var = id (if el = [] then "_" else "x'x") loc_begin in
+    let fun_var = var fun_id_var loc_begin in
+    let add_expr (e1,e2) e =
+      let eq_id = { id_str = Ident.op_equ; id_ats = [];
+                    id_loc = e1.expr_loc } in
+      let v_eq_e1 = Einfix (fun_var,eq_id,e1) in
+      let v_eq_e1 = { expr_desc = v_eq_e1; expr_loc = e1.expr_loc } in
+      { expr_desc = Eif (v_eq_e1,e2,e);
+        expr_loc = Loc.join e1.expr_loc e.expr_loc } in
+    let ifte = reduce_fun_lit add_expr el_proxies default_proxy in
+    let binder = (loc_begin, Some fun_id_var, false, None) in
+    let pattern = { pat_desc = Ptree.Pvar fun_id_var;
+                    pat_loc = loc_begin } in
+    let spec = { sp_pre = []; sp_post = []; sp_xpost = []; sp_reads = [];
+                 sp_writes = []; sp_alias = []; sp_variant = [];
+                 sp_checkrw = false; sp_diverge = false; sp_partial = false } in
+    let efun = Ptree.Efun ([binder], None, pattern, Ity.MaskVisible, spec, ifte) in
+    let efun = { expr_desc = efun; expr_loc = lit_loc } in
+    (* let d1 = e1 in
+       let r1 = e2 in
+       let ... in
+       fun x -> if x = d1 then r1 else ... *)
+    let e2id e = match e with
+      | {expr_desc = Eident (Qident id)} -> id | _ -> assert false in
+    let mk_let e (d,r) (e1,e2) =
+      let expr_desc = Elet (e2id r,false,Expr.RKnone,e2,e) in
+      let e = {expr_desc; expr_loc = lit_loc} in
+      let expr_desc = Elet (e2id d,false,Expr.RKnone,e1,e) in
+      {expr_desc; expr_loc = lit_loc} in
+    let elets = List.fold_left2 mk_let efun el_proxies el in
+    (* let def = e_default in ... *)
+    let e = match default, default_proxy with
+      | Some e, Some d ->
+         let expr_desc = Elet (e2id d,false,Expr.RKnone,e,elets) in
+         {expr_desc; expr_loc = lit_loc}
+      | _ -> elets
+    in
+    Ptree.Eattr (Ptree.ATstr Ident.funlit, e)
+
 %}
 
 (* Tokens *)
@@ -232,13 +315,13 @@
 
 (* symbols *)
 
-%token AND ARROW
+%token AND ARROW EQUALARROW
 %token AMP BAR
 %token COLON COMMA
 %token DOT DOTDOT EQUAL LT GT LTGT MINUS
-%token LEFTPAR LEFTSQ
+%token LEFTPAR LEFTSQ LEFTSQBAR
 %token LARROW LRARROW OR
-%token RIGHTPAR RIGHTSQ
+%token RIGHTPAR RIGHTSQ BARRIGHTSQ
 %token UNDERSCORE
 
 %token EOF
@@ -282,7 +365,8 @@
 
 No entry points here, see `parser.mly`
 
-The implicit/shared entry point is `module_decl_parsing_only`
+The implicit/shared entry points are `module_head_parsing_only`,
+`scope_head_parsing_only` and `use_clone_parsing_only`
 
 See also `plugins/cfg/cfg_parser.mly`
 
@@ -293,14 +377,6 @@ See also `plugins/cfg/cfg_parser.mly`
 %public module_head_parsing_only:
 | THEORY attrs(uident_nq)  { $2 }
 | MODULE attrs(uident_nq)  { $2 }
-
-
-%public module_decl_parsing_only:
-| scope_head_parsing_only module_decl_parsing_only* END
-    { let loc,import,qid = $1 in (Dscope(loc,import,qid,$2))}
-| IMPORT uqualid { (Dimport $2) }
-| d = pure_decl | d = prog_decl | d = meta_decl { d }
-| use_clone_parsing_only { $1 }
 
 %public scope_head_parsing_only:
 | SCOPE boption(IMPORT) attrs(uident_nq)
@@ -704,14 +780,18 @@ term_arg: mk_term(term_arg_) { $1 }
 term_dot: mk_term(term_dot_) { $1 }
 
 term_arg_:
-| qualid                    { Tident $1 }
-| AMP qualid                { Tasref $2 }
-| numeral                   { Tconst $1 }
-| STRING                    { Tconst (Constant.ConstStr $1) }
-| TRUE                      { Ttrue }
-| FALSE                     { Tfalse }
-| o = oppref ; a = term_arg { Tidapp (Qident o, [a]) }
-| term_sub_                 { $1 }
+| qualid                            { Tident $1 }
+| AMP qualid                        { Tasref $2 }
+| numeral                           { Tconst $1 }
+| STRING                            { Tconst (Constant.ConstStr $1) }
+| TRUE                              { Ttrue }
+| FALSE                             { Tfalse }
+| o = oppref ; a = term_arg         { Tidapp (Qident o, [a]) }
+| term_sub_                         { $1 }
+| LEFTSQBAR term_fun_lit BARRIGHTSQ
+    { let loc_begin = floc $startpos($1) $endpos($1) in
+      let loc_end = floc $startpos($3) $endpos($3) in
+      term_fun_lit loc_begin loc_end $2 }
 
 term_dot_:
 | lqualid                   { Tident $1 }
@@ -740,6 +820,15 @@ term_sub_:
     { Tidapp (rcut_op $5 $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ DOTDOT term rightsq
     { Tidapp (lcut_op $5 $startpos($2) $endpos($2), [$1;$4]) }
+
+term_fun_lit:
+| mapping_list_with_default(term)   { $1 }
+| semicolon_list1(term)
+    { let mk_index_pair i t =
+        let const = Constant.int_const ~il_kind:Number.ILitDec (BigInt.of_int i) in
+        let tconst = {term_desc = Tconst const; term_loc  = t.term_loc} in
+        tconst, t in
+      List.mapi mk_index_pair $1, None }
 
 field_list1(X):
 | fl = semicolon_list1(separated_pair(lqualid, EQUAL, X)) { fl }
@@ -879,10 +968,12 @@ assign_expr:
     { let loc = floc $startpos $endpos in
       let rec down ll rl = match ll, rl with
         | ({expr_desc = Eident q} as e1)::ll, e2::rl ->
-            let e1 = {e1 with expr_desc = Easref q} in
-            (e1, None, e2) :: down ll rl
+           let e1 = {e1 with expr_desc = Easref q} in
+           let (attrs,l) = down ll rl in
+           (attrs, (e1, None, e2) :: l)
         | {expr_desc = Eidapp (q, [e1])}::ll, e2::rl ->
-            (e1, Some q, e2) :: down ll rl
+           let (attrs,l) = down ll rl in
+           (attrs, (e1, Some q, e2) :: l)
         | {expr_desc = Eidapp (Qident id, [_;_]); expr_loc = loc}::_, _::_ ->
             begin match Ident.sn_decode id.id_str with
               | Ident.SNget _ -> Loc.errorm ~loc
@@ -890,10 +981,19 @@ assign_expr:
               | _ -> Loc.errorm ~loc
                   "Invalid left expression in an assignment"
             end
+        | {expr_desc = Eattr(attr, e)}::ll, rl ->
+           let (attrs,l) = down (e::ll) rl in
+           (attr::attrs,l)
         | {expr_loc = loc}::_, _::_ -> Loc.errorm ~loc
             "Invalid left expression in an assignment"
-        | [], [] -> []
-        | _ -> Loc.errorm ~loc "Invalid parallel assignment" in
+        | [], [] -> ([],[])
+        | _ -> Loc.errorm ~loc "Invalid parallel assignment"
+      in
+      let eassign (attrs,l) =
+        List.fold_left
+          (fun e a -> Eattr(a, { expr_desc = e ; expr_loc = loc }))
+          (Eassign l) attrs
+      in
       let d = match $1.expr_desc, $3.expr_desc with
         | Eidapp (Qident id, [e1;e2]), _ ->
             begin match Ident.sn_decode id.id_str with
@@ -902,9 +1002,9 @@ assign_expr:
               | _ -> Loc.errorm ~loc:$1.expr_loc
                   "Invalid left expression in an assignment"
             end
-        | Etuple ll, Etuple rl -> Eassign (down ll rl)
+        | Etuple ll, Etuple rl -> eassign (down ll rl)
         | Etuple _, _ -> Loc.errorm ~loc "Invalid parallel assignment"
-        | _, _ -> Eassign (down [$1] [$3]) in
+        | _, _ -> eassign (down [$1] [$3]) in
       { expr_desc = d; expr_loc = loc } }
 
 expr:
@@ -1091,6 +1191,19 @@ expr_arg_:
 | FALSE                     { Efalse }
 | o = oppref ; a = expr_arg { Eidapp (Qident o, [a]) }
 | expr_sub_                 { $1 }
+| LEFTSQBAR expr_fun_lit BARRIGHTSQ
+    { let loc_begin = floc $startpos($1) $endpos($1) in
+      let loc_end = floc $startpos($3) $endpos($3) in
+      expr_fun_lit loc_begin loc_end $2 }
+
+expr_fun_lit:
+| mapping_list_with_default(expr)   { $1 }
+| semicolon_list1(expr)
+    { let mk_index_pair i e =
+        let const = Constant.int_const ~il_kind:Number.ILitDec (BigInt.of_int i) in
+        let econst = {expr_desc = Econst const; expr_loc  = e.expr_loc} in
+        econst, e in
+      List.mapi mk_index_pair $1, None }
 
 expr_dot_:
 | lqualid                   { Eident $1 }
@@ -1520,3 +1633,9 @@ comma_list0(X):
 | x = X ; SEMICOLON ; xl = semicolon_list1(X) { x :: xl }
 
 located(X): X { $1, $startpos, $endpos }
+
+mapping_list_with_default(X):
+| UNDERSCORE EQUALARROW X option(SEMICOLON) { [], Some $3 }
+| X EQUALARROW X option(SEMICOLON)          { [$1, $3], None }
+| X EQUALARROW X SEMICOLON mapping_list_with_default(X)
+    { let l,d = $5 in ($1, $3) :: l, d }

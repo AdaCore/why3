@@ -166,15 +166,13 @@ induction len; eauto.
 intros. simpl. rewrite IHlen. reflexivity.
 Qed.
 
-(* Why3 goal *)
-Definition interval :
-  Numbers.BinNums.Z -> Numbers.BinNums.Z -> set.Fset.fset Numbers.BinNums.Z.
+Lemma interval_proof :
+  forall l r : int, exists s : list int,
+  List.NoDup s /\
+  forall e : int, List.In e s <->
+   (if Z_le_dec l e then if Z_lt_dec e r then true else false else false) = true.
 Proof.
 intros l r.
-exists (fun x => if Z_le_dec l x then 
-                   if Z_lt_dec x r then true 
-                   else false 
-                 else false).
 destruct (Z_le_dec l r).
 + exists (seqZ l (Z.to_nat (r - l))%Z).
   split. 
@@ -185,8 +183,8 @@ destruct (Z_le_dec l r).
     destruct Z_le_dec.
     * destruct Z_lt_dec. split; intros; [reflexivity|].
       intuition.
-      intuition. inversion H.
-    * intuition. inversion H.
+      intuition ; try inversion H.
+    * intuition ; try inversion H.
 + exists List.nil. 
   split.
   - constructor.
@@ -195,6 +193,18 @@ destruct (Z_le_dec l r).
     omega.
     inversion H.
     inversion H.
+Qed.
+
+(* Why3 goal *)
+Definition interval :
+  Numbers.BinNums.Z -> Numbers.BinNums.Z -> set.Fset.fset Numbers.BinNums.Z.
+Proof.
+intros l r.
+exists (fun x =>
+  if Z_le_dec l x then
+    if Z_lt_dec x r then true else false
+  else false).
+apply interval_proof.
 Defined.
 
 (* Why3 goal *)

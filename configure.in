@@ -215,6 +215,9 @@ echo "ocaml version is $OCAMLVERSION"
 AX_VERSION_GE([$OCAMLVERSION], 4.05.0, [],
   [AC_MSG_ERROR(You need Objective Caml 4.05.0 or higher.)])
 
+AX_VERSION_GE([$OCAMLVERSION], 4.08.0, [new_dynlink=yes], [new_dynlink=no])
+AC_SUBST(new_dynlink)
+
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
 OCAMLLIB=`$OCAMLC -where | tr -d '\\r'`
@@ -701,13 +704,6 @@ if test "$enable_ide" = yes ; then
    LABLGTKPKG="lablgtk$GTKVERSION $PKG_SOURCEVIEW"
 fi
 
-# checking for ocamlgraph
-# temporarily disabled until #453 is fixed
-if test "$enable_hypothesis_selection" = yes; then
-   enable_hypothesis_selection=no
-   reason_hypothesis_selection=" (broken)"
-fi
-
 if test "$enable_hypothesis_selection" = yes; then
    DIR=
    if test "$enable_ocamlfind" = yes; then
@@ -899,6 +895,9 @@ if test "$enable_coq_support" = yes; then
          ;;
       8.12*)
          coq_compat_version="COQ812"
+         ;;
+      8.13*)
+         coq_compat_version="COQ813"
          ;;
       *)
          enable_coq_support=no

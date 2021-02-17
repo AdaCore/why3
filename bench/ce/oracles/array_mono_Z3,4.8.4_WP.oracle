@@ -1,37 +1,40 @@
 Weakest Precondition
 File bench/ce/array_mono.mlw:
 Verification condition array'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/array_mono.mlw", line 36, characters 4-8:
 Goal Index in array bounds from verification condition f1'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File array_mono.mlw:
   Line 16:
     a [@introduced] =
-      {"proj_name": "length",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
   Line 35:
     a [@introduced] =
-      {"proj_name": "length",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
   Line 36:
     a [@introduced] [@model_trace:a] =
-      {"proj_name": "length",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
 
 File "bench/ce/array_mono.mlw", line 41, characters 4-14:
 Goal Index in array bounds from verification condition f2'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/array_mono.mlw", line 40, characters 14-26:
 Goal Postcondition from verification condition f2'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File array_mono.mlw:

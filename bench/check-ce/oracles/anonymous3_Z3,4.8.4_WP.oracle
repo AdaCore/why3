@@ -82,58 +82,14 @@
                     result = 0
             - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
               
-<check-ce>Check model 2 ("bench/check-ce/anonymous3.mlw", line 7, characters 12-22)
-<check-ce>Validating model:
-          File anonymous3.mlw:
-            Line 6:
-              y = {"type": "Integer", "val": "-8016"}
-            Line 7:
-              y = {"type": "Integer", "val": "-8016"}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for y at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: (-8016)
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for y at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: (-8016)
-<rac-values>No value for result at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File anonymous3.mlw:
-                Line 6:
-                  y = (-8016)
-                  Execution of main function g's body with env:
-                    y = (-8016)
-                    zero = 0
-                    one = 1
-                Line 8:
-                  Concrete execution of f with args:
-                    x = (-8016)
-                  Concrete execution of (@) with args:
-                    u = ({x -> (-8016)} fun y -> y + x)
-                    u = (-8016)
-                Line 4:
-                  Concrete execution of (+) with args:
-                    _ = (-8016)
-                    _ = (-8016)
-                Line 7:
-                  Property failure, Postcondition of g with:
-                    y = (-8016)
-                    result = (-16032)
-            - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
-              
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: don't know)
     Summary: The program does not comply to the verification goal
 - Checked model 1 (Concrete: good model, Abstract: don't know)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: don't know)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/anonymous3.mlw", line 7, characters 12-22:
 Goal Postcondition from verification condition g'vc.
-Prover result is: timeout (1.00s, 2273707 steps).
+Prover result is: Step limit exceeded (0.15s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

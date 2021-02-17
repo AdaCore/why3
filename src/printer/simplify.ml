@@ -77,8 +77,9 @@ and print_fmla info fmt f = match f.t_node with
       | Some s ->
           syntax_arguments s (print_term info) fmt tl
       | None ->
-          fprintf fmt "(EQ (%a@ %a) |@@true|)"
-            print_ident ls.ls_name (print_list space (print_term info)) tl
+         (* `%@` prints a single `@` *)
+         fprintf fmt "(EQ (%a@ %a) |%@true|)"
+           print_ident ls.ls_name (print_list space (print_term info)) tl
     end
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "FORALL" | Texists -> "EXISTS" in

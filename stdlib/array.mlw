@@ -49,7 +49,14 @@ module Array
   = if i < 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  val function make [@extraction:array_make] (n: int) (v: 'a) : array 'a
+  function make (n: int) (v: 'a) : array 'a
+
+  axiom make_spec : forall n:int, v:'a.
+    n >= 0 ->
+    (forall i:int. 0 <= i < n -> (make n v)[i] = v) /\
+    length (make n v) = n
+
+  val make [@extraction:array_make] (n: int) (v: 'a) : array 'a
     requires { [@expl:array creation size] n >= 0 }
     ensures { forall i:int. 0 <= i < n -> result[i] = v }
     ensures { result.length = n }
@@ -294,6 +301,11 @@ module ArrayPermut
     forall a1 a2: array 'a, i j l u: int.
     exchange a1 a2 i j -> l <= i < u -> l <= j < u ->
     0 <= l -> u <= length a1 -> permut_sub a1 a2 l u
+
+  lemma permut_sub_trans:
+    forall a1 a2 a3: array 'a, l u: int.
+    0 <= l -> u <= length a1 -> permut_sub a1 a2 l u ->
+    permut_sub a2 a3 l u -> permut_sub a1 a3 l u
 
   (** we can always enlarge the interval *)
   lemma permut_sub_weakening:

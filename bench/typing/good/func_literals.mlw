@@ -1,0 +1,88 @@
+
+constant a2 : int -> int = [|1|]
+constant a3 : int -> int = [|1;2|]
+constant a4 : int -> int = [|1;2;3;4;5;6;7|]
+
+constant b1 : int -> int = [|0 => 1|]
+constant b2 : int -> int = [|0 => 1; 1 => 2|]
+constant b3 : int -> int = [|5 => 50; 1 => 10|]
+constant b4 : int -> int = [|0 => 1; 1 => 2; 2 => 3; 3 => 4|]
+
+constant c1 : int -> int = [|_ => 1|]
+constant c2 : int -> int = [|0 => 1; _ => 2|]
+constant c3 : int -> int = [|5 => 50; _ => 10|]
+constant c4 : int -> int = [|0 => 1; 1 => 2; 2 => 3; _ => 4|]
+
+use int.Int
+function z (x: int) : int = x + x
+
+function d2 (x: int) : int -> int = [|1; x|]
+function d3 (x: int) : int -> int = [|1; x; x + 1|]
+function d4 (x: int) : int -> int = [|1; x; x + 1; z x |]
+function d5 (x: int) : int -> int = d4 (x+1)
+
+function e1 (x: int) : int -> int = [|0 => 1; 1 => x|]
+function e2 (x: int) : int -> int = [|0 => 1; 1 => x; 2 => x + 1|]
+function e3 (x: int) : int -> int = [|5 => 1; 1 => x; 10 => x + 1; _ => z x |]
+function e4 (x: int) : int -> int = e3 (x+1)
+
+constant f1 : int -> int = [|1;|]
+constant f2 : int -> int = [|1 => 1;|]
+constant f3 : int -> int = [|1 => 1;1 => 1;|]
+constant f4 : int -> int = [|_ => 1;|]
+constant f5 : int -> int = [|1 => 1;2 => 2;_ => -1;|]
+constant f6 : int -> real -> string  = [|[|0. => "zero"|];[|1. => "one"; 2. => "two"|]|]
+
+
+let w (x: int) = x + x
+
+let f1 ()                 = [| _ => 1 |]
+let f2 ()                 = [| _ => "foo" |]
+let f3 (x: int)           = [| _ => x|]
+let f4 (x: string)        = [| _ => x |]
+let f5 ()                 = [| 0 => 1 |]
+let f6 ()                 = [| 0 => "foo" |]
+
+use string.OCaml                                   (* required for '=' *)
+let f7 (): string -> int  = [| "bar" => 1 |]       (* type required, or *)
+let f8 ()                 = [| "bar" => (1:int) |] (* type required *)
+let f9 ()                 = [| "bar" => "foo" |]
+let f10 (): string -> int = [| "bar" => 1; _ => 0 |]       (* type required, or *)
+let f11 ()                = [| "bar" => (1:int); _ => 0 |] (* type required *)
+let f12 ()                = [| "bar" => "foo"; _ => "baz" |]
+let f13 (x: int) = [| "a" => 1; "b" => x; "c" => x + 1; _ => w x |]
+
+use int.Int                                        (* required for '=' *)
+let f14 (x: int) : int -> int = [| 2 => 1; 3 => x; -1 => x + 1; _ => 0 |]
+let f15 (x: int) = f13 (x+1)
+
+let function f17 () : int -> int = [|1|]
+
+use real.Real
+
+let f18 () :int -> real -> string  = [|[|0. => "zero"|];[|1. => "one"; 2. => "two"|]|]
+
+use seq.Seq
+function s1 : seq int = create 10 [|1;2;3;4|]
+let      s2 : seq int = create 10 [|1;2;3;4|]
+
+function s3 : seq string = create 10 [|"a";"ab";"abc";"abcd"|]
+let      s4 : seq string = create 10 [|"a";"ab";"abc";"abcd"|]
+
+use string.String
+function s5 : seq string = create 10 [|"a";"ab";concat s3[2] s3[0];"abcd"|]
+let      s6 : seq string = create 10 [|"a";"ab";concat s4[11] s4[1];"abcd"|]
+
+function s7 : seq string = create 10 [|2 => "a";0 => "abc"; -1 => "abcd"|]
+let      s8 : seq string = create 10 [|2 => "a";0 => "abc"; -1 => "abcd"|]
+
+function s9  : seq string = create 10 [|2 => "a";0 => "abc"; -1 => "abcd"; _ => ""|]
+let      s10 : seq string = create 10 [|2 => "a";0 => "abc"; -1 => "abcd"; _ => ""|]
+
+use array.Init
+
+let aa1 : array int    = init 10 [|1;2;3;4|]
+let aa2 : array string = init 10 [|"a";"ab";"abc";"abcd"|]
+(* let aa3 : array string = init 10 [|"a";"ab";concat aa2[11] aa2[1];"abcd"|] *)
+let aa4 : array string = init 10 [|2 => "a";0 => "abc"; -1 => "abcd"|]
+let aa5 : array string = init 10 [|2 => "a";0 => "abc"; -1 => "abcd"; _ => ""|]

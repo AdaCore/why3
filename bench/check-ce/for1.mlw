@@ -10,16 +10,12 @@ let f ()
     x
 
 (*
-make -j 4; why3 prove my_examples/ce-rac/for1.mlw -P cvc4-ce --apply-transform=split_vc
-make -j 4; why3 execute my_examples/ce-rac/for1.mlw --use=Top --rac "f ()"
-*)
+counterexamle: `x = 0`, `i = 2` at beggining of loop.
 
-(*
-counterexamle: x = 0, i = 2
-It is a true counterexample because the underspecification (weak loop invariant wrt postcondition);
-If the program is interpreted (w. rac) from the initial state, it does not fail,
-because it doesn't reach an iteration where x = 0 and i = 2.
-If we execute the iteration where x = 0 and i = 2, then the loop condition will be false
-and the post condition will fail -- we can conclude that the program is underspecified.
-*)
+The execution of `f` with the counterexample:
+- terminates normally if executed concretly;
+- terminates in error if executed abstractly (postcondition fails)
 
+It is a real counterexample due to underspecification (weak loop
+invariant).
+*)

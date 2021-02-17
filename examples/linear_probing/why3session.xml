@@ -3,11 +3,14 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.3.3" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="linear_probing.mlw"/>
 <theory name="HashedTypeWithDummy" proved="true">
@@ -48,7 +51,7 @@
  </transf>
  </goal>
  <goal name="create&#39;vc" expl="VC for create" proved="true">
- <proof prover="6"><result status="valid" time="0.02" steps="164"/></proof>
+ <proof prover="6"><result status="valid" time="0.02" steps="95"/></proof>
  </goal>
  <goal name="clear&#39;vc" expl="VC for clear" proved="true">
  <proof prover="6"><result status="valid" time="0.07" steps="219"/></proof>
@@ -126,7 +129,7 @@
   <proof prover="6"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="resize&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.02" steps="27848"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="27975"/></proof>
   </goal>
   <goal name="resize&#39;vc.4" expl="index in array bounds" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
@@ -138,60 +141,60 @@
   <proof prover="6"><result status="valid" time="0.03" steps="100"/></proof>
   </goal>
   <goal name="resize&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="2.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.03" steps="34210"/></proof>
+  <proof prover="2"><result status="valid" time="3.20"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="34392"/></proof>
   </goal>
   <goal name="resize&#39;vc.8" expl="index in array bounds" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="resize&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.24" steps="521699"/></proof>
+  <proof prover="3"><result status="valid" time="0.41" steps="654224"/></proof>
   </goal>
   <goal name="resize&#39;vc.10" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.21" steps="389061"/></proof>
+  <proof prover="3"><result status="valid" time="0.52" steps="754747"/></proof>
   </goal>
   <goal name="resize&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="5.06" steps="5609117"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00"/></proof>
+  <proof prover="3" timelimit="10"><result status="valid" time="9.83" steps="8902237"/></proof>
+  <proof prover="5"><result status="timeout" time="1.00" steps="2341136"/></proof>
+  <proof prover="6"><result status="timeout" time="5.00"/></proof>
+  <proof prover="8"><result status="timeout" time="1.00" steps="126797"/></proof>
   </goal>
   <goal name="resize&#39;vc.12" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="resize&#39;vc.12.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.76"/></proof>
+   <proof prover="0"><result status="valid" time="0.58"/></proof>
    </goal>
    <goal name="resize&#39;vc.12.1" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.82"/></proof>
-   <transf name="remove" proved="true" arg1="real,tuple0,unit,ref,map,list,option,zero,one,(&gt;),(&gt;=),abs,div,mod,const,is_nil,mem,is_none,(!),hash,([]&#39;),([&lt;-]&#39;),next,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_any,numof_change_some,numof_change_equiv,is_nil&#39;spec,is_none&#39;spec,neq&#39;spec,hash_nonneg,hash_eq,array&#39;invariant,([&lt;-])&#39;spec,make&#39;spec,bucket&#39;spec,bucket&#39;def,numof_eq,dummy_const">
+   <transf name="remove" proved="true" arg1="real,tuple0,unit,ref,map,list,option,zero,one,(&gt;),(&gt;=),abs,div,mod,const,is_nil,mem,is_none,(!),hash,([]&#39;),([&lt;-]&#39;),next,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_any,numof_change_some,numof_change_equiv,is_nil&#39;spec,is_none&#39;spec,neq&#39;spec,hash_nonneg,hash_eq,array&#39;invariant,([&lt;-])&#39;spec,make_spec,bucket&#39;spec,bucket&#39;def,numof_eq,dummy_const">
     <goal name="resize&#39;vc.12.1.0" expl="loop invariant preservation" proved="true">
-    <proof prover="4" timelimit="5"><result status="valid" time="0.02" steps="58943"/></proof>
+    <proof prover="4" timelimit="5"><result status="valid" time="0.02" steps="49068"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="resize&#39;vc.12.2" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.47"/></proof>
-   <transf name="remove" proved="true" arg1="real,tuple0,unit,ref,map,list,option,zero,one,(&gt;),(&gt;=),abs,div,mod,const,is_nil,mem,is_none,(!),hash,([]&#39;),([&lt;-]&#39;),next,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_any,numof_change_some,numof_change_equiv,is_nil&#39;spec,is_none&#39;spec,neq&#39;spec,hash_nonneg,hash_eq,array&#39;invariant,([&lt;-])&#39;spec,make&#39;spec,bucket&#39;spec,bucket&#39;def,numof_eq,dummy_const">
+   <transf name="remove" proved="true" arg1="real,tuple0,unit,ref,map,list,option,zero,one,(&gt;),(&gt;=),abs,div,mod,const,is_nil,mem,is_none,(!),hash,([]&#39;),([&lt;-]&#39;),next,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_any,numof_change_some,numof_change_equiv,is_nil&#39;spec,is_none&#39;spec,neq&#39;spec,hash_nonneg,hash_eq,array&#39;invariant,([&lt;-])&#39;spec,make_spec,bucket&#39;spec,bucket&#39;def,numof_eq,dummy_const">
     <goal name="resize&#39;vc.12.2.0" expl="loop invariant preservation" proved="true">
-    <proof prover="4" timelimit="5"><result status="valid" time="0.02" steps="63695"/></proof>
+    <proof prover="4" timelimit="5"><result status="valid" time="0.02" steps="79157"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="resize&#39;vc.12.3" expl="loop invariant preservation" proved="true">
-   <proof prover="3"><result status="valid" time="0.49" steps="829081"/></proof>
+   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([]&#39;),([&lt;-]&#39;),const,(!),is_nil,mem,is_none,([]),numof,numofd,next,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_any,numof_change_some,numof_change_equiv,is_nil&#39;spec,is_none&#39;spec,eq&#39;spec,hash_nonneg,hash_eq,array&#39;invariant,([&lt;-])&#39;spec,make_spec,bucket&#39;spec,bucket&#39;def,numof_eq,dummy_const">
+    <goal name="resize&#39;vc.12.3.0" expl="loop invariant preservation" proved="true">
+    <proof prover="3" timelimit="1"><result status="valid" time="0.02" steps="19502"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="resize&#39;vc.12.4" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="1.57"/></proof>
-   <transf name="remove" proved="true" arg1="real,tuple0,unit,ref,map,list,option,zero,one,(&gt;),abs,div,const,is_nil,mem,is_none,(!),([]&#39;),([&lt;-]&#39;),next,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_any,numof_change_some,numof_change_equiv,is_nil&#39;spec,is_none&#39;spec,neq&#39;spec,hash_nonneg,array&#39;invariant,([&lt;-])&#39;spec,bucket&#39;spec,numof_eq">
+   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([]&#39;),([&lt;-]&#39;),const,(!),is_nil,mem,is_none,neq,dummym,between,numof,numofd,next,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,Abs_le,Abs_pos,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_any,numof_change_some,numof_change_equiv,is_nil&#39;spec,is_none&#39;spec,neq&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,make_spec,bucket&#39;spec,numof_eq,dummy_const">
     <goal name="resize&#39;vc.12.4.0" expl="loop invariant preservation" proved="true">
-    <proof prover="4" timelimit="5"><result status="valid" time="0.20" steps="446802"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.13"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="resize&#39;vc.12.5" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.12"/></proof>
-   <transf name="remove" proved="true" arg1="real,tuple0,unit,ref,map,list,option,zero,one,(&gt;),(&gt;=),abs,div,mod,const,is_nil,mem,is_none,(!),hash,([]&#39;),([&lt;-]&#39;),next,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_any,numof_change_some,numof_change_equiv,is_nil&#39;spec,is_none&#39;spec,neq&#39;spec,hash_nonneg,hash_eq,array&#39;invariant,([&lt;-])&#39;spec,make&#39;spec,bucket&#39;spec,bucket&#39;def,numof_eq,dummy_const">
-    <goal name="resize&#39;vc.12.5.0" expl="loop invariant preservation" proved="true">
-    <proof prover="4" timelimit="5"><result status="valid" time="0.02" steps="49480"/></proof>
-    </goal>
-   </transf>
+   <proof prover="0"><result status="valid" time="0.16"/></proof>
    </goal>
   </transf>
   </goal>
@@ -199,16 +202,16 @@
   <proof prover="6"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
   <goal name="resize&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="26381"/></proof>
   </goal>
   <goal name="resize&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.10" steps="177926"/></proof>
+  <proof prover="3"><result status="valid" time="0.10" steps="178151"/></proof>
   </goal>
   <goal name="resize&#39;vc.16" expl="type invariant" proved="true">
-  <proof prover="7"><result status="valid" time="0.04" steps="14644"/></proof>
+  <proof prover="7"><result status="valid" time="0.04" steps="14941"/></proof>
   </goal>
   <goal name="resize&#39;vc.17" expl="type invariant" proved="true">
-  <proof prover="7"><result status="valid" time="0.06" steps="14901"/></proof>
+  <proof prover="7"><result status="valid" time="0.06" steps="15208"/></proof>
   </goal>
   <goal name="resize&#39;vc.18" expl="type invariant" proved="true">
   <transf name="split_goal_right" proved="true" >

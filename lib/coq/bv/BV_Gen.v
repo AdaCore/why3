@@ -1620,6 +1620,29 @@ Lemma to_uint_urem :
   rewrite Z.abs_eq; apply to_uint_bounds.
 Qed.
 
+(* abstract sdiv and srem while we have no realization yet *)
+Definition sdiv_abstract : t -> t -> t.
+  admit.
+Admitted.
+
+Definition srem_abstract : t -> t -> t.
+  admit.
+Admitted.
+
+
+
+(* Why3 goal *)
+Definition sdiv : t -> t -> t.
+Proof.
+  exact sdiv_abstract.
+Defined.
+
+(* Why3 goal *)
+Definition srem : t -> t -> t.
+Proof.
+  exact srem_abstract.
+Defined.
+
 (* Why3 goal *)
 Definition lsr_bv : t -> t -> t.
   exact (fun v w => lsr v (to_uint w)).

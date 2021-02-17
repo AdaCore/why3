@@ -45,7 +45,7 @@ module MaxArray
     i <- i + 1;
     switch (i < length a)
     | True  -> goto L2
-    | False -> (m, ind)
+    | False -> return (m, ind)
     end
   }
   L2 {
@@ -54,5 +54,4 @@ module MaxArray
     | False -> goto L1
     end
   }
-
 end

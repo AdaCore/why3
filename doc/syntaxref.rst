@@ -197,14 +197,35 @@ that expects an argument of a mutable type will accept an argument of
 the corresponding snapshot type as long as it is not modified by the
 function.
 
-Logical expressions: terms and formulas
----------------------------------------
+Logical expressions
+-------------------
+
+A significant part of a typical WhyML source file is occupied by
+non-executable logical content intended for specification and proof:
+function contracts, assertions, definitions of logical functions and
+predicates, axioms, lemmas, etc.
+
+
+Terms and Formulas
+^^^^^^^^^^^^^^^^^^
+
+Logical expressions are called *terms*. Boolean terms are called
+*formulas*. Internally, Why3 distinguishes the proper formulas (produced
+by predicate symbols, propositional connectives and quantifiers) and the
+terms of type ``bool`` (produced by Boolean variables and logical
+functions that return ``bool``). However, this distinction is not
+enforced on the syntactical level, and Why3 will perform the necessary
+conversions behind the scenes.
+
+The syntax of WhyML terms is given in :token:`term`.
+
 
 .. productionlist::
     term0: `integer`   ; integer constant
         : | `real`   ; real constant
         : | "true" | "false"   ; Boolean constant
         : | "()"   ; empty tuple
+        : | `string` ; string constant
         : | `qualid`   ; qualified identifier
         : | `qualifier`? "(" `term` ")"   ; term in a scope
         : | `qualifier`? "begin" `term` "end"   ; idem
@@ -217,6 +238,8 @@ Logical expressions: terms and formulas
         : | `term` "[" `term` ".." `term` "]" "'"*   ; collection slice
         : | `term` "[" `term` ".." "]" "'"*   ; right-open slice
         : | `term` "[" ".." `term` "]" "'"*   ; left-open slice
+        : | "[|" (`term` "=>" `term` ";")* ("_" "=>" `term`)? "|]" ; function literal
+        : | "[|" (`term` ";")+ "|]" ; function literal (domain over nat)
         : | `term` `term`+   ; application
         : | `prefix_op` `term`   ; prefix operator
         : | `term` `infix_op_4` `term`   ; infix operator 4
@@ -266,58 +289,45 @@ Logical expressions: terms and formulas
     trigger: `term` ("," `term`)*
 
 
-A significant part of a typical WhyML source file is occupied by
-non-executable logical content intended for specification and proof:
-function contracts, assertions, definitions of logical functions and
-predicates, axioms, lemmas, etc.
-
-Logical expressions are called *terms*. Boolean terms are called
-*formulas*. Internally, Why3 distinguishes the proper formulas (produced
-by predicate symbols, propositional connectives and quantifiers) and the
-terms of type ``bool`` (produced by Boolean variables and logical
-functions that return ``bool``). However, this distinction is not
-enforced on the syntactical level, and Why3 will perform the necessary
-conversions behind the scenes.
-
-The syntax of WhyML terms is given in :token:`term`.  The various
+The various
 constructs have the following priorities and associativities, from
 lowest to greatest priority:
 
-+---------------------------------+-----------------+
-| construct                       | associativity   |
-+=================================+=================+
-| ``if then else`` / ``let in``   | –               |
-+---------------------------------+-----------------+
-| attribute                       | –               |
-+---------------------------------+-----------------+
-| cast                            | –               |
-+---------------------------------+-----------------+
-| ``->`` / ``<->``                | right           |
-+---------------------------------+-----------------+
-| ``by`` / ``so``                 | right           |
-+---------------------------------+-----------------+
-| ``\/`` / ``||``                 | right           |
-+---------------------------------+-----------------+
-| ``/\`` / ``&&``                 | right           |
-+---------------------------------+-----------------+
-| ``not``                         | –               |
-+---------------------------------+-----------------+
-| infix-op level 1                | left            |
-+---------------------------------+-----------------+
-| infix-op level 2                | left            |
-+---------------------------------+-----------------+
-| infix-op level 3                | left            |
-+---------------------------------+-----------------+
-| infix-op level 4                | left            |
-+---------------------------------+-----------------+
-| prefix-op                       | –               |
-+---------------------------------+-----------------+
-| function application            | left            |
-+---------------------------------+-----------------+
-| brackets / ternary brackets     | –               |
-+---------------------------------+-----------------+
-| bang-op                         | –               |
-+---------------------------------+-----------------+
++------------------------------------+-----------------+
+| construct                          | associativity   |
++====================================+=================+
+| ``if then else`` / ``let in``      | –               |
++------------------------------------+-----------------+
+| attribute                          | –               |
++------------------------------------+-----------------+
+| cast                               | –               |
++------------------------------------+-----------------+
+| ``->`` / ``<->`` / ``by`` / ``so`` | right           |
++------------------------------------+-----------------+
+| ``\/`` / ``||``                    | right           |
++------------------------------------+-----------------+
+| ``/\`` / ``&&``                    | right           |
++------------------------------------+-----------------+
+| ``not``                            | –               |
++------------------------------------+-----------------+
+| infix-op level 1                   | right           |
++------------------------------------+-----------------+
+| ``at`` / ``old``                   | –               |
++------------------------------------+-----------------+
+| infix-op level 2                   | left            |
++------------------------------------+-----------------+
+| infix-op level 3                   | left            |
++------------------------------------+-----------------+
+| infix-op level 4                   | left            |
++------------------------------------+-----------------+
+| prefix-op                          | –               |
++------------------------------------+-----------------+
+| function application               | left            |
++------------------------------------+-----------------+
+| brackets / ternary brackets        | –               |
++------------------------------------+-----------------+
+| bang-op                            | –               |
++------------------------------------+-----------------+
 
 For example, as was mentioned above,
 tight operators have the highest precedence of all operators, so that
@@ -325,11 +335,12 @@ tight operators have the highest precedence of all operators, so that
 ``!p.x`` denotes the field ``x`` of a record stored in the reference
 ``p``.
 
+Infix operators from groups 2-4 are left-associative. Infix operators
+from group 1 are right-associative and can be chained. For example, the
+term ``0 <= i < j < length a`` is parsed as the conjunction of three
+inequalities ``0 <= i``, ``i < j``, and ``j < length a``.
 Note that infix symbols of level 1 include equality (``=``) and
 disequality (``<>``).
-
-Note the curryfied syntax for function application, though partial
-application is not allowed (rejected at typing).
 
 An operator in parentheses acts as an identifier referring to that
 operator, for example, in a definition. To distinguish between prefix
@@ -338,9 +349,27 @@ example, ``(-)`` refers to the binary subtraction and ``(-_)`` to the
 unary negation. Tight operators cannot be used as infix operators, and
 thus do not require disambiguation.
 
+As with normal identifiers, we can put a qualifier over a parenthesised
+operator, e.g., ``Map.S.([]) m i``. Also, as noted above, a qualifier
+can be put over a parenthesised term, and the parentheses can be omitted
+if the term is a record or a record update.
+
+Note the curryfied syntax for function application, though partial
+application is not allowed (rejected at typing).
+
+.. _rubric.collections_syntax:
+
+.. index:: bracket; syntax
+.. index:: collections; syntax; function literals
+
+Specific syntax for collections
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 In addition to prefix and infix operators, WhyML supports several mixfix
 bracket operators to manipulate various collection types: dictionaries,
-arrays, sequences, etc. Bracket operators do not have any predefined
+arrays, sequences, etc.
+
+Bracket operators do not have any predefined
 meaning and may be used to denote access and update operations for
 various user-defined collection types. We can introduce multiple bracket
 operations in the same scope by disambiguating them with primes after
@@ -357,8 +386,23 @@ with normal identifiers, names with a letter after a prime, such as
 ``(+)'spec``, can only be introduced by Why3, and not by the user in a
 WhyML source.
 
-.. index:: at
-.. index:: old
+WhyML provides a special syntax for `function literals`. The term
+``[|t1 => u1; ...; tn => un; _ => default|]``, where ``t1, ..., tn``
+have some type ``t`` and ``u1, ..., un, default`` some type ``u``,
+represents a total function of the form ``fun x -> if x = t1 then u1
+else if ... else if x = tn then un else default``. The default value
+can be omitted in which case the last value will be taken as the
+default value. For instance, the function literal ``[|t1 => u1|]``
+represents the term ``fun x -> if x = t1 then u1 else u1``. When the
+domain of the function ranges over an initial sequence of the natural
+numbers it is possible to write ``[|t1;t2;t3|]`` as a shortcut for
+``[|0 => t1; 1 => t2; 2 => t3|]``.  Function literals cannot be empty.
+
+.. index:: at; syntax
+.. index:: old; syntax
+
+The "at" and "old" operators
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
@@ -367,17 +411,10 @@ operators have higher precedence than the infix operators from group 1
 (:token:`infix_op_1`): ``old i > j`` is parsed as ``(old i) > j`` and not as
 ``old (i > j)``.
 
-Infix operators from groups 2-4 are left-associative. Infix operators
-from group 1 are non-associative and can be chained. For example, the
-term ``0 <= i < j < length a`` is parsed as the conjunction of three
-inequalities ``0 <= i``, ``i < j``, and ``j < length a``.
-
-As with normal identifiers, we can put a qualifier over a parenthesised
-operator, e.g., ``Map.S.([]) m i``. Also, as noted above, a qualifier
-can be put over a parenthesised term, and the parentheses can be omitted
-if the term is a record or a record update.
-
 .. index:: &&, ||, by, so
+
+Non-standard connectives
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The propositional connectives in WhyML formulas are listed in
 :token:`term`. The non-standard connectives — asymmetric
@@ -430,6 +467,13 @@ instead: ``A <-> B <-> C`` is transformed into a conjunction of
 ``A <-> B`` and ``B <-> C``. To reduce ambiguity, WhyML forbids to place
 a non-parenthesised implication at the right-hand side of an
 equivalence: ``A <-> B -> C`` is rejected.
+
+.. index:: conditionals; syntax
+.. index:: let; syntax
+.. index:: pattern-matching; syntax
+
+Conditionals, "let" bindings and pattern-matching
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. productionlist::
   term: `term0`
@@ -509,6 +553,7 @@ conjunction and disjunction, respectively.
         : | `real`   ; real constant
         : | "true" | "false"   ; Boolean constant
         : | "()"   ; empty tuple
+        : | `string` ; string constant
         : | `qualid`   ; identifier in a scope
         : | `qualifier`? "(" `expr` ")"   ; expression in a scope
         : | `qualifier`? "begin" `expr` "end"   ; idem
@@ -521,6 +566,8 @@ conjunction and disjunction, respectively.
         : | `expr` "[" `expr` ".." `expr` "]" "'"*   ; collection slice
         : | `expr` "[" `expr` ".." "]" "'"*   ; right-open slice
         : | `expr` "[" ".." `expr` "]" "'"*   ; left-open slice
+        : | "[|" (`expr` "=>" `expr` ";")* ("_" "=>" `expr`)? "|]" ; function literal
+        : | "[|" (`expr` ";")+ "|]" ; function literal (domain over nat)
         : | `expr` `expr`+   ; application
         : | `prefix_op` `expr`   ; prefix operator
         : | `expr` `infix_op_4` `expr`   ; infix operator 4
@@ -548,6 +595,8 @@ conjunction and disjunction, respectively.
         : | "while" `expr` "do" `invariant`* `variant`? `expr` "done"   ; while loop
         : | "for" `lident` "=" `expr` ("to" | "downto") `expr` "do" `invariant`* `expr` "done"   ; for loop
         : | "for" `pattern` "in" `expr` "with" `uident` ("as" `lident_nq`)? "do"  `invariant`* `variant`? `expr` "done" ; for each loop
+        : | "break" `lident`?   ; loop break
+        : | "continue" `lident`?   ; loop continue
         : | ("assert" | "assume" | "check") "{" `term` "}"   ; assertion
         : | "raise" `uqualid` `expr`?   ; exception raising
         : | "raise" "(" `uqualid` `expr`? ")"
@@ -580,9 +629,10 @@ conjunction and disjunction, respectively.
     variant: "variant" "{" `variant_term` ("," `variant_term`)* "}"   ; termination variant
     variant_term: `term` ("with" `lqualid`)?   ; variant term + WF-order
 
-
 .. index:: ghost expressions
-.. rubric:: Ghost expressions
+
+Ghost expressions
+^^^^^^^^^^^^^^^^^
 
 Keyword ``ghost`` marks the expression as ghost code added for
 verification purposes. Ghost code is removed from the final code
@@ -590,7 +640,9 @@ intended for execution, and thus cannot affect the computation of the
 program results nor the content of the observable memory.
 
 .. index:: assignment expressions
-.. rubric:: Assignment expressions
+
+Assignment expressions
+^^^^^^^^^^^^^^^^^^^^^^
 
 Assignment updates in place a mutable record field or an element of a
 collection. The former can be done simultaneously on a tuple of values:
@@ -599,32 +651,149 @@ of the ternary bracket operator ``([]<-)`` and cannot be used in a
 multiple assignment.
 
 .. index:: auto-dereference
-.. rubric:: Auto-dereference: simplified usage of mutable variables
+.. index:: reference
 
-TODO: put here what is currently in the release notes.
+Auto-dereference: simplified usage of mutable variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some syntactic sugar is provided to ease the use of mutable variables
+(aka references), in such a way that the bang character is no more
+needed to access the value of a reference, in both logic and programs.
+This syntactic sugar summarized in the following table.
+
++-------------------------+-------------------------------+
+| auto-dereference syntax | desugared to                  |
++=========================+===============================+
+| ``let &x = ... in``     | ``let (x: ref ...) = ... in`` |
++-------------------------+-------------------------------+
+| ``f x``                 | ``f x.contents``              |
++-------------------------+-------------------------------+
+| ``x <- ...``            | ``x.contents <- ...``         |
++-------------------------+-------------------------------+
+| ``let ref x = ...``     | ``let &x = ref ...``          |
++-------------------------+-------------------------------+
+
+Notice that
+
+- the ``&`` marker adds the typing constraint ``(x: ref ...)``;
+- top-level ``let/val ref`` and ``let/val &`` are allowed;
+- auto-dereferencing works in logic, but such variables
+  cannot be introduced inside logical terms.
+
+Here is an example:
+
+.. code-block:: whyml
+
+    let ref x = 0 in while x < 100 do invariant { 0 <= x <= 100 } x <- x + 1 done
+
+That syntactic sugar is further extended to pattern matching, function
+parameters, and reference passing, as follows.
+
++----------------------------------+-----------------------------------------------------+
+| auto-dereference syntax          | desugared to                                        |
++==================================+=====================================================+
+| ``match e with (x,&y) -> y end`` | ``match e with (x,(y: ref ...)) -> y.contents end`` |
++----------------------------------+-----------------------------------------------------+
+| .. code-block:: whyml            | .. code-block:: whyml                               |
+|                                  |                                                     |
+|    let incr (&x: ref int) =      |    let incr (x: ref int) =                          |
+|      x <- x + 1                  |      x.contents <- x.contents + 1                   |
+|                                  |                                                     |
+|    let f () =                    |    let f () =                                       |
+|      let ref x = 0 in            |      let x = ref 0 in                               |
+|      incr x;                     |      incr x;                                        |
+|      x                           |      x.contents                                     |
++----------------------------------+-----------------------------------------------------+
+| ``let incr (ref x: int) ...``    | ``let incr (&x: ref int) ...``                      |
++----------------------------------+-----------------------------------------------------+
+
+The type annotation is not required. Let-functions with such formal
+parameters also prevent the actual argument from auto-dereferencing when
+used in logic. Pure logical symbols cannot be declared with such
+parameters.
+
+Auto-dereference suppression does not work in the middle of a relation
+chain: in ``0 < x :< 17``, ``x`` will be dereferenced even if ``(:<)``
+expects a ref-parameter on the left.
+
+Finally, that syntactic sugar applies to the caller side:
+
++-------------------------+-----------------------+
+| auto-dereference syntax | desugared to          |
++=========================+=======================+
+| .. code-block:: whyml   | .. code-block:: whyml |
+|                         |                       |
+|    let f () =           |    let f () =         |
+|      let ref x = 0 in   |      let x = ref 0 in |
+|      g &x               |      g x              |
++-------------------------+-----------------------+
+
+The ``&`` marker can only be attached to a variable. Works in logic.
+
+Ref-binders and ``&``-binders in variable declarations, patterns, and
+function parameters do not require importing ``ref.Ref``. Any example
+that does not use references inside data structures can be rewritten by
+using ref-binders, without importing ``ref.Ref``.
+
+Explicit use of type symbol ``ref``, program function ``ref``, or field
+``contents`` requires importing ``ref.Ref`` or ``why3.Ref.Ref``.
+Operations ``(:=)`` and ``(!)`` require importing ``ref.Ref``.
+Note that operation ``(:=)`` is fully subsumed by direct assignment ``(<-)``.
 
 .. index:: evaluation order
-.. rubric:: Evaluation order
+
+Evaluation order
+^^^^^^^^^^^^^^^^
 
 In applications, arguments are evaluated from right to left. This
 includes applications of infix operators, with the only exception of
 lazy operators ``&&`` and ``||`` which evaluate from left to right,
 lazily.
 
-.. index:: specification clauses
+.. index:: past program states
 .. index:: at
 .. index:: old
-.. rubric:: Specification clauses
+.. index:: label
 
-The syntax for specification clauses in programs is given in
-:token:`spec`.  Within specifications, terms are extended with
-constructs `old` and `at`.  Within a postcondition, `old t` refers to
-the value of term `t` in the prestate. Within the scope of a code mark
-`L`, the term `at t L` refers to the value of term `t` at the program
-point corresponding to `L`.
+Referring to past program states using "at" and "old" operators
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Within specifications, terms are extended with
+constructs ``old`` and ``at``.  Within a postcondition, ``old t`` refers to
+the value of term ``t`` in the pre-state. Within the scope of a code label
+``L``, introduced with ``label L in ...``, the term ``t at L`` refers to the
+value of term ``t`` at the program point corresponding to ``L``.
+
+Note that ``old`` can be used in annotations contained in the function
+body as well (assertions, loop invariants), with the exact same meaning: it
+refers to the pre-state of the function. In particular, ``old t`` in
+a loop invariant does not refer to the program point right before the
+loop but to the function entry.
+
+Whenever ``old t`` or ``t at L`` refers to a program point at which
+none of the variables in ``t`` is defined, Why3 emits a warning ``this
+`at'/`old' operator is never used`` and the operator ``old``/``at`` is
+ignored. For instance, the following code
+
+.. code-block:: whyml
+
+    let x = ref 0 in assert { old !x = !x }
+
+emits a warning and is provable, as it amounts to proving `0=0`.
+Similarly, if ``old t`` or ``t at L`` refers to a term ``t`` that is
+immutable, Why3 emits the same warning and ignores the operator.
+
+Caveat: Whenever the term ``t`` contains several variables, some of
+them being meaningful at the corresponding program point but others
+not being in scope or being immutable, there is *no warning* and the
+operator ``old``/``at`` is applied where it is defined and ignored
+elsewhere. This is convenient when writing terms such as ``old a[i]``
+where ``a`` makes sense in the pre-state but ``i`` does not.
 
 .. index:: for loop, invariant; for loop
-.. rubric:: The “for” loop
+
+The “for” loop
+^^^^^^^^^^^^^^
 
 The “for” loop of Why3 has the following general form:
 
@@ -633,8 +802,8 @@ The “for” loop of Why3 has the following general form:
     for v=e1 to e2 do invariant { i } e3 done
 
 Here, ``v`` is a variable identifier, that is bound by the loop
-statement and of type ``integer`` ; ``e1`` and ``e2`` are program
-expressions of type ``integer``, and ``e3`` is an expression of type
+statement and of type ``int`` ; ``e1`` and ``e2`` are program
+expressions of type ``int``, and ``e3`` is an expression of type
 ``unit``. The variable ``v`` may occur both in ``i`` and ``e3``, and
 is not mutable. The execution of such a loop amounts to first evaluate
 ``e1`` and ``e2`` to values ``n1`` and ``n2``. If ``n1 >= n2`` then
@@ -658,7 +827,9 @@ It is also possible for ``v`` to be an integer range type (see
 :numref:`sec.range_types`) instead of an integer.
 
 .. index:: for each loop, invariant; for each loop
-.. rubric:: The “for each” loop
+
+The “for each” loop
+^^^^^^^^^^^^^^^^^^^
 
 The “for each” loop of Why3 has the following syntax:
 
@@ -688,8 +859,109 @@ As shown above, the iterator is named ``it``. It can be referred to
 within annotations. A different name can be specified, using syntax
 ``with S as x do``.
 
-Constructions ``break`` and ``continue`` can be used in for each
-loops, with the expected semantics.
+.. index:: while loop, for loop, break, continue
+
+Break & Continue
+^^^^^^^^^^^^^^^^
+
+
+The ``break`` and ``continue`` statements can be used in ``while``,
+``for`` and ``for-each`` loops, with the expected semantics. The
+statements take an optional identifier which can be used to break
+out of nested loops. This identifier can be defined using ``label``
+like in the following example:
+
+.. code-block:: whyml
+
+    label A in
+    while true do
+      variant...
+      while true do
+        variant..
+        break A (* abort the outer loop *)
+      done
+    done
+
+.. index:: collections; syntax; function literals
+
+Function literals
+^^^^^^^^^^^^^^^^^
+
+Function literals can be written in expressions the same way as they
+are in terms but there are a few subtleties that one must bear in
+mind. First of all, if the domain of the literal is of type ``t`` then
+an equality infix operator ``=`` should exist. For instance, the
+literal ``[|t1 => u1|]`` with ``t1`` of type ``t``, is only considered
+well typed if the infix operator ``=`` of type ``t -> t -> bool`` is
+visible in the current scope. This problem does not exist in terms
+because the equality in terms is polymorphic.
+
+Second, the function literal expression ``[|t1 => u1; t2 => u2; _ =>
+u3|]`` will be translated into the following expression:
+
+.. code-block:: whyml
+
+    let def'e = u3 in
+    let d'i1 = t2 in
+    let r'i1 = u2 in
+    let d'i0 = t1 in
+    let r'i0 = u1 in
+    fun x'x -> if x'x = d'i0 then r'i0 else
+               if x'x = d'i1 then r'i1 else
+               def'e
+
+.. index:: any expression
+
+The ``any`` expression
+^^^^^^^^^^^^^^^^^^^^^^
+
+The general form of the ``any`` expression is the following.
+
+.. code-block:: whyml
+
+  any <type> <contract>
+
+This expression non-deterministically evaluates to a value of the
+given type that satisfies the contract. For example, the code
+
+.. code-block:: whyml
+
+  let x = any int ensures { 0 <= result < 100 } in
+  ...
+
+will give to ``x`` any non-negative integer value smaller than 100.
+
+As for contracts on functions, it is allowed to name the result or
+even give a pattern for it. For example the following expression
+returns a pair of integers which first component is smaller than the
+second.
+
+.. code-block:: whyml
+
+  any (int,int) returns { (a,b) -> a <= b }
+
+Notice that an ``any`` expression is not supposed to have side effects
+nor raise exceptions, hence its contract cannot include any
+``writes`` or ``raises`` clauses.
+
+To ensure that this construction is safe, it is mandatory to show that
+there is always at least one possible value to return. It means that
+the VC generator produces a proof obligation of form
+
+.. code-block:: whyml
+
+   exists result:<type>. <post-condition>
+
+In that respect, notice the difference with the construct
+
+.. code-block:: whyml
+
+  val x:<type> <contract> in x
+
+which will not generate any proof obligation, meaning that the
+existence of the value ``x`` is taken for granted.
+
+
 
 Modules
 -------
@@ -1345,9 +1617,7 @@ Library ``int``: mathematical integers
 The ``int`` library contains several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.int`.
 
-.. %EXECUTE bin/why3 pp --output=dep stdlib/int.mlw | tred > doc/stdlib-dot/library-int.dot
-
-.. graphviz:: stdlib-dot/library-int.dot
+.. graphviz:: generated/library-int.dot
    :caption: Module dependencies in library ``int``.
    :name: fig.lib.int
 
@@ -1375,9 +1645,7 @@ Library ``array``: array data structure
 The ``array`` library contains several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.array`.
 
-.. %EXECUTE bin/why3 pp --output=dep stdlib/array.mlw | tred > doc/stdlib-dot/library-array.dot
-
-.. graphviz:: stdlib-dot/library-array.dot
+.. graphviz:: generated/library-array.dot
    :caption: Module dependencies in library ``array``.
    :name: fig.lib.array
 

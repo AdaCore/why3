@@ -55,34 +55,10 @@ nondet_types=""
 remove_solver_details () {
     sed 's/[0-9]\+\.[0-9]\+s//g' \
   | sed 's/[0-9]\+ steps//g' \
-  | sed 's/Timeout.*$\|Unknown (unknown).*$\|Unknown (incomplete).*$\|Unknown (unknown + incomplete).*$\|Unknown (unknown + interrupted).*$/Timeout or Unknown/'
+  | sed 's/Prover result is: Timeout.*$\|Unknown (\(unknown\|incomplete\|unknown + \(incomplete\|interrupted\)\)).*$\|Out of memory\.$\|Step limit exceeded.*$/Prover result is: Unknown or time\/memory\/step limit./'
 }
 
-check_nondet () {
-    case "$1" in
-        # "bench/check-ce/EXAMPLE1.mlw")
-        #     nondet=true
-        #     nondet_types="Integer String";;
-        # "bench/check-ce/EXAMPLE2.mlw")
-        #     nondet=true
-        #     nondet_types="Integer";;
-        "bench/check-ce/anonymous5.mlw")
-            nondet=true
-            nondet_types="Integer";;
-        *)
-            nondet=false
-            nondet_types="";;
-    esac
-}
-
-# $1 = type
-remove_nondet () {
-    sed 's/"type": "'"$1"'", "val": "\([^"]\|\\"\)\+"/"type": "'"$1"'", "val": "ANY_'"$1"'"/g' \
-  | sed 's/\(\([a-z]\|_\)[^ ]*\) = [^\n]\+/\1 = ANY_VALUE/g'
-    # ^ in the interpretation log there is no type in values, thus we need to remove all
-}
-
-# $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP
+# $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP, $5 = steps
 run () {
     printf "  $2 ($1)... "
     file_path="$2/$3"
@@ -100,9 +76,10 @@ run () {
         printf "Strongest Postcondition  ${file_path} ($1)... "
     fi
     prover="$1,counterexamples"
+    steps=$5
     # Call why3 prove to create CE (and accept return value of 2 for unproven goals)
     ($dir/../bin/why3"$suffix" prove --apply-transform=split_vc \
-       --prover="$prover" --check-ce --timelimit=1 --verbosity=5 \
+       --prover="$prover" --stepslimit=$steps --check-ce --verbosity=5 \
        --library="$2" "${file_path}.mlw" --debug=check-ce,rac-values \
        || [ $? -eq 2 ]) 2>&1 \
      | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
@@ -116,29 +93,20 @@ run () {
     if [ "$str_oracle" = "$str_out" ] ; then
         echo "ok"
     else
-        check_nondet "$file_path.mlw"
-        for type in $nondet_types; do
-            str_out=$(echo "$str_out"|remove_nondet "$type")
-            str_oracle=$(echo "$str_oracle"|remove_nondet "$type")
-        done
-        if [ "$nondet_types" != "" ] && [ "$str_oracle" = "$str_out" ] ; then
-            echo "ok (nondet detected)"
-        else
-            if $updateoracle; then
-                echo "Updating oracle"
-                mv "$f.out" "${oracle_file}"
-            else
-                echo "FAILED!"
-                echo "diff is the following:"
-                echo "$f"
-                diff -u <(echo "$str_oracle") <(echo "$str_out")|colorize
-                failed="$failed$f\n"
-                success=false
-            fi
-        fi
+	if $updateoracle; then
+	    echo "Updating oracle"
+	    mv "$f.out" "${oracle_file}"
+	else
+	    echo "FAILED!"
+	    echo "diff is the following:"
+	    echo "$f"
+	    diff -u <(echo "$str_oracle") <(echo "$str_out")|colorize
+	    failed="$failed$f\n"
+	    success=false
+	fi
     fi
     if $forceupdateoracle; then
-        echo "Forcing update oracle for ${file_path}, prover $1"
+	echo "Forcing update oracle for ${file_path}, prover $1"
         mv "$f.out" "${oracle_file}"
     fi
 }
@@ -147,10 +115,10 @@ for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
-    run CVC4,1.7 $filedir $filebase true
-    run CVC4,1.7 $filedir $filebase false
-    run Z3,4.8.4 $filedir $filebase true
-    run Z3,4.8.4 $filedir $filebase false
+    run CVC4,1.7 $filedir $filebase true   150000
+    run CVC4,1.7 $filedir $filebase false  150000
+    run Z3,4.8.4 $filedir $filebase true  7500000
+    run Z3,4.8.4 $filedir $filebase false 7500000
 done
 
 if [ "$success" = true ]; then

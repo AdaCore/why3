@@ -190,116 +190,14 @@
                   result = ()
                   Property failure, Assertion with:
                     z = {contents= 2}
-<check-ce>Check model 2 ("bench/check-ce/func_call4.mlw", line 9, characters 34-39)
-<check-ce>Validating model:
-          File func_call4.mlw:
-            Line 7:
-              old z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            Line 9:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 3, characters 9-14, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23:
-              {contents= 2}
-<rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 9, characters 19-23, taking default.
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 3, characters 9-14, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call4.mlw", line 9, characters 19-23:
-              {contents= 2}
-<rac-values>No value for result at "bench/check-ce/func_call4.mlw", line 9, characters 19-23, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call4.mlw:
-                Line 3:
-                  Constant z initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
-                Line 9:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    z = {contents= 2}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                  Concrete execution of Tuple0 with args:
-                  (abstract) execution of any function g with args:
-                    _ = ()
-                  z = {contents= 2}
-                  result = ()
-                  Property failure, Assertion with:
-                    z = {contents= 2}
-            - Abstract: good model (Abstract RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call4.mlw:
-                Line 3:
-                  Constant z initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
-                Line 9:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    z = {contents= 2}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                  Concrete execution of Tuple0 with args:
-                  Abstract execution of g with args:
-                    _ = ()
-                  z = {contents= 2}
-                  result = ()
-                  Property failure, Assertion with:
-                    z = {contents= 2}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
 - Selected model 1 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call4.mlw", line 9, characters 34-39:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 7756097 steps).
+Prover result is: Step limit exceeded (0.76s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

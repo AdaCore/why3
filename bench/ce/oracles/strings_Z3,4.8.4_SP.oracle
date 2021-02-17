@@ -1,54 +1,58 @@
 Strongest Postcondition
 File "bench/ce/strings.mlw", line 6, characters 21-34:
 Verification condition T1.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 6:
-    s [@introduced] = {"type": "String", "val": "8"}
+    s [@introduced] = {"type": "String", "val": "\u0000"}
 
 File "bench/ce/strings.mlw", line 7, characters 21-35:
 Verification condition T2.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 7:
-    s [@introduced] = {"type": "String", "val": "44424"}
+    s [@introduced] = {"type": "String", "val": "\u0000\u0000\u0000\u0000"}
 
 File "bench/ce/strings.mlw", line 8, characters 25-52:
 Verification condition T3.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 8:
-    s1 [@introduced] = {"type": "String", "val": "!!!1!!!"}
-    s2 [@introduced] = {"type": "String", "val": "!!!0!!!"}
+    s1 [@introduced] = {"type": "String", "val": "!0!"}
+    s2 [@introduced] = {"type": "String", "val": "!1!"}
 
 File "bench/ce/strings.mlw", line 9, characters 38-55:
 Verification condition T4.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 9:
-    s [@introduced] = {"type": "String", "val": "118112148284"}
+    s [@introduced] =
+      {"type": "String",
+       "val":
+        "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"}
 
 File "bench/ce/strings.mlw", line 10, characters 59-78:
 Verification condition T5.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 10:
-    s [@introduced] = {"type": "String", "val": "2882262"}
+    s [@introduced] =
+      {"type": "String", "val": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000"}
     x [@introduced] = {"type": "String", "val": "b{uoh\ti"}
 
 File "bench/ce/strings.mlw", line 11, characters 59-79:
 Verification condition T6.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
@@ -60,7 +64,7 @@ File strings.mlw:
 
 File "bench/ce/strings.mlw", line 12, characters 59-78:
 Verification condition T7.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
@@ -70,21 +74,22 @@ File strings.mlw:
 
 File "bench/ce/strings.mlw", line 13, characters 59-79:
 Verification condition T8.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/strings.mlw", line 14, characters 59-78:
 Verification condition T9.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 14:
-    s [@introduced] = {"type": "String", "val": "2814148"}
+    s [@introduced] =
+      {"type": "String", "val": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000"}
     x [@introduced] = {"type": "String", "val": "b{uoh\ti"}
 
 File "bench/ce/strings.mlw", line 15, characters 60-80:
 Verification condition T10.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
@@ -96,7 +101,7 @@ File strings.mlw:
 
 File "bench/ce/strings.mlw", line 16, characters 60-79:
 Verification condition T11.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
@@ -106,7 +111,7 @@ File strings.mlw:
 
 File "bench/ce/strings.mlw", line 17, characters 60-80:
 Verification condition T12.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
@@ -116,7 +121,7 @@ File strings.mlw:
 
 File "bench/ce/strings.mlw", line 18, characters 22-28:
 Verification condition T13.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
@@ -125,7 +130,7 @@ File strings.mlw:
 
 File "bench/ce/strings.mlw", line 19, characters 22-34:
 Verification condition T14.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
@@ -134,7 +139,7 @@ File strings.mlw:
 
 File "bench/ce/strings.mlw", line 20, characters 24-45:
 Verification condition T15.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
@@ -144,7 +149,7 @@ File strings.mlw:
 
 File "bench/ce/strings.mlw", line 21, characters 22-38:
 Verification condition T16.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
@@ -153,7 +158,7 @@ File strings.mlw:
 
 File "bench/ce/strings.mlw", line 22, characters 42-54:
 Verification condition T17.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:

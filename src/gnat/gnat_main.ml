@@ -163,7 +163,7 @@ let report_messages c obj =
       let unproved_task = Opt.map (fun x -> Session_itp.get_task s x) unproved_goal in
       let model =
         match Opt.map (Session_itp.get_proof_attempt_node s) unproved_pa with
-        | Some ({ Session_itp.parent; proof_state = Some pr } as pa) ->
+        | Some ({ Session_itp.proof_state = Some pr } as pa) ->
             if pr.Call_provers.pr_answer = Call_provers.StepLimitExceeded then
               (* Resource limit was hit, the model is not useful *)
               None
@@ -173,7 +173,7 @@ let report_messages c obj =
               let th = Session_itp.find_th s pa.Session_itp.parent in
               let pm = Pmodule.restore_module (Theory.restore_theory (Session_itp.theory_name th)) in
               let env = c.Controller_itp.controller_env in
-              let sort_models = prioritize_last_model in
+              let sort_models = prioritize_last_non_empty_model in
               let model = Opt.map fst (select_model ~sort_models env pm pr.pr_models) in
               model
         | _ -> None

@@ -1,4 +1,43 @@
-<check-ce>Model 0 is empty
+<check-ce>Check model 0 ("bench/check-ce/ref2.mlw", line 7, characters 11-16)
+<check-ce>Validating model:
+          
+<check-ce>Interpreting concretly
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Interpreting abstractly
+<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>No value for result at "bench/check-ce/ref2.mlw", line 5, characters 10-15, taking default.
+<check-ce>Result of checking model 0:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File ref2.mlw:
+                Line 4:
+                  _ = ()
+                  Execution of main function f's body with env:
+                    _ = ()
+                Line 5:
+                  Concrete execution of ref with args:
+                    contents = 1
+                  Concrete execution of ref'mk with args:
+                    contents = 1
+                Line 6:
+                  Concrete execution of (:=) with args:
+                    r = {contents= 1}
+                    v = 2
+                Line 7:
+                  Property failure, Assertion with:
+            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
+              File ref2.mlw:
+                Line 4:
+                  _ = ()
+                  Execution of main function f's body with env:
+                    _ = ()
+                Line 5:
+                  Abstract execution of ref with args:
+                    contents = 1
+                  result = {contents= 0}
+              Unknown location:
+                  Execution got stuck, Assume postcondition of ref with:
+                    contents = 1
+                    result = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/ref2.mlw", line 7, characters 11-16)
 <check-ce>Validating model:
           File ref2.mlw:
@@ -48,63 +87,14 @@
                   Execution got stuck, Assume postcondition of ref with:
                     contents = 1
                     result = {contents= 0}
-<check-ce>Check model 2 ("bench/check-ce/ref2.mlw", line 7, characters 11-16)
-<check-ce>Validating model:
-          File ref2.mlw:
-            Line 6:
-              x =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            Line 7:
-              the check fails with all inputs
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>No value for result at "bench/check-ce/ref2.mlw", line 5, characters 10-15, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
-              File ref2.mlw:
-                Line 4:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    _ = ()
-                Line 5:
-                  Concrete execution of ref with args:
-                    contents = 1
-                  Concrete execution of ref'mk with args:
-                    contents = 1
-                Line 6:
-                  Concrete execution of (:=) with args:
-                    r = {contents= 1}
-                    v = 2
-                Line 7:
-                  Property failure, Assertion with:
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after )
-              File ref2.mlw:
-                Line 4:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    _ = ()
-                Line 5:
-                  Abstract execution of ref with args:
-                    contents = 1
-                  result = {contents= 0}
-              Unknown location:
-                  Execution got stuck, Assume postcondition of ref with:
-                    contents = 1
-                    result = {contents= 0}
 <check-ce>Models:
-- Selected model 1 (Concrete: good model, Abstract: bad model)
+- Selected model 0 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: bad model)
+- Checked model 1 (Concrete: good model, Abstract: bad model)
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/ref2.mlw", line 7, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 7260689 steps).
+Prover result is: Step limit exceeded (0.83s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ref2.mlw:

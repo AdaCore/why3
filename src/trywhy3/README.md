@@ -48,6 +48,12 @@ Instructions to build TryWhy3
     this creates a tarball containing a directory `trywhy3/` which you can put on a web server.
     You may want to add a symbolic link from `index.html` to `trywhy3.html` (or rename the file).
 
+  * From directory `trywhy3/`, you can test by running
+
+        python3 -m http.server 8080
+
+    and opening `http://0.0.0.0:8080/trywhy3.html` in a browser.
+
 
 Customization
 -------------

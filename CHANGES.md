@@ -1,7 +1,21 @@
 :x: marks a potential source of incompatibility
 
+Documentation
+  * Why3 modes for editors (Section 5.3)
+  * Why3-specific configuration for shells (Section 5.4)
+  * detailed explanations on semantics of various WhyML statements
+    (Section 7.4)
+  * detailed explanations on WhyML module system (Section 7.5)
+  * explanations on how users can customize drivers (Section 12.5)
+
+WhyML
+  * allow sub-namespace in `for each` loops. See manual Section 7.4.7.
+  * function literals. See manual Sections 7.3.2 and 7.4.9.
+
 Input Formats
-  * the MLCFG front end now supports recursive CFG functions and scope declarations.
+  * new MLCFG front-end language for unstructured program codes,
+    including goto statements. See manual Section 9.3
+  * micro-C/Python: fixed translation of <> and not
 
 Tools
   * command-line options now follow the getopt standard;
@@ -9,18 +23,60 @@ Tools
   * binaries `why3config`, `why3prove`, etc, no longer exist;
     they are now plugins that can be loaded only using the main `why3` binary,
     e.g., `why3 config`
+  * runtime assertion checking for `why3 execute` and for the validation of
+    counterexamples in `why3 prove`. See manual Section 6.8.1.
+  * automatic inference of loop invariants. See manual Section 8.5.
 
-IDE
+GTK-based IDE
   * use native modifiers on macOS
 
-TryWhy3
+Web interface TryWhy3
   * `?lang=foo` can now be used to select an input format other than WhyML;
     the input format can also be changed dynamically using a combobox
   * examples are no longer embedded; only files mentioned
     in `examples/index.txt` are considered
 
-Provers
+Provers support
   * support for PVS 7.1 (released Apr 30, 2020)
+  * support for Z3 4.8.7 (released Nov 19, 2019)
+  * support for Z3 4.8.8 (released May 9, 2020)
+  * support for Z3 4.8.9 (released Sep 11, 2020)
+  * support for Z3 4.8.10 (released Jan 20, 2021)
+  * support for AltErgo 2.3.3 (released Aug 19, 2020)
+  * support for AltErgo 2.4.0 (released Jan 22, 2021)
+  * support for Coq 8.13.0 (released Jan 7, 2021)
+  * support for CVC4 1.8 (released Jun 19, 2020)
+
+Generation of counterexamples
+  * various improvements
+  x changes in the display of counterexamples
+  x changes in the JSON output format
+  x changes in the API. See manual Section 4.10.
+
+API
+  * new helpers for easier production of parse trees. See manual Section 4.9
+
+Standard library
+  * new lemma permut_sub_trans in array.ArrayPermut
+  * added intersection (function `inter`) in bag.Bag
+  * added a new theory option.Map
+  * added a precondition to string.OCaml.([])
+  * added mach.array,ArrayInt63.{set,init,sub}
+  * OCaml exception Invalid_argument moved to ocaml.Exceptions
+  * added a function length in mach.c.String
+  * added functions sdiv and srem in library `bv` for bit-vectors in logic
+  * added signed operations in library `mach.bv` for bit-vectors in
+    programs. Fixed some contracts.
+  * added missing module for double-precision floats in the library
+    `mach.floats`for IEEE-754-based floating-point operations
+
+Various additional bug fixes
+  * fixed bug in OCaml extraction (#509)
+  * fixed bug when `why3 prove` is called on a DIMACS file (#524)
+  * fixed micro-Python parser when no newline at end of file
+  * fixed SMT translation of negative floating-point literals (#548)
+  * fixed set of reserved symbols for SMT solvers (#461)
+
 
 Version 1.3.3, September 11, 2020
 ---------------------------------

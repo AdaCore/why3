@@ -33,6 +33,7 @@ extensions = [
     'sphinxcontrib.bibtex',
     'why3'
 ]
+bibtex_bibfiles = ['manual.bib']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -74,9 +75,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
-
-nitpicky = True
-nitpick_ignore = [('envvar','PATH')]
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -163,6 +161,13 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+
+# -- Specific options -----------------------------------------------------
+
+nitpicky = True
+nitpick_ignore = [('envvar','PATH')]
+
+bibtex_bibfiles = ['manual.bib']
 highlight_language = 'none'
 numfig = True
 

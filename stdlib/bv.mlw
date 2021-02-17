@@ -197,6 +197,7 @@ module BV_Gen
   lemma lsl_zeros: forall x. lsl x 0 = x
 
   use int.EuclideanDivision
+(*  use int.ComputerDivision as CD*)
 
   function rotate_right t int : t
 
@@ -216,9 +217,15 @@ module BV_Gen
   use Pow2int
 
   constant two_power_size : int
+(* not needed yet, since sdiv and srem are not yet realized
+  constant two_power_size_minus_one : int
+*)
   constant max_int : int
 
   axiom two_power_size_val : two_power_size = pow2 size
+(* not needed yet, since sdiv and srem are not yet realized
+  axiom two_power_size_minus_one_val : two_power_size_minus_one = pow2 (size-1)
+*)
   axiom max_int_val : max_int = two_power_size - 1
 
   predicate is_signed_positive t
@@ -249,6 +256,14 @@ module BV_Gen
 
   axiom to_uint_of_int :
     forall i. 0 <= i < two_power_size -> to_uint (of_int i) = i
+
+(* not yet realized
+  axiom to_int_bounds :
+    forall v:t. - two_power_size_minus_one <= to_int v < two_power_size_minus_one
+
+  axiom to_int_of_int :
+    forall i. - two_power_size_minus_one <= i < two_power_size_minus_one -> to_int (of_int i) = i
+*)
 
   constant size_bv : t
 
@@ -323,6 +338,22 @@ module BV_Gen
   val function urem (v1 v2 : t) : t
   axiom to_uint_urem:
     forall v1 v2. to_uint (urem v1 v2) = mod (to_uint v1) (to_uint v2)
+
+  val function sdiv (v1 v2 : t) : t
+(* not yet realized
+  axiom to_int_sdiv:
+    forall v1 v2. to_int (sdiv v1 v2) = CD.mod (CD.div (to_int v1) (to_int v2)) two_power_size
+  axiom to_int_sdiv_bounded:
+    forall v1 v2.
+    v1 <> (lsl one (size-1)) \/ v2 <> ones ->
+    to_int (sdiv v1 v2) = CD.div (to_int v1) (to_int v2)
+*)
+
+  val function srem (v1 v2 : t) : t
+(* not yet realized
+  axiom to_int_srem:
+    forall v1 v2. to_int (srem v1 v2) = CD.mod (to_int v1) (to_int v2)
+*)
 
   (** Bitvector alternatives for shifts, rotations and nth *)
 

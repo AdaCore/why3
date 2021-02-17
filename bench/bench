@@ -42,28 +42,38 @@ enabled () {
     test -z "$only" -o "$only" = "$1"
 }
 
+simple_test() {
+    if ! "$@" > /dev/null 2> /dev/null; then
+        echo "failed!"
+        echo "$@"
+        "$@"
+        exit 1
+    fi
+    echo "ok"
+}
+
 # TODO: remove the hack about int.mlw once it has become builtin
 goods () {
     pgm="bin/why3$suffix prove"
     ERROR=
     test -d $1 || exit 1
     rm -f bench_errors
-    for f in $1/*.[wm][hl][yw] ; do
-	printf "  $f... "
+    for f in $1/*.{why,mlw,mlcfg} ; do
+        printf "  $f... "
         opts="$2"
         if test $f = stdlib/int.mlw; then opts="$2 --type-only"; fi
-	# running Why
-	if ! $pgm $opts $f > /dev/null 2> bench_error; then
-	    echo "FAILED!"
+        # running Why
+        if ! $pgm $opts $f > /dev/null 2> bench_error; then
+            echo "failed!"
 #            echo "env: WHY3DATA='$WHY3DATA'"
             echo "invocation: $pgm $opts $f" | tee -a bench_errors
             cat bench_error | tee -a bench_errors
             ERROR=yes
-	elif test -s bench_error; then
+        elif test -s bench_error; then
             echo "warning!"
             cat bench_error
         else
-	    echo "ok"
+            echo "ok"
         fi
     done
     rm -f bench_error
@@ -75,17 +85,18 @@ goods () {
     fi
 }
 
-plugins () {
+plugin_bads () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.$3 ; do
-	printf "  $f... "
-	if ! $pgm $2 $f > /dev/null 2>&1; then
-	    echo "FAILED!"
-            echo "invocation: $pgm $2 $f"
-	    exit 1
-	fi
-	echo "ok"
+        printf "  $f... "
+        if $pgm $2 $f > /dev/null 2>&1; then
+            echo "failed! (should have an error)"
+            echo $pgm $2 $f
+            $pgm $2 $f
+            exit 1
+        fi
+        echo "ok"
     done
 }
 
@@ -93,14 +104,14 @@ bads () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.[wm][hl][yw] ; do
-	printf "  $f... "
-	if $pgm $2 $f > /dev/null 2>&1; then
-	    echo "SHOULD FAIL!"
-#            echo "env: WHY3DATA='$WHY3DATA'"
-            echo "invocation: $pgm $2 $f"
-	    exit 1
-	fi
-	echo "ok"
+        printf "  $f... "
+        if $pgm $2 $f > /dev/null 2>&1; then
+            echo "failed! (should have an error)"
+            echo $pgm $2 $f
+            $pgm $2 $f
+            exit 1
+        fi
+        echo "ok"
     done
 }
 
@@ -109,18 +120,20 @@ warns () {
     test -d $1 || exit 1
     rm -f bench_errors
     for f in $1/*.[wm][hl][yw] ; do
-	printf "  $f... "
-	if ! $pgm $2 $f > /dev/null 2>bench_errors; then
-            echo "FAILED!"
-            echo "invocation: $pgm $2 $f"
+        printf "  $f... "
+        if ! $pgm $2 $f > /dev/null 2>bench_errors; then
+            echo "failed!"
+            echo $pgm $2 $f
+            $pgm $2 $f
             exit 1
         fi
         if ! test -s bench_errors; then
-            echo "SHOULD HAVE A WARNING !"
-            echo "invocation: $pgm $2 $f"
+            echo "failed! (should have a warning)"
+            echo $pgm $2 $f
+            $pgm $2 $f
             exit 1
         fi
-	echo "ok"
+        echo "ok"
     done
 }
 
@@ -131,14 +144,14 @@ drivers () {
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
         if [[ $f == drivers/c.drv ]]; then continue; fi
         if [[ $f == drivers/cakeml.drv ]]; then continue; fi
-	printf "  $f... "
-	# running Why
-	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f - > /dev/null; then
-	    echo "why FAILED"
+        printf "  $f... "
+        # running Why
+        if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f - > /dev/null; then
+            echo "failed!"
             echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver=$f -
-	    exit 1
-	fi
-	echo "ok"
+            exit 1
+        fi
+        echo "ok"
     done
 }
 
@@ -147,14 +160,8 @@ valid_goals () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
-	printf "  $f... "
-        if ! $pgm -t 15 -P alt-ergo $2 $f > /dev/null 2>&1; then
-            echo "FAILED!"
-            echo "$pgm -t 15 -P alt-ergo $2 $f"
-            $pgm -t 15 -P alt-ergo $2 $f
-	    exit 1
-       fi
-       echo "ok"
+        printf "  $f... "
+        simple_test $pgm -t 15 -P alt-ergo $2 $f
     done
 }
 
@@ -163,15 +170,14 @@ invalid_goals () {
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
-	printf "  $f... "
-	if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
-	    echo "invalid test $f failed!"
-	    echo "$pgm -P alt-ergo $f"
-	    $pgm -t 3 -P alt-ergo $f
-	    exit 1
-        else
-	    echo "ok"
-       fi
+        printf "  $f... "
+        if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
+            echo "failed!"
+            echo $pgm -t 3 -P alt-ergo $f
+            $pgm -t 3 -P alt-ergo $f
+            exit 1
+        fi
+        echo "ok"
     done
 }
 
@@ -180,35 +186,26 @@ replay () {
     test -d $1 || exit 1
     for f in $1/*/; do
         printf "  $f... "
-        if $pgm $2 $f > /dev/null 2> /dev/null; then
-            echo "ok"
-        else
-            echo "replay test failed!"
-            echo $pgm $2 $f
-            $pgm $2 $f
-            exit 1
-        fi
+        simple_test $pgm $2 $f
     done
 }
 
 replay_without_shape () {
-    pgm="bin/why3$suffix replay"; test=$1
+    pgm="bin/why3$suffix replay"
+    test=$1
     test -d "$test" || exit 1
-    echo -n "Replay $test with shapes... "
-    if $pgm "$test" > /dev/null 2>&1; then
-        echo "OK."
-    else
-        echo "Failure!"
-        exit 1
-    fi
-    echo -n "Replay $test without shapes... "
+    printf "  $test with shapes... "
+    simple_test $pgm "$test"
+    printf "  $test without shapes... "
     noshapes=$(mktemp -d -p $(dirname "$test") "$(basename "$test")-without-shapes.XXXXXXXX")
     cp "$test/why3session.xml" "$noshapes"
     if $pgm "$noshapes" > /dev/null 2>&1 ; then
-        echo "OK."
+        echo "ok"
         rm -rf "$noshapes"
     else
-        echo "Failure!"
+        echo "failed!"
+        echo $pgm $noshapes
+        $pgm "$noshapes"
         rm -rf "$noshapes"
         exit 1
     fi
@@ -216,12 +213,13 @@ replay_without_shape () {
 
 execute () {
     pgm="bin/why3$suffix execute"
-    echo -n "  ${@:1}... "
-    # Run why3execute and discard warnings from the reduction engine
-    if $pgm "$@" > /dev/null 2> >(grep -v '$warning: reduction of term'); then
+    printf "  ${@:1}... "
+    # Run why3execute, discard warnings from the reduction engine
+    # Remove `[ $? -eq 2 ]` when value origins (default vs model) can be distinguished in RAC
+    if ($pgm "$@" || [ $? -eq 2 ] ) > /dev/null 2> >(grep -v '$warning: reduction of term'); then
         echo "ok"
     else
-        echo "execution test failed! $?"
+        echo "failed!"
         echo $pgm "$@"
         $pgm "$@"
         exit 1
@@ -229,163 +227,106 @@ execute () {
 }
 
 extract () {
-    pgm="bin/why3$suffix extract"
     dir=$1
-    shift
+    dst=$2
     for f in $dir/*.mlw; do
         printf "  $f... "
-        if ($pgm $@ $f -o bench_test.ml && ocaml -noinit bench_test.ml) > /dev/null 2> /dev/null; then
+        g=$(basename -s.mlw $f).$dst
+        if make -C $dir $g > /dev/null 2> /dev/null; then
             echo "ok"
         else
-            echo "extract test failed!"
-            echo $pgm $@ $f
-            $pgm $@ $f -o bench_test.ml
-            ocaml -noinit bench_test.ml
-            rm -f bench_test.ml
+            echo "failed!"
+            make -C $dir clean > /dev/null
+            echo make -C $dir $g
+            make -C $dir $g
+            make -C $dir clean > /dev/null
             exit 1
         fi
     done
-    rm -f bench_test.ml
+    make -C $dir clean > /dev/null
 }
 
 extract_and_run () {
     dir=$1
     shift
-    prg=$1
-    shift
-    printf "  $dir... "
-    rm -f $dir/$prg
-    printf "clean... "
-    if BENCH=yes make -C $dir clean > /dev/null; then
-        printf "extract... "
-        if BENCH=yes make -C $dir extract > /dev/null; then
-            printf "compile... "
-            if BENCH=yes make -C $dir > /dev/null; then
-                printf "execute... "
-                if $dir/main.opt "$@" > /dev/null; then
-                    printf "doc... "
-                    if BENCH=yes make -C $dir doc > /dev/null; then
-                        echo "ok"
-                    else
-                        echo "documentation failed!"
-                        echo BENCH=yes make -C $dir doc
-                        BENCH=yes make -C $dir doc
-                        exit 1
-                    fi
-                else
-                    echo "execution failed!"
-                    echo $dir/main.opt "$@"
-                    $dir/main.opt "$@"
-                    exit 1
-                fi
-            else
-                echo "compilation failed!"
-                echo BENCH=yes make -C $dir
-                BENCH=yes make -C $dir
-                exit 1
-            fi
-        else
-            echo "extract failed!"
-            echo BENCH=yes make -C $dir extract
-            BENCH=yes make -C $dir extract
-            exit 1
-        fi
-    else
-        echo "clean failed!"
-        echo BENCH=yes make -C $dir clean
-        BENCH=yes make -C $dir clean
+    make="make BENCH=yes -C $dir"
+    printf "  $dir... clean... "
+    if ! $make clean > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make clean
+        $make clean
         exit 1
     fi
-}
-
-extract_and_test_wmp () {
-    dir=$1
-    shift
-    printf "  $dir... "
-    printf "clean... "
-    if BENCH=yes make -C $dir clean > /dev/null; then
-        printf "extract... "
-        if BENCH=yes make -C $dir extract > /dev/null; then
-            printf "compile... "
-            if BENCH=yes make -C $dir build/tests > /dev/null; then
-                printf "execute... "
-                if $dir/build/tests > /dev/null; then
-                    echo "ok"
-                else
-                    echo "execution failed!"
-                    echo $dir/build/tests
-                    $dir/build/tests
-                    exit 1
-                fi
-            else
-                echo "compilation failed!"
-                echo BENCH=yes make -C $dir
-                BENCH=yes make -C $dir
-                exit 1
-            fi
-        else
-            echo "extract failed!"
-            echo BENCH=yes make -C $dir extract
-            BENCH=yes make -C $dir extract
-            exit 1
-        fi
-    else
-        echo "clean failed!"
-        echo BENCH=yes make -C $dir clean
-        BENCH=yes make -C $dir clean
+    printf "extract... "
+    if ! $make extract > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make extract
+        $make extract
         exit 1
     fi
+    printf "compile... "
+    if ! $make > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make
+        $make
+        exit 1
+    fi
+    printf "execute... "
+    if ! $dir/main.opt "$@" > /dev/null 2>&1; then
+        echo "failed!"
+        echo $dir/main.opt "$@"
+        $dir/main.opt "$@"
+        exit 1
+    fi
+    printf "doc... "
+    if ! $make doc > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make doc
+        $make doc
+        exit 1
+    fi
+    echo "ok"
 }
 
 extract_and_test_c () {
     dir=$1
     shift
-    printf "  $dir... "
-    printf "clean... "
-    if BENCH=yes make -C $dir clean > /dev/null; then
-        printf "extract... "
-        if BENCH=yes make -C $dir extract > /dev/null; then
-            printf "compile... "
-            if BENCH=yes make -C $dir cfiles > /dev/null; then
-                printf "execute... "
-                if BENCH=yes make -C $dir tests > /dev/null; then
-                    echo "ok"
-                else
-                    echo "execution failed!"
-                    echo BENCH=yes make -C $dir tests
-                    BENCH=yes make -C $dir tests
-                    exit 1
-                fi
-            else
-                echo "compilation failed!"
-                echo BENCH=yes make -C $dir cfiles
-                BENCH=yes make -C $dir cfiles
-                exit 1
-            fi
-        else
-            echo "extract failed!"
-            echo BENCH=yes make -C $dir extract
-            BENCH=yes make -C $dir extract
-            exit 1
-        fi
-    else
-        echo "clean failed!"
-        echo BENCH=yes make -C $dir clean
-        BENCH=yes make -C $dir clean
+    make="make BENCH=yes -C $dir"
+    printf "  $dir... clean... "
+    if ! $make clean > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make clean
+        $make clean
         exit 1
     fi
+    printf "extract... "
+    if ! $make extract > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make extract
+        $make extract
+        exit 1
+    fi
+    printf "compile... "
+    if ! $make build/tests > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make build/tests
+        $make build/tests
+        exit 1
+    fi
+    printf "execute... "
+    if ! $dir/build/tests > /dev/null 2>&1; then
+        echo "failed!"
+        echo $dir/build/tests
+        $dir/build/tests
+        exit 1
+    fi
+    echo "ok"
 }
 
 list_stuff () {
     pgm="bin/why3$suffix"
-    printf '  %s ' "$1"
-    if $pgm $1 > /dev/null; then
-        echo "ok"
-    else
-        echo "$pgm $1 FAIL"
-        $pgm $1
-        exit 1
-    fi
+    printf "  $1... "
+    simple_test $pgm $1
 }
 
 test_mlw_printer () {
@@ -419,7 +360,7 @@ rac () {
     for func in $@; do
         echo "** $mod.$func"
         echo -n " $func" >&2
-        bin/why3"$suffix" execute --rac --rac-prover=cvc4 \
+        bin/why3"$suffix" execute --rac --rac-prover=cvc4 --rac-try-negate \
                 --debug=rac-check-term-result \
                 "${RACARGS[@]}" "$file" --use="$mod" "$func ()" 2>&1 |\
             sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" |\
@@ -450,6 +391,7 @@ bads bench/typing/bad --type-only
 bads bench/programs/bad-typing --type-only
 warns bench/programs/warn-typing --type-only
 goods bench/typing/x-bad --type-only
+plugin_bads bench/plugins/mlcfg/bad --parse-only mlcfg
 echo ""
 fi
 
@@ -478,8 +420,7 @@ goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
 goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
 goods examples/in_progress
-plugins tests/python --type-only py
-plugins tests/microc --type-only c
+goods bench/plugins/mlcfg
 echo ""
 fi
 
@@ -523,6 +464,8 @@ output="examples/tests/rac.out"
     rac "$mlw" Ghost test1 test2
     rac "$mlw" Predicates test1 test2
     rac "$mlw" Arrays test0 test1 test2 test3
+    rac "$mlw" Variants loop_var_ok1 loop_var_ok2 loop_var_fail1 loop_var_fail2 loop_custom_variant
+    rac "$mlw" TestUInt64 test
 ) > "$output"
 if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
     echo "RAC: ok"
@@ -602,17 +545,18 @@ fi
 
 if enabled extraction; then
 echo "=== Checking extraction to OCaml ==="
-extract bench/extraction -D ocaml64
-extract_and_run examples/euler001 euler001.ml 1000000
-extract_and_run examples/gcd gcd.ml 6 15
-extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml
-extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
-extract_and_run examples/defunctionalization defunctionalization.ml
-extract_and_run examples/sudoku sudoku.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
+extract bench/extraction cmo
+extract_and_run bench/extraction/test
+extract_and_run examples/euler001 1000000
+extract_and_run examples/gcd 6 15
+extract_and_run examples/vstte10_max_sum
+extract_and_run examples/vstte12_combinators "((((K K) K) K) K)"
+extract_and_run examples/defunctionalization
+extract_and_run examples/sudoku 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
 echo ""
 
 echo "=== Checking extraction to C ==="
-extract_and_test_wmp examples/multiprecision
+extract_and_test_c examples/multiprecision
 extract_and_test_c examples/c_cursor
 echo ""
 fi
@@ -635,6 +579,8 @@ replay examples/logic --merging-only
 replay examples --merging-only
 replay examples/foveoos11-cm --merging-only
 replay examples/WP_revisited --merging-only
+replay examples/microc --merging-only
+replay examples/python --merging-only
 replay examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps --merging-only"
 replay examples/bitvectors "-L examples/bitvectors --merging-only"
 replay examples/avl "-L examples/avl --merging-only"
@@ -645,6 +591,7 @@ replay examples/double_wp "-L examples/double_wp --merging-only"
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
 replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_vars"
 #replay examples/in_progress --merging-only
+replay examples/mlcfg --merging-only
 echo ""
 fi
 
@@ -660,8 +607,8 @@ echo ""
 fi
 
 if enabled realizations; then
-echo "=== Checking realizations ==="
-bench/check_realizations.sh || exit $?
+    echo "=== Checking realizations ==="
+    bench/check_realizations.sh || exit $?
 fi
 
 if enabled mlwprinter; then

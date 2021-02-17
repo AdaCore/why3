@@ -1,6 +1,18 @@
-(** {1 Program functions on bitvectors with preconditions enforcing absence of overflow}
+(** {1 Program functions on bitvectors with preconditions}
 
-   Warning: this module is mostly obsolete, it should be improved by using the `bv` module
+    This module provides extra functions with pre-conditions ensuring
+    the absence of overflows.
+
+    Those pre-conditions are expressed in term of interpretation into
+    mathematical integers. It is not ideal since conversion to
+    integers is typically poorly supported bit-vectors built-in in SMT
+    solvers. A better solution in the future would be to express those
+    pre-conditions is purely bit-vector logic formulas. An insight on
+    how this could be could can be found in the book Hacker's Delight
+    [Section 2-13, Overflow detection].
+
+   Another note for the future: it might be better to introduce two
+   separate modules for signed operation and unsigned operations.
 
 *)
 
@@ -14,9 +26,13 @@ module BVCheck_Gen
   constant size : int
 
   constant two_power_size : int
+  constant two_power_size_minus_one : int
   constant zeros           : t
+  constant minus_one : t
+  constant min_sint : t
 
   function to_uint t   : int
+  function to_int t   : int
   function of_int  int : t
 
   function add  t t : t
@@ -24,6 +40,8 @@ module BVCheck_Gen
   function mul  t t : t
   function udiv t t : t
   function urem t t : t
+  function sdiv t t : t
+  function srem t t : t
 
   function lsl    t int : t
   function lsl_bv t t   : t
@@ -37,23 +55,57 @@ module BVCheck_Gen
   predicate uge t t
   predicate ugt t t
 
-  (** addition with overflow check *)
-  val add_check (a b:t) : t
+  predicate sle t t
+  predicate slt t t
+  predicate sge t t
+  predicate sgt t t
+
+  (** addition for overflow check *)
+(***     Notes for the future pre-conditions in pure BV formulas :
+
+     in signed addition, overflow occurs iff
+     msb (((a+b) xor a) & (a+b) xor b)) = 1
+
+     in unsigned addition, overflow occurs iff
+     msb ((a&b) | ((a|b) & not (a+b))) = 1
+
+     alternatives : (a+b) < a    or    not a < b
+
+  *)
+  val uadd_check (a b:t) : t
     requires { [@expl:arithmetic overflow] 0 <= to_uint a + to_uint b < two_power_size }
     ensures  { to_uint result = to_uint a + to_uint b }
     ensures  { result = add a b }
 
+  val sadd_check (a b:t) : t
+    requires { [@expl:arithmetic overflow]
+      - two_power_size_minus_one <= to_int a + to_int b < two_power_size_minus_one }
+    ensures  { to_int result = to_int a + to_int b }
+    ensures  { result = add a b }
+
   (** subtraction with overflow check *)
-  val sub_check (a b:t) : t
+  val usub_check (a b:t) : t
     requires { [@expl:arithmetic overflow] 0 <= to_uint a - to_uint b < two_power_size }
     ensures  { result = sub a b }
     ensures  { to_uint result = to_uint a - to_uint b }
 
+  val ssub_check (a b:t) : t
+    requires { [@expl:arithmetic overflow]
+      - two_power_size_minus_one <= to_int a - to_int b < two_power_size_minus_one }
+    ensures  { result = sub a b }
+    ensures  { to_int result = to_int a - to_int b }
+
   (** multiplication with overflow check *)
-  val mul_check (a b:t) : t
+  val umul_check (a b:t) : t
     requires { [@expl:arithmetic overflow] 0 <= to_uint a * to_uint b < two_power_size }
     ensures  { result = mul a b }
-    ensures  { to_uint result = to_uint a * to_uint b }
+    ensures  { to_int result = to_uint a * to_uint b }
+
+  val smul_check (a b:t) : t
+    requires { [@expl:arithmetic overflow]
+      - two_power_size_minus_one <= to_int a * to_int b < two_power_size_minus_one }
+    ensures  { result = mul a b }
+    ensures  { to_int result = to_int a * to_int b }
 
   (** logical shift left requires the second argument to be smaller than bitvector size *)
   val lsl_check (a b:t) : t
@@ -73,19 +125,35 @@ module BVCheck_Gen
     ensures  { result = asr_bv a b }
     ensures  { result = asr a (to_uint b) }
 
-  use int.EuclideanDivision
+  use int.EuclideanDivision as ED
 
   (** unsigned division requires the second argument to be non-zero *)
   val udiv_check (a b:t) : t
     requires { [@expl:division by zero] b <> zeros}
-    ensures  { to_uint result = div (to_uint a) (to_uint b) }
+    ensures  { to_uint result = ED.div (to_uint a) (to_uint b) }
     ensures  { result = udiv a b }
 
   (** unsigned remainder requires the second argument to be non-zero *)
   val urem_check (a b:t) : t
     requires { [@expl:remainder by zero] b <> zeros}
-    ensures  { to_uint result = mod (to_uint a) (to_uint b) }
+    ensures  { to_uint result = ED.mod (to_uint a) (to_uint b) }
     ensures  { result = urem a b }
+
+  use int.ComputerDivision as CD
+
+  (** signed division requires the second argument to be non-zero, but also that
+      either the dividend is not min_int or the divisor is not -1 *)
+  val sdiv_check (a b:t) : t
+    requires { [@expl:division by zero] b <> zeros}
+    requires { [@expl:signed division overflow check] a <> min_sint \/ b <> minus_one}
+    ensures  { to_int result = CD.div (to_int a) (to_int b) }
+    ensures  { result = sdiv a b }
+
+  (** unsigned remainder requires the second argument to be non-zero *)
+  val srem_check (a b:t) : t
+    requires { [@expl:remainder by zero] b <> zeros}
+    ensures  { to_int result = CD.mod (to_int a) (to_int b) }
+    ensures  { result = srem a b }
 
   (** comparison operators have no preconditions *)
   val eq_check (a b:t) : bool
@@ -94,21 +162,37 @@ module BVCheck_Gen
   val ne_check (a b:t) : bool
     ensures { result <-> a <> b }
 
-  val le_check (a b:t) : bool
+  val ule_check (a b:t) : bool
     ensures { result <-> to_uint a <= to_uint b }
     ensures { result <-> ule a b }
 
-  val lt_check (a b:t) : bool
+  val ult_check (a b:t) : bool
     ensures { result <-> to_uint a < to_uint b }
     ensures { result <-> ult a b }
 
-  val ge_check (a b:t) : bool
+  val uge_check (a b:t) : bool
     ensures { result <-> to_uint a >= to_uint b }
     ensures { result <-> uge a b }
 
-  val gt_check (a b:t) : bool
+  val ugt_check (a b:t) : bool
     ensures { result <-> to_uint a > to_uint b }
     ensures { result <-> ugt a b }
+
+  val sle_check (a b:t) : bool
+    ensures { result <-> to_int a <= to_int b }
+    ensures { result <-> sle a b }
+
+  val slt_check (a b:t) : bool
+    ensures { result <-> to_int a < to_int b }
+    ensures { result <-> slt a b }
+
+  val sge_check (a b:t) : bool
+    ensures { result <-> to_int a >= to_int b }
+    ensures { result <-> sge a b }
+
+  val sgt_check (a b:t) : bool
+    ensures { result <-> to_int a > to_int b }
+    ensures { result <-> sgt a b }
 
 end
 
@@ -117,18 +201,28 @@ end
 module BVCheck8
   use export bv.BV8
 
+  constant two_power_size_minus_one : int = 0x80
+  constant minus_one : t = 0xFF
+  constant min_sint : t = 0x80
+
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
+    function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
     function to_uint = t'int,
+    function to_int = to_int,
     function of_int = of_int,
     function add = add,
     function sub = sub,
     function mul = mul,
     function udiv = udiv,
     function urem = urem,
+    function sdiv = sdiv,
+    function srem = srem,
     function lsl = lsl,
     function lsl_bv = lsl_bv,
     function lsr = lsr,
@@ -138,24 +232,39 @@ module BVCheck8
     predicate ule = ule,
     predicate ult = ult,
     predicate uge = uge,
-    predicate ugt = ugt
+    predicate ugt = ugt,
+    predicate sle = sle,
+    predicate slt = slt,
+    predicate sge = sge,
+    predicate sgt = sgt
 end
+
 
 module BVCheck16
   use export bv.BV16
 
+  constant two_power_size_minus_one : int = 0x8000
+  constant minus_one : t = 0xFFFF
+  constant min_sint : t = 0x8000
+
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
+    function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
     function to_uint = t'int,
+    function to_int = to_int,
     function of_int = of_int,
     function add = add,
     function sub = sub,
     function mul = mul,
     function udiv = udiv,
     function urem = urem,
+    function sdiv = sdiv,
+    function srem = srem,
     function lsl = lsl,
     function lsl_bv = lsl_bv,
     function lsr = lsr,
@@ -165,24 +274,38 @@ module BVCheck16
     predicate ule = ule,
     predicate ult = ult,
     predicate uge = uge,
-    predicate ugt = ugt
+    predicate ugt = ugt,
+    predicate sle = sle,
+    predicate slt = slt,
+    predicate sge = sge,
+    predicate sgt = sgt
 end
 
 module BVCheck32
   use export bv.BV32
 
+  constant two_power_size_minus_one : int = 0x8000_0000
+  constant minus_one : t = 0xFFFF_FFFF
+  constant min_sint : t = 0x8000_0000
+
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
+    function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
     function to_uint = t'int,
+    function to_int = to_int,
     function of_int = of_int,
     function add = add,
     function sub = sub,
     function mul = mul,
     function udiv = udiv,
     function urem = urem,
+    function sdiv = sdiv,
+    function srem = srem,
     function lsl = lsl,
     function lsl_bv = lsl_bv,
     function lsr = lsr,
@@ -192,24 +315,38 @@ module BVCheck32
     predicate ule = ule,
     predicate ult = ult,
     predicate uge = uge,
-    predicate ugt = ugt
+    predicate ugt = ugt,
+    predicate sle = sle,
+    predicate slt = slt,
+    predicate sge = sge,
+    predicate sgt = sgt
 end
 
 module BVCheck64
   use export bv.BV64
 
+  constant two_power_size_minus_one : int = 0x8000_0000_0000_0000
+  constant minus_one : t = 0xFFFF_FFFF_FFFF_FFFF
+  constant min_sint : t = 0x8000_0000_0000_0000
+
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     function two_power_size = two_power_size,
+    function two_power_size_minus_one = two_power_size_minus_one,
     function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
     function to_uint = t'int,
+    function to_int = to_int,
     function of_int = of_int,
     function add = add,
     function sub = sub,
     function mul = mul,
     function udiv = udiv,
     function urem = urem,
+    function sdiv = sdiv,
+    function srem = srem,
     function lsl = lsl,
     function lsl_bv = lsl_bv,
     function lsr = lsr,
@@ -219,5 +356,9 @@ module BVCheck64
     predicate ule = ule,
     predicate ult = ult,
     predicate uge = uge,
-    predicate ugt = ugt
+    predicate ugt = ugt,
+    predicate sle = sle,
+    predicate slt = slt,
+    predicate sge = sge,
+    predicate sgt = sgt
 end

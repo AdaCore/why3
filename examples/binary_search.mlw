@@ -181,3 +181,55 @@ module BinarySearchBoolean
     lo
 
 end
+
+module Complexity
+
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
+  use array.Array
+
+  let rec function log2 (n: int) : int
+    variant { n }
+  = if n <= 1 then 0 else 1 + log2 (div n 2)
+
+  let rec lemma log2_monotone (x y: int)
+    requires { x <= y }
+    ensures  { log2 x <= log2 y }
+    variant  { y }
+  = if y > 1 then log2_monotone (div x 2) (div y 2)
+
+  let function f (n: int) : int
+  = if n = 0 then 0 else 1 + log2 n
+
+  lemma upper_bound:
+    forall n. n >= 2 -> f n <= 2 * log2 n
+
+  val ref time: int
+
+  let binary_search (a: array int) (v: int) : int
+    requires { forall i1 i2. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    requires { time = 0 }
+    ensures  { 0 <= result < length a && a[result] = v
+            || result = -1 && forall i. 0 <= i < length a -> a[i] <> v }
+    ensures  { time - old time <= f (length a) }
+  =
+    let ref lo = 0 in
+    let ref hi = length a in
+    while lo < hi do
+      invariant { 0 <= lo <= hi <= length a }
+      invariant { forall i. 0 <= i < lo || hi <= i < length a -> a[i] <> v }
+      invariant { (time - old time) + f (hi - lo) <= f (length a) }
+      variant   { hi - lo }
+      let mid = lo + div (hi - lo) 2 in
+      if a[mid] < v then
+        lo <- mid + 1
+      else if a[mid] > v then
+        hi <- mid
+      else
+        return mid;
+      time <- time + 1
+    done;
+    -1
+
+end

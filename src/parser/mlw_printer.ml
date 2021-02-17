@@ -133,7 +133,9 @@ let remove_id_attr s id =
   {id with id_ats= List.filter p id.id_ats}
 
 let pp_attr fmt = function
-  | ATstr att -> fprintf fmt "[@%s]" att.Ident.attr_string
+  | ATstr att ->
+     (* `%@` prints a single `@` *)
+     fprintf fmt "[%@%s]" att.Ident.attr_string
   | ATpos loc ->
       let filename, line, bchar, echar = Loc.get loc in
       fprintf fmt "[#%S %d %d %d]%a" filename line bchar echar
@@ -722,6 +724,8 @@ and pp_expr =
         pp_cast pp_expr fmt e pty
     | Eghost e ->
         fprintf fmt "ghost %a" pp_expr.closed e
+    | Eattr (ATstr attr,e) when attr = Ident.funlit ->
+        pp_e_funlit fmt e
     | Eattr (attr, e) ->
         let expr_closed = function
           | {expr_desc=Eattr _} -> true
@@ -786,6 +790,8 @@ and pp_term =
         let pp_terms = pp_print_list ~pp_sep:(pp_sep ", ") pp_term.marked in
         let pp_triggers = pp_print_opt_list ~prefix:" [" ~sep:" | " ~suffix:"]" pp_terms in
         fprintf fmt "@[<hv 2>%s%a%a%s@ %a@]" quant pp_binders binders pp_triggers triggers sep pp_term.marked t
+    | Tattr (ATstr attr, t) when attr = Ident.funlit ->
+        pp_t_funlit fmt t
     | Tattr (attr, t) ->
         let term_closed t = match t.term_desc with
           | Tattr _ -> true
@@ -815,6 +821,42 @@ and pp_term =
   let marked fmt t = pp_maybe_marked (fun t -> t.term_loc) raw fmt t in
   let closed fmt = pp_closed term_closed marked fmt in
   { closed; marked }
+
+and pp_t_funlit fmt t =
+  let rec print_elems var fmt t = match t.term_desc with
+    | Tif ({term_desc = Tinfix ({term_desc = Tident (Qident v)},_,t)},t2,t3)
+         when var = v ->
+       fprintf fmt "%a => %a;%a" pp_term.marked t
+         pp_term.marked t2 (print_elems var) t3
+    | Tidapp (Qident {id_str = "any function"},_) -> ()
+    | _ -> fprintf fmt "_ => %a" pp_term.marked t in
+  match t.term_desc with
+  | Tquant (Dterm.DTlambda, [(_, Some var,_,_)], _, t) ->
+     fprintf fmt "[|%a|]" (print_elems var) t
+  | _ -> assert false (* should not happen *)
+
+and pp_e_funlit fmt e =
+  let rec substitute_and_print var e fmt l =
+    match e.expr_desc, l with
+    | Eif ({expr_desc = Einfix ({expr_desc = Eident (Qident v)},
+                                _,
+                                {expr_desc = Eident (Qident id1)})},
+           {expr_desc = Eident (Qident id2)},
+           e3),
+      (id3,e4) :: (id4,e5) :: tl when var = v && id1 = id4 && id2 = id3 ->
+       fprintf fmt "%a => %a;%a" pp_expr.marked e5
+         pp_expr.marked e4 (substitute_and_print var e3) tl
+    | Eident (Qident id1), [(id2,e)] when id1 = id2 ->
+       fprintf fmt "_ => %a" pp_expr.marked e
+    | Eident (Qident _), [] -> ()
+    | _ -> assert false (* should not happen *) in
+  let rec unfold_let acc fmt e = match e.expr_desc with
+    | Elet (id,false,Expr.RKnone,e1,e2) ->
+       unfold_let ((id,e1) :: acc) fmt e2
+    | Efun ([(_,Some var,_,_)],_,_,_,_,e) ->
+       substitute_and_print var e fmt acc
+    | _ -> assert false (* should not happen *) in
+  fprintf fmt "[|%a|]" (unfold_let []) e
 
 and pp_variants fmt vs =
   let pp = match vs with [] | [_] -> pp_term.marked | _ -> pp_term.closed in

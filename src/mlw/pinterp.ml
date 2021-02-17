@@ -34,6 +34,7 @@ let debug_rac_check_sat =
     ~desc:"satisfiability of terms in rac"
 (* print debug information when checking the satisfiability of terms
    during rac *)
+
 let debug_rac_check_term_result =
   Debug.register_info_flag "rac-check-term-result"
     ~desc:"print the result when terms are checked for validity"
@@ -102,7 +103,7 @@ let mode_to_string m =
 module rec Value : sig
   type value = {v_desc: value_desc; v_ty: ty}
   and value_desc =
-    | Vconstr of rsymbol * field list
+    | Vconstr of rsymbol * rsymbol list * field list
     | Vnum of BigInt.t
     | Vreal of Big_real.real
     | Vfloat_mode of float_mode
@@ -120,7 +121,7 @@ module rec Value : sig
 end = struct
   type value = {v_desc: value_desc; v_ty: ty}
   and value_desc =
-    | Vconstr of rsymbol * field list
+    | Vconstr of rsymbol * rsymbol list * field list
     | Vnum of BigInt.t
     | Vreal of Big_real.real
     | Vfloat_mode of float_mode
@@ -149,7 +150,7 @@ end = struct
     | Vproj (ls1, v1), Vproj (ls2, v2) ->
         cmp [cmptr fst ls_compare; cmptr snd compare_values] (ls1, v1) (ls2, v2)
     | Vproj _, _ -> -1 | _, Vproj _ -> 1
-    | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
+    | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
         let field_get (Field f) = !f in
         let cmp_fields = cmp_lists [cmptr field_get compare_values] in
         cmp [cmptr fst rs_compare; cmptr snd cmp_fields] (rs1, fs1) (rs2, fs2)
@@ -208,17 +209,30 @@ let field_get (Field r) = r.contents
 let field_set (Field r) v = r := v
 
 let int_value n = value ty_int (Vnum n)
-let range_value ity n = value (ty_of_ity ity) (Vnum n)
+
+let range_value ity n =
+  begin match ity_components ity with
+  | { its_def = Range r }, _, _ ->
+      begin
+        try
+          Number.(check_range { il_kind = ILitUnk; il_int = n } r);
+        with Number.OutOfRange _ ->
+          cannot_compute "%s is out of range" (BigInt.to_string n)
+      end
+  | _ -> ()
+  end;
+  value (ty_of_ity ity) (Vnum n)
+
 let string_value s = value ty_str (Vstring s)
 let bool_value b = value ty_bool (Vbool b)
 let proj_value ity ls v =
   value (ty_of_ity ity) (Vproj (ls, v))
-let constr_value ity rs vl =
-  value (ty_of_ity ity) (Vconstr (rs, List.map field vl))
+let constr_value ity rs fs vl =
+  value (ty_of_ity ity) (Vconstr (rs, fs, List.map field vl))
 let purefun_value ~result_ity ~arg_ity mv v =
   value (ty_of_ity result_ity) (Vpurefun (ty_of_ity arg_ity, mv, v))
 let unit_value =
-  value (ty_tuple []) (Vconstr (Expr.rs_void, []))
+  value (ty_tuple []) (Vconstr (Expr.rs_void, [], []))
 let undefined_value ity =
   value (ty_of_ity ity) Vundefined
 
@@ -247,13 +261,13 @@ let rec print_value fmt v =
         print_vs vs print_expr e
   | Vproj (ls, v) ->
       fprintf fmt "{%a => %a}" print_ls ls print_value v
-  | Vconstr (rs, vs) ->
+  | Vconstr (rs, fs, vs) ->
       if is_rs_tuple rs then
         fprintf fmt "@[<hv1>(%a)@]" (Pp.print_list Pp.comma print_field) vs
       else if Strings.has_suffix "'mk" rs.rs_name.id_string then
-        let print_field fmt (f, v) = fprintf fmt "@[%s=@ %a@]" f print_field v in
+        let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
         fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
-          (List.combine (List.map (fun pv -> pv.pv_vs.vs_name.id_string) rs.rs_cty.cty_args) vs)
+          (List.combine fs vs)
   | Varray a ->
       fprintf fmt "@[[%a]@]"
         (Pp.print_list Pp.semi print_value)
@@ -269,7 +283,7 @@ and print_field fmt f = print_value fmt (field_get f)
 
 let rec snapshot v =
   let v_desc = match v.v_desc with
-    | Vconstr (rs, fs) -> Vconstr (rs, List.map snapshot_field fs)
+    | Vconstr (rs, fs, vs) -> Vconstr (rs, fs, List.map snapshot_field vs)
     | Vfun (cl, vs, e) -> Vfun (Mvs.map snapshot cl, vs, e)
     | Vpurefun (ty, mv, v) ->
         let mv = Mv.(fold (fun k v -> add (snapshot k) (snapshot v)) mv empty) in
@@ -326,11 +340,13 @@ let rac_prover ~command driver limit =
 type rac_reduce_config = {
   rac_trans: Task.task Trans.tlist option;
   rac_prover: rac_prover option;
+  rac_try_negate: bool;
 }
 
-let rac_reduce_config ?trans:rac_trans ?prover:rac_prover () = {rac_trans; rac_prover}
+let rac_reduce_config ?trans:rac_trans ?prover:rac_prover ?try_negate:(rac_try_negate=false) () =
+  {rac_trans; rac_prover; rac_try_negate}
 
-let rac_reduce_config_lit config env ?trans ?prover () =
+let rac_reduce_config_lit config env ?trans ?prover ?try_negate () =
   let trans =
     let aux s = Trans.lookup_transform_l s env in
     Opt.map aux trans in
@@ -350,7 +366,7 @@ let rac_reduce_config_lit config env ?trans ?prover () =
       let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
       rac_prover ~command driver limit in
     Opt.map aux prover in
-  rac_reduce_config ?trans ?prover ()
+  rac_reduce_config ?trans ?prover ?try_negate ()
 
 (* Interpretation log *)
 
@@ -363,7 +379,7 @@ module type Log = sig
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
-    | Exec_loop of exec_kind
+    | Iter_loop of exec_kind
     | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -385,7 +401,7 @@ module type Log = sig
                       Loc.position option -> unit
   val log_any_call : log_uc -> rsymbol option -> value Mvs.t ->
                      Loc.position option -> unit
-  val log_exec_loop : log_uc -> exec_kind -> Loc.position option -> unit
+  val log_iter_loop : log_uc -> exec_kind -> Loc.position option -> unit
   val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Mrs.t ->
                       Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
@@ -409,7 +425,7 @@ module Log : Log = struct
     | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
-    | Exec_loop of exec_kind
+    | Iter_loop of exec_kind
     | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -448,8 +464,8 @@ module Log : Log = struct
   let log_any_call log_uc rs mvs loc =
     log_entry log_uc (Exec_any (rs,mvs)) loc
 
-  let log_exec_loop log_uc kind loc =
-    log_entry log_uc (Exec_loop kind) loc
+  let log_iter_loop log_uc kind loc =
+    log_entry log_uc (Iter_loop kind) loc
 
   let log_exec_main log_uc rs mvs mrs loc =
     log_entry log_uc (Exec_main (rs,mvs,mrs)) loc
@@ -518,8 +534,8 @@ module Log : Log = struct
            (Pp.print_option Pp.string) (Opt.map (fun rs -> rs.rs_name.id_string) rs)
            (if Mvs.is_empty mvs then "" else " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
-    | Exec_loop k ->
-        fprintf fmt "@[<h2>%s execution of loop@]" (exec_kind_to_string k)
+    | Iter_loop k ->
+        fprintf fmt "@[<h2>%s iteration of loop@]" (exec_kind_to_string k)
     | Exec_main (rs, mvs, mrs) ->
         fprintf fmt "@[<h2>Execution of main function %a's body with env:%a%a@]"
           print_decoded rs.rs_name.id_string
@@ -588,10 +604,10 @@ module Log : Log = struct
                   | None -> Null)
               (print_json_field "args" (list (print_key_value vs2string)))
               (Mvs.bindings mvs)
-        | Exec_loop kind ->
+        | Iter_loop kind ->
             fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-          (print_json_field "kind" print_json) (string "EXEC_LOOP")
-          (print_json_field "exec" print_json_kind) kind
+              (print_json_field "kind" print_json) (string "ITER_LOOP")
+              (print_json_field "exec" print_json_kind) kind
         | Exec_main (rs,mvs,mrs) ->
            let mid = Mvs.fold (fun vs v mid -> Mid.add vs.vs_name v mid) mvs Mid.empty in
            let mid = Mrs.fold (fun rs v mid -> Mid.add rs.rs_name v mid) mrs mid in
@@ -629,7 +645,7 @@ module Log : Log = struct
             | Val_assumed _ | Const_init _ | Exec_main _ -> true
             | Exec_call _ | Exec_pure _ | Exec_any _
                  when verb_lvl > 1 -> true
-            | Exec_loop _ when verb_lvl > 2 -> true
+            | Iter_loop _ when verb_lvl > 2 -> true
             | Exec_failed _ | Exec_stucked _ | Exec_ended
                  when verb_lvl > 3 -> true
             | _ -> false) entry_log in
@@ -699,18 +715,17 @@ let rac_config ~do_rac ~abstract:rac_abstract
   {do_rac; rac_abstract; rac_reduce; log_uc= Log.empty_log_uc ();
    get_value; skip_cannot_compute }
 
-type env =
-  { mod_known   : Pdecl.known_map;
-    th_known    : Decl.known_map;
-    funenv      : cexp Mrs.t;
-    vsenv       : value Mvs.t;
-    rsenv       : value Mrs.t; (* global constants *)
-    env         : Env.env;
-    rac         : rac_config;
-  }
+type env = {
+  pmodule : Pmodule.pmodule;
+  funenv  : cexp Mrs.t;
+  vsenv   : value Mvs.t;
+  rsenv   : value Mrs.t; (* global constants *)
+  env     : Env.env;
+  rac     : rac_config;
+}
 
-let default_env env rac mod_known th_known =
-  { mod_known; th_known; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty }
+let default_env env rac pmodule =
+  { pmodule; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty }
 
 let register_used_value env loc id value =
   Log.log_val env.rac.log_uc id (snapshot value) loc
@@ -727,8 +742,8 @@ let register_pure_call env loc ls kind =
 let register_any_call env loc rs mvs =
   Log.log_any_call env.rac.log_uc rs mvs loc
 
-let register_loop env loc kind =
-  Log.log_exec_loop env.rac.log_uc kind loc
+let register_iter_loop env loc kind =
+  Log.log_iter_loop env.rac.log_uc kind loc
 
 let register_exec_main env rs =
   Log.log_exec_main env.rac.log_uc rs env.vsenv env.rsenv rs.rs_name.id_loc
@@ -851,7 +866,7 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
   with
   | Big_real.Undetermined ->
       (* Cannot decide interval comparison *)
-      cannot_compute "computetation on reals is undetermined"
+      cannot_compute "computation on reals is undetermined"
   | Mlmpfr_wrapper.Not_Implemented ->
       cannot_compute "mlmpfr wrapper is not implemented"
 
@@ -980,7 +995,7 @@ let built_in_modules () =
               with e -> cannot_compute "array could not be made: %a" Exn_printer.exn_printer e )
           | _ -> assert false);
       "empty", (fun _ args -> match args with
-          | [{v_desc= Vconstr(_, [])}] ->
+          | [{v_desc= Vconstr(_, _, [])}] ->
               (* we know by typing that the constructor
                   will be the Tuple0 constructor *)
               let ty = ty_app ts [ty_var (tv_of_string "a")] in
@@ -1054,9 +1069,9 @@ let rec default_value_of_type env known ity : value =
   | Ityapp (ts, _, _) when its_equal ts its_real -> assert false (* TODO *)
   | Ityapp (ts, _, _) when its_equal ts its_bool -> value ty (Vbool false)
   | Ityapp (ts, _, _) when its_equal ts its_str -> value ty (Vstring "")
-  | Ityapp(ts,ityl1,_) when is_ts_tuple ts.its_ts ->
+  | Ityapp (ts,ityl1,_) when is_ts_tuple ts.its_ts ->
       let vs = List.map (default_value_of_type env known) ityl1 in
-      constr_value ity (rs_tuple (List.length ityl1)) vs
+      constr_value ity (rs_tuple (List.length ityl1)) [] vs
   | Ityapp (its, l1, l2)
   | Ityreg {reg_its= its; reg_args= l1; reg_regs= l2} ->
       if is_array_its env its then
@@ -1066,12 +1081,12 @@ let rec default_value_of_type env known ity : value =
             let zero_in_range = BigInt.(le r.Number.ir_lower zero && le zero r.Number.ir_upper) in
             let n = if zero_in_range then BigInt.zero else r.Number.ir_lower in
             range_value ity n
-        | {Pdecl.itd_constructors= rs :: _} ->
+        | {Pdecl.itd_constructors= rs :: _; itd_fields= fs} ->
             let subst = its_match_regs its l1 l2 in
             let ityl = List.map (fun pv -> pv.pv_ity) rs.rs_cty.cty_args in
             let tyl = List.map (ity_full_inst subst) ityl in
             let vs = List.map (default_value_of_type env known) tyl in
-            constr_value ity rs vs
+            constr_value ity rs fs vs
         | {Pdecl.itd_constructors= []} ->
             (* if its.its_private then
              *   (\* There is no constructor so we can just invent a Vconstr,
@@ -1128,7 +1143,18 @@ let find_definition env (rs: rsymbol) =
   (* then try if it is a local function *)
   try LocalFunction ([], Mrs.find rs env.funenv) with Not_found ->
   (* else look for a global function *)
-  find_global_definition env.mod_known rs
+  find_global_definition env.pmodule.Pmodule.mod_known rs
+
+(* Parameter for the conversion of arrays to terms. With [`Update] an array [a] of length
+   [n] is converted into a formula [(make n undefined)[0 <- a[0]]...[n-1 <- a[n-1]]], with
+   [`Epsilon] it is converted to [(epsilon v. v.length = n /\ v[0] = a[0] /\ ... /\ a[n-1]
+   = a[n-1])]. *)
+let term_of_array : [< `Update | `Epsilon ] =
+  match Sys.getenv "WHY3PINTERPARRAY" with
+  | exception Not_found -> `Epsilon
+  | "epsilon" -> `Epsilon
+  | "update" -> `Update
+  | _ -> failwith "WHY3PINTERPARRAY must be `epsilon` or `update`"
 
 (** Convert a value into a term. The first component of the result are additional bindings
    from closures. *)
@@ -1164,14 +1190,18 @@ let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * t
       let ty_x = ty_inst ty_mt x.v_ty in
       let t = t_equ (fs_app ls [t_var vs] ty_x) t_x in
       vsenv, t_eps (t_close_bound vs t)
-  | Vconstr (rs, fs) ->
-      if rs_kind rs = RKfunc then
-        let term_of_field vsenv f = term_of_value ~ty_mt env vsenv (field_get f) in
-        let vsenv, fs = Lists.map_fold_left term_of_field vsenv fs in
-        vsenv, fs_app (ls_of_rs rs) fs v_ty
-      else (* TODO bench/ce/{record_one_field,record_inv}.mlw/CVC4/WP *)
-        kasprintf failwith "Cannot construct term for constructor \
-                            %a that is not a function" print_rs rs
+  | Vconstr (rs, field_rss, fs) -> (
+      let term_of_field vsenv f = term_of_value ~ty_mt env vsenv (field_get f) in
+      let vsenv, fs = Lists.map_fold_left term_of_field vsenv fs in
+      match rs_kind rs with
+      | RKfunc -> vsenv, fs_app (ls_of_rs rs) fs v_ty
+      | RKnone when Strings.has_suffix "'mk" rs.rs_name.id_string ->
+          let vs = create_vsymbol (id_fresh "v") v_ty in
+          let for_field rs = t_equ (t_app_infer (ls_of_rs rs) [t_var vs]) in
+          let t = t_and_l (List.map2 for_field field_rss fs) in
+          vsenv, t_eps (t_close_bound vs t)
+      | _ -> kasprintf failwith "Cannot construct term for constructor \
+                                 %a that is not a function" print_rs rs )
   | Vfun (cl, arg, e) ->
       (* TERM: fun arg -> t *)
       let t = Opt.get_exn (Failure "Cannot convert function body to term")
@@ -1192,26 +1222,46 @@ let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * t
       let mt = ty_match mt arg.vs_ty ty_arg in
       let t = t_ty_subst mt mv t in
       vsenv, t_lambda [vs_arg] [] t
-  | Varray arr ->
-      let open Pmodule in
-      (* TERM: epsilon v. v.length = length arr /\ v[0] = arr.(ix) /\ ... *)
-      let {mod_theory= {Theory.th_export= ns}} = read_module env.env ["array"] "Array" in
-      let ts_array = Theory.ns_find_ts ns ["array"] in
-      let ls_length = Theory.ns_find_ls ns ["length"] in
-      let ls_get = Theory.ns_find_ls ns [op_get ""] in
-      let v = create_vsymbol (id_fresh "a") v_ty in
-      let t_eq_length = (* v.length = length arr *)
-        t_equ (fs_app ls_length [t_var v] ty_int)
-          (t_nat_const (Array.length arr)) in
-      let elt_ty = ty_app_arg ts_array 0 v_ty in
-      let rec loop vsenv sofar ix = (* v[ix] = arr.(ix) *)
-        if ix = Array.length arr then vsenv, List.rev sofar else
-          let vsenv, t_a_ix = term_of_value ~ty_mt env vsenv arr.(ix) in
-          let t_eq_ix = t_equ (fs_app ls_get [t_var v; t_nat_const ix] elt_ty) t_a_ix in
-          loop vsenv (t_eq_ix :: sofar) (succ ix) in
-      let vsenv, t_eq_ixs = loop vsenv [] 0 in
-      let t = t_and_l (t_eq_length :: t_eq_ixs) in
-      vsenv, t_eps (t_close_bound v t)
+  | Varray arr -> (match term_of_array with
+      | `Update ->
+          (* TERM: (make <length arr> undefined)[<i> <- <arr[i]>] *)
+          let open Pmodule in
+          let {mod_theory= {Theory.th_export= ns}} = read_module env.env ["array"] "Array" in
+          let ts_array = Theory.ns_find_ts ns ["array"] in
+          let ls_make = Theory.ns_find_ls ns ["make"] in
+          let ls_update = Theory.ns_find_ls ns [Ident.op_update ""] in
+          let t_length = t_nat_const (Array.length arr) in
+          let ty_elt = ty_app_arg ts_array 0 v_ty in
+          let t_undefined = fs_app ls_undefined [] ty_elt in
+          let t0 = fs_app ls_make [t_length; t_undefined] v_ty in
+          let rec loop vsenv sofar ix =
+            if ix = Array.length arr then vsenv, sofar
+            else
+              let t_ix = t_nat_const ix in
+              let vsenv, t_v = term_of_value ~ty_mt env vsenv arr.(ix) in
+              let sofar = fs_app ls_update [sofar; t_ix; t_v] v_ty in
+              loop vsenv sofar (succ ix) in
+          loop vsenv t0 0
+      | `Epsilon ->
+          (* TERM: epsilon v. v.length = length arr /\ v[0] = arr.(ix) /\ ... *)
+          let open Pmodule in
+          let {mod_theory= {Theory.th_export= ns}} = read_module env.env ["array"] "Array" in
+          let ts_array = Theory.ns_find_ts ns ["array"] in
+          let ls_length = Theory.ns_find_ls ns ["length"] in
+          let ls_get = Theory.ns_find_ls ns [op_get ""] in
+          let v = create_vsymbol (id_fresh "a") v_ty in
+          let t_eq_length = (* v.length = length arr *)
+            t_equ (fs_app ls_length [t_var v] ty_int)
+              (t_nat_const (Array.length arr)) in
+          let elt_ty = ty_app_arg ts_array 0 v_ty in
+          let rec loop vsenv sofar ix = (* v[ix] = arr.(ix) *)
+            if ix = Array.length arr then vsenv, List.rev sofar else
+              let vsenv, t_a_ix = term_of_value ~ty_mt env vsenv arr.(ix) in
+              let t_eq_ix = t_equ (fs_app ls_get [t_var v; t_nat_const ix] elt_ty) t_a_ix in
+              loop vsenv (t_eq_ix :: sofar) (succ ix) in
+          let vsenv, t_eq_ixs = loop vsenv [] 0 in
+          let t = t_and_l (t_eq_length :: t_eq_ixs) in
+          vsenv, t_eps (t_close_bound v t) )
   | Vpurefun (ty, m, def) ->
       (* TERM: fun x -> if x = k0 then v0 else ... else def *)
       let vs_arg = create_vsymbol (id_fresh "x") ty in
@@ -1357,30 +1407,45 @@ let bind_fun rs cexp (task, ls_mv) =
 
 let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
-  let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
-  let task = List.fold_left use_export task Theory.[builtin_theory; bool_theory; highord_theory] in
-  let task = add_param_decl task ls_undefined in
+  let th = env.pmodule.Pmodule.mod_theory in
   let lsenv =
     let aux1 rs v mls =
       match rs.rs_logic with
       | RLls ls -> Mls.add ls v mls
       | _ -> mls in
     Mrs.fold aux1 env.rsenv Mls.empty in
-  (* Add known declarations *)
-  let add_known _ decl task =
+  let add_used task td =
+    let open Theory in
+    match td.td_node with
+    | Use th ->
+        Task.use_export task th
+    | Clone (th, sm) ->
+        let inst_df = Decl.Paxiom in
+        let inst_pr = Decl.Mpr.map (fun _ -> Decl.Paxiom) sm.sm_pr in
+        let inst =
+          {inst_df; inst_pr; inst_ty= sm.sm_ty; inst_ts= sm.sm_ts; inst_ls= sm.sm_ls } in
+        Task.clone_export task th inst
+    | _ -> task in
+  let add_known used id decl (task, ls_mt, ls_mv) =
+    if Mid.mem id used then (task, ls_mt, ls_mv) else
     match decl.d_node with
-    | Dprop (Pgoal, _, _) -> task
-    | Dprop (Plemma, prs, t) ->
-        add_decl task (create_prop_decl Paxiom prs t)
     | Dparam ls when Mls.contains lsenv ls ->
         (* Take value from lsenv (i.e. env.rsenv) for declaration *)
         let vsenv, t = term_of_value env [] (Mls.find ls lsenv) in
         let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
         let t = t_ty_subst ls_mt ls_mv t in
         let decl = Decl.make_ls_defn ls [] t in
-        add_decl task (create_logic_decl [decl])
-    | _ -> add_decl task decl in
-  let task = Mid.fold add_known env.th_known task in
+        add_decl task (create_logic_decl [decl]), ls_mt, ls_mv
+    | Dprop (Plemma, prs, t) ->
+        add_decl task (create_prop_decl Paxiom prs t), ls_mt, ls_mv
+    | Dprop (Pgoal, _, _) -> task, ls_mt, ls_mv
+    | _ -> add_decl task decl, ls_mt, ls_mv in
+  let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
+  let task = List.fold_left add_used task th.Theory.th_decls in
+  let used = Task.used_symbols (Task.used_theories task) in
+  let task, ls_mt, ls_mv =
+    Mid.fold (add_known used) th.Theory.th_known (task, ls_mt, ls_mv) in
+  let task = add_param_decl task ls_undefined in
   let task, ls_mv = Mrs.fold bind_fun env.funenv (task, ls_mv) in
   let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env) env.vsenv (task, ls_mt, ls_mv) in
@@ -1420,7 +1485,7 @@ let get_value_for_quant_var env vs =
       let value =
         if value <> None then value else
           if bind_univ_quant_vars_default then (
-            let v = default_value_of_type env.env env.mod_known (ity_of_ty vs.vs_ty) in
+            let v = default_value_of_type env.env env.pmodule.Pmodule.mod_known (ity_of_ty vs.vs_ty) in
             Debug.dprintf debug_rac_values
               "Use default value for all-quantified variable %a: %a@."
               print_vs vs print_value v;
@@ -1512,14 +1577,33 @@ let check_term_dispatch (Rac_prover {command; driver; limit}) task =
   let open Call_provers in
   let call = Driver.prove_task ~command ~limit driver task in
   let res = wait_on_call call in
-  Debug.dprintf debug_rac_check_sat "Check term dispatch answer: %a@."
+  Debug.dprintf debug_rac_check_sat "@[<h>Check term dispatch answer: %a@]@."
     print_prover_answer res.pr_answer;
   match res.pr_answer with
   | Valid -> Some true
   | Invalid -> Some false
   | _ -> None
 
+let negate_goal task =
+  let open Task in
+  let tdecl, task = task_separate_goal task in
+  match tdecl.Theory.td_node with
+  | Theory.Decl Decl.{d_node= Dprop (Pgoal,p,t)} ->
+      add_prop_decl task Decl.Pgoal p (t_not t)
+  | _ -> failwith "negate_goal"
+
+let check_term_dispatch ~try_negate rp task =
+  match check_term_dispatch rp task with
+  | None when try_negate ->
+      Debug.dprintf debug_rac_check_sat "Try negation.@.";
+      let task = negate_goal task in
+      let res = check_term_dispatch rp task in
+      Opt.map (fun b -> not b) res
+  | r -> r
+
+(* The callee must ensure that RAC is enabled. *)
 let check_term ?vsenv ctx t =
+  if not ctx.c_env.rac.do_rac then failwith "ceck_term with RAC disabled";
   Debug.dprintf debug_rac_check_sat "@[<hv2>Check term: %a@]@." print_term t;
   let task, _ = task_of_term ?vsenv ctx.c_env t in
   let res = (* Try checking the term using computation first ... *)
@@ -1528,9 +1612,10 @@ let check_term ?vsenv ctx t =
          (fun trans -> check_term_compute ctx.c_env trans task)) in
   let res =
     if res = None then (* ... then try solving using a prover *)
+      let try_negate = ctx.c_env.rac.rac_reduce.rac_try_negate in
       Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Dispatched: %b.@." b; b)
         (Opt.bind ctx.c_env.rac.rac_reduce.rac_prover
-           (fun rp -> check_term_dispatch rp task))
+           (fun rp -> check_term_dispatch ~try_negate rp task))
     else res in
   match res with
   | Some true ->
@@ -1540,8 +1625,10 @@ let check_term ?vsenv ctx t =
       raise (Contr (ctx, t))
   | None ->
       let msg = "cannot be evaluated" in
-      Debug.dprintf debug_rac_check_term_result "%a: %a@." report_cntr_title (ctx, msg) print_term t;
-      if not ctx.c_env.rac.skip_cannot_compute then
+      Debug.dprintf debug_rac_check_term_result "%a@." report_cntr_head (ctx, msg, t);
+      if ctx.c_env.rac.skip_cannot_compute then
+        Warning.emit "%a@." report_cntr_head (ctx, msg, t)
+      else
         cannot_compute "%a" report_cntr_title (ctx, msg)
 
 let check_terms ctx = List.iter (check_term ctx)
@@ -1618,6 +1705,46 @@ let check_posts desc loc env v posts =
     register_failure ctx.c_env t.t_loc ctx.c_desc mid;
     raise e
 
+(** [oldify_variant env var] returns a pair [old_ts, oldies] where [old_ts] are
+    the variant terms where all free variables have been replaced by fresh
+    variables, and [oldies] is a mapping from the fresh variables in [old_ts] to
+    snapshots of the current values of the original variables in [env]. *)
+let oldify_variant env var =
+  let ts = List.map fst var in
+  let free_vs = Mvs.keys (List.fold_left t_freevars Mvs.empty ts) in
+  let aux vs (subst, oldies) =
+    let vs' = create_vsymbol (id_clone vs.vs_name) vs.vs_ty in
+    let v = snapshot (Mvs.find vs env.vsenv) in
+    Mvs.add vs (t_var vs') subst, Mvs.add vs' v oldies in
+  let subst, oldies =
+    List.fold_right aux free_vs (Mvs.empty, Mvs.empty) in
+  let old_ts = List.map (t_subst subst) ts in
+  old_ts, oldies
+
+(** [mk_variant_term env old_ts var] creates a term that represents the validity
+    of variant [var], where [old_ts] are the oldified variant terms. *)
+let mk_variant_term env =
+  let {Pmodule.mod_theory= {Theory.th_export= ns}} =
+    Pmodule.read_module env.env ["int"] "Int" in
+  let ls_int_le = Theory.ns_find_ls ns [Ident.op_infix "<="] in
+  let ls_int_lt = Theory.ns_find_ls ns [Ident.op_infix "<"] in
+  let rec loop old_ts var =
+    match old_ts, var with
+    | [], [] -> t_false
+    | old_t :: old_ts, (t, opt_op) :: var ->
+        let t_here =
+          match opt_op with
+          | Some op -> ps_app op [t; old_t]
+          | None ->
+              match (t_type t).ty_node with
+              | Tyapp (ts, _) when ts_equal ts ts_int ->
+                  t_and (ps_app ls_int_le [t_nat_const 0; old_t])
+                    (ps_app ls_int_lt [t; old_t])
+              | _ -> cannot_compute "loop variant implemented only for int" in
+        t_or t_here (t_and (t_equ old_t t) (loop old_ts var))
+    | _ -> assert false in
+  loop
+
 (* EXPRESSION EVALUATION *)
 
 (* Assuming the real is given in pow2 and pow5 *)
@@ -1647,7 +1774,7 @@ let rec matching env (v : value) p =
   | Pas (p, vs) -> matching (bind_vs vs v env) v p
   | Papp (ls, pl) -> (
       match v.v_desc with
-      | Vconstr ({rs_logic= RLls ls2}, tl) ->
+      | Vconstr ({rs_logic= RLls ls2}, _, tl) ->
           if ls_equal ls ls2 then
             List.fold_left2 matching env (List.map field_get tl) pl
           else if ls2.ls_constr > 0 then
@@ -1683,7 +1810,7 @@ let exec_pure ~loc env ls pvs =
   else if ls_equal ls fs_func_app then
     failwith "Pure function application not yet implemented"
   else
-    match Decl.find_logic_definition env.th_known ls with
+    match Decl.find_logic_definition env.pmodule.Pmodule.mod_theory.Theory.th_known ls with
     | Some defn ->
         let vs, t = Decl.open_ls_defn defn in
         let args = List.map (get_pvs env) pvs in
@@ -1717,7 +1844,7 @@ let get_and_register_value env ?def ?ity vs loc =
          print_decoded name print_loc' loc print_value v; v
     | None ->
        let v = match def with
-         | None -> default_value_of_type env.env env.mod_known ity
+         | None -> default_value_of_type env.env env.pmodule.Pmodule.mod_known ity
          | Some v -> v in
        Debug.dprintf debug_rac_values
          "@[<h>No value for %s at %a, taking default%t.@]@." name print_loc' loc
@@ -1729,7 +1856,7 @@ let get_and_register_value env ?def ?ity vs loc =
 let rec set_fields fs1 fs2 =
   let set_field f1 f2 =
     match (field_get f1).v_desc, (field_get f2).v_desc with
-    | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
+    | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
         assert (rs_equal rs1 rs2);
         set_fields fs1 fs2
     | _ -> field_set f1 (field_get f2) in
@@ -1737,7 +1864,7 @@ let rec set_fields fs1 fs2 =
 
 let set_constr v1 v2 =
   match v1.v_desc, v2.v_desc with
-   | Vconstr (rs1, fs1), Vconstr (rs2, fs2) ->
+   | Vconstr (rs1, _, fs1), Vconstr (rs2, _, fs2) ->
        assert (rs_equal rs1 rs2);
        set_fields fs1 fs2;
    | _ -> failwith "set_constr"
@@ -1818,8 +1945,13 @@ and eval_expr' env e =
           | _ -> failwith "many args for exec fun" (* TODO *) )
       | Cany ->
          register_any_call env e.e_loc None Mvs.empty;
-         exec_call_abstract ?loc:e.e_loc env cty [] e.e_ity
-      | Capp (rs, pvsl) when Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.mod_known) = Some true ->
+         if env.rac.do_rac then
+           exec_call_abstract ?loc:e.e_loc env cty [] e.e_ity
+         else (* We must check postconditions for abstract exec *)
+           cannot_compute "cannot evaluate any-value with RAC disabled"
+      | Capp (rs, pvsl) when
+          Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.pmodule.Pmodule.mod_known)
+          = Some true ->
           assert (cty.cty_args = [] && pvsl = []);
           let v = Mrs.find rs env.rsenv in
           (* check_posts "Exec postcondition" e.e_loc env v cty.cty_post; *)
@@ -1829,22 +1961,18 @@ and eval_expr' env e =
           exec_call ?loc:e.e_loc env rs pvsl e.e_ity
     end
   | Eassign l ->
-      List.iter
-        (fun (pvs, rs, value) ->
-          let cstr, args =
-            match (get_pvs env pvs).v_desc with
-            | Vconstr (cstr, args) -> cstr, args
-            | _ -> assert false in
-          let rec search_and_assign constr_args args =
-            match constr_args, args with
-            | pv :: pvl, Field r :: vl ->
-                if pv_equal pv (fd_of_rs rs) then
-                  r := get_pvs env value
-                else
-                  search_and_assign pvl vl
-            | _ -> assert false in
-          search_and_assign cstr.rs_cty.cty_args args)
-        l ;
+      let search_and_assign (pvs, rs, v) =
+        let rss, fs =
+          match (get_pvs env pvs).v_desc with
+          | Vconstr (_, rs, args) -> rs, args
+          | _ -> assert false in
+        let maybe_assign rs' f =
+          if rs_equal rs' rs then (
+            field_set f (get_pvs env v);
+            raise Exit) in
+        try List.iter2 maybe_assign rss fs
+        with Exit -> () in
+      List.iter search_and_assign l;
       Normal unit_value
   | Elet (ld, e2) -> (
     match ld with
@@ -1878,7 +2006,7 @@ and eval_expr' env e =
         Irred e )
     | r -> r )
   | Ewhile (cond, inv, _var, e1) when env.rac.rac_abstract -> begin
-      (* arbitrary execution of an iteartion taken from the counterexample
+      (* arbitrary execution of an iteration taken from the counterexample
 
         while e1 do invariant {I} e2 done
         ~>
@@ -1895,9 +2023,9 @@ and eval_expr' env e =
             (invariant does not hold after iteration)
         * stop the interpretation here - raise RACStuck *)
       (* assert1 *)
-      register_loop env e.e_loc Log.ExecAbstract;
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv;
+      register_iter_loop env e.e_loc Log.ExecAbstract;
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
         (Mvs.keys env.vsenv);
       (* assert2 *)
@@ -1905,12 +2033,14 @@ and eval_expr' env e =
       match eval_expr env cond with
       | Normal v ->
          if is_true v then begin
+             register_iter_loop env e.e_loc Log.ExecConcrete;
              match eval_expr env e1 with
              | Normal _ ->
                 if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
                 (* the execution cannot continue from here *)
-                register_stucked env e.e_loc "Cannot continue after arbitrary iteration" Mid.empty;
+                register_stucked env e.e_loc
+                  "Cannot continue after arbitrary iteration" Mid.empty;
                 raise (RACStuck (env,e.e_loc))
              | r -> r
            end
@@ -1922,27 +2052,38 @@ and eval_expr' env e =
            Irred e )
       | r -> r
     end
-  | Ewhile (cond, inv, _var, e1) -> begin
-      register_loop env e.e_loc Log.ExecConcrete;
-      (* TODO variants *)
+  | Ewhile (e1, inv, var, e2) ->
       if env.rac.do_rac then
         check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
-      match eval_expr env cond with
-      | Normal v ->
-          if is_true v then (
-            match eval_expr env e1 with
-            | Normal _ ->
-                if env.rac.do_rac then
-                  check_terms (cntr_ctx "Loop invariant preservation" env) inv ;
-                eval_expr env e
-            | r -> r )
-          else if is_false v then
-            Normal unit_value
-          else (
-            Warning.emit "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
+      let rec iter () =
+        let opt_old_variant =
+          if env.rac.do_rac then Some (oldify_variant env var) else None in
+        match eval_expr env e1 with
+        | Normal v ->
+            if is_true v then ( (* condition true *)
+              register_iter_loop env e.e_loc Log.ExecConcrete;
+              match eval_expr env e2 with
+              | Normal _ -> (* body executed normally *)
+                  if env.rac.do_rac then
+                    check_terms (cntr_ctx "Loop invariant preservation" env) inv;
+                  if env.rac.do_rac then (
+                    let old_ts, oldies = Opt.get opt_old_variant in
+                    let vsenv =
+                      Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
+                    let env = {env with vsenv} in
+                    check_term
+                      (cntr_ctx "Loop variant decrease" ?trigger_loc:e.e_loc env)
+                      (mk_variant_term env old_ts var) );
+                  iter ()
+              | r -> r
+            ) else if is_false v then (* condition false *)
+              Normal unit_value
+            else (
+              Warning.emit "@[[Exec] Cannot decide condition of while: @[%a@]@]@."
               print_value v ;
             Irred e )
-      | r -> r end
+        | r -> r in
+      iter ()
   | Efor (i, (pvs1, dir, pvs2), _ii, inv, e1) when env.rac.rac_abstract -> begin
       (* TODO what to do with _ii? *)
       (* arbitrary execution of an iteartion taken from the counterexample
@@ -1951,19 +2092,19 @@ and eval_expr' env e =
         let a = eval_expr e1 in
         let b = eval_expr e2 in
         if a <= b + 1 then begin
-          (let i = a in assert1 {I});
+          bind_vs i a;
+          assert1 {I};
           assign_written_vars_with_ce;
           let i = get_and_register_value ~def:(b+1) i in
           if not (a <= i <= b + 1) then abort1;
           if a <= i <= b then begin
             assert2* { I };
             eval_expr e;
-            let i = i + 1 in
+            bind_vs i (i + 1) in
             assert3 {I};
-            abort2
-          end else begin
-            assert4* {I} (* i is already equal to 'b + 1' *)
-          end
+            bind_vs i (b + 1);
+          end;
+          assert4* {I}
         end else ()
 
         1 - if assert1 fails, then we have a real counterexample
@@ -1975,16 +2116,14 @@ and eval_expr' env e =
         4 - if assert4 fails, then we have a false counterexample
             (invariant does not hold for the execution to continue)
         5 - abort1: we have a false counterexample
-            (value assigned to i is not compatible with loop range)
-        6 - abort2: we have a false counterexample
-            (the abstract rac cannot continue from this state) *)
-      register_loop env e.e_loc Log.ExecAbstract;
+            (value assigned to i is not compatible with loop range) *)
       try
         let a = big_int_of_value (get_pvs env pvs1) in
         let b = big_int_of_value (get_pvs env pvs2) in
         let le, suc = match dir with
           | To -> BigInt.le, BigInt.succ
           | DownTo -> BigInt.ge, BigInt.pred in
+        register_iter_loop env e.e_loc Log.ExecAbstract;
         (* assert1 *)
         if le a (suc b) then begin
           if env.rac.do_rac then begin
@@ -2003,6 +2142,7 @@ and eval_expr' env e =
             register_stucked env e.e_loc msg mid;
             raise (RACStuck (env,e.e_loc)) end;
           if le a i_bi && le i_bi b then begin
+            register_iter_loop env e.e_loc Log.ExecAbstract;
             (* assert2 *)
             let ctx = cntr_ctx "Assume loop invariant" env in
             check_assume_terms ctx inv;
@@ -2012,9 +2152,11 @@ and eval_expr' env e =
                 (* assert3 *)
                 if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                register_stucked env e.e_loc
-                  "Cannot continue after arbitrary iteration" Mid.empty;
-                raise (RACStuck (env,e.e_loc))
+                let env = bind_vs i.pv_vs (value ty_int (Vnum (suc b))) env in
+                (* assert4 *)
+                let ctx = cntr_ctx "Assume loop invariant with (b+1)" env in
+                check_assume_terms ctx inv;
+                Normal unit_value
             | r -> r
           end
           else begin
@@ -2030,18 +2172,21 @@ and eval_expr' env e =
       with NotNum -> Irred e
     end
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) -> (
-    register_loop env e.e_loc Log.ExecConcrete;
+    let le, suc =
+      match dir with
+      | To -> BigInt.le, BigInt.succ
+      | DownTo -> BigInt.ge, BigInt.pred in
     try
       let a = big_int_of_value (get_pvs env pvs1) in
       let b = big_int_of_value (get_pvs env pvs2) in
-      let le, suc =
-        match dir with
-        | To -> BigInt.le, BigInt.succ
-        | DownTo -> BigInt.ge, BigInt.pred in
+      ( if env.rac.do_rac then
+          let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
+          check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
       let rec iter i =
         Debug.dprintf debug_trace_exec "[interp] for loop with index = %s@."
           (BigInt.to_string i) ;
-        if le i b then
+        if le i b then (
+          register_iter_loop env e.e_loc Log.ExecConcrete;
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum i)) env in
           match eval_expr env' e1 with
           | Normal _ ->
@@ -2049,11 +2194,9 @@ and eval_expr' env e =
                 check_terms (cntr_ctx "Loop invariant preservation" env') inv ;
               iter (suc i)
           | r -> r
-        else
-          Normal unit_value in
-      ( if env.rac.do_rac then
-          let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
-          check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
+        ) else
+          Normal unit_value
+        in
       iter a
     with NotNum -> Irred e )
   | Ematch (e0, ebl, el) -> (
@@ -2189,29 +2332,34 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                     let env' = multibind_pvs ce.c_cty.cty_args arg_vs env in
                     eval_expr env' body
                 | Cany ->
-                    check_pre_and_register_call ~any_function:true Log.ExecAbstract;
-                    let rs_name,cty = rs.rs_name, rs.rs_cty in
-                    exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
+                    if env.rac.do_rac then (
+                      check_pre_and_register_call ~any_function:true Log.ExecAbstract;
+                      let rs_name,cty = rs.rs_name, rs.rs_cty in
+                      exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result )
+                    else (* We can't check the postcondition *)
+                      cannot_compute "cannot apply an any-function %a with RAC disabled"
+                        print_rs rs
                 | Cpur _ -> assert false (* TODO ? *) )
             | Builtin f ->
                 check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
                 ( match f rs arg_vs with
                   | Some v -> Normal v
-                  | None -> cannot_compute "cannot compute builtin" )
-            | Constructor _ ->
+                  | None -> cannot_compute "cannot compute result of builtin %a"
+                              Ident.print_decoded rs.rs_name.id_string )
+            | Constructor its_def ->
                 check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
                 let mt = List.fold_left2 ty_match Mtv.empty
                     (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
                 let ty = ty_inst mt (ty_of_ity ity_result) in
-                let fs = List.map field arg_vs in
-                Normal (value ty (Vconstr (rs, fs)))
+                let vs = List.map field arg_vs in
+                Normal (value ty (Vconstr (rs, its_def.Pdecl.itd_fields, vs)))
             | Projection _d -> (
                 check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
                 match rs.rs_field, arg_vs with
-                | Some pv, [{v_desc= Vconstr (cstr, args)}] ->
+                | Some pv, [{v_desc= Vconstr (cstr, _, args)}] ->
                     let rec search constr_args args =
                       match constr_args, args with
                       | pv2 :: pvl, v :: vl ->
@@ -2224,7 +2372,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
             | exception Not_found ->
                 cannot_compute "definition of routine %s could not be found"
                   rs.rs_name.id_string in
-      ( match res with
+      if env.rac.do_rac then (
+        match res with
         | Normal v ->
             let desc = cntr_desc "Postcondition" rs.rs_name in
             check_posts desc loc env v rs.rs_cty.cty_post
@@ -2275,16 +2424,19 @@ and exec_call_abstract ?loc ?rs_name env cty arg_pvs ity_result =
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 let bind_globals ?rs_main mod_known env =
-  let get_value id opt_e ity =
+  let get_value env id opt_e ity =
     let name = string_or_model_trace id in
     match env.rac.get_value ~name ?loc:id.id_loc ity with
     | Some v -> register_used_value env id.id_loc id v; v
     | None ->
        match opt_e with
-       | None ->
-          let v = default_value_of_type env.env mod_known ity in
-          register_used_value env id.id_loc id v; v
-       | Some e ->
+         | None ->
+             if env.rac.do_rac then (
+               let v = default_value_of_type env.env mod_known ity in
+               register_used_value env id.id_loc id v; v )
+             else
+               cannot_compute "any-value with RAC disabled"
+         | Some e ->
           let env' = {env with rac= {env.rac with rac_abstract= false}} in
           register_const_init env id.id_loc id;
           match eval_expr env' e with
@@ -2298,15 +2450,16 @@ let bind_globals ?rs_main mod_known env =
   let eval_global _ d env =
     match d.pd_node with
     | PDlet (LDvar (pv, e)) ->
-        let v = get_value pv.pv_vs.vs_name (Some e) e.e_ity in
+        let v = get_value env pv.pv_vs.vs_name (Some e) e.e_ity in
         bind_vs pv.pv_vs v env
     | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
         assert (ce.c_cty.cty_args = []);
         let opt_e = match ce.c_node with
           | Cany -> None | Cfun e -> Some e
           | _ -> failwith "eval_globals: program constant cexp" in
-        let v = get_value rs.rs_name opt_e ce.c_cty.cty_result in
-        check_assume_posts (cntr_ctx "Any postcondition" env) v ce.c_cty.cty_post;
+        let v = get_value env rs.rs_name opt_e ce.c_cty.cty_result in
+        if env.rac.do_rac then
+          check_assume_posts (cntr_ctx "Any postcondition" env) v ce.c_cty.cty_post;
         bind_rs rs v env )
     | _ -> env in
   let is_before id d (env, found_rs) =
@@ -2320,18 +2473,16 @@ let bind_globals ?rs_main mod_known env =
   let mod_known, _ = Mid.fold is_before mod_known (Mid.empty, false) in
   Mid.fold eval_global mod_known env
 
-let eval_global_fundef rac env mod_known th_known locals e =
+let eval_global_fundef rac env pmodule locals e =
   get_builtin_progs env ;
-  let env = default_env env rac mod_known th_known in
-  let env = bind_globals mod_known env in
+  let env = default_env env rac pmodule in
+  let env = bind_globals pmodule.Pmodule.mod_known env in
   let env = add_local_funs locals env in
   let res = eval_expr env e in
   res, env.vsenv, env.rsenv
 
 let eval_rs rac env pm rs =
   let open Pmodule in
-  let mod_known = pm.mod_known in
-  let th_known = pm.mod_theory.Theory.th_known in
   let get_value (pv: pvsymbol) =
     let id = pv.pv_vs.vs_name in
     let name = string_or_model_trace id in
@@ -2344,14 +2495,14 @@ let eval_rs rac env pm rs =
          print_value v;
        v
     | None ->
-       let v = default_value_of_type env mod_known pv.pv_ity in
+       let v = default_value_of_type env pm.mod_known pv.pv_ity in
        Debug.dprintf debug_rac_values
          "@[<h>Missing value for parameter %a, continue with default value %a.@]@."
          print_pv pv print_value v;
        v in
   get_builtin_progs env ;
-  let env = default_env env rac mod_known th_known in
-  let env = bind_globals ~rs_main:rs mod_known env in
+  let env = default_env env rac pm in
+  let env = bind_globals ~rs_main:rs pm.mod_known env in
   let env = multibind_pvs ~register:(register_used_value env rs.rs_name.id_loc)
       rs.rs_cty.cty_args (List.map get_value rs.rs_cty.cty_args) env in
   register_exec_main env rs;

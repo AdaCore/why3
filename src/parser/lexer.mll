@@ -240,6 +240,8 @@ rule token = parse
       { LTGT }
   | "="
       { EQUAL }
+  | "=>"
+      { EQUALARROW }
   | "-"
       { MINUS }
   | "["
@@ -252,6 +254,10 @@ rule token = parse
       { RIGHTPAR_QUOTE s }
   | ")" ('_' alpha suffix core_suffix* as s)
       { RIGHTPAR_USCORE s }
+  | "[|"
+      { LEFTSQBAR }
+  | "|]"
+      { BARRIGHTSQ }
   | op_char_pref op_char_4* quote* as s
       { OPPREF s }
   | op_char_1234* op_char_1 op_char_1234* quote* as s

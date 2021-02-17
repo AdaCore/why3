@@ -17,17 +17,17 @@
  </goal>
  <goal name="defensive_get&#39;vc" expl="VC for defensive_get" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
- <proof prover="7"><result status="valid" time="0.01" steps="2133"/></proof>
+ <proof prover="7"><result status="valid" time="0.01" steps="2111"/></proof>
  </goal>
  <goal name="defensive_set&#39;vc" expl="VC for defensive_set" proved="true">
  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
- <proof prover="7"><result status="valid" time="0.01" steps="2295"/></proof>
+ <proof prover="7"><result status="valid" time="0.01" steps="2273"/></proof>
  </goal>
  <goal name="copy&#39;vc" expl="VC for copy" proved="true">
- <proof prover="8"><result status="valid" time="0.05" steps="6810"/></proof>
+ <proof prover="8"><result status="valid" time="0.05" steps="8390"/></proof>
  </goal>
  <goal name="sub&#39;vc" expl="VC for sub" proved="true">
- <proof prover="8"><result status="valid" time="0.08" steps="9087"/></proof>
+ <proof prover="8"><result status="valid" time="0.08" steps="10605"/></proof>
  </goal>
  <goal name="fill&#39;vc" expl="VC for fill" proved="true">
  <proof prover="8"><result status="valid" time="0.08" steps="10420"/></proof>
@@ -72,7 +72,7 @@
  </transf>
  </goal>
  <goal name="append&#39;vc" expl="VC for append" proved="true">
- <proof prover="8"><result status="valid" time="0.04" steps="9473"/></proof>
+ <proof prover="8"><result status="valid" time="0.04" steps="8694"/></proof>
  </goal>
  <goal name="self_blit&#39;vc" expl="VC for self_blit" proved="true">
  <proof prover="3"><result status="valid" time="0.07" steps="255"/></proof>
@@ -80,18 +80,23 @@
 </theory>
 <theory name="Init" proved="true">
  <goal name="init&#39;vc" expl="VC for init" proved="true">
- <proof prover="8"><result status="valid" time="0.05" steps="6981"/></proof>
+ <proof prover="8"><result status="valid" time="0.05" steps="7788"/></proof>
  </goal>
 </theory>
 <theory name="ArrayPermut" proved="true">
  <goal name="exchange_permut_sub" proved="true">
  <proof prover="1"><path name="array_ArrayPermut_exchange_permut_sub_1.v"/><result status="valid" time="1.42"/></proof>
  </goal>
+ <goal name="permut_sub_trans" proved="true">
+ <proof prover="2" timelimit="1"><result status="valid" time="0.01" steps="119"/></proof>
+ </goal>
  <goal name="permut_sub_weakening" proved="true">
  <proof prover="1"><path name="array_ArrayPermut_permut_sub_weakening_2.v"/><result status="valid" time="0.48"/></proof>
  </goal>
  <goal name="exchange_permut_all" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="27905"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="28395"/></proof>
+ <proof prover="2" timelimit="1"><result status="timeout" time="1.00"/></proof>
+ <proof prover="7" timelimit="1"><result status="valid" time="0.06" steps="14822"/></proof>
  </goal>
 </theory>
 <theory name="ArraySwap" proved="true">
@@ -133,7 +138,7 @@
   <proof prover="2" timelimit="6"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
   <goal name="to_seq_nth&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="6"><result status="valid" time="0.01" steps="340"/></proof>
+  <proof prover="2" timelimit="6"><result status="valid" time="0.11" steps="342"/></proof>
   </goal>
  </transf>
  </goal>
@@ -165,7 +170,7 @@
    <proof prover="0" timelimit="1"><result status="valid" time="0.88" steps="1976655"/></proof>
    </goal>
    <goal name="exchange_inversion&#39;vc.2.4" expl="assertion" proved="true">
-   <transf name="remove" proved="true" arg1="real,tuple0,unit,map,zero,one,( * ),sum,get,set,([&lt;-]),([&lt;-]&#39;),make,inversions_for,inversions,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_some,numof_change_equiv,sum&#39;def,sum_left,sum_ext,sum_le,sum_zero,sum_nonneg,sum_decomp,shift_left,exchange_set,array&#39;invariant,([&lt;-])&#39;spec,make&#39;spec">
+   <transf name="remove" proved="true" arg1="real,tuple0,unit,map,zero,one,( * ),sum,get,set,([&lt;-]),([&lt;-]&#39;),make,inversions_for,inversions,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,numof&#39;def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_some,numof_change_equiv,sum&#39;def,sum_left,sum_ext,sum_le,sum_zero,sum_nonneg,sum_decomp,shift_left,exchange_set,array&#39;invariant,([&lt;-])&#39;spec,make_spec">
     <goal name="exchange_inversion&#39;vc.2.4.0" expl="assertion" proved="true">
     <proof prover="0" timelimit="1"><result status="valid" time="0.02" steps="20717"/></proof>
     <proof prover="2"><result status="valid" time="0.02" steps="147"/></proof>

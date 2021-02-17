@@ -1,15 +1,15 @@
 Strongest Postcondition
 File "bench/ce/loop_ce.mlw", line 13, characters 16-25:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/loop_ce.mlw", line 12, characters 14-20:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/loop_ce.mlw", line 13, characters 16-25:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File loop_ce.mlw:
@@ -33,7 +33,8 @@ File loop_ce.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
   Line 11:
     [before iteration] b [@field:0:contents] [@introduced]
-      [@mlw:reference_var] =
+      [@loop:bench/ce/loop_ce.mlw:11:2:91] [@mlw:reference_var]
+      [@vc:written:11:2:91:bench/ce/loop_ce.mlw] =
       {"type": "Record",
        "val":
         {"Field":
@@ -61,7 +62,7 @@ File loop_ce.mlw:
 
 File "bench/ce/loop_ce.mlw", line 23, characters 13-23:
 Goal Assertion from verification condition g'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File loop_ce.mlw:
@@ -94,7 +95,7 @@ File loop_ce.mlw:
 
 File "bench/ce/loop_ce.mlw", line 20, characters 31-44:
 Goal Postcondition from verification condition g'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File loop_ce.mlw:

@@ -206,13 +206,16 @@ let rec import_model_value known th_known ity v =
           let rs = match def.Pdecl.itd_constructors with
             | [rs] -> rs
             | _ -> failwith "import_model_value: type with not exactly one constructors" in
-          let assoc_ity rs =
-            get_field_name rs, ity_full_inst subst (fd_of_rs rs).pv_ity in
-          let field_itys = Mstr.of_list (List.map assoc_ity def.Pdecl.itd_fields) in
-          let field_names, field_values = List.split r in
-          let itys = List.map (fun f -> Mstr.find f field_itys) field_names in
-          let fields = List.map2 (import_model_value known th_known) itys field_values in
-          constr_value ity rs fields
+          let aux field_rs =
+            let field_name = get_field_name field_rs in
+            let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
+            match List.assoc field_name r with
+            | v -> import_model_value known th_known field_ity v
+            | exception Not_found ->
+                (* TODO Better create a default value? Requires an [Env.env]. *)
+                undefined_value ity in
+          let vs = List.map aux def.Pdecl.itd_fields in
+          constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
           check_not_nonfree def;
           let matching_name rs = String.equal rs.rs_name.id_string s in
@@ -220,7 +223,7 @@ let rec import_model_value known th_known ity v =
           let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
               rs.rs_cty.cty_args in
           let vs = List.map2 (import_model_value known th_known) itys vs in
-          constr_value ity rs vs
+          constr_value ity rs [] vs
       | Proj (p, x) ->
           let is_proj id _ = id.id_string = p in
           let ls = try
@@ -415,19 +418,25 @@ let check_model reduce env pm model =
             Pretty.print_loc' loc in
         Cannot_check_model {reason}
 
+let select_model_last_non_empty models =
+  let models = List.filter (fun (_,m) -> not (is_model_empty m)) models in
+  match List.rev models with
+  | (_,m) :: _ -> Some m
+  | [] -> None
+
 type sort_models =
   (int * Call_provers.prover_answer * model * check_model_result * ce_summary) list ->
   (int * Call_provers.prover_answer * model * check_model_result * ce_summary) list
 
-let prioritize_last_model: sort_models =
+let prioritize_last_non_empty_model: sort_models = fun models ->
   let open Util in
   let compare = cmp [
       cmptr (fun (i,_,_,_,_) -> -i) (-);
     ] in
-  List.sort compare
+  List.filter (fun (_,_,m,_,_) -> not (is_model_empty m))
+    (List.sort compare models)
 
-let prioritize_first_good_model: sort_models =
-  fun models ->
+let prioritize_first_good_model: sort_models = fun models ->
   let open Util in
   let good_models, other_models =
     let is_good (_,_,_,_,s) = match s with
@@ -472,19 +481,24 @@ let print_dbg_model selected_ix fmt (i,_,_,mr,s) =
         (print_ce_summary_title ?check_ce:None) s
 
 let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
-    ?(sort_models=prioritize_first_good_model) env pmodule models =
+    ?sort_models env pmodule models =
+  let sort_models = Opt.get_def
+      (if check then prioritize_first_good_model
+       else prioritize_last_non_empty_model) sort_models in
   let check_model =
     if check then check_model reduce_config env pmodule
     else fun _ -> Cannot_check_model {reason="not checking CE model"} in
+  let models = (* Keep at most one empty model *)
+    let found_empty = ref false in
+    let p (_,m) =
+      if is_model_empty m then
+        if !found_empty then false
+        else (found_empty := true; true)
+      else true in
+    List.filter p models in
   let models =
     let add_index i (r,m) = i,r,m in
     List.mapi add_index models in
-  let models =
-    let not_empty (i,_,m) =
-      let res = is_model_empty m in
-      if res then Debug.dprintf debug_check_ce "Model %d is empty@." i;
-      not res in
-    List.filter not_empty models in
   let models =
     let add_check_model_result (i,r,m) =
       Debug.dprintf debug_check_ce "Check model %d (%a)@." i
@@ -519,7 +533,7 @@ let rec model_value v =
   let open Value in
   let id_name {id_string= name; id_attrs= attrs} =
     Ident.get_model_trace_string ~name ~attrs in
-  match v.v_desc with
+  match v_desc v with
   | Vnum i -> Integer { int_value= i; int_verbatim= BigInt.to_string i }
   | Vstring s -> String s
   | Vbool b -> Boolean b
@@ -536,11 +550,11 @@ let rec model_value v =
         arr_indices= List.mapi aux (Array.to_list a);
         arr_others= Undefined;
       }
-  | Vconstr (rs, fs) -> (
+  | Vconstr (rs, frs, fs) -> (
       let vs = List.map (fun f -> model_value (field_get f)) fs in
       if Strings.has_suffix "'mk" rs.rs_name.id_string then
         (* same test for record-ness as in smtv2.ml *)
-        let ns = List.map (fun pv -> id_name pv.pv_vs.vs_name) rs.rs_cty.cty_args in
+        let ns = List.map (fun rs -> rs.rs_name.id_string) frs in
         Record (List.combine ns vs)
       else
         Apply (id_name rs.rs_name, vs) )

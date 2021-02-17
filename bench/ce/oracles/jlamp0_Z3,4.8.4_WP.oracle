@@ -1,7 +1,7 @@
 Weakest Precondition
 File "bench/ce/jlamp0.mlw", line 12, characters 13-26:
 Goal Assertion from verification condition p1'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File jlamp0.mlw:
@@ -32,7 +32,7 @@ File jlamp0.mlw:
 
 File "bench/ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File jlamp0.mlw:
@@ -69,7 +69,7 @@ File jlamp0.mlw:
 
 File "bench/ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File jlamp0.mlw:
@@ -100,7 +100,7 @@ File jlamp0.mlw:
 
 File "bench/ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File jlamp0.mlw:
@@ -125,16 +125,17 @@ File jlamp0.mlw:
 
 File "bench/ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/jlamp0.mlw", line 24, characters 16-18:
 Goal Loop variant decrease from verification condition p2'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    c [@field:0:contents] [@introduced] =
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
@@ -153,22 +154,25 @@ File jlamp0.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 21:
-    a [@field:0:contents] [@introduced] =
+    a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c [@field:0:contents] [@introduced] =
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
   Line 24:
-    c [@field:0:contents] [@introduced] [@model_trace:c] =
+    c [@field:0:contents] [@introduced] [@loop:bench/ce/jlamp0.mlw:21:4:157]
+      [@model_trace:c] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
   Line 25:
     a [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -184,12 +188,13 @@ File jlamp0.mlw:
 
 File "bench/ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    c [@field:0:contents] [@introduced] =
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
@@ -208,12 +213,14 @@ File jlamp0.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 21:
-    a [@field:0:contents] [@introduced] =
+    a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c [@field:0:contents] [@introduced] =
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
@@ -239,12 +246,13 @@ File jlamp0.mlw:
 
 File "bench/ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    c [@field:0:contents] [@introduced] =
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
@@ -263,12 +271,14 @@ File jlamp0.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 21:
-    a [@field:0:contents] [@introduced] =
+    a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
-    c [@field:0:contents] [@introduced] =
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
@@ -294,12 +304,13 @@ File jlamp0.mlw:
 
 File "bench/ce/jlamp0.mlw", line 19, characters 15-28:
 Goal Postcondition from verification condition p2'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    c [@field:0:contents] [@introduced] =
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
@@ -312,7 +323,8 @@ File jlamp0.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 19:
-    a [@field:0:contents] [@introduced] [@model_trace:a] =
+    a [@field:0:contents] [@introduced] [@loop:bench/ce/jlamp0.mlw:21:4:157]
+      [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
@@ -324,12 +336,14 @@ File jlamp0.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 21:
-    a [@field:0:contents] [@introduced] =
+    a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
-    c [@field:0:contents] [@introduced] =
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":

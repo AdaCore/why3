@@ -37,7 +37,8 @@ let print_status fmt st =
   | Undone            -> fprintf fmt "Undone"
   | Scheduled         -> fprintf fmt "Scheduled"
   | Running           -> fprintf fmt "Running"
-  | Done r            -> fprintf fmt "Done(%a)" (Call_provers.print_prover_result ~json:false) r
+  | Done r            -> fprintf fmt "Done(@[<h>%a@])"
+                           (Call_provers.print_prover_result ~json:false) r
   | Interrupted       -> fprintf fmt "Interrupted"
   | Detached          -> fprintf fmt "Detached"
   | InternalFailure e ->
@@ -1074,25 +1075,25 @@ type report =
 let print_report fmt (r: report) =
   match r with
   | Result (new_r, old_r) ->
-    Format.fprintf fmt "new_result = %a, old_result = %a@."
+    Format.fprintf fmt "new_result = %a, old_result = %a"
       (Call_provers.print_prover_result ~json:false) new_r
       (Call_provers.print_prover_result ~json:false) old_r
   | CallFailed e ->
-    Format.fprintf fmt "Callfailed %a@." Exn_printer.exn_printer e
+    Format.fprintf fmt "Callfailed %a" Exn_printer.exn_printer e
   | Replay_interrupted ->
-    Format.fprintf fmt "Interrupted@."
+    Format.fprintf fmt "Interrupted"
   | Prover_not_installed ->
-    Format.fprintf fmt "Prover not installed@."
+    Format.fprintf fmt "Prover not installed"
   | Edited_file_absent _ ->
-    Format.fprintf fmt "No edited file@."
+    Format.fprintf fmt "No edited file"
   | No_former_result new_r ->
-    Format.fprintf fmt "new_result = %a, no former result@."
+    Format.fprintf fmt "new_result = %a, no former result"
       (Call_provers.print_prover_result ~json:false) new_r
 
 (* TODO to be removed when we have a better way to print *)
 let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
   let pp_elem fmt (id, pr, rl, report) =
-    fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %d, Result: %a@."
+    fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %d, Result: @[<h>%a@]"
       (Obj.magic id) Whyconf.print_prover pr
       rl.Call_provers.limit_time print_report report
   in
@@ -1272,7 +1273,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                                    Exn_printer.exn_printer exn
                   | Done res ->
                      assert (res.Call_provers.pr_answer = Call_provers.Valid);
-                     Debug.dprintf debug "Bisecting: %a.@."
+                     Debug.dprintf debug "@[<h>Bisecting: %a.@]@."
                        (Call_provers.print_prover_result ~json:false) res
                   end
                 in

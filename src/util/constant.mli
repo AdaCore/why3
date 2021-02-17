@@ -23,7 +23,7 @@ val compare_const : ?structural:bool -> constant -> constant -> int
    mathematically equal values might differ; otherwise. mathematical
    values are compared *)
 
-val int_const : BigInt.t -> constant
+val int_const : ?il_kind:int_literal_kind -> BigInt.t -> constant
 val int_const_of_int : int -> constant
 val real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> constant
 val string_const : string -> constant

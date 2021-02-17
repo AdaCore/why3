@@ -1,7 +1,7 @@
 Weakest Precondition
 File "bench/ce/ref_ex.mlw", line 7, characters 14-25:
 Goal Postcondition from verification condition test_post'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref_ex.mlw:
@@ -30,7 +30,7 @@ File ref_ex.mlw:
 
 File "bench/ce/ref_ex.mlw", line 13, characters 14-29:
 Goal Postcondition from verification condition test_post2'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref_ex.mlw:
@@ -64,7 +64,7 @@ File ref_ex.mlw:
 
 File "bench/ce/ref_ex.mlw", line 24, characters 12-36:
 Goal Postcondition from verification condition incr'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -135,7 +135,7 @@ File ref_ex.mlw:
 
 File "bench/ce/ref_ex.mlw", line 38, characters 14-36:
 Goal Loop invariant init from verification condition test_loop'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref_ex.mlw:
@@ -192,16 +192,16 @@ File ref_ex.mlw:
 
 File "bench/ce/ref_ex.mlw", line 39, characters 12-14:
 Goal Loop variant decrease from verification condition test_loop'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/ref_ex.mlw", line 38, characters 14-36:
 Goal Loop invariant preservation from verification condition test_loop'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    x [@field:0:contents] [@introduced] =
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96] =
       {"type": "Record",
        "val":
         {"Field":
@@ -246,7 +246,8 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 37:
-    [before iteration] x [@field:0:contents] [@introduced] =
+    [before iteration] x [@field:0:contents] [@introduced]
+      [@loop:bench/ce/ref_ex.mlw:37:2:96] =
       {"type": "Record",
        "val":
         {"Field":
@@ -279,12 +280,12 @@ File ref_ex.mlw:
 
 File "bench/ce/ref_ex.mlw", line 32, characters 12-23:
 Goal Postcondition from verification condition test_loop'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    x [@field:0:contents] [@introduced] =
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96] =
       {"type": "Record",
        "val":
         {"Field":
@@ -319,7 +320,8 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 32:
-    x [@field:0:contents] [@introduced] [@model_trace:x] =
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96]
+      [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
@@ -337,7 +339,7 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 37:
-    x [@field:0:contents] [@introduced] =
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96] =
       {"type": "Record",
        "val":
         {"Field":

@@ -38,12 +38,12 @@ let debug_ignore_diverges = Debug.register_info_flag "ignore_missing_diverges"
 let case_split = Ident.create_attribute "case_split"
 let add_case t = t_attr_add case_split t
 
-let clone_pv loc {pv_vs = {vs_name = id; vs_ty = ty}} =
+let clone_pv loc attrs {pv_vs = {vs_name = id; vs_ty = ty}} =
   (* we do not preserve the location of the initial pv
      in the new variable for SP, because we do not want
      to require a model for it and rely on "model_vc_*"
      attributes to produce new, correctly located, variables *)
-  let id = id_fresh ~attrs:id.id_attrs ?loc id.id_string in
+  let id = id_fresh ~attrs:(Sattr.union attrs id.id_attrs) ?loc id.id_string in
   create_vsymbol id ty
 
 let pv_is_unit v = ity_equal v.pv_ity ity_unit
@@ -365,7 +365,7 @@ type kode =
   | Kif    of pvsymbol * kode * kode          (* deterministic choice *)
   | Kcase  of pvsymbol * (pattern * kode) list    (* pattern matching *)
   | Khavoc of pvsymbol option Mpv.t Mreg.t *
-              Loc.position option           (* writes and assignments *)
+                Loc.position option * Sattr.t (* writes and assignments *)
   | Klet   of pvsymbol * term * term         (* let v = t such that f *)
   | Kval   of pvsymbol list * term        (* let vl = any such that f *)
   | Kcut   of term                        (* assert: check and assume *)
@@ -469,10 +469,10 @@ let k_unit res = Kval ([res], t_true)
 let bind_oldies o2v k = Mpv.fold (fun o v k ->
   Kseq (Klet (o, t_var v.pv_vs, t_true), 0, k)) o2v k
 
-let k_havoc loc eff k =
+let k_havoc loc attrs eff k =
   if Sreg.is_empty eff.eff_covers then k else
   let conv wr = Mpv.map (fun () -> None) wr in
-  Kseq (Khavoc (Mreg.map conv eff.eff_writes, loc), 0, k)
+  Kseq (Khavoc (Mreg.map conv eff.eff_writes, loc, attrs), 0, k)
 
 (* missing exceptional postconditions are set to True,
    unless we skip them altogether and let the exception
@@ -636,7 +636,7 @@ let rec k_expr env lps e res xmap =
           Kpar(k, Kseq (xk, 0, Kcont i))) xq xmap k in
         let k = List.fold_right assume_inv qinv k in
         (* oldies and havoc are common for all outcomes *)
-        let k = bind_oldies oldies (k_havoc loc eff k) in
+        let k = bind_oldies oldies (k_havoc loc attrs eff k) in
         (* ignore divergence here if we check it later *)
         let k = match ce.c_node with
           | Cfun e when not (Sattr.mem nt_attr e.e_attrs) -> k
@@ -682,7 +682,7 @@ let rec k_expr env lps e res xmap =
         let add_write r wfs acc =
           try Mreg.add (Mreg.find r t2f) (Mpv.map (fun v -> Some v) wfs) acc
           with Not_found -> acc in
-        Kseq (Khavoc (Mreg.fold add_write wr Mreg.empty, loc), 0, k_unit res)
+        Kseq (Khavoc (Mreg.fold add_write wr Mreg.empty, loc, attrs), 0, k_unit res)
     | Elet (LDvar (v, e0), e1) ->
         let k = k_expr env lps e1 res xmap in
         Kseq (k_expr env lps e0 v xmap, 0, k)
@@ -698,7 +698,7 @@ let rec k_expr env lps e res xmap =
         let add_axiom cty q k = if can_simp q then k else
           let p = Kval (cty.cty_args, sp_of_pre cty.cty_pre) in
           let ax = Kseq (p, 0, bind_oldies cty.cty_oldies (Kstop q)) in
-          Kseq (Kaxiom (k_havoc loc eff ax), 0, k) in
+          Kseq (Kaxiom (k_havoc loc attrs eff ax), 0, k) in
         let add_axiom cty q k =
           let pinv = inv_of_pvs env loc (cty_reads cty) in
           List.fold_right assert_inv pinv (add_axiom cty q k) in
@@ -732,9 +732,9 @@ let rec k_expr env lps e res xmap =
               let rec k_par = function
                 | [k] -> k | [] -> assert false
                 | k::kl -> Kpar (k, k_par kl) in
-              Kpar (k_havoc loc eff (k_par (k_rec env lps rdl)), k)
+              Kpar (k_havoc loc attrs eff (k_par (k_rec env lps rdl)), k)
           | LDsym (_, {c_node = Cfun e; c_cty = cty}) ->
-              Kpar (k_havoc loc eff (k_fun env lps cty e), k)
+              Kpar (k_havoc loc attrs eff (k_fun env lps cty e), k)
           | _ -> k end
     | Eif (e0, e1, e2) ->
         (* with both branches pure, switch to SP to avoid splitting *)
@@ -854,7 +854,7 @@ let rec k_expr env lps e res xmap =
         let k = Kseq (Kval ([], prev), 0, bind_oldies oldies k) in
         let k = List.fold_right assume_inv iinv k in
         let k = check_divergence k in
-        Kpar (j, k_havoc loc eff k)
+        Kpar (j, k_havoc loc attrs eff k)
     | Efor (vx, (a, d, b), vi, invl, e1) ->
         let int_of_pv = match vx.pv_vs.vs_ty.ty_node with
           | Tyapp (s,_) when ts_equal s ts_int ->
@@ -892,7 +892,7 @@ let rec k_expr env lps e res xmap =
         in
         let k = Kpar (k, Kval ([res], last)) in
         let k = List.fold_right assume_inv iinv k in
-        let k = Kpar (j, k_havoc loc eff k) in
+        let k = Kpar (j, k_havoc loc attrs eff k) in
         let k = check_divergence k in
         (* [ ASSUME a <= b+1 ;
              [ STOP inv[a]
@@ -1076,10 +1076,10 @@ let reflow vc_wp k =
 (* a "destination map" maps program variables (pre-effect state)
    to fresh vsymbols (post-effect state) *)
 
-let dst_of_wp loc wr wp =
+let dst_of_wp loc attrs wr wp =
   if Mreg.is_empty wr then Mpv.empty else
   let clone_affected v _ =
-    if pv_affected wr v then Some (clone_pv loc v) else None in
+    if pv_affected wr v then Some (clone_pv loc attrs v) else None in
   Mpv.mapi_filter clone_affected (t_freepvs Spv.empty wp)
 
 let adjustment dst = Mpv.fold (fun o n sbs ->
@@ -1234,14 +1234,16 @@ let ht_written = Hvs.create 17
 
 let fresh_loc_attrs = Loc.dummy_position, Sattr.empty
 
-let wrt_mk_loc_attr loc =
-  Opt.map (fun loc -> loc, create_written_attr loc) loc
+let wrt_mk_loc_attr loc attrs =
+  Opt.map (fun loc ->
+      let a = create_written_attr loc in
+      loc, Sattr.add a attrs) loc
 
 let wrt_add_loc_attr v = function
-  | Some (loc,attr) ->
+  | Some (loc,a) ->
       begin match Hvs.find ht_written v with
       | _, attrs ->
-          let attrs = Sattr.add attr attrs in
+          let attrs = Sattr.union a attrs in
           Hvs.replace ht_written v (loc,attrs)
       | exception Not_found -> ()
       end
@@ -1328,7 +1330,7 @@ let rec sp_expr kn k rdm dst = match k with
       (* log new "written" variables added to dst *)
       let new_written = ref [] in
       let mk_written v =
-        let n = clone_pv None v in
+        let n = clone_pv None Sattr.empty v in
         if relevant_for_counterexample v.pv_vs.vs_name then begin
           Hvs.add ht_written n fresh_loc_attrs;
           new_written := n :: !new_written
@@ -1428,7 +1430,7 @@ let rec sp_expr kn k rdm dst = match k with
         Mint.merge (join p) sp spm) spl spm in
       let sp_case (bl, wr) = sp_case t bl, wr in
       wp_case t wpl, Mint.map sp_case spm, Spv.add v rds
-  | Khavoc (wr, loc) ->
+  | Khavoc (wr, loc, attrs) ->
       let rd = Mint.find 0 rdm in
       let dst = Mpv.set_inter dst (pvs_affected wr rd) in
       if Mpv.is_empty dst then sp_expr kn (Kcont 0) rdm dst else
@@ -1437,7 +1439,7 @@ let rec sp_expr kn k rdm dst = match k with
       let add _ t fvs = t_freevars fvs t in
       let fvs = Mreg.fold add regs Mvs.empty in
       let fvs = Mpv.fold (fun _ -> Mvs.remove) dst fvs in
-      let loc_attr = wrt_mk_loc_attr loc in
+      let loc_attr = wrt_mk_loc_attr loc attrs in
       let update {pv_vs = o; pv_ity = ity} n sp =
         wrt_add_loc_attr n loc_attr;
         let t, fl = havoc kn wr regs (t_var o) ity [] in
@@ -1495,9 +1497,9 @@ and wp_expr kn k q = match k with
   | Kcase ({pv_vs = v}, bl) ->
       let branch (p,k) = t_close_branch p (wp_expr kn k q) in
       wp_case (t_var v) (List.map branch bl)
-  | Khavoc (wr, loc) ->
+  | Khavoc (wr, loc, attrs) ->
       let q = Mint.find 0 q in
-      let dst = dst_of_wp loc wr q in
+      let dst = dst_of_wp loc attrs wr q in
       if Mpv.is_empty dst then q else
       let regs = name_regions kn wr dst in
       let () = print_dst dst; print_regs regs in

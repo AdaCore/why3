@@ -30,40 +30,21 @@
             - Concrete: don't know (failure: many args for exec fun)
             - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
               
-<check-ce>Check model 2 ("bench/check-ce/anonymous5.mlw", line 7, characters 12-22)
-<check-ce>Validating model:
-          File anonymous5.mlw:
-            Line 6:
-              y = {"type": "Integer", "val": "-2878"}
-            Line 7:
-              y = {"type": "Integer", "val": "-2878"}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for y at "bench/check-ce/anonymous5.mlw", line 6, characters 7-8: (-2878)
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for y at "bench/check-ce/anonymous5.mlw", line 6, characters 7-8: (-2878)
-<rac-values>No value for result at "bench/check-ce/anonymous5.mlw", line 8, characters 2-5, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: don't know (failure: many args for exec fun)
-            - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
-              
 <check-ce>Models:
 - Checked model 0 (Concrete: don't know, Abstract: don't know)
     Summary: The following counterexample model has not been verified
     (failure: many args for exec fun)
-- Checked model 1 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (failure: many args for exec fun)
-- Selected model 2 (Concrete: don't know, Abstract: don't know)
+- Selected model 1 (Concrete: don't know, Abstract: don't know)
     Summary: The following counterexample model has not been verified
     (failure: many args for exec fun)
 File "bench/check-ce/anonymous5.mlw", line 7, characters 12-22:
 Goal Postcondition from verification condition g'vc.
-Prover result is: timeout (1.00s, 2469003 steps).
+Prover result is: Step limit exceeded (0.19s).
 The following counterexample model could not be verified
   (failure: many args for exec fun):
 File anonymous5.mlw:
   Line 6:
-    y = -2878 (-2878)
+    y = 0
   Line 7:
-    y = -2878 (-2878)
+    y = 0
 

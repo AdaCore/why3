@@ -336,7 +336,6 @@ end
 module mach.peano.Peano
   syntax type t      "int"
   syntax val  to_int "Z.of_int"
-  syntax val  of_int "Z.to_int"
   syntax val  zero   "0"
   syntax val  one    "1"
   syntax val  succ   "%1 + 1"   prec 8 8 7
@@ -349,9 +348,10 @@ module mach.peano.Peano
   syntax val  ne     "%1 <> %2" prec 11 11 10
   syntax val  neg    "- %1"     prec 5 4
   syntax val  abs    "abs"
-  syntax val  add    "%1 + %2"  prec 8 8 7
-  syntax val  sub    "%1 - %2"  prec 8 8 7
-  syntax val  mul    "%1 * %2"  prec 7 7 6
+  syntax val  add    "%1 + %2 (*%3 %4*)"  prec 8 8 7
+  syntax val  sub    "%1 - %2 (*%3 %4*)"  prec 8 8 7
+  syntax val  mul    "%1 * %2 (*%3 %4*)"  prec 7 7 6
+  syntax val  of_int "Z.to_int %1 (*%2 %3*)"
 end
 
 module mach.peano.ComputerDivision
@@ -373,8 +373,10 @@ end
 module mach.onetime.OneTime
   syntax type t      "int"
   syntax val  to_int "Z.of_int"
-  syntax val  zero   "0"
-  syntax val  one    "1"
+  syntax val  zero   "0 (*%1*)"
+  syntax val  one    "1 (*%1*)"
+    (* note: it is safe to ignore the argument of `zero` and `one`, of
+       type unit, thanks to the A-normal form of WhyML code. *)
   syntax val  succ   "%1 + 1"   prec 8 8 7
   syntax val  pred   "%1 - 1"   prec 8 8 7
   syntax val  lt     "%1 < %2"  prec 11 11 10
@@ -384,9 +386,10 @@ module mach.onetime.OneTime
   syntax val  eq     "%1 = %2"  prec 11 11 10
   syntax val  ne     "%1 <> %2" prec 11 11 10
 
+  syntax val to_peano "%1"
   syntax val transfer "%1"
   syntax val neg      "-%1"     prec 5 4
-  syntax val abs      "abs"
+  syntax val abs      "abs %1"
   syntax val add      "%1 + %2" prec 8 8 7
   syntax val sub      "%1 - %2" prec 8 8 7
   syntax val split    "(%1-%2, %2)" prec 0 13 13

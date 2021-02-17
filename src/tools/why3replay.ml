@@ -146,22 +146,22 @@ let print_report ses (id,p,l,r) =
      begin
        match r with
        | C.Result(new_res,old_res) ->
-          printf "%a instead of %a (timelimit=%d, memlimit=%d, steplimit=%d)@."
+          printf "@[<h>%a instead of %a (timelimit=%d, memlimit=%d, steplimit=%d)@]@."
                  print_result new_res print_result old_res
                  l.Call_provers.limit_time
                  l.Call_provers.limit_mem
                  l.Call_provers.limit_steps
        | C.No_former_result new_res ->
-          printf "no former result available, new result is: %a@."
+          printf "@[<h>no former result available, new result is: %a@]@."
                  print_result new_res
        | C.CallFailed msg ->
-          printf "internal failure '%a'@." Exn_printer.exn_printer msg;
+          printf "@[<h>internal failure '%a'@]@." Exn_printer.exn_printer msg;
        | C.Replay_interrupted ->
-          printf "replay interrupted@."
+          printf "@[<h>replay interrupted@]@."
        | C.Edited_file_absent f ->
-          printf "proof script absent (%s)@." f
+          printf "@[<h>proof script absent (%s)@]@." f
        | C.Prover_not_installed ->
-          printf "not installed@."
+          printf "@[<h>not installed@]@."
      end
   | _ ->
      let res =

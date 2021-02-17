@@ -1,11 +1,11 @@
 Weakest Precondition
 File "bench/ce/jlamp_projections.mlw", line 29, characters 8-18:
 Goal Precondition from verification condition p3'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/jlamp_projections.mlw", line 29, characters 2-18:
 Goal Integer overflow from verification condition p3'vc.
-Prover result is: unknown (sat).
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File jlamp_projections.mlw:
@@ -27,11 +27,11 @@ File jlamp_projections.mlw:
 
 File "bench/ce/jlamp_projections.mlw", line 42, characters 14-24:
 Goal Precondition from verification condition p3'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/jlamp_projections.mlw", line 42, characters 7-24:
 Goal Integer overflow from verification condition p3'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -44,7 +44,7 @@ File ref.mlw:
             "value":
              {"proj_name": "to_int",
               "type": "Proj",
-              "value": {"type": "Integer", "val": "127"}}}]}}
+              "value": {"type": "Integer", "val": "0"}}}]}}
 File jlamp_projections.mlw:
   Line 41:
     a [@field:0:contents] [@introduced] =
@@ -55,7 +55,7 @@ File jlamp_projections.mlw:
             "value":
              {"proj_name": "to_int",
               "type": "Proj",
-              "value": {"type": "Integer", "val": "127"}}}]}}
+              "value": {"type": "Integer", "val": "0"}}}]}}
   Line 42:
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type": "Record",
@@ -65,15 +65,15 @@ File jlamp_projections.mlw:
             "value":
              {"proj_name": "to_int",
               "type": "Proj",
-              "value": {"type": "Integer", "val": "127"}}}]}}
+              "value": {"type": "Integer", "val": "0"}}}]}}
 
 File "bench/ce/jlamp_projections.mlw", line 54, characters 29-39:
 Goal Precondition from verification condition p4'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/jlamp_projections.mlw", line 54, characters 21-39:
 Goal Integer overflow from verification condition p4'vc.
-Prover result is: unknown (sat).
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File jlamp_projections.mlw:

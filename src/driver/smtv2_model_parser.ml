@@ -8,7 +8,7 @@ module FromSexp = struct
 
   let is_name_start = function
     | '_' | 'a'..'z' | 'A'..'Z'
-    | '@' | '#' -> true
+    | '@' | '#' | '$' -> true
     | _ -> false
 
 
@@ -281,6 +281,15 @@ let debug = Debug.register_info_flag "smtv2_model_parser"
 ****************************************************************
 *)
 
+exception Smtv2_model_parsing_error of string
+
+let () =
+  Exn_printer.register
+    (fun fmt exn -> match exn with
+        | Smtv2_model_parsing_error msg ->
+            Format.fprintf fmt "Error@ while@ reading@ SMT@ model:@ %s" msg
+        | _ -> raise exn)
+
 let get_model_string input =
   (*    let r = Re.Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
         ignore (Re.Str.search_forward r input 0);
@@ -291,16 +300,20 @@ let get_model_string input =
 
 let parse_sexps str =
   let lexbuf = Lexing.from_string str in
-  try Sexp.read_list lexbuf with Sexp.Error ->
-    Warning.emit "Error@ while@ parsing@ of@ smtv2@ model at character %d"
-      (Lexing.lexeme_start lexbuf);
-    raise Exit
+  try
+    Sexp.read_list lexbuf
+  with Sexp.Error ->
+    let msg = Format.sprintf "Cannot parse as S-expression at character %d" 
+        (Lexing.lexeme_start lexbuf) in
+    raise (Smtv2_model_parsing_error msg)
 
 let model_of_sexps sexps =
-  try Opt.get_def Mstr.empty (FromSexp.model sexps) with FromSexp.E (sexp', s) ->
-    Warning.emit "Error@ while@ reading@ %s@ from@ smtv2@ model:@ %a"
-      s FromSexp.pp_sexp sexp';
-    raise Exit
+  try
+    Opt.get_def Mstr.empty (FromSexp.model sexps)
+  with FromSexp.E (sexp', s) ->
+    let msg = Format.asprintf "Cannot read the following S-expression as %s: %a"
+        s FromSexp.pp_sexp sexp' in
+    raise (Smtv2_model_parsing_error msg)
 
 (* Parses the model returned by CVC4, Z3 or Alt-ergo.
    Returns the list of pairs term - value *)

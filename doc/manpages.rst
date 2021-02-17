@@ -312,6 +312,13 @@ Options
    first). The prover *p* is the name or shortcut of a prover, with optional,
    comma-separated time limit and memory limit, e.g. ``cvc4,2,1000``.
 
+.. option:: --rac-try-negate
+
+   Try to decide the validity of an assertion by negating the assertion and the
+   prover answer (if any), when a prover is defined for RAC using
+   :option:`--rac-prover` but unable to decide the validity of the un-negated
+   assertion.
+
 Generating potential counterexamples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1508,9 +1515,11 @@ Options
 
 .. option:: --rac-prover=<p>
 
-   Use the prover `p` to check assertions in RAC when term reduction is
-   insufficient, with optional, comma-separated time and memory limit (e.g.
-   ``cvc4,2,1000``).
+   Same option as for :why3:tool:`prove`.
+
+.. option:: --rac-try-negate
+
+   Same option as for :why3:tool:`prove`.
 
 .. option:: --rac-fail-cannot-reduce
 
