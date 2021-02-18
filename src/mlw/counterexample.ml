@@ -422,7 +422,7 @@ let check_model reduce env pm model =
 let select_model_last_non_empty models =
   let models = List.filter (fun (_,m) -> not (is_model_empty m)) models in
   match List.rev models with
-  | (_,m) :: _ -> Some m
+  | (_,m) :: _ -> Some (m, UNKNOWN "No CE checking")
   | [] -> None
 
 type sort_models =
