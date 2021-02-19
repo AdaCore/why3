@@ -299,6 +299,11 @@ let rec snapshot v =
 and snapshot_field f =
   field (snapshot (field_get f))
 
+let snapshot_oldies oldies vsenv =
+  let aux old_pv pv =
+    Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs vsenv)) in
+  Mpv.fold aux oldies vsenv
+
 let ls_undefined =
   let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
   create_fsymbol (id_fresh "undefined") [] ty_a
@@ -2000,7 +2005,7 @@ and eval_expr' env e =
           | [] ->
              if env.rac.rac_abstract then begin
                  register_call env e.e_loc None mvs Log.ExecAbstract;
-                 exec_call_abstract ?loc:e.e_loc env ce.c_cty [] e.e_ity
+                 exec_call_abstract ~snapshot:cty.cty_oldies ?loc:e.e_loc env ce.c_cty [] e.e_ity
                end
              else begin
                  register_call env e.e_loc None mvs Log.ExecConcrete;
@@ -2017,7 +2022,7 @@ and eval_expr' env e =
       | Cany ->
          register_any_call env e.e_loc None Mvs.empty;
          if env.rac.do_rac then
-           exec_call_abstract ?loc:e.e_loc env cty [] e.e_ity
+           exec_call_abstract ~snapshot:cty.cty_oldies ?loc:e.e_loc env cty [] e.e_ity
          else (* We must check postconditions for abstract exec *)
            cannot_compute "cannot evaluate any-value with RAC disabled"
       | Capp (rs, pvsl) when
@@ -2325,13 +2330,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
   Debug.dprintf debug_trace_exec "@[<h>%tExec call %a %a@]@."
     pp_indent print_rs rs Pp.(print_list space print_value) arg_vs;
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
-  let oldies =
-    let snapshot_oldie old_pv pv =
-      Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs env.vsenv)) in
-    Mpv.fold snapshot_oldie rs.rs_cty.cty_oldies Mvs.empty in
-  let env =
-    let vsenv = Mvs.union (fun _ _ v -> Some v) env.vsenv oldies in
-    {env with vsenv} in
+  let env = {env with vsenv= snapshot_oldies rs.rs_cty.cty_oldies env.vsenv} in
   let exec_kind =
     let can_interpret_abstractly =
       if rs_equal rs rs_func_app then false else
@@ -2452,7 +2451,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
         | _ -> () );
       res
 
-and exec_call_abstract ?loc ?rs_name env cty arg_pvs ity_result =
+and exec_call_abstract ?snapshot ?loc ?rs_name env cty arg_pvs ity_result =
   (* let f (x1: ...) ... (xn: ...) = e
      ~>
      assert1 {f_pre};
@@ -2466,15 +2465,17 @@ and exec_call_abstract ?loc ?rs_name env cty arg_pvs ity_result =
      from the counterexample)
    *)
   let loc_or_dummy = Opt.get_def Loc.dummy_position loc in
+  let env = match snapshot with
+    | Some oldies -> {env with vsenv= snapshot_oldies oldies env.vsenv}
+    | None -> env in
   (* assert1 is already done above *)
   let res = match cty.cty_post with
-    | p :: _ -> let (vs,_) = open_post p in
-                id_clone vs.vs_name
+    | p :: _ -> let (vs,_) = open_post p in id_clone vs.vs_name
     | _ -> id_fresh "result" in
   let res = create_vsymbol res (ty_of_ity ity_result) in
   let vars_map = Mpv.of_list (List.combine cty.cty_args arg_pvs) in
-  let asgn_wrt = assign_written_vars ~vars_map
-                   cty.cty_effect.eff_writes loc_or_dummy env in
+  let asgn_wrt =
+    assign_written_vars ~vars_map cty.cty_effect.eff_writes loc_or_dummy env in
   List.iter asgn_wrt (Mvs.keys env.vsenv);
   let posts_vsenv =
     let aux pv =
