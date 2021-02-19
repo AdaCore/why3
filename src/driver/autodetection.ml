@@ -225,7 +225,11 @@ module Detected_binary = struct
     Whyconf.User.set_simple_family config section_name family
 
   let add rc m =
-    let l = List.filter (fun x -> x.binary <> m.binary) (load rc) in
+    let l =
+      List.map
+        (fun x -> if x.shortcut = m.shortcut then {x with shortcut = None} else x )
+        (load rc)
+    in
     set rc (m::l)
 
 end
@@ -268,7 +272,11 @@ module Manual_binary = struct
     Whyconf.User.set_simple_family rc section_name family
 
   let add rc m =
-    let l = List.filter (fun x -> x.shortcut <> m.shortcut) (load rc) in
+    let l =
+      List.map
+        (fun x -> if x.shortcut = m.shortcut then {x with shortcut = None} else x )
+        (load rc)
+    in
     set rc (m::l)
 
 end
