@@ -268,10 +268,12 @@ let rec print_value fmt v =
         let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
         fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
           (List.combine fs vs)
+      else
+        fprintf fmt "@[<h>(%a%a)@]" print_rs rs
+          Pp.(print_list_pre space print_value) (List.map field_get vs)
   | Varray a ->
       fprintf fmt "@[[%a]@]"
-        (Pp.print_list Pp.semi print_value)
-        (Array.to_list a)
+        (Pp.print_list Pp.semi print_value) (Array.to_list a)
   | Vpurefun (_, mv, v) ->
       fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
         (Mv.bindings mv) print_value v
