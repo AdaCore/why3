@@ -213,7 +213,7 @@ let rec import_model_value known th_known ity v =
             | v -> import_model_value known th_known field_ity v
             | exception Not_found ->
                 (* TODO Better create a default value? Requires an [Env.env]. *)
-                undefined_value ity in
+                undefined_value field_ity in
           let vs = List.map aux def.Pdecl.itd_fields in
           constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
