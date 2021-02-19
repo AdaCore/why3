@@ -42,25 +42,27 @@ end
 
 val read_auto_detection_data: Whyconf.config -> Prover_autodetection_data.t
 
+type binaries
+
 (** Detect the provers *)
 val request_binaries_version :
-  Whyconf.config -> Prover_autodetection_data.t -> Detected_binary.t list Wstdlib.Mstr.t
+  Whyconf.config -> Prover_autodetection_data.t -> binaries
 
 val request_manual_binaries_version :
   Prover_autodetection_data.t -> Manual_binary.t list ->
-  Detected_binary.t list Wstdlib.Mstr.t
+  binaries
 
 val set_binaries_detected:
-  Detected_binary.t list Wstdlib.Mstr.t -> Whyconf.config -> Whyconf.config
+  binaries -> Whyconf.config -> Whyconf.config
 (** replace all the binaries detected by the given one in the configuration *)
 
 val update_binaries_detected:
-  Detected_binary.t list Wstdlib.Mstr.t -> Whyconf.config -> Whyconf.config
+  binaries -> Whyconf.config -> Whyconf.config
 (** replace or add only the binaries detected by the given one in the
     configuration *)
 
 val compute_builtin_prover:
-  Detected_binary.t list Wstdlib.Mstr.t ->
+  binaries ->
   Prover_autodetection_data.t ->
   unit
 (** Compute the builtin prover. Only print errors if {!is_config_command} is

@@ -163,7 +163,7 @@ Options
 
 .. option:: --add-prover=<known>,<shortcut>,<file>
 
-   Check the executable program ``<file>`` as if it was the known binary
+   Check the executable program ``<file>`` as if it was the known prover
    ``<known>``, and register it as ``<shortcut>``. It removes previous manually
    added binary with the same shortcut.
 
@@ -172,11 +172,11 @@ Options
 
    ::
 
-      why3 config --add-prover=alt-ergo,new-ae,/home/me/bin/alt-ergo-trunk
+      why3 config --add-prover=Alt-Ergo,new-ae,/home/me/bin/alt-ergo-trunk
 
 .. option:: --list-binaries
 
-   List the known prover binary names, as used by option :option:`--add-prover`.
+   List the known prover names, as used by option :option:`--add-prover`.
 
 .. why3:tool:: prove
 .. _sec.why3prove:
