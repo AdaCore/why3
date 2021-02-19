@@ -1866,7 +1866,7 @@ let value_of_term known t =
     | Ttrue -> bool_value true
     | Tfalse -> bool_value false
     | Tconst c -> value_of_constant ty c
-    | Tapp (ls, ts)  ->
+    | Tapp (ls, ts) when ls.ls_constr > 0 ->
         let rs = try restore_rs ls with Not_found -> raise Exit in
         let fs = match (ity_of_ty ty).ity_node with
           | Ityapp (its, _, _) | Ityreg {reg_its= its} ->
@@ -1874,8 +1874,7 @@ let value_of_term known t =
           | _ -> raise Exit in
         let vs = List.map aux ts in
         value ty (Vconstr (rs, fs, List.map field vs))
-    | Tvar _ | Tif _ | Tlet _ | Tcase _ | Teps _
-    | Tquant _ | Tbinop _ | Tnot _ -> raise Exit in
+    | _ -> raise Exit in
   try Some (aux t) with Exit -> None
 
 (* Find a postcondition of the form [ensures { result = t (/\ ...) }], compute_fraction
@@ -2424,16 +2423,20 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                 check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
                 match rs.rs_field, arg_vs with
-                | Some pv, [{v_desc= Vconstr (cstr, _, args)}] ->
+                | Some pv, [{v_desc= Vconstr (cstr, _, args)} as v] ->
                     let rec search constr_args args =
                       match constr_args, args with
                       | pv2 :: pvl, v :: vl ->
                           if pv_equal pv pv2 then
                             Normal (field_get v)
                           else search pvl vl
-                      | _ -> assert false in
+                      | _ -> kasprintf failwith "Cannot project %a by %a"
+                               print_value v print_rs rs
+                    in
                     search cstr.rs_cty.cty_args args
-                | _ -> assert false )
+                | _ -> kasprintf failwith "Cannot project values %a by %a"
+                         Pp.(print_list comma print_value) arg_vs
+                         print_rs rs )
             | exception Not_found ->
                 cannot_compute "definition of routine %s could not be found"
                   rs.rs_name.id_string in
