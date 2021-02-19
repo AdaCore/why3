@@ -342,8 +342,8 @@ let sanitize_exec =
 
 let check_version version (_,schema) = Re.Str.string_match schema version 0
 
-let known_version env exec_name =
-  Hstr.replace env.prover_unknown_version exec_name None
+let known_version env binary =
+  Hstr.replace env.prover_unknown_version binary None
 
 let unknown_version env exec_name binary shortcut prover_config data priority =
   if not (Hstr.mem env.prover_unknown_version binary)
@@ -585,11 +585,11 @@ let detect_exec env data acc exec_name =
   List.fold_left (fun acc p ->
       try
         let prover_config = detect_exec_skip env data p in
-        known_version env exec_name;
+        known_version env p.binary;
         add_prover_with_uniq_id prover_config acc
       with
       | Skip -> acc
-      | Discard -> known_version env exec_name; acc
+      | Discard -> known_version env p.binary; acc
     )
     acc l
 
@@ -629,8 +629,8 @@ let convert_shortcuts env =
     check_prover_auto_level env p; Mstr.add s p acc
   ) env.prover_shortcuts Mstr.empty
 
-let run_auto_detection' env l =
-  let detected = List.fold_left (detect_prover env) Mprover.empty l in
+let run_auto_detection env skeletons =
+  let detected = List.fold_left (detect_prover env) Mprover.empty skeletons in
   let length_recognized = Mprover.cardinal detected in
   let detected = detect_unknown env detected in
   let length_detected = Mprover.cardinal detected in
@@ -671,7 +671,7 @@ let () =
     let config = Whyconf.default_config save_to in
     let datas = read_auto_detection_data config in
     let env = create_env binaries datas.shortcuts in
-    let detected = run_auto_detection' env datas.skeletons in
+    let detected = run_auto_detection env datas.skeletons in
     generate_builtin_config env datas detected config
   in
   Whyconf.provers_from_detected_provers :=
@@ -779,5 +779,5 @@ let update_binaries_detected binaries config =
 
 let compute_builtin_prover detected datas =
   let env = create_env detected datas.Prover_autodetection_data.shortcuts in
-  let _ = run_auto_detection' env datas.skeletons in
+  let _ = run_auto_detection env datas.skeletons in
   ()
