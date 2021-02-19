@@ -3530,19 +3530,23 @@ case $? in #(
      ;;
 esac
 
-as_arg_v1=$OCAMLVERSION
-as_arg_v2=4.08.0
-awk "$as_awk_strverscmp" v1="$as_arg_v1" v2="$as_arg_v2" /dev/null
-case $? in #(
-  1) :
-    new_dynlink=no ;; #(
-  0) :
-    new_dynlink=yes ;; #(
-  2) :
-    new_dynlink=yes ;; #(
-  *) :
-     ;;
-esac
+# The below test doesn't work on our windows machines. We hardcode new_dynlink
+# to "no", which is appropriate for ocaml 4.07.1
+
+# as_arg_v1=$OCAMLVERSION
+# as_arg_v2=4.08.0
+# awk "$as_awk_strverscmp" v1="$as_arg_v1" v2="$as_arg_v2" /dev/null
+# case $? in #(
+#   1) :
+#     new_dynlink=no ;; #(
+#   0) :
+#     new_dynlink=yes ;; #(
+#   2) :
+#     new_dynlink=yes ;; #(
+#   *) :
+#      ;;
+# esac
+new_dynlink=no
 
 
 # Ocaml library path
