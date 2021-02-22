@@ -2503,12 +2503,18 @@ let bind_globals ?rs_main mod_known env =
   let get_value env id opt_e ity =
     let name = model_element_name_of_ident id in
     match env.rac.get_value ~name ?loc:id.id_loc ity with
-    | Some v -> register_used_value env id.id_loc id v; v
+    | Some v ->
+         Debug.dprintf debug_rac_values "Value from model for global %a: %a@."
+           print_decoded id.id_string print_value v;
+         register_used_value env id.id_loc id v; v
     | None ->
        match opt_e with
          | None ->
              if env.rac.do_rac then (
                let v = default_value_of_type env.env mod_known ity in
+               Debug.dprintf debug_rac_values
+                 "Type default value for global %a: %a@."
+                 print_decoded id.id_string print_value v;
                register_used_value env id.id_loc id v; v )
              else
                cannot_compute "any-value with RAC disabled"
@@ -2517,20 +2523,26 @@ let bind_globals ?rs_main mod_known env =
           register_const_init env id.id_loc id;
           match eval_expr env' e with
           | Normal v -> v
-          | Excep _ -> cannot_compute "initialization of global variable %a raised an exception"
-                         print_decoded id.id_string
-          | Irred _ -> cannot_compute "initialization of global variable %a is irreducible"
-                         print_decoded id.id_string
+          | Excep _ ->
+              cannot_compute "initialization of global variable %a raised an \
+                              exception" print_decoded id.id_string
+          | Irred _ ->
+              cannot_compute "initialization of global variable %a is \
+                              irreducible" print_decoded id.id_string
   in
   let open Pdecl in
   let eval_global id d env =
     match d.pd_node with
     | PDlet (LDvar (pv, e)) ->
-        Debug.dprintf debug_trace_exec "EVAL GLOBAL VAR %a@." print_decoded id.id_string;
+        Debug.dprintf debug_trace_exec "EVAL GLOBAL VAR %a at %a@."
+          print_decoded id.id_string Pp.(print_option_or_default "NO LOC"
+                                           print_loc') pv.pv_vs.vs_name.id_loc;
         let v = get_value env pv.pv_vs.vs_name (Some e) e.e_ity in
         bind_vs pv.pv_vs v env
     | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
-        Debug.dprintf debug_trace_exec "EVAL GLOBAL SYM CONST %a@." print_decoded id.id_string;
+        Debug.dprintf debug_trace_exec "EVAL GLOBAL SYM CONST %a at %a@."
+          print_decoded id.id_string Pp.(print_option_or_default "NO LOC"
+                                           Pretty.print_loc') rs.rs_name.id_loc;
         assert (ce.c_cty.cty_args = []);
         let opt_e = match ce.c_node with
           | Cany -> None | Cfun e -> Some e
