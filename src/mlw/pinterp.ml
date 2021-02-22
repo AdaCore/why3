@@ -43,6 +43,10 @@ let debug_disable_builtin_mach =
   Debug.register_flag "execute-no-builtin-mach"
     ~desc:"don't register builtins for modules under stdlib/mach"
 
+let debug_array_as_update_chains_not_epsilon =
+  Debug.register_flag "rac-array-as-update-chains"
+    ~desc:"represent arrays in terms for RAC as chains of updates, not epsilons"
+
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
   let pp_binding fmt (k, v) =
@@ -1157,17 +1161,6 @@ let find_definition env (rs: rsymbol) =
   (* else look for a global function *)
   find_global_definition env.pmodule.Pmodule.mod_known rs
 
-(* Parameter for the conversion of arrays to terms. With [`Update] an array [a] of length
-   [n] is converted into a formula [(make n undefined)[0 <- a[0]]...[n-1 <- a[n-1]]], with
-   [`Epsilon] it is converted to [(epsilon v. v.length = n /\ v[0] = a[0] /\ ... /\ a[n-1]
-   = a[n-1])]. *)
-let term_of_array : [< `Update | `Epsilon ] =
-  match Sys.getenv "WHY3PINTERPARRAY" with
-  | exception Not_found -> `Epsilon
-  | "epsilon" -> `Epsilon
-  | "update" -> `Update
-  | _ -> failwith "WHY3PINTERPARRAY must be `epsilon` or `update`"
-
 (** Convert a value into a term. The first component of the result are additional bindings
    from closures. *)
 let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * term =
@@ -1234,46 +1227,45 @@ let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * t
       let mt = ty_match mt arg.vs_ty ty_arg in
       let t = t_ty_subst mt mv t in
       vsenv, t_lambda [vs_arg] [] t
-  | Varray arr -> (match term_of_array with
-      | `Update ->
-          (* TERM: (make <length arr> undefined)[<i> <- <arr[i]>] *)
-          let open Pmodule in
-          let {mod_theory= {Theory.th_export= ns}} = read_module env.env ["array"] "Array" in
-          let ts_array = Theory.ns_find_ts ns ["array"] in
-          let ls_make = Theory.ns_find_ls ns ["make"] in
-          let ls_update = Theory.ns_find_ls ns [Ident.op_update ""] in
-          let t_length = t_nat_const (Array.length arr) in
-          let ty_elt = ty_app_arg ts_array 0 v_ty in
-          let t_undefined = fs_app ls_undefined [] ty_elt in
-          let t0 = fs_app ls_make [t_length; t_undefined] v_ty in
-          let rec loop vsenv sofar ix =
-            if ix = Array.length arr then vsenv, sofar
-            else
-              let t_ix = t_nat_const ix in
-              let vsenv, t_v = term_of_value ~ty_mt env vsenv arr.(ix) in
-              let sofar = fs_app ls_update [sofar; t_ix; t_v] v_ty in
-              loop vsenv sofar (succ ix) in
-          loop vsenv t0 0
-      | `Epsilon ->
-          (* TERM: epsilon v. v.length = length arr /\ v[0] = arr.(ix) /\ ... *)
-          let open Pmodule in
-          let {mod_theory= {Theory.th_export= ns}} = read_module env.env ["array"] "Array" in
-          let ts_array = Theory.ns_find_ts ns ["array"] in
-          let ls_length = Theory.ns_find_ls ns ["length"] in
-          let ls_get = Theory.ns_find_ls ns [op_get ""] in
-          let v = create_vsymbol (id_fresh "a") v_ty in
-          let t_eq_length = (* v.length = length arr *)
-            t_equ (fs_app ls_length [t_var v] ty_int)
-              (t_nat_const (Array.length arr)) in
-          let elt_ty = ty_app_arg ts_array 0 v_ty in
-          let rec loop vsenv sofar ix = (* v[ix] = arr.(ix) *)
-            if ix = Array.length arr then vsenv, List.rev sofar else
-              let vsenv, t_a_ix = term_of_value ~ty_mt env vsenv arr.(ix) in
-              let t_eq_ix = t_equ (fs_app ls_get [t_var v; t_nat_const ix] elt_ty) t_a_ix in
-              loop vsenv (t_eq_ix :: sofar) (succ ix) in
-          let vsenv, t_eq_ixs = loop vsenv [] 0 in
-          let t = t_and_l (t_eq_length :: t_eq_ixs) in
-          vsenv, t_eps (t_close_bound v t) )
+  | Varray arr ->
+      let open Pmodule in
+      let {mod_theory= {Theory.th_export= ns}} =
+        read_module env.env ["array"] "Array" in
+      let ts_array = Theory.ns_find_ts ns ["array"] in
+      if Debug.test_flag debug_array_as_update_chains_not_epsilon then
+        (* TERM: (make <length arr> undefined)[<i> <- <arr[i]>] *)
+        let ls_make = Theory.ns_find_ls ns ["make"] in
+        let ls_update = Theory.ns_find_ls ns [Ident.op_update ""] in
+        let t_length = t_nat_const (Array.length arr) in
+        let ty_elt = ty_app_arg ts_array 0 v_ty in
+        let t_undefined = fs_app ls_undefined [] ty_elt in
+        let t0 = fs_app ls_make [t_length; t_undefined] v_ty in
+        let rec loop vsenv sofar ix =
+          if ix = Array.length arr then vsenv, sofar
+          else
+            let t_ix = t_nat_const ix in
+            let vsenv, t_v = term_of_value ~ty_mt env vsenv arr.(ix) in
+            let sofar = fs_app ls_update [sofar; t_ix; t_v] v_ty in
+            loop vsenv sofar (succ ix) in
+        loop vsenv t0 0
+      else
+        (* TERM: epsilon v. v.length = length arr /\ v[0] = arr.(ix) /\ ... *)
+        let ls_length = Theory.ns_find_ls ns ["length"] in
+        let ls_get = Theory.ns_find_ls ns [op_get ""] in
+        let v = create_vsymbol (id_fresh "a") v_ty in
+        let t_eq_length = (* v.length = length arr *)
+          t_equ (fs_app ls_length [t_var v] ty_int)
+            (t_nat_const (Array.length arr)) in
+        let elt_ty = ty_app_arg ts_array 0 v_ty in
+        let rec loop vsenv sofar ix = (* v[ix] = arr.(ix) *)
+          if ix = Array.length arr then vsenv, List.rev sofar else
+            let vsenv, t_a_ix = term_of_value ~ty_mt env vsenv arr.(ix) in
+            let t_eq_ix =
+              t_equ (fs_app ls_get [t_var v; t_nat_const ix] elt_ty) t_a_ix in
+            loop vsenv (t_eq_ix :: sofar) (succ ix) in
+        let vsenv, t_eq_ixs = loop vsenv [] 0 in
+        let t = t_and_l (t_eq_length :: t_eq_ixs) in
+        vsenv, t_eps (t_close_bound v t)
   | Vpurefun (ty, m, def) ->
       (* TERM: fun x -> if x = k0 then v0 else ... else def *)
       let vs_arg = create_vsymbol (id_fresh "x") ty in
