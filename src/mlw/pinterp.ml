@@ -39,6 +39,10 @@ let debug_rac_check_term_result =
   Debug.register_info_flag "rac-check-term-result"
     ~desc:"print the result when terms are checked for validity"
 
+let debug_disable_builtin_mach =
+  Debug.register_flag "execute-no-builtin-mach"
+    ~desc:"don't register builtins for modules under stdlib/mach"
+
 let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, rbrace))
     pp_key pp_value fmt l =
   let pp_binding fmt (k, v) =
@@ -963,9 +967,6 @@ let built_in_modules () =
       "div",           eval_int_op BigInt.euclidean_div;
       "mod",           eval_int_op BigInt.euclidean_mod
     ];
-    builtin ["mach"; "int"] "Byte" bounded_int_ops;
-    builtin ["mach"; "int"] "Int31" bounded_int_ops;
-    builtin ["mach"; "int"] "Int63" bounded_int_ops;
     builtin1t ["ieee_float"] "RoundingMode" ("mode", dummy_type) (fun ts -> [
       "RNE",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode To_Nearest)));
       "RNA",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Away_From_Zero)));
@@ -1028,6 +1029,10 @@ let built_in_modules () =
         ]);
     float_module 32 ~prec:24 "Float32";
     float_module 64 ~prec:53 "Float64";
+  ] @ if Debug.test_flag debug_disable_builtin_mach then [] else [
+    builtin ["mach"; "int"] "Byte" bounded_int_ops;
+    builtin ["mach"; "int"] "Int31" bounded_int_ops;
+    builtin ["mach"; "int"] "Int63" bounded_int_ops;
   ]
 
 let add_builtin_mo env (Builtin_module {path; name; types; values}) =

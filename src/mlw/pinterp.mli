@@ -271,3 +271,8 @@ val ity_components : Ity.ity -> Ity.itysymbol * Ity.ity list * Ity.ity list
 
 (** Checks if the argument is a range type *)
 val is_range_ty : Ty.ty -> bool
+
+(** {2 Configuration by debug flags} *)
+
+val debug_disable_builtin_mach : Debug.flag
+(** Don't register builtins for machine-dependent modules under stdlib/mach. *)
