@@ -199,24 +199,15 @@ module Detected_binary = struct
 
   let load_one acc section =
     try
-      let v = match get_stringo section "exec_name" with
-        | Some exec_name ->
-            {
-              name = Exec_name exec_name;
-              version = get_string section "version";
-              shortcut = get_stringo section "shortcut";
-            }
-        | None ->
-            {
-              name = Name { name = get_string section "name";
-                            binary = get_string section "binary" };
-              version = get_string section "version";
-              shortcut = get_stringo section "shortcut";
-            }
-      in
-      v::acc
+      let exec = get_string section "exec_name" in
+      let name = match get_stringo section "name" with
+        | Some name -> Name { name; binary = exec }
+        | None -> Exec_name exec in
+      let version = get_string section "version" in
+      let shortcut = get_stringo section "shortcut" in
+      { name; version; shortcut } :: acc
     with MissingField s ->
-      Warning.emit "[Warning] cannot load a detected_prover section: missing field '%s'@." s;
+      Warning.emit "cannot load a detected_prover section: missing field '%s'@." s;
       acc
 
   let load_rc rc =
@@ -236,7 +227,7 @@ module Detected_binary = struct
           set_string section "exec_name" exec_name
       | Name { name; binary } ->
           let section = set_string section "name" name in
-          let section = set_string section "binary" binary in
+          let section = set_string section "exec_name" binary in
           section
     in
     section
