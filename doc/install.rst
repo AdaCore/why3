@@ -217,7 +217,7 @@ added to specify names of prover executables:
 
 the first argument (here ``cvc4``) must be one of the provers' known
 executable names. The list of these names can be obtained
-using :option:`why3 config --list-binaries`.
+using :option:`why3 config --list-supported-provers`.
 They can also be found in the file :file:`provers-detection-data.conf`,
 typically located in :file:`/usr/local/share/why3` after installation. See
 :numref:`sec.proverdetectiondata` for details.

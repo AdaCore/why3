@@ -161,22 +161,22 @@ Options
 
    Only show the expanded version of the configuraion file
 
-.. option:: --add-prover=<known>,<shortcut>,<file>
+.. option:: --add-prover=<name>,<shortcut>,<file>
 
-   Check the executable program ``<file>`` as if it was the known prover
-   ``<known>``, and register it as ``<shortcut>``. It removes previous manually
-   added binary with the same shortcut.
+   Detect the program ``<file>`` as an executable for prover ``<name>``,
+   and register it as ``<shortcut>`` (potentially empty).
 
-   Example: to add an Alt-Ergo
-   executable :file:`/home/me/bin/alt-ergo-trunk`, one can type
+   For example, to add an Alt-Ergo
+   executable :file:`/home/me/bin/alt-ergo-trunk` with shortcut
+   ``new-ae``, one can type
 
    ::
 
       why3 config --add-prover=Alt-Ergo,new-ae,/home/me/bin/alt-ergo-trunk
 
-.. option:: --list-binaries
+.. option:: --list-supported-provers
 
-   List the known prover names, as used by option :option:`--add-prover`.
+   List the names of supported provers, as used by option :option:`--add-prover`.
 
 .. why3:tool:: prove
 .. _sec.why3prove:

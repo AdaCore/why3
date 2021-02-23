@@ -46,11 +46,11 @@ let spec =
                                 Queue.add {Autodetection.Manual_binary.same_as;
                                            shortcut;
                                            binary } prover_bins),
-    "<id>,<shortcut>,<file> add a new prover executable as if it was id";
+    "<name>,<shortcut>,<file> add a new executable for prover <name>";
     KLong "show-config", Hnd0 (fun () -> show_config := true),
     " show the expansion of the configuration";
-    KLong "list-binaries", Hnd0 (fun () -> opt_list_binaries := true),
-    " list name of binaries looked for";
+    KLong "list-supported-provers", Hnd0 (fun () -> opt_list_binaries := true),
+    " list supported provers";
     KLong "install-plugin", Hnd1 (AString, add_plugin),
     "<file> copy a plugin to the current library directory";
     KLong "dont-save", Hnd0 (fun () -> save := false),
@@ -89,7 +89,7 @@ let main () =
 
   if !opt_list_binaries then begin
     opt_list := true;
-    printf "@[<hov 2>Binaries looked for:@\n%a@]@\n@."
+    printf "@[<hov 2>Supported provers:@\n%a@]@\n@."
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Autodetection.list_binaries ()))
   end;
