@@ -42,10 +42,10 @@ let spec =
     KLong "detect", Hnd0 (fun () -> ()),
     " deprecated does nothing";
     KLong "add-prover", Hnd1 (APair (',', AString, (APair (',', AString, AString))),
-                              fun (same_as, (shortcut, binary)) ->
-                                Queue.add {Autodetection.Manual_binary.same_as;
-                                           shortcut;
-                                           binary } prover_bins),
+      fun (same_as, (shortcut, binary)) ->
+      Queue.add {Autodetection.Manual_binary.same_as;
+                 shortcut = if shortcut = "" then None else Some shortcut;
+                 binary } prover_bins),
     "<name>,<shortcut>,<file> add a new executable for prover <name>";
     KLong "show-config", Hnd0 (fun () -> show_config := true),
     " show the expansion of the configuration";

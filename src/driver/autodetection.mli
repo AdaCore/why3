@@ -33,7 +33,7 @@ module Manual_binary: sig
   type t = {
     same_as  : string;
     binary : string; (* custom executable *)
-    shortcut: string;
+    shortcut: string option;
   }
 
   val add: Whyconf.config -> t -> Whyconf.config

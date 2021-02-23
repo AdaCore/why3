@@ -251,21 +251,21 @@ module Manual_binary = struct
   let section_name = "manual_binary"
 
   type t = {
-    same_as  : string;
+    same_as : string;
     binary : string; (* custom executable *)
-    shortcut: string;
+    shortcut: string option;
   }
 
   let load_one acc section =
     try
       let v = {
-        same_as = get_string section "same_as";
-        binary = get_string section "binary";
-        shortcut = get_string section "shortcut";
+        same_as = get_string section "name";
+        binary = get_string section "exec_name";
+        shortcut = get_stringo section "shortcut";
       } in
       v::acc
     with MissingField s ->
-      Warning.emit "[Warning] cannot load a manual_prover section: missing field '%s'@." s;
+      Warning.emit "cannot load a manual_prover section: missing field '%s'@." s;
       acc
 
   let load rc =
@@ -274,9 +274,9 @@ module Manual_binary = struct
 
   let set_one prover =
     let section = empty_section in
-    let section = set_string section "same_as" prover.same_as in
-    let section = set_string section "binary" prover.binary in
-    let section = set_string section "shortcut" prover.shortcut in
+    let section = set_string section "name" prover.same_as in
+    let section = set_string section "exec_name" prover.binary in
+    let section = set_stringo section "shortcut" prover.shortcut in
     section
 
   let set rc detected_provers =
@@ -768,7 +768,7 @@ let detected_of_manuals options manuals =
           let name = Detected_binary.Name { name = x.same_as; binary = x.binary } in
           match detect_prover name switch regexp with
           | Some r ->
-              let r = { r with shortcut = Some x.shortcut } in
+              let r = { r with shortcut = x.shortcut } in
               Mstr.add x.same_as
                 (r::(Mstr.find_def [] x.same_as acc))
                 acc
