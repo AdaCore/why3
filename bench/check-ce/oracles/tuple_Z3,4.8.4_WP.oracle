@@ -2,13 +2,13 @@
 <check-ce>Validating model:
           File tuple.mlw:
             Line 5:
-              b = {"type": "Integer", "val": "1"}
+              b [@introduced] = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 14-23, taking default.
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File int.mlw:
@@ -106,15 +106,15 @@
 <check-ce>Validating model:
           File tuple.mlw:
             Line 5:
-              a = {"type": "Integer", "val": "0"}
-              b = {"type": "Integer", "val": "2"}
-              result = {"type": "Integer", "val": "1"}
+              a [@introduced] = {"type": "Integer", "val": "0"}
+              b [@introduced] = {"type": "Integer", "val": "2"}
+              result [@introduced] = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 14-23, taking default.
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File int.mlw:
@@ -215,7 +215,7 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/tuple.mlw", line 5, characters 38-43:
 Goal Postcondition from verification condition swap'vc.
-Prover result is: Step limit exceeded (0.38s).
+Prover result is: Step limit exceeded (0.26s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

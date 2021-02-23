@@ -1,14 +1,14 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: Valid (0.02s, 24 steps).
+Prover result is: Valid (0.00s, 24 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: Valid (0.02s, 1775 steps).
+Prover result is: Valid (0.00s, 1775 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Valid (0.01s, 1646 steps).
+Prover result is: Valid (0.00s, 1646 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce>Validating model:
@@ -16,7 +16,9 @@ Prover result is: Valid (0.01s, 1646 steps).
             Line 5:
               the check fails with all inputs
             Line 8:
-              x =
+              x [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while1.mlw:8:4:113]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -26,11 +28,14 @@ Prover result is: Valid (0.01s, 1646 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>No value for result at "bench/check-ce/while1.mlw", line 6, characters 16-17, taking default.
-<rac-values>No value for result at "bench/check-ce/while1.mlw", line 7, characters 16-17, taking default.
-<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113:
-              {contents= 0}
-<rac-values>No value for i at "bench/check-ce/while1.mlw", line 8, characters 4-113, taking default.
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while1.mlw", line 6, characters 16-17: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while1.mlw", line 7, characters 16-17: {contents=
+                                                                    0}
+<rac-values>Value from model for x at "bench/check-ce/while1.mlw", line 8, characters 4-113: {contents=
+                                                                    0}
+<rac-values>Value type default for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -153,26 +158,34 @@ Prover result is: Valid (0.01s, 1646 steps).
 <check-ce>Validating model:
           File while1.mlw:
             Line 5:
-              x =
+              x_vc_constant [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while1.mlw:8:4:113]
+                [@mlw:reference_var] [@model_trace:x] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 8:
-              i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while1.mlw:8:4:113]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-              i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while1.mlw:8:4:113]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-              x =
+              x [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while1.mlw:8:4:113]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -182,12 +195,14 @@ Prover result is: Valid (0.01s, 1646 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>No value for result at "bench/check-ce/while1.mlw", line 6, characters 16-17, taking default.
-<rac-values>No value for result at "bench/check-ce/while1.mlw", line 7, characters 16-17, taking default.
-<rac-values>Value imported for x at "bench/check-ce/while1.mlw", line 8, characters 4-113:
-              {contents= 0}
-<rac-values>Value imported for i at "bench/check-ce/while1.mlw", line 8, characters 4-113:
-              {contents= 2}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while1.mlw", line 6, characters 16-17: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while1.mlw", line 7, characters 16-17: {contents=
+                                                                    0}
+<rac-values>Value from model for x at "bench/check-ce/while1.mlw", line 8, characters 4-113: {contents=
+                                                                    0}
+<rac-values>Value from model for i at "bench/check-ce/while1.mlw", line 8, characters 4-113: {contents=
+                                                                    2}
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -304,7 +319,7 @@ Prover result is: Valid (0.01s, 1646 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Step limit exceeded (0.93s).
+Prover result is: Step limit exceeded (0.92s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
