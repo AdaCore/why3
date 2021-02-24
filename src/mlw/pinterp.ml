@@ -1559,18 +1559,20 @@ let compute_term ?vsenv env t =
   | Some trans ->
       let task, ls_mv = task_of_term ?vsenv env t in
       if t.t_ty = None then (* [t] is a formula *)
-        match List.map Task.task_goal_fmla (trans_and_bind_quants env trans task) with
+        let tasks = trans_and_bind_quants env trans task in
+        match List.map Task.task_goal_fmla tasks with
         | [] -> t_true
         | t :: ts -> List.fold_left t_and t ts
       else (* [t] is not a formula *)
         let t = match Trans.apply trans task with
           | [task] -> undef_pred_app_arg (Task.task_goal_fmla task)
           | _ -> failwith "compute_term" in
-        (* Free vsymbols in the original [t] have been substituted in by fresh lsymbols
-           (actually: ls @ []) to bind them to declarations in the task. Now we have to
-           reverse these substitution to ensures that the reduced term is valid in the
-           original environment of [t]. *)
-        let reverse vs t' t = t_replace t' (t_var vs) t in
+        (* Free vsymbols in the original [t] have been substituted in by fresh
+           lsymbols (actually: ls @ []) to bind them to declarations in the
+           task. Now we have to reverse these substitution to ensures that the
+           reduced term is valid in the original environment of [t]. *)
+        let reverse vs t' t =
+          if t_occurs t' t then t_replace t' (t_var vs) t else t in
         Mvs.fold reverse ls_mv t
 
 (** Check the validiy of a term that has been encoded in a task by the (reduction) transformation *)
@@ -1913,7 +1915,8 @@ let get_and_register_value env ?def ?ity ?rs_name ?posts_vsenv vs loc =
         | None ->
             let v = default_value_of_type env.env env.pmodule.Pmodule.mod_known ity in
             let posts = Opt.get_def [] (Opt.map fst posts_vsenv) in
-            match check_posts "default value" (Some loc) env v posts with
+            let desc = "postcondition for default value" in
+            match check_posts desc (Some loc) env v posts with
             | _ -> v, "type default"
             | exception Contr _ ->
                 cannot_compute "missing value for %a at %a" print_decoded name
