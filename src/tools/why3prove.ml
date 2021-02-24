@@ -34,6 +34,7 @@ let opt_rac_try_negate = ref false
 let opt_rac_timelimit = ref None
 let opt_rac_steplimit = ref None
 let opt_ce_check_verbosity = ref None
+let opt_sub_goals = ref []
 
 let debug_print_original_model = Debug.register_info_flag "print-original-model"
     ~desc:"Print original counterexample model when --check-ce"
@@ -54,9 +55,9 @@ let add_opt_theory x =
   in
   match !opt_input, p with
   | None, [] ->
-      eprintf "Option '-T'/'--theory' with a non-qualified \
-        argument requires an input file.@.";
-      exit 1
+      let msg = "Option '-T'/'--theory' with a non-qualified \
+                 argument requires an input file.@." in
+      raise (Getopt.GetoptFailure msg)
   | Some tlist, [] ->
       let glist = Queue.create () in
       let elist = Queue.create () in
@@ -73,9 +74,10 @@ let add_opt_theory x =
 
 let add_opt_goal x =
   let glist = match !opt_theory, !opt_input with
-    | None, None -> eprintf
-        "Option '-G'/'--goal' requires an input file or a library theory.@.";
-        exit 1
+    | None, None ->
+        let msg = "Option '-G'/'--goal' requires an input file or a library \
+                   theory.@." in
+        raise (Getopt.GetoptFailure msg)
     | None, Some _ ->
         add_opt_theory "Top";
         Opt.get !opt_theory
@@ -96,6 +98,30 @@ let add_opt_meta meta =
   in
   opt_metas := (meta_name,meta_arg)::!opt_metas
 
+let subgoal_re = Re.Str.regexp "^\\([^:@]+\\)?\\(:[^@]+\\)?\\(@.+\\)?$"
+
+let add_sub_goal s =
+  let failure str =
+    let msg = str ^ " for option --sub-goal" in
+    raise (Getopt.GetoptFailure msg) in
+  if Re.Str.string_match subgoal_re s 0 then (
+    let f =
+      try Re.Str.matched_group 1 s
+      with Not_found ->
+      try Opt.get (fst (Queue.peek opt_queue))
+      with _ -> failure "Missing file" in
+    let l =
+      try
+        let s = Strings.remove_prefix ":" (Re.Str.matched_group 2 s) in
+        Some (int_of_string s)
+      with Not_found -> None | Failure _ -> failure "Invalid line number" in
+    let e =
+      try Some (Strings.remove_prefix "@" (Re.Str.matched_group 3 s))
+      with Not_found -> None in
+    opt_sub_goals := (f,l,e) :: !opt_sub_goals )
+  else
+    failure "Invalid argument"
+
 let opt_driver = ref []
 let opt_parser = ref None
 let opt_prover = ref None
@@ -115,6 +141,12 @@ let option_list =
     "<theory> select <theory> in the input file or in the library";
     Key ('G', "goal"), Hnd1 (AString, add_opt_goal),
     "<goal> select <goal> in the last selected theory";
+    Key ('a', "apply-transform"), Hnd1 (AString, add_opt_trans),
+    "<transf> apply a transformation to every task";
+    Key ('g', "sub-goal"), Hnd1 (AString, add_sub_goal),
+    "[<file>][:<line>][@<expl>] select sub-goals at the given\n\
+     position and with the given explanation after applying\n\
+     the transformations (<file> defaults to the input file)";
     Key ('P', "prover"), Hnd1 (AString, fun s -> opt_prover := Some s),
     "<prover> prove or print (with -o) the selected goals";
     Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
@@ -125,8 +157,6 @@ let option_list =
     "<steps> set the prover's step limit (default: no limit)";
     Key ('m', "memlimit"), Hnd1 (AInt, fun i -> opt_memlimit := Some i),
     "<MiB> set the prover's memory limit (default: no limit)";
-    Key ('a', "apply-transform"), Hnd1 (AString, add_opt_trans),
-    "<transf> apply a transformation to every task";
     Key ('M', "meta"), Hnd1 (AString, add_opt_meta),
     "<meta>[=<string>] add a meta to every task";
     Key ('D', "driver"), Hnd1 (AString, fun s -> opt_driver := s::!opt_driver),
@@ -249,6 +279,20 @@ let memlimit = match !opt_memlimit with
 let print_th_namespace fmt th =
   Pretty.print_namespace fmt th.th_name.Ident.id_string th
 
+let really_do_task (task: task) =
+  let t = task_goal_fmla task in
+  let aux (f,l,e) =
+    match t.Term.t_loc with
+    | None -> false
+    | Some loc ->
+        let goal_f, goal_l, _, _ = Loc.get loc in
+        goal_f = f &&
+        (match l with None -> true | Some l -> l = goal_l) &&
+        (match e with None -> true | Some e ->
+         let expls = String.concat " " (Termcode.get_expls_fmla t) in
+         String.(equal (lowercase_ascii e) (lowercase_ascii expls))) in
+  !opt_sub_goals = [] || List.exists aux !opt_sub_goals
+
 let fname_printer = ref (Ident.create_ident_printer [])
 
 let output_task drv fname _tname th task dir =
@@ -336,6 +380,7 @@ let print_other_models (m, ce_summary) =
     | _ -> () )
 
 let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
+  if really_do_task task then
   let open Call_provers in
   let limit =
     { limit_time = timelimit;
