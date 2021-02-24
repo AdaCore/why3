@@ -29,17 +29,15 @@ let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
 let opt_json : [< `All | `Values ] option ref = ref None
 let opt_check_ce_model = ref false
-let opt_print_original_model = ref false
-let opt_print_derived_model = ref false
 let opt_rac_prover = ref None
 let opt_rac_try_negate = ref false
 let opt_ce_check_verbosity = ref None
 
-let () = (* Instead of additional command line parameters *)
-  if Opt.get_def "" (Sys.getenv_opt "WHY3PRINTORIGINALMODEL") = "yes" then
-    opt_print_original_model := true;
-  if Opt.get_def "" (Sys.getenv_opt "WHY3PRINTDERIVEDMODEL") = "yes" then
-    opt_print_derived_model := true
+let debug_print_original_model = Debug.register_info_flag "print-original-model"
+    ~desc:"Print original counterexample model when --check-ce"
+
+let debug_print_derived_model = Debug.register_info_flag "print-derived-model"
+    ~desc:"Print derived counterexample model when --check-ce"
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -334,9 +332,9 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
         let print_other_models (m, ce_summary) =
           match ce_summary with
             | Counterexample.(NCCE log | SWCE log | NCCE_SWCE log) ->
-                if !opt_print_original_model then
+                if Debug.test_flag debug_print_original_model then
                   printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
-                if !opt_print_derived_model then
+                if Debug.test_flag debug_print_derived_model then
                   printf "@[<v>Derived model:@\n%a@]@\n@." print_model
                     (Counterexample.model_of_exec_log ~original_model:m log)
             | _ -> () in
