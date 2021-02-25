@@ -1,12 +1,12 @@
 File "bench/check-ce/anonymous6.mlw", line 6, characters 18-27:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.03s, 1520 steps).
+Prover result is: Valid (0.02s, 1520 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 <check-ce>Validating model:
           File anonymous6.mlw:
             Line 6:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -18,10 +18,10 @@ Prover result is: Valid (0.03s, 1520 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15, taking default.
-<rac-values>Value imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40:
-              {contents= 0}
-<rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40, taking default.
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value from model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -46,42 +46,21 @@ Prover result is: Valid (0.03s, 1520 steps).
                     z = {contents= 0}
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous6.mlw", line 6, characters 18-27)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File anonymous6.mlw:
-                Line 4:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 5:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 6:
-                  Abstract execution of anonymous function with args:
-                    z = {contents= 0}
-                  z = {contents= 0}
-                  result = ()
-                  Execution got stuck, Assume postcondition of anonymous function with:
-                    z = {contents= 0}
+            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40)
+              
 <check-ce>Check model 1 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 <check-ce>Validating model:
           File anonymous6.mlw:
             Line 6:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
             Line 7:
-              z =
+              z_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:z] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -91,10 +70,11 @@ Prover result is: Valid (0.03s, 1520 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15, taking default.
-<rac-values>Value imported for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40:
-              {contents= 3}
-<rac-values>No value for result at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40, taking default.
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value from model for z at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: {contents=
+                                                                    3}
+<rac-values>Value type default for result at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: ()
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -145,13 +125,14 @@ Prover result is: Valid (0.03s, 1520 steps).
                   Property failure, Assertion with:
                     z = {contents= 3}
 <check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
+- Checked model 0 (Concrete: bad model, Abstract: don't know)
+    Summary: The following counterexample model has not been verified
+    (Abstract RAC terminated because missing value for result at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40)
 - Selected model 1 (Concrete: bad model, Abstract: good model)
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous6.mlw", line 7, characters 10-15:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (0.78s).
+Prover result is: Step limit exceeded (0.80s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:

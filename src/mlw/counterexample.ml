@@ -127,15 +127,16 @@ let print_check_model_result ?verb_lvl fmt = function
         (print_full_verdict ?verb_lvl) r.concrete
         (print_full_verdict ?verb_lvl) r.abstract
 
-let ce_summary v_concrete v_abstract =
-  match v_concrete.verdict, v_abstract.verdict with
-  | Good_model, _          -> NCCE v_concrete.exec_log
-  | Bad_model , Good_model -> SWCE v_abstract.exec_log
-  | Dont_know , Good_model -> NCCE_SWCE v_abstract.exec_log
-  | Dont_know , Dont_know
-  | Dont_know , Bad_model  -> UNKNOWN v_concrete.reason
-  | Bad_model , Dont_know  -> UNKNOWN v_abstract.reason
-  | Bad_model , Bad_model  -> BAD_CE
+let ce_summary = function
+  | Cannot_check_model {reason} -> UNKNOWN reason
+  | Check_model_result r -> match r.concrete.verdict, r.abstract.verdict with
+    | Good_model, _          -> NCCE r.concrete.exec_log
+    | Bad_model , Good_model -> SWCE r.abstract.exec_log
+    | Dont_know , Good_model -> NCCE_SWCE r.abstract.exec_log
+    | Dont_know , Dont_know
+    | Dont_know , Bad_model  -> UNKNOWN r.concrete.reason
+    | Bad_model , Dont_know  -> UNKNOWN r.abstract.reason
+    | Bad_model , Bad_model  -> BAD_CE
 
 let print_counterexample ?verb_lvl ?check_ce ?json fmt (model,ce_summary) =
   fprintf fmt "@ @[<hov2>%a%t@]"
@@ -162,9 +163,8 @@ let check_not_nonfree its_def =
 
 let get_field_name rs =
   match get_model_element_name ~attrs:rs.rs_name.id_attrs with
+  | name -> if name = "" then rs.rs_name.id_string else name
   | exception Not_found -> rs.rs_name.id_string
-  | "" -> rs.rs_name.id_string
-  | name -> name
 
 (* let empty_model_trace attrs =
  *   try
@@ -213,7 +213,7 @@ let rec import_model_value known th_known ity v =
             | v -> import_model_value known th_known field_ity v
             | exception Not_found ->
                 (* TODO Better create a default value? Requires an [Env.env]. *)
-                undefined_value ity in
+                undefined_value field_ity in
           let vs = List.map aux def.Pdecl.itd_fields in
           constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
@@ -404,9 +404,10 @@ let check_model reduce env pm model =
           let rac = rac_config ~do_rac:true ~abstract
                       ~skip_cannot_compute:false ~reduce ~get_value () in
           check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
+        let me_name_trans men = men.Model_parser.men_name in
         Debug.dprintf debug_check_ce
           "@[Validating model:@\n@[<hv2>%a@]@]@\n"
-          (print_model ~filter_similar:false ?me_name_trans:None ~print_attrs:false) model;
+          (print_model ~filter_similar:false ~me_name_trans ~print_attrs:true) model;
         Debug.dprintf debug_check_ce "@[Interpreting concretly@]@\n";
         let concrete = check_model_rs ~abstract:false in
         Debug.dprintf debug_check_ce "@[Interpreting abstractly@]@\n";
@@ -421,7 +422,7 @@ let check_model reduce env pm model =
 let select_model_last_non_empty models =
   let models = List.filter (fun (_,m) -> not (is_model_empty m)) models in
   match List.rev models with
-  | (_,m) :: _ -> Some m
+  | (_,m) :: _ -> Some (m, UNKNOWN "No CE checking")
   | [] -> None
 
 type sort_models =
@@ -513,10 +514,7 @@ let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     List.map add_check_model_result models in
   let models =
     let add_ce_summary (i,r,m,mr) =
-      let summary = match mr with
-        | Cannot_check_model {reason} -> UNKNOWN reason
-        | Check_model_result r -> ce_summary r.concrete r.abstract in
-      i,r,m,mr,summary in
+      i,r,m,mr,ce_summary mr in
     List.map add_ce_summary models in
   let selected, selected_ix =
     match List.nth_opt (sort_models models) 0 with

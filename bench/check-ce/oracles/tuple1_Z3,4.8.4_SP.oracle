@@ -2,60 +2,66 @@
 <check-ce>Validating model:
           File tuple1.mlw:
             Line 6:
-              a =
+              a [@introduced] =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "0"}}
-              b =
+              b [@introduced] =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "0"}}
             Line 7:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74, taking default.
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74, taking default.
 <check-ce>Result of checking model 0:
-            - Concrete: don't know (Concrete RAC terminated because Assume postcondition of anonymous function cannot be evaluated)
+            - Concrete: don't know (Concrete RAC terminated because postcondition for default value cannot be evaluated)
               
-            - Abstract: don't know (Abstract RAC terminated because Assume postcondition of anonymous function cannot be evaluated)
+            - Abstract: don't know (Abstract RAC terminated because postcondition for default value cannot be evaluated)
               
 <check-ce>Check model 1 ("bench/check-ce/tuple1.mlw", line 7, characters 14-19)
 <check-ce>Validating model:
           File int.mlw:
             Line 432:
-              max_int =
+              max_int  =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "4611686018427387903"}}
             Line 434:
-              min_int =
+              min_int  =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "-4611686018427387904"}}
             File tuple1.mlw:
               Line 6:
-                a =
+                a [@introduced] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
-                b =
+                b [@introduced] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
               Line 7:
-                a =
+                a_vc_constant [@introduced] [@model_trace:a] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
-                b =
+                b_vc_constant [@introduced] [@model_trace:b] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
 <check-ce>Interpreting concretly
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Result of checking model 1:
             - Concrete: don't know (Concrete RAC terminated because Precondition of (+) cannot be evaluated)
@@ -65,13 +71,13 @@
 <check-ce>Models:
 - Checked model 0 (Concrete: don't know, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Assume postcondition of anonymous function cannot be evaluated)
+    (Concrete RAC terminated because postcondition for default value cannot be evaluated)
 - Selected model 1 (Concrete: don't know, Abstract: don't know)
     Summary: The following counterexample model has not been verified
     (Concrete RAC terminated because Precondition of (+) cannot be evaluated)
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-19:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: Step limit exceeded (0.12s).
+Prover result is: Step limit exceeded (0.10s).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of (+) cannot be evaluated):
 File int.mlw:
@@ -93,7 +99,7 @@ Prover result is: Valid (0.01s, 5525 steps).
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 3-8:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: Valid (0.01s, 5656 steps).
+Prover result is: Valid (0.00s, 5656 steps).
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 3-12:
 Goal Integer overflow from verification condition swap'vc.

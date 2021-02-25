@@ -2,12 +2,14 @@
 <check-ce>Validating model:
           File global_logic_constant.mlw:
             Line 5:
-              v1 = {"type": "Integer", "val": "1"}
+              v1  = {"type": "Integer", "val": "1"}
             Line 8:
               the check fails with all inputs
 <check-ce>Interpreting concretly
+<rac-values>Value from model for global v1: 1
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
+<rac-values>Value from model for global v1: 1
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -52,12 +54,15 @@
 <check-ce>Validating model:
           File global_logic_constant.mlw:
             Line 5:
-              v1 = {"type": "Integer", "val": "1"}
+              v1  = {"type": "Integer", "val": "1"}
             Line 8:
-              v1 = {"type": "Integer", "val": "1"}
+              v1_vc_constant [@model_trace:v1] =
+                {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
+<rac-values>Value from model for global v1: 1
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
+<rac-values>Value from model for global v1: 1
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -102,12 +107,15 @@
 <check-ce>Validating model:
           File global_logic_constant.mlw:
             Line 5:
-              v1 = {"type": "Integer", "val": "1"}
+              v1  = {"type": "Integer", "val": "1"}
             Line 8:
-              v1 = {"type": "Integer", "val": "1"}
+              v1_vc_constant [@model_trace:v1] =
+                {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
+<rac-values>Value from model for global v1: 1
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
+<rac-values>Value from model for global v1: 1
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -183,7 +191,7 @@ File global_logic_constant.mlw:
 <check-ce>Validating model:
           File global_logic_constant.mlw:
             Line 11:
-              v2 =
+              v2 [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -192,10 +200,12 @@ File global_logic_constant.mlw:
             Line 14:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
+<rac-values>Value type default for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22: 0
+<rac-values>Value from model for global v2: {contents= 1}
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
+<rac-values>Value type default for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22: 0
+<rac-values>Value from model for global v2: {contents= 1}
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -256,24 +266,27 @@ File global_logic_constant.mlw:
 <check-ce>Validating model:
           File global_logic_constant.mlw:
             Line 11:
-              v2 =
+              v2 [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 14:
-              v2 =
+              v2_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:v2] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
+<rac-values>Value type default for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22: 0
+<rac-values>Value from model for global v2: {contents= 2}
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22, taking default.
+<rac-values>Value type default for result at "bench/check-ce/global_logic_constant.mlw", line 5, characters 17-22: 0
+<rac-values>Value from model for global v2: {contents= 2}
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
@@ -337,7 +350,7 @@ File global_logic_constant.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24:
 Goal Postcondition from verification condition f2'vc.
-Prover result is: Step limit exceeded (0.80s).
+Prover result is: Step limit exceeded (0.82s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

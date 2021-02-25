@@ -2,11 +2,13 @@
 <check-ce>Validating model:
           File falseCE.mlw:
             Line 12:
-              a = {"type": "Integer", "val": "-2"}
-              b = {"type": "Integer", "val": "-2"}
+              a [@introduced] = {"type": "Integer", "val": "-2"}
+              b [@introduced] = {"type": "Integer", "val": "-2"}
             Line 15:
-              a = {"type": "Integer", "val": "0"}
-              b = {"type": "Integer", "val": "0"}
+              a_vc_constant [@introduced] [@model_trace:a] =
+                {"type": "Integer", "val": "0"}
+              b_vc_constant [@introduced] [@model_trace:b] =
+                {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: (-2)
 <rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: (-2)
@@ -56,11 +58,13 @@
 <check-ce>Validating model:
           File falseCE.mlw:
             Line 12:
-              a = {"type": "Integer", "val": "2"}
-              b = {"type": "Integer", "val": "2"}
+              a [@introduced] = {"type": "Integer", "val": "2"}
+              b [@introduced] = {"type": "Integer", "val": "2"}
             Line 15:
-              a = {"type": "Integer", "val": "2"}
-              b = {"type": "Integer", "val": "2"}
+              a_vc_constant [@introduced] [@model_trace:a] =
+                {"type": "Integer", "val": "2"}
+              b_vc_constant [@introduced] [@model_trace:b] =
+                {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
 <rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
@@ -104,11 +108,13 @@
 <check-ce>Validating model:
           File falseCE.mlw:
             Line 12:
-              a = {"type": "Integer", "val": "2"}
-              b = {"type": "Integer", "val": "2"}
+              a [@introduced] = {"type": "Integer", "val": "2"}
+              b [@introduced] = {"type": "Integer", "val": "2"}
             Line 15:
-              a = {"type": "Integer", "val": "2"}
-              b = {"type": "Integer", "val": "2"}
+              a_vc_constant [@introduced] [@model_trace:a] =
+                {"type": "Integer", "val": "2"}
+              b_vc_constant [@introduced] [@model_trace:b] =
+                {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
 <rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
@@ -157,7 +163,7 @@
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
 Goal Assertion from verification condition rsa'vc.
-Prover result is: Unknown (unknown + incomplete) (0.05s, 15056 steps).
+Prover result is: Unknown (unknown + incomplete) (0.08s, 15056 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

@@ -4,7 +4,7 @@ Prover result is: Valid (0.03s, 256 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 16, characters 18-35:
 Goal Precondition from verification condition max_rgf'vc.
-Prover result is: Valid (0.03s, 9669 steps).
+Prover result is: Valid (0.01s, 9669 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 16, characters 18-35:
 Goal Precondition from verification condition max_rgf'vc.
@@ -30,7 +30,7 @@ Prover result is: Valid (0.01s, 10920 steps).
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 23:
-              [current iteration] k = {"type": "Integer", "val": "0"}
+              k [@introduced] = {"type": "Integer", "val": "0"}
             Line 24:
               the check fails with all inputs
 <check-ce>Interpreting concretly
@@ -96,11 +96,12 @@ Prover result is: Valid (0.01s, 10920 steps).
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 18:
-              i = {"type": "Integer", "val": "176"}
+              i [@introduced] = {"type": "Integer", "val": "176"}
             Line 23:
-              [current iteration] k = {"type": "Integer", "val": "177"}
+              k [@introduced] = {"type": "Integer", "val": "177"}
             Line 24:
-              [current iteration] k = {"type": "Integer", "val": "177"}
+              k_vc_constant [@introduced] [@model_trace:k] =
+                {"type": "Integer", "val": "177"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter a, continue with default value [].
 <rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 176
@@ -116,11 +117,12 @@ Prover result is: Valid (0.01s, 10920 steps).
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 18:
-              i = {"type": "Integer", "val": "1"}
+              i [@introduced] = {"type": "Integer", "val": "1"}
             Line 23:
-              [current iteration] k = {"type": "Integer", "val": "2"}
+              k [@introduced] = {"type": "Integer", "val": "2"}
             Line 24:
-              [current iteration] k = {"type": "Integer", "val": "2"}
+              k_vc_constant [@introduced] [@model_trace:k] =
+                {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter a, continue with default value [].
 <rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 1
@@ -143,7 +145,7 @@ Prover result is: Valid (0.01s, 10920 steps).
     (Concrete RAC terminated because Precondition of g cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 24, characters 18-28:
 Goal Loop invariant preservation from verification condition g'vc.
-Prover result is: Unknown (unknown) (0.05s, 134903 steps).
+Prover result is: Unknown (unknown) (0.06s, 134903 steps).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of g cannot be evaluated):
 File petiot2015.mlw:
@@ -158,7 +160,7 @@ File petiot2015.mlw:
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 25:
-              [current iteration] j = {"type": "Integer", "val": "0"}
+              j [@introduced] = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter a, continue with default value [].
 <rac-values>Missing value for parameter i, continue with default value 0.
@@ -222,11 +224,11 @@ File petiot2015.mlw:
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 18:
-              i = {"type": "Integer", "val": "401"}
+              i [@introduced] = {"type": "Integer", "val": "401"}
             Line 23:
-              [current iteration] k = {"type": "Integer", "val": "402"}
+              k [@introduced] = {"type": "Integer", "val": "402"}
             Line 25:
-              [current iteration] j = {"type": "Integer", "val": "1"}
+              j [@introduced] = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter a, continue with default value [].
 <rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 401
@@ -242,11 +244,11 @@ File petiot2015.mlw:
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 18:
-              i = {"type": "Integer", "val": "1"}
+              i [@introduced] = {"type": "Integer", "val": "1"}
             Line 23:
-              [current iteration] k = {"type": "Integer", "val": "2"}
+              k [@introduced] = {"type": "Integer", "val": "2"}
             Line 25:
-              [current iteration] j = {"type": "Integer", "val": "1"}
+              j [@introduced] = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter a, continue with default value [].
 <rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 1
@@ -269,7 +271,7 @@ File petiot2015.mlw:
     (Concrete RAC terminated because Precondition of g cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 25, characters 43-60:
 Goal Loop invariant preservation from verification condition g'vc.
-Prover result is: Unknown (unknown) (0.05s, 146256 steps).
+Prover result is: Unknown (unknown) (0.06s, 146256 steps).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of g cannot be evaluated):
 File petiot2015.mlw:
@@ -290,7 +292,7 @@ Prover result is: Valid (0.01s, 11571 steps).
 
 File bench/check-ce/petiot2015.mlw:
 Goal Out of loop bounds from verification condition g'vc.
-Prover result is: Valid (0.00s, 11613 steps).
+Prover result is: Valid (0.01s, 11613 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 38, characters 18-40:
 Goal Loop invariant init from verification condition f'vc.
@@ -298,7 +300,7 @@ Prover result is: Valid (0.01s, 10672 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 40, characters 17-23:
 Goal Index in array bounds from verification condition f'vc.
-Prover result is: Valid (0.01s, 10889 steps).
+Prover result is: Valid (0.02s, 10889 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 40, characters 9-13:
 Goal Index in array bounds from verification condition f'vc.
@@ -306,7 +308,7 @@ Prover result is: Valid (0.01s, 10885 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.00s, 191 steps).
+Prover result is: Valid (0.01s, 191 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
@@ -322,13 +324,15 @@ Prover result is: Valid (0.01s, 11072 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 45, characters 4-9:
 Goal Precondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 11373 steps).
+Prover result is: Valid (0.02s, 11373 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 45, characters 4-9)
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 37:
-              i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -349,14 +353,18 @@ Prover result is: Valid (0.01s, 11373 steps).
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 37:
-              i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "176"}}]}}
             Line 45:
-              i =
+              i_vc_constant [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
+                [@mlw:reference_var] [@model_trace:i] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -380,7 +388,7 @@ Prover result is: Valid (0.01s, 11373 steps).
     (Concrete RAC terminated because Precondition of f cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 45, characters 4-9:
 Goal Precondition from verification condition f'vc.
-Prover result is: Step limit exceeded (1.18s).
+Prover result is: Step limit exceeded (1.30s).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of f cannot be evaluated):
 File petiot2015.mlw:
@@ -393,7 +401,7 @@ File petiot2015.mlw:
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 46:
-              j = {"type": "Integer", "val": "0"}
+              j [@introduced] = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter a1, continue with default value [].
 <check-ce>Interpreting abstractly
@@ -407,14 +415,16 @@ File petiot2015.mlw:
 <check-ce>Validating model:
           File petiot2015.mlw:
             Line 37:
-              i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "401"}}]}}
             Line 46:
-              j = {"type": "Integer", "val": "0"}
+              j [@introduced] = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter a1, continue with default value [].
 <check-ce>Interpreting abstractly
@@ -433,7 +443,7 @@ File petiot2015.mlw:
     (Concrete RAC terminated because Precondition of f cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 46, characters 37-54:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (1.19s).
+Prover result is: Step limit exceeded (1.22s).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of f cannot be evaluated):
 File petiot2015.mlw:
@@ -444,7 +454,7 @@ File petiot2015.mlw:
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 164 steps).
+Prover result is: Valid (0.00s, 164 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 34, characters 6-105)
 <check-ce>Validating model:
@@ -464,7 +474,9 @@ Prover result is: Valid (0.01s, 164 steps).
             Line 34:
               the check fails with all inputs
             Line 37:
-              i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -488,7 +500,7 @@ Prover result is: Valid (0.01s, 164 steps).
     (Concrete RAC terminated because Precondition of f cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Step limit exceeded (1.44s).
+Prover result is: Step limit exceeded (1.51s).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of f cannot be evaluated):
 File petiot2015.mlw:
@@ -515,7 +527,7 @@ Prover result is: Valid (0.01s, 125 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 44, characters 12-16:
 Goal Index in array bounds from verification condition f'vc.
-Prover result is: Valid (0.01s, 10945 steps).
+Prover result is: Valid (0.02s, 10945 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 44, characters 4-20:
 Goal Index in array bounds from verification condition f'vc.
@@ -535,7 +547,7 @@ Prover result is: Valid (0.01s, 11229 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 163 steps).
+Prover result is: Valid (0.03s, 163 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.

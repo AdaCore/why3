@@ -2,15 +2,15 @@
 <check-ce>Validating model:
           File tuple.mlw:
             Line 5:
-              a = {"type": "Integer", "val": "0"}
-              b = {"type": "Integer", "val": "-1"}
-              result = {"type": "Integer", "val": "0"}
+              a [@introduced] = {"type": "Integer", "val": "0"}
+              b [@introduced] = {"type": "Integer", "val": "-1"}
+              result [@introduced] = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 14-23, taking default.
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File int.mlw:
@@ -108,15 +108,15 @@
 <check-ce>Validating model:
           File tuple.mlw:
             Line 5:
-              a = {"type": "Integer", "val": "-1"}
-              b = {"type": "Integer", "val": "0"}
-              result = {"type": "Integer", "val": "0"}
+              a [@introduced] = {"type": "Integer", "val": "-1"}
+              b [@introduced] = {"type": "Integer", "val": "0"}
+              result [@introduced] = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 14-23, taking default.
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File int.mlw:
@@ -214,15 +214,15 @@
 <check-ce>Validating model:
           File tuple.mlw:
             Line 5:
-              a = {"type": "Integer", "val": "-1"}
-              b = {"type": "Integer", "val": "0"}
-              result = {"type": "Integer", "val": "0"}
+              a [@introduced] = {"type": "Integer", "val": "-1"}
+              b [@introduced] = {"type": "Integer", "val": "0"}
+              result [@introduced] = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 14-23, taking default.
-<rac-values>No value for result at "bench/check-ce/tuple.mlw", line 7, characters 3-12, taking default.
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
+<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File int.mlw:

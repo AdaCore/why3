@@ -2,33 +2,32 @@
 <check-ce>Validating model:
           File anonymous5.mlw:
             Line 6:
-              y = {"type": "Integer", "val": "0"}
+              y [@introduced] = {"type": "Integer", "val": "0"}
             Line 7:
               the check fails with all inputs
 <check-ce>Interpreting concretly
 <rac-values>Value imported for y at "bench/check-ce/anonymous5.mlw", line 6, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for y at "bench/check-ce/anonymous5.mlw", line 6, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/anonymous5.mlw", line 8, characters 2-5, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: don't know (failure: many args for exec fun)
-            - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
+            - Abstract: don't know (Abstract RAC terminated because postcondition for default value cannot be evaluated)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous5.mlw", line 7, characters 12-22)
 <check-ce>Validating model:
           File anonymous5.mlw:
             Line 6:
-              y = {"type": "Integer", "val": "0"}
+              y [@introduced] = {"type": "Integer", "val": "0"}
             Line 7:
-              y = {"type": "Integer", "val": "0"}
+              y_vc_constant [@introduced] [@model_trace:y] =
+                {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for y at "bench/check-ce/anonymous5.mlw", line 6, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for y at "bench/check-ce/anonymous5.mlw", line 6, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/anonymous5.mlw", line 8, characters 2-5, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: don't know (failure: many args for exec fun)
-            - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
+            - Abstract: don't know (Abstract RAC terminated because postcondition for default value cannot be evaluated)
               
 <check-ce>Models:
 - Checked model 0 (Concrete: don't know, Abstract: don't know)

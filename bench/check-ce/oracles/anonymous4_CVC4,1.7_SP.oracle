@@ -2,14 +2,14 @@
 <check-ce>Validating model:
           File anonymous4.mlw:
             Line 6:
-              y = {"type": "Integer", "val": "0"}
+              y [@introduced] = {"type": "Integer", "val": "0"}
             Line 8:
-              y = {"type": "Integer", "val": "0"}
+              y_vc_constant [@introduced] [@model_trace:y] =
+                {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for y at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for y at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5, taking default.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
               File int.mlw:
@@ -34,20 +34,20 @@
                 Line 4:
                   Execution got stuck, Assumption with:
                     y = 0
-            - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
+            - Abstract: don't know (Abstract RAC terminated because postcondition for default value cannot be evaluated)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
 <check-ce>Validating model:
           File anonymous4.mlw:
             Line 6:
-              y = {"type": "Integer", "val": "0"}
+              y [@introduced] = {"type": "Integer", "val": "0"}
             Line 8:
-              y = {"type": "Integer", "val": "0"}
+              y_vc_constant [@introduced] [@model_trace:y] =
+                {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for y at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for y at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5, taking default.
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
               File int.mlw:
@@ -72,20 +72,20 @@
                 Line 4:
                   Execution got stuck, Assumption with:
                     y = 0
-            - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
+            - Abstract: don't know (Abstract RAC terminated because postcondition for default value cannot be evaluated)
               
 <check-ce>Check model 2 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
 <check-ce>Validating model:
           File anonymous4.mlw:
             Line 6:
-              y = {"type": "Integer", "val": "0"}
+              y [@introduced] = {"type": "Integer", "val": "0"}
             Line 8:
-              y = {"type": "Integer", "val": "0"}
+              y_vc_constant [@introduced] [@model_trace:y] =
+                {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for y at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for y at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5, taking default.
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
               File int.mlw:
@@ -110,23 +110,23 @@
                 Line 4:
                   Execution got stuck, Assumption with:
                     y = 0
-            - Abstract: don't know (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
+            - Abstract: don't know (Abstract RAC terminated because postcondition for default value cannot be evaluated)
               
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
+    (Abstract RAC terminated because postcondition for default value cannot be evaluated)
 - Checked model 1 (Concrete: bad model, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
+    (Abstract RAC terminated because postcondition for default value cannot be evaluated)
 - Selected model 2 (Concrete: bad model, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Abstract RAC terminated because Assume postcondition of f cannot be evaluated)
+    (Abstract RAC terminated because postcondition for default value cannot be evaluated)
 File "bench/check-ce/anonymous4.mlw", line 8, characters 13-23:
 Goal Postcondition from verification condition g'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 5041 steps).
+Prover result is: Unknown (unknown + incomplete) (0.05s, 5041 steps).
 The following counterexample model could not be verified
-  (Abstract RAC terminated because Assume postcondition of f cannot be evaluated):
+  (Abstract RAC terminated because postcondition for default value cannot be evaluated):
 File anonymous4.mlw:
   Line 6:
     y = 0
