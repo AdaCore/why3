@@ -52,6 +52,23 @@ It certainly makes sense to turn this command line into a shell script for easie
     #!/bin/sh
     exec docker run --rm --network host --user `id -u` --volume $HOME/.Xauthority:/home/guest/.Xauthority --env DISPLAY=$DISPLAY --volume `pwd`:/data --workdir /data why3 "$@"
 
+It is also possible to run the graphical user interface from within a web
+browser, thus alleviating the need for a X server. To do so, just set the
+environment variable ``WHY3IDE`` to ``web`` and publish port 8080:
+
+.. code-block:: shell
+
+   docker run --rm -p 8080:8080 --env WHY3IDE=web --user `id -u` --volume `pwd`:/data --workdir /data why3 ide foo.mlw
+
+You can now point your web browser to http://localhost:8080/. As before,
+this can be turned into a shell script for easier use:
+
+.. code-block:: shell
+
+    #!/bin/sh
+    exec docker --rm -p 8080:8080 --env WHY3IDE=web --user `id -u` --volume `pwd`:/data --workdir /data why3 "$@"
+
+
 Installation from Source Distribution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

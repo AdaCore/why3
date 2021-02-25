@@ -345,12 +345,21 @@ let add_modifiable_sans_font_view v =
 let add_modifiable_mono_font_view v =
   modifiable_mono_font_views := v :: !modifiable_mono_font_views
 
+let disable_size_spec =
+  match Sys.getenv "GDK_BACKEND" with
+  | "broadway" -> true
+  | _ -> false
+  | exception Not_found -> false
+
 let change_font size =
 (*
   Tools.resize_images (!Colors.font_size * 2 - 4);
 *)
-  let sff = sans_font_family ^ " " ^ string_of_int size in
-  let mff = mono_font_family ^ " " ^ string_of_int size in
+  let size_spec s =
+    if disable_size_spec then s
+    else s ^ " " ^ string_of_int size in
+  let sff = size_spec sans_font_family in
+  let mff = size_spec mono_font_family in
   List.iter (fun v -> v#modify_font_by_name sff) !modifiable_sans_font_views;
   List.iter (fun v -> v#modify_font_by_name mff) !modifiable_mono_font_views
 
