@@ -216,11 +216,15 @@ let normal_handle_one_subp c subp =
 
 (* save session on interrupt initiated by the user *)
 let save_session_and_exit c signum =
-  (* ignore all SIGINT, SIGHUP and SIGTERM, which may be received when
-     gnatprove is called in GPS, so that the session file is always saved *)
-  Sys.set_signal Sys.sigint Sys.Signal_ignore;
-  Sys.set_signal Sys.sighup Sys.Signal_ignore;
-  Sys.set_signal Sys.sigterm Sys.Signal_ignore;
+  (* Ignore all SIGINT, SIGHUP and SIGTERM, which may be received when
+     gnatprove is called in GNATStudio, so that the session file is always
+     saved. Wrap in exception block as some signals are not supported on
+     windows. *)
+  begin try
+    Sys.set_signal Sys.sigint Sys.Signal_ignore;
+    Sys.set_signal Sys.sighup Sys.Signal_ignore;
+    Sys.set_signal Sys.sigterm Sys.Signal_ignore;
+  with Invalid_argument _ -> () end;
   C.save_session c;
   exit signum
 
