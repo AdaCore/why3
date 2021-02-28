@@ -75,8 +75,10 @@ module Why3Task = Task (* prevent shadowing *)
 
 module Task =
   struct
-    type task_info =
-      { task : [ `Theory of Theory.theory | `Task of Task.task ];
+    type task_kind = Theory of Theory.theory | Task of Task.task
+
+    type task_info = {
+        task : task_kind;
 	parent_id : id;
 	mutable status : status;
 	mutable subtasks : id list;
@@ -168,9 +170,9 @@ module Task =
           end
       in
       let task_info =
-        { task = `Task(task);
+        { task = Task task;
 	  parent_id = parent_id;
-	  status = `New;
+	  status = StNew;
 	  subtasks = [];
 	  loc = id_loc @  (collect_locs task);
 	  expl = expl;
@@ -186,18 +188,20 @@ module Task =
       let task_ids = List.fold_left (fun acc t ->
 				     let tid = register_task th_id t in
 				     tid:: acc) [] tasks in
-      Hashtbl.add task_table th_id  { task = `Theory(th);
-				      parent_id = "theory-list";
-				      status = `New;
-				      subtasks = List.rev task_ids;
-				      loc = [];
-				      expl = th_name;
-                                      pretty = "";
-                                    };
+      Hashtbl.add task_table th_id  {
+          task = Theory th;
+          parent_id = "theory-list";
+          status = StNew;
+          subtasks = List.rev task_ids;
+          loc = [];
+          expl = th_name;
+          pretty = "";
+        };
       th_id
 
-    let get_task = function `Task t -> t
-                          | `Theory _ -> log ("called get_task on a theory !"); assert false
+    let get_task = function
+      | Task t -> t
+      | Theory _ -> log ("called get_task on a theory !"); assert false
 
     let set_status id st =
       let rec loop id st acc =
@@ -213,12 +217,13 @@ module Task =
 	          List.fold_left
 	            (fun (an, au) id ->
 	             let info = Hashtbl.find task_table id in
-	             (an || info.status = `New), (au || info.status = `Unknown))
+	             (an || info.status = StNew), (au || info.status = StUnknown))
 	            (false, false) par_info.subtasks
 	        in
-	        let par_status = if has_new then `New else if
-			           has_unknown then `Unknown
-			         else `Valid
+	        let par_status =
+                  if has_new then StNew
+                  else if has_unknown then StUnknown
+                  else StValid
 	        in
 	        if par_info.status <> par_status then
 	          loop info.parent_id par_status acc
@@ -248,12 +253,13 @@ let rec why3_prove ?(steps= ~-1) id =
   let open Task in
   let t = get_info id in
   match t.subtasks with
-    [] ->  t.status <- `Unknown;
-	  let task = get_task t.task in
-	  let msg = Task (id, t.parent_id, t.expl, task_to_string task, t.loc, t.pretty, steps) in
-	  W.send msg;
-	  let l = set_status id `New in
-          List.iter W.send l
+  | [] ->
+      t.status <- StUnknown;
+      let task = get_task t.task in
+      let msg = Worker_proto.Task (id, t.parent_id, t.expl, task_to_string task, t.loc, t.pretty, steps) in
+      W.send msg;
+      let l = set_status id StNew in
+      List.iter W.send l
   | l -> List.iter (why3_prove ~steps) l
 
 
@@ -265,7 +271,7 @@ let why3_split id =
     begin
       match Trans.apply split_trans (get_task t.task), t.task with
 	[], _ -> ()
-      | [ child ], `Task(orig) when Why3.Task.task_equal child orig -> ()
+      | [ child ], Task orig when Why3.Task.task_equal child orig -> ()
       | subtasks, _ ->
           t.subtasks <- List.map (fun t -> register_task id t) subtasks;
           List.iter (why3_prove ?steps:None) t.subtasks
@@ -280,7 +286,7 @@ let why3_clean id =
     let t = get_info id in
     List.iter clean_task t.subtasks;
     t.subtasks <- [];
-    let l = set_status id `Unknown in
+    let l = set_status id StUnknown in
     List.iter W.send l
   with
     Not_found -> ()
@@ -289,7 +295,7 @@ let why3_prove_all () =
   Hashtbl.iter
     (fun _ info ->
      match info.Task.task with
-       `Theory _ -> List.iter (fun i -> why3_prove i) info.Task.subtasks
+     | Task.Theory _ -> List.iter (fun i -> why3_prove i) info.Task.subtasks
      | _ -> ()) Task.task_table
 
 
@@ -308,7 +314,7 @@ let why3_parse_theories theories =
      let th_id = Task.register_theory th_name th in
      W.send (Theory(th_id, th_name));
      let subs = (Task.get_info th_id).Task.subtasks in
-     W.send (UpdateStatus( (if subs == [] then `Valid else `New) , th_id));
+     W.send (UpdateStatus( (if subs == [] then StValid else StNew) , th_id));
      List.iter (fun i -> why3_prove i) subs
     ) theories
 
@@ -378,9 +384,9 @@ let why3_run f format lang code =
 		      (Printexc.to_string e)))
 
 let handle_message = function
-  | Transform (`Split, id) -> why3_split id
-  | Transform (`Prove(steps), id) -> why3_prove ~steps id
-  | Transform (`Clean, id) -> why3_clean id
+  | Transform (Split, id) -> why3_split id
+  | Transform (Prove steps, id) -> why3_prove ~steps id
+  | Transform (Clean, id) -> why3_clean id
   | ProveAll -> why3_prove_all ()
   | ParseBuffer (format, code) ->
       Task.clear_warnings ();
