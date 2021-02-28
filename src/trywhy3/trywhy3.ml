@@ -631,12 +631,12 @@ let handle_why3_message o =
         let span_msg = getElement AsHtml.span (id ^ "_msg") in
         let cls =
           match st with
-          | `New ->
+          | StNew ->
               !!"fas fa-fw fa-cog fa-spin fa-fw why3-task-pending"
-          | `Valid ->
+          | StValid ->
               span_msg ##. innerHTML := !!"";
               !!"fas fa-check-circle why3-task-valid"
-          | `Unknown ->
+          | StUnknown ->
               !!"fas fa-question-circle why3-task-unknown"
         in
         span_icon ##. className := cls
@@ -921,25 +921,7 @@ module Controller =
       alt_ergo_not_running () && Queue.is_empty task_queue && not (!why3_busy)
 
 
-
-    let rec init_alt_ergo_worker i =
-      let worker = Worker.create "alt_ergo_worker.js" in
-      worker ##. onmessage :=
-        Dom.handler (fun ev ->
-            let (id, result) as res = unmarshal (ev ##. data) in
-            TaskList.print_alt_ergo_output id result;
-            let status_update = status_of_result res in
-            let () = match status_update with
-              | SetStatus(v, id) ->
-                  handle_why3_message (UpdateStatus(v, id))
-              | _ -> () in
-            (get_why3_worker()) ## postMessage (marshal status_update);
-            !alt_ergo_workers.(i) <- Free(worker);
-            process_task ();
-            Js._false);
-      Free (worker)
-
-    and process_task () =
+    let process_task () =
       let rec find_free_worker_slot i =
         if i < num_workers then
           match !alt_ergo_workers.(i) with
@@ -951,15 +933,30 @@ module Controller =
       match w with
       | Free w when not (Queue.is_empty task_queue) ->
         let task = Queue.take task_queue in
-        !alt_ergo_workers.(idx) <- Busy (w);
-        w ## postMessage (marshal (OptionSteps !alt_ergo_steps));
+        !alt_ergo_workers.(idx) <- Busy w;
         w ## postMessage (marshal task)
       | _ -> if is_idle () then ToolBar.enable_compile ()
+
+    let init_alt_ergo_worker i =
+      let worker = Worker.create "alt_ergo_worker.js" in
+      worker ##. onmessage :=
+        Dom.handler (fun ev ->
+            let (id, result) = unmarshal (ev ##. data) in
+            TaskList.print_alt_ergo_output id result;
+            let status = match result with
+              | Valid -> StValid
+              | _ -> StUnknown in
+            handle_why3_message (UpdateStatus (status, id));
+            (get_why3_worker ()) ## postMessage (marshal (SetStatus (status, id)));
+            !alt_ergo_workers.(i) <- Free worker;
+            process_task ();
+            Js._false);
+      Free worker
 
     let reset_workers () =
       Array.iteri (fun i w ->
           match w with
-          | Busy (w)  ->
+          | Busy w  ->
               w ## terminate;
               !alt_ergo_workers.(i) <- init_alt_ergo_worker i
           | Absent -> !alt_ergo_workers.(i) <- init_alt_ergo_worker i
@@ -982,8 +979,8 @@ module Controller =
             handle_why3_message msg;
             let () =
               match msg with
-                Task (id,_,_,code,_, _, steps) ->
-                  push_task (Goal (id,code, steps))
+              | Task (id, _, _, code, _, _, _) ->
+                  push_task (id, code, !alt_ergo_steps)
               | Idle ->
                   why3_busy := false;
                   if is_idle () then ToolBar.enable_compile ()
@@ -1079,17 +1076,17 @@ let () =
   ToolBar.add_action Buttons.button_about Dialogs.(show about_dialog);
 
   ContextMenu.(add_action split_menu_entry
-                 Controller.(why3_transform `Split ignore));
+                 Controller.(why3_transform Split ignore));
   ContextMenu.(add_action prove_menu_entry
-                 Controller.(why3_transform (`Prove(-1)) ignore));
+                 Controller.(why3_transform (Prove (-1)) ignore));
   ContextMenu.(add_action prove100_menu_entry
-                 Controller.(why3_transform (`Prove(100)) ignore));
+                 Controller.(why3_transform (Prove 100) ignore));
   ContextMenu.(add_action prove1000_menu_entry
-                 Controller.(why3_transform (`Prove(1000)) ignore));
+                 Controller.(why3_transform (Prove 1000) ignore));
   ContextMenu.(add_action prove5000_menu_entry
-                 Controller.(why3_transform (`Prove(5000)) ignore));
+                 Controller.(why3_transform (Prove 5000) ignore));
   ContextMenu.(add_action clean_menu_entry
-                 Controller.(why3_transform (`Clean) TaskList.clean_task));
+                 Controller.(why3_transform Clean TaskList.clean_task));
 
   Dialogs.(set_onchange input_num_threads (fun o ->
                let open Controller in

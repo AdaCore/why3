@@ -14,13 +14,14 @@ module Js = Js_of_ocaml.Js
 type id = string
 type loc = int * int * int * int
 type why3_loc = string * (int * int * int) (* kind, line, column, length *)
-type status = [`New | `Valid | `Unknown ]
+type status = StNew | StValid | StUnknown
+type transform = Prove of int | Split | Clean
 
 type why3_command =
   | ParseBuffer of string * string
   | ExecuteBuffer of string * string
   | ProveAll
-  | Transform of [ `Prove of int | `Split | `Clean ] * id
+  | Transform of transform * id
   | SetStatus of status * id
   | GetFormats
 
@@ -36,7 +37,7 @@ type why3_output =
   | Idle
   | Formats of (string * string list) list
 
-type prover_command = OptionSteps of int | Goal of id * string * int
+type prover_command = id * string * int
 type prover_output = Valid | Unknown of string | Invalid of string
 
 let marshal a =
@@ -44,7 +45,3 @@ let marshal a =
 
 let unmarshal a =
   Marshal.from_string (Scanf.unescaped (Js.to_string a)) 0
-
-let status_of_result = function
-    (id, Valid) -> SetStatus(`Valid, id)
-  | (id, _) -> SetStatus(`Unknown, id)
