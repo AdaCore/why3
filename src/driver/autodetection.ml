@@ -818,5 +818,4 @@ let update_binaries_detected binaries config =
 
 let compute_builtin_prover binaries datas =
   let env = create_env binaries datas.Prover_autodetection_data.shortcuts in
-  let _ = run_auto_detection env datas.skeletons in
-  ()
+  run_auto_detection env datas.skeletons

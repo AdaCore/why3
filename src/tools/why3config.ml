@@ -122,13 +122,16 @@ let main () =
       match prover_bins with
       | [] ->
           let binaries = Autodetection.request_binaries_version config datas in
-          Autodetection.compute_builtin_prover binaries datas;
+          ignore (Autodetection.compute_builtin_prover binaries datas);
           Autodetection.set_binaries_detected binaries config
       | _ ->
           let binaries =
             Autodetection.request_manual_binaries_version datas prover_bins
           in
-          Autodetection.compute_builtin_prover binaries datas;
+          let m = Autodetection.compute_builtin_prover binaries datas in
+          if Mprover.is_empty m then begin
+            exit 1
+          end;
           let config = List.fold_left Autodetection.Manual_binary.add config prover_bins in
           Autodetection.update_binaries_detected binaries config
     in
