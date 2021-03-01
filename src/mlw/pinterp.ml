@@ -26,8 +26,6 @@ let debug_trace_exec =
 let debug_rac_values =
   Debug.register_info_flag "rac-values"
     ~desc:"print values that are taken into account during interpretation"
-(* print debug information about the values that are imported during
-   interpretation *)
 
 let debug_rac_check_sat =
   Debug.register_info_flag "rac-check-term-sat"

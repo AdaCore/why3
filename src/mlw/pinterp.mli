@@ -282,3 +282,7 @@ val debug_array_as_update_chains_not_epsilon : Debug.flag
    [a] of length [n] is converted to [(epsilon v. v.length =n /\ v[0] = a[0] /\
    ... /\ a[n-1] = a[n-1])]. As an update chain, it is instead converted into a
    formula [(make n undefined)[0 <- a[0]]... [n-1 <- a[n-1]]] *)
+
+val debug_rac_values : Debug.flag
+(* print debug information about the values that are imported during
+   interpretation *)
