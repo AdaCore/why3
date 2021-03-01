@@ -9,142 +9,193 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Format
 open Why3
 open Whyconf
 
 let conf_file = ref None
-let show_config = ref false
 
-(* When no arguments are given, activate the fallback to auto mode on error.
-   true <-> fallback *)
-let auto_fb = Array.length Sys.argv = 1
+let exec_name = Filename.basename Sys.argv.(0)
 
-let opt_list_binaries = ref false
-
-let save = ref true
-
-let set_oref r = (fun s -> r := Some s)
-
-let prover_bins = Queue.create ()
-
-let plugins = Queue.create ()
-let add_plugin x = Queue.add x plugins
-
-let spec =
+let option_C =
   let open Getopt in
-  [ Key ('C', "config"), Hnd1 (AString, set_oref conf_file),
-    "<file> config file to create";
-    KLong "detect-provers", Hnd0 (fun () -> ()),
-    " deprecated does nothing";
-    KLong "detect-plugins", Hnd0 (fun () -> ()),
-    " deprecated does nothing";
-    KLong "detect", Hnd0 (fun () -> ()),
-    " deprecated does nothing";
-    KLong "add-prover", Hnd1 (APair (',', AString, (APair (',', AString, AString))),
-      fun (same_as, (shortcut, binary)) ->
-      Queue.add {Autodetection.Manual_binary.same_as;
-                 shortcut = if shortcut = "" then None else Some shortcut;
-                 binary } prover_bins),
-    "<name>,<shortcut>,<file> add a new executable for prover <name>";
-    KLong "show-config", Hnd0 (fun () -> show_config := true),
-    " show the expansion of the configuration";
-    KLong "list-supported-provers", Hnd0 (fun () -> opt_list_binaries := true),
-    " list supported provers";
-    KLong "install-plugin", Hnd1 (AString, add_plugin),
-    "<file> copy a plugin to the current library directory";
-    KLong "dont-save", Hnd0 (fun () -> save := false),
-    " do not modify the config file";
-    Debug.Args.desc_debug;
-    Debug.Args.desc_debug_all;
-    Debug.Args.desc_debug_list;
-  ]
+  Key ('C', "config"), Hnd1 (AString, fun s -> conf_file := Some s),
+  "<file> config file to create"
 
-let usage () =
-  Printf.eprintf
-    "Usage: %s [options] \n\
-     Detect provers to configure Why3.\n\
-     \n%s%!"
-    (Filename.basename Sys.argv.(0))
-    (Getopt.format spec);
-  exit 0
+let load_config () =
+  Autodetection.is_config_command := true;
+  try
+    Whyconf.read_config !conf_file
+  with
+  | Rc.CannotOpen (f, s) | Whyconf.ConfigFailure (f, s) ->
+      Format.eprintf "warning: cannot read config file %s:@\n  %s@." f s;
+      Whyconf.default_config f
 
-let spec =
-  let open Why3.Getopt in
-  (Key ('h', "help"), Hnd0 usage," display this help and exit") :: spec
+type cmd = {
+    cmd_spec : Getopt.opt list;
+    cmd_desc : string;
+    cmd_args : string;
+    cmd_name : string;
+    cmd_run  : unit -> unit;
+    cmd_anon_fun : (string -> unit) option;
+  }
 
-let anon_file x = raise (Getopt.GetoptFailure (sprintf "unexpected argument: %s" x))
+module DetectProvers = struct
 
-(* let add_prover_binary config (id,shortcut,file) =
- *   Autodetection.add_prover_binary config id shortcut file *)
+  let run () =
+    let open Autodetection in
+    let config = load_config () in
+    let datas = read_auto_detection_data config in
+    let binaries = request_binaries_version config datas in
+    ignore (compute_builtin_prover binaries datas);
+    let config = set_binaries_detected binaries config in
+    Format.printf "Save config to %s@." (Whyconf.get_conf_file config);
+    save_config config
 
-let main () =
-  (* Parse the command line *)
-  Getopt.parse_all ~i:!Whyconf.Args.first_arg spec anon_file Sys.argv;
+  let cmd = {
+      cmd_spec = [option_C];
+      cmd_desc = "detect installed provers";
+      cmd_args = "";
+      cmd_name = "detect";
+      cmd_run = run;
+      cmd_anon_fun = None;
+    }
 
-  let opt_list = ref false in
+end
 
-  (* Debug flag *)
-  Debug.Args.set_flags_selected ();
+module AddProver = struct
 
-  if !opt_list_binaries then begin
-    opt_list := true;
-    printf "@[<hov 2>Supported provers:@\n%a@]@\n@."
+  let args = ref []
+
+  let run () =
+    let open Autodetection in
+    let prover =
+      match !args with
+      | [shortcut; binary; name] ->
+          { Manual_binary.same_as = name; binary; shortcut = Some shortcut }
+      | [binary; name] ->
+          { Manual_binary.same_as = name; binary; shortcut = None }
+      | _ ->
+          Printf.eprintf "%s config add-prover: expected 2 or 3 arguments: <name> <path> [<shortcut>]\n%!"
+            exec_name;
+          exit 1 in
+    let config = load_config () in
+    let datas = read_auto_detection_data config in
+    let binaries = request_manual_binaries_version datas [prover] in
+    let m = compute_builtin_prover binaries datas in
+    if Mprover.is_empty m then exit 1;
+    let config = Manual_binary.add config prover in
+    let config = update_binaries_detected binaries config in
+    Format.printf "Save config to %s@." (Whyconf.get_conf_file config);
+    save_config config
+
+  let cmd = {
+      cmd_spec = [option_C];
+      cmd_desc = "add prover";
+      cmd_args = " <name> <path> [<shortcut>]";
+      cmd_name = "add-prover";
+      cmd_run = run;
+      cmd_anon_fun = Some (fun s -> args := s :: !args);
+    }
+
+end
+
+module ListProvers = struct
+
+  let run () =
+    Format.printf "@[<v>%a@]@."
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Autodetection.list_binaries ()))
-  end;
 
-  opt_list := Debug.Args.option_list () || !opt_list;
-  if !opt_list then exit 0;
+  let cmd = {
+      cmd_spec = [];
+      cmd_desc = "list all the supported provers";
+      cmd_args = "";
+      cmd_name = "list-supported-provers";
+      cmd_run = run;
+      cmd_anon_fun = None;
+    }
 
-  (* Main *)
+end
 
-  if !show_config then begin
+module ShowConfig = struct
+
+  let run () =
     let config = Whyconf.init_config !conf_file in
     let rc = Whyconf.rc_of_config config in
     Rc.to_channel stdout rc
-  end else begin
-    Autodetection.is_config_command := true;
-    let config =
-      try
-        Whyconf.read_config !conf_file
-      with
-      | Rc.CannotOpen (f, s)
-      | Whyconf.ConfigFailure (f, s) ->
-          eprintf "warning: cannot read config file %s:@\n  %s@." f s;
-          Whyconf.default_config f
-    in
 
-    let prover_bins = Queue.fold (fun acc x -> x::acc) [] prover_bins in
-    let datas = Autodetection.read_auto_detection_data config in
+  let cmd = {
+      cmd_spec = [option_C];
+      cmd_desc = "show the full configution";
+      cmd_args = "";
+      cmd_name = "show";
+      cmd_run = run;
+      cmd_anon_fun = None;
+    }
 
-    let config =
-      match prover_bins with
-      | [] ->
-          let binaries = Autodetection.request_binaries_version config datas in
-          ignore (Autodetection.compute_builtin_prover binaries datas);
-          Autodetection.set_binaries_detected binaries config
-      | _ ->
-          let binaries =
-            Autodetection.request_manual_binaries_version datas prover_bins
-          in
-          let m = Autodetection.compute_builtin_prover binaries datas in
-          if Mprover.is_empty m then begin
-            exit 1
-          end;
-          let config = List.fold_left Autodetection.Manual_binary.add config prover_bins in
-          Autodetection.update_binaries_detected binaries config
-    in
+end
 
-    if !save then begin
-      printf "Save config to %s@." (Whyconf.get_conf_file config);
-      save_config config
-    end
-  end
+let cmds = [
+    AddProver.cmd;
+    DetectProvers.cmd;
+    ListProvers.cmd;
+    ShowConfig.cmd;
+  ]
+
+let print_commands fmt =
+  let maxl = List.fold_left
+    (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds in
+  Format.fprintf fmt "Available commands:@\n%a"
+    (Pp.print_list_suf Pp.newline
+       (fun fmt e -> Format.fprintf fmt "  %s   @[<hov>%s@]"
+         (Strings.pad_right ' ' e.cmd_name maxl) e.cmd_desc)) cmds
+
+let do_usage () =
+  Format.printf
+    "@[Usage: %s config [options] <command> [options]@\n\
+     Execute the given subcommand.@\n\
+     @\n%t@]@?"
+    exec_name
+    print_commands;
+  exit 0
+
+let option_list =
+  let open Getopt in
+  [ Key ('C', "config"), Hnd1 (AString, fun s -> conf_file := Some s),
+    "<file> config file to create";
+    Key ('h', "help"), Hnd0 do_usage,
+    " display this help and exit" ]
+
+let anon_file x = raise (Getopt.GetoptFailure (Printf.sprintf "unexpected argument: %s" x))
 
 let () =
+  let i = Getopt.parse_many option_list Sys.argv !Whyconf.Args.first_arg in
+  if i = Array.length Sys.argv then do_usage ();
+  let cmd_name = Sys.argv.(i) in
+  let cmd =
+    match List.find (fun e -> e.cmd_name = cmd_name) cmds with
+    | cmd -> cmd
+    | exception Not_found ->
+        Format.eprintf "'%s' is not a why3config command.@\n@\n%t"
+          cmd_name print_commands;
+        exit 1 in
+  let rec cmd_usage () =
+    Printf.printf "Usage: %s config %s [options]%s\n\n%s%!"
+      exec_name cmd_name
+      cmd.cmd_args
+      (Getopt.format options);
+    exit 0
+  and options =
+    let open Getopt in
+    (Key ('h', "help"), Hnd0 cmd_usage, " display this help and exit") ::
+      cmd.cmd_spec in
+  let anon_fun = match cmd.cmd_anon_fun with
+    | Some f -> f
+    | None -> anon_file in
+  Getopt.parse_all ~i:(i + 1) options anon_fun Sys.argv;
   try
-    main ()
+    Debug.Args.set_flags_selected ();
+    cmd.cmd_run ()
   with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "Error: %a@." Exn_printer.exn_printer e;
+    Format.eprintf "@.%a@." Exn_printer.exn_printer e;
     exit 1
