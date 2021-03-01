@@ -794,13 +794,14 @@ let request_binaries_version config datas =
       binaries
   in
   (** manual prover *)
+  let names = names_of_data datas.Prover_autodetection_data.skeletons in
   let manuals = Manual_binary.load config in
-  let of_name = detected_of_manuals binaries manuals in
+  let of_name = detected_of_manuals names manuals in
   { of_name; of_exec_name }
 
 let request_manual_binaries_version datas manuals =
-  let binaries = names_of_data datas.Prover_autodetection_data.skeletons in
-  let of_name = detected_of_manuals binaries manuals in
+  let names = names_of_data datas.Prover_autodetection_data.skeletons in
+  let of_name = detected_of_manuals names manuals in
   { of_name; of_exec_name = Mstr.empty }
 
 let detected_of_binaries binaries =
