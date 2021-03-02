@@ -187,12 +187,12 @@ let usage_str = sprintf
 
 let env, gconfig =
   try
-    let config, base_config, env =
+    let config, env =
       Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
     in
     if Queue.is_empty files then
       Whyconf.Args.exit_with_usage spec usage_str;
-    Gconfig.load_config config base_config;
+    Gconfig.load_config config;
     env, Gconfig.config ()
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "Anomaly while loading configuration: %a@." Exn_printer.exn_printer e;

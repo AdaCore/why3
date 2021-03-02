@@ -88,7 +88,7 @@ let option_list =
 
 let add_file f = Queue.push f files
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_file usage_msg
 
 module C = Controller_itp.Make(Unix_scheduler.Unix_scheduler)

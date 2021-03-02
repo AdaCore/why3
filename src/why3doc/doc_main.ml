@@ -43,7 +43,7 @@ let option_list =
     " only produce the body of the HTML document";
   ]
 
-let _,_,env =
+let _,env =
   Whyconf.Args.initialize option_list
     (fun x -> Queue.add x opt_queue) usage_msg
 

@@ -64,7 +64,7 @@ let option_list =
     "<qualified_module> use module in the execution";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt usage_msg
 
 let () =

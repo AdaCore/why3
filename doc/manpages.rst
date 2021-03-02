@@ -135,52 +135,48 @@ please consider submitting a new prover configuration on the bug
 tracking system.)
 
 The result of provers detection is stored in the user's configuration
-file (see :numref:`sec.whyconffile`). This file is also
-human-readable, and advanced users may modify it in order to experiment
-with different ways of calling provers, e.g., different versions of the same
-prover, or with different options.
-The :why3:tool:`config` command also detects the :index:`plugins <plugin>` installed in the Why3
-plugins directory (e.g., :file:`/usr/local/lib/why3/plugins`).
+file (see :numref:`sec.whyconffile`). Only the version of the binaries detected
+is stored by the :why3:tool:`config`. The actual definition of the provers,
+shortcuts, stategies and editors are regenerated at each startup of a Why3,
+without having to execute any prover. The expanded definition can be inspected
+with the option :option:`--show-config` of the :why3:tool:`config`.
 
-If the user's configuration file is already present, :why3:tool:`config` will
-only reset unset variables to default value, but will not try to detect
-provers and plugins. Options :option:`--detect-provers` and
-:option:`--detect-plugins` can be used in that case.
+This output is also human-readable, and advanced users may copy some part in
+their (see :numref:`sec.whyconffile`) in order to experiment with different ways
+of calling provers, e.g., different versions of the same prover, or with
+different options.
+
+If the user's configuration file is already present, :why3:tool:`config` only
+modifies the ``[detected_binary]`` sections.
+
 If a supported prover is installed under a name that is not
 automatically recognized by :why3:tool:`config`, the :option:`--add-prover` option
-can be used to add a specified binary to the configuration.
+can be used to add a specified binary to the configuration by adding
+``[manual_binary]`` section.
 
 Options
 ~~~~~~~
 
-.. option:: --detect-provers
+.. option:: --show-config
 
-   Force detection of provers, when the configuration file already exists.
+   Only show the expanded version of the configuraion file
 
-.. option:: --detect-plugins
+.. option:: --add-prover=<name>,<shortcut>,<file>
 
-   Force detection of plugins, when the configuration file already exists.
+   Detect the program ``<file>`` as an executable for prover ``<name>``,
+   and register it as ``<shortcut>`` (potentially empty).
 
-.. option:: --detect
-
-   Imply both :option:`--detect-provers` and :option:`--detect-plugins`.
-   Also reset the loadpath.
-
-.. option:: --add-prover=<id>,<shortcut>,<file>
-
-   Check the executable program ``<file>`` against the provers of family
-   ``<id>``, and register it as ``<shortcut>``.
-
-   Example: to add an Alt-Ergo
-   executable :file:`/home/me/bin/alt-ergo-trunk`, one can type
+   For example, to add an Alt-Ergo
+   executable :file:`/home/me/bin/alt-ergo-trunk` with shortcut
+   ``new-ae``, one can type
 
    ::
 
-      why3 config --add-prover=alt-ergo,new-ae,/home/me/bin/alt-ergo-trunk
+      why3 config --add-prover=Alt-Ergo,new-ae,/home/me/bin/alt-ergo-trunk
 
-.. option:: --list-prover-families
+.. option:: --list-supported-provers
 
-   List families of provers, as used by option :option:`--add-prover`.
+   List the names of supported provers, as used by option :option:`--add-prover`.
 
 .. why3:tool:: prove
 .. _sec.why3prove:

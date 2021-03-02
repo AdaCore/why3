@@ -139,7 +139,7 @@ Installation can be tested as follows:
 
 #. install some external provers (see :numref:`sec.provers` below)
 
-#. run :option:`why3 config --detect`
+#. run :why3:tool:`why3 config`
 
 #. run some examples from the distribution, e.g., you should obtain the
    following (provided the required provers are installed on your
@@ -211,7 +211,7 @@ to run the following command:
 
 ::
 
-    why3 config --detect
+    why3 config
 
 It scans your :envvar:`PATH` for provers and updates your configuration file
 (see :numref:`sec.why3config`) accordingly.
@@ -230,13 +230,12 @@ added to specify names of prover executables:
 
 ::
 
-    why3 config --add-prover cvc4 cvc4-dev /usr/local/bin/cvc4-dev
+    why3 config --add-prover=cvc4,cvc4-dev,/usr/local/bin/cvc4-dev
 
-the first argument (here ``cvc4``) must be one of the family of provers
-known. The list of these famillies can be obtain using
-:option:`why3 config --list-prover-families`.
-
-as they are in fact listed in the file :file:`provers-detection-data.conf`,
+the first argument (here ``cvc4``) must be one of the provers' known
+executable names. The list of these names can be obtained
+using :option:`why3 config --list-supported-provers`.
+They can also be found in the file :file:`provers-detection-data.conf`,
 typically located in :file:`/usr/local/share/why3` after installation. See
 :numref:`sec.proverdetectiondata` for details.
 
