@@ -16,10 +16,7 @@ let () = Debug.set_flag Glob.flag
 
 (* command line parsing *)
 
-let usage_msg = sprintf
-  "Usage: %s [options] <file>...\n\
-   Produce HTML documentation for the given files.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg = "<file>...\nProduce HTML documentation for the given files."
 
 let opt_output = ref None
 let opt_index = ref None (* default behavior *)
@@ -118,10 +115,3 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3doc.opt"
-End:
-*)
-

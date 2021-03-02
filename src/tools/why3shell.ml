@@ -387,10 +387,9 @@ let spec =
    " remove all printing to stdout"]
 
 (* --help *)
-let usage_str = Format.sprintf
-  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]\n\
-   Launch a command-line interface for Why3.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_str =
+  "[<file.xml>|<f1.why> <f2.mlw> ...]\n\
+   Launch a command-line interface for Why3."
 
 (* Parse files *)
 let config, env =

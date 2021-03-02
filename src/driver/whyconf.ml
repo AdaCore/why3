@@ -1081,6 +1081,9 @@ module Args = struct
   let opt_stdlib = ref true
   let opt_load_default_plugins = ref true
 
+  let add_command s =
+    Getopt.commands := !Getopt.commands @ [s]
+
   let common_options =
     let open Getopt in
     [ Key ('C', "config"), Hnd1 (AString, fun s -> opt_config := Some s),
@@ -1099,16 +1102,25 @@ module Args = struct
     ]
 
   let do_usage options header footer =
-    Printf.printf "%s\n%s" header (Getopt.format options);
+    Printf.printf "Usage:";
+    List.iter (Printf.printf " %s") !Getopt.commands;
+    Printf.printf " [options]";
+    if header = "" then Printf.printf "\n\n"
+    else if header.[String.length header - 1] <> '\n' then
+      Printf.printf " %s\n\n" header
+    else Printf.printf " %s\n" header;
+    Printf.printf "%s" (Getopt.format options);
     if footer <> "" then Printf.printf "\n%s" footer;
     Printf.printf "%!"
 
   let all_options options header footer =
-    let options = common_options @ options in
-    let open Getopt in
-    (Key ('h', "help"), Hnd0 (fun () -> do_usage options header footer; exit 0),
-     " display this help and exit") ::
-      options
+    let options = ref (common_options @ options) in
+    let help =
+      let open Getopt in
+      (Key ('h', "help"), Hnd0 (fun () -> do_usage !options header footer; exit 0),
+       " display this help and exit") in
+    options := help :: !options;
+    !options
 
   let complete_initialization () =
     Debug.Args.set_flags_selected ~silent:true ();
@@ -1131,7 +1143,7 @@ module Args = struct
     complete_initialization ()
 
   let exit_with_usage ?(exit_code=1) ?(extra_help="") options usage =
-    let options = common_options @ options in
+    let options = all_options options usage extra_help in
     do_usage options usage extra_help;
     exit exit_code
 end

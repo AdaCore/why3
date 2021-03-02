@@ -60,10 +60,7 @@ let set_opt_smoke = function
   | Some _ -> assert false
   | None -> opt_smoke := SD_Top
 
-let usage_msg = Format.sprintf
-  "Usage: %s [options] <dir>\n\
-   Replay the session stored in the given directory.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg = "<dir>\nReplay the session stored in the given directory."
 
 let option_list =
   let open Getopt in

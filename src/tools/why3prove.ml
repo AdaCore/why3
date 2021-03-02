@@ -16,10 +16,9 @@ open Whyconf
 open Theory
 open Task
 
-let usage_msg = sprintf
-  "Usage: %s [options] [[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
-   Run some transformation or prover on the given goals.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg =
+  "Usage: [[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
+   Run some transformation or prover on the given goals."
 
 let opt_queue = Queue.create ()
 
