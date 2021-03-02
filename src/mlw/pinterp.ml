@@ -2315,7 +2315,8 @@ and eval_expr' env e =
       let t = compute_term env t in
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
-      Irred e (* TODO stuck? *)
+      let ctx = cntr_ctx "absurd" ?trigger_loc:e.e_loc env in
+      raise (Contr (ctx, t_false))
 
 and exec_match env t ebl =
   let rec iter ebl =
