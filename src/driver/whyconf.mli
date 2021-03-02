@@ -309,6 +309,8 @@ module Args : sig
 
   val first_arg : int ref
 
+  val opt_config : string option ref
+
   val all_options : Getopt.opt list -> string -> string -> Getopt.opt list
 
   val initialize :
