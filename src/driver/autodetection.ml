@@ -389,12 +389,6 @@ let find_prover_altern provers prover_id =
        confusing *)
     aux 2
 
-let add_prover_with_uniq_id prover provers =
-  (* find an unique prover triplet *)
-  let prover_id = find_prover_altern provers prover.Wc.prover in
-  let prover = {prover with Wc.prover = prover_id} in
-  Mprover.add prover_id prover provers
-
 let add_prover_shortcuts env prover =
   let rec aux = function
     | [] -> []
@@ -524,93 +518,90 @@ let check_support_library (data:Prover_autodetection_data.data) ver =
       data.prover_name ver;
     false
 
-exception Skip    (* prover is ignored *)
-exception Discard (* prover is recognized, but unusable *)
-
-let detect_exec_skip env (data:Prover_autodetection_data.data) (p:Detected_binary.t) =
+let detect_exec env (data:Prover_autodetection_data.data) provers (p:Detected_binary.t) =
   let binary = Detected_binary.binary p.name in
   (* bad here means not good, it is not the same thing as a version
      of a prover with known problems *)
   let bad = List.exists (check_version p.version) data.versions_bad in
-  if bad then raise Discard;
-  let good = List.exists (check_version p.version) data.versions_ok in
-  let old  = List.exists (check_version p.version) data.versions_old in
-  let pp_shortcut fmt = Opt.iter (Format.fprintf fmt (" (manually added as %s)")) p.shortcut in
-  let prover_command =
+  if bad then begin
+    known_version env binary;
+    provers
+  end else
+    let good = List.exists (check_version p.version) data.versions_ok in
+    let old  = List.exists (check_version p.version) data.versions_old in
+    let pp_shortcut fmt = Opt.iter (Format.fprintf fmt (" (manually added as %s)")) p.shortcut in
     match data.prover_command with
     | None ->
-      (* empty prover: a matching version means known problems *)
-      if not (good || old) then raise Skip;
-      print_info "Found prover %s%t version %s%s@."
-        data.prover_name
-        pp_shortcut
-        p.version
-        (Opt.get_def
-           ". This version of the prover is known to have problems."
-           data.message);
-      raise Discard
-    | Some prover_command -> prover_command
-  in
-  (* create the prover config *)
-  let c = make_command binary prover_command in
-  let c_steps = Opt.map (make_command binary) data.prover_command_steps in
-  let prover =
-    { Wc.prover_name = data.prover_name;
-      prover_version = p.version;
-      prover_altern = data.prover_altern } in
-  let prover_config =
-    { prover = prover;
-      command = c;
-      command_steps = c_steps;
-      driver = data.prover_driver;
-      editor = data.prover_editor;
-      in_place = data.prover_in_place;
-      interactive = (match data.kind with ITP -> true | ATP -> false);
-      extra_options = [];
-      extra_drivers = [];
-    } in
-  (* if unknown, temporarily put the prover away *)
-  let shortcut = Opt.get_def data.prover_id p.shortcut in
-  if not (good || old) then begin
-    let priority = next_priority () in
-    unknown_version env binary shortcut prover_config data priority;
-    raise Skip
-  end;
-  (* check if this prover needs compile-time support *)
-  if data.support_library <> "" && not (check_support_library data p.version) then
-    raise Discard;
-  let priority = next_priority () in
-  print_info "Found prover %s%t version %s%s@."
-    data.prover_name pp_shortcut p.version
-    (Opt.get_def
-       (if old then
-           " (old version, please consider upgrading)."
-        else
-           if data.prover_altern <> "" then
-             " (alternative: " ^ data.prover_altern ^ ")"
-           else
-             ", OK.")
-       data.message);
-  add_prover_shortcuts env prover;
-  add_id_prover_shortcut env shortcut prover priority;
-  let level = data.use_at_auto_level in
-  if level > 0 then record_prover_for_auto_mode env prover level;
-  prover_config
+        (* an empty prover command is used for forbidding some versions:
+           a matching version means known problems *)
+        if not (good || old) then begin
+          provers
+        end else begin
+          print_info "Found prover %s%t version %s%s@."
+            data.prover_name
+            pp_shortcut
+            p.version
+            (Opt.get_def
+               ". This version of the prover is known to have problems."
+               data.message);
+          known_version env binary;
+          provers
+        end
+    | Some prover_command ->
+        (* create the prover config *)
+        let c = make_command binary prover_command in
+        let c_steps = Opt.map (make_command binary) data.prover_command_steps in
+        let prover =
+          { Wc.prover_name = data.prover_name;
+            prover_version = p.version;
+            prover_altern = data.prover_altern } in
+        let prover_config =
+          { prover = prover;
+            command = c;
+            command_steps = c_steps;
+            driver = data.prover_driver;
+            editor = data.prover_editor;
+            in_place = data.prover_in_place;
+            interactive = (match data.kind with ITP -> true | ATP -> false);
+            extra_options = [];
+            extra_drivers = [];
+          } in
+        let shortcut = Opt.get_def data.prover_id p.shortcut in
+        if not (good || old) then begin
+          (* Unknown, temporarily put the prover away *)
+          let priority = next_priority () in
+          unknown_version env binary shortcut prover_config data priority;
+          provers
+        end
+        else if data.support_library <> "" && not (check_support_library data p.version) then begin
+          (* The prover needs compile-time support and it is not available *)
+          known_version env binary;
+          provers
+        end else
+          (* The prover can be added with a uniq id *)
+          let prover = find_prover_altern provers prover in
+          let prover_config = { prover_config with prover } in
+          let priority = next_priority () in
+          print_info "Found prover %s%t version %s%s@."
+            data.prover_name pp_shortcut p.version
+            (Opt.get_def
+               (if old then
+                  " (old version, please consider upgrading)."
+                else
+                if data.prover_altern <> "" then
+                  " (alternative: " ^ data.prover_altern ^ ")"
+                else
+                  ", OK.")
+               data.message);
+          add_prover_shortcuts env prover;
+          add_id_prover_shortcut env shortcut prover priority;
+          let level = data.use_at_auto_level in
+          if level > 0 then record_prover_for_auto_mode env prover level;
+          known_version env binary;
+          Mprover.add prover prover_config provers
 
 let detect_exec env acc data =
-  let fold acc l =
-      List.fold_left (fun acc p ->
-      let binary = Detected_binary.binary p.Detected_binary.name in
-      try
-        let prover_config = detect_exec_skip env data p in
-        known_version env binary;
-        add_prover_with_uniq_id prover_config acc
-      with
-      | Skip -> acc
-      | Discard -> known_version env binary; acc
-    )
-      acc l
-  in
+  let fold = List.fold_left (detect_exec env data) in
   let acc =
     List.fold_left (fun acc exec_name ->
         fold acc (Mstr.find_def [] exec_name env.binaries.of_exec_name)
@@ -623,28 +614,35 @@ let pp_versions =
   Pp.print_list Pp.comma
                 (Pp.print_pair_delim Pp.nothing Pp.nothing Pp.nothing Pp.string Pp.nothing)
 
-let detect_unknown_skip env uv =
-  let prover = uv.prover_config.prover in
-  let ver = prover.prover_version in
-  if uv.data.support_library <> "" && not (check_support_library uv.data ver) then raise Skip;
-  print_info
-    "@[<v>@[Prover %s version %s is not known to be supported.@]@ \
-     @[Known versions for this prover:@ %a.@]@ \
-     @[Known old versions for this prover:@ %a.@]@]@."
-    prover.Wc.prover_name ver
-    pp_versions uv.data.versions_ok
-    pp_versions uv.data.versions_old;
-  add_id_prover_shortcut env uv.shortcut prover uv.priority;
-  uv.prover_config
+let detect_unknown env provers uv =
+  let ver = uv.prover_config.prover.prover_version in
+  if uv.data.support_library <> "" && not (check_support_library uv.data ver) then begin
+    (* The prover needs compile-time support and it is not available *)
+    provers
+  end else begin
+    let prover = find_prover_altern provers uv.prover_config.prover in
+    let prover_config = { uv.prover_config with prover } in
+    print_info
+      "@[<v>@[Prover %s version %s is not known to be supported.@]@ \
+       @[Known versions for this prover:@ %a.@]@ \
+       @[Known old versions for this prover:@ %a.@]@]@."
+      prover.Wc.prover_name ver
+      pp_versions uv.data.versions_ok
+      pp_versions uv.data.versions_old;
+    add_id_prover_shortcut env uv.shortcut prover uv.priority;
+    Mprover.add prover prover_config provers
+  end
 
 let detect_unknown env detected =
   Hstr.fold (fun _ pc acc ->
       match pc with
-      | None -> acc
+      | None ->
+          (* The prover version appeared in some section *)
+          acc
       | Some uv ->
-          try
-            add_prover_with_uniq_id (detect_unknown_skip env uv) acc
-          with Skip -> acc
+          (* The version never appeared in any section,
+             so we take the first not bad section *)
+          detect_unknown env acc uv
     ) env.prover_unknown_version detected
 
 let convert_shortcuts env =
