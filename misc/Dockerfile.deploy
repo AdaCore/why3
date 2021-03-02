@@ -68,6 +68,6 @@ USER guest
 ENV HOME /home/guest
 WORKDIR /home/guest
 
-RUN why3 config --detect
+RUN why3 config detect
 
 ENTRYPOINT [ "why3-wrapper.sh" ]

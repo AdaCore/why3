@@ -224,17 +224,17 @@ CVC4 1.4 and CVC4 1.5 at the same time. The automatic detection of
 provers looks for typical names for their executable command, e.g., :program:`cvc4`
 for CVC3. However, if you install several versions of the same prover it
 is likely that you would use specialized executable names, such as
-:program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, option
-:option:`why3 config --add-prover` can be
-added to specify names of prover executables:
+:program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, the command
+:why3:tool:`why3 config add-prover` can be
+used to specify names of prover executables:
 
 ::
 
-    why3 config --add-prover=cvc4,cvc4-dev,/usr/local/bin/cvc4-dev
+    why3 config add-prover CVC4 /usr/local/bin/cvc4-dev cvc4-dev
 
-the first argument (here ``cvc4``) must be one of the provers' known
-executable names. The list of these names can be obtained
-using :option:`why3 config --list-supported-provers`.
+the first argument (here ``CVC4``) must be one of the known provers. The
+list of these names can be obtained
+using :why3:tool:`why3 config list-supported-provers`.
 They can also be found in the file :file:`provers-detection-data.conf`,
 typically located in :file:`/usr/local/share/why3` after installation. See
 :numref:`sec.proverdetectiondata` for details.
