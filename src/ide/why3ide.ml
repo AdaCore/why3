@@ -180,10 +180,9 @@ let spec =
     KLong "batch", Hnd1 (AString, fun s -> opt_batch := Some s), "";
   ]
 
-let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]...\n\
-   Open a graphical interface for Why3.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_str =
+  "[<file.why>|<project directory>]...\n\
+   Open a graphical interface for Why3."
 
 let env, gconfig =
   try

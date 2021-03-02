@@ -65,7 +65,7 @@ module AddProver = struct
       | [binary; name] ->
           { Manual_binary.same_as = name; binary; shortcut = None }
       | _ ->
-          Printf.eprintf "%s config add-prover: expected 2 or 3 arguments: <name> <path> [<shortcut>]\n%!"
+          Printf.eprintf "%s config add-prover: expected 2 or 3 arguments: <name> <path> [shortcut]\n%!"
             exec_name;
           exit 1 in
     let config = load_config () in
@@ -80,7 +80,7 @@ module AddProver = struct
 
   let cmd = {
       cmd_desc = "add prover";
-      cmd_usage = " <name> <path> [<shortcut>]\nDetect prover <name> at <path> and register it.";
+      cmd_usage = "<name> <path> [shortcut]\nDetect prover <name> at <path> and register it.";
       cmd_name = "add-prover";
       cmd_run = run;
       cmd_anon_fun = Some (fun s -> args := s :: !args);
@@ -139,14 +139,8 @@ let print_commands fmt =
 
 let anon_file x = raise (Getopt.GetoptFailure (Printf.sprintf "unexpected argument: %s" x))
 
-let usage_msg =
-  Printf.sprintf
-    "Usage: %s config [options] <command> [options]\n\
-     Execute the given subcommand.\n"
-    exec_name
-
-let extra_help =
-  Format.asprintf "%t" print_commands
+let usage_msg = "<command>\nExecute the given subcommand.\n"
+let extra_help = Format.asprintf "%t" print_commands
 
 let () =
   let options = Whyconf.Args.all_options [] usage_msg extra_help in
@@ -161,12 +155,11 @@ let () =
         Format.eprintf "'%s' is not a why3config command.@\n@\n%t"
           cmd_name print_commands;
         exit 1 in
+  Whyconf.Args.add_command cmd_name;
   let anon_fun = match cmd.cmd_anon_fun with
     | Some f -> f
     | None -> anon_file in
-  let usage_msg =
-    Printf.sprintf "Usage: %s config %s [options]%s\n"
-      exec_name cmd_name cmd.cmd_usage in
+  let usage_msg = cmd.cmd_usage in
   let options = Whyconf.Args.all_options [] usage_msg "" in
   Getopt.parse_all ~i:(i + 1) options anon_fun Sys.argv;
   try

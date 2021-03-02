@@ -136,11 +136,9 @@ let spec =
     Termcode.opt_extra_expl_prefix;
   ]
 
-let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]...\n\
-   Launch a web server that provides a graphical interface for Why3.\n"
-  (Filename.basename Sys.argv.(0))
-
+let usage_str =
+  "[<file.why>|<project directory>]...\n\
+   Launch a web server that provides a graphical interface for Why3."
 
 let () =
     let config, env =
