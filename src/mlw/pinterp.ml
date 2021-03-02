@@ -1129,14 +1129,10 @@ let rec find_constr_or_proj dl rs =
   match dl with
   | [] -> raise Not_found
   | d :: rem ->
-      if List.mem rs d.Pdecl.itd_constructors then (
-        Debug.dprintf debug_trace_exec "@[<hov 2>[interp] found constructor:@ %s@]@."
-          rs.rs_name.id_string ;
-        Constructor d )
-      else if List.mem rs d.Pdecl.itd_fields then (
-        Debug.dprintf debug_trace_exec "@[<hov 2>[interp] found projection:@ %s@]@."
-          rs.rs_name.id_string ;
-        Projection d )
+      if List.mem rs d.Pdecl.itd_constructors then
+        Constructor d
+      else if List.mem rs d.Pdecl.itd_fields then
+        Projection d
       else
         find_constr_or_proj rem rs
 
@@ -2075,8 +2071,11 @@ and eval_expr' env e =
         eval_expr env e2
       else if is_false v then
         eval_expr env e3
-      else
-        Irred e
+      else (
+        let rs = match v.v_desc with Vconstr (rs, _, _) -> rs | _ -> assert false in
+        Debug.dprintf debug_trace_exec "Cannot eval if condition (%a)@."
+          print_rs rs;
+        Irred e )
     | r -> r )
   | Ewhile (cond, inv, _var, e1) when env.rac.rac_abstract -> begin
       (* arbitrary execution of an iteration taken from the counterexample
@@ -2119,8 +2118,9 @@ and eval_expr' env e =
            end
          else if is_false v then
            Normal unit_value
-         else
-           Irred e
+         else (
+           Debug.dprintf debug_trace_exec "Cannot debug while condition@.";
+           Irred e )
       | r -> r
     end
   | Ewhile (e1, inv, var, e2) ->
@@ -2149,8 +2149,9 @@ and eval_expr' env e =
               | r -> r
             ) else if is_false v then (* condition false *)
               Normal unit_value
-            else
-              Irred e
+            else (
+              Debug.dprintf debug_trace_exec "Cannot eval while condition@.";
+              Irred e )
         | r -> r in
       iter ()
   | Efor (i, (pvs1, dir, pvs2), _ii, inv, e1) when env.rac.rac_abstract -> begin
@@ -2238,7 +2239,9 @@ and eval_expr' env e =
         end
         else
           Normal unit_value
-      with NotNum -> Irred e
+      with NotNum -> (
+          Debug.dprintf debug_trace_exec "Something's not a number@.";
+          Irred e )
     end
   | Efor (pvs, (pvs1, dir, pvs2), _i, inv, e1) -> (
     let le, suc =
@@ -2267,7 +2270,9 @@ and eval_expr' env e =
           Normal unit_value
         in
       iter a
-    with NotNum -> Irred e )
+    with NotNum -> (
+        Debug.dprintf debug_trace_exec "Something's not a number@.";
+        Irred e ) )
   | Ematch (e0, ebl, el) -> (
       let r = eval_expr env e0 in
       match r with
@@ -2275,7 +2280,9 @@ and eval_expr' env e =
           if ebl = [] then
             r
           else
-            try exec_match env t ebl with Undetermined -> Irred e )
+            try exec_match env t ebl with Undetermined -> (
+                Debug.dprintf debug_trace_exec "Match is undetermined@.";
+                Irred e ) )
       | Excep (ex, t) -> (
         match Mxs.find ex el with
         | [], e2 ->
