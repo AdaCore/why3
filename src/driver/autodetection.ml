@@ -629,6 +629,7 @@ let detect_unknown env provers uv =
       prover.Wc.prover_name ver
       pp_versions uv.data.versions_ok
       pp_versions uv.data.versions_old;
+    add_prover_shortcuts env prover;
     add_id_prover_shortcut env uv.shortcut prover uv.priority;
     Mprover.add prover prover_config provers
   end
