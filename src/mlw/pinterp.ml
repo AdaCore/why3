@@ -1802,14 +1802,18 @@ let rec matching env (v : value) p =
           if ls_equal ls ls2 then env else raise NoMatch
       | _ -> raise Undetermined )
 
+(* Many ways to say yes... *)
 let is_true v = match v.v_desc with
   | Vbool true | Vterm {t_node= Ttrue} -> true
   | Vterm t when t_equal t t_bool_true -> true
+  | Vconstr (rs, [], []) when rs_equal rs rs_true -> true
   | _ -> false
 
+(* ...and no *)
 let is_false v = match v.v_desc with
   | Vbool false | Vterm {t_node= Tfalse} -> true
   | Vterm t when t_equal t t_bool_false -> true
+  | Vconstr (rs, [], []) when rs_equal rs rs_false -> true
   | _ -> false
 
 let fix_boolean_term t =
