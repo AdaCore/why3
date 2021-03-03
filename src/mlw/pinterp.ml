@@ -1480,7 +1480,8 @@ let task_of_term ?(vsenv=[]) env t =
 let bind_univ_quant_vars = false
 let bind_univ_quant_vars_default = false
 
-let model_element_name_of_ident id = id.id_string
+let model_element_name_of_ident id =
+  Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
 
 (* Get the value of a vsymbol with env.rac.get_value or a default value *)
 let get_value_for_quant_var env vs =

@@ -450,25 +450,28 @@ let get_model_elements m =
 let get_model_term_loc m = m.vc_term_loc
 let get_model_term_attrs m = m.vc_term_attrs
 
+let trace_by_id id =
+  Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
+
+let trace_by_men men =
+  Ident.get_model_trace_string ~name:men.men_name ~attrs:men.men_attrs
+
 let get_model_element model name loc =
   let aux me =
-    me.me_name.men_name = name &&
+    trace_by_men me.me_name = name &&
     Opt.equal Loc.equal me.me_location (Some loc) in
   List.find_opt aux (get_model_elements model)
 
 let get_model_element_value model name loc =
   let aux me =
-    me.me_name.men_name = name &&
+    trace_by_men me.me_name = name &&
     Opt.equal Loc.equal me.me_location (Some loc) in
   List.find_opt aux (get_model_elements model)
 
 let get_model_element_by_id model id =
   match id.id_loc with
   | None -> None
-  | Some loc ->
-      let name = id.id_string in
-      let name = Ident.get_model_trace_string ~name ~attrs:id.id_attrs in
-      get_model_element_value model name loc
+  | Some loc -> get_model_element_value model (trace_by_id id) loc
 
 let get_model_element_by_loc model loc =
   let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
