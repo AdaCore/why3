@@ -148,7 +148,7 @@ let print_counterexample ?verb_lvl ?check_ce ?json fmt (model,ce_summary) =
        | UNKNOWN _ ->
            fprintf fmt ":"
        | _ -> ());
-  let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
+  let print_attrs = Debug.test_flag Call_provers.debug_attrs in
   fprintf fmt "@ %a"
     (print_ce_summary_values ?verb_lvl ~print_attrs ?json model) ce_summary
 
@@ -399,9 +399,10 @@ let check_model reduce env pm model =
                       ~skip_cannot_compute:false ~reduce ~get_value () in
           check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
         let me_name_trans men = men.Model_parser.men_name in
+        let print_attrs = Debug.test_flag Call_provers.debug_attrs in
         Debug.dprintf debug_check_ce
           "@[Validating model:@\n@[<hv2>%a@]@]@\n"
-          (print_model ~filter_similar:false ~me_name_trans ~print_attrs:true) model;
+          (print_model ~filter_similar:false ~me_name_trans ~print_attrs) model;
         Debug.dprintf debug_check_ce "@[Interpreting concretly@]@\n";
         let concrete = check_model_rs ~abstract:false in
         Debug.dprintf debug_check_ce "@[Interpreting abstractly@]@\n";
