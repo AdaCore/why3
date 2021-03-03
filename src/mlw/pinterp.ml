@@ -1972,35 +1972,58 @@ let try_eval_ensures env (posts, vsenv) =
 (*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
 (******************************************************************************)
 
-(** Get a value and register it in the execution log.
-    The value is retrieved by the first of the following ways which succeeds:
-    1) Reading it from the model, or env
-    2) evaluating the post-condition when it has the form [ensures = t], or else
-    3) using the specified default value, or else
-    3) use the default value of the type if it validates the postconditions. *)
-let get_and_register_value env ?def ?ity ?rs_name ?posts_vsenv vs loc =
-  let ity = match ity with None -> ity_of_ty vs.vs_ty | Some ity -> ity in
-  let value, descr = match env.rac.get_value ~loc vs.vs_name ity with
-    | Some v -> v, "from model"
-    | None -> match Opt.bind posts_vsenv (try_eval_ensures env) with
-      | Some v -> v, "computed from post condition"
-      | None -> match def with
-        | Some v -> v, "given default"
-        | None ->
-            let v = default_value_of_type env.env env.pmodule.Pmodule.mod_known ity in
-            let posts = Opt.get_def [] (Opt.map fst posts_vsenv) in
-            let desc = "postcondition for default value" in
-            match check_posts desc (Some loc) env v posts with
-            | _ -> v, "type default"
-            | exception Contr _ ->
-                cannot_compute "missing value for %a at %a" print_vs vs
-                  print_loc' loc in
-  Debug.dprintf debug_rac_values "@[<h>Value %s for %a%a at %a: %a@]@."
-    descr print_vs vs
-    (Pp.print_option
-       (fun fmt id -> fprintf fmt " of %a" print_decoded id.id_string)) rs_name
-    print_loc' loc print_value value;
-  register_used_value env (Some loc) vs.vs_name value;
+(** A value generator with a string as a description. *)
+type value_gen = string * (unit -> value option)
+
+(** [get_value gens] takes a list of generators [gen] and returns the
+    description and value for the first generator whose result is not [None]. *)
+let get_value : value_gen list -> string * value =
+  let aux (s, gen) = match gen () with Some v -> Some (s, v) | None -> None in
+  Lists.first aux
+
+(** Generator for a default value *)
+let gen_default def : value_gen =
+  "default value", fun () -> def
+
+(** Generate a value by computing the postcondition *)
+let gen_from_post env posts_vsenv : value_gen =
+  "value computed from postcondition", fun () ->
+    Opt.bind posts_vsenv (try_eval_ensures env)
+
+(** Generator for the type default value *)
+let gen_type_default env oloc posts ity : value_gen =
+  "type default value", fun () ->
+    let desc = "postcondition for default value" in
+    let v = default_value_of_type env.env env.pmodule.Pmodule.mod_known ity in
+    try check_posts desc oloc env v posts; Some v with
+      Contr _ -> None
+
+(** Get a value from a list of generators and print debugging messages or fail,
+    if no value is generated. *)
+let get_value' ctx_desc oloc gens =
+  let desc, value = try get_value gens with Not_found ->
+    cannot_compute "Missing value for %s" ctx_desc
+      (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc in
+  Debug.dprintf debug_rac_values "@[<h>%s for %a at %a: %a@]@."
+    (String.capitalize_ascii desc) print_decoded ctx_desc
+    (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc print_value value;
+  value
+
+let get_and_register_value env ?def ?loc ?posts_vsenv id ity =
+  let ctx_desc = asprintf "variable %a" print_decoded id.id_string in
+  let gen_variable_value : value_gen =
+    "value from model", fun () ->
+      let res = env.rac.get_value ?loc id ity in
+      Opt.iter (check_assume_type_invs ?loc env ity) res; res in
+  let oloc = if loc <> None then loc else id.id_loc in
+  let gens = [
+    gen_variable_value;
+    gen_from_post env posts_vsenv;
+    gen_default def;
+    gen_type_default env oloc Opt.(get_def [] (map fst posts_vsenv)) ity;
+  ] in
+  let value = get_value' ctx_desc oloc gens in
+  register_used_value env oloc id value;
   value
 
 (******************************************************************************)
@@ -2030,7 +2053,7 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
       pp_indent print_pv pv
       (Pp.print_option print_loc') pv.pv_vs.vs_name.id_loc;
     let pv = Mpv.find_def pv pv vars_map in
-    let value = get_and_register_value ~ity:pv.pv_ity env pv.pv_vs loc in
+    let value = get_and_register_value env ~loc pv.pv_vs.vs_name pv.pv_ity in
     set_constr (get_vs env vs) value )
 
 (******************************************************************************)
@@ -2290,8 +2313,9 @@ and eval_expr' env e =
           List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
             (Mvs.keys env.vsenv);
           let def = value ty_int (Vnum (suc b)) in
-          let i_val = get_and_register_value ~def ~ity:i.pv_ity env i.pv_vs
-              (Opt.get i.pv_vs.vs_name.id_loc) in
+          let i_val =
+            let loc = Opt.get i.pv_vs.vs_name.id_loc in
+            get_and_register_value env ~def ~loc i.pv_vs.vs_name i.pv_ity in
           let env = bind_vs i.pv_vs i_val env in
           let i_bi = big_int_of_value i_val in
           if not (le a i_bi && le i_bi (suc b)) then begin
@@ -2579,7 +2603,7 @@ and exec_call_abstract ?snapshot ?loc ?rs_name env cty arg_pvs ity_result =
     try Some (cty.cty_post, List.map aux arg_pvs)
     with Exit -> None in
   let res_v =
-    get_and_register_value ~ity:ity_result ?rs_name ?posts_vsenv env res loc_or_dummy in
+    get_and_register_value env ~loc ?posts_vsenv res ity_result in
   (* assert2 *)
   let msg = "Assume postcondition" in
   let msg = match rs_name with
