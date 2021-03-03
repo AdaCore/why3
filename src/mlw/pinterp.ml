@@ -1803,6 +1803,7 @@ let oldify_variant env var =
 (** [mk_variant_term env old_ts var] creates a term that represents the validity
     of variant [var], where [old_ts] are the oldified variant terms. *)
 let mk_variant_term env =
+  let {Pmodule.mod_theory= {Theory.th_crcmap= crc}} = env.pmodule in
   let {Pmodule.mod_theory= {Theory.th_export= ns}} =
     Pmodule.read_module env.env ["int"] "Int" in
   let ls_int_le = Theory.ns_find_ls ns [Ident.op_infix "<="] in
@@ -1815,11 +1816,14 @@ let mk_variant_term env =
           match opt_op with
           | Some op -> ps_app op [t; old_t]
           | None ->
-              match (t_type t).ty_node with
-              | Tyapp (ts, _) when ts_equal ts ts_int ->
-                  t_and (ps_app ls_int_le [t_nat_const 0; old_t])
-                    (ps_app ls_int_lt [t; old_t])
-              | _ -> cannot_compute "loop variant implemented only for int" in
+              if ty_equal (t_type t) ty_int then
+                t_and (ps_app ls_int_le [t_nat_const 0; old_t])
+                  (ps_app ls_int_lt [t; old_t])
+              else
+                let crc = try ignore (Coercion.find crc (t_type t) ty_int); true
+                  with Not_found -> false in
+                if crc then failwith "coercsions not supported in variants"
+                else cannot_compute "loop variant implemented only for int" in
         t_or t_here (t_and (t_equ old_t t) (loop old_ts var))
     | _ -> assert false in
   loop
