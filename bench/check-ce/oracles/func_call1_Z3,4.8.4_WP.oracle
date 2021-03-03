@@ -55,7 +55,7 @@ Prover result is: Valid (0.01s, 24 steps).
                 Line 12:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 1}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -177,7 +177,7 @@ Prover result is: Valid (0.01s, 24 steps).
                 Line 12:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 1}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -218,7 +218,7 @@ Prover result is: Valid (0.01s, 24 steps).
                 Line 12:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 2}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -240,7 +240,7 @@ Prover result is: Valid (0.01s, 24 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/func_call1.mlw", line 15, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (0.76s).
+Prover result is: Step limit exceeded (0.80s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -260,7 +260,7 @@ File func_call1.mlw:
   Line 12:
     _ = ()
     Execution of main function f's body with env:
-      z = {contents= 2}
+      z = {contents= 0}
       _ = ()
       zero = 0
       one = 1

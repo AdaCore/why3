@@ -123,7 +123,7 @@
                 Line 8:
                   b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = {contents= 3}
+                    a = {contents= 0}
                     b = {contents= 3}
                     zero = 0
                     one = 1
@@ -165,7 +165,7 @@
                 Line 8:
                   b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = {contents= 3}
+                    a = {contents= 0}
                     b = {contents= 3}
                     zero = 0
                     one = 1
@@ -194,7 +194,7 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Goal Assertion from verification condition p1'vc.
-Prover result is: Step limit exceeded (1.06s).
+Prover result is: Step limit exceeded (1.12s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -208,7 +208,7 @@ File jlamp0.mlw:
   Line 8:
     b = {contents= 3}
     Execution of main function p1's body with env:
-      a = {contents= 3}
+      a = {contents= 0}
       b = {contents= 3}
       zero = 0
       one = 1
@@ -388,7 +388,7 @@ File jlamp0.mlw:
                 Line 8:
                   b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = {contents= 9}
+                    a = {contents= 7}
                     b = {contents= 3}
                     zero = 0
                     one = 1
@@ -465,7 +465,7 @@ File jlamp0.mlw:
                 Line 8:
                   b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = {contents= 9}
+                    a = {contents= 7}
                     b = {contents= 3}
                     zero = 0
                     one = 1
@@ -513,7 +513,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: Step limit exceeded (0.77s).
+Prover result is: Step limit exceeded (0.76s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -527,7 +527,7 @@ File jlamp0.mlw:
   Line 8:
     b = {contents= 3}
     Execution of main function p1's body with env:
-      a = {contents= 9}
+      a = {contents= 7}
       b = {contents= 3}
       zero = 0
       one = 1
@@ -730,7 +730,7 @@ File jlamp0.mlw:
                 Line 8:
                   b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = {contents= 5}
+                    a = {contents= 2}
                     b = {contents= 3}
                     zero = 0
                     one = 1
@@ -785,7 +785,7 @@ File jlamp0.mlw:
                 Line 8:
                   b = {contents= 3}
                   Execution of main function p1's body with env:
-                    a = {contents= 5}
+                    a = {contents= 2}
                     b = {contents= 3}
                     zero = 0
                     one = 1
@@ -822,7 +822,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: Step limit exceeded (1.19s).
+Prover result is: Step limit exceeded (1.13s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -836,7 +836,7 @@ File jlamp0.mlw:
   Line 8:
     b = {contents= 3}
     Execution of main function p1's body with env:
-      a = {contents= 5}
+      a = {contents= 2}
       b = {contents= 3}
       zero = 0
       one = 1
@@ -926,7 +926,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -995,7 +995,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1023,7 +1023,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1043,7 +1043,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: Step limit exceeded (0.86s).
+Prover result is: Step limit exceeded (0.92s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1064,7 +1064,7 @@ File jlamp0.mlw:
     _ = ()
     Execution of main function p2's body with env:
       a = {contents= 0}
-      c = {contents= 1}
+      c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
@@ -1136,7 +1136,7 @@ Prover result is: Valid (0.01s, 221 steps).
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1250,7 +1250,7 @@ Prover result is: Valid (0.01s, 221 steps).
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1278,7 +1278,7 @@ Prover result is: Valid (0.01s, 221 steps).
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1298,7 +1298,7 @@ Prover result is: Valid (0.01s, 221 steps).
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Goal Loop variant decrease from verification condition p2'vc.
-Prover result is: Step limit exceeded (0.99s).
+Prover result is: Step limit exceeded (0.94s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1319,7 +1319,7 @@ File jlamp0.mlw:
     _ = ()
     Execution of main function p2's body with env:
       a = {contents= 0}
-      c = {contents= 1}
+      c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
@@ -1377,7 +1377,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1484,7 +1484,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1512,7 +1512,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1532,7 +1532,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: Step limit exceeded (1.67s).
+Prover result is: Step limit exceeded (0.94s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1553,7 +1553,7 @@ File jlamp0.mlw:
     _ = ()
     Execution of main function p2's body with env:
       a = {contents= 0}
-      c = {contents= 1}
+      c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
@@ -1611,7 +1611,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1718,7 +1718,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1746,7 +1746,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1766,7 +1766,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: Step limit exceeded (0.96s).
+Prover result is: Step limit exceeded (0.94s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1787,7 +1787,7 @@ File jlamp0.mlw:
     _ = ()
     Execution of main function p2's body with env:
       a = {contents= 0}
-      c = {contents= 1}
+      c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
@@ -1852,7 +1852,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1953,7 +1953,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -1981,7 +1981,7 @@ File jlamp0.mlw:
                   _ = ()
                   Execution of main function p2's body with env:
                     a = {contents= 0}
-                    c = {contents= 1}
+                    c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -2001,7 +2001,7 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Goal Postcondition from verification condition p2'vc.
-Prover result is: Step limit exceeded (0.86s).
+Prover result is: Step limit exceeded (0.85s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -2022,7 +2022,7 @@ File jlamp0.mlw:
     _ = ()
     Execution of main function p2's body with env:
       a = {contents= 0}
-      c = {contents= 1}
+      c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
