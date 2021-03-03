@@ -749,11 +749,13 @@ let detect_prover name version_switch version_regexp =
     None
 
 let binaries_of_data data =
-  List.fold_left (fun acc (d:Prover_autodetection_data.data) ->
-      List.fold_left (fun acc exec_name ->
-          Mstr.add exec_name (d.version_switch,d.version_regexp) acc
-        ) acc d.execs
-    ) Mstr.empty data
+  let h = Hashtbl.create 10 in
+  List.iter (fun (d:Prover_autodetection_data.data) ->
+      List.iter (fun exec_name ->
+          Hashtbl.replace h (exec_name,d.version_switch,d.version_regexp) ()
+        ) d.execs
+    ) data;
+  Hashtbl.fold (fun c () acc -> c::acc) h []
 
 let names_of_data data =
   List.fold_left (fun acc (d:Prover_autodetection_data.data) ->
@@ -785,12 +787,15 @@ let detected_of_manuals options manuals =
 let request_binaries_version config datas =
   let binaries = binaries_of_data datas.Prover_autodetection_data.skeletons in
   let of_exec_name =
-    Mstr.mapi_filter
-      (fun exec_name (switch,regexp) ->
-         let name = Detected_binary.Exec_name exec_name in
-         let r = detect_prover name switch regexp in
-         Opt.map (fun x -> [x]) r)
-      binaries
+    List.fold_left
+      (fun acc (exec_name,switch,regexp) ->
+         if Mstr.mem exec_name acc then acc
+         else
+           let name = Detected_binary.Exec_name exec_name in
+           let r = detect_prover name switch regexp in
+           Opt.fold (fun acc x -> Mstr.add exec_name [x] acc) acc r
+      )
+      Mstr.empty binaries
   in
   (** manual prover *)
   let names = names_of_data datas.Prover_autodetection_data.skeletons in
