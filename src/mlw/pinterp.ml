@@ -2188,7 +2188,7 @@ and eval_expr' env e =
           print_rs rs;
         Irred e )
     | r -> r )
-  | Ewhile (cond, inv, _var, e1) when env.rac.rac_abstract -> begin
+  | Ewhile (cond, inv, var, e1) when env.rac.rac_abstract -> begin
       (* arbitrary execution of an iteration taken from the counterexample
 
         while e1 do invariant {I} e2 done
@@ -2212,6 +2212,8 @@ and eval_expr' env e =
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
         (Mvs.keys env.vsenv);
       (* assert2 *)
+      let opt_old_variant =
+        if env.rac.do_rac then Some (oldify_variant env var) else None in
       check_assume_terms (cntr_ctx "Assume loop invariant" env) inv;
       match eval_expr env cond with
       | Normal v ->
@@ -2219,8 +2221,15 @@ and eval_expr' env e =
              register_iter_loop env e.e_loc Log.ExecConcrete;
              match eval_expr env e1 with
              | Normal _ ->
-                if env.rac.do_rac then
+                if env.rac.do_rac then (
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
+                  let old_ts, oldies = Opt.get opt_old_variant in
+                  let vsenv =
+                    Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
+                  let env = {env with vsenv} in
+                  check_term
+                    (cntr_ctx "Loop variant decrease" ?trigger_loc:e.e_loc env)
+                    (mk_variant_term env old_ts var) );
                 (* the execution cannot continue from here *)
                 register_stucked env e.e_loc
                   "Cannot continue after arbitrary iteration" Mid.empty;
