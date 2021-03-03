@@ -63,6 +63,37 @@ and proj_name = string
 
 and field_name = string
 
+let bv_compare v1 v2 = BigInt.compare v1.bv_value v2.bv_value
+
+let float_compare f1 f2 = match f1, f2 with
+  | Float_number {binary= b1}, Float_number {binary= b2} -> (
+      match bv_compare b1.sign b2.sign with
+      | 0 -> (
+          match bv_compare b1.exp b2.exp with
+          | 0 -> bv_compare b1.mant b2.mant
+          | n -> n )
+      | n -> n )
+  | Float_number _, _ -> -1
+  | _, Float_number _ -> 1
+  | f1, f2 -> compare f1 f2
+
+let compare_model_value v1 v2 = match v1, v2 with
+  | Boolean b1, Boolean b2 -> compare b1 b2
+  | Boolean _, _ -> -1 | _, Boolean _ -> 1
+  | String s1, String s2 -> String.compare s1 s2
+  | String _, _ -> -1 | _, String _ -> 1
+  | Integer i1, Integer i2 -> BigInt.compare i1.int_value i2.int_value
+  | Integer _, _ -> -1 | _, Integer _ -> 1
+  | Float f1, Float f2 -> float_compare f1 f2
+  | Float _, _ -> -1 | _, Float _ -> 1
+  | Bitvector v1, Bitvector v2 -> bv_compare v1 v2
+  | Bitvector _, _ -> -1 | _, Bitvector _ -> 1
+  | Decimal d1, Decimal d2 -> (match BigInt.compare d1.dec_int d2.dec_int with 0 -> BigInt.compare d1.dec_frac d2.dec_frac | n -> n)
+  | Decimal _, _ -> -1 | _, Decimal _ -> 1
+  | Fraction f1, Fraction f2 -> (match BigInt.compare f1.frac_nom f2.frac_nom with 0 -> BigInt.compare f1.frac_den f2.frac_den | n -> n)
+  | Fraction _, _ -> -1 | _, Fraction _ -> 1
+  | _ -> 0
+
 let array_create_constant ~value = {arr_others= value; arr_indices= []}
 
 let array_add_element ~array ~index ~value =
@@ -304,10 +335,11 @@ let rec print_array_human fmt (arr : model_array) =
     let {arr_index_key= key; arr_index_value= v} = arr in
     fprintf fmt "@[%a =>@ %a@]" print_model_value_human key
       print_model_value_human v in
+  let sort_ix i1 i2 = compare_model_value i1.arr_index_key i2.arr_index_key in
   fprintf fmt "@[(%a%a)@]"
     (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.comma ~sep:Pp.comma
        print_key_val)
-    arr.arr_indices print_others arr.arr_others
+    (List.sort sort_ix arr.arr_indices) print_others arr.arr_others
 
 and print_record_human fmt r =
   match r with
