@@ -747,25 +747,26 @@ let register_const_init env loc id =
   Log.log_const env.rac.log_uc id loc
 
 let register_call env loc rs mvs kind =
-  Log.log_call env.rac.log_uc rs mvs kind loc
+  Log.log_call env.rac.log_uc rs (Mvs.map snapshot mvs) kind loc
 
 let register_pure_call env loc ls kind =
   Log.log_pure_call env.rac.log_uc ls kind loc
 
 let register_any_call env loc rs mvs =
-  Log.log_any_call env.rac.log_uc rs mvs loc
+  Log.log_any_call env.rac.log_uc rs (Mvs.map snapshot mvs) loc
 
 let register_iter_loop env loc kind =
   Log.log_iter_loop env.rac.log_uc kind loc
 
 let register_exec_main env rs =
-  Log.log_exec_main env.rac.log_uc rs env.vsenv env.rsenv rs.rs_name.id_loc
+  Log.log_exec_main env.rac.log_uc rs (Mvs.map snapshot env.vsenv)
+    env.rsenv rs.rs_name.id_loc
 
 let register_failure env loc reason mvs =
-  Log.log_failed env.rac.log_uc reason mvs loc
+  Log.log_failed env.rac.log_uc reason (Mid.map snapshot mvs) loc
 
 let register_stucked env loc reason mvs =
-  Log.log_stucked env.rac.log_uc reason mvs loc
+  Log.log_stucked env.rac.log_uc reason (Mid.map snapshot mvs) loc
 
 let register_ended env loc =
   Log.log_exec_ended env.rac.log_uc loc
