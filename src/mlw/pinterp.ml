@@ -1696,6 +1696,22 @@ let check_posts desc loc env v posts =
   let ctx = cntr_ctx desc ?trigger_loc:loc env in
   List.iter (check_post ctx v) posts
 
+let check_type_invs ?loc env ity v =
+  let ts = match ity.ity_node with
+  | Ityapp (ts, _, _) | Ityreg {reg_its= ts} -> ts
+  | Ityvar _ -> failwith "check_type_invs: type variable" in
+  let def = Pdecl.find_its_defn env.pmodule.Pmodule.mod_known ts in
+  if def.Pdecl.itd_invariant <> [] then
+    let fs_vs = match v.v_desc with
+      | Vconstr (_, fs, vs) ->
+          List.fold_right2 Mrs.add fs (List.map field_get vs) Mrs.empty
+      | _ -> failwith "check_type_invs: value is not record" in
+    let bind_field env rs =
+      bind_pvs (Opt.get rs.rs_field) (Mrs.find rs fs_vs) env in
+    let env = List.fold_left bind_field env def.Pdecl.itd_fields in
+    let ctx = cntr_ctx "type invariant" ?trigger_loc:loc env in
+    check_terms ctx def.Pdecl.itd_invariant
+
 exception RACStuck of env * Loc.position option
 (* The execution goes into RACStuck when a property that should be
    assumed is not satisfied. E.g. when executing a function, if the
@@ -1752,6 +1768,18 @@ let check_terms ctx tl =
 
 let check_posts desc loc env v posts =
   try check_posts desc loc env v posts with (Contr (ctx,t)) as e ->
+    let mid = value_of_free_vars ctx.c_env t in
+    register_failure ctx.c_env t.t_loc ctx.c_desc mid;
+    raise e
+
+let check_assume_type_invs ?loc env ity v =
+  try check_type_invs ?loc env ity v with Contr (ctx, t) ->
+    let mid = value_of_free_vars ctx.c_env t in
+    register_stucked ctx.c_env t.t_loc ctx.c_desc mid;
+    raise (RACStuck (ctx.c_env, t.t_loc))
+
+let check_type_invs ?loc env ity v =
+  try check_type_invs ?loc env ity v with Contr (ctx, t) as e ->
     let mid = value_of_free_vars ctx.c_env t in
     register_failure ctx.c_env t.t_loc ctx.c_desc mid;
     raise e
@@ -2567,7 +2595,8 @@ let bind_globals ?rs_main mod_known env =
   let get_value env id opt_e ity =
     match env.rac.get_value ?loc:id.id_loc id ity with
     | Some v ->
-         Debug.dprintf debug_rac_values "Value from model for global %a: %a@."
+        check_assume_type_invs ?loc:id.id_loc env ity v;
+        Debug.dprintf debug_rac_values "Value from model for global %a: %a@."
            print_decoded id.id_string print_value v;
          register_used_value env id.id_loc id v; v
     | None ->
@@ -2636,29 +2665,31 @@ let eval_global_fundef rac env pmodule locals e =
 
 let eval_rs rac env pm rs =
   let open Pmodule in
-  let get_value (pv: pvsymbol) =
+  let get_value env pv =
     match rac.get_value pv.pv_vs.vs_name pv.pv_ity with
     | Some v ->
+       check_assume_type_invs ?loc:pv.pv_vs.vs_name.id_loc env pv.pv_ity v;
        Debug.dprintf debug_rac_values
-         "@[<h>Value imported for %a at %a: %a@]@."
+         "@[<h>Value from model for %a at %a: %a@]@."
          print_pv pv
          (Pp.print_option_or_default "NOLOC" print_loc') pv.pv_vs.vs_name.id_loc
          print_value v;
        v
     | None ->
-       let v = default_value_of_type env pm.mod_known pv.pv_ity in
+       let v = default_value_of_type env.env pm.mod_known pv.pv_ity in
        Debug.dprintf debug_rac_values
-         "@[<h>Missing value for parameter %a, continue with default value %a.@]@."
-         print_pv pv print_value v;
+         "@[<h>Missing value for parameter %a, continue with default value %a.\
+          @]@." print_pv pv print_value v;
        v in
   get_builtin_progs env ;
   let env = default_env env rac pm in
   let env = bind_globals ~rs_main:rs pm.mod_known env in
   let env = multibind_pvs ~register:(register_used_value env rs.rs_name.id_loc)
-      rs.rs_cty.cty_args (List.map get_value rs.rs_cty.cty_args) env in
+      rs.rs_cty.cty_args (List.map (get_value env) rs.rs_cty.cty_args) env in
   register_exec_main env rs;
-  let e_loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
-  let res = exec_call ~main_function:true ~loc:e_loc env rs rs.rs_cty.cty_args rs.rs_cty.cty_result in
+  let loc = Opt.get_def Loc.dummy_position rs.rs_name.id_loc in
+  let res = exec_call ~main_function:true ~loc env rs rs.rs_cty.cty_args
+      rs.rs_cty.cty_result in
   register_ended env rs.rs_name.id_loc;
   res, env
 
