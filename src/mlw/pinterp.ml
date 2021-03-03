@@ -264,11 +264,12 @@ let rec print_value fmt v =
   | Vfloat_mode m -> fprintf fmt "%s" (mode_to_string m)
   | Vstring s -> Constant.print_string_def fmt s
   | Vfun (mvs, vs, e) ->
-      fprintf fmt "(@[<v2>%tfun %a -> %a)@]"
-        (fun fmt ->
-           if not (Mvs.is_empty mvs) then
-             fprintf fmt "%a " (pp_bindings print_vs print_value) (Mvs.bindings mvs))
+      fprintf fmt "@[<h>@[<v3>(fun %a -> %a)@]%a@]"
         print_vs vs print_expr e
+        Pp.(let start = constant_formatted "@ with " in
+            print_list_delim ~start ~sep:comma ~stop:nothing
+              (print_pair_delim nothing equal nothing print_vs print_value))
+        (Mvs.bindings mvs)
   | Vproj (ls, v) ->
       fprintf fmt "{%a => %a}" print_ls ls print_value v
   | Vconstr (rs, fs, vs) ->
@@ -278,6 +279,8 @@ let rec print_value fmt v =
         let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
         fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
           (List.combine fs vs)
+      else if vs = [] then
+        print_rs fmt rs
       else
         fprintf fmt "@[<h>(%a%a)@]" print_rs rs
           Pp.(print_list_pre space print_value) (List.map field_get vs)
@@ -543,24 +546,25 @@ module Log : Log = struct
           (exec_kind_to_string k)
           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_call (Some rs, mvs, k) ->
-        fprintf fmt "@[<h2>%s execution of %a with args:%a@]"
+        fprintf fmt "@[<h2>%s execution of function `%a` with args:%a@]"
           (exec_kind_to_string k)
           print_decoded rs.rs_name.id_string
           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_pure (ls,k) ->
-        fprintf fmt "@[<h2>%s execution of %a@]" (exec_kind_to_string k)
+        fprintf fmt "@[<h2>%s execution of function `%a`@]" (exec_kind_to_string k)
           print_decoded ls.ls_name.id_string
     | Exec_any (rs,mvs) ->
          fprintf fmt
-           "@[<h2>(abstract) execution of any function%s%a%s%a@]"
+           "@[<h2>(abstract) execution of unimplemented function%s`%a`%s%a@]"
            (if rs = None then "" else " ")
-           (Pp.print_option Pp.string) (Opt.map (fun rs -> rs.rs_name.id_string) rs)
+           (Pp.print_option Ident.print_decoded)
+           (Opt.map (fun rs -> rs.rs_name.id_string) rs)
            (if Mvs.is_empty mvs then "" else " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
     | Iter_loop k ->
         fprintf fmt "@[<h2>%s iteration of loop@]" (exec_kind_to_string k)
     | Exec_main (rs, mvs, mrs) ->
-        fprintf fmt "@[<h2>Execution of main function %a's body with env:%a%a@]"
+        fprintf fmt "@[<h2>Execution of main function `%a` with env:%a%a@]"
           print_decoded rs.rs_name.id_string
           (print_list vs2string) (Mvs.bindings mvs)
           (print_list rs2string) (Mrs.bindings mrs)
@@ -1319,7 +1323,7 @@ exception Contr of cntr_ctx * term
 let cntr_desc_str str1 str2 = str1 ^ " of " ^ str2
 
 let cntr_desc str id =
-  asprintf "%s of %a" str print_decoded id.id_string
+  asprintf "%s of `%a`" str print_decoded id.id_string
 
 let report_cntr_title fmt (ctx, msg) =
   fprintf fmt "%s %s" ctx.c_desc msg
@@ -1663,13 +1667,16 @@ let check_term ?vsenv ctx t =
     else res in
   match res with
   | Some true ->
-      Debug.dprintf debug_rac_check_term_result "%a@." report_cntr_head (ctx, "is ok", t)
+      Debug.dprintf debug_rac_check_term_result "%a@."
+        report_cntr_head (ctx, "is ok", t)
   | Some false ->
-      Debug.dprintf debug_rac_check_term_result "%a@." report_cntr_head (ctx, "has failed", t);
+      Debug.dprintf debug_rac_check_term_result "%a@."
+        report_cntr_head (ctx, "has failed", t);
       raise (Contr (ctx, t))
   | None ->
       let msg = "cannot be evaluated" in
-      Debug.dprintf debug_rac_check_term_result "%a@." report_cntr_head (ctx, msg, t);
+      Debug.dprintf debug_rac_check_term_result "%a@."
+        report_cntr_head (ctx, msg, t);
       if ctx.c_env.rac.skip_cannot_compute then
         Warning.emit "%a@." report_cntr_head (ctx, msg, t)
       else
