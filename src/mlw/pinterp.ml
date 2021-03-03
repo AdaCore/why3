@@ -2591,18 +2591,18 @@ and exec_call_abstract ?snapshot ?loc ?rs_name env cty arg_pvs ity_result =
      (postcondition does not hold with the values obtained
      from the counterexample)
    *)
-  let loc_or_dummy = Opt.get_def Loc.dummy_position loc in
+  let exn = CannotCompute {reason= "Abstract call without location"} in
+  let loc = Opt.get_exn exn loc in
   let env = match snapshot with
     | Some oldies -> {env with vsenv= snapshot_oldies oldies env.vsenv}
     | None -> env in
   (* assert1 is already done above *)
   let res = match cty.cty_post with
-    | p :: _ -> let (vs,_) = open_post p in id_clone vs.vs_name
-    | _ -> id_fresh "result" in
-  let res = create_vsymbol res (ty_of_ity ity_result) in
+    | p :: _ -> let (vs,_) = open_post p in vs.vs_name
+    | _ -> id_register (id_fresh "result") in
   let vars_map = Mpv.of_list (List.combine cty.cty_args arg_pvs) in
   let asgn_wrt =
-    assign_written_vars ~vars_map cty.cty_effect.eff_writes loc_or_dummy env in
+    assign_written_vars ~vars_map cty.cty_effect.eff_writes loc env in
   List.iter asgn_wrt (Mvs.keys env.vsenv);
   let posts_vsenv =
     let aux pv =
@@ -2618,7 +2618,7 @@ and exec_call_abstract ?snapshot ?loc ?rs_name env cty arg_pvs ity_result =
   let msg = match rs_name with
     | None -> cntr_desc_str msg "anonymous function"
     | Some name -> cntr_desc msg name in
-  let ctx = cntr_ctx msg ?trigger_loc:loc env in
+  let ctx = cntr_ctx msg ~trigger_loc:loc env in
   check_assume_posts ctx res_v cty.cty_post;
   Normal res_v
 
