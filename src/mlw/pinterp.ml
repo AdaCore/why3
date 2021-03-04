@@ -1972,7 +1972,7 @@ let try_eval_ensures env (posts, vsenv) =
 (*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
 (******************************************************************************)
 
-(** A value generator with a string as a description. *)
+(** A partial value generator with a string as a description. *)
 type value_gen = string * (unit -> value option)
 
 (** [get_value gens] takes a list of generators [gen] and returns the
@@ -1980,6 +1980,12 @@ type value_gen = string * (unit -> value option)
 let get_value : value_gen list -> string * value =
   let aux (s, gen) = match gen () with Some v -> Some (s, v) | None -> None in
   Lists.first aux
+
+(** Generate a value by querying the model *)
+let gen_model_value env ?loc id ity : value_gen =
+  "value from model", fun () ->
+    let res = env.rac.get_value ?loc id ity in
+    Opt.iter (check_assume_type_invs ?loc env ity) res; res
 
 (** Generator for a default value *)
 let gen_default def : value_gen =
@@ -1998,6 +2004,22 @@ let gen_type_default env oloc posts ity : value_gen =
     try check_posts desc oloc env v posts; Some v with
       Contr _ -> None
 
+(** Generate a value by evaluating an optional expression, if that is not [None]
+   *)
+let gen_eval_expr env eval_expr id oexp =
+  "RHS evaluated", fun () ->
+    match oexp with
+    | None -> None
+    | Some e ->
+        let env' = {env with rac= {env.rac with rac_abstract= false}} in
+        register_const_init env id.id_loc id;
+        match eval_expr env' e with
+        | Normal v -> Some v
+        | Excep _ ->
+            cannot_compute "initialization of global variable %a raised an \
+                            exception" print_decoded id.id_string
+        | Irred _ -> None
+
 (** Get a value from a list of generators and print debugging messages or fail,
     if no value is generated. *)
 let get_value' ctx_desc oloc gens =
@@ -2011,19 +2033,38 @@ let get_value' ctx_desc oloc gens =
 
 let get_and_register_value env ?def ?loc ?posts_vsenv id ity =
   let ctx_desc = asprintf "variable %a" print_decoded id.id_string in
-  let gen_variable_value : value_gen =
-    "value from model", fun () ->
-      let res = env.rac.get_value ?loc id ity in
-      Opt.iter (check_assume_type_invs ?loc env ity) res; res in
   let oloc = if loc <> None then loc else id.id_loc in
   let gens = [
-    gen_variable_value;
+    gen_model_value env ?loc id ity;
     gen_from_post env posts_vsenv;
     gen_default def;
     gen_type_default env oloc Opt.(get_def [] (map fst posts_vsenv)) ity;
   ] in
   let value = get_value' ctx_desc oloc gens in
   register_used_value env oloc id value;
+  value
+
+let get_and_register_param env ?loc id ity =
+  let ctx_desc = asprintf "parameter %a" print_decoded id.id_string in
+  let oloc = if loc <> None then loc else id.id_loc in
+  let gens = [
+    gen_model_value env ?loc id ity;
+    gen_type_default env oloc [] ity;
+  ] in
+  let value = get_value' ctx_desc oloc gens in
+  register_used_value env oloc id value;
+  value
+
+let get_and_register_global env eval_expr id oexp ity =
+  let ctx_desc = asprintf "global %a" print_decoded id.id_string in
+  let gen_type_default =
+    if env.rac.do_rac then [gen_type_default env id.id_loc [] ity] else [] in
+  let gens = [
+    gen_model_value env id ity;
+    gen_eval_expr env eval_expr id oexp;
+  ] @ gen_type_default in
+  let value = get_value' ctx_desc id.id_loc gens in
+  register_used_value env id.id_loc id value;
   value
 
 (******************************************************************************)
@@ -2629,62 +2670,35 @@ and exec_call_abstract ?snapshot ?loc ?rs_name env cty arg_pvs ity_result =
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
 let bind_globals ?rs_main mod_known env =
-  let get_value env id opt_e ity =
-    match env.rac.get_value ?loc:id.id_loc id ity with
-    | Some v ->
-        check_assume_type_invs ?loc:id.id_loc env ity v;
-        Debug.dprintf debug_rac_values "Value from model for global %a: %a@."
-           print_decoded id.id_string print_value v;
-         register_used_value env id.id_loc id v; v
-    | None ->
-       match opt_e with
-         | None ->
-             if env.rac.do_rac then (
-               let v = default_value_of_type env.env mod_known ity in
-               Debug.dprintf debug_rac_values
-                 "Type default value for global %a: %a@."
-                 print_decoded id.id_string print_value v;
-               register_used_value env id.id_loc id v; v )
-             else
-               cannot_compute "any-value with RAC disabled"
-         | Some e ->
-          let env' = {env with rac= {env.rac with rac_abstract= false}} in
-          register_const_init env id.id_loc id;
-          match eval_expr env' e with
-          | Normal v -> v
-          | Excep _ ->
-              cannot_compute "initialization of global variable %a raised an \
-                              exception" print_decoded id.id_string
-          | Irred _ ->
-              cannot_compute "initialization of global variable %a is \
-                              irreducible" print_decoded id.id_string
-  in
   let open Pdecl in
   let eval_global id d env =
     match d.pd_node with
     | PDlet (LDvar (pv, e)) ->
         Debug.dprintf debug_trace_exec "EVAL GLOBAL VAR %a at %a@."
-          print_decoded id.id_string Pp.(print_option_or_default "NO LOC"
-                                           print_loc') pv.pv_vs.vs_name.id_loc;
-        let v = get_value env pv.pv_vs.vs_name (Some e) e.e_ity in
+          print_decoded id.id_string
+          Pp.(print_option_or_default "NO LOC" print_loc') id.id_loc;
+        let v = get_and_register_global env eval_expr id (Some e) e.e_ity in
         bind_vs pv.pv_vs v env
     | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
         Debug.dprintf debug_trace_exec "EVAL GLOBAL SYM CONST %a at %a@."
-          print_decoded id.id_string Pp.(print_option_or_default "NO LOC"
-                                           Pretty.print_loc') rs.rs_name.id_loc;
+          print_decoded id.id_string
+          Pp.(print_option_or_default "NO LOC" Pretty.print_loc') id.id_loc;
         assert (ce.c_cty.cty_args = []);
-        let opt_e = match ce.c_node with
+        let oexp = match ce.c_node with
           | Cany -> None | Cfun e -> Some e
           | _ -> failwith "eval_globals: program constant cexp" in
-        let v = get_value env rs.rs_name opt_e ce.c_cty.cty_result in
-        if env.rac.do_rac then
-          check_assume_posts (cntr_ctx "Any postcondition" env) v ce.c_cty.cty_post;
+        let v =
+          get_and_register_global env eval_expr id oexp ce.c_cty.cty_result in
+        if env.rac.do_rac then (
+          let ctx = cntr_ctx "Any postcondition" env in
+          check_assume_posts ctx v ce.c_cty.cty_post );
         bind_rs rs v env )
     | _ -> env in
   let is_before id d (env, found_rs) =
     let found_rs_here = match d.pd_node with
       | PDlet (LDsym (rs, _)) -> Opt.equal rs_equal (Some rs) rs_main
-      | PDlet (LDrec ds) -> List.exists (fun d -> Opt.equal rs_equal (Some d.rec_sym) rs_main) ds
+      | PDlet (LDrec ds) ->
+          List.exists (fun d -> Opt.equal rs_equal (Some d.rec_sym) rs_main) ds
       | _ -> false in
     let found_rs = found_rs || found_rs_here in
     let env = if found_rs then env else Mid.add id d env in
@@ -2702,22 +2716,7 @@ let eval_global_fundef rac env pmodule locals e =
 
 let eval_rs rac env pm rs =
   let open Pmodule in
-  let get_value env pv =
-    match rac.get_value pv.pv_vs.vs_name pv.pv_ity with
-    | Some v ->
-       check_assume_type_invs ?loc:pv.pv_vs.vs_name.id_loc env pv.pv_ity v;
-       Debug.dprintf debug_rac_values
-         "@[<h>Value from model for %a at %a: %a@]@."
-         print_pv pv
-         (Pp.print_option_or_default "NOLOC" print_loc') pv.pv_vs.vs_name.id_loc
-         print_value v;
-       v
-    | None ->
-       let v = default_value_of_type env.env pm.mod_known pv.pv_ity in
-       Debug.dprintf debug_rac_values
-         "@[<h>Missing value for parameter %a, continue with default value %a.\
-          @]@." print_pv pv print_value v;
-       v in
+  let get_value env pv = get_and_register_param env pv.pv_vs.vs_name pv.pv_ity in
   get_builtin_progs env ;
   let env = default_env env rac pm in
   let env = bind_globals ~rs_main:rs pm.mod_known env in
