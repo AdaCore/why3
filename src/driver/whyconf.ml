@@ -700,7 +700,7 @@ let empty_config conf_file =
   }
 
 let default_config conf_file =
-  RC_load.config_from_rc (empty_config conf_file) conf_file Rc.empty
+  RC_load.config_from_rc (empty_config conf_file) conf_file empty_rc
 
 let read_config_aux config filename rc =
   try
