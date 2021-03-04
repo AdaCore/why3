@@ -1778,6 +1778,8 @@ let check_assume_type_invs ?loc env ity v =
     register_stucked ctx.c_env t.t_loc ctx.c_desc mid;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
+(* Currently, type invariants are only check when creating values or getting
+   values from the model. TODO Check type invariants also during execution *)
 let check_type_invs ?loc env ity v =
   try check_type_invs ?loc env ity v with Contr (ctx, t) as e ->
     let mid = value_of_free_vars ctx.c_env t in
@@ -1934,7 +1936,7 @@ let value_of_constant ty c =
   | ConstStr s -> string_value s
   | ConstReal _ -> failwith "not implemented: value_of_term real"
 
-let value_of_term known t =
+let value_of_term env t =
   let rec aux t =
     let ty = Opt.get_exn Exit t.t_ty in
     match t.t_node with
@@ -1945,20 +1947,23 @@ let value_of_term known t =
         let rs = try restore_rs ls with Not_found -> raise Exit in
         let fs = match (ity_of_ty ty).ity_node with
           | Ityapp (its, _, _) | Ityreg {reg_its= its} ->
-              (Pdecl.find_its_defn known its).Pdecl.itd_fields
+              let defn = Pdecl.find_its_defn env.pmodule.Pmodule.mod_known its in
+              defn.Pdecl.itd_fields
           | _ -> raise Exit in
         let vs = List.map aux ts in
-        value ty (Vconstr (rs, fs, List.map field vs))
+        let res = value ty (Vconstr (rs, fs, List.map field vs)) in
+        if env.rac.do_rac then check_type_invs env (ity_of_ty ty) res;
+        res
     | _ -> raise Exit in
   try Some (aux t) with Exit -> None
 
-(* Find a postcondition of the form [ensures { result = t (/\ ...) }], compute_fraction
-    [t], and return it as a value. *)
+(* Find a postcondition of the form [ensures { result = t (/\ ...) }],
+   compute_fraction [t], and return it as a value. *)
 let try_eval_ensures env (posts, vsenv) =
   let rec loop vs = function
     | {t_node= Tapp (ls, [{t_node= Tvar vs'}; t])}
       when ls_equal ls ps_equ && vs_equal vs vs' ->
-        value_of_term env.pmodule.Pmodule.mod_known (compute_term ~vsenv env t)
+        value_of_term env (compute_term ~vsenv env t)
     | {t_node= Tbinop (Tand, t1, t2)} ->
         let res = loop vs t1 in
         if res <> None then res else loop vs t2
@@ -2224,9 +2229,7 @@ and eval_expr' env e =
       else if is_false v then
         eval_expr env e3
       else (
-        let rs = match v.v_desc with Vconstr (rs, _, _) -> rs | _ -> assert false in
-        Debug.dprintf debug_trace_exec "Cannot eval if condition (%a)@."
-          print_rs rs;
+        Debug.dprintf debug_trace_exec "Cannot eval if condition@.";
         Irred e )
     | r -> r )
   | Ewhile (cond, inv, var, e1) when env.rac.rac_abstract -> begin
@@ -2585,7 +2588,9 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                     (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
                 let ty = ty_inst mt (ty_of_ity ity_result) in
                 let vs = List.map field arg_vs in
-                Normal (value ty (Vconstr (rs, its_def.Pdecl.itd_fields, vs)))
+                let v = value ty (Vconstr (rs, its_def.Pdecl.itd_fields, vs)) in
+                if env.rac.do_rac then check_type_invs ?loc env ity_result v;
+                Normal v
             | Projection _d -> (
                 check_pre_and_register_call Log.ExecConcrete;
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
