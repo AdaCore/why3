@@ -159,10 +159,6 @@ exception CannotImportModelValue of string
 let cannot_import f =
   kasprintf (fun msg -> raise (CannotImportModelValue msg)) f
 
-let check_not_nonfree its_def =
-  if its_def.Pdecl.itd_its.its_nonfree then
-    cannot_import "value of non-free type %a" print_its its_def.Pdecl.itd_its
-
 let trace_or_name id =
   match get_model_element_name ~attrs:id.id_attrs with
   | name -> if name = "" then id.id_string else name
@@ -194,7 +190,6 @@ let rec import_model_value known th_known ity v =
           ity_equal_check ity ity_bool;
           bool_value b
       | Record r ->
-          check_not_nonfree def;
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
             cannot_import "type with not exactly one constructors" in
           let aux field_rs =
@@ -208,7 +203,6 @@ let rec import_model_value known th_known ity v =
           let vs = List.map aux def.Pdecl.itd_fields in
           constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
-          check_not_nonfree def;
           let matching_name rs = String.equal rs.rs_name.id_string s in
           let rs = List.find matching_name def.Pdecl.itd_constructors in
           let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
