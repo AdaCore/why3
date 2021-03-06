@@ -297,6 +297,37 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
 
 let unproved = ref false
 
+let select_ce env th models =
+  if models <> [] then
+    match Pmodule.restore_module th with
+    | pm ->
+        let reduce_config =
+          Pinterp.rac_reduce_config_lit config env
+            ~trans:"compute_in_goal" ?prover:!opt_rac_prover
+            ~try_negate:!opt_rac_try_negate () in
+        Counterexample.select_model ~reduce_config
+          ~check:!opt_check_ce_model ?verb_lvl:!opt_ce_check_verbosity
+          env pm models
+    | exception Not_found -> None
+  else None
+
+let print_other_models (m, ce_summary) =
+  let print_model fmt m =
+    let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
+    if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
+    else Model_parser.print_model (* json values *) fmt m ~print_attrs in
+  ( match ce_summary with
+    | Counterexample.(NCCE _ | SWCE _ | NCCE_SWCE _ | BAD_CE) ->
+        if Debug.test_flag debug_print_original_model then
+          printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
+    | _ -> () );
+  ( match ce_summary with
+    | Counterexample.(NCCE log | SWCE log | NCCE_SWCE log) ->
+        if Debug.test_flag debug_print_derived_model then
+          printf "@[<v>Derived model:@\n%a@]@\n@." print_model
+            (Counterexample.model_of_exec_log ~original_model:m log)
+    | _ -> () )
+
 let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
   let open Call_provers in
   let limit =
@@ -307,37 +338,12 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
     | None, Some command ->
         let call = Driver.prove_task ~command ~limit drv task in
         let res = wait_on_call call in
-        let ce =
-          if res.pr_models <> [] then
-            match Pmodule.restore_module th with
-            | pm ->
-               let reduce_config =
-                 Pinterp.rac_reduce_config_lit config env
-                   ~trans:"compute_in_goal" ?prover:!opt_rac_prover
-                   ~try_negate:!opt_rac_try_negate () in
-               Counterexample.select_model ~reduce_config
-                 ~check:!opt_check_ce_model ?verb_lvl:!opt_ce_check_verbosity
-                 env pm res.pr_models
-            | exception Not_found -> None
-          else None in
+        let ce = select_ce env th res.pr_models in
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
         printf "%a@." (print_result ?json:!opt_json)
           (fname, t.Term.t_loc, goal_name, expls, res, ce);
-        let print_model fmt m =
-          let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
-          if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
-          else Model_parser.print_model (* json values *) fmt m ~print_attrs in
-        let print_other_models (m, ce_summary) =
-          match ce_summary with
-            | Counterexample.(NCCE log | SWCE log | NCCE_SWCE log) ->
-                if Debug.test_flag debug_print_original_model then
-                  printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
-                if Debug.test_flag debug_print_derived_model then
-                  printf "@[<v>Derived model:@\n%a@]@\n@." print_model
-                    (Counterexample.model_of_exec_log ~original_model:m log)
-            | _ -> () in
         Opt.iter print_other_models ce;
         if res.pr_answer <> Valid then unproved := true
     | None, None ->
