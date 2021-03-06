@@ -65,7 +65,7 @@ type printer_mapping = {
 
 
 (** Return the union of projections and fields of a printer_mapping *)
-val list_projs : printer_mapping -> ident Mstr.t
+val fields_projs : printer_mapping -> ident Mstr.t
 
 type printer_args = {
   env        : Env.env;

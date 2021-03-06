@@ -176,6 +176,7 @@ let rec import_model_value known th_known ity v =
   let subst = its_match_regs ts l1 l2 in
   let def = Pdecl.find_its_defn known ts in
     match v with
+      | Var v -> cannot_import "variable %s" v
       | Integer s ->
           if ity_equal ity ity_int then
             int_value s.int_value

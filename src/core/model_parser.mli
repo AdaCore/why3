@@ -37,6 +37,7 @@ type model_value =
   | Record of model_record
   | Proj of model_proj
   | Apply of string * model_value list
+  | Var of string
   | Undefined
   | Unparsed of string
 
@@ -73,6 +74,7 @@ val array_add_element :
 val float_of_binary : model_float_binary -> model_float
 
 val print_model_value : Format.formatter -> model_value -> unit
+val print_model_value_human : Format.formatter -> model_value -> unit
 
 val debug_force_binary_floats : Debug.flag
 (** Print all floats using bitvectors in JSON output for models *)
@@ -307,12 +309,13 @@ val model_for_positions_and_decls : model ->
 ***************************************************************
 *)
 
-(** Method clean#model cleans a model from unparsed values and handles contradictory VCs
-   ("the check fails with all inputs"). *)
+(** Method clean#model cleans a model from unparsed values and handles
+   contradictory VCs ("the check fails with all inputs"). *)
 class clean : object
   method model : model -> model
   method element : model_element -> model_element option
   method value : model_value -> model_value option
+  method var : string -> model_value option
   method unparsed : string -> model_value option
   method integer : model_int -> model_value option
   method string : string -> model_value option
