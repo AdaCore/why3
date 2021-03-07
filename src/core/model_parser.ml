@@ -407,6 +407,16 @@ type model_element_kind =
   | Error_message
   | Other
 
+let print_model_kind fmt = function
+  | Result -> fprintf fmt "Result"
+  | Old -> fprintf fmt "Old"
+  | At l -> fprintf fmt "At %s" l
+  | Error_message -> fprintf fmt "Error_message"
+  | Loop_before -> fprintf fmt "Loop_before"
+  | Loop_previous_iteration -> fprintf fmt "Loop_previous_iteration"
+  | Loop_current_iteration -> fprintf fmt "Loop_current_iteration"
+  | Other -> fprintf fmt "Other"
+
 type model_element_name = {
   men_name: string;
   men_kind: model_element_kind; (* Attributes associated to the id of the men *)
@@ -420,21 +430,11 @@ type model_element = {
   me_term: Term.term option;
 }
 
-let model_trace_is_result attrs =
-  match Ident.get_model_trace_attr ~attrs with
-  | exception Not_found -> false
-  | a ->
-      match Strings.(bounded_split '@' a.attr_string 3) with
-      | _ :: "result" :: _ -> true
-      | _ -> false
-
 let create_model_element ~name ~value ~attrs =
-  let kind = if model_trace_is_result attrs then Result else Other in
-  let me_name = {men_name= name; men_kind= kind; men_attrs= attrs} in
+  let me_name = {men_name= name; men_kind= Other; men_attrs= attrs} in
   {me_name; me_value= value; me_location= None; me_term= None}
 
-let create_model_element_name name attrs : model_element_name =
-  let kind = if model_trace_is_result attrs then Result else Other in
+let create_model_element_name name attrs kind =
   {men_name= name; men_kind= kind; men_attrs= attrs}
 
 (*
@@ -512,47 +512,26 @@ let search_model_element_for_id m ?loc id =
 ***************************************************************
 *)
 
-(* Adapt kind to matching label *)
-let fix_loc_kind ~at_loc name =
-  let aux attr_at (labels_added, name) =
-    try
-      Scanf.sscanf attr_at.attr_string "at:%[^:]:loc:%[^:]:%d" @@ fun label loc_file loc_line ->
-      if at_loc = (Filename.basename loc_file, loc_line) &&
-         not (Sstr.mem label labels_added) &&
-         label <> "'Old" (* Already dealt with in [get_kind] *)
-      then Sstr.add label labels_added, {name with men_kind=At label}
-      else labels_added, name
-    with End_of_file | Scanf.Scan_failure _ ->
-      labels_added, name in
-  snd (Sattr.fold aux name.men_attrs (Sstr.empty, name))
-
 let cmp_attrs a1 a2 =
   String.compare a1.attr_string a2.attr_string
 
-let print_model_element ?(print_locs=false) ~at_loc ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
+let print_model_element ?(print_locs=false) ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message -> fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
-      let m_element = {m_element with me_name=fix_loc_kind ~at_loc m_element.me_name} in
-      fprintf fmt "@[<hv2>@[<hov2>%s%t%t =@]@ %a@]" (me_name_trans m_element.me_name)
+      fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]" (me_name_trans m_element.me_name)
         (fun fmt ->
            if print_attrs then
              fprintf fmt " %a" Pp.(print_list space Pretty.print_attr)
-               (List.sort cmp_attrs (Sattr.elements m_element.me_name.men_attrs)))
-        (fun fmt ->
+               (List.sort cmp_attrs (Sattr.elements m_element.me_name.men_attrs));
            if print_locs then fprintf fmt " (%a)"
                (Pp.print_option_or_default "NO LOC "Pretty.print_loc) m_element.me_location)
         print_model_value m_element.me_value
 
-let similar_model_element_names me_nm1 me_nm2 =
-  (* TODO Add an efficient version of symmetric difference to extset *)
-  let symm_diff = Sattr.diff (Sattr.union me_nm1.men_attrs me_nm2.men_attrs)
-                    (Sattr.inter me_nm1.men_attrs me_nm2.men_attrs) in
-  Ident.get_model_trace_string ~name:me_nm1.men_name ~attrs:me_nm1.men_attrs
-  = Ident.get_model_trace_string ~name:me_nm2.men_name ~attrs:me_nm2.men_attrs
-  && Sattr.equal me_nm1.men_attrs me_nm2.men_attrs
-  && Sattr.for_all (fun x ->
-         not (Strings.has_prefix "at" x.attr_string)) symm_diff
+let similar_model_element_names n1 n2 =
+  Ident.get_model_trace_string ~name:n1.men_name ~attrs:n1.men_attrs
+  = Ident.get_model_trace_string ~name:n2.men_name ~attrs:n2.men_attrs &&
+  n1.men_kind = n2.men_kind
 
 (* TODO optimize *)
 let rec filter_duplicated l =
@@ -563,13 +542,13 @@ let rec filter_duplicated l =
   | me :: l when exist_similar me l -> filter_duplicated l
   | me :: l -> me :: filter_duplicated l
 
-let print_model_elements ~filter_similar ~at_loc ~print_attrs ?(sep = Pp.newline)
+let print_model_elements ~filter_similar ~print_attrs ?(sep = Pp.newline)
     ~print_model_value ~me_name_trans fmt m_elements =
   let m_elements =
     if filter_similar then filter_duplicated m_elements else m_elements in
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ?print_locs:None ~at_loc ~print_attrs ~print_model_value
+       (print_model_element ?print_locs:None ~print_attrs ~print_model_value
           ~me_name_trans))
     m_elements
 
@@ -583,7 +562,7 @@ let print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_tr
       if n = 0 then Sattr.compare men1.men_attrs men2.men_attrs else n in
     let m_elements = List.sort cmp m_elements in
     fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
-      (print_model_elements ~filter_similar ?sep:None ~at_loc:(filename, line) ~print_attrs
+      (print_model_elements ~filter_similar ?sep:None ~print_attrs
          ~print_model_value ~me_name_trans) m_elements in
   fprintf fmt "@[<v 0>File %s:@ %a@]" filename
     Pp.(print_list space pp) (Mint.bindings model_file)
@@ -595,10 +574,9 @@ let why_name_trans men =
   | Result -> "result"
   | Old -> "old "^name
   | At l -> name^" at "^l
-  (* | Loop_before -> "[before loop] "^name *)
   | Loop_previous_iteration -> "[before iteration] "^name
   | Loop_current_iteration -> "[current iteration] "^name
-  | _ -> name
+  | Loop_before | Error_message | Other -> name
 
 let json_name_trans men =
   let name = get_model_trace_string ~name:men.men_name ~attrs:men.men_attrs in
@@ -657,7 +635,7 @@ let add_offset off (loc, a) =
   let f, l, fc, lc = Loc.get loc in
   (Loc.user_position f (l + off) fc lc, a)
 
-let interleave_line ~filename ~print_attrs start_comment end_comment
+let interleave_line ~filename:_ ~print_attrs start_comment end_comment
     me_name_trans model_file
     (source_code, line_number, offset, remaining_locs, locs) line =
   let remaining_locs, list_loc =
@@ -667,7 +645,7 @@ let interleave_line ~filename ~print_attrs start_comment end_comment
     let model_elements = Mint.find line_number model_file in
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
-        (print_model_elements ~filter_similar:true ~sep:Pp.semi ~at_loc:(filename, line_number)
+        (print_model_elements ~filter_similar:true ~sep:Pp.semi
            ~print_attrs ~print_model_value:print_model_value_human ~me_name_trans)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
@@ -726,32 +704,6 @@ let print_attrs_json (me : model_element_name) fmt =
     fmt
     (List.sort cmp_attrs (Sattr.elements me.men_attrs))
 
-(* Compute the kind of a model_element using its attributes and location *)
-let compute_kind (me : model_element) =
-  let me_kind = me.me_name.men_kind in
-  let location = me.me_location in
-  let attrs = me.me_name.men_attrs in
-  let me_kind =
-    (* We match on the attribute on the form [@at:'Old:loc:file:line]. If it
-       exists, depending on the location of the me, we use it or not. If it
-       does not we keep me_kind.
-    *)
-    match
-      Sattr.choose
-        (Sattr.filter
-           (fun x -> Strings.has_prefix "at:'Old:" x.attr_string)
-           attrs)
-    with
-    | exception Not_found -> me_kind
-    | a -> (
-      match (Strings.split ':' a.attr_string, location) with
-      | ["at"; "'Old"; "loc"; file; line_number], Some location ->
-          let loc_file, loc_line, _, _ = Loc.get location in
-          if loc_file = file && loc_line = int_of_string line_number then Old
-          else me_kind
-      | _ -> me_kind ) in
-  me_kind
-
 (*
 **  Quering the model - json
 *)
@@ -759,7 +711,7 @@ let print_model_element_json me_name_to_str fmt me =
   let print_value fmt = fprintf fmt "%a" print_model_value_sanit me.me_value in
   let print_kind fmt =
     (* We compute kinds using the attributes and locations *)
-    match compute_kind me with
+    match me.me_name.men_kind with
     | Result -> fprintf fmt "%a" Json_base.string "result"
     | At l -> fprintf fmt "@%s" l
     | Old -> fprintf fmt "%a" Json_base.string "old"
@@ -810,24 +762,9 @@ let print_model_json ?(me_name_trans = json_name_trans)
 
 (*
 ***************************************************************
-**  Building the model from raw model
+**  Get element kinds
 ***************************************************************
 *)
-
-let at_old_kind at_loc attrs =
-  let rec search = function
-    | [] -> None
-    | attr :: attrs ->
-        try
-          Scanf.sscanf attr.attr_string "at:%[^:]:loc:%[^:]:%d" @@
-          fun label loc_file loc_line ->
-          if at_loc = (loc_file, loc_line) then
-            Some (if label = "'Old" then Old else At label)
-          else
-            search attrs
-        with End_of_file | Scanf.Scan_failure _ ->
-          search attrs in
-  search (Sattr.elements attrs)
 
 let loc_starts_le loc1 loc2 =
   loc1 <> Loc.dummy_position && loc2 <> Loc.dummy_position &&
@@ -836,51 +773,84 @@ let loc_starts_le loc1 loc2 =
   f1 = f2 && l1 <= l2 && l1 <= l2 && b1 <= b2
 
 let while_loop_kind vc_attrs var_loc =
-  let is_inv_pres a = a.attr_string = "expl:loop invariant preservation" in
+  let is_inv_pres a =
+    a.attr_string = "expl:loop invariant preservation" ||
+    a.attr_string = "expl:loop variant decrease" in
   if Sattr.exists is_inv_pres vc_attrs then
     let loop_loc =
       let is_while a = Strings.has_prefix "loop:" a.attr_string in
       let attr = Sattr.choose (Sattr.filter is_while vc_attrs) in
       Scanf.sscanf attr.attr_string "loop:%[^:]:%d:%d:%d"
         Loc.user_position in
-    let kind =
-      if var_loc = loop_loc then Loop_previous_iteration
-      else if loc_starts_le loop_loc var_loc then Loop_current_iteration
-      else Loop_before in
-    Some kind
+    Some (
+      if var_loc = loop_loc then
+        Loop_previous_iteration
+      else if loc_starts_le loop_loc var_loc then
+        Loop_current_iteration
+      else
+        Loop_before )
   else None
 
-let fix_kind at_loc vc_attrs me =
-  let men_kind =
-    match at_old_kind at_loc me.me_name.men_attrs with
-    | Some k -> k
-    | None -> (
-        match Opt.map (while_loop_kind vc_attrs) me.me_location with
-        | Some (Some k) -> k
-        | _ -> me.me_name.men_kind) in
-  {me with me_name={me.me_name with men_kind}}
+let get_loop_kind vc_attrs oloc () =
+  Opt.bind oloc (while_loop_kind vc_attrs)
 
-let add_to_model ?vc_term_attrs model_element model =
-  match model_element.me_location with
+let get_loc_kind oloc attrs () =
+  match oloc with
+  | None -> None
+  | Some loc ->
+      let f,l,_,_ = Loc.get loc in
+      let search a =
+        try
+          Scanf.sscanf a.attr_string "at:%[^:]:loc:%[^:]:%d"
+            (fun label f' l' ->
+               if Filename.basename f = Filename.basename f' && l = l' then
+                 Some (if label = "'Old" then Old else At label)
+               else
+                 None)
+        with _ -> None in
+      try Some (Lists.first search (Sattr.elements attrs)) with
+        Not_found -> None
+
+let get_result_kind attrs () =
+  match Ident.get_model_trace_attr ~attrs with
+  | exception Not_found -> None
+  | a ->
+      match Strings.(bounded_split '@' a.attr_string 3) with
+      | _ :: "result" :: _ -> Some Result
+      | _ -> None
+
+let compute_kind vc_attrs oloc attrs =
+  try
+    Lists.first (fun f -> f ()) [
+      get_loc_kind oloc attrs;
+      get_result_kind attrs;
+      get_loop_kind vc_attrs oloc;
+    ]
+  with Not_found -> Other
+
+(*
+***************************************************************
+**  Building the model from raw model
+***************************************************************
+*)
+
+let add_to_model_if_loc ?kind me model =
+  match me.me_location with
   | None -> model
   | Some pos ->
       let filename, line_number, _, _ = Loc.get pos in
       let model_file = get_model_file model filename in
+      let me = match kind with None -> me | Some men_kind ->
+        {me with me_name= {me.me_name with men_kind}} in
       let elements = get_elements model_file line_number in
-      let model_element =
-        match vc_term_attrs with
-        | Some vc_term_attrs ->
-            fix_kind (filename, line_number) vc_term_attrs model_element
-        | None -> model_element in
-      let el = model_element.me_name in
       (* This removes elements that are duplicated *)
       let found_elements =
         List.exists (fun x ->
-            similar_model_element_names x.me_name el
+            similar_model_element_names x.me_name me.me_name
             && pos = Opt.get_def Loc.dummy_position x.me_location)
           elements in
       let elements = if found_elements then elements
-                     else model_element :: elements in
+                     else me :: elements in
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 
@@ -894,7 +864,7 @@ let recover_name pm fields_projs raw_name =
     with Not_found ->
       let id = Mstr.find raw_name fields_projs in
       (id.id_string, id.id_attrs) in
-  create_model_element_name (get_model_trace_string ~name ~attrs) attrs
+  get_model_trace_string ~name ~attrs
 
 (** [replace_projection const_function mv] replaces record names, projections, and application callees
    in [mv] using [const_function] *)
@@ -965,11 +935,11 @@ let register_remove_field f = remove_field := f
 (** Build the model by replacing projections and restore single field records in the model
    elements, and adding the element at all relevant locations *)
 let build_model_rec pm (elts: model_element list) : model_files =
-  let add_with_loc ~vc_term_attrs model_elt loc model =
-    match loc with
-    | None -> model
-    | me_location -> add_to_model ~vc_term_attrs {model_elt with me_location} model in
-  let fields_projs = fields_projs pm and vc_term_attrs = pm.Printer.vc_term_attrs in
+  let fields_projs = fields_projs pm and vc_attrs = pm.Printer.vc_term_attrs in
+  let add_with_loc_set_kind me loc model =
+    if loc = None then model else
+      let kind = compute_kind vc_attrs loc me.me_name.men_attrs in
+      add_to_model_if_loc ~kind {me with me_location= loc} model in
   let process_me me =
     assert (me.me_location = None && me.me_term = None);
     let aux t =
@@ -979,14 +949,14 @@ let build_model_rec pm (elts: model_element list) : model_files =
         | _ -> "", attrs in
       (* Replace projections with their real name *)
       let me_value = replace_projection
-          (fun s -> (recover_name pm fields_projs s).men_name)
+          (fun s -> recover_name pm fields_projs s)
           me.me_value in
       (* Remove some specific record field related to the front-end language.
          This function is registered. *)
       let attrs, me_value = !remove_field (attrs, me_value) in
       (* Transform value flattened by eval_match (one field record) back to records *)
       let attrs, me_value = read_one_fields ~attrs me_value in
-      let me_name = create_model_element_name name attrs in
+      let me_name = create_model_element_name name attrs Other in
       {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
     match Mstr.find_opt me.me_name.men_name pm.queried_terms with
     | None ->
@@ -999,10 +969,13 @@ let build_model_rec pm (elts: model_element list) : model_files =
         Some (aux t) in
   (** Add a model element at the relevant locations *)
   let add_model_elt model me =
-    let model = add_to_model ~vc_term_attrs me model in
-    let model = add_with_loc ~vc_term_attrs me (internal_loc (Opt.get me.me_term)) model in
+    let kind = compute_kind vc_attrs me.me_location me.me_name.men_attrs in
+    let model = add_to_model_if_loc ~kind me model in
+    let oloc = internal_loc (Opt.get me.me_term) in
+    let model = add_with_loc_set_kind me oloc model in
     let add_written_loc a =
-      add_with_loc ~vc_term_attrs me (Ident.extract_written_loc a) in
+      let oloc = Ident.extract_written_loc a in
+      add_with_loc_set_kind me oloc in
     Sattr.fold add_written_loc me.me_name.men_attrs model in
   List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
 
@@ -1024,17 +997,12 @@ let handle_contradictory_vc vc_term_loc model_files =
         match get_elements model_file line_number with
         | [] ->
             (* The vc is contradictory, add special model element  *)
-            let me = {
-              me_name= {
-                men_name= "the check fails with all inputs";
-                men_kind= Error_message;
-                men_attrs= Sattr.empty;
-              };
-              me_value= Unparsed "";
-              me_location= Some pos;
-              me_term= None;
-            } in
-            add_to_model me model_files
+            let me = create_model_element
+                ~name:"the check fails with all inputs"
+                ~value:(Unparsed "contradictory vc")
+                ~attrs:Sattr.empty in
+            let me = {me with me_location= Some pos} in
+            add_to_model_if_loc ~kind:Error_message me model_files
         | _ -> model_files
 
 (*

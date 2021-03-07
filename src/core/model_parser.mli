@@ -104,6 +104,8 @@ type model_element_kind =
      error message is saved in the name of the model element.*)
   | Other
 
+val print_model_kind : Format.formatter -> model_element_kind -> unit
+
 (** Information about the name of the model element *)
 type model_element_name = {
   men_name   : string;
