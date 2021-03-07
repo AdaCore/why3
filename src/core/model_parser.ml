@@ -570,6 +570,10 @@ let print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_tr
      hides the local paths. *)
   let filename = Filename.basename filename in
   let pp fmt (line, m_elements) =
+    let cmp {me_name= men1} {me_name= men2} =
+      let n = String.compare men1.men_name men2.men_name in
+      if n = 0 then Sattr.compare men1.men_attrs men2.men_attrs else n in
+    let m_elements = List.sort cmp m_elements in
     fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
       (print_model_elements ~filter_similar ?sep:None ~at_loc:(filename, line) ~print_attrs
          ~print_model_value ~me_name_trans) m_elements in
