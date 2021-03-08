@@ -271,3 +271,18 @@ val ity_components : Ity.ity -> Ity.itysymbol * Ity.ity list * Ity.ity list
 
 (** Checks if the argument is a range type *)
 val is_range_ty : Ty.ty -> bool
+
+(** {2 Configuration by debug flags} *)
+
+val debug_disable_builtin_mach : Debug.flag
+(** Don't register builtins for machine-dependent modules under stdlib/mach. *)
+
+val debug_array_as_update_chains_not_epsilon : Debug.flag
+(** Parameter for the conversion of arrays to terms in RAC. Normally, an array
+   [a] of length [n] is converted to [(epsilon v. v.length =n /\ v[0] = a[0] /\
+   ... /\ a[n-1] = a[n-1])]. As an update chain, it is instead converted into a
+   formula [(make n undefined)[0 <- a[0]]... [n-1 <- a[n-1]]] *)
+
+val debug_rac_values : Debug.flag
+(* print debug information about the values that are imported during
+   interpretation *)

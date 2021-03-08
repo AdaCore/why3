@@ -2,37 +2,45 @@
 <check-ce>Validating model:
           File int.mlw:
             Line 432:
-              max_int =
+              max_int  =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "0"}}
             Line 434:
-              min_int =
+              min_int  =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "0"}}
             File tuple1.mlw:
               Line 6:
-                a =
+                a [@introduced] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
-                b =
+                b [@introduced] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
               Line 7:
-                a =
+                a_vc_constant [@introduced] [@model_trace:a] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
-                b =
+                b_vc_constant [@introduced] [@model_trace:b] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
 <check-ce>Interpreting concretly
+<rac-values>Value from model for global max_int: {int63'int => 0}
+<rac-values>Value from model for global max_int: {int63'int => 0}
+<rac-values>Value from model for global min_int: {int63'int => 0}
+<rac-values>Value from model for global min_int: {int63'int => 0}
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
+<rac-values>Value from model for global max_int: {int63'int => 0}
+<rac-values>Value from model for global max_int: {int63'int => 0}
+<rac-values>Value from model for global min_int: {int63'int => 0}
+<rac-values>Value from model for global min_int: {int63'int => 0}
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Result of checking model 0:
             - Concrete: don't know (Concrete RAC terminated because Precondition of (+) cannot be evaluated)
@@ -43,37 +51,45 @@
 <check-ce>Validating model:
           File int.mlw:
             Line 432:
-              max_int =
+              max_int  =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "4611686018427387903"}}
             Line 434:
-              min_int =
+              min_int  =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "-4611686018427387904"}}
             File tuple1.mlw:
               Line 6:
-                a =
+                a [@introduced] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
-                b =
+                b [@introduced] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
               Line 7:
-                a =
+                a_vc_constant [@introduced] [@model_trace:a] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
-                b =
+                b_vc_constant [@introduced] [@model_trace:b] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
 <check-ce>Interpreting concretly
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Result of checking model 1:
             - Concrete: don't know (Concrete RAC terminated because Precondition of (+) cannot be evaluated)
@@ -84,41 +100,49 @@
 <check-ce>Validating model:
           File int.mlw:
             Line 432:
-              max_int =
+              max_int  =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "4611686018427387903"}}
             Line 434:
-              min_int =
+              min_int  =
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "-4611686018427387904"}}
             File tuple1.mlw:
               Line 6:
-                a =
+                a [@introduced] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value":
                     {"type": "Integer", "val": "-4611686018427387902"}}
-                b =
+                b [@introduced] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value":
                     {"type": "Integer", "val": "-4611686018427387903"}}
               Line 7:
-                a =
+                a_vc_constant [@introduced] [@model_trace:a] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value":
                     {"type": "Integer", "val": "-4611686018427387902"}}
-                b =
+                b_vc_constant [@introduced] [@model_trace:b] =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value":
                     {"type": "Integer", "val": "-4611686018427387903"}}
 <check-ce>Interpreting concretly
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Interpreting abstractly
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global max_int: {int63'int => 4611686018427387903}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
+<rac-values>Value from model for global min_int: {int63'int => (-4611686018427387904)}
 <rac-values>Missing value for parameter x, continue with default value (0, 0).
 <check-ce>Result of checking model 2:
             - Concrete: don't know (Concrete RAC terminated because Precondition of (+) cannot be evaluated)
@@ -137,7 +161,7 @@
     (Concrete RAC terminated because Precondition of (+) cannot be evaluated)
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-19:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: Unknown (unknown + incomplete) (0.08s, 11434 steps).
+Prover result is: Unknown (unknown + incomplete) (0.07s, 11434 steps).
 The following counterexample model could not be verified
   (Concrete RAC terminated because Precondition of (+) cannot be evaluated):
 File int.mlw:
@@ -155,7 +179,7 @@ File tuple1.mlw:
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-23:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: Valid (0.03s, 4124 steps).
+Prover result is: Valid (0.02s, 4124 steps).
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 3-8:
 Goal Integer overflow from verification condition swap'vc.
@@ -163,7 +187,7 @@ Prover result is: Valid (0.02s, 4409 steps).
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 3-12:
 Goal Integer overflow from verification condition swap'vc.
-Prover result is: Valid (0.03s, 4520 steps).
+Prover result is: Valid (0.02s, 4520 steps).
 
 File "bench/check-ce/tuple1.mlw", line 5, characters 38-43:
 Goal Postcondition from verification condition swap'vc.

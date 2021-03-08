@@ -2,8 +2,8 @@
 <check-ce>Validating model:
           File falseCE.mlw:
             Line 12:
-              a = {"type": "Integer", "val": "1"}
-              b = {"type": "Integer", "val": "12166397"}
+              a [@introduced] = {"type": "Integer", "val": "1"}
+              b [@introduced] = {"type": "Integer", "val": "12166397"}
             Line 15:
               the check fails with all inputs
 <check-ce>Interpreting concretly
@@ -56,7 +56,7 @@
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
 Goal Assertion from verification condition rsa'vc.
-Prover result is: Step limit exceeded (0.05s).
+Prover result is: Step limit exceeded (0.08s).
 Sorry, we don't have a good counterexample for you :(
 
 

@@ -2,7 +2,7 @@
 <check-ce>Validating model:
           File anonymous2.mlw:
             Line 8:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -11,10 +11,10 @@
             Line 9:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
 <rac-values>Missing value for parameter x, continue with default value 0.
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
 <rac-values>Missing value for parameter x, continue with default value 0.
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous2.mlw", line 6, characters 13-18)
@@ -71,30 +71,31 @@
 <check-ce>Validating model:
           File anonymous2.mlw:
             Line 5:
-              x = {"type": "Integer", "val": "1"}
+              x [@introduced] = {"type": "Integer", "val": "1"}
             Line 8:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 9:
-              z =
+              z_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:z] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
 <rac-values>Value imported for x at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
 <rac-values>Value imported for x at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
-<rac-values>Value imported for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25:
-              {contents= 0}
-<rac-values>No value for result at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25, taking default.
+<rac-values>Value from model for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: {contents=
+                                                                    0}
+<rac-values>Value type default for result of h at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: ()
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -114,7 +115,7 @@
                 Line 5:
                   x = 1
                   Execution of main function f's body with env:
-                    z = {contents= 1}
+                    z = {contents= 0}
                     x = 1
                     zero = 0
                     one = 1
@@ -165,7 +166,7 @@
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/anonymous2.mlw", line 9, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (0.80s).
+Prover result is: Step limit exceeded (0.76s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:

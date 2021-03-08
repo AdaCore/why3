@@ -34,7 +34,7 @@ as follows:
 
 ::
 
-    why3 config --detect
+    why3 config
 
 .. %EXECUTE rm -rf doc/hello_proof/
 .. %EXECUTE cp examples/logic/hello_proof.why doc/
@@ -86,7 +86,7 @@ Calling provers on goals
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 You are now ready to call provers on the goals. (If not done yet, you
-must perform prover autodetection using :option:`why3 config --detect-provers`.)
+must perform prover autodetection using :why3:tool:`why3 config`.)
 A prover is
 selected using the context menu (right-click). This prover is then
 called on the goal selected in the tree view. You can select several

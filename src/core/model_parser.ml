@@ -390,22 +390,21 @@ type model_element = {
   me_term: Term.term option;
 }
 
-let split_model_trace_name mt_name =
-  (* Mt_name is of the form "name[@kind[@*]]". Return (name, kind) *)
-  let splitted = Strings.bounded_split '@' mt_name 3 in
-  match splitted with
-  | [] -> mt_name, Other
-  | [name] -> name, Other
-  | name :: "result" :: _ -> name, Result
-  | name :: _ :: _ -> name, Other
+let model_trace_is_result attrs =
+  match Ident.get_model_trace_attr ~attrs with
+  | exception Not_found -> false
+  | a ->
+      match Strings.(bounded_split '@' a.attr_string 3) with
+      | _ :: "result" :: _ -> true
+      | _ -> false
 
 let create_model_element ~name ~value ~attrs =
-  let name, kind = split_model_trace_name name in
+  let kind = if model_trace_is_result attrs then Result else Other in
   let me_name = {men_name= name; men_kind= kind; men_attrs= attrs} in
   {me_name; me_value= value; me_location= None; me_term= None}
 
 let create_model_element_name name attrs : model_element_name =
-  let name, kind = split_model_trace_name name in
+  let kind = if model_trace_is_result attrs then Result else Other in
   {men_name= name; men_kind= kind; men_attrs= attrs}
 
 (*
@@ -451,25 +450,28 @@ let get_model_elements m =
 let get_model_term_loc m = m.vc_term_loc
 let get_model_term_attrs m = m.vc_term_attrs
 
+let trace_by_id id =
+  Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
+
+let trace_by_men men =
+  Ident.get_model_trace_string ~name:men.men_name ~attrs:men.men_attrs
+
 let get_model_element model name loc =
   let aux me =
-    me.me_name.men_name = name &&
+    trace_by_men me.me_name = name &&
     Opt.equal Loc.equal me.me_location (Some loc) in
   List.find_opt aux (get_model_elements model)
 
 let get_model_element_value model name loc =
   let aux me =
-    me.me_name.men_name = name &&
+    trace_by_men me.me_name = name &&
     Opt.equal Loc.equal me.me_location (Some loc) in
   List.find_opt aux (get_model_elements model)
 
 let get_model_element_by_id model id =
   match id.id_loc with
   | None -> None
-  | Some loc ->
-      let name = id.id_string in
-      let name = Ident.get_model_trace_string ~name ~attrs:id.id_attrs in
-      get_model_element_value model name loc
+  | Some loc -> get_model_element_value model (trace_by_id id) loc
 
 let get_model_element_by_loc model loc =
   let aux me = Opt.equal Loc.equal me.me_location (Some loc) in
@@ -552,21 +554,25 @@ let print_model_file ~filter_similar ~print_attrs ~print_model_value ~me_name_tr
   fprintf fmt "@[<v 0>File %s:@ %a@]" filename
     Pp.(print_list space pp) (Mint.bindings model_file)
 
-let why_name_trans {men_kind; men_name} =
-  match men_kind with
+let why_name_trans men =
+  let name = get_model_trace_string ~name:men.men_name ~attrs:men.men_attrs in
+  let name = List.hd (Strings.bounded_split '@' name 2) in
+  match men.men_kind with
   | Result -> "result"
-  | Old -> "old "^men_name
-  | At l -> men_name^" at "^l
-  (* | Loop_before -> "[before loop] "^men_name *)
-  | Loop_previous_iteration -> "[before iteration] "^men_name
-  | Loop_current_iteration -> "[current iteration] "^men_name
-  | _ -> men_name
+  | Old -> "old "^name
+  | At l -> name^" at "^l
+  (* | Loop_before -> "[before loop] "^name *)
+  | Loop_previous_iteration -> "[before iteration] "^name
+  | Loop_current_iteration -> "[current iteration] "^name
+  | _ -> name
 
-let json_name_trans {men_kind; men_name} =
-  match men_kind with
+let json_name_trans men =
+  let name = get_model_trace_string ~name:men.men_name ~attrs:men.men_attrs in
+  let name = List.hd (Strings.bounded_split '@' name 2) in
+  match men.men_kind with
   | Result -> "result"
-  | Old -> "old "^men_name
-  | _ -> men_name
+  | Old -> "old "^name
+  | _ -> name
 
 let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
     ~print_model_value fmt model =
@@ -946,7 +952,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
       let attrs, me_value = !remove_field (attrs, me_value) in
       (* Transform value flattened by eval_match (one field record) back to records *)
       let attrs, me_value = read_one_fields ~attrs me_value in
-      let me_name = create_model_element_name (get_model_trace_string ~name ~attrs) attrs in
+      let me_name = create_model_element_name name attrs in
       {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
     Opt.map aux (Mstr.find_opt me.me_name.men_name pm.queried_terms) in
   (** Add a model element at the relevant locations *)
@@ -1004,6 +1010,8 @@ let opt_bind_all os f =
   else None
 
 class clean = object (self)
+  method model m =
+    {m with model_files= map_filter_model_files self#element m.model_files}
   method element me =
     if me.me_name.men_kind = Error_message then
       (* Keep unparsed values for error messages *)

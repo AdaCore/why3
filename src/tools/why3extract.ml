@@ -16,10 +16,9 @@ open Pmodule
 open Compile
 open Theory
 
-let usage_msg = sprintf
-    "Usage: %s [options] -D <driver> [<file>.<Module>*.<symbol>?|-]\n\
-     Extract some WhyML code to the target language.\n"
-    (Filename.basename Sys.argv.(0))
+let usage_msg =
+  "-D <driver> [<file>.<Module>*.<symbol>?|-]\n\
+   Extract some WhyML code to the target language."
 
 type extract_target =
   | File   of string
@@ -79,7 +78,7 @@ let option_list =
     "<file|dir> destination of extracted code";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =

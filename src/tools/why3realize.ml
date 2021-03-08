@@ -12,10 +12,9 @@
 open Format
 open Why3
 
-let usage_msg = sprintf
-  "Usage: %s [options] -D <driver> -o <dir> -T <theory> ...\n\
-   Output realization skeletons for the given theories or update them.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg =
+  "-D <driver> -o <dir> -T <theory> ...\n\
+   Output realization skeletons for the given theories or update them."
 
 let opt_queue = Queue.create ()
 
@@ -54,7 +53,7 @@ let option_list =
     "<dir> write the realizations to <dir>";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =

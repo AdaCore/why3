@@ -124,63 +124,97 @@ The ``config`` Command
 .. program:: why3 config
 
 Why3 must be configured to access external provers. Typically, this is
-done by running the :program:`why3 config` command. This must be done each time a
-new prover is installed.
+done by running :why3:tool:`why3 config detect`. This command must be run
+every time a new prover is installed.
 
-The provers that Why3 attempts to detect are described in the readable
+The provers known by Why3 are described in the
 configuration file :file:`provers-detection-data.conf` of the Why3 data
 directory (e.g., :file:`/usr/local/share/why3`). Advanced users may try to modify
 this file to add support for detection of other provers. (In that case,
 please consider submitting a new prover configuration on the bug
 tracking system.)
 
-The result of provers detection is stored in the user's configuration
-file (see :numref:`sec.whyconffile`). This file is also
-human-readable, and advanced users may modify it in order to experiment
-with different ways of calling provers, e.g., different versions of the same
-prover, or with different options.
-The :why3:tool:`config` command also detects the :index:`plugins <plugin>` installed in the Why3
-plugins directory (e.g., :file:`/usr/local/lib/why3/plugins`).
+The result of prover detection is stored in the user's configuration file
+(see :numref:`sec.whyconffile`). Only the version of the provers is
+stored; the actual configuration of the provers, shortcuts, strategies,
+and editors, are regenerated at each startup of a Why3. This
+configuration can be inspected with the command :why3:tool:`why3 config
+show`.
 
-If the user's configuration file is already present, :why3:tool:`config` will
-only reset unset variables to default value, but will not try to detect
-provers and plugins. Options :option:`--detect-provers` and
-:option:`--detect-plugins` can be used in that case.
-If a supported prover is installed under a name that is not
-automatically recognized by :why3:tool:`config`, the :option:`--add-prover` option
-can be used to add a specified binary to the configuration.
+If a supported prover is not automatically recognized by :why3:tool:`why3
+config detect`, the command :why3:tool:`why3 config add-prover` can be
+used to add it.
 
-Options
-~~~~~~~
+The available subcommands are as follows:
 
-.. option:: --detect-provers
+:why3:tool:`config add-prover`
+   Manually register a prover.
 
-   Force detection of provers, when the configuration file already exists.
+:why3:tool:`config detect`
+   Automatically detect installed provers.
 
-.. option:: --detect-plugins
+:why3:tool:`config list-supported-provers`
+   List the names of all supported provers.
 
-   Force detection of plugins, when the configuration file already exists.
+:why3:tool:`config show`
+   Show the expanded version of the configuration file.
 
-.. option:: --detect
+Only the first two commands modify the configuration file.
 
-   Imply both :option:`--detect-provers` and :option:`--detect-plugins`.
-   Also reset the loadpath.
+.. why3:tool:: config add-prover
 
-.. option:: --add-prover=<id>,<shortcut>,<file>
+Command ``add-prover``
+~~~~~~~~~~~~~~~~~~~~~~
 
-   Check the executable program ``<file>`` against the provers of family
-   ``<id>``, and register it as ``<shortcut>``.
+This commands adds a prover to the configuration. It is invoked as follows.
 
-   Example: to add an Alt-Ergo
-   executable :file:`/home/me/bin/alt-ergo-trunk`, one can type
+::
 
-   ::
+   why3 config add-prover <name> <file> [<shortcut>]
 
-      why3 config --add-prover=alt-ergo,new-ae,/home/me/bin/alt-ergo-trunk
+Argument *name* is the name of the prover, as listed by
+command :why3:tool:`why3 config list-supported-provers` and as found in
+file :file:`provers-detection-data.conf`.
 
-.. option:: --list-prover-families
+If the argument *shortcut* is present, it is used as the shortcut for
+invoking the prover.
 
-   List families of provers, as used by option :option:`--add-prover`.
+For example, to add an Alt-Ergo
+executable :file:`/home/me/bin/alt-ergo-trunk` with shortcut ``new-ae``,
+one can type
+
+::
+
+   why3 config add-prover Alt-Ergo /home/me/bin/alt-ergo-trunk new-ae
+
+Manually added provers are stored in the configuration file under
+``[manual_binary]`` sections as well as ``[detected_binary]`` ones.
+
+.. why3:tool:: config detect
+
+Command ``detect``
+~~~~~~~~~~~~~~~~~~
+
+This command automatically detects the installed provers that are
+supported by Why3. It also creates a configuration file if none exists.
+
+Automatically detected provers are stored in the configuration file under
+``[detected_binary]`` sections.
+
+.. why3:tool:: config list-supported-provers
+
+Command ``list-supported-provers``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This command lists the names of all supported provers, as used for
+command :why3:tool:`why3 config add-prover`.
+
+.. why3:tool:: config show
+
+Command ``show``
+~~~~~~~~~~~~~~~~
+
+This command shows the expanded version of the configuration file.
 
 .. why3:tool:: prove
 .. _sec.why3prove:

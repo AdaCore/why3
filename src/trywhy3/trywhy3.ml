@@ -631,12 +631,12 @@ let handle_why3_message o =
         let span_msg = getElement AsHtml.span (id ^ "_msg") in
         let cls =
           match st with
-          | `New ->
+          | StNew ->
               !!"fas fa-fw fa-cog fa-spin fa-fw why3-task-pending"
-          | `Valid ->
+          | StValid ->
               span_msg ##. innerHTML := !!"";
               !!"fas fa-check-circle why3-task-valid"
-          | `Unknown ->
+          | StUnknown ->
               !!"fas fa-question-circle why3-task-unknown"
         in
         span_icon ##. className := cls
@@ -894,15 +894,9 @@ end
 module Controller =
   struct
     let task_queue  = Queue.create ()
-    let array_for_all a f =
-      let rec loop i n =
-        if i < n then (f a.(i)) && loop (i+1) n
-        else true
-      in
-      loop 0 (Array.length a)
 
     let first_task = ref true
-    type 'a status = Free of 'a | Busy of 'a | Absent
+    type 'a status = Free of 'a | Busy of 'a * Worker_proto.id | Absent
     let num_workers = Session.load_num_threads ()
     let alt_ergo_steps = ref (Session.load_num_steps ())
     let alt_ergo_workers = ref (Array.make num_workers Absent)
@@ -914,61 +908,64 @@ module Controller =
       | Some w -> w
       | None -> log ("Why3 Worker not initialized !"); assert false
 
-    let alt_ergo_not_running () =
-      array_for_all !alt_ergo_workers (function Busy _ -> false | _ -> true)
+    let alt_ergo_idle () =
+      Array.for_all (function Busy _ -> false | _ -> true) !alt_ergo_workers
 
     let is_idle () =
-      alt_ergo_not_running () && Queue.is_empty task_queue && not (!why3_busy)
+      alt_ergo_idle () && Queue.is_empty task_queue && not !why3_busy
 
+    let process_task i w id s =
+      !alt_ergo_workers.(i) <- Busy (w, id);
+      w ## postMessage (marshal (id, s, !alt_ergo_steps))
 
+    let update_status id status =
+      handle_why3_message (UpdateStatus (status, id));
+      (get_why3_worker ()) ## postMessage (marshal (SetStatus (status, id)))
 
-    let rec init_alt_ergo_worker i =
+    let init_alt_ergo_worker i =
       let worker = Worker.create "alt_ergo_worker.js" in
       worker ##. onmessage :=
         Dom.handler (fun ev ->
-            let (id, result) as res = unmarshal (ev ##. data) in
+            let (id, result) = unmarshal (ev ##. data) in
             TaskList.print_alt_ergo_output id result;
-            let status_update = status_of_result res in
-            let () = match status_update with
-              | SetStatus(v, id) ->
-                  handle_why3_message (UpdateStatus(v, id))
-              | _ -> () in
-            (get_why3_worker()) ## postMessage (marshal status_update);
-            !alt_ergo_workers.(i) <- Free(worker);
-            process_task ();
+            let status = match result with
+              | Valid -> StValid
+              | _ -> StUnknown in
+            update_status id status;
+            begin match Queue.take task_queue with
+            | (id, s) -> process_task i worker id s
+            | exception Queue.Empty ->
+                !alt_ergo_workers.(i) <- Free worker;
+                if is_idle () then ToolBar.enable_compile ()
+            end;
             Js._false);
-      Free (worker)
-
-    and process_task () =
-      let rec find_free_worker_slot i =
-        if i < num_workers then
-          match !alt_ergo_workers.(i) with
-          | Free _ as w -> i, w
-          | _ -> find_free_worker_slot (i + 1)
-        else -1, Absent
-      in
-      let idx, w = find_free_worker_slot 0 in
-      match w with
-      | Free w when not (Queue.is_empty task_queue) ->
-        let task = Queue.take task_queue in
-        !alt_ergo_workers.(idx) <- Busy (w);
-        w ## postMessage (marshal (OptionSteps !alt_ergo_steps));
-        w ## postMessage (marshal task)
-      | _ -> if is_idle () then ToolBar.enable_compile ()
+      worker
 
     let reset_workers () =
       Array.iteri (fun i w ->
           match w with
-          | Busy (w)  ->
+          | Busy (w, id)  ->
               w ## terminate;
-              !alt_ergo_workers.(i) <- init_alt_ergo_worker i
-          | Absent -> !alt_ergo_workers.(i) <- init_alt_ergo_worker i
-          | Free _ -> ()
-        ) !alt_ergo_workers
+              update_status id StUnknown;
+              !alt_ergo_workers.(i) <- Absent
+          | Absent | Free _ -> ()
+        ) !alt_ergo_workers;
+      Queue.iter (fun (id, _) -> update_status id StUnknown) task_queue;
+      Queue.clear task_queue;
+      if not !why3_busy then ToolBar.enable_compile ()
 
-    let push_task task =
-      Queue.add  task task_queue;
-      process_task ()
+    let push_task id s =
+      let rec aux i =
+        if i >= 0 then
+          match !alt_ergo_workers.(i) with
+          | Free w -> process_task i w id s
+          | Absent ->
+              let w = init_alt_ergo_worker i in
+              process_task i w id s
+          | Busy _ -> aux (i - 1)
+        else
+          Queue.add (id, s) task_queue in
+      aux (Array.length !alt_ergo_workers - 1)
 
     let init_why3_worker () =
       let worker = Worker.create "why3_worker.js" in
@@ -982,8 +979,8 @@ module Controller =
             handle_why3_message msg;
             let () =
               match msg with
-                Task (id,_,_,code,_, _, steps) ->
-                  push_task (Goal (id,code, steps))
+              | Task (id, _, _, code, _, _, _) ->
+                  push_task id code
               | Idle ->
                   why3_busy := false;
                   if is_idle () then ToolBar.enable_compile ()
@@ -1039,18 +1036,17 @@ module Controller =
           (get_why3_worker()) ## postMessage (marshal ProveAll)
         end
 
-    let force_stop () =
-      log ("Called force_stop");
-      (get_why3_worker()) ## terminate;
-      why3_worker := Some (init_why3_worker ());
-      reset_workers ();
-      TaskList.clear ();
-      ToolBar.enable_compile ()
-
     let stop () =
-      if not (is_idle ()) then force_stop ();
-
-
+      if not (alt_ergo_idle ()) then
+        reset_workers ()
+      else if not (is_idle ()) then
+        begin
+          (get_why3_worker ()) ## terminate;
+          why3_worker := Some (init_why3_worker ());
+          reset_workers ();
+          TaskList.clear ();
+          ToolBar.enable_compile ()
+        end
 end
 
 (* Initialisation *)
@@ -1079,28 +1075,28 @@ let () =
   ToolBar.add_action Buttons.button_about Dialogs.(show about_dialog);
 
   ContextMenu.(add_action split_menu_entry
-                 Controller.(why3_transform `Split ignore));
+                 Controller.(why3_transform Split ignore));
   ContextMenu.(add_action prove_menu_entry
-                 Controller.(why3_transform (`Prove(-1)) ignore));
+                 Controller.(why3_transform (Prove (-1)) ignore));
   ContextMenu.(add_action prove100_menu_entry
-                 Controller.(why3_transform (`Prove(100)) ignore));
+                 Controller.(why3_transform (Prove 100) ignore));
   ContextMenu.(add_action prove1000_menu_entry
-                 Controller.(why3_transform (`Prove(1000)) ignore));
+                 Controller.(why3_transform (Prove 1000) ignore));
   ContextMenu.(add_action prove5000_menu_entry
-                 Controller.(why3_transform (`Prove(5000)) ignore));
+                 Controller.(why3_transform (Prove 5000) ignore));
   ContextMenu.(add_action clean_menu_entry
-                 Controller.(why3_transform (`Clean) TaskList.clean_task));
+                 Controller.(why3_transform Clean TaskList.clean_task));
 
   Dialogs.(set_onchange input_num_threads (fun o ->
                let open Controller in
                let len = int_of_js_string (o ##. value) in
-               force_stop ();
+               reset_workers ();
                alt_ergo_workers := Array.make len Absent));
 
   Dialogs.(set_onchange input_num_steps (fun o ->
                let steps = int_of_js_string (o ##. value) in
                Controller.alt_ergo_steps := steps;
-               Controller.force_stop ()));
+               Controller.reset_workers ()));
 
   ToolBar.add_action Dialogs.button_close Dialogs.close;
   (*KeyBinding.add_global Keycode.esc  Dialogs.close;*)

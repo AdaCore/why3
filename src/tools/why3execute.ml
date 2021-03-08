@@ -13,10 +13,9 @@ open Format
 open Why3
 open Pmodule
 
-let usage_msg = sprintf
-  "Usage: %s [options] <file> <expr>\n\
-   Execute the expression in the given file (and --use the necessary modules).\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg =
+  "<file> <expr>\n\
+   Execute the expression in the given file (and --use the necessary modules)."
 
 let opt_file = ref None
 let opt_exec = ref ""
@@ -64,7 +63,7 @@ let option_list =
     "<qualified_module> use module in the execution";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt usage_msg
 
 let () =

@@ -6,16 +6,16 @@ Prover result is: Valid (0.02s, 23 steps).
 <check-ce>Validating model:
           File multifile1.mlw:
             Line 6:
-              x = {"type": "Integer", "val": "2"}
+              x [@introduced] = {"type": "Integer", "val": "2"}
             Line 9:
-              x = {"type": "Integer", "val": "2"}
+              x [@introduced] = {"type": "Integer", "val": "2"}
             Line 10:
               the check fails with all inputs
 <check-ce>Interpreting concretly
 <rac-values>Value imported for x at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for x at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
-<rac-values>No value for result at "bench/check-ce/multifile1.mlw", line 11, characters 4-10, taking default.
+<rac-values>Value type default for result of decr at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -79,16 +79,17 @@ Prover result is: Valid (0.02s, 23 steps).
 <check-ce>Validating model:
           File multifile1.mlw:
             Line 6:
-              x = {"type": "Integer", "val": "2"}
+              x [@introduced] = {"type": "Integer", "val": "2"}
             Line 9:
-              x = {"type": "Integer", "val": "2"}
+              x [@introduced] = {"type": "Integer", "val": "2"}
             Line 10:
-              x = {"type": "Integer", "val": "2"}
+              x_vc_constant [@introduced] [@model_trace:x] =
+                {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for x at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for x at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
-<rac-values>No value for result at "bench/check-ce/multifile1.mlw", line 11, characters 4-10, taking default.
+<rac-values>Value type default for result of decr at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -152,16 +153,17 @@ Prover result is: Valid (0.02s, 23 steps).
 <check-ce>Validating model:
           File multifile1.mlw:
             Line 6:
-              x = {"type": "Integer", "val": "2"}
+              x [@introduced] = {"type": "Integer", "val": "2"}
             Line 9:
-              x = {"type": "Integer", "val": "2"}
+              x [@introduced] = {"type": "Integer", "val": "2"}
             Line 10:
-              x = {"type": "Integer", "val": "2"}
+              x_vc_constant [@introduced] [@model_trace:x] =
+                {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for x at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for x at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
-<rac-values>No value for result at "bench/check-ce/multifile1.mlw", line 11, characters 4-10, taking default.
+<rac-values>Value type default for result of decr at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -230,7 +232,7 @@ Prover result is: Valid (0.02s, 23 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
 Goal Postcondition from verification condition incr'vc.
-Prover result is: Unknown (sat) (0.01s, 835 steps).
+Prover result is: Unknown (sat) (0.02s, 835 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:

@@ -52,6 +52,23 @@ It certainly makes sense to turn this command line into a shell script for easie
     #!/bin/sh
     exec docker run --rm --network host --user `id -u` --volume $HOME/.Xauthority:/home/guest/.Xauthority --env DISPLAY=$DISPLAY --volume `pwd`:/data --workdir /data why3 "$@"
 
+It is also possible to run the graphical user interface from within a web
+browser, thus alleviating the need for a X server. To do so, just set the
+environment variable ``WHY3IDE`` to ``web`` and publish port 8080:
+
+.. code-block:: shell
+
+   docker run --rm -p 8080:8080 --env WHY3IDE=web --user `id -u` --volume `pwd`:/data --workdir /data why3 ide foo.mlw
+
+You can now point your web browser to http://localhost:8080/. As before,
+this can be turned into a shell script for easier use:
+
+.. code-block:: shell
+
+    #!/bin/sh
+    exec docker --rm -p 8080:8080 --env WHY3IDE=web --user `id -u` --volume `pwd`:/data --workdir /data why3 "$@"
+
+
 Installation from Source Distribution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -122,7 +139,7 @@ Installation can be tested as follows:
 
 #. install some external provers (see :numref:`sec.provers` below)
 
-#. run :option:`why3 config --detect`
+#. run :why3:tool:`why3 config`
 
 #. run some examples from the distribution, e.g., you should obtain the
    following (provided the required provers are installed on your
@@ -194,7 +211,7 @@ to run the following command:
 
 ::
 
-    why3 config --detect
+    why3 config
 
 It scans your :envvar:`PATH` for provers and updates your configuration file
 (see :numref:`sec.why3config`) accordingly.
@@ -207,19 +224,18 @@ CVC4 1.4 and CVC4 1.5 at the same time. The automatic detection of
 provers looks for typical names for their executable command, e.g., :program:`cvc4`
 for CVC3. However, if you install several versions of the same prover it
 is likely that you would use specialized executable names, such as
-:program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, option
-:option:`why3 config --add-prover` can be
-added to specify names of prover executables:
+:program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, the command
+:why3:tool:`why3 config add-prover` can be
+used to specify names of prover executables:
 
 ::
 
-    why3 config --add-prover cvc4 cvc4-dev /usr/local/bin/cvc4-dev
+    why3 config add-prover CVC4 /usr/local/bin/cvc4-dev cvc4-dev
 
-the first argument (here ``cvc4``) must be one of the family of provers
-known. The list of these famillies can be obtain using
-:option:`why3 config --list-prover-families`.
-
-as they are in fact listed in the file :file:`provers-detection-data.conf`,
+the first argument (here ``CVC4``) must be one of the known provers. The
+list of these names can be obtained
+using :why3:tool:`why3 config list-supported-provers`.
+They can also be found in the file :file:`provers-detection-data.conf`,
 typically located in :file:`/usr/local/share/why3` after installation. See
 :numref:`sec.proverdetectiondata` for details.
 

@@ -421,7 +421,11 @@ let create_list pm (table: definition Mstr.t) =
 
   (* Convert list_records to take replace fields with model_trace when necessary. *)
   let list_records =
-    let select (a, b) = if b = "" then a else b in
+    let select fi =
+      if fi.field_trace <> "" then fi.field_trace else
+        match fi.field_ident with
+        | Some id -> id.Ident.id_string
+        | None -> fi.field_name in
     Mstr.mapi (fun _ -> List.map select) pm.list_records in
 
   (* Convert calls [r'mk v1 .. vn] to [{f1= v1; ...; fn= vn}] and unary calls

@@ -298,6 +298,7 @@ val model_for_positions_and_decls : model ->
 (** Method clean#model cleans a model from unparsed values and handles contradictory VCs
    ("the check fails with all inputs"). *)
 class clean : object
+  method model : model -> model
   method element : model_element -> model_element option
   method value : model_value -> model_value option
   method unparsed : string -> model_value option

@@ -8,7 +8,7 @@ Prover result is: Valid (0.02s, 50 steps).
             Line 17:
               the check fails with all inputs
             Line 19:
-              [current iteration] x1 =
+              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -18,11 +18,15 @@ Prover result is: Valid (0.02s, 50 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 14, characters 17-18, taking default.
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 15, characters 17-18, taking default.
-<rac-values>No value for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139, taking default.
-<rac-values>No value for x2 at "bench/check-ce/underspec.mlw", line 16, characters 4-139, taking default.
-<rac-values>No value for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9, taking default 2.
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/underspec.mlw", line 14, characters 17-18: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/underspec.mlw", line 15, characters 17-18: {contents=
+                                                                    0}
+<rac-values>Value type default for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+                                                                    0}
+<rac-values>Value type default for x2 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+                                                                    0}
+<rac-values>Value given default for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 2
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -107,22 +111,25 @@ Prover result is: Valid (0.02s, 50 steps).
 <check-ce>Validating model:
           File underspec.mlw:
             Line 16:
-              [current iteration] i = {"type": "Integer", "val": "0"}
-              [before iteration] x1 =
+              i [@introduced] = {"type": "Integer", "val": "0"}
+              x1 [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/underspec.mlw:16:4:139]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 17:
-              [current iteration] x1 =
+              x1_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:x1] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 19:
-              [current iteration] x1 =
+              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -132,13 +139,15 @@ Prover result is: Valid (0.02s, 50 steps).
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 14, characters 17-18, taking default.
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 15, characters 17-18, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139:
-              {contents= (-1)}
-<rac-values>No value for x2 at "bench/check-ce/underspec.mlw", line 16, characters 4-139, taking default.
-<rac-values>Value imported for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9:
-              0
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/underspec.mlw", line 14, characters 17-18: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/underspec.mlw", line 15, characters 17-18: {contents=
+                                                                    0}
+<rac-values>Value from model for x1 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+                                                                    (-1)}
+<rac-values>Value type default for x2 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+                                                                    0}
+<rac-values>Value from model for i at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 0
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -293,14 +302,14 @@ Prover result is: Valid (0.01s, 1545 steps).
 <check-ce>Validating model:
           File underspec.mlw:
             Line 41:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 46:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -309,14 +318,13 @@ Prover result is: Valid (0.01s, 1545 steps).
             Line 47:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
+<rac-values>Value type default for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
+<rac-values>Value type default for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
 <rac-values>Missing value for parameter _1, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8:
-              {contents= 0}
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
+<rac-values>Value from model for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -336,7 +344,7 @@ Prover result is: Valid (0.01s, 1545 steps).
                 Line 44:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 1}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -352,84 +360,57 @@ Prover result is: Valid (0.01s, 1545 steps).
                     _ = 1
                 Line 44:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/underspec.mlw", line 41, characters 14-23)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File underspec.mlw:
-                Line 37:
-                  Constant z initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
-                Line 44:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    z = {contents= 0}
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 46:
-                  Concrete execution of Tuple0 with args:
-                  Abstract execution of g with args:
-                    _ = ()
-                  z = {contents= 0}
-                  result = ()
-                Line 41:
-                  Execution got stuck, Assume postcondition of g with:
-                    z = {contents= 0}
-                    z = {contents= 0}
+            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
+              
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Validating model:
           File underspec.mlw:
             Line 41:
-              old z =
+              z [@at:'Old] [@at:'Old:loc:bench/check-ce/underspec.mlw:41]
+                [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 45:
-              z =
+              z [@at:'Old] [@at:'Old:loc:bench/check-ce/underspec.mlw:41]
+                [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 46:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 47:
-              z =
+              z_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:z] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
+<rac-values>Value type default for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
 <rac-values>Missing value for parameter _1, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16, taking default.
+<rac-values>Value type default for result at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
 <rac-values>Missing value for parameter _1, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8:
-              {contents= 2}
-<rac-values>No value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8, taking default.
+<rac-values>Value from model for z at "bench/check-ce/underspec.mlw", line 46, characters 4-8: {contents=
+                                                                    2}
+<rac-values>Value type default for result of g at "bench/check-ce/underspec.mlw", line 46, characters 4-8: ()
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -449,7 +430,7 @@ Prover result is: Valid (0.01s, 1545 steps).
                 Line 44:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 1}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -483,7 +464,7 @@ Prover result is: Valid (0.01s, 1545 steps).
                 Line 44:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 2}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -497,13 +478,14 @@ Prover result is: Valid (0.01s, 1545 steps).
                   Property failure, Assertion with:
                     z = {contents= 2}
 <check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
+- Checked model 0 (Concrete: bad model, Abstract: don't know)
+    Summary: The following counterexample model has not been verified
+    (Abstract RAC terminated because missing value for result at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
 - Selected model 1 (Concrete: bad model, Abstract: good model)
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (0.73s).
+Prover result is: Step limit exceeded (0.82s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -523,7 +505,7 @@ File underspec.mlw:
   Line 44:
     _ = ()
     Execution of main function f's body with env:
-      z = {contents= 2}
+      z = {contents= 0}
       _ = ()
       zero = 0
       one = 1

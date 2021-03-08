@@ -387,18 +387,17 @@ let spec =
    " remove all printing to stdout"]
 
 (* --help *)
-let usage_str = Format.sprintf
-  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]\n\
-   Launch a command-line interface for Why3.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_str =
+  "[<file.xml>|<f1.why> <f2.mlw> ...]\n\
+   Launch a command-line interface for Why3."
 
 (* Parse files *)
-let config, base_config, env =
-  let config, base_config, env =
+let config, env =
+  let config, env =
     Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
   if Queue.is_empty files then
     Whyconf.Args.exit_with_usage spec usage_str;
-  (config, base_config, env)
+  (config, env)
 
 let () =
   let fmt = if !quiet then str_formatter else std_formatter in

@@ -1,51 +1,58 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: Valid (0.04s, 1022 steps).
+Prover result is: Valid (0.05s, 1022 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: Valid (0.02s, 1332 steps).
+Prover result is: Valid (0.01s, 1332 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Validating model:
           File while.mlw:
             Line 4:
-              z = {"type": "Integer", "val": "0"}
+              z [@introduced] = {"type": "Integer", "val": "0"}
             Line 8:
-              [before iteration] i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while.mlw:8:2:161]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              [current iteration] i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while.mlw:8:2:161]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              [before iteration] x1 =
+              x1 [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while.mlw:8:2:161]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 10:
-              [current iteration] x1 =
+              x1_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:x1] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 12:
-              [current iteration] x1 =
+              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 15:
-              [current iteration] i =
+              i [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -55,14 +62,18 @@ Prover result is: Valid (0.02s, 1332 steps).
 <rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
-<rac-values>No value for result at "bench/check-ce/while.mlw", line 6, characters 15-16, taking default.
-<rac-values>No value for result at "bench/check-ce/while.mlw", line 7, characters 14-15, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161:
-              {contents= 0}
-<rac-values>No value for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161, taking default.
-<rac-values>Value imported for i at "bench/check-ce/while.mlw", line 8, characters 2-161:
-              {contents= 0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value from model for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
+<rac-values>Value type default for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
+<rac-values>Value from model for i at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -210,42 +221,49 @@ Prover result is: Valid (0.02s, 1332 steps).
 <check-ce>Validating model:
           File while.mlw:
             Line 4:
-              z = {"type": "Integer", "val": "0"}
+              z [@introduced] = {"type": "Integer", "val": "0"}
             Line 8:
-              [before iteration] i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while.mlw:8:2:161]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              [current iteration] i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while.mlw:8:2:161]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              [before iteration] x1 =
+              x1 [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while.mlw:8:2:161]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-2"}}]}}
             Line 10:
-              [current iteration] x1 =
+              x1_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:x1] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 12:
-              [current iteration] x1 =
+              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 15:
-              [current iteration] i =
+              i [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -255,14 +273,18 @@ Prover result is: Valid (0.02s, 1332 steps).
 <rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
-<rac-values>No value for result at "bench/check-ce/while.mlw", line 6, characters 15-16, taking default.
-<rac-values>No value for result at "bench/check-ce/while.mlw", line 7, characters 14-15, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161:
-              {contents= (-2)}
-<rac-values>No value for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161, taking default.
-<rac-values>Value imported for i at "bench/check-ce/while.mlw", line 8, characters 2-161:
-              {contents= 0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value from model for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    (-2)}
+<rac-values>Value type default for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
+<rac-values>Value from model for i at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -412,42 +434,49 @@ Prover result is: Valid (0.02s, 1332 steps).
 <check-ce>Validating model:
           File while.mlw:
             Line 4:
-              z = {"type": "Integer", "val": "0"}
+              z [@introduced] = {"type": "Integer", "val": "0"}
             Line 8:
-              [before iteration] i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while.mlw:8:2:161]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              [current iteration] i =
+              i [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while.mlw:8:2:161]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              [before iteration] x1 =
+              x1 [@field:0:contents] [@introduced]
+                [@loop:bench/check-ce/while.mlw:8:2:161]
+                [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-2"}}]}}
             Line 10:
-              [current iteration] x1 =
+              x1_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:x1] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 12:
-              [current iteration] x1 =
+              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 15:
-              [current iteration] i =
+              i [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -457,14 +486,18 @@ Prover result is: Valid (0.02s, 1332 steps).
 <rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/while.mlw", line 5, characters 15-16, taking default.
-<rac-values>No value for result at "bench/check-ce/while.mlw", line 6, characters 15-16, taking default.
-<rac-values>No value for result at "bench/check-ce/while.mlw", line 7, characters 14-15, taking default.
-<rac-values>Value imported for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161:
-              {contents= (-2)}
-<rac-values>No value for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161, taking default.
-<rac-values>Value imported for i at "bench/check-ce/while.mlw", line 8, characters 2-161:
-              {contents= 0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
+                                                                    0}
+<rac-values>Value from model for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    (-2)}
+<rac-values>Value type default for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
+<rac-values>Value from model for i at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+                                                                    0}
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -619,7 +652,7 @@ Prover result is: Valid (0.02s, 1332 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6190 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6190 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -682,7 +715,7 @@ File while.mlw:
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: Valid (0.02s, 1327 steps).
+Prover result is: Valid (0.01s, 1327 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.

@@ -205,10 +205,10 @@ let get_value read ?default section key =
       | None -> raise (MissingField key)
       | Some v -> v
 
-let get_valueo read section key =
+let get_valueo read ?default section key =
   try
     Some (get_value read section key)
-  with MissingField _ -> None
+  with MissingField _ -> default
 
 let get_valuel read ?default section key =
   try
@@ -236,6 +236,17 @@ let set_valuel write ?default section key valuel =
     then Mstr.add key (List.map write valuel) section
     else Mstr.remove key section
 
+let set_valueo write ?default section key valueo =
+  match valueo with
+  | None -> Mstr.remove key section
+  | Some value ->
+    let actually_write = match default with
+      | None -> true
+      | Some default -> default <> value in
+    if actually_write
+    then Mstr.add key [write value] section
+    else Mstr.remove key section
+
 let rint k = function
   | RCint n -> n
   | v -> raise (IntExpected (k,v))
@@ -260,18 +271,21 @@ let get_into = get_valueo rint
 
 let set_int = set_value wint
 let set_intl = set_valuel wint
+let set_into = set_valueo wint
 
 let get_bool = get_value rbool
 let get_booll = get_valuel rbool
 let get_boolo = get_valueo rbool
 let set_bool = set_value wbool
 let set_booll = set_valuel wbool
+let set_boolo = set_valueo wbool
 
 let get_string = get_value rstring
 let get_stringl = get_valuel rstring
 let get_stringo = get_valueo rstring
 let set_string ?escape_eol ?default s = set_value (wstring ?escape_eol) ?default s
 let set_stringl ?escape_eol ?default s = set_valuel (wstring ?escape_eol) ?default s
+let set_stringo ?escape_eol ?default s = set_valueo (wstring ?escape_eol) ?default s
 
 let check_exhaustive section keyl =
   let test k _ = if Sstr.mem k keyl then ()

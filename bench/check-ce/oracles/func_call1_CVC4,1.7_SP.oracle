@@ -2,7 +2,7 @@ File "bench/check-ce/func_call1.mlw", line 14, characters 6-7:
 warning: unused variable w
 File "bench/check-ce/func_call1.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: Valid (0.04s, 1134 steps).
+Prover result is: Valid (0.05s, 1134 steps).
 
 File "bench/check-ce/func_call1.mlw", line 8, characters 12-26:
 Goal Postcondition from verification condition g'vc.
@@ -12,48 +12,51 @@ Prover result is: Valid (0.02s, 901 steps).
 <check-ce>Validating model:
           File func_call1.mlw:
             Line 7:
-              old z =
+              z [@at:'Old] [@at:'Old:loc:bench/check-ce/func_call1.mlw:7]
+                [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 13:
-              z =
+              z [@at:'Old] [@at:'Old:loc:bench/check-ce/func_call1.mlw:7]
+                [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 14:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 15:
-              z =
+              z_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:z] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15:
-              {contents= 0}
-<rac-values>No value for result at "bench/check-ce/func_call1.mlw", line 14, characters 10-15, taking default.
+<rac-values>Value from model for z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: {contents=
+                                                                    0}
+<rac-values>Value computed from post condition for result of g at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: 3
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -73,7 +76,7 @@ Prover result is: Valid (0.02s, 901 steps).
                 Line 12:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 1}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -122,7 +125,7 @@ Prover result is: Valid (0.02s, 901 steps).
                   Abstract execution of g with args:
                     x = 2
                   z = {contents= 0}
-                  result = 0
+                  result = 3
                 Line 7:
                   Execution got stuck, Assume postcondition of g with:
                     z = {contents= 0}
@@ -131,48 +134,51 @@ Prover result is: Valid (0.02s, 901 steps).
 <check-ce>Validating model:
           File func_call1.mlw:
             Line 7:
-              old z =
+              z [@at:'Old] [@at:'Old:loc:bench/check-ce/func_call1.mlw:7]
+                [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 13:
-              z =
+              z [@at:'Old] [@at:'Old:loc:bench/check-ce/func_call1.mlw:7]
+                [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 14:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 15:
-              z =
+              z_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:z] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15:
-              {contents= 2}
-<rac-values>No value for result at "bench/check-ce/func_call1.mlw", line 14, characters 10-15, taking default.
+<rac-values>Value from model for z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: {contents=
+                                                                    2}
+<rac-values>Value computed from post condition for result of g at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: 3
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -192,7 +198,7 @@ Prover result is: Valid (0.02s, 901 steps).
                 Line 12:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 1}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -215,7 +221,7 @@ Prover result is: Valid (0.02s, 901 steps).
                     _ = 3
                 Line 12:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call1.mlw", line 8, characters 12-26)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -233,7 +239,7 @@ Prover result is: Valid (0.02s, 901 steps).
                 Line 12:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 2}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -241,57 +247,62 @@ Prover result is: Valid (0.02s, 901 steps).
                   Abstract execution of g with args:
                     x = 2
                   z = {contents= 2}
-                  result = 0
-                Line 8:
-                  Execution got stuck, Assume postcondition of g with:
-                    x = 2
-                    result = 0
+                  result = 3
+                  Concrete execution of (+) with args:
+                    _ = 3
+                    _ = 3
+                Line 15:
+                  Property failure, Assertion with:
+                    z = {contents= 2}
 <check-ce>Check model 2 ("bench/check-ce/func_call1.mlw", line 15, characters 11-16)
 <check-ce>Validating model:
           File func_call1.mlw:
             Line 7:
-              old z =
+              z [@at:'Old] [@at:'Old:loc:bench/check-ce/func_call1.mlw:7]
+                [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 13:
-              z =
+              z [@at:'Old] [@at:'Old:loc:bench/check-ce/func_call1.mlw:7]
+                [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 14:
-              z =
+              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 15:
-              z =
+              z_vc_constant [@field:0:contents] [@introduced]
+                [@mlw:reference_var] [@model_trace:z] =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
 <rac-values>Missing value for parameter _, continue with default value ().
 <check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14, taking default.
+<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
 <rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15:
-              {contents= 2}
-<rac-values>No value for result at "bench/check-ce/func_call1.mlw", line 14, characters 10-15, taking default.
+<rac-values>Value from model for z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: {contents=
+                                                                    2}
+<rac-values>Value computed from post condition for result of g at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: 3
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
@@ -311,7 +322,7 @@ Prover result is: Valid (0.02s, 901 steps).
                 Line 12:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 1}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -334,7 +345,7 @@ Prover result is: Valid (0.02s, 901 steps).
                     _ = 3
                 Line 12:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call1.mlw", line 8, characters 12-26)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -352,7 +363,7 @@ Prover result is: Valid (0.02s, 901 steps).
                 Line 12:
                   _ = ()
                   Execution of main function f's body with env:
-                    z = {contents= 2}
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
@@ -360,21 +371,55 @@ Prover result is: Valid (0.02s, 901 steps).
                   Abstract execution of g with args:
                     x = 2
                   z = {contents= 2}
-                  result = 0
-                Line 8:
-                  Execution got stuck, Assume postcondition of g with:
-                    x = 2
-                    result = 0
+                  result = 3
+                  Concrete execution of (+) with args:
+                    _ = 3
+                    _ = 3
+                Line 15:
+                  Property failure, Assertion with:
+                    z = {contents= 2}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
-- Checked model 1 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Selected model 2 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
+- Selected model 1 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified
+- Checked model 2 (Concrete: bad model, Abstract: good model)
+    Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/func_call1.mlw", line 15, characters 11-16:
 Goal Assertion from verification condition f'vc.
 Prover result is: Unknown (unknown + incomplete) (0.03s, 6083 steps).
-Sorry, we don't have a good counterexample for you :(
-
+The contracts of some function or loop are underspecified, for example during
+  the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+  Line 14:
+    Constant one initialization
+File func_call1.mlw:
+  Line 3:
+    Constant z initialization
+    (abstract) execution of any function
+    result = 0
+    Concrete execution of ref with args:
+      contents = 0
+    Concrete execution of ref'mk with args:
+      contents = 0
+  Line 12:
+    _ = ()
+    Execution of main function f's body with env:
+      z = {contents= 0}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 14:
+    Abstract execution of g with args:
+      x = 2
+    z = {contents= 2}
+    result = 3
+    Concrete execution of (+) with args:
+      _ = 3
+      _ = 3
+  Line 15:
+    Property failure, Assertion with:
+      z = {contents= 2}
 

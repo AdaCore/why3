@@ -69,7 +69,7 @@ let available_commands () =
 
 let do_usage () =
   Format.printf
-    "@[Usage: %s [options] <command> [options]@\n\
+    "@[Usage: %s [options] <command>@\n\
      Execute the given subcommand.@\n\
      @\n%s@\n%a@]@?"
     (Filename.basename Sys.argv.(0))
@@ -114,6 +114,7 @@ let command cur =
   let argi = Array.length Sys.argv - argc in
   Array.blit args 0 Sys.argv argi argc;
   Whyconf.Args.first_arg := argi;
+  Whyconf.Args.add_command sscmd;
   try
     Dynlink.allow_unsafe_modules true;
     Dynlink_wrapper.loadfile cmd;
@@ -125,7 +126,7 @@ let command cur =
 let () = try
   let i = Getopt.parse_many option_list Sys.argv 1 in
   if i < Array.length Sys.argv then command i;
-  let config,_,_ = Args.complete_initialization () in
+  let config,_ = Args.complete_initialization () in
 
   (* listings *)
 

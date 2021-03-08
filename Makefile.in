@@ -1810,7 +1810,14 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.$(SHAREDBEST) plugins $(TOOLS) \
 	@echo "=== Check parsing messages ==="
 	bench/parsing-bench
 
-APITESTS=logic transform clone mlw_tree mlw_expr create_session counterexample
+APITESTS = \
+	clone \
+	counterexample \
+	create_session \
+	logic \
+	mlw_expr \
+	mlw_tree \
+	transform \
 
 ifeq (@enable_infer@,yes)
 	APITESTS += mlw_tree_infer_invs

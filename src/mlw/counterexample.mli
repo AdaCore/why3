@@ -59,6 +59,8 @@ type ce_summary =
   | BAD_CE (** Bad counterexample. *)
   | UNKNOWN of string (** The counterexample has not been verified. *)
 
+val ce_summary : check_model_result -> ce_summary
+
 val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 
 val print_ce_summary_kind : ce_summary Pp.pp
@@ -101,9 +103,12 @@ val prioritize_last_non_empty_model : sort_models
 (** {3 Compatibility} *)
 
 val select_model_last_non_empty :
-  (Call_provers.prover_answer * model) list -> model option
+  (Call_provers.prover_answer * model) list -> (model * ce_summary) option
 (** Select the last, non-empty model in the incremental list of models as done
-    before 2020. Same behaviour as
+    before 2020. The summary is included for compatibility with [select_model]
+    and is always [UNKNOWN].
+
+    Same behaviour as
     [select_model ~check:false ~sort_models:prioritize_last_non_empty_model]. *)
 
 (** {2 Conversion to [Model_parser.model] }*)

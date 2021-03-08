@@ -44,9 +44,23 @@ val read_config : string option -> config
 
  *)
 
-val merge_config : config -> string -> config
-(** [merge_config config filename] merge the content of [filename]
+val init_config : ?extra_config:string list -> string option -> config
+(** [init_config ?extra_config conf_file]
+
+    Add the automatically generated part of the configuration, and load plugins
+
+*)
+
+
+val read_config_rc: string option -> string * Rc.t
+(** [read_config_rc conf_file] same rule than {!init_config} but just returned
+   the parsed Rc file *)
+
+val add_extra_config : config -> string -> config
+(** [add_extra_config config filename] merge the content of [filename]
     into [config] *)
+
+val empty_rc : Rc.t
 
 val save_config : config -> unit
 (** [save_config config] save the configuration *)
@@ -62,6 +76,8 @@ val get_conf_file : config -> string
 (* (\** [set_conf_file config] set the rc file corresponding to this *)
 (*     configuration *\) *)
 
+val rc_of_config : config -> Rc.t
+
 (** {2 Main section} *)
 type main
 
@@ -76,9 +92,6 @@ val set_stdlib: bool -> config -> config
 
 val set_load_default_plugins: bool -> config -> config
 (** Set if the plugins in the default path should be loaded *)
-
-val set_load_default_config: bool -> config -> config
-(** Set if the default strategies should be automatically generated *)
 
 val libdir: main -> string
 val datadir: main -> string
@@ -98,8 +111,6 @@ val pluginsdir : main -> string
 val set_plugins : main -> string list -> main
 val add_plugin : main -> string -> main
 val load_plugins : main -> unit
-
-val load_default_config_if_needed : config -> config
 
 (** {2 Provers} *)
 
@@ -134,7 +145,6 @@ type config_prover = {
   interactive  : bool; (* Interactive theorem prover *)
   extra_options: string list;
   extra_drivers: string list;
-  detected_at_startup : bool; (* detected at startup *)
 }
 
 val get_complete_command : config_prover -> with_steps:bool -> string
@@ -217,15 +227,6 @@ val get_strategies : config -> config_strategy Mstr.t
 
 val add_strategy : config -> config_strategy -> config
 
-(** detected provers *)
-type detected_prover = {
-  exec_name  : string;
-  version : string;
-}
-
-val set_detected_provers: config -> detected_prover list -> config
-val get_detected_provers: config -> detected_prover list
-
 (** filter prover *)
 type filter_prover
 
@@ -264,27 +265,53 @@ val filter_one_prover : config -> filter_prover -> config_prover
 
 val why3_regexp_of_string : string -> Re.Str.regexp
 
-(** {2 For accesing other parts of the configuration } *)
+(** {2 For accesing and modifying the user configuration } *)
 
-val get_section : config -> string -> Rc.section option
-(** [get_section config name] Same as {!Rc.get_section} except name
-    must not be "main" *)
-val get_family  : config -> string -> Rc.family
-(** [get_family config name] Same as {!Rc.get_family} except name
-    must not be prover *)
+module User: sig
 
-val set_section : config -> string -> Rc.section -> config
-(** [set_section config name] Same as {!Rc.set_section} except name
-    must not be "main" *)
-val set_family  : config -> string -> Rc.family  -> config
-(** [set_family config name] Same as {!Rc.set_family} except name
-    must not be prover *)
+  val update_section : Rc.t -> string -> (Rc.section -> Rc.section) -> Rc.t
 
+  val update_prover_editor : config -> Mprover.key -> string -> config
+
+  val set_default_editor : config -> string -> config
+
+  val set_limits : time:int -> mem:int -> j:int -> config -> config
+
+  val set_prover_upgrade_policy :
+    config -> Mprover.key -> prover_upgrade_policy -> config
+
+  val remove_user_policy : config -> Mprover.key -> config
+
+  val get_section : config -> string -> Rc.section option
+  (** [get_section config name] Same as {!Rc.get_section} except name
+      must not be "main" *)
+  val get_simple_family  : config -> string -> Rc.section list
+  (** [get_family config name] Same as {!Rc.get_simple_family} except name
+      must not be prover *)
+  val get_family  : config -> string -> Rc.family
+  (** [get_family config name] Same as {!Rc.get_family} except name
+      must not be prover *)
+
+  val set_section : config -> string -> Rc.section -> config
+  (** [set_section config name] Same as {!Rc.set_section} except name
+      must not be "main" *)
+  val set_simple_family  : config -> string -> Rc.section list  -> config
+  (** [set_simple_family config name] Same as {!Rc.set_simple_family} except name
+      must not be prover *)
+  val set_family  : config -> string -> Rc.family  -> config
+  (** [set_family config name] Same as {!Rc.set_family} except name
+      must not be prover *)
+
+end
 (** Common command line options *)
 
 module Args : sig
 
   val first_arg : int ref
+
+  val opt_config : string option ref
+
+  val add_command : string -> unit
 
   val all_options : Getopt.opt list -> string -> string -> Getopt.opt list
 
@@ -292,9 +319,9 @@ module Args : sig
     ?extra_help:string ->
     Getopt.opt list ->
     (string -> unit) -> string ->
-    config * config * Env.env
+    config * Env.env
 
-  val complete_initialization : unit -> config * config * Env.env
+  val complete_initialization : unit -> config * Env.env
 
   val exit_with_usage :
     ?exit_code:int -> ?extra_help:string ->
@@ -328,6 +355,6 @@ val unknown_to_known_provers  :
 
 (** Internal, recursive functionality with Autodetection  *)
 
-val provers_from_detected_provers: (config -> config) ref
+val provers_from_detected_provers: (save_to:string -> Rc.t -> config) ref
 
 (** */ *)

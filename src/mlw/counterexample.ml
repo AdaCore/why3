@@ -21,6 +21,14 @@ open Model_parser
 let debug_check_ce = Debug.register_info_flag "check-ce"
     ~desc:"Debug@ info@ for@ --check-ce"
 
+(** [first2 iter f] returns the result of [f] that is inhabitated, when
+    applied on elements that the iterator [iter] receives. It raises [Not_found]
+    if no such element is encountered by the iterator. *)
+let first2 (type a) iter f =
+  let exception Found of a in
+  let f x y = match f x y with Some z -> raise (Found z) | None -> () in
+  try iter f; raise Not_found with Found z -> z
+
 (** Result of checking solvers' counterexample models *)
 
 type ce_summary =
@@ -127,15 +135,16 @@ let print_check_model_result ?verb_lvl fmt = function
         (print_full_verdict ?verb_lvl) r.concrete
         (print_full_verdict ?verb_lvl) r.abstract
 
-let ce_summary v_concrete v_abstract =
-  match v_concrete.verdict, v_abstract.verdict with
-  | Good_model, _          -> NCCE v_concrete.exec_log
-  | Bad_model , Good_model -> SWCE v_abstract.exec_log
-  | Dont_know , Good_model -> NCCE_SWCE v_abstract.exec_log
-  | Dont_know , Dont_know
-  | Dont_know , Bad_model  -> UNKNOWN v_concrete.reason
-  | Bad_model , Dont_know  -> UNKNOWN v_abstract.reason
-  | Bad_model , Bad_model  -> BAD_CE
+let ce_summary = function
+  | Cannot_check_model {reason} -> UNKNOWN reason
+  | Check_model_result r -> match r.concrete.verdict, r.abstract.verdict with
+    | Good_model, _          -> NCCE r.concrete.exec_log
+    | Bad_model , Good_model -> SWCE r.abstract.exec_log
+    | Dont_know , Good_model -> NCCE_SWCE r.abstract.exec_log
+    | Dont_know , Dont_know
+    | Dont_know , Bad_model  -> UNKNOWN r.concrete.reason
+    | Bad_model , Dont_know  -> UNKNOWN r.abstract.reason
+    | Bad_model , Bad_model  -> BAD_CE
 
 let print_counterexample ?verb_lvl ?check_ce ?json fmt (model,ce_summary) =
   fprintf fmt "@ @[<hov2>%a%t@]"
@@ -155,37 +164,29 @@ let print_counterexample ?verb_lvl ?check_ce ?json fmt (model,ce_summary) =
 
 exception CannotImportModelValue of string
 
+let cannot_import f =
+  kasprintf (fun msg -> raise (CannotImportModelValue msg)) f
+
 let check_not_nonfree its_def =
   if its_def.Pdecl.itd_its.its_nonfree then
-    let msg = asprintf "value of non-free type %a" print_its its_def.Pdecl.itd_its in
-    raise (CannotImportModelValue msg)
+    cannot_import "value of non-free type %a" print_its its_def.Pdecl.itd_its
 
-let get_field_name rs =
-  match get_model_element_name ~attrs:rs.rs_name.id_attrs with
-  | exception Not_found -> rs.rs_name.id_string
-  | "" -> rs.rs_name.id_string
-  | name -> name
+let trace_or_name id =
+  match get_model_element_name ~attrs:id.id_attrs with
+  | name -> if name = "" then id.id_string else name
+  | exception Not_found -> id.id_string
 
-(* let empty_model_trace attrs =
- *   try
- *     let a = Ident.get_model_trace_attr ~attrs in
- *     a.attr_string = "model_trace:"
- *   with Not_found -> false *)
+(** Import a value from the prover model to an interpreter value.
 
-(** Import a value from the prover model to an interpreter value. Raises [Exit] if the
-    value cannot be imported. *)
+    @raise Exit when the type [ity] and the shape of the the value [v] do not
+    match. This may happen when a module that contains a value with an abstract
+    type is cloned with different types as instantiations of the abstract type.
+
+    @raise CannotImportModelValue when the value cannot be imported *)
 let rec import_model_value known th_known ity v =
   let ts, l1, l2 = ity_components ity in
   let subst = its_match_regs ts l1 l2 in
   let def = Pdecl.find_its_defn known ts in
-  (* match def.Pdecl.itd_constructors, def.Pdecl.itd_fields with
-   * | [rs_constr], [rs_field]
-   *   when empty_model_trace rs_field.rs_name.id_attrs ->
-   *     (\* type ty = { f[@model_trace:]: ty'} *\)
-   *     eprintf "WRAP %a in %a@." print_ity ity print_ity rs_field.rs_cty.cty_result;
-   *     let v = import_model_value known th_known rs_field.rs_cty.cty_result v in
-   *     constr_value ity rs_constr [v]
-   * | _ -> *)
     match v with
       | Integer s ->
           if ity_equal ity ity_int then
@@ -193,8 +194,7 @@ let rec import_model_value known th_known ity v =
           else if is_range_ty (ty_of_ity ity) then
             range_value ity s.int_value
           else
-            kasprintf failwith "import_model_value: found type %a instead of int or range type"
-              print_ity ity
+            cannot_import "type %a instead of int or range type" print_ity ity
       | String s ->
           ity_equal_check ity ity_str;
           string_value s
@@ -203,17 +203,16 @@ let rec import_model_value known th_known ity v =
           bool_value b
       | Record r ->
           check_not_nonfree def;
-          let rs = match def.Pdecl.itd_constructors with
-            | [rs] -> rs
-            | _ -> failwith "import_model_value: type with not exactly one constructors" in
+          let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
+            cannot_import "type with not exactly one constructors" in
           let aux field_rs =
-            let field_name = get_field_name field_rs in
+            let field_name = trace_or_name field_rs.rs_name in
             let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
             match List.assoc field_name r with
             | v -> import_model_value known th_known field_ity v
             | exception Not_found ->
                 (* TODO Better create a default value? Requires an [Env.env]. *)
-                undefined_value ity in
+                undefined_value field_ity in
           let vs = List.map aux def.Pdecl.itd_fields in
           constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
@@ -225,28 +224,36 @@ let rec import_model_value known th_known ity v =
           let vs = List.map2 (import_model_value known th_known) itys vs in
           constr_value ity rs [] vs
       | Proj (p, x) ->
-          let is_proj id _ = id.id_string = p in
-          let ls = try
-              let _, d = Mid.choose (Mid.filter is_proj th_known) in
-              match d.Decl.d_node with Decl.Dparam ls -> ls | _ -> raise Not_found
-            with Not_found -> kasprintf failwith "Projection %s not found" p in
-          (* eprintf "FOUND PROJECTION for %s in %a: %a:%a->%a ity=%a,%a@." p print_model_value v Pretty.print_ls ls Pp.(print_list arrow Pretty.print_ty) ls.ls_args (Pp.print_option Pretty.print_ty) ls.ls_value print_ity ity print_ity ity; *)
-          let ty_arg = match ls.ls_args with [ty] -> ty
-            | _ -> kasprintf failwith "import_model_value: projection %s not unary" p in
-          if not (Ty.ty_equal ty_arg (ty_of_ity ity)) then raise Exit;
-          let x_ty = Opt.get_exn (Failure "import_model_value: projection is predicate") ls.ls_value in
-          let x = import_model_value known th_known (ity_of_ty x_ty) x in
-          (* eprintf "MAKE PROJ ity=%a ls=%a x=%a:%a@." Pretty.print_ty ty_arg Pretty.print_ls ls print_value x Pretty.print_ty x_ty; *)
+          (* {p : ity -> ty_res => x: ty_res} : ITY *)
+          let search id = function
+            | Decl.{d_node= Dparam ls} when String.equal (trace_or_name id) p ->
+                Some ls
+            | _ -> None in
+          let ls = try first2 (fun f -> Mid.iter f th_known) search with
+              Not_found -> cannot_import "Projection %s not found" p in
+          let ty_res = match ls.ls_value with Some ty -> ty | None ->
+            cannot_import "projection %a is predicate" Pretty.print_ls ls in
+          let ty_arg = match ls.ls_args with [ty] -> ty | _ ->
+            cannot_import "projection %a is no unary function"
+              Pretty.print_ls ls in
+          if not (Ty.ty_equal ty_arg (ty_of_ity ity)) then (
+            Debug.dprintf debug_rac_values
+              "Cannot import projection %a, argument type %a is not value type \
+               %a" Pretty.print_ls ls Pretty.print_ty ty_arg print_ity ity;
+            raise Exit );
+          let x = import_model_value known th_known (ity_of_ty ty_res) x in
           proj_value ity ls x
       | Array a ->
           let open Ty in
-          assert (its_equal def.Pdecl.itd_its its_func);
+          if not (its_equal def.Pdecl.itd_its its_func) then (
+            Debug.dprintf debug_rac_values "Cannot import array as %a"
+              print_its def.Pdecl.itd_its;
+            raise Exit );
           let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
             | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
             | _ -> assert false in
-          let keys, values =
-            List.split (List.map (fun ix -> ix.arr_index_key, ix.arr_index_value)
-                          a.arr_indices) in
+          let key_value ix = ix.arr_index_key, ix.arr_index_value in
+          let keys, values = List.split (List.map key_value a.arr_indices) in
           let keys = List.map (import_model_value known th_known key_ity) keys in
           let values = List.map (import_model_value known th_known value_ity) values in
           let mv = Mv.of_list (List.combine keys values) in
@@ -254,8 +261,7 @@ let rec import_model_value known th_known ity v =
           purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
       | Undefined -> undefined_value ity
       | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
-          kasprintf failwith "import_model_value: not implemented for value %a"
-            print_model_value v
+          cannot_import "implemented for value %a" print_model_value v
 
 let get_model_value m known th_known =
   fun ?name ?loc ity : Value.value option ->
@@ -268,8 +274,8 @@ let get_model_value m known th_known =
      match ome with
      | None -> None
      | Some me ->
-         try Some (import_model_value known th_known ity me.me_value)
-         with Exit -> None
+         try Some (import_model_value known th_known ity me.me_value) with
+           Exit -> None
 
 (** Check and select solver counterexample models *)
 
@@ -404,9 +410,10 @@ let check_model reduce env pm model =
           let rac = rac_config ~do_rac:true ~abstract
                       ~skip_cannot_compute:false ~reduce ~get_value () in
           check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
+        let me_name_trans men = men.Model_parser.men_name in
         Debug.dprintf debug_check_ce
           "@[Validating model:@\n@[<hv2>%a@]@]@\n"
-          (print_model ~filter_similar:false ?me_name_trans:None ~print_attrs:false) model;
+          (print_model ~filter_similar:false ~me_name_trans ~print_attrs:true) model;
         Debug.dprintf debug_check_ce "@[Interpreting concretly@]@\n";
         let concrete = check_model_rs ~abstract:false in
         Debug.dprintf debug_check_ce "@[Interpreting abstractly@]@\n";
@@ -421,7 +428,7 @@ let check_model reduce env pm model =
 let select_model_last_non_empty models =
   let models = List.filter (fun (_,m) -> not (is_model_empty m)) models in
   match List.rev models with
-  | (_,m) :: _ -> Some m
+  | (_,m) :: _ -> Some (m, UNKNOWN "No CE checking")
   | [] -> None
 
 type sort_models =
@@ -513,10 +520,7 @@ let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     List.map add_check_model_result models in
   let models =
     let add_ce_summary (i,r,m,mr) =
-      let summary = match mr with
-        | Cannot_check_model {reason} -> UNKNOWN reason
-        | Check_model_result r -> ce_summary r.concrete r.abstract in
-      i,r,m,mr,summary in
+      i,r,m,mr,ce_summary mr in
     List.map add_ce_summary models in
   let selected, selected_ix =
     match List.nth_opt (sort_models models) 0 with

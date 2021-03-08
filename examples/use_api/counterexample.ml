@@ -12,7 +12,7 @@
 (*******************
 
 This file builds some goals based on logic.ml using the API and calls
-the cvc4 to query counterexamples for them
+CVC4 to query counterexamples for them
 
 Note: the comments of the form BEGIN{id} and END{id} are there for automatic extraction
 of the chapter "The Why3 API" of the manual
@@ -75,9 +75,8 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 
 (* To call a prover, we need to access the Why configuration *)
 
-(* reads the config file *)
-let config : Whyconf.config =
-  Whyconf.(load_default_config_if_needed (read_config None))
+(* reads the default config file *)
+let config = Whyconf.init_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
@@ -85,32 +84,31 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 
 (* BEGIN{ce_get_cvc4ce} *)
-(* One alternative for Cvc4 with counterexamples in the config file *)
+(* One alternative for CVC4 with counterexamples in the config file *)
 let cvc4 : Whyconf.config_prover =
-  let fp = Whyconf.parse_filter_prover "CVC4,,counterexamples" in
-  (* All provers alternative counterexamples that have the name CVC4 *)
+  let fp = Whyconf.parse_filter_prover "CVC4,1.7,counterexamples" in
+  (* All provers alternative counterexamples that have the name CVC4 and version 1.7 *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    eprintf "Prover Cvc4 not installed or not configured@.";
+    eprintf "Prover CVC4 1.7 not installed or not configured@.";
     exit 1
   end else
-    (* Most recent version found *)
     snd (Whyconf.Mprover.max_binding provers)
 (* END{ce_get_cvc4ce} *)
 
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
-(* loading the Cvc4 driver *)
+(* loading the CVC4 driver *)
 let cvc4_driver : Driver.driver =
   try
     Whyconf.load_driver main env cvc4
   with e ->
-    eprintf "Failed to load driver for Cvc4: %a@."
+    eprintf "Failed to load driver for CVC4,1.7: %a@."
       Exn_printer.exn_printer e;
     exit 1
 
-(* calls Cvc4 *)
+(* calls CVC4 *)
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task ~limit:Call_provers.empty_limit
@@ -118,8 +116,8 @@ let result1 : Call_provers.prover_result =
     cvc4_driver task2)
 
 (* BEGIN{ce_callprover} *)
-(* prints Cvc4 answer *)
-let () = printf "@[On task 1, Cvc4 answers %a@."
+(* prints CVC4 answer *)
+let () = printf "@[On task 1, CVC4,1.7 answers %a@."
     (Call_provers.print_prover_result ?json:None) result1
 
 let () = printf "Model is %t@."

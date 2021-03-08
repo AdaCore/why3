@@ -415,9 +415,7 @@ let set_output = function
 
 let prefix = ref "WHY"
 
-let usage_msg = sprintf
-  "Usage: %s [options] [--output=latex|mlw|sexp|dep] [--kind=inductive] [--prefix=<prefix>] <filename> [<Module>.]<type> ...\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg = "<filename> [<Module>.]<type> ..."
 
 let spec =
   let open Why3.Getopt in
@@ -481,7 +479,7 @@ let deps_file fmt header filename f =
   if header then fprintf fmt "}@."
 
 
-let _, _, _ =
+let _, _ =
   Whyconf.Args.initialize spec add_filename_then_path usage_msg
 
 let () =
@@ -502,7 +500,7 @@ let () =
          | Sexp, None, 0 ->
              Why3pp_sexp.why3pp_sexp stdout mlw_file
          | _, _, _ ->
-             Getopt.handle_exn Sys.argv "invalid arguments"
+             Getopt.handle_exn "invalid arguments"
         )
     | None ->
-        Getopt.handle_exn Sys.argv "missing filename"
+        Getopt.handle_exn "missing filename"

@@ -2,14 +2,15 @@
 <check-ce>Validating model:
           File anonymous1.mlw:
             Line 4:
-              x = {"type": "Integer", "val": "0"}
+              x [@introduced] = {"type": "Integer", "val": "0"}
             Line 6:
-              x = {"type": "Integer", "val": "0"}
+              x_vc_constant [@introduced] [@model_trace:x] =
+                {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28, taking default.
+<rac-values>Value computed from post condition for result of h at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
@@ -34,7 +35,7 @@
                   Property failure, Assertion with:
                     x = 0
                     w = 2
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous1.mlw", line 5, characters 20-25)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -50,22 +51,24 @@
                 Line 5:
                   Abstract execution of h with args:
                     y = 0
-                  result = 0
-                  Execution got stuck, Assume postcondition of h with:
-                    y = 0
-                    result = 0
+                  result = 2
+                Line 6:
+                  Property failure, Assertion with:
+                    x = 0
+                    w = 2
 <check-ce>Check model 1 ("bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
 <check-ce>Validating model:
           File anonymous1.mlw:
             Line 4:
-              x = {"type": "Integer", "val": "0"}
+              x [@introduced] = {"type": "Integer", "val": "0"}
             Line 6:
-              x = {"type": "Integer", "val": "0"}
+              x_vc_constant [@introduced] [@model_trace:x] =
+                {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28, taking default.
+<rac-values>Value computed from post condition for result of h at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
@@ -90,7 +93,7 @@
                   Property failure, Assertion with:
                     x = 0
                     w = 2
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous1.mlw", line 5, characters 20-25)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -106,22 +109,24 @@
                 Line 5:
                   Abstract execution of h with args:
                     y = 0
-                  result = 0
-                  Execution got stuck, Assume postcondition of h with:
-                    y = 0
-                    result = 0
+                  result = 2
+                Line 6:
+                  Property failure, Assertion with:
+                    x = 0
+                    w = 2
 <check-ce>Check model 2 ("bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
 <check-ce>Validating model:
           File anonymous1.mlw:
             Line 4:
-              x = {"type": "Integer", "val": "0"}
+              x [@introduced] = {"type": "Integer", "val": "0"}
             Line 6:
-              x = {"type": "Integer", "val": "0"}
+              x_vc_constant [@introduced] [@model_trace:x] =
+                {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
 <rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <check-ce>Interpreting abstractly
 <rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
-<rac-values>No value for result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28, taking default.
+<rac-values>Value computed from post condition for result of h at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
@@ -146,7 +151,7 @@
                   Property failure, Assertion with:
                     x = 0
                     w = 2
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous1.mlw", line 5, characters 20-25)
+            - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -162,20 +167,21 @@
                 Line 5:
                   Abstract execution of h with args:
                     y = 0
-                  result = 0
-                  Execution got stuck, Assume postcondition of h with:
-                    y = 0
-                    result = 0
+                  result = 2
+                Line 6:
+                  Property failure, Assertion with:
+                    x = 0
+                    w = 2
 <check-ce>Models:
-- Selected model 0 (Concrete: good model, Abstract: bad model)
+- Selected model 0 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
-- Checked model 1 (Concrete: good model, Abstract: bad model)
+- Checked model 1 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: bad model)
+- Checked model 2 (Concrete: good model, Abstract: good model)
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
 Goal Assertion from verification condition f'vc.
-Prover result is: Unknown (sat) (0.07s, 4720 steps).
+Prover result is: Unknown (sat) (0.05s, 4720 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

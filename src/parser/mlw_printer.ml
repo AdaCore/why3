@@ -926,7 +926,7 @@ and pp_spec result_pat fmt s =
   pp_print_opt_list ~prefix:"@ @[<hv 2>reads { " ~suffix:"@] }" ~sep:",@ " pp_qualid fmt s.sp_reads;
   pp_print_opt_list ~prefix:"@ " ~sep:"@ " pp_requires fmt s.sp_pre;
   if s.sp_checkrw then
-    fprintf fmt "@ @[<hv 2>writes { %a }" (pp_print_opt_list ~sep:",@ " pp_term.marked) s.sp_writes
+    fprintf fmt "@ @[<h>writes { %a }@]" (pp_print_opt_list ~sep:",@ " pp_term.marked) s.sp_writes
   else
     pp_print_opt_list ~prefix:"@ @[<hv 2>writes { " ~sep:",@ " ~suffix:"@] }" pp_term.marked fmt s.sp_writes;
   pp_print_list pp_post fmt s.sp_post;
@@ -1111,6 +1111,6 @@ let pp_mlw_file fmt = function
       pp_decls fmt decls
   | Modules modules ->
       let pp_module fmt (id, decls) =
-        fprintf fmt "@[<v 2>module %a@ %a@]@ end" pp_id id pp_decls decls in
+        fprintf fmt "@[<v0>@[<v2>module %a@ %a@]@ end@]" pp_id id pp_decls decls in
       let pp_modules = pp_print_list ~pp_sep:(pp_sep "@\n@\n") pp_module in
       fprintf fmt "@[<v>%a@]" pp_modules modules
