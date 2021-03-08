@@ -665,17 +665,17 @@ let interleave_line ~filename ~print_attrs start_comment end_comment
     (* We need to know how many lines will be taken by the counterexample. This
        is ad hoc as we don't really know how the lines are split in IDE. *)
     let len_cnt = 1 + (String.length cntexmp_line / 80) in
-    ( source_code ^ line ^ cntexmp_line ^ "\n"
-    , line_number + 1
-    , offset + len_cnt
-    , remaining_locs
-    , list_loc @ locs )
+    source_code ^ line ^ cntexmp_line ^ "\n",
+    line_number + 1,
+    offset + len_cnt,
+    remaining_locs,
+    list_loc @ locs
   with Not_found ->
-    ( source_code ^ line
-    , line_number + 1
-    , offset
-    , remaining_locs
-    , list_loc @ locs )
+    source_code ^ line,
+    line_number + 1,
+    offset,
+    remaining_locs,
+    list_loc @ locs
 
 let interleave_with_source ~print_attrs ?(start_comment = "(* ")
     ?(end_comment = " *)") ?(me_name_trans = why_name_trans) model ~rel_filename
