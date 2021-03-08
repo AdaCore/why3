@@ -394,10 +394,10 @@ type model_element_kind =
   | Result
   | Old
   | At of string
-  | Error_message
   | Loop_before
   | Loop_previous_iteration
   | Loop_current_iteration
+  | Error_message
   | Other
 
 type model_element_name = {

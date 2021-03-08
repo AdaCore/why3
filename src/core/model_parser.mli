@@ -84,15 +84,23 @@ val debug_force_binary_floats : Debug.flag
 *)
 
 type model_element_kind =
-| Result (* Result of a function call (if the counter-example is for postcondition)  *)
-| Old (* Old value of function argument (if the counter-example is for postcondition) *)
-| At of string (* Value at label *)
-| Error_message (* The model element represents error message, not source-code element.
-                   The error message is saved in the name of the model element.*)
-| Loop_before
-| Loop_previous_iteration
-| Loop_current_iteration
-| Other
+  | Result
+  (** Result of a function call (if the counter-example is for postcondition) *)
+  | Old
+  (** Old value of function argument (if the counter-example is for
+      postcondition) *)
+  | At of string
+  (** Value at label *)
+  | Loop_before
+  (** Value from before the loop *)
+  | Loop_previous_iteration
+  (** Value from before current loop iteration *)
+  | Loop_current_iteration
+  (** Value from current loop iteration *)
+  | Error_message
+  (** The model element represents error message, not source-code element. The
+     error message is saved in the name of the model element.*)
+  | Other
 
 (** Information about the name of the model element *)
 type model_element_name = {
