@@ -31,6 +31,7 @@ let opt_json : [< `All | `Values ] option ref = ref None
 let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
 let opt_rac_try_negate = ref false
+let opt_rac_timelimit = ref None
 let opt_ce_check_verbosity = ref None
 
 let debug_print_original_model = Debug.register_info_flag "print-original-model"
@@ -150,6 +151,8 @@ let option_list =
     KLong "rac-try-negate", Hnd0 (fun () -> opt_rac_try_negate := true),
     " try checking the negated term using the RAC prover when\n\
      the prover is defined and didn't give a result";
+    KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
+    "<seconds> Time limit for RAC (with --check-ce)";
     Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
     "<lvl> verbosity level for interpretation log of counterexam-\n\
      ple solver model";
@@ -305,7 +308,8 @@ let select_ce env th models =
           Pinterp.rac_reduce_config_lit config env
             ~trans:"compute_in_goal" ?prover:!opt_rac_prover
             ~try_negate:!opt_rac_try_negate () in
-        Counterexample.select_model ~reduce_config
+        let timelimit = Opt.map float_of_int !opt_rac_timelimit in
+        Counterexample.select_model ~reduce_config ?timelimit
           ~check:!opt_check_ce_model ?verb_lvl:!opt_ce_check_verbosity
           env pm models
     | exception Not_found -> None

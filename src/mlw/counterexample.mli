@@ -41,7 +41,7 @@ type check_model_result = private
 
 val print_check_model_result : ?verb_lvl:int -> check_model_result Pp.pp
 
-val check_model :
+val check_model : ?timelimit : float ->
   rac_reduce_config -> Env.env -> pmodule -> model -> check_model_result
 (* interpret concrecly and abstractly the program corresponding to the
    model (the program corresponding to the model is obtained from the
@@ -77,7 +77,7 @@ type sort_models
 
 val select_model :
   ?verb_lvl:int -> ?check:bool -> ?reduce_config:rac_reduce_config ->
-  ?sort_models:sort_models -> Env.env -> pmodule ->
+  ?timelimit:float -> ?sort_models:sort_models -> Env.env -> pmodule ->
   (Call_provers.prover_answer * model) list ->
   (model * ce_summary) option
 (** [select ~check ~conservative ~reduce_config env pm ml] chooses a model from

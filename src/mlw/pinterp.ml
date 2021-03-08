@@ -730,6 +730,7 @@ type rac_config = {
   rac_reduce          : rac_reduce_config;
   get_value           : get_value;
   log_uc              : Log.log_uc;
+  timelimit           : float option; (* seconds *)
 }
 
 let default_get_value ?loc:_ _ _ = None
@@ -737,12 +738,12 @@ let default_get_value ?loc:_ _ _ = None
 let rac_config ~do_rac ~abstract:rac_abstract
       ?(skip_cannot_compute=true)
       ?reduce:rac_reduce
-      ?(get_value=default_get_value) () =
+      ?(get_value=default_get_value) ?timelimit () =
   let rac_reduce = match rac_reduce with
     | Some r -> r
     | None -> rac_reduce_config () in
   {do_rac; rac_abstract; rac_reduce; log_uc= Log.empty_log_uc ();
-   get_value; skip_cannot_compute }
+   get_value; skip_cannot_compute; timelimit }
 
 type env = {
   pmodule : Pmodule.pmodule;
@@ -2103,10 +2104,37 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc env vs =
     set_constr (get_vs env vs) value )
 
 (******************************************************************************)
+(*                               TIME LIMITS                                  *)
+(******************************************************************************)
+
+(* Internal start time *)
+let time0 = ref None
+
+let with_timelimit f =
+  if !time0 <> None then failwith "with_timelimit: called twice";
+  time0 := Some (Sys.time ());
+  try
+    let res = f () in
+    time0 := None; res
+  with e ->
+    time0 := None;
+    Printexc.raise_with_backtrace e (Printexc.get_raw_backtrace ())
+
+let check_timelimit = function
+  | None -> ()
+  | Some timelimit ->
+      match !time0 with
+      | None -> failwith "check_timelimit: called outside with_timelimit"
+      | Some time0 ->
+          if Sys.time () -. time0 >= timelimit then
+            cannot_compute "RAC timelimit reached"
+
+(******************************************************************************)
 (*                          EXPRESSION EVALUATION                             *)
 (******************************************************************************)
 
 let rec eval_expr env e =
+  check_timelimit env.rac.timelimit;
   Debug.dprintf debug_trace_exec "@[<h>%t%sEVAL EXPR: %a@]@." pp_indent
     (if env.rac.rac_abstract then "Abs. " else "")
     (pp_limited print_expr) e;
@@ -2712,6 +2740,7 @@ let bind_globals ?rs_main mod_known env =
   Mid.fold eval_global mod_known env
 
 let eval_global_fundef rac env pmodule locals e =
+  with_timelimit @@ fun () ->
   get_builtin_progs env ;
   let env = default_env env rac pmodule in
   let env = bind_globals pmodule.Pmodule.mod_known env in
@@ -2721,6 +2750,7 @@ let eval_global_fundef rac env pmodule locals e =
 
 let eval_rs rac env pm rs =
   let open Pmodule in
+  with_timelimit @@ fun () ->
   let get_value env pv = get_and_register_param env pv.pv_vs.vs_name pv.pv_ity in
   get_builtin_progs env ;
   let env = default_env env rac pm in

@@ -163,6 +163,8 @@ type rac_config = private {
   (** import values when they are needed *)
   log_uc : Log.log_uc;
   (** log *)
+  timelimit : float option;
+  (** Timeout in seconds for RAC execution *)
 }
 
 val rac_config :
@@ -171,6 +173,7 @@ val rac_config :
   ?skip_cannot_compute:bool ->
   ?reduce:rac_reduce_config ->
   ?get_value:get_value ->
+  ?timelimit:float ->
   unit -> rac_config
 
 (** {2 Interpreter environment and results} *)
