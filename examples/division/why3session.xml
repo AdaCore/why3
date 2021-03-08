@@ -3,11 +3,46 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="division.mlw"/>
 <theory name="Division" proved="true">
  <goal name="division&#39;vc" expl="VC for division" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+ </goal>
+</theory>
+<theory name="Hoare" proved="true">
+ <goal name="division&#39;vc" expl="VC for division" proved="true">
+ <proof prover="3" timelimit="1"><result status="valid" time="0.03" steps="2112"/></proof>
+ </goal>
+</theory>
+<theory name="HoareSound" proved="true">
+ <goal name="Hoare.A1" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="204"/></proof>
+ </goal>
+ <goal name="Hoare.A2" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="243"/></proof>
+ </goal>
+ <goal name="Hoare.A3" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="289"/></proof>
+ </goal>
+ <goal name="Hoare.A4" proved="true">
+ <proof prover="3"><result status="valid" time="0.01" steps="345"/></proof>
+ </goal>
+ <goal name="Hoare.A5" proved="true">
+ <proof prover="3"><result status="valid" time="0.01" steps="408"/></proof>
+ </goal>
+ <goal name="Hoare.A6" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="465"/></proof>
+ </goal>
+ <goal name="Hoare.A7" proved="true">
+ <proof prover="3"><result status="valid" time="0.01" steps="494"/></proof>
+ </goal>
+ <goal name="Hoare.A8" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="519"/></proof>
+ </goal>
+ <goal name="Hoare.A9" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="545"/></proof>
  </goal>
 </theory>
 </file>
