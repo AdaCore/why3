@@ -27,34 +27,34 @@ let debug_check_ce_summary = Debug.register_info_flag "check-ce-summary"
 (** Result of checking solvers' counterexample models *)
 
 type ce_summary =
-  | NCCE of Log.exec_log
-  | SWCE of Log.exec_log
-  | NCCE_SWCE of Log.exec_log
-  | BAD_CE
+  | NC of Log.exec_log
+  | SW of Log.exec_log
+  | NCSW of Log.exec_log
+  | BAD
   | UNKNOWN of string
 
 let print_ce_summary_kind fmt s =
   let str = match s with
-    | NCCE _ -> "NCCE"
-    | SWCE _ -> "SWCE"
-    | NCCE_SWCE _ -> "NCCE_SWCE"
+    | NC _ -> "NC"
+    | SW _ -> "SW"
+    | NCSW _ -> "NCSW"
     | UNKNOWN _ -> "UNKNOWN"
-    | BAD_CE -> "BAD_CE" in
+    | BAD -> "BAD" in
   pp_print_string fmt str
 
 let print_ce_summary_title ?check_ce fmt = function
-  | NCCE _ ->
+  | NC _ ->
      Format.fprintf fmt
        "The@ program@ does@ not@ comply@ to@ the@ verification@ goal"
-  | SWCE _ ->
+  | SW _ ->
      Format.fprintf fmt
        "The@ contracts@ of@ some@ function@ or@ loop@ are@ underspecified"
-  | NCCE_SWCE _ ->
+  | NCSW _ ->
      Format.fprintf fmt
        ("The@ program@ does@ not@ comply@ to@ the@ verification@ \
          goal,@ or@ the@ contracts@ of@ some@ loop@ or@ function@ are@ \
          too@ weak")
-  | BAD_CE ->
+  | BAD ->
      Format.fprintf fmt
        "Sorry,@ we@ don't@ have@ a@ good@ counterexample@ for@ you@ :("
   | UNKNOWN reason ->
@@ -82,45 +82,46 @@ let print_ce_summary_values ?verb_lvl ?json ~print_attrs model fmt s =
   match json with
   | None | Some `Values -> (
       match s with
-      | NCCE log | SWCE log | NCCE_SWCE log ->
+      | NC log | SW log | NCSW log ->
           fprintf fmt "@[%a@]" (Log.print_log ?verb_lvl ~json:false) log
       | UNKNOWN _ ->
           let print_model fmt m =
             if json = None then print_model_human fmt m
             else print_model (* json values *) fmt m in
           fprintf fmt "@[%a@]" (print_model ~print_attrs) model
-      | BAD_CE -> ()
+      | BAD -> ()
     )
   | Some `All -> (
       match s with
-      | NCCE log | SWCE log | NCCE_SWCE log ->
+      | NC log | SW log | NCSW log ->
           fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
             print_model_field model print_log_field log
       | UNKNOWN _ ->
           fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
-      | BAD_CE -> ()
+      | BAD -> ()
     )
 
-type verdict = Good_model | Bad_model | Dont_know
+type result_state = Rnormal | Rfailure | Rstuck | Runknown
 
-type full_verdict = {
-    verdict  : verdict;
+type result = {
+    state    : result_state;
     reason   : string;
     exec_log : Log.exec_log;
   }
 
-let print_verdict fmt = function
-  | Good_model -> fprintf fmt "good model"
-  | Bad_model -> fprintf fmt "bad model"
-  | Dont_know -> fprintf fmt "don't know"
+let print_result_state fmt = function
+  | Rnormal -> fprintf fmt "NORMAL"
+  | Rfailure -> fprintf fmt "FAILURE"
+  | Rstuck -> fprintf fmt "STUCK"
+  | Runknown -> fprintf fmt "UNKNOWN"
 
 let print_full_verdict ?verb_lvl fmt v =
   fprintf fmt "%a (%s)@,%a"
-    print_verdict v.verdict v.reason (Log.print_log ?verb_lvl ~json:false) v.exec_log
+    print_result_state v.state v.reason (Log.print_log ?verb_lvl ~json:false) v.exec_log
 
 type check_model_result =
   | Cannot_check_model of {reason: string}
-  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
+  | Check_model_result of {abstract: result; concrete: result}
 
 let print_check_model_result ?verb_lvl fmt = function
   | Cannot_check_model r ->
@@ -132,21 +133,33 @@ let print_check_model_result ?verb_lvl fmt = function
 
 let ce_summary = function
   | Cannot_check_model {reason} -> UNKNOWN reason
-  | Check_model_result r -> match r.concrete.verdict, r.abstract.verdict with
-    | Good_model, _          -> NCCE r.concrete.exec_log
-    | Bad_model , Good_model -> SWCE r.abstract.exec_log
-    | Dont_know , Good_model -> NCCE_SWCE r.abstract.exec_log
-    | Dont_know , Dont_know
-    | Dont_know , Bad_model  -> UNKNOWN r.concrete.reason
-    | Bad_model , Dont_know  -> UNKNOWN r.abstract.reason
-    | Bad_model , Bad_model  -> BAD_CE
+  | Check_model_result r ->
+      match r.concrete.state with
+      | Rfailure -> NC r.concrete.exec_log
+      | Rstuck -> BAD
+      | Rnormal -> (
+          match r.abstract.state with
+          | Rfailure ->
+              SW r.abstract.exec_log
+          | Rnormal | Rstuck ->
+              BAD
+          | Runknown ->
+              UNKNOWN (r.concrete.reason^", "^r.abstract.reason) )
+      | Runknown -> (
+          match r.abstract.state with
+          | Rfailure ->
+              NCSW r.abstract.exec_log
+          | Rnormal | Runknown ->
+              UNKNOWN (r.concrete.reason^", "^r.abstract.reason)
+          | Rstuck ->
+              BAD )
 
 let print_counterexample ?verb_lvl ?check_ce ?json fmt (model,ce_summary) =
   fprintf fmt "@ @[<hov2>%a%t@]"
     (print_ce_summary_title ?check_ce) ce_summary
     (fun fmt ->
        match ce_summary with
-       | NCCE _ | SWCE _ | NCCE_SWCE _ ->
+       | NC _ | SW _ | NCSW _ ->
            fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
        | UNKNOWN _ ->
            fprintf fmt ":"
@@ -348,34 +361,34 @@ let check_model_rs ?loc rac env pm rs =
     let _, env = eval_rs rac env pm rs in
     let reason = sprintf "%s RAC does not confirm the counter-example, no \
                           contradiction during execution" abs_Msg in
-    {verdict= Bad_model; reason; exec_log= Log.close_log env.rac.log_uc}
+    {state= Rnormal; reason; exec_log= Log.close_log env.rac.log_uc}
   with
   | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc loc ->
       let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
-      {verdict= Good_model; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
+      {state= Rfailure; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
   | Contr (ctx, t) ->
       let reason = asprintf "%s RAC found a contradiction at different location %a"
           abs_Msg (Pp.print_option_or_default "NO LOC" Pretty.print_loc') t.t_loc in
-      {verdict= Good_model; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
+      {verdict= Rfailure; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
+  | RACStuck (env,l) ->
+      let reason =
+        asprintf "%s RAC, with the counterexample model cannot continue after %a"
+          abs_Msg (Pp.print_option Pretty.print_loc') l in
+      {state= Rstuck; reason; exec_log= Log.close_log env.rac.log_uc}
   | CannotImportModelValue msg ->
       let reason = sprintf "cannot import value from model: %s" msg in
-      {verdict= Dont_know; reason; exec_log= Log.empty_log}
+      {state= Runknown; reason; exec_log= Log.empty_log}
   | CannotCompute r ->
       (* TODO E.g., bad default value for parameter and cannot evaluate
          pre-condition *)
       let reason = sprintf "%s RAC terminated because %s"
                      abs_Msg r.reason in
-      {verdict= Dont_know; reason; exec_log= Log.empty_log}
+      {state= Runknown; reason; exec_log= Log.empty_log}
   | Failure msg ->
       (* E.g., cannot create default value for non-free type, cannot construct
           term for constructor that is not a function *)
       let reason = sprintf "failure: %s" msg in
-      {verdict= Dont_know; reason; exec_log= Log.empty_log}
-  | RACStuck (env,l) ->
-      let reason =
-        asprintf "%s RAC, with the counterexample model cannot continue after %a"
-          abs_Msg (Pp.print_option Pretty.print_loc') l in
-      {verdict= Bad_model; reason; exec_log= Log.close_log env.rac.log_uc}
+      {state= Runknown; reason; exec_log= Log.empty_log}
 
 let check_model ?timelimit reduce env pm model =
   match get_model_term_loc model with
@@ -434,15 +447,15 @@ let prioritize_first_good_model: sort_models = fun models ->
   let open Util in
   let good_models, other_models =
     let is_good (_,_,_,_,s) = match s with
-      | NCCE _ | SWCE _ | NCCE_SWCE _ -> true
-      | BAD_CE | UNKNOWN _ -> false in
+      | NC _ | SW _ | NCSW _ -> true
+      | BAD | UNKNOWN _ -> false in
     List.partition is_good models in
   if good_models = [] then
     (* No interesting models, prioritize the last, non-empty model
        as it was done before 2020, but penalize bad models. *)
     let ce_summary_index = function
-      | UNKNOWN _ -> 0 | BAD_CE -> 1 | NCCE _
-      | SWCE _ | NCCE_SWCE _ -> assert false in
+      | UNKNOWN _ -> 0 | BAD -> 1 | NC _
+      | SW _ | NCSW _ -> assert false in
     let compare = cmp [
         cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
         cmptr (fun (i,_,_,_,_) -> -i) (-);
@@ -450,10 +463,10 @@ let prioritize_first_good_model: sort_models = fun models ->
     List.sort compare other_models
   else
     let ce_summary_index = function
-      | NCCE _ -> 0 | SWCE _ -> 1 | NCCE_SWCE _ -> 2
-      | UNKNOWN _ | BAD_CE -> assert false in
+      | NC _ -> 0 | SW _ -> 1 | NCSW _ -> 2
+      | UNKNOWN _ | BAD -> assert false in
     let compare = cmp [
-        (* prefer NCCE > SWCE > NCCE_SWCE > UNKNOWN > BAD *)
+        (* prefer NC > SW > NCSW > UNKNOWN > BAD *)
         cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
         (* prefer simpler models *)
         cmptr (fun (i,_,_,_,_) -> i) (-);
@@ -471,8 +484,8 @@ let print_dbg_model selected_ix fmt (i,_,_,mr,s) =
       fprintf fmt
         "- @[<v>%t model %d: %a@\nconcrete: %a, %s@\nabstract: %a, %s@]"
         mark_selected i print_ce_summary_kind s
-        print_verdict r.concrete.verdict r.concrete.reason
-        print_verdict r.abstract.verdict r.abstract.reason
+        print_result_state r.concrete.state r.concrete.reason
+        print_result_state r.abstract.state r.abstract.reason
 
 let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     ?timelimit ?sort_models env pmodule models =

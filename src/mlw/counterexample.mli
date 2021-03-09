@@ -22,13 +22,14 @@ val debug_check_ce : Debug.flag
    result of checking them by interpreting the program concretly and
    abstractly using the values in the solver's model *)
 
-type verdict = private
-  | Good_model (** the model leads to a counterexample *)
-  | Bad_model  (** the model doesn't lead to a counterexample *)
-  | Dont_know  (** cannot decide if the model leads to a counterexample *)
+type result_state =
+  | Rnormal (** the execution terminated normally *)
+  | Rfailure (** the model leads to a counterexample *)
+  | Rstuck (** the model doesn't lead to a counterexample *)
+  | Runknown (** cannot decide if the model leads to a counterexample *)
 
-type full_verdict = private {
-    verdict  : verdict;
+type result = {
+    state    : result_state;
     reason   : string;
     exec_log : Log.exec_log;
   }
@@ -36,7 +37,7 @@ type full_verdict = private {
 type check_model_result = private
   | Cannot_check_model of {reason: string}
   (* the model cannot be checked (e.g. it doesn't contain a location) *)
-  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
+  | Check_model_result of {abstract: result; concrete: result}
   (* the model was checked *)
 
 val print_check_model_result : ?verb_lvl:int -> check_model_result Pp.pp
@@ -50,14 +51,18 @@ val check_model : ?timelimit : float ->
 (** {2 Summary of checking models} *)
 
 type ce_summary =
-  | NCCE of Log.exec_log (** Non-conformity between program and annotations: the
-                             CE shows that the program doesn't comply to the
-                             verification goal. *)
-  | SWCE of Log.exec_log (** Sub-contract weakness: The contracts of some
-                             function or loop are underspecified. *)
-  | NCCE_SWCE of Log.exec_log (** Non-conformity or sub-contract weakness. *)
-  | BAD_CE (** Bad counterexample. *)
-  | UNKNOWN of string (** The counterexample has not been verified. *)
+  | NC of Log.exec_log
+  (** Non-conformity between program and annotations: the CE shows that the
+      program doesn't comply to the verification goal. *)
+  | SW of Log.exec_log
+  (** Sub-contract weakness: The contracts of some function or loop are
+      underspecified. *)
+  | NCSW of Log.exec_log
+  (** Non-conformity or sub-contract weakness. *)
+  | BAD
+  (** Bad counterexample. *)
+  | UNKNOWN of string
+  (** The counterexample has not been verified. *)
 
 val ce_summary : check_model_result -> ce_summary
 

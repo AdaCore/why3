@@ -321,12 +321,12 @@ let print_other_models (m, ce_summary) =
     if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
     else Model_parser.print_model (* json values *) fmt m ~print_attrs in
   ( match ce_summary with
-    | Counterexample.(NCCE _ | SWCE _ | NCCE_SWCE _ | BAD_CE) ->
+    | Counterexample.(NC _ | SW _ | NCSW _ | BAD) ->
         if Debug.test_flag debug_print_original_model then
           printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
     | _ -> () );
   ( match ce_summary with
-    | Counterexample.(NCCE log | SWCE log | NCCE_SWCE log) ->
+    | Counterexample.(NC log | SW log | NCSW log) ->
         if Debug.test_flag debug_print_derived_model then
           printf "@[<v>Derived model:@\n%a@]@\n@." print_model
             (Counterexample.model_of_exec_log ~original_model:m log)
