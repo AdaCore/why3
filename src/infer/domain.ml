@@ -264,9 +264,7 @@ module Make_from_apron(M:sig
                 begin
 
                   let myi = match c with
-                    | Coeff.Scalar s ->
-                      let s = Scalar.to_string s in
-                      int_of_string s
+                    | Coeff.Scalar s -> int_of_s s
                     | _ -> assert false
                   in
                   Lincons1.set_coeff l' v (Coeff.s_of_int (if myi < 0 then -1 else 1));
