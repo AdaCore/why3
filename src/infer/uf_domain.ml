@@ -18,7 +18,7 @@ module Make(S:sig
   (* utility function that make equivalent classes and
      sum the last component *)
   let sum_list l =
-    let sl = List.sort (fun (i, _) (j, _) -> compare i j) l in
+    let sl = List.sort (fun (i, _) (j, _) -> Var.compare i j) l in
     let rec merge = function
       | [] -> []
       | [b] -> [b]

@@ -1,12 +1,18 @@
 type t = int
 
+let compare x y = compare (x:int) y
+
 type set = int list list
 
 let empty = []
 
+let rec mem (e:int) = function
+  | [] -> false
+  | h::t -> h = e || mem e t
+
 let get_class t s =
   try
-    Some (List.find (List.mem t) s)
+    Some (List.find (mem t) s)
   with
   | Not_found -> None
 
@@ -75,7 +81,7 @@ let join a b =
   in
   let all_elts = List.concat (a @ b) in
   let known_elts = List.concat c in
-  let all_elts = List.filter (fun t -> not (List.mem t known_elts)) all_elts |> List.map (fun t -> [t]) in
+  let all_elts = List.filter (fun t -> not (mem t known_elts)) all_elts |> List.map (fun t -> [t]) in
   c @ all_elts
 
 let print s =
