@@ -2285,7 +2285,8 @@ and eval_expr' env e =
         (Mvs.keys env.vsenv);
       (* assert2 *)
       let opt_old_variant =
-        if env.rac.do_rac then Some (oldify_variant env var) else None in
+        if env.rac.do_rac && e.e_effect.eff_oneway = Total then
+          Some (oldify_variant env var) else None in
       check_assume_terms (cntr_ctx "Assume loop invariant" env) inv;
       match eval_expr env cond with
       | Normal v ->
@@ -2293,8 +2294,9 @@ and eval_expr' env e =
              register_iter_loop env e.e_loc Log.ExecConcrete;
              match eval_expr env e1 with
              | Normal _ ->
-                if env.rac.do_rac then (
+                if env.rac.do_rac then
                   check_terms (cntr_ctx "Loop invariant preservation" env) inv;
+                if env.rac.do_rac && e.e_effect.eff_oneway = Total then (
                   let old_ts, oldies = Opt.get opt_old_variant in
                   let vsenv =
                     Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
@@ -2320,7 +2322,8 @@ and eval_expr' env e =
         check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
       let rec iter () =
         let opt_old_variant =
-          if env.rac.do_rac then Some (oldify_variant env var) else None in
+          if env.rac.do_rac && e.e_effect.eff_oneway = Total then
+            Some (oldify_variant env var) else None in
         match eval_expr env e1 with
         | Normal v ->
             if is_true v then ( (* condition true *)
@@ -2329,7 +2332,7 @@ and eval_expr' env e =
               | Normal _ -> (* body executed normally *)
                   if env.rac.do_rac then
                     check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                  if env.rac.do_rac then (
+                  if env.rac.do_rac && e.e_effect.eff_oneway = Total then (
                     let old_ts, oldies = Opt.get opt_old_variant in
                     let vsenv =
                       Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
