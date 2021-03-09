@@ -73,10 +73,10 @@ module Make(S:sig
     build_var_pool_aux n |> VarPool.of_list
 
   let npool = 10
+  let var_npool = build_var_pool npool
 
   let create_manager () =
-    let var_pool = build_var_pool npool in
-    let vars = Array.of_list (VarPool.elements var_pool
+    let vars = Array.of_list (VarPool.elements var_npool
                               @ tmp_pool) in
     let variable_mapping = Hashtbl.create 512 in
     let apron_mapping = Mterm.empty in
@@ -93,7 +93,7 @@ module Make(S:sig
   let empty_uf_domain = {
     classes = Union_find.empty;
     uf_to_var = TermToVar.empty;
-    var_pool = build_var_pool npool;
+    var_pool = var_npool;
   }
 
   let bottom (man, uf_man) _ =
@@ -309,8 +309,7 @@ module Make(S:sig
       done;
     with Not_found ->
       assert (VarPool.is_empty (VarPool.inter uf_t.var_pool !var_pool));
-      assert (VarPool.equal (VarPool.union uf_t.var_pool !var_pool)
-                (build_var_pool npool))
+      assert (VarPool.equal (VarPool.union uf_t.var_pool !var_pool) var_npool)
 
   let join_uf (man, uf_man) uf_t1 uf_t2 dom_t =
     invariant_uf uf_t1;
