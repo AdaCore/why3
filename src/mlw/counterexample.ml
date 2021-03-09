@@ -21,6 +21,9 @@ open Model_parser
 let debug_check_ce = Debug.register_info_flag "check-ce"
     ~desc:"Debug@ info@ for@ --check-ce"
 
+let debug_check_ce_summary = Debug.register_info_flag "check-ce-summary"
+    ~desc:"Debug@ summary@ for@ --check-ce"
+
 (** Result of checking solvers' counterexample models *)
 
 type ce_summary =
@@ -466,10 +469,10 @@ let print_dbg_model selected_ix fmt (i,_,_,mr,s) =
       fprintf fmt "- Couldn't check model: %s" reason
   | Check_model_result r ->
       fprintf fmt
-        "- @[<v2>%t model %d (Concrete: %a, Abstract: %a)@ @[Summary: %a@]@]"
-        mark_selected i print_verdict r.concrete.verdict
-        print_verdict r.abstract.verdict
-        (print_ce_summary_title ?check_ce:None) s
+        "- @[<v>%t model %d: %a@\nconcrete: %a, %s@\nabstract: %a, %s@]"
+        mark_selected i print_ce_summary_kind s
+        print_verdict r.concrete.verdict r.concrete.reason
+        print_verdict r.abstract.verdict r.abstract.reason
 
 let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     ?timelimit ?sort_models env pmodule models =
@@ -511,8 +514,8 @@ let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     | None -> None, None
     | Some (i,_,m,_,s) -> Some (m, s), Some i in
   if models <> [] then
-    Debug.dprintf debug_check_ce "Models:@\n%a@."
-      Pp.(print_list space (print_dbg_model selected_ix)) models;
+    Debug.dprintf debug_check_ce_summary "Results:@ %a@."
+      Pp.(print_list newline (print_dbg_model selected_ix)) models;
   selected
 
 (** Transformations interpretation log and prover models *)
