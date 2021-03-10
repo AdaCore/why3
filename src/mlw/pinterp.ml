@@ -1974,11 +1974,12 @@ let value_of_term env t =
 
 (* Find a postcondition of the form [ensures { result = t (/\ ...) }],
    compute_fraction [t], and return it as a value. *)
-let try_eval_ensures env (posts, vsenv) =
+let try_eval_ensures env posts =
   let rec loop vs = function
     | {t_node= Tapp (ls, [{t_node= Tvar vs'}; t])}
       when ls_equal ls ps_equ && vs_equal vs vs' ->
-        value_of_term env (compute_term ~vsenv env t)
+        let t = compute_term env t in
+        value_of_term env t
     | {t_node= Tbinop (Tand, t1, t2)} ->
         let res = loop vs t1 in
         if res <> None then res else loop vs t2
@@ -2001,8 +2002,8 @@ let get_value : value_gen list -> string * value =
   let aux (s, gen) = match gen () with Some v -> Some (s, v) | None -> None in
   Lists.first aux
 
-(** Generate a value by querying the model *)
-let gen_model_value env ?loc id ity : value_gen =
+(** Generate a value by querying the model for a variable *)
+let gen_model_variable env ?loc id ity : value_gen =
   "value from model", fun () ->
     let res = env.rac.get_value ?loc id ity in
     Opt.iter (check_assume_type_invs ?loc env ity) res; res
@@ -2012,17 +2013,20 @@ let gen_default def : value_gen =
   "default value", fun () -> def
 
 (** Generate a value by computing the postcondition *)
-let gen_from_post env posts_vsenv : value_gen =
+let gen_from_post env posts : value_gen =
   "value computed from postcondition", fun () ->
-    Opt.bind posts_vsenv (try_eval_ensures env)
+    Opt.bind posts (try_eval_ensures env)
 
-(** Generator for the type default value *)
-let gen_type_default env oloc posts ity : value_gen =
+(** Generator for the type default value, when [posts] are not none or [really]
+    is true. *)
+let gen_type_default ~really ?posts env ity : value_gen =
   "type default value", fun () ->
-    let desc = "postcondition for default value" in
+    if posts = None && not really then None else
     let v = default_value_of_type env.env env.pmodule.Pmodule.mod_known ity in
-    try check_posts desc oloc env v posts; Some v with
-      Contr _ -> None
+    try
+      Opt.iter (check_posts Vc.expl_post ~desc:"default value" None env v) posts;
+      Some v
+    with Contr _ -> None
 
 (** Generate a value by evaluating an optional expression, if that is not [None]
    *)
@@ -2051,38 +2055,40 @@ let get_value' ctx_desc oloc gens =
     (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc print_value value;
   value
 
-let get_and_register_value env ?def ?loc ?posts_vsenv id ity =
-  let ctx_desc = asprintf "variable %a" print_decoded id.id_string in
+let is_ignore_id id = id.id_string = "_"
+
+let get_and_register_value env ?def ?loc ?posts id ity =
+  let ctx_desc = asprintf "variable at %a%t" print_decoded id.id_string
+      (fun fmt -> match loc with
+         | Some loc -> fprintf fmt " %a" Pretty.print_loc' loc
+         | None -> ()) in
   let oloc = if loc <> None then loc else id.id_loc in
   let gens = [
-    gen_model_value env ?loc id ity;
-    gen_from_post env posts_vsenv;
+    gen_model_variable env ?loc id ity;
+    gen_from_post env posts;
     gen_default def;
-    gen_type_default env oloc Opt.(get_def [] (map fst posts_vsenv)) ity;
+    gen_type_default ~really:(is_ignore_id id) ?posts env ity;
   ] in
   let value = get_value' ctx_desc oloc gens in
   register_used_value env oloc id value;
   value
 
-let get_and_register_param env ?loc id ity =
+let get_and_register_param env id ity =
   let ctx_desc = asprintf "parameter %a" print_decoded id.id_string in
-  let oloc = if loc <> None then loc else id.id_loc in
   let gens = [
-    gen_model_value env ?loc id ity;
-    gen_type_default env oloc [] ity;
+    gen_model_variable env id ity;
+    gen_type_default ~really:(is_ignore_id id) env ity;
   ] in
-  let value = get_value' ctx_desc oloc gens in
-  register_used_value env oloc id value;
+  let value = get_value' ctx_desc id.id_loc gens in
+  register_used_value env id.id_loc id value;
   value
 
 let get_and_register_global env eval_expr id oexp ity =
   let ctx_desc = asprintf "global %a" print_decoded id.id_string in
-  let gen_type_default =
-    if env.rac.do_rac then [gen_type_default env id.id_loc [] ity] else [] in
   let gens = [
-    gen_model_value env id ity;
+    gen_model_variable env id ity;
     gen_eval_expr env eval_expr id oexp;
-  ] @ gen_type_default in
+  ] in
   let value = get_value' ctx_desc id.id_loc gens in
   register_used_value env id.id_loc id value;
   value
@@ -2412,9 +2418,7 @@ and eval_expr' env e =
           List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
             (Mvs.keys env.vsenv);
           let def = value ty_int (Vnum (suc b)) in
-          let i_val =
-            let loc = Opt.get i.pv_vs.vs_name.id_loc in
-            get_and_register_value env ~def ~loc i.pv_vs.vs_name i.pv_ity in
+          let i_val = get_and_register_value env ~def i.pv_vs.vs_name i.pv_ity in
           let env = bind_vs i.pv_vs i_val env in
           let i_bi = big_int_of_value i_val in
           if not (le a i_bi && le i_bi (suc b)) then begin
@@ -2571,8 +2575,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
   match exec_kind with
   | Log.ExecAbstract ->
       check_pre_and_register_call Log.ExecAbstract;
-      let rs_name,cty = rs.rs_name, rs.rs_cty in
-      exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result
+      exec_call_abstract ?loc ~rs env rs.rs_cty arg_pvs ity_result
   | Log.ExecConcrete ->
       let res =
         if rs_equal rs rs_func_app then begin
@@ -2613,8 +2616,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                 | Cany ->
                     if env.rac.do_rac then (
                       check_pre_and_register_call ~any_function:true Log.ExecAbstract;
-                      let rs_name,cty = rs.rs_name, rs.rs_cty in
-                      exec_call_abstract ?loc ~rs_name env cty arg_pvs ity_result )
+                      exec_call_abstract ?loc ~rs env rs.rs_cty arg_pvs ity_result )
                     else (* We can't check the postcondition *)
                       cannot_compute "cannot apply an any-function %a with RAC disabled"
                         print_rs rs
@@ -2668,7 +2670,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
         | _ -> () );
       res
 
-and exec_call_abstract ?snapshot ?loc ?rs_name env cty arg_pvs ity_result =
+and exec_call_abstract ?snapshot ?loc ?rs env cty arg_pvs ity_result =
   (* let f (x1: ...) ... (xn: ...) = e
      ~>
      assert1 {f_pre};
@@ -2694,15 +2696,8 @@ and exec_call_abstract ?snapshot ?loc ?rs_name env cty arg_pvs ity_result =
   let asgn_wrt =
     assign_written_vars ~vars_map cty.cty_effect.eff_writes loc env in
   List.iter asgn_wrt (Mvs.keys env.vsenv);
-  let posts_vsenv =
-    let aux pv =
-      let vsenv, t = term_of_value env [] (get_pvs env pv) in
-      if vsenv <> [] then raise Exit;
-      pv.pv_vs, t in
-    try Some (cty.cty_post, List.map aux arg_pvs)
-    with Exit -> None in
   let res_v =
-    get_and_register_value env ~loc ?posts_vsenv res ity_result in
+    get_and_register_value env ~loc ~posts:cty.cty_post res ity_result in
   (* assert2 *)
   let desc = match rs with
     | None -> "of anonymous function"
