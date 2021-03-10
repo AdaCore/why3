@@ -2189,11 +2189,13 @@ and eval_expr' env e =
   | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
   | Eexec (ce, cty) -> begin
       (* TODO (When) do we have to check the contracts in cty? When ce <> Capp? *)
-      (* check_terms (cntr_ctx "Exec precondition" env) cty.cty_pre; *)
       match ce.c_node with
       | Cpur (ls, pvs) ->
           Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent print_ls ls
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
+          let desc = asprintf "of `%a`" print_ls ls in
+          if env.rac.do_rac then
+            check_terms (cntr_ctx ?loc:e.e_loc Vc.expl_pre ~desc env) cty.cty_pre;
           exec_pure ~loc:e.e_loc env ls pvs
       | Cfun e' ->
         Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR EXEC FUN: %a@]@." pp_indent print_expr e';
@@ -2208,6 +2210,8 @@ and eval_expr' env e =
                end
              else begin
                  register_call env e.e_loc None mvs Log.ExecConcrete;
+                 if env.rac.do_rac then
+                   check_terms (cntr_ctx ?loc:e.e_loc Vc.expl_pre env) cty.cty_pre;
                  eval_expr env e'
                end
           | [arg] ->
@@ -2216,6 +2220,9 @@ and eval_expr' env e =
                 ty_match mt pv.pv_vs.vs_ty v.v_ty in
               let mt = Spv.fold match_free cty.cty_effect.eff_reads Mtv.empty in
               let ty = ty_inst mt (ty_of_ity e.e_ity) in
+              if cty.cty_pre <> [] then
+                cannot_compute "anonymous function with precondition not supported (%a)"
+                  Pretty.print_loc' e.e_loc;
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
           | _ -> failwith "many args for exec fun" (* TODO *) )
       | Cany ->
@@ -2227,13 +2234,20 @@ and eval_expr' env e =
       | Capp (rs, pvsl) when
           Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.pmodule.Pmodule.mod_known)
           = Some true ->
+          if env.rac.do_rac then (
+            let desc = asprintf "of `%a`" print_rs rs in
+            let ctx = cntr_ctx ?loc:e.e_loc Vc.expl_pre ~desc env in
+            check_terms ctx cty.cty_pre );
           assert (cty.cty_args = [] && pvsl = []);
           let v = Mrs.find rs env.rsenv in
           if env.rac.do_rac then
             check_posts Vc.expl_post None env v rs.rs_cty.cty_post;
           Normal v
       | Capp (rs, pvsl) ->
-          if cty.cty_args <> [] then cannot_compute "function cannot be applied partially";
+          if ce.c_cty.cty_args <> [] then
+            cannot_compute "no support for partial function applications (%a)"
+              (Pp.print_option_or_default "unknown location" Pretty.print_loc')
+              e.e_loc;
           exec_call ?loc:e.e_loc env rs pvsl e.e_ity
     end
   | Eassign l ->
@@ -2569,9 +2583,10 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
       else
         register_call env loc (Some rs) mvs exec_kind;
     if env.rac.do_rac then (
-      let ctx = cntr_ctx Vc.expl_pre ?loc:loc env in
-      if main_function then check_assume_terms ctx rs.rs_cty.cty_pre
-      else check_terms ctx rs.rs_cty.cty_pre ) in
+      let desc = asprintf "of `%a`" print_rs rs in
+      let ctx = cntr_ctx ?loc:loc Vc.expl_pre ~desc env in
+      (if main_function then check_assume_terms else check_terms)
+        ctx rs.rs_cty.cty_pre ) in
   match exec_kind with
   | Log.ExecAbstract ->
       check_pre_and_register_call Log.ExecAbstract;
@@ -2661,9 +2676,10 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                   rs.rs_name.id_string in
       if env.rac.do_rac then (
         let desc = asprintf "of `%a`" print_rs rs in
+        let loc = if main_function then None else loc in
         match res with
         | Normal v ->
-            check_posts Vc.expl_post ~desc None env v rs.rs_cty.cty_post
+            check_posts Vc.expl_post ~desc loc env v rs.rs_cty.cty_post
         | Excep (xs, v) ->
             let posts = Mxs.find xs rs.rs_cty.cty_xpost in
             check_posts Vc.expl_xpost ~desc loc env v posts
