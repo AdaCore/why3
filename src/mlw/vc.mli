@@ -23,3 +23,22 @@ val set_infer_invs :
 (* adds a function to infer invariants during the VC generation *)
 
 val vc : Env.env -> known_map -> Theory.theory_uc -> pdecl -> pdecl list
+
+(**/**)
+
+val expl_pre : Ident.attribute
+val expl_post : Ident.attribute
+val expl_xpost : Ident.attribute
+val expl_assume : Ident.attribute
+val expl_assert : Ident.attribute
+val expl_check : Ident.attribute
+val expl_lemma : Ident.attribute
+val expl_absurd : Ident.attribute
+val expl_for_bound : Ident.attribute
+val expl_off_bound : Ident.attribute
+val expl_loop_init : Ident.attribute
+val expl_loop_keep : Ident.attribute
+val expl_loop_vari : Ident.attribute
+val expl_variant : Ident.attribute
+val expl_type_inv : Ident.attribute
+val expl_divergent : Ident.attribute

@@ -354,7 +354,12 @@ let find_rs pm loc =
     | Udecl pd -> find_pdecl pd in
   find_in_list find_mod_unit pm.mod_units
 
-let check_model_rs ?loc rac env pm rs =
+let is_vc_term ?vc_term_loc ?(vc_term_attrs=Sattr.empty) ctx t =
+  let loc = if ctx.c_loc <> None then ctx.c_loc else t.t_loc in
+  loc <> None && Opt.equal Loc.equal loc vc_term_loc &&
+  Sattr.mem ctx.c_attr vc_term_attrs
+
+let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
   let abs_msg = if rac.rac_abstract then "abstract" else "concrete" in
   let abs_Msg = String.capitalize_ascii abs_msg in
   try
@@ -363,17 +368,19 @@ let check_model_rs ?loc rac env pm rs =
                           contradiction during execution" abs_Msg in
     {state= Rnormal; reason; exec_log= Log.close_log env.rac.log_uc}
   with
-  | Contr (ctx, t) when t.t_loc <> None && Opt.equal Loc.equal t.t_loc loc ->
+  | Contr (ctx, t) when is_vc_term ?vc_term_loc ?vc_term_attrs ctx t ->
       let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
       {state= Rfailure; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
   | Contr (ctx, t) ->
-      let reason = asprintf "%s RAC found a contradiction at different location %a"
-          abs_Msg (Pp.print_option_or_default "NO LOC" Pretty.print_loc') t.t_loc in
-      {verdict= Rfailure; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
+      let reason = asprintf
+          "Invalid assumption, %s RAC found a contradiction at different \
+           location %a %a" abs_msg (Pp.print_option Pretty.print_loc') t.t_loc
+          Pp.(print_option string) ctx.c_desc in
+      {state= Rstuck; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
   | RACStuck (env,l) ->
-      let reason =
-        asprintf "%s RAC, with the counterexample model cannot continue after %a"
-          abs_Msg (Pp.print_option Pretty.print_loc') l in
+      let reason = asprintf
+          "%s RAC, with the counterexample model cannot continue after %a" abs_Msg
+          (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
       {state= Rstuck; reason; exec_log= Log.close_log env.rac.log_uc}
   | CannotImportModelValue msg ->
       let reason = sprintf "cannot import value from model: %s" msg in
@@ -395,20 +402,21 @@ let check_model ?timelimit reduce env pm model =
   | None ->
      let reason = "model term has no location" in
      Cannot_check_model {reason}
-  | Some loc ->
+  | Some vc_term_loc ->
      (* TODO deal with VCs from goal definitions? *)
-     if Loc.equal loc Loc.dummy_position then
+     if Loc.equal vc_term_loc Loc.dummy_position then
        failwith ("Pinterp.check_model: the term of the CE model has a \
                   dummy location, it cannot be used to find the \
                   toplevel definition");
-     match find_rs pm loc with
+     match find_rs pm vc_term_loc with
      | Some rs ->
         let check_model_rs ~abstract =
           let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
           let get_value = get_value model mod_known th_known in
           let rac = rac_config ~do_rac:true ~abstract ?timelimit
                       ~skip_cannot_compute:false ~reduce ~get_value () in
-          check_model_rs ?loc:(get_model_term_loc model) rac env pm rs in
+          let vc_term_attrs = get_model_term_attrs model in
+          check_model_rs ~vc_term_loc ~vc_term_attrs rac env pm rs in
         let me_name_trans men = men.Model_parser.men_name in
         let print_attrs = Debug.test_flag Call_provers.debug_attrs in
         Debug.dprintf debug_check_ce
@@ -422,7 +430,7 @@ let check_model ?timelimit reduce env pm model =
      | None ->
         let reason =
           Format.asprintf "no corresponding routine symbol found for %a"
-            Pretty.print_loc' loc in
+            Pretty.print_loc' vc_term_loc in
         Cannot_check_model {reason}
 
 let select_model_last_non_empty models =

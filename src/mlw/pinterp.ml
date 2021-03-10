@@ -1314,25 +1314,26 @@ let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * t
 (******************************************************************************)
 
 type cntr_ctx = {
-  c_desc: string;
-  c_trigger_loc: Loc.position option;
+  c_attr: attribute; (* From Vc *)
+  c_desc: string option;
+  c_loc: Loc.position option;
   c_env: env;
 }
 
 exception Contr of cntr_ctx * term
 
-let cntr_desc_str str1 str2 = str1 ^ " of " ^ str2
-
-let cntr_desc str id =
-  asprintf "%s of `%a`" str print_decoded id.id_string
+let describe ctx =
+  asprintf "%s%a"
+    (Strings.remove_prefix "expl:" ctx.c_attr.attr_string)
+    (Pp.print_option (fun fmt -> fprintf fmt " %s")) ctx.c_desc
 
 let report_cntr_title fmt (ctx, msg) =
-  fprintf fmt "%s %s" ctx.c_desc msg
+  fprintf fmt "%s %s" (describe ctx) msg
 
 let report_cntr_head fmt (ctx, msg, term) =
   fprintf fmt "@[<v>%a%t@]" report_cntr_title (ctx, msg)
     (fun fmt ->
-       match ctx.c_trigger_loc, term.t_loc with
+       match ctx.c_loc, term.t_loc with
        | Some t1, Some t2 ->
            fprintf fmt " at %a@,- Defined at %a" print_loc' t1 print_loc' t2
        | Some t, None | None, Some t ->
@@ -1360,10 +1361,12 @@ let report_cntr fmt (ctx, msg, term) =
     report_cntr_head (ctx, msg, term)
     report_cntr_body (ctx, term)
 
-let cntr_ctx desc ?trigger_loc env =
-  { c_desc= desc;
-    c_trigger_loc= trigger_loc;
-    c_env= snapshot_env env}
+let cntr_ctx ?loc attr ?desc env = {
+  c_attr= attr;
+  c_desc= desc;
+  c_loc= loc;
+  c_env= snapshot_env env;
+}
 
 (******************************************************************************)
 (*                                TERM TO TASK                                *)
@@ -1693,8 +1696,8 @@ let check_post ctx v post =
   let ctx = {ctx with c_env= {ctx.c_env with vsenv}} in
   check_term ctx t
 
-let check_posts desc loc env v posts =
-  let ctx = cntr_ctx desc ?trigger_loc:loc env in
+let check_posts attr ?desc loc env v posts =
+  let ctx = cntr_ctx attr ?desc ?loc env in
   List.iter (check_post ctx v) posts
 
 let check_type_invs ?loc env ity v =
@@ -1710,7 +1713,7 @@ let check_type_invs ?loc env ity v =
     let bind_field env rs =
       bind_pvs (Opt.get rs.rs_field) (Mrs.find rs fs_vs) env in
     let env = List.fold_left bind_field env def.Pdecl.itd_fields in
-    let ctx = cntr_ctx "type invariant" ?trigger_loc:loc env in
+    let ctx = cntr_ctx Vc.expl_type_inv ?loc:loc env in
     check_terms ctx def.Pdecl.itd_invariant
 
 exception RACStuck of env * Loc.position option
@@ -1740,43 +1743,44 @@ let value_of_free_vars env t =
 let check_assume_term ctx t =
   try check_term ctx t with Contr (ctx,t) ->
     let mid = value_of_free_vars ctx.c_env t in
-    register_stucked ctx.c_env t.t_loc ctx.c_desc mid;
+    register_stucked ctx.c_env t.t_loc (describe ctx) mid;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
 let check_assume_terms ctx tl =
   try check_terms ctx tl with Contr (ctx,t) ->
     let mid = value_of_free_vars ctx.c_env t in
-    register_stucked ctx.c_env t.t_loc ctx.c_desc mid;
+    register_stucked ctx.c_env t.t_loc (describe ctx) mid;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
 let check_assume_posts ctx v posts =
-  try check_posts ctx.c_desc ctx.c_trigger_loc ctx.c_env v posts with Contr (ctx,t) ->
+  try check_posts ctx.c_attr ?desc:ctx.c_desc ctx.c_loc ctx.c_env v posts
+  with Contr (ctx,t) ->
     let mid = value_of_free_vars ctx.c_env t in
-    register_stucked ctx.c_env t.t_loc ctx.c_desc mid;
+    register_stucked ctx.c_env t.t_loc (describe ctx) mid;
     raise (RACStuck (ctx.c_env,t.t_loc))
 
 let check_term ?vsenv ctx t =
   try check_term ?vsenv ctx t with (Contr (ctx,t)) as e ->
     let mid = value_of_free_vars ctx.c_env t in
-    register_failure ctx.c_env t.t_loc ctx.c_desc mid;
+    register_failure ctx.c_env t.t_loc (describe ctx) mid;
     raise e
 
 let check_terms ctx tl =
   try check_terms ctx tl with (Contr (ctx,t)) as e ->
     let mid = value_of_free_vars ctx.c_env t in
-    register_failure ctx.c_env t.t_loc ctx.c_desc mid;
+    register_failure ctx.c_env t.t_loc (describe ctx) mid;
     raise e
 
-let check_posts desc loc env v posts =
-  try check_posts desc loc env v posts with (Contr (ctx,t)) as e ->
+let check_posts attr ?desc loc env v posts =
+  try check_posts attr ?desc loc env v posts with (Contr (ctx,t)) as e ->
     let mid = value_of_free_vars ctx.c_env t in
-    register_failure ctx.c_env t.t_loc ctx.c_desc mid;
+    register_failure ctx.c_env t.t_loc (describe ctx) mid;
     raise e
 
 let check_assume_type_invs ?loc env ity v =
   try check_type_invs ?loc env ity v with Contr (ctx, t) ->
     let mid = value_of_free_vars ctx.c_env t in
-    register_stucked ctx.c_env t.t_loc ctx.c_desc mid;
+    register_stucked ctx.c_env t.t_loc (describe ctx) mid;
     raise (RACStuck (ctx.c_env, t.t_loc))
 
 (* Currently, type invariants are only check when creating values or getting
@@ -1784,7 +1788,7 @@ let check_assume_type_invs ?loc env ity v =
 let check_type_invs ?loc env ity v =
   try check_type_invs ?loc env ity v with Contr (ctx, t) as e ->
     let mid = value_of_free_vars ctx.c_env t in
-    register_failure ctx.c_env t.t_loc ctx.c_desc mid;
+    register_failure ctx.c_env t.t_loc (describe ctx) mid;
     raise e
 
 (** [oldify_variant env var] returns a pair [old_ts, oldies] where [old_ts] are
@@ -1803,9 +1807,12 @@ let oldify_variant env var =
   let old_ts = List.map (t_subst subst) ts in
   old_ts, oldies
 
-(** [mk_variant_term env old_ts var] creates a term that represents the validity
-    of variant [var], where [old_ts] are the oldified variant terms. *)
-let mk_variant_term env =
+(** [mk_variant_term env loc old_ts var] creates a term that represents the
+    validity of variant [var] of a loop at location [loc], where [old_ts] are
+    the oldified variant terms.
+
+    TODO use Vc.decrease? *)
+let mk_variant_term env loc attr old_ts var =
   let {Pmodule.mod_theory= {Theory.th_crcmap= crc}} = env.pmodule in
   let {Pmodule.mod_theory= {Theory.th_export= ns}} =
     Pmodule.read_module env.env ["int"] "Int" in
@@ -1825,11 +1832,18 @@ let mk_variant_term env =
               else
                 let crc = try ignore (Coercion.find crc (t_type t) ty_int); true
                   with Not_found -> false in
-                if crc then failwith "coercsions not supported in variants"
+                if crc then failwith "coercions not supported in variants"
                 else cannot_compute "loop variant implemented only for int" in
-        t_or t_here (t_and (t_equ old_t t) (loop old_ts var))
+        t_attr_set ?loc:t.t_loc Sattr.empty
+          (t_or t_here (t_and (t_equ old_t t) (loop old_ts var)))
     | _ -> assert false in
-  loop
+  let loc = match var with
+    | (var_t, _) :: _  when var_t.t_loc <> None -> var_t.t_loc
+    | _ -> loc in
+  let rec relocate g =
+    t_attr_set ?loc g.t_attrs (TermTF.t_map (fun t -> t) relocate g) in
+  t_attr_set ?loc (Sattr.singleton attr)
+    (relocate (loop old_ts var))
 
 (******************************************************************************)
 (*                           EXPRESSION EVALUATION                            *)
@@ -2209,7 +2223,8 @@ and eval_expr' env e =
           = Some true ->
           assert (cty.cty_args = [] && pvsl = []);
           let v = Mrs.find rs env.rsenv in
-          (* check_posts "Exec postcondition" e.e_loc env v cty.cty_post; *)
+          if env.rac.do_rac then
+            check_posts Vc.expl_post None env v rs.rs_cty.cty_post;
           Normal v
       | Capp (rs, pvsl) ->
           if cty.cty_args <> [] then cannot_compute "function cannot be applied partially";
@@ -2279,7 +2294,7 @@ and eval_expr' env e =
         * stop the interpretation here - raise RACStuck *)
       (* assert1 *)
       if env.rac.do_rac then
-        check_terms (cntr_ctx "Loop invariant initialization" env) inv;
+        check_terms (cntr_ctx Vc.expl_loop_init env) inv;
       register_iter_loop env e.e_loc Log.ExecAbstract;
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
         (Mvs.keys env.vsenv);
@@ -2287,24 +2302,24 @@ and eval_expr' env e =
       let opt_old_variant =
         if env.rac.do_rac && e.e_effect.eff_oneway = Total then
           Some (oldify_variant env var) else None in
-      check_assume_terms (cntr_ctx "Assume loop invariant" env) inv;
+      check_assume_terms (cntr_ctx Vc.expl_loop_keep env) inv;
       match eval_expr env cond with
       | Normal v ->
          if is_true v then begin
              register_iter_loop env e.e_loc Log.ExecConcrete;
              match eval_expr env e1 with
              | Normal _ ->
-                if env.rac.do_rac then
-                  check_terms (cntr_ctx "Loop invariant preservation" env) inv;
-                if env.rac.do_rac && e.e_effect.eff_oneway = Total then (
-                  let old_ts, oldies = Opt.get opt_old_variant in
-                  let vsenv =
-                    Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
-                  let env = {env with vsenv} in
-                  check_term
-                    (cntr_ctx "Loop variant decrease" ?trigger_loc:e.e_loc env)
-                    (mk_variant_term env old_ts var) );
-                (* the execution cannot continue from here *)
+                 if env.rac.do_rac then
+                   check_terms (cntr_ctx Vc.expl_loop_keep env) inv;
+                 if env.rac.do_rac && e.e_effect.eff_oneway = Total then (
+                   let old_ts, oldies = Opt.get opt_old_variant in
+                   let vsenv =
+                     Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
+                   let env = {env with vsenv} in
+                   check_term (cntr_ctx Vc.expl_loop_vari env)
+                     (mk_variant_term env e.e_loc Vc.expl_loop_vari old_ts var)
+                 );
+                 (* the execution cannot continue from here *)
                 register_stucked env e.e_loc
                   "Cannot continue after arbitrary iteration" Mid.empty;
                 raise (RACStuck (env,e.e_loc))
@@ -2319,7 +2334,7 @@ and eval_expr' env e =
     end
   | Ewhile (e1, inv, var, e2) ->
       if env.rac.do_rac then
-        check_terms (cntr_ctx "Loop invariant initialization" env) inv ;
+        check_terms (cntr_ctx Vc.expl_loop_init env) inv ;
       let rec iter () =
         let opt_old_variant =
           if env.rac.do_rac && e.e_effect.eff_oneway = Total then
@@ -2331,15 +2346,15 @@ and eval_expr' env e =
               match eval_expr env e2 with
               | Normal _ -> (* body executed normally *)
                   if env.rac.do_rac then
-                    check_terms (cntr_ctx "Loop invariant preservation" env) inv;
+                    check_terms (cntr_ctx Vc.expl_loop_keep env) inv;
                   if env.rac.do_rac && e.e_effect.eff_oneway = Total then (
                     let old_ts, oldies = Opt.get opt_old_variant in
                     let vsenv =
                       Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
                     let env = {env with vsenv} in
                     check_term
-                      (cntr_ctx "Loop variant decrease" ?trigger_loc:e.e_loc env)
-                      (mk_variant_term env old_ts var) );
+                      (cntr_ctx Vc.expl_loop_vari env)
+                      (mk_variant_term env e.e_loc Vc.expl_loop_vari old_ts var) );
                   iter ()
               | r -> r
             ) else if is_false v then (* condition false *)
@@ -2393,7 +2408,7 @@ and eval_expr' env e =
         if le a (suc b) then begin
           if env.rac.do_rac then begin
             let env = bind_vs i.pv_vs (value ty_int (Vnum a)) env in
-            check_terms (cntr_ctx "Loop invariant initialization" env) inv end;
+            check_terms (cntr_ctx Vc.expl_loop_init env) inv end;
           List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
             (Mvs.keys env.vsenv);
           let def = value ty_int (Vnum (suc b)) in
@@ -2410,17 +2425,17 @@ and eval_expr' env e =
           if le a i_bi && le i_bi b then begin
             register_iter_loop env e.e_loc Log.ExecAbstract;
             (* assert2 *)
-            let ctx = cntr_ctx "Assume loop invariant" env in
+            let ctx = cntr_ctx Vc.expl_loop_keep env in
             check_assume_terms ctx inv;
             match eval_expr env e1 with
             | Normal _ ->
                 let env = bind_vs i.pv_vs (value ty_int (Vnum (suc i_bi))) env in
                 (* assert3 *)
                 if env.rac.do_rac then
-                  check_terms (cntr_ctx "Loop invariant preservation" env) inv;
+                  check_terms (cntr_ctx Vc.expl_loop_keep env) inv;
                 let env = bind_vs i.pv_vs (value ty_int (Vnum (suc b))) env in
                 (* assert4 *)
-                let ctx = cntr_ctx "Assume loop invariant with (b+1)" env in
+                let ctx = cntr_ctx Vc.expl_loop_keep ~desc:"with (b+1)" env in
                 check_assume_terms ctx inv;
                 Normal unit_value
             | r -> r
@@ -2428,7 +2443,7 @@ and eval_expr' env e =
           else begin
             (* assert4 *)
             (* i is already equal to b + 1 *)
-            let ctx = cntr_ctx "Invariant after last iteration" env in
+            let ctx = cntr_ctx Vc.expl_loop_keep ~desc:"after last iteration" env in
             check_assume_terms ctx inv;
             Normal unit_value
           end
@@ -2449,7 +2464,7 @@ and eval_expr' env e =
       let b = big_int_of_value (get_pvs env pvs2) in
       ( if env.rac.do_rac then
           let env' = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
-          check_terms (cntr_ctx "Loop invariant initialization" env') inv ) ;
+          check_terms (cntr_ctx Vc.expl_loop_init env') inv ) ;
       let rec iter i =
         Debug.dprintf debug_trace_exec "[interp] for loop with index = %s@."
           (BigInt.to_string i) ;
@@ -2459,7 +2474,7 @@ and eval_expr' env e =
           match eval_expr env' e1 with
           | Normal _ ->
               if env.rac.do_rac then
-                check_terms (cntr_ctx "Loop invariant preservation" env') inv ;
+                check_terms (cntr_ctx Vc.expl_loop_keep env') inv ;
               iter (suc i)
           | r -> r
         ) else
@@ -2497,9 +2512,9 @@ and eval_expr' env e =
   | Eassert (kind, t) ->
       if env.rac.do_rac then begin
           match kind with
-          | Assert -> check_term (cntr_ctx "Assertion" env) t
-          | Assume -> check_assume_term (cntr_ctx "Assumption" env) t
-          | Check -> check_term (cntr_ctx "Check" env) t
+            | Assert -> check_term (cntr_ctx Vc.expl_assert env) t
+            | Assume -> check_assume_term (cntr_ctx Vc.expl_assume env) t
+            | Check -> check_term (cntr_ctx Vc.expl_check env) t
         end;
       Normal unit_value
   | Eghost e1 ->
@@ -2511,7 +2526,7 @@ and eval_expr' env e =
       let t = compute_term env t in
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
-      let ctx = cntr_ctx "absurd" ?trigger_loc:e.e_loc env in
+      let ctx = cntr_ctx Vc.expl_absurd ?loc:e.e_loc env in
       raise (Contr (ctx, t_false))
 
 and exec_match env t ebl =
@@ -2550,8 +2565,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
       else
         register_call env loc (Some rs) mvs exec_kind;
     if env.rac.do_rac then (
-      let desc = cntr_desc "Precondition" rs.rs_name in
-      let ctx = cntr_ctx desc ?trigger_loc:loc env in
+      let ctx = cntr_ctx Vc.expl_pre ?loc:loc env in
       if main_function then check_assume_terms ctx rs.rs_cty.cty_pre
       else check_terms ctx rs.rs_cty.cty_pre ) in
   match exec_kind with
@@ -2644,14 +2658,13 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                 cannot_compute "definition of routine %s could not be found"
                   rs.rs_name.id_string in
       if env.rac.do_rac then (
+        let desc = asprintf "for %a" print_rs rs in
         match res with
         | Normal v ->
-            let desc = cntr_desc "Postcondition" rs.rs_name in
-            check_posts desc loc env v rs.rs_cty.cty_post
+            check_posts Vc.expl_post ~desc None env v rs.rs_cty.cty_post
         | Excep (xs, v) ->
-            let desc = cntr_desc "Exceptional postcondition" rs.rs_name in
             let posts = Mxs.find xs rs.rs_cty.cty_xpost in
-            check_posts desc loc env v posts
+            check_posts Vc.expl_xpost ~desc loc env v posts
         | _ -> () );
       res
 
@@ -2691,11 +2704,10 @@ and exec_call_abstract ?snapshot ?loc ?rs_name env cty arg_pvs ity_result =
   let res_v =
     get_and_register_value env ~loc ?posts_vsenv res ity_result in
   (* assert2 *)
-  let msg = "Assume postcondition" in
-  let msg = match rs_name with
-    | None -> cntr_desc_str msg "anonymous function"
-    | Some name -> cntr_desc msg name in
-  let ctx = cntr_ctx msg ~trigger_loc:loc env in
+  let desc = match rs with
+    | None -> "of anonymous function"
+    | Some rs -> asprintf "of %a" print_rs rs in
+  let ctx = cntr_ctx Vc.expl_post ~desc env in
   check_assume_posts ctx res_v cty.cty_post;
   Normal res_v
 
@@ -2726,7 +2738,8 @@ let bind_globals ?rs_main mod_known env =
         let v =
           get_and_register_global env eval_expr id oexp ce.c_cty.cty_result in
         if env.rac.do_rac then (
-          let ctx = cntr_ctx "Any postcondition" env in
+          let desc = asprintf "of global value %a" print_rs rs in
+          let ctx = cntr_ctx Vc.expl_post ~desc env in
           check_assume_posts ctx v ce.c_cty.cty_post );
         bind_rs rs v env )
     | _ -> env in

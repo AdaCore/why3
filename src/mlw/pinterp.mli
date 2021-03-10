@@ -196,9 +196,10 @@ type result = private
 
 (** Context of a contradiction during RAC *)
 type cntr_ctx = private {
-  c_desc: string;
-  c_trigger_loc: Loc.position option;
-  c_env: env
+  c_attr: Ident.attribute; (** Related VC attribute *)
+  c_desc: string option; (** Additional context *)
+  c_loc: Loc.position option; (** Position if different than term *)
+  c_env: env;
 }
 
 exception CannotCompute of {reason: string}
