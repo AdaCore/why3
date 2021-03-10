@@ -2,87 +2,103 @@
 <check-ce>Validating model:
           File falseCE.mlw:
             Line 12:
-              a [@introduced] = {"type": "Integer", "val": "-2"}
-              b [@introduced] = {"type": "Integer", "val": "-2"}
+              a = {"type": "Integer", "val": "-2"}
+              b = {"type": "Integer", "val": "-2"}
             Line 15:
-              a_vc_constant [@introduced] [@model_trace:a] =
-                {"type": "Integer", "val": "0"}
-              b_vc_constant [@introduced] [@model_trace:b] =
-                {"type": "Integer", "val": "0"}
+              a_vc_constant = {"type": "Integer", "val": "0"}
+              b_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: (-2)
-<rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: (-2)
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: (-2)
+<rac-values>Value from model for parameter b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: (-2)
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: (-2)
-<rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: (-2)
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: (-2)
+<rac-values>Value from model for parameter b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: (-2)
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File falseCE.mlw:
                 Line 12:
                   a = (-2)
                   b = (-2)
-                  Execution of main function rsa's body with env:
+                  a = (-2)
+                  b = (-2)
+                  Execution of main function `rsa` with env:
                     a = (-2)
                     b = (-2)
                     zero = 0
                     one = 1
                 Line 13:
-                  Execution got stuck, Precondition of rsa with:
+                  Execution got stuck, Precondition of `rsa` with:
                     a = (-2)
                     b = (-2)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File falseCE.mlw:
                 Line 12:
                   a = (-2)
                   b = (-2)
-                  Execution of main function rsa's body with env:
+                  a = (-2)
+                  b = (-2)
+                  Execution of main function `rsa` with env:
                     a = (-2)
                     b = (-2)
                     zero = 0
                     one = 1
                 Line 13:
-                  Execution got stuck, Precondition of rsa with:
+                  Execution got stuck, Precondition of `rsa` with:
                     a = (-2)
                     b = (-2)
 <check-ce>Check model 1 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
 <check-ce>Validating model:
           File falseCE.mlw:
             Line 12:
-              a [@introduced] = {"type": "Integer", "val": "2"}
-              b [@introduced] = {"type": "Integer", "val": "2"}
+              a = {"type": "Integer", "val": "2"}
+              b = {"type": "Integer", "val": "2"}
             Line 15:
-              a_vc_constant [@introduced] [@model_trace:a] =
-                {"type": "Integer", "val": "2"}
-              b_vc_constant [@introduced] [@model_trace:b] =
-                {"type": "Integer", "val": "2"}
+              a_vc_constant = {"type": "Integer", "val": "2"}
+              b_vc_constant = {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
-<rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
+<rac-values>Value from model for parameter b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
-<rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
+<rac-values>Value from model for parameter b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File falseCE.mlw:
                 Line 12:
                   a = 2
                   b = 2
-                  Execution of main function rsa's body with env:
+                  a = 2
+                  b = 2
+                  Execution of main function `rsa` with env:
                     a = 2
                     b = 2
                     zero = 0
@@ -92,13 +108,17 @@
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File falseCE.mlw:
                 Line 12:
                   a = 2
                   b = 2
-                  Execution of main function rsa's body with env:
+                  a = 2
+                  b = 2
+                  Execution of main function `rsa` with env:
                     a = 2
                     b = 2
                     zero = 0
@@ -108,31 +128,37 @@
 <check-ce>Validating model:
           File falseCE.mlw:
             Line 12:
-              a [@introduced] = {"type": "Integer", "val": "2"}
-              b [@introduced] = {"type": "Integer", "val": "2"}
+              a = {"type": "Integer", "val": "2"}
+              b = {"type": "Integer", "val": "2"}
             Line 15:
-              a_vc_constant [@introduced] [@model_trace:a] =
-                {"type": "Integer", "val": "2"}
-              b_vc_constant [@introduced] [@model_trace:b] =
-                {"type": "Integer", "val": "2"}
+              a_vc_constant = {"type": "Integer", "val": "2"}
+              b_vc_constant = {"type": "Integer", "val": "2"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
-<rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
+<rac-values>Value from model for parameter b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
-<rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
+<rac-values>Value from model for parameter b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File falseCE.mlw:
                 Line 12:
                   a = 2
                   b = 2
-                  Execution of main function rsa's body with env:
+                  a = 2
+                  b = 2
+                  Execution of main function `rsa` with env:
                     a = 2
                     b = 2
                     zero = 0
@@ -142,13 +168,17 @@
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File falseCE.mlw:
                 Line 12:
                   a = 2
                   b = 2
-                  Execution of main function rsa's body with env:
+                  a = 2
+                  b = 2
+                  Execution of main function `rsa` with env:
                     a = 2
                     b = 2
                     zero = 0
@@ -163,7 +193,7 @@
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
 Goal Assertion from verification condition rsa'vc.
-Prover result is: Unknown (unknown + incomplete) (0.08s, 15056 steps).
+Prover result is: Unknown (unknown + incomplete) (0.11s, 15056 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

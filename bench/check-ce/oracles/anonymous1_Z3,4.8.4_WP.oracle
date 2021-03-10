@@ -2,28 +2,35 @@
 <check-ce>Validating model:
           
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter x, continue with default value 0.
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter x, continue with default value 0.
-<rac-values>Value computed from post condition for result of h at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Execution of main function f's body with env:
+                  x = 0
+                  Execution of main function `f` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of h with args:
+                  Concrete execution of function `h` with args:
                     y = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 2
                 Line 6:
@@ -34,17 +41,20 @@
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Execution of main function f's body with env:
+                  x = 0
+                  Execution of main function `f` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of h with args:
+                  Abstract execution of function `h` with args:
                     y = 0
                   result = 2
                 Line 6:
@@ -55,33 +65,39 @@
 <check-ce>Validating model:
           File anonymous1.mlw:
             Line 4:
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             Line 6:
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "0"}
+              x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
-<rac-values>Value computed from post condition for result of h at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Execution of main function f's body with env:
+                  x = 0
+                  Execution of main function `f` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of h with args:
+                  Concrete execution of function `h` with args:
                     y = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 2
                 Line 6:
@@ -92,17 +108,20 @@
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Execution of main function f's body with env:
+                  x = 0
+                  Execution of main function `f` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of h with args:
+                  Abstract execution of function `h` with args:
                     y = 0
                   result = 2
                 Line 6:
@@ -113,33 +132,39 @@
 <check-ce>Validating model:
           File anonymous1.mlw:
             Line 4:
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             Line 6:
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "0"}
+              x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
-<rac-values>Value computed from post condition for result of h at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Execution of main function f's body with env:
+                  x = 0
+                  Execution of main function `f` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of h with args:
+                  Concrete execution of function `h` with args:
                     y = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 2
                 Line 6:
@@ -150,17 +175,20 @@
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous1.mlw:
                 Line 4:
                   x = 0
-                  Execution of main function f's body with env:
+                  x = 0
+                  Execution of main function `f` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of h with args:
+                  Abstract execution of function `h` with args:
                     y = 0
                   result = 2
                 Line 6:
@@ -176,25 +204,28 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
 Goal Assertion from verification condition f'vc.
-Prover result is: Unknown (sat) (0.02s, 655 steps).
+Prover result is: Unknown (sat) (0.01s, 655 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File anonymous1.mlw:
   Line 4:
     x = 0
-    Execution of main function f's body with env:
+    x = 0
+    Execution of main function `f` with env:
       x = 0
       zero = 0
       one = 1
   Line 5:
-    Concrete execution of h with args:
+    Concrete execution of function `h` with args:
       y = 0
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = 2
   Line 6:

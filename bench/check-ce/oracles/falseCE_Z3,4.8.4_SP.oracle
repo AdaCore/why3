@@ -2,53 +2,65 @@
 <check-ce>Validating model:
           File falseCE.mlw:
             Line 12:
-              a [@introduced] = {"type": "Integer", "val": "1"}
-              b [@introduced] = {"type": "Integer", "val": "12166397"}
+              a = {"type": "Integer", "val": "1"}
+              b = {"type": "Integer", "val": "12166397"}
             Line 15:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 1
-<rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 12166397
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 1
+<rac-values>Value from model for parameter b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 12166397
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 1
-<rac-values>Value imported for b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 12166397
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter a at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 1
+<rac-values>Value from model for parameter b at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 12166397
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File falseCE.mlw:
                 Line 12:
                   a = 1
                   b = 12166397
-                  Execution of main function rsa's body with env:
+                  a = 1
+                  b = 12166397
+                  Execution of main function `rsa` with env:
                     a = 1
                     b = 12166397
                     zero = 0
                     one = 1
                 Line 13:
-                  Execution got stuck, Precondition of rsa with:
+                  Execution got stuck, Precondition of `rsa` with:
                     a = 1
                     b = 12166397
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/falseCE.mlw", line 13, characters 13-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File falseCE.mlw:
                 Line 12:
                   a = 1
                   b = 12166397
-                  Execution of main function rsa's body with env:
+                  a = 1
+                  b = 12166397
+                  Execution of main function `rsa` with env:
                     a = 1
                     b = 12166397
                     zero = 0
                     one = 1
                 Line 13:
-                  Execution got stuck, Precondition of rsa with:
+                  Execution got stuck, Precondition of `rsa` with:
                     a = 1
                     b = 12166397
 <check-ce>Models:
@@ -56,7 +68,7 @@
     Summary: Sorry, we don't have a good counterexample for you :(
 File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
 Goal Assertion from verification condition rsa'vc.
-Prover result is: Step limit exceeded (0.07s).
+Prover result is: Step limit exceeded (0.08s).
 Sorry, we don't have a good counterexample for you :(
 
 

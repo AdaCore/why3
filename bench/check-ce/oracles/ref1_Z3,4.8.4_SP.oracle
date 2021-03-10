@@ -4,33 +4,37 @@ warning: unused variable x
 <check-ce>Validating model:
           
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/ref1.mlw", line 5, characters 10-15: {contents=
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/ref1.mlw", line 5, characters 10-15: {contents=
                                                                     1}
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              Unknown location:
+                  _ = ()
               File ref1.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 6:
                   Property failure, Assertion with:
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              Unknown location:
+                  _ = ()
               File ref1.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                 Line 5:
-                  Abstract execution of ref with args:
+                  Abstract execution of function `ref` with args:
                     contents = 1
                   result = {contents= 1}
                 Line 6:
@@ -40,18 +44,20 @@ warning: unused variable x
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/ref1.mlw", line 6, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (0.91s).
+Prover result is: Step limit exceeded (0.84s).
 The program does not comply to the verification goal, for example during the
   following execution:
+Unknown location:
+    _ = ()
 File ref1.mlw:
   Line 4:
     _ = ()
-    Execution of main function f's body with env:
+    Execution of main function `f` with env:
       _ = ()
   Line 5:
-    Concrete execution of ref with args:
+    Concrete execution of function `ref` with args:
       contents = 1
-    Concrete execution of ref'mk with args:
+    Concrete execution of function `ref'mk` with args:
       contents = 1
   Line 6:
     Property failure, Assertion with:

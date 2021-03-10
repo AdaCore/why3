@@ -39,16 +39,6 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File array_mono.mlw:
   Line 25:
-    old a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]
-      [@at:'Old:loc:bench/ce/array_mono.mlw:26] [@introduced] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "elts",
-            "value":
-             {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "4"}}]}},
-           {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
     a [@introduced] =
       {"type": "Record",
        "val":
@@ -60,6 +50,16 @@ File array_mono.mlw:
                [{"indice": {"type": "Integer", "val": "0"},
                  "value": {"type": "Integer", "val": "42"}},
                 {"others": {"type": "Integer", "val": "4"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
+    old a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]
+      [@at:'Old:loc:bench/ce/array_mono.mlw:26] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "4"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 38:
     a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]

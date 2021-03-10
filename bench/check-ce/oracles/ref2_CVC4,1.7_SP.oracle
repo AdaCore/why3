@@ -2,7 +2,7 @@
 <check-ce>Validating model:
           File ref2.mlw:
             Line 6:
-              x [@field:0:contents] [@introduced] =
+              x =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -11,38 +11,40 @@
             Line 7:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
                                                                     1}
-<rac-values>Value from model for x at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
+<rac-values>Value from model for variable x at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
                                                                     0}
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              Unknown location:
+                  _ = ()
               File ref2.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 6:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 1}
                     v = 2
                 Line 7:
                   Property failure, Assertion with:
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/ref2.mlw", line 6, characters 2-8)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 1 ("bench/check-ce/ref2.mlw", line 7, characters 11-16)
 <check-ce>Validating model:
           File ref2.mlw:
             Line 6:
-              x [@field:0:contents] [@introduced] =
+              x =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -51,44 +53,48 @@
             Line 7:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
                                                                     1}
-<rac-values>Value from model for x at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
+<rac-values>Value from model for variable x at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
                                                                     2}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
+<rac-values>Type default value for variable result at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              Unknown location:
+                  _ = ()
               File ref2.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 6:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 1}
                     v = 2
                 Line 7:
                   Property failure, Assertion with:
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              Unknown location:
+                  _ = ()
               File ref2.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                 Line 5:
-                  Abstract execution of ref with args:
+                  Abstract execution of function `ref` with args:
                     contents = 1
                   result = {contents= 1}
                 Line 6:
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 1}
                     v = 2
                   x = {contents= 2}
@@ -99,7 +105,7 @@
 <check-ce>Validating model:
           File ref2.mlw:
             Line 6:
-              x [@field:0:contents] [@introduced] =
+              x =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -108,44 +114,48 @@
             Line 7:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
                                                                     1}
-<rac-values>Value from model for x at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
+<rac-values>Value from model for variable x at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
                                                                     2}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
+<rac-values>Type default value for variable result at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
+              Unknown location:
+                  _ = ()
               File ref2.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 6:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 1}
                     v = 2
                 Line 7:
                   Property failure, Assertion with:
             - Abstract: good model (Abstract RAC confirms the counter-example)
+              Unknown location:
+                  _ = ()
               File ref2.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                 Line 5:
-                  Abstract execution of ref with args:
+                  Abstract execution of function `ref` with args:
                     contents = 1
                   result = {contents= 1}
                 Line 6:
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 1}
                     v = 2
                   x = {contents= 2}
@@ -161,21 +171,23 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/ref2.mlw", line 7, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.05s, 1038 steps).
+Prover result is: Unknown (unknown + incomplete) (0.02s, 1038 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
+Unknown location:
+    _ = ()
 File ref2.mlw:
   Line 4:
     _ = ()
-    Execution of main function f's body with env:
+    Execution of main function `f` with env:
       _ = ()
   Line 5:
-    Concrete execution of ref with args:
+    Concrete execution of function `ref` with args:
       contents = 1
-    Concrete execution of ref'mk with args:
+    Concrete execution of function `ref'mk` with args:
       contents = 1
   Line 6:
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 1}
       v = 2
   Line 7:

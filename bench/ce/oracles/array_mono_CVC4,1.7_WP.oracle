@@ -51,8 +51,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File array_mono.mlw:
   Line 25:
-    old a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]
-      [@at:'Old:loc:bench/ce/array_mono.mlw:26] [@introduced] =
+    a [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
@@ -66,7 +65,8 @@ File array_mono.mlw:
                  "value": {"type": "Integer", "val": "42"}},
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
-    a [@introduced] =
+    old a [@at:'Old] [@at:'Old:loc:bench/ce/array_mono.mlw:25]
+      [@at:'Old:loc:bench/ce/array_mono.mlw:26] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":

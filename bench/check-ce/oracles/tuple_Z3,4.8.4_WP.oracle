@@ -2,210 +2,234 @@
 <check-ce>Validating model:
           File tuple.mlw:
             Line 5:
-              b [@introduced] = {"type": "Integer", "val": "1"}
+              b = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter x, continue with default value (0, 0).
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter x at "bench/check-ce/tuple.mlw", line 4, characters 10-11: (0,
+                                                                    0)
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter x, continue with default value (0, 0).
-<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
-<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter x at "bench/check-ce/tuple.mlw", line 4, characters 10-11: (0,
+                                                                    0)
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Execution of main function swap's body with env:
+                  x = (0, 0)
+                  Execution of main function `swap` with env:
                     x = (0, 0)
                     zero = 0
                     one = 1
                 Line 7:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 0
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
               File tuple.mlw:
                 Line 7:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 0
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
               File tuple.mlw:
                 Line 7:
-                  Concrete execution of Tuple2 with args:
+                  Concrete execution of function `Tuple2` with args:
                     u = 0
                     u = 1
                 Line 5:
-                  Property failure, Postcondition of swap with:
+                  Property failure, Postcondition of `swap` with:
                     x = (0, 0)
                     result = (0, 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Execution of main function swap's body with env:
+                  x = (0, 0)
+                  Execution of main function `swap` with env:
                     x = (0, 0)
                     zero = 0
                     one = 1
                 Line 7:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
-                  Abstract execution of (-) with args:
+                  Abstract execution of function `(-)` with args:
                     x = 0
                     y = 0
                   result = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
-                  Abstract execution of (-) with args:
+                  Abstract execution of function `(-)` with args:
                     x = 0
                     y = 0
                   result = 0
-                  Concrete execution of Tuple2 with args:
+                  Concrete execution of function `Tuple2` with args:
                     u = 0
                     u = 1
                 Line 5:
-                  Property failure, Postcondition of swap with:
+                  Property failure, Postcondition of `swap` with:
                     x = (0, 0)
                     result = (0, 1)
 <check-ce>Check model 1 ("bench/check-ce/tuple.mlw", line 5, characters 38-43)
 <check-ce>Validating model:
           File tuple.mlw:
             Line 5:
-              a [@introduced] = {"type": "Integer", "val": "0"}
-              b [@introduced] = {"type": "Integer", "val": "2"}
-              result [@introduced] = {"type": "Integer", "val": "1"}
+              a = {"type": "Integer", "val": "0"}
+              b = {"type": "Integer", "val": "2"}
+              result = {"type": "Integer", "val": "1"}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter x, continue with default value (0, 0).
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter x at "bench/check-ce/tuple.mlw", line 4, characters 10-11: (0,
+                                                                    0)
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter x, continue with default value (0, 0).
-<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
-<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter x at "bench/check-ce/tuple.mlw", line 4, characters 10-11: (0,
+                                                                    0)
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/tuple.mlw", line 7, characters 14-23: 0
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/tuple.mlw", line 7, characters 3-12: 0
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Execution of main function swap's body with env:
+                  x = (0, 0)
+                  Execution of main function `swap` with env:
                     x = (0, 0)
                     zero = 0
                     one = 1
                 Line 7:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 0
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
               File tuple.mlw:
                 Line 7:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 0
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
               File tuple.mlw:
                 Line 7:
-                  Concrete execution of Tuple2 with args:
+                  Concrete execution of function `Tuple2` with args:
                     u = 0
                     u = 1
                 Line 5:
-                  Property failure, Postcondition of swap with:
+                  Property failure, Postcondition of `swap` with:
                     x = (0, 0)
                     result = (0, 1)
             - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/tuple.mlw", line 5, characters 12-43)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File tuple.mlw:
                 Line 4:
                   x = (0, 0)
-                  Execution of main function swap's body with env:
+                  x = (0, 0)
+                  Execution of main function `swap` with env:
                     x = (0, 0)
                     zero = 0
                     one = 1
                 Line 7:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
-                  Abstract execution of (-) with args:
+                  Abstract execution of function `(-)` with args:
                     x = 0
                     y = 0
                   result = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
-                  Abstract execution of (-) with args:
+                  Abstract execution of function `(-)` with args:
                     x = 0
                     y = 0
                   result = 0
-                  Concrete execution of Tuple2 with args:
+                  Concrete execution of function `Tuple2` with args:
                     u = 0
                     u = 1
                 Line 5:
-                  Property failure, Postcondition of swap with:
+                  Property failure, Postcondition of `swap` with:
                     x = (0, 0)
                     result = (0, 1)
 <check-ce>Models:
@@ -215,60 +239,63 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/tuple.mlw", line 5, characters 38-43:
 Goal Postcondition from verification condition swap'vc.
-Prover result is: Step limit exceeded (0.26s).
+Prover result is: Step limit exceeded (0.34s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File tuple.mlw:
   Line 4:
     x = (0, 0)
-    Execution of main function swap's body with env:
+    x = (0, 0)
+    Execution of main function `swap` with env:
       x = (0, 0)
       zero = 0
       one = 1
   Line 7:
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = 0
-    Concrete execution of (-) with args:
+    Concrete execution of function `(-)` with args:
       x = 0
       y = 0
 File int.mlw:
   Line 23:
-    Concrete execution of (-_) with args:
+    Concrete execution of function `(-_)` with args:
       _ = 0
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = 0
 File tuple.mlw:
   Line 7:
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = 1
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = 0
-    Concrete execution of (-) with args:
+    Concrete execution of function `(-)` with args:
       x = 0
       y = 0
 File int.mlw:
   Line 23:
-    Concrete execution of (-_) with args:
+    Concrete execution of function `(-_)` with args:
       _ = 0
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = 0
 File tuple.mlw:
   Line 7:
-    Concrete execution of Tuple2 with args:
+    Concrete execution of function `Tuple2` with args:
       u = 0
       u = 1
   Line 5:
-    Property failure, Postcondition of swap with:
+    Property failure, Postcondition of `swap` with:
       x = (0, 0)
       result = (0, 1)
 

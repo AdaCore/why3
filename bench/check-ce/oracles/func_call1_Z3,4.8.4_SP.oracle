@@ -12,14 +12,14 @@ Prover result is: Valid (0.00s, 24 steps).
 <check-ce>Validating model:
           File func_call1.mlw:
             Line 7:
-              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 14:
-              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -28,52 +28,66 @@ Prover result is: Valid (0.00s, 24 steps).
             Line 15:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value from model for z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global z at "bench/check-ce/func_call1.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of g at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: 3
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<check-ce>Interpreting abstractly
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global z at "bench/check-ce/func_call1.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value from model for variable z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: {contents=
+                                                                    0}
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: 3
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call1.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = 0
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
+                  z = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File func_call1.mlw:
                 Line 12:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of g with args:
+                  Concrete execution of function `g` with args:
                     x = 2
                 Line 9:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 10:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 2
                     _ = 1
                 Line 14:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 3
                     _ = 3
                 Line 12:
@@ -82,120 +96,137 @@ Prover result is: Valid (0.00s, 24 steps).
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call1.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = 0
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
+                  z = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File func_call1.mlw:
                 Line 12:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
-                  Abstract execution of g with args:
+                  Abstract execution of function `g` with args:
                     x = 2
                   z = {contents= 0}
                   result = 3
                 Line 7:
-                  Execution got stuck, Assume postcondition of g with:
+                  Execution got stuck, Assume postcondition of `g` with:
                     z = {contents= 0}
                     z = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/func_call1.mlw", line 15, characters 11-16)
 <check-ce>Validating model:
           File func_call1.mlw:
             Line 7:
-              z [@at:'Old] [@at:'Old:loc:bench/check-ce/func_call1.mlw:7]
-                [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 13:
-              z [@at:'Old] [@at:'Old:loc:bench/check-ce/func_call1.mlw:7]
-                [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 14:
-              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 15:
-              z_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:z] =
+              z_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global z at "bench/check-ce/func_call1.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value from model for z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/func_call1.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global z at "bench/check-ce/func_call1.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value from model for variable z at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: {contents=
                                                                     2}
-<rac-values>Value computed from post condition for result of g at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: 3
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/func_call1.mlw", line 14, characters 10-15: 3
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call1.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = 0
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
+                  z = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File func_call1.mlw:
                 Line 12:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of g with args:
+                  Concrete execution of function `g` with args:
                     x = 2
                 Line 9:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 10:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 2
                     _ = 1
                 Line 14:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 3
                     _ = 3
                 Line 12:
@@ -204,30 +235,36 @@ Prover result is: Valid (0.00s, 24 steps).
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call1.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = 0
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
+                  z = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File func_call1.mlw:
                 Line 12:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 14:
-                  Abstract execution of g with args:
+                  Abstract execution of function `g` with args:
                     x = 2
                   z = {contents= 2}
                   result = 3
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 3
                     _ = 3
                 Line 15:
@@ -240,36 +277,42 @@ Prover result is: Valid (0.00s, 24 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/func_call1.mlw", line 15, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (0.81s).
+Prover result is: Step limit exceeded (0.77s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File func_call1.mlw:
   Line 3:
     Constant z initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = 0
-    Concrete execution of ref with args:
+    Concrete execution of function `ref` with args:
       contents = 0
-    Concrete execution of ref'mk with args:
+    Concrete execution of function `ref'mk` with args:
       contents = 0
+    z = {contents= 0}
+Unknown location:
+    _ = ()
+File func_call1.mlw:
   Line 12:
     _ = ()
-    Execution of main function f's body with env:
+    Execution of main function `f` with env:
       z = {contents= 0}
       _ = ()
       zero = 0
       one = 1
   Line 14:
-    Abstract execution of g with args:
+    Abstract execution of function `g` with args:
       x = 2
     z = {contents= 2}
     result = 3
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 3
       _ = 3
   Line 15:

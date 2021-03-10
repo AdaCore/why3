@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Goal Postcondition from verification condition g1'vc.
-Prover result is: Valid (0.05s, 899 steps).
+Prover result is: Valid (0.02s, 899 steps).
 
 File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
 Goal Precondition from verification condition f1'vc.
@@ -10,203 +10,221 @@ Prover result is: Valid (0.02s, 1094 steps).
 <check-ce>Validating model:
           File func_call5.mlw:
             Line 8:
-              x [@introduced] = {"type": "Integer", "val": "-1"}
-              z [@field:0:contents] [@introduced] =
+              x = {"type": "Integer", "val": "-1"}
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 11:
-              x [@introduced] = {"type": "Integer", "val": "-1"}
+              x = {"type": "Integer", "val": "-1"}
             Line 13:
-              z [@field:0:contents] [@introduced] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 14:
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "0"}
-              z_vc_constant [@field:0:contents] [@introduced]
-                [@model_trace:z] =
+              x_vc_constant = {"type": "Integer", "val": "0"}
+              z_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: (-1)
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: (-1)
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: (-1)
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: (-1)
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 12, characters 13-18)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 11:
                   x = (-1)
-                  Execution of main function f1's body with env:
+                  x = (-1)
+                  Execution of main function `f1` with env:
                     x = (-1)
                     zero = 0
                     one = 1
                 Line 12:
-                  Execution got stuck, Precondition of f1 with:
+                  Execution got stuck, Precondition of `f1` with:
                     x = (-1)
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 12, characters 13-18)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 11:
                   x = (-1)
-                  Execution of main function f1's body with env:
+                  x = (-1)
+                  Execution of main function `f1` with env:
                     x = (-1)
                     zero = 0
                     one = 1
                 Line 12:
-                  Execution got stuck, Precondition of f1 with:
+                  Execution got stuck, Precondition of `f1` with:
                     x = (-1)
 <check-ce>Check model 1 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Validating model:
           File func_call5.mlw:
             Line 8:
-              x [@introduced] = {"type": "Integer", "val": "1"}
-              z [@field:0:contents] [@introduced] =
+              x = {"type": "Integer", "val": "1"}
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 11:
-              x [@introduced] = {"type": "Integer", "val": "1"}
+              x = {"type": "Integer", "val": "1"}
             Line 13:
-              z [@field:0:contents] [@introduced] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 14:
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "1"}
-              z_vc_constant [@field:0:contents] [@introduced]
-                [@model_trace:z] =
+              x_vc_constant = {"type": "Integer", "val": "1"}
+              z_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 11:
                   x = 1
-                  Execution of main function f1's body with env:
+                  x = 1
+                  Execution of main function `f1` with env:
                     x = 1
                     zero = 0
                     one = 1
                 Line 13:
-                  Concrete execution of g1 with args:
+                  Concrete execution of function `g1` with args:
                     y = 1
                 Line 9:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 11:
                   Execution of main function terminated normally
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Validating model:
           File func_call5.mlw:
             Line 8:
-              x [@introduced] = {"type": "Integer", "val": "1"}
-              z [@field:0:contents] [@introduced] =
+              x = {"type": "Integer", "val": "1"}
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 11:
-              x [@introduced] = {"type": "Integer", "val": "1"}
+              x = {"type": "Integer", "val": "1"}
             Line 13:
-              z [@field:0:contents] [@introduced] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 14:
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "1"}
-              z_vc_constant [@field:0:contents] [@introduced]
-                [@model_trace:z] =
+              x_vc_constant = {"type": "Integer", "val": "1"}
+              z_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 11:
                   x = 1
-                  Execution of main function f1's body with env:
+                  x = 1
+                  Execution of main function `f1` with env:
                     x = 1
                     zero = 0
                     one = 1
                 Line 13:
-                  Concrete execution of g1 with args:
+                  Concrete execution of function `g1` with args:
                     y = 1
                 Line 9:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 11:
                   Execution of main function terminated normally
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
     Summary: Sorry, we don't have a good counterexample for you :(
 - Checked model 1 (Concrete: bad model, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Abstract RAC terminated because missing value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
+    (Abstract RAC terminated because Missing value for variable result)
 - Selected model 2 (Concrete: bad model, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Abstract RAC terminated because missing value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
+    (Abstract RAC terminated because Missing value for variable result)
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
 Goal Assertion from verification condition f1'vc.
 Prover result is: Unknown (unknown + incomplete) (0.03s, 6212 steps).
 The following counterexample model could not be verified
-  (Abstract RAC terminated because missing value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14):
+  (Abstract RAC terminated because Missing value for variable result):
 File func_call5.mlw:
   Line 8:
     x = 1
@@ -223,40 +241,46 @@ File func_call5.mlw:
 <check-ce>Validating model:
           File func_call5.mlw:
             Line 18:
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             Line 20:
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "0"}
+              x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
-<rac-values>Value computed from post condition for result of g2 at "bench/check-ce/func_call5.mlw", line 19, characters 10-14: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14: {contents=
                                                                     1}
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Execution of main function f2's body with env:
+                  x = 0
+                  Execution of main function `f2` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 19:
-                  Concrete execution of g2 with args:
+                  Concrete execution of function `g2` with args:
                     y = 0
                 Line 16:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 20:
                   Property failure, Assertion with:
@@ -266,17 +290,20 @@ File func_call5.mlw:
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Execution of main function f2's body with env:
+                  x = 0
+                  Execution of main function `f2` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 19:
-                  Abstract execution of g2 with args:
+                  Abstract execution of function `g2` with args:
                     y = 0
                   result = {contents= 1}
                 Line 20:
@@ -287,40 +314,46 @@ File func_call5.mlw:
 <check-ce>Validating model:
           File func_call5.mlw:
             Line 18:
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             Line 20:
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "0"}
+              x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
-<rac-values>Value computed from post condition for result of g2 at "bench/check-ce/func_call5.mlw", line 19, characters 10-14: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14: {contents=
                                                                     1}
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Execution of main function f2's body with env:
+                  x = 0
+                  Execution of main function `f2` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 19:
-                  Concrete execution of g2 with args:
+                  Concrete execution of function `g2` with args:
                     y = 0
                 Line 16:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 20:
                   Property failure, Assertion with:
@@ -330,17 +363,20 @@ File func_call5.mlw:
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Execution of main function f2's body with env:
+                  x = 0
+                  Execution of main function `f2` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 19:
-                  Abstract execution of g2 with args:
+                  Abstract execution of function `g2` with args:
                     y = 0
                   result = {contents= 1}
                 Line 20:
@@ -351,40 +387,46 @@ File func_call5.mlw:
 <check-ce>Validating model:
           File func_call5.mlw:
             Line 18:
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             Line 20:
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "0"}
+              x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
-<rac-values>Value computed from post condition for result of g2 at "bench/check-ce/func_call5.mlw", line 19, characters 10-14: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14: {contents=
                                                                     1}
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Execution of main function f2's body with env:
+                  x = 0
+                  Execution of main function `f2` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 19:
-                  Concrete execution of g2 with args:
+                  Concrete execution of function `g2` with args:
                     y = 0
                 Line 16:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 20:
                   Property failure, Assertion with:
@@ -394,17 +436,20 @@ File func_call5.mlw:
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 18:
                   x = 0
-                  Execution of main function f2's body with env:
+                  x = 0
+                  Execution of main function `f2` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 19:
-                  Abstract execution of g2 with args:
+                  Abstract execution of function `g2` with args:
                     y = 0
                   result = {contents= 1}
                 Line 20:
@@ -420,31 +465,34 @@ File func_call5.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
 Goal Assertion from verification condition f2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 5935 steps).
+Prover result is: Unknown (unknown + incomplete) (0.05s, 5935 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File func_call5.mlw:
   Line 18:
     x = 0
-    Execution of main function f2's body with env:
+    x = 0
+    Execution of main function `f2` with env:
       x = 0
       zero = 0
       one = 1
   Line 19:
-    Concrete execution of g2 with args:
+    Concrete execution of function `g2` with args:
       y = 0
   Line 16:
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = 1
-    Concrete execution of ref with args:
+    Concrete execution of function `ref` with args:
       contents = 1
-    Concrete execution of ref'mk with args:
+    Concrete execution of function `ref'mk` with args:
       contents = 1
   Line 20:
     Property failure, Assertion with:

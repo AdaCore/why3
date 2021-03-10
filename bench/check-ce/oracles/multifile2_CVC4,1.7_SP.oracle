@@ -2,182 +2,200 @@
 <check-ce>Validating model:
           File multifile2.mlw:
             Line 7:
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             Line 8:
-              result [@introduced] = {"type": "Integer", "val": "0"}
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "0"}
+              x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File multifile2.mlw:
                 Line 7:
                   x = 0
-                  Execution of main function f's body with env:
+                  x = 0
+                  Execution of main function `f` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 9:
-                  Concrete execution of incr with args:
+                  Concrete execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of decr with args:
+                  Concrete execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
                 Line 7:
                   Execution of main function terminated normally
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 <check-ce>Validating model:
           File multifile2.mlw:
             Line 7:
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             Line 8:
-              result [@introduced] = {"type": "Integer", "val": "2"}
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "2"}
+              x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File multifile2.mlw:
                 Line 7:
                   x = 0
-                  Execution of main function f's body with env:
+                  x = 0
+                  Execution of main function `f` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 9:
-                  Concrete execution of incr with args:
+                  Concrete execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of decr with args:
+                  Concrete execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
                 Line 7:
                   Execution of main function terminated normally
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 <check-ce>Validating model:
           File multifile2.mlw:
             Line 7:
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             Line 8:
-              result [@introduced] = {"type": "Integer", "val": "2"}
-              x_vc_constant [@introduced] [@model_trace:x] =
-                {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "2"}
+              x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File multifile2.mlw:
                 Line 7:
                   x = 0
-                  Execution of main function f's body with env:
+                  x = 0
+                  Execution of main function `f` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 9:
-                  Concrete execution of incr with args:
+                  Concrete execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of decr with args:
+                  Concrete execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
                 Line 7:
                   Execution of main function terminated normally
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+    (Abstract RAC terminated because Missing value for variable result)
 - Checked model 1 (Concrete: bad model, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+    (Abstract RAC terminated because Missing value for variable result)
 - Selected model 2 (Concrete: bad model, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+    (Abstract RAC terminated because Missing value for variable result)
 File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
 Goal Postcondition from verification condition f'vc.
 Prover result is: Unknown (sat) (0.06s, 4933 steps).
 The following counterexample model could not be verified
-  (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 9, characters 2-8):
+  (Abstract RAC terminated because Missing value for variable result):
 File multifile2.mlw:
   Line 7:
     x = 0
@@ -189,184 +207,202 @@ File multifile2.mlw:
 <check-ce>Validating model:
           File multifile1.mlw:
             Line 10:
-              result [@introduced] = {"type": "Integer", "val": "0"}
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             File multifile2.mlw:
               Line 12:
-                x [@introduced] = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
               Line 13:
-                result [@introduced] = {"type": "Integer", "val": "0"}
-                x_vc_constant [@introduced] [@model_trace:x] =
-                  {"type": "Integer", "val": "0"}
+                result = {"type": "Integer", "val": "0"}
+                x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File multifile2.mlw:
                 Line 12:
                   x = 0
-                  Execution of main function g's body with env:
+                  x = 0
+                  Execution of main function `g` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of incr with args:
+                  Concrete execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of decr with args:
+                  Concrete execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
                 Line 13:
-                  Property failure, Postcondition of g with:
+                  Property failure, Postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 <check-ce>Validating model:
           File multifile1.mlw:
             Line 10:
-              result [@introduced] = {"type": "Integer", "val": "1"}
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "1"}
+              x = {"type": "Integer", "val": "0"}
             File multifile2.mlw:
               Line 12:
-                x [@introduced] = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
               Line 13:
-                result [@introduced] = {"type": "Integer", "val": "1"}
-                x_vc_constant [@introduced] [@model_trace:x] =
-                  {"type": "Integer", "val": "0"}
+                result = {"type": "Integer", "val": "1"}
+                x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File multifile2.mlw:
                 Line 12:
                   x = 0
-                  Execution of main function g's body with env:
+                  x = 0
+                  Execution of main function `g` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of incr with args:
+                  Concrete execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of decr with args:
+                  Concrete execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
                 Line 13:
-                  Property failure, Postcondition of g with:
+                  Property failure, Postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 <check-ce>Validating model:
           File multifile1.mlw:
             Line 10:
-              result [@introduced] = {"type": "Integer", "val": "1"}
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "1"}
+              x = {"type": "Integer", "val": "0"}
             File multifile2.mlw:
               Line 12:
-                x [@introduced] = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
               Line 13:
-                result [@introduced] = {"type": "Integer", "val": "1"}
-                x_vc_constant [@introduced] [@model_trace:x] =
-                  {"type": "Integer", "val": "0"}
+                result = {"type": "Integer", "val": "1"}
+                x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <check-ce>Result of checking model 2:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File multifile2.mlw:
                 Line 12:
                   x = 0
-                  Execution of main function g's body with env:
+                  x = 0
+                  Execution of main function `g` with env:
                     x = 0
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of incr with args:
+                  Concrete execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of decr with args:
+                  Concrete execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
                 Line 13:
-                  Property failure, Postcondition of g with:
+                  Property failure, Postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Models:
 - Selected model 0 (Concrete: good model, Abstract: don't know)
@@ -377,47 +413,50 @@ File multifile2.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/multifile2.mlw", line 13, characters 12-26:
 Goal Postcondition from verification condition g'vc.
-Prover result is: Unknown (sat) (0.05s, 4862 steps).
+Prover result is: Unknown (sat) (0.03s, 4862 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File multifile2.mlw:
   Line 12:
     x = 0
-    Execution of main function g's body with env:
+    x = 0
+    Execution of main function `g` with env:
       x = 0
       zero = 0
       one = 1
   Line 14:
-    Concrete execution of incr with args:
+    Concrete execution of function `incr` with args:
       x = 0
 File multifile1.mlw:
   Line 11:
-    Concrete execution of decr with args:
+    Concrete execution of function `decr` with args:
       x = 0
   Line 7:
-    Concrete execution of (-) with args:
+    Concrete execution of function `(-)` with args:
       x = 0
       y = 1
 File int.mlw:
   Line 23:
-    Concrete execution of (-_) with args:
+    Concrete execution of function `(-_)` with args:
       _ = 1
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = (-1)
 File multifile1.mlw:
   Line 11:
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = (-1)
       _ = 2
 File multifile2.mlw:
   Line 13:
-    Property failure, Postcondition of g with:
+    Property failure, Postcondition of `g` with:
       x = 0
       result = 1
 
@@ -425,83 +464,92 @@ File multifile2.mlw:
 <check-ce>Validating model:
           File multifile1.mlw:
             Line 14:
-              result [@introduced] = {"type": "Integer", "val": "0"}
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
             File multifile2.mlw:
               Line 18:
-                x [@introduced] = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
               Line 19:
-                result [@introduced] = {"type": "Integer", "val": "0"}
-                x_vc_constant [@introduced] [@model_trace:x] =
-                  {"type": "Integer", "val": "0"}
+                result = {"type": "Integer", "val": "0"}
+                x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <check-ce>Result of checking model 0:
-            - Concrete: don't know (Concrete RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Concrete: don't know (Concrete RAC terminated because Missing value for variable result)
               
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>Validating model:
           File multifile1.mlw:
             Line 14:
-              result [@introduced] = {"type": "Integer", "val": "1"}
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "1"}
+              x = {"type": "Integer", "val": "0"}
             File multifile2.mlw:
               Line 18:
-                x [@introduced] = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
               Line 19:
-                result [@introduced] = {"type": "Integer", "val": "1"}
-                x_vc_constant [@introduced] [@model_trace:x] =
-                  {"type": "Integer", "val": "0"}
+                result = {"type": "Integer", "val": "1"}
+                x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <check-ce>Result of checking model 1:
-            - Concrete: don't know (Concrete RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Concrete: don't know (Concrete RAC terminated because Missing value for variable result)
               
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>Validating model:
           File multifile1.mlw:
             Line 14:
-              result [@introduced] = {"type": "Integer", "val": "1"}
-              x [@introduced] = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "1"}
+              x = {"type": "Integer", "val": "0"}
             File multifile2.mlw:
               Line 18:
-                x [@introduced] = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
               Line 19:
-                result [@introduced] = {"type": "Integer", "val": "1"}
-                x_vc_constant [@introduced] [@model_trace:x] =
-                  {"type": "Integer", "val": "0"}
+                result = {"type": "Integer", "val": "1"}
+                x_vc_constant = {"type": "Integer", "val": "0"}
 <check-ce>Interpreting concretly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <check-ce>Interpreting abstractly
-<rac-values>Value imported for x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter x at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <check-ce>Result of checking model 2:
-            - Concrete: don't know (Concrete RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Concrete: don't know (Concrete RAC terminated because Missing value for variable result)
               
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Models:
 - Checked model 0 (Concrete: don't know, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+    (Concrete RAC terminated because Missing value for variable result)
 - Checked model 1 (Concrete: don't know, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+    (Concrete RAC terminated because Missing value for variable result)
 - Selected model 2 (Concrete: don't know, Abstract: don't know)
     Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+    (Concrete RAC terminated because Missing value for variable result)
 File "bench/check-ce/multifile2.mlw", line 19, characters 12-26:
 Goal Postcondition from verification condition h'vc.
-Prover result is: Unknown (sat) (0.05s, 4862 steps).
+Prover result is: Unknown (sat) (0.03s, 4862 steps).
 The following counterexample model could not be verified
-  (Concrete RAC terminated because missing value for result at "bench/check-ce/multifile2.mlw", line 20, characters 2-12):
+  (Concrete RAC terminated because Missing value for variable result):
 File multifile1.mlw:
   Line 14:
     result = 1

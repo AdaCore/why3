@@ -2,7 +2,7 @@
 <check-ce>Validating model:
           File jlamp0.mlw:
             Line 11:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -11,143 +11,167 @@
             Line 12:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Missing value for parameter b, continue with default value {contents=
-                                                                    0}.
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Missing value for parameter b, continue with default value {contents=
-                                                                    0}.
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 8:
                   b = {contents= 0}
-                  Execution of main function p1's body with env:
+                  b = {contents= 0}
+                  Execution of main function `p1` with env:
                     a = {contents= 0}
                     b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
-                  Execution got stuck, Precondition of p1 with:
+                  Execution got stuck, Precondition of `p1` with:
                     a = {contents= 0}
                     b = {contents= 0}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 8:
                   b = {contents= 0}
-                  Execution of main function p1's body with env:
+                  b = {contents= 0}
+                  Execution of main function `p1` with env:
                     a = {contents= 0}
                     b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
-                  Execution got stuck, Precondition of p1 with:
+                  Execution got stuck, Precondition of `p1` with:
                     a = {contents= 0}
                     b = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
 <check-ce>Validating model:
           File jlamp0.mlw:
             Line 6:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 8:
-              b [@field:0:contents] [@introduced] =
+              b =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
             Line 11:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
             Line 12:
-              a_vc_constant [@field:0:contents] [@introduced]
-                [@model_trace:a] =
+              a_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
 <check-ce>Interpreting abstractly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
-<rac-values>Value computed from post condition for result of (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
-<rac-values>Value computed from post condition for result of (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
-<rac-values>Value from model for a at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
+<rac-values>Value from model for variable a at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     3}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 8:
                   b = {contents= 3}
-                  Execution of main function p1's body with env:
+                  b = {contents= 3}
+                  Execution of main function `p1` with env:
                     a = {contents= 0}
                     b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
-                  Concrete execution of (!) with args:
+                  Concrete execution of function `(!)` with args:
                     r = {contents= 3}
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 3}
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (!) with args:
+                  Concrete execution of function `(!)` with args:
                     r = {contents= 0}
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 3
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 3
                 Line 12:
@@ -157,29 +181,32 @@
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 8:
                   b = {contents= 3}
-                  Execution of main function p1's body with env:
+                  b = {contents= 3}
+                  Execution of main function `p1` with env:
                     a = {contents= 0}
                     b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
-                  Abstract execution of (!) with args:
+                  Abstract execution of function `(!)` with args:
                     r = {contents= 3}
                   result = 3
-                  Abstract execution of (!) with args:
+                  Abstract execution of function `(!)` with args:
                     r = {contents= 0}
                   result = 0
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 3
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 3
                   a = {contents= 3}
@@ -194,45 +221,48 @@
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Goal Assertion from verification condition p1'vc.
-Prover result is: Step limit exceeded (1.12s).
+Prover result is: Step limit exceeded (1.14s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File jlamp0.mlw:
   Line 6:
     a = {contents= 0}
   Line 8:
     b = {contents= 3}
-    Execution of main function p1's body with env:
+    b = {contents= 3}
+    Execution of main function `p1` with env:
       a = {contents= 0}
       b = {contents= 3}
       zero = 0
       one = 1
   Line 11:
-    Concrete execution of (!) with args:
+    Concrete execution of function `(!)` with args:
       r = {contents= 3}
 File ref.mlw:
   Line 18:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= 3}
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (!) with args:
+    Concrete execution of function `(!)` with args:
       r = {contents= 0}
 File ref.mlw:
   Line 18:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= 0}
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = 3
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 0}
       v = 3
   Line 12:
@@ -243,268 +273,295 @@ File jlamp0.mlw:
 <check-ce>Validating model:
           File jlamp0.mlw:
             Line 10:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 13:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Missing value for parameter b, continue with default value {contents=
-                                                                    0}.
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Missing value for parameter b, continue with default value {contents=
-                                                                    0}.
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 8:
                   b = {contents= 0}
-                  Execution of main function p1's body with env:
+                  b = {contents= 0}
+                  Execution of main function `p1` with env:
                     a = {contents= 0}
                     b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
-                  Execution got stuck, Precondition of p1 with:
+                  Execution got stuck, Precondition of `p1` with:
                     a = {contents= 0}
                     b = {contents= 0}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 8:
                   b = {contents= 0}
-                  Execution of main function p1's body with env:
+                  b = {contents= 0}
+                  Execution of main function `p1` with env:
                     a = {contents= 0}
                     b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
-                  Execution got stuck, Precondition of p1 with:
+                  Execution got stuck, Precondition of `p1` with:
                     a = {contents= 0}
                     b = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Validating model:
           File jlamp0.mlw:
             Line 6:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "7"}}]}}
             Line 8:
-              b [@field:0:contents] [@introduced] =
+              b =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
             Line 10:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "9"}}]}}
-              a_vc_constant [@field:0:contents] [@introduced]
-                [@model_trace:a] =
+              a_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "9"}}]}}
             Line 11:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "10"}}]}}
             Line 13:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "9"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value from model for global a: {contents= 7}
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    7}
+<rac-values>Value from model for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
 <check-ce>Interpreting abstractly
-<rac-values>Value from model for global a: {contents= 7}
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    7}
+<rac-values>Value from model for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
-<rac-values>Value computed from post condition for result of (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
-<rac-values>Value computed from post condition for result of (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 7
-<rac-values>Value from model for a at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 7
+<rac-values>Value from model for variable a at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     10}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
-<rac-values>Value computed from post condition for result of (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 10
-<rac-values>Value computed from post condition for result of (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28: 10
-<rac-values>Value computed from post condition for result of (-) at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32: 9
-<rac-values>Value from model for a at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 10
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 13, characters 26-28: 10
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 13, characters 26-32: 9
+<rac-values>Value from model for variable a at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: {contents=
                                                                     9}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: ()
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 13, characters 21-32: ()
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 7}
                 Line 8:
                   b = {contents= 3}
-                  Execution of main function p1's body with env:
+                  b = {contents= 3}
+                  Execution of main function `p1` with env:
                     a = {contents= 7}
                     b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
-                  Concrete execution of (!) with args:
+                  Concrete execution of function `(!)` with args:
                     r = {contents= 3}
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 3}
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (!) with args:
+                  Concrete execution of function `(!)` with args:
                     r = {contents= 7}
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 7}
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 7
                     _ = 3
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 7}
                     v = 10
                 Line 13:
-                  Concrete execution of (!) with args:
+                  Concrete execution of function `(!)` with args:
                     r = {contents= 10}
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 10}
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (>=) with args:
+                  Concrete execution of function `(>=)` with args:
                     x = 10
                     y = 10
-                  Concrete execution of (!) with args:
+                  Concrete execution of function `(!)` with args:
                     r = {contents= 10}
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 10}
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (-) with args:
+                  Concrete execution of function `(-)` with args:
                     x = 10
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of (-_) with args:
+                  Concrete execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 10
                     _ = (-1)
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 10}
                     v = 9
                 Line 10:
-                  Property failure, Postcondition of p1 with:
+                  Property failure, Postcondition of `p1` with:
                     a = {contents= 9}
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 7}
                 Line 8:
                   b = {contents= 3}
-                  Execution of main function p1's body with env:
+                  b = {contents= 3}
+                  Execution of main function `p1` with env:
                     a = {contents= 7}
                     b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
-                  Abstract execution of (!) with args:
+                  Abstract execution of function `(!)` with args:
                     r = {contents= 3}
                   result = 3
-                  Abstract execution of (!) with args:
+                  Abstract execution of function `(!)` with args:
                     r = {contents= 7}
                   result = 7
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 7
                     _ = 3
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 7}
                     v = 10
                   a = {contents= 10}
                   result = ()
                 Line 13:
-                  Abstract execution of (!) with args:
+                  Abstract execution of function `(!)` with args:
                     r = {contents= 10}
                   result = 10
-                  Concrete execution of (>=) with args:
+                  Concrete execution of function `(>=)` with args:
                     x = 10
                     y = 10
-                  Abstract execution of (!) with args:
+                  Abstract execution of function `(!)` with args:
                     r = {contents= 10}
                   result = 10
-                  Abstract execution of (-) with args:
+                  Abstract execution of function `(-)` with args:
                     x = 10
                     y = 1
                   result = 9
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 10}
                     v = 9
                   a = {contents= 9}
                   result = ()
                 Line 10:
-                  Property failure, Postcondition of p1 with:
+                  Property failure, Postcondition of `p1` with:
                     a = {contents= 9}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
@@ -513,307 +570,337 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: Step limit exceeded (0.76s).
+Prover result is: Step limit exceeded (0.77s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File jlamp0.mlw:
   Line 6:
     a = {contents= 7}
   Line 8:
     b = {contents= 3}
-    Execution of main function p1's body with env:
+    b = {contents= 3}
+    Execution of main function `p1` with env:
       a = {contents= 7}
       b = {contents= 3}
       zero = 0
       one = 1
   Line 11:
-    Concrete execution of (!) with args:
+    Concrete execution of function `(!)` with args:
       r = {contents= 3}
 File ref.mlw:
   Line 18:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= 3}
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (!) with args:
+    Concrete execution of function `(!)` with args:
       r = {contents= 7}
 File ref.mlw:
   Line 18:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= 7}
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 7
       _ = 3
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 7}
       v = 10
   Line 13:
-    Concrete execution of (!) with args:
+    Concrete execution of function `(!)` with args:
       r = {contents= 10}
 File ref.mlw:
   Line 18:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= 10}
 File jlamp0.mlw:
   Line 13:
-    Concrete execution of (>=) with args:
+    Concrete execution of function `(>=)` with args:
       x = 10
       y = 10
-    Concrete execution of (!) with args:
+    Concrete execution of function `(!)` with args:
       r = {contents= 10}
 File ref.mlw:
   Line 18:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= 10}
 File jlamp0.mlw:
   Line 13:
-    Concrete execution of (-) with args:
+    Concrete execution of function `(-)` with args:
       x = 10
       y = 1
 File int.mlw:
   Line 23:
-    Concrete execution of (-_) with args:
+    Concrete execution of function `(-_)` with args:
       _ = 1
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 10
       _ = (-1)
 File jlamp0.mlw:
   Line 13:
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 10}
       v = 9
   Line 10:
-    Property failure, Postcondition of p1 with:
+    Property failure, Postcondition of `p1` with:
       a = {contents= 9}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Validating model:
           File jlamp0.mlw:
             Line 10:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 11:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Missing value for parameter b, continue with default value {contents=
-                                                                    0}.
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Missing value for parameter b, continue with default value {contents=
-                                                                    0}.
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+                                                                    0}
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 8:
                   b = {contents= 0}
-                  Execution of main function p1's body with env:
+                  b = {contents= 0}
+                  Execution of main function `p1` with env:
                     a = {contents= 0}
                     b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
-                  Execution got stuck, Precondition of p1 with:
+                  Execution got stuck, Precondition of `p1` with:
                     a = {contents= 0}
                     b = {contents= 0}
             - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/jlamp0.mlw", line 9, characters 15-45)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 8:
                   b = {contents= 0}
-                  Execution of main function p1's body with env:
+                  b = {contents= 0}
+                  Execution of main function `p1` with env:
                     a = {contents= 0}
                     b = {contents= 0}
                     zero = 0
                     one = 1
                 Line 9:
-                  Execution got stuck, Precondition of p1 with:
+                  Execution got stuck, Precondition of `p1` with:
                     a = {contents= 0}
                     b = {contents= 0}
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Validating model:
           File jlamp0.mlw:
             Line 6:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 8:
-              b [@field:0:contents] [@introduced] =
+              b =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
             Line 10:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "5"}}]}}
-              a_vc_constant [@field:0:contents] [@introduced]
-                [@model_trace:a] =
+              a_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "5"}}]}}
             Line 11:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "5"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value from model for global a: {contents= 2}
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    2}
+<rac-values>Value from model for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
 <check-ce>Interpreting abstractly
-<rac-values>Value from model for global a: {contents= 2}
-<rac-values>Value imported for b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
+                                                                    2}
+<rac-values>Value from model for parameter b at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
-<rac-values>Value computed from post condition for result of (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
-<rac-values>Value computed from post condition for result of (!) at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 2
-<rac-values>Value from model for a at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 2
+<rac-values>Value from model for variable a at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
                                                                     5}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
-<rac-values>Value computed from post condition for result of (!) at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 5
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/jlamp0.mlw", line 13, characters 7-9: 5
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 2}
                 Line 8:
                   b = {contents= 3}
-                  Execution of main function p1's body with env:
+                  b = {contents= 3}
+                  Execution of main function `p1` with env:
                     a = {contents= 2}
                     b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
-                  Concrete execution of (!) with args:
+                  Concrete execution of function `(!)` with args:
                     r = {contents= 3}
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 3}
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (!) with args:
+                  Concrete execution of function `(!)` with args:
                     r = {contents= 2}
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 2}
               File jlamp0.mlw:
                 Line 11:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 2
                     _ = 3
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 2}
                     v = 5
                 Line 13:
-                  Concrete execution of (!) with args:
+                  Concrete execution of function `(!)` with args:
                     r = {contents= 5}
               File ref.mlw:
                 Line 18:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 5}
               File jlamp0.mlw:
                 Line 13:
-                  Concrete execution of (>=) with args:
+                  Concrete execution of function `(>=)` with args:
                     x = 5
                     y = 10
-                  Concrete execution of Tuple0 with args:
+                  Concrete execution of function `Tuple0` with args:
                 Line 10:
-                  Property failure, Postcondition of p1 with:
+                  Property failure, Postcondition of `p1` with:
                     a = {contents= 5}
             - Abstract: good model (Abstract RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 2}
                 Line 8:
                   b = {contents= 3}
-                  Execution of main function p1's body with env:
+                  b = {contents= 3}
+                  Execution of main function `p1` with env:
                     a = {contents= 2}
                     b = {contents= 3}
                     zero = 0
                     one = 1
                 Line 11:
-                  Abstract execution of (!) with args:
+                  Abstract execution of function `(!)` with args:
                     r = {contents= 3}
                   result = 3
-                  Abstract execution of (!) with args:
+                  Abstract execution of function `(!)` with args:
                     r = {contents= 2}
                   result = 2
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 2
                     _ = 3
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 2}
                     v = 5
                   a = {contents= 5}
                   result = ()
                 Line 13:
-                  Abstract execution of (!) with args:
+                  Abstract execution of function `(!)` with args:
                     r = {contents= 5}
                   result = 5
-                  Concrete execution of (>=) with args:
+                  Concrete execution of function `(>=)` with args:
                     x = 5
                     y = 10
-                  Concrete execution of Tuple0 with args:
+                  Concrete execution of function `Tuple0` with args:
                 Line 10:
-                  Property failure, Postcondition of p1 with:
+                  Property failure, Postcondition of `p1` with:
                     a = {contents= 5}
 <check-ce>Models:
 - Checked model 0 (Concrete: bad model, Abstract: bad model)
@@ -822,69 +909,72 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Goal Postcondition from verification condition p1'vc.
-Prover result is: Step limit exceeded (1.13s).
+Prover result is: Step limit exceeded (1.12s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File jlamp0.mlw:
   Line 6:
     a = {contents= 2}
   Line 8:
     b = {contents= 3}
-    Execution of main function p1's body with env:
+    b = {contents= 3}
+    Execution of main function `p1` with env:
       a = {contents= 2}
       b = {contents= 3}
       zero = 0
       one = 1
   Line 11:
-    Concrete execution of (!) with args:
+    Concrete execution of function `(!)` with args:
       r = {contents= 3}
 File ref.mlw:
   Line 18:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= 3}
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (!) with args:
+    Concrete execution of function `(!)` with args:
       r = {contents= 2}
 File ref.mlw:
   Line 18:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= 2}
 File jlamp0.mlw:
   Line 11:
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 2
       _ = 3
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 2}
       v = 5
   Line 13:
-    Concrete execution of (!) with args:
+    Concrete execution of function `(!)` with args:
       r = {contents= 5}
 File ref.mlw:
   Line 18:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= 5}
 File jlamp0.mlw:
   Line 13:
-    Concrete execution of (>=) with args:
+    Concrete execution of function `(>=)` with args:
       x = 5
       y = 10
-    Concrete execution of Tuple0 with args:
+    Concrete execution of function `Tuple0` with args:
   Line 10:
-    Property failure, Postcondition of p1 with:
+    Property failure, Postcondition of `p1` with:
       a = {contents= 5}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Validating model:
           File jlamp0.mlw:
             Line 20:
-              c [@field:0:contents] [@introduced] =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -893,114 +983,148 @@ File jlamp0.mlw:
             Line 22:
               the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value from model for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value from model for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     0}
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Validating model:
           File jlamp0.mlw:
             Line 6:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 20:
-              c [@field:0:contents] [@introduced] =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
             Line 22:
-              c_vc_constant [@field:0:contents] [@introduced]
-                [@model_trace:c] =
+              c_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value from model for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value from model for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     1}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
@@ -1010,25 +1134,31 @@ File jlamp0.mlw:
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                   c = {contents= 1}
@@ -1043,33 +1173,40 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant init from verification condition p2'vc.
-Prover result is: Step limit exceeded (0.92s).
+Prover result is: Step limit exceeded (0.93s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File jlamp0.mlw:
   Line 6:
     Constant a initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    a = {contents= 0}
   Line 15:
     Constant c initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    c = {contents= 0}
+Unknown location:
+    _ = ()
+File jlamp0.mlw:
   Line 17:
     _ = ()
-    Execution of main function p2's body with env:
+    Execution of main function `p2` with env:
       a = {contents= 0}
       c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
   Line 20:
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 0}
       v = 1
   Line 22:
@@ -1084,8 +1221,7 @@ Prover result is: Valid (0.01s, 221 steps).
 <check-ce>Validating model:
           File ref.mlw:
             Line 18:
-              c [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1093,8 +1229,7 @@ Prover result is: Valid (0.01s, 221 steps).
                       "value": {"type": "Integer", "val": "-1"}}]}}
             File jlamp0.mlw:
               Line 21:
-                c [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -1103,58 +1238,76 @@ Prover result is: Valid (0.01s, 221 steps).
               Line 24:
                 the check fails with all inputs
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value type default for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Type default value for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     0}
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>Validating model:
           File ref.mlw:
             Line 18:
-              c [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1162,100 +1315,112 @@ Prover result is: Valid (0.01s, 221 steps).
                       "value": {"type": "Integer", "val": "2"}}]}}
             File jlamp0.mlw:
               Line 6:
-                a [@field:0:contents] [@introduced] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "0"}}]}}
               Line 20:
-                c [@field:0:contents] [@introduced] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "1"}}]}}
               Line 21:
-                a [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "3"}}]}}
-                c [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "2"}}]}}
               Line 24:
-                c [@field:0:contents] [@introduced] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "4"}}]}}
-                c_vc_constant [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157]
-                  [@model_trace:c] =
+                c_vc_constant =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "2"}}]}}
               Line 25:
-                a [@field:0:contents] [@introduced] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "5"}}]}}
               Line 26:
-                c [@field:0:contents] [@introduced] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "4"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value from model for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value from model for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     1}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
@@ -1265,25 +1430,31 @@ Prover result is: Valid (0.01s, 221 steps).
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                   c = {contents= 1}
@@ -1298,33 +1469,40 @@ Prover result is: Valid (0.01s, 221 steps).
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Goal Loop variant decrease from verification condition p2'vc.
-Prover result is: Step limit exceeded (0.94s).
+Prover result is: Step limit exceeded (0.98s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File jlamp0.mlw:
   Line 6:
     Constant a initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    a = {contents= 0}
   Line 15:
     Constant c initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    c = {contents= 0}
+Unknown location:
+    _ = ()
+File jlamp0.mlw:
   Line 17:
     _ = ()
-    Execution of main function p2's body with env:
+    Execution of main function `p2` with env:
       a = {contents= 0}
       c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
   Line 20:
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 0}
       v = 1
   Line 22:
@@ -1337,65 +1515,83 @@ File jlamp0.mlw:
             Line 22:
               the check fails with all inputs
             Line 26:
-              c [@field:0:contents] [@introduced] =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value type default for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Type default value for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     0}
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Validating model:
           File ref.mlw:
             Line 18:
-              c [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1403,93 +1599,106 @@ File jlamp0.mlw:
                       "value": {"type": "Integer", "val": "10"}}]}}
             File jlamp0.mlw:
               Line 6:
-                a [@field:0:contents] [@introduced] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "0"}}]}}
               Line 20:
-                c [@field:0:contents] [@introduced] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "1"}}]}}
               Line 21:
-                a [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "3"}}]}}
-                c [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "10"}}]}}
               Line 22:
-                c_vc_constant [@field:0:contents] [@introduced]
-                  [@model_trace:c] =
+                c_vc_constant =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "12"}}]}}
               Line 25:
-                a [@field:0:contents] [@introduced] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "13"}}]}}
               Line 26:
-                c [@field:0:contents] [@introduced] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "12"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value from model for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value from model for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     1}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC confirms the counter-example)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
@@ -1499,25 +1708,31 @@ File jlamp0.mlw:
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                   c = {contents= 1}
@@ -1532,33 +1747,40 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: Step limit exceeded (0.94s).
+Prover result is: Step limit exceeded (0.97s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File jlamp0.mlw:
   Line 6:
     Constant a initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    a = {contents= 0}
   Line 15:
     Constant c initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    c = {contents= 0}
+Unknown location:
+    _ = ()
+File jlamp0.mlw:
   Line 17:
     _ = ()
-    Execution of main function p2's body with env:
+    Execution of main function `p2` with env:
       a = {contents= 0}
       c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
   Line 20:
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 0}
       v = 1
   Line 22:
@@ -1571,65 +1793,83 @@ File jlamp0.mlw:
             Line 23:
               the check fails with all inputs
             Line 25:
-              a [@field:0:contents] [@introduced] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value type default for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Type default value for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     0}
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>Validating model:
           File ref.mlw:
             Line 18:
-              c [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1637,93 +1877,106 @@ File jlamp0.mlw:
                       "value": {"type": "Integer", "val": "2"}}]}}
             File jlamp0.mlw:
               Line 6:
-                a [@field:0:contents] [@introduced] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "0"}}]}}
               Line 20:
-                c [@field:0:contents] [@introduced] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "1"}}]}}
               Line 21:
-                a [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "9"}}]}}
-                c [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "2"}}]}}
               Line 23:
-                a_vc_constant [@field:0:contents] [@introduced]
-                  [@model_trace:a] =
+                a_vc_constant =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "11"}}]}}
               Line 25:
-                a [@field:0:contents] [@introduced] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "11"}}]}}
               Line 26:
-                c [@field:0:contents] [@introduced] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "4"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value from model for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value from model for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     1}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
@@ -1733,25 +1986,31 @@ File jlamp0.mlw:
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                   c = {contents= 1}
@@ -1766,33 +2025,40 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Goal Loop invariant preservation from verification condition p2'vc.
-Prover result is: Step limit exceeded (0.94s).
+Prover result is: Step limit exceeded (1.09s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File jlamp0.mlw:
   Line 6:
     Constant a initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    a = {contents= 0}
   Line 15:
     Constant c initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    c = {contents= 0}
+Unknown location:
+    _ = ()
+File jlamp0.mlw:
   Line 17:
     _ = ()
-    Execution of main function p2's body with env:
+    Execution of main function `p2` with env:
       a = {contents= 0}
       c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
   Line 20:
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 0}
       v = 1
   Line 22:
@@ -1803,74 +2069,90 @@ File jlamp0.mlw:
 <check-ce>Validating model:
           File jlamp0.mlw:
             Line 19:
-              a [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 21:
-              a [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 6, characters 8-17: {contents=
                                                                     0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value type default for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Type default value for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     0}
 <check-ce>Result of checking model 0:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   Constant a initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
                   Property failure, Loop invariant initialization with:
                     c = {contents= 1}
-            - Abstract: don't know (Abstract RAC terminated because missing value for result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>Validating model:
           File ref.mlw:
             Line 18:
-              c [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1878,87 +2160,98 @@ File jlamp0.mlw:
                       "value": {"type": "Integer", "val": "11"}}]}}
             File jlamp0.mlw:
               Line 6:
-                a [@field:0:contents] [@introduced] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "0"}}]}}
               Line 19:
-                a [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "3"}}]}}
-                a_vc_constant [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157]
-                  [@model_trace:a] =
+                a_vc_constant =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "3"}}]}}
               Line 20:
-                c [@field:0:contents] [@introduced] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "1"}}]}}
               Line 21:
-                a [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "3"}}]}}
-                c [@field:0:contents] [@introduced]
-                  [@loop:bench/check-ce/jlamp0.mlw:21:4:157] =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "11"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Value from model for global a: {contents= 0}
-<rac-values>Value type default for result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global a at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value from model for c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 15, characters 8-17: {contents=
+                                                                    0}
+<rac-values>RHS evaluated for global c at "bench/check-ce/jlamp0.mlw", line 15, characters 6-7: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value from model for variable c at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: {contents=
                                                                     1}
-<rac-values>Value type default for result of (:=) at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
+<rac-values>Type default value for variable result at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10: ()
 <check-ce>Result of checking model 1:
             - Concrete: good model (Concrete RAC found a contradiction at different location "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of (:=) with args:
+                  Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                 Line 22:
@@ -1968,25 +2261,31 @@ File jlamp0.mlw:
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File jlamp0.mlw:
                 Line 6:
                   a = {contents= 0}
                 Line 15:
                   Constant c initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function``
                   result = {contents= 0}
+                  c = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File jlamp0.mlw:
                 Line 17:
                   _ = ()
-                  Execution of main function p2's body with env:
+                  Execution of main function `p2` with env:
                     a = {contents= 0}
                     c = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of (:=) with args:
+                  Abstract execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 1
                   c = {contents= 1}
@@ -2001,33 +2300,40 @@ File jlamp0.mlw:
     Summary: The program does not comply to the verification goal
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Goal Postcondition from verification condition p2'vc.
-Prover result is: Step limit exceeded (0.85s).
+Prover result is: Step limit exceeded (0.95s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File jlamp0.mlw:
   Line 6:
     Constant a initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    a = {contents= 0}
   Line 15:
     Constant c initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function``
     result = {contents= 0}
+    c = {contents= 0}
+Unknown location:
+    _ = ()
+File jlamp0.mlw:
   Line 17:
     _ = ()
-    Execution of main function p2's body with env:
+    Execution of main function `p2` with env:
       a = {contents= 0}
       c = {contents= 0}
       _ = ()
       zero = 0
       one = 1
   Line 20:
-    Concrete execution of (:=) with args:
+    Concrete execution of function `(:=)` with args:
       r = {contents= 0}
       v = 1
   Line 22:

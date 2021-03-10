@@ -1,93 +1,99 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: Valid (0.05s, 1016 steps).
+Prover result is: Valid (0.02s, 1016 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Validating model:
           File for.mlw:
             Line 7:
-              i [@introduced] = {"type": "Integer", "val": "0"}
-              x1 [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/for.mlw:7:2:125] [@mlw:reference_var] =
+              i = {"type": "Integer", "val": "0"}
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 8:
-              x1_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:x1] =
+              x1_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 10:
-              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value from model for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+<rac-values>Value from model for variable x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     0}
-<rac-values>Value type default for x2 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+<rac-values>Type default value for variable x2 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     0}
-<rac-values>Value from model for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
+<rac-values>Value from model for variable i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
 <check-ce>Result of checking model 0:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
                   Concrete iteration of loop
                 Line 9:
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 10:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 7:
                   Concrete iteration of loop
                 Line 9:
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 12:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 4:
@@ -96,21 +102,25 @@ Prover result is: Valid (0.05s, 1016 steps).
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of ref with args:
+                  Abstract execution of function `ref` with args:
                     contents = 0
                   result = {contents= 0}
                 Line 6:
-                  Abstract execution of ref with args:
+                  Abstract execution of function `ref` with args:
                     contents = 0
                   result = {contents= 0}
                 Line 7:
@@ -120,13 +130,13 @@ Prover result is: Valid (0.05s, 1016 steps).
                   i = 0
                   Abstract iteration of loop
                 Line 9:
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 10:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 4:
@@ -135,88 +145,94 @@ Prover result is: Valid (0.05s, 1016 steps).
 <check-ce>Validating model:
           File for.mlw:
             Line 7:
-              i [@introduced] = {"type": "Integer", "val": "0"}
-              x1 [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/for.mlw:7:2:125] [@mlw:reference_var] =
+              i = {"type": "Integer", "val": "0"}
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 8:
-              x1_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:x1] =
+              x1_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 10:
-              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value from model for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+<rac-values>Value from model for variable x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     (-1)}
-<rac-values>Value type default for x2 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+<rac-values>Type default value for variable x2 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     0}
-<rac-values>Value from model for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
+<rac-values>Value from model for variable i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
 <check-ce>Result of checking model 1:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
                   Concrete iteration of loop
                 Line 9:
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 10:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 7:
                   Concrete iteration of loop
                 Line 9:
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 12:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 4:
@@ -225,21 +241,25 @@ Prover result is: Valid (0.05s, 1016 steps).
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of ref with args:
+                  Abstract execution of function `ref` with args:
                     contents = 0
                   result = {contents= 0}
                 Line 6:
-                  Abstract execution of ref with args:
+                  Abstract execution of function `ref` with args:
                     contents = 0
                   result = {contents= 0}
                 Line 7:
@@ -249,13 +269,13 @@ Prover result is: Valid (0.05s, 1016 steps).
                   i = 0
                   Abstract iteration of loop
                 Line 9:
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 10:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= (-1)}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = (-1)
                     _ = 1
                 Line 8:
@@ -266,88 +286,94 @@ Prover result is: Valid (0.05s, 1016 steps).
 <check-ce>Validating model:
           File for.mlw:
             Line 7:
-              i [@introduced] = {"type": "Integer", "val": "0"}
-              x1 [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/for.mlw:7:2:125] [@mlw:reference_var] =
+              i = {"type": "Integer", "val": "0"}
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 8:
-              x1_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:x1] =
+              x1_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 10:
-              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
 <check-ce>Interpreting concretly
-<rac-values>Missing value for parameter _, continue with default value ().
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter _ at NO LOC: ()
 <check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter _ at NO LOC: ()
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for variable result at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value from model for x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+<rac-values>Value from model for variable x1 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     (-1)}
-<rac-values>Value type default for x2 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
+<rac-values>Type default value for variable x2 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     0}
-<rac-values>Value from model for i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
+<rac-values>Value from model for variable i at "bench/check-ce/for.mlw", line 7, characters 6-7: 0
 <check-ce>Result of checking model 2:
             - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
                   Concrete iteration of loop
                 Line 9:
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 10:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 7:
                   Concrete iteration of loop
                 Line 9:
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 12:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 4:
@@ -356,21 +382,25 @@ Prover result is: Valid (0.05s, 1016 steps).
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
               File for.mlw:
                 Line 4:
                   _ = ()
-                  Execution of main function f's body with env:
+                  Execution of main function `f` with env:
                     _ = ()
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of ref with args:
+                  Abstract execution of function `ref` with args:
                     contents = 0
                   result = {contents= 0}
                 Line 6:
-                  Abstract execution of ref with args:
+                  Abstract execution of function `ref` with args:
                     contents = 0
                   result = {contents= 0}
                 Line 7:
@@ -380,13 +410,13 @@ Prover result is: Valid (0.05s, 1016 steps).
                   i = 0
                   Abstract iteration of loop
                 Line 9:
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 10:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= (-1)}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = (-1)
                     _ = 1
                 Line 8:
@@ -402,27 +432,31 @@ Prover result is: Valid (0.05s, 1016 steps).
     Summary: The contracts of some function or loop are underspecified
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6176 steps).
+Prover result is: Unknown (unknown + incomplete) (0.05s, 6176 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
 File for.mlw:
   Line 4:
     _ = ()
-    Execution of main function f's body with env:
+    Execution of main function `f` with env:
       _ = ()
       zero = 0
       one = 1
   Line 5:
-    Abstract execution of ref with args:
+    Abstract execution of function `ref` with args:
       contents = 0
     result = {contents= 0}
   Line 6:
-    Abstract execution of ref with args:
+    Abstract execution of function `ref` with args:
       contents = 0
     result = {contents= 0}
   Line 7:
@@ -432,13 +466,13 @@ File for.mlw:
     i = 0
     Abstract iteration of loop
   Line 9:
-    Concrete execution of (=) with args:
+    Concrete execution of function `(=)` with args:
       x = 0
       y = 0
   Line 10:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= (-1)}
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = (-1)
       _ = 1
   Line 8:
@@ -448,5 +482,5 @@ File for.mlw:
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Valid (0.01s, 1208 steps).
+Prover result is: Valid (0.02s, 1208 steps).
 
