@@ -11,6 +11,7 @@
 
 open Wstdlib
 open Ty
+open Ident
 open Term
 open Decl
 open Theory
