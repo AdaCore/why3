@@ -1328,7 +1328,7 @@ let describe ctx =
     (Pp.print_option (fun fmt -> fprintf fmt " %s")) ctx.c_desc
 
 let report_cntr_title fmt (ctx, msg) =
-  fprintf fmt "%s %s" (describe ctx) msg
+  fprintf fmt "%s %s" (String.capitalize_ascii (describe ctx)) msg
 
 let report_cntr_head fmt (ctx, msg, term) =
   fprintf fmt "@[<v>%a%t@]" report_cntr_title (ctx, msg)
@@ -2040,7 +2040,7 @@ let gen_eval_expr env eval_expr id oexp =
         match eval_expr env' e with
         | Normal v -> Some v
         | Excep _ ->
-            cannot_compute "initialization of global variable %a raised an \
+            cannot_compute "initialization of global variable `%a` raised an \
                             exception" print_decoded id.id_string
         | Irred _ -> None
 
@@ -2048,19 +2048,19 @@ let gen_eval_expr env eval_expr id oexp =
     if no value is generated. *)
 let get_value' ctx_desc oloc gens =
   let desc, value = try get_value gens with Not_found ->
-    cannot_compute "Missing value for %s" ctx_desc
+    cannot_compute "missing value for %s" ctx_desc
       (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc in
-  Debug.dprintf debug_rac_values "@[<h>%s for %a at %a: %a@]@."
-    (String.capitalize_ascii desc) print_decoded ctx_desc
+  Debug.dprintf debug_rac_values "@[<h>%s for %s at %a: %a@]@."
+    (String.capitalize_ascii desc) ctx_desc
     (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc print_value value;
   value
 
 let is_ignore_id id = id.id_string = "_"
 
 let get_and_register_value env ?def ?loc ?posts id ity =
-  let ctx_desc = asprintf "variable at %a%t" print_decoded id.id_string
+  let ctx_desc = asprintf "variable `%a`%t" print_decoded id.id_string
       (fun fmt -> match loc with
-         | Some loc -> fprintf fmt " %a" Pretty.print_loc' loc
+         | Some loc -> fprintf fmt " at %a" Pretty.print_loc' loc
          | None -> ()) in
   let oloc = if loc <> None then loc else id.id_loc in
   let gens = [
@@ -2074,7 +2074,7 @@ let get_and_register_value env ?def ?loc ?posts id ity =
   value
 
 let get_and_register_param env id ity =
-  let ctx_desc = asprintf "parameter %a" print_decoded id.id_string in
+  let ctx_desc = asprintf "parameter `%a`" print_decoded id.id_string in
   let gens = [
     gen_model_variable env id ity;
     gen_type_default ~really:(is_ignore_id id) env ity;
@@ -2084,7 +2084,7 @@ let get_and_register_param env id ity =
   value
 
 let get_and_register_global env eval_expr id oexp ity =
-  let ctx_desc = asprintf "global %a" print_decoded id.id_string in
+  let ctx_desc = asprintf "global `%a`" print_decoded id.id_string in
   let gens = [
     gen_model_variable env id ity;
     gen_eval_expr env eval_expr id oexp;
@@ -2626,7 +2626,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
                 ( match f rs arg_vs with
                   | Some v -> Normal v
-                  | None -> cannot_compute "cannot compute result of builtin %a"
+                  | None -> cannot_compute "cannot compute result of builtin `%a`"
                               Ident.print_decoded rs.rs_name.id_string )
             | Constructor its_def ->
                 check_pre_and_register_call Log.ExecConcrete;
@@ -2660,7 +2660,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
                 cannot_compute "definition of routine %s could not be found"
                   rs.rs_name.id_string in
       if env.rac.do_rac then (
-        let desc = asprintf "for %a" print_rs rs in
+        let desc = asprintf "of `%a`" print_rs rs in
         match res with
         | Normal v ->
             check_posts Vc.expl_post ~desc None env v rs.rs_cty.cty_post
@@ -2701,7 +2701,7 @@ and exec_call_abstract ?snapshot ?loc ?rs env cty arg_pvs ity_result =
   (* assert2 *)
   let desc = match rs with
     | None -> "of anonymous function"
-    | Some rs -> asprintf "of %a" print_rs rs in
+    | Some rs -> asprintf "of `%a`" print_rs rs in
   let ctx = cntr_ctx Vc.expl_post ~desc env in
   check_assume_posts ctx res_v cty.cty_post;
   Normal res_v
@@ -2733,7 +2733,7 @@ let bind_globals ?rs_main mod_known env =
         let v =
           get_and_register_global env eval_expr id oexp ce.c_cty.cty_result in
         if env.rac.do_rac then (
-          let desc = asprintf "of global value %a" print_rs rs in
+          let desc = asprintf "of global variable `%a`" print_rs rs in
           let ctx = cntr_ctx Vc.expl_post ~desc env in
           check_assume_posts ctx v ce.c_cty.cty_post );
         bind_rs rs v env )
