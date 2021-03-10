@@ -2139,8 +2139,7 @@ type value_gen = string * (unit -> value option)
 (** [get_value gens] takes a list of generators [gen] and returns the
     description and value for the first generator whose result is not [None]. *)
 let get_value : value_gen list -> string * value =
-  let aux (s, gen) = match gen () with Some v -> Some (s, v) | None ->
-    Debug.dprintf debug_rac_values "No %s@." s; None in
+  let aux (s, gen) = match gen () with Some v -> Some (s, v) | None -> None in
   Lists.first aux
 
 (** Generate a value by querying the model for a variable. *)

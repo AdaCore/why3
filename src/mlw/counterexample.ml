@@ -410,8 +410,8 @@ let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
       {state= Runknown; reason; exec_log= Log.empty_log}
 
 let check_model_rs ?timelimit ?steplimit ~abstract reduce env pm model rs =
-  Debug.dprintf debug_check_ce "@[Interpreting %s@]@."
-    (if abstract then "abstractly" else "concretely");
+  Debug.dprintf debug_check_ce "%s-step RAC@."
+    (if abstract then "Giant" else "Small");
   let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
   let vc_term_loc = Opt.get (get_model_term_loc model) in
   let vc_term_attrs = get_model_term_attrs model in

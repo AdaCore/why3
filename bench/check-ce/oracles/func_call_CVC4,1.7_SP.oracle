@@ -1,9 +1,9 @@
 File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: Valid (0.04s, 1134 steps).
+Prover result is: Valid (0.02s, 1134 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File func_call.mlw:
             Line 7:
               z =
@@ -39,24 +39,24 @@ Prover result is: Valid (0.04s, 1134 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable result at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
-<rac-values>RHS evaluated for global z at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<rac-values>Type default value for parameter _ at NO LOC: ()
-<check-ce>Interpreting abstractly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable result at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
-<rac-values>RHS evaluated for global z at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: {contents=
                                                                     0}
-<rac-values>Type default value for parameter _ at NO LOC: ()
-<rac-values>Value from model for variable z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: {contents=
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Result of checking model 0:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 0: UNKNOWN
+            - Concrete RAC NORMAL (no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -67,7 +67,7 @@ Prover result is: Valid (0.04s, 1134 steps).
               File func_call.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of unimplemented function``
+                  (abstract) execution of unimplemented function with args:
                   result = 0
                   Concrete execution of function `ref` with args:
                     contents = 0
@@ -96,10 +96,10 @@ Prover result is: Valid (0.04s, 1134 steps).
                     _ = 1
                 Line 10:
                   Execution of main function terminated normally
-            - Abstract: don't know (Abstract RAC terminated because Missing value for variable result)
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6)
               
 <check-ce>Check model 1 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File func_call.mlw:
             Line 7:
               z =
@@ -135,25 +135,25 @@ Prover result is: Valid (0.04s, 1134 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable result at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
-<rac-values>RHS evaluated for global z at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<rac-values>Type default value for parameter _ at NO LOC: ()
-<check-ce>Interpreting abstractly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable result at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
-<rac-values>RHS evaluated for global z at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
-                                                                    0}
-<rac-values>Type default value for parameter _ at NO LOC: ()
-<rac-values>Value from model for variable z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: {contents=
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: {contents=
                                                                     2}
-<rac-values>Type default value for variable result at "bench/check-ce/func_call.mlw", line 12, characters 2-6: ()
-<check-ce>Result of checking model 1:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: ()
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 1: SW
+            - Concrete RAC NORMAL (no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -164,7 +164,7 @@ Prover result is: Valid (0.04s, 1134 steps).
               File func_call.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of unimplemented function``
+                  (abstract) execution of unimplemented function with args:
                   result = 0
                   Concrete execution of function `ref` with args:
                     contents = 0
@@ -193,7 +193,7 @@ Prover result is: Valid (0.04s, 1134 steps).
                     _ = 1
                 Line 10:
                   Execution of main function terminated normally
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -204,7 +204,7 @@ Prover result is: Valid (0.04s, 1134 steps).
               File func_call.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of unimplemented function``
+                  (abstract) execution of unimplemented function with args:
                   result = 0
                   Concrete execution of function `ref` with args:
                     contents = 0
@@ -228,10 +228,10 @@ Prover result is: Valid (0.04s, 1134 steps).
                   z = {contents= 2}
                   result = ()
                 Line 13:
-                  Property failure, Assertion with:
+                  Property failure at assertion with:
                     z = {contents= 2}
 <check-ce>Check model 2 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File func_call.mlw:
             Line 7:
               z =
@@ -267,25 +267,25 @@ Prover result is: Valid (0.04s, 1134 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable result at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
-<rac-values>RHS evaluated for global z at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<rac-values>Type default value for parameter _ at NO LOC: ()
-<check-ce>Interpreting abstractly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable result at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
-<rac-values>RHS evaluated for global z at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
-                                                                    0}
-<rac-values>Type default value for parameter _ at NO LOC: ()
-<rac-values>Value from model for variable z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: {contents=
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: {contents=
                                                                     2}
-<rac-values>Type default value for variable result at "bench/check-ce/func_call.mlw", line 12, characters 2-6: ()
-<check-ce>Result of checking model 2:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: ()
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 2: SW
+            - Concrete RAC NORMAL (no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -296,7 +296,7 @@ Prover result is: Valid (0.04s, 1134 steps).
               File func_call.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of unimplemented function``
+                  (abstract) execution of unimplemented function with args:
                   result = 0
                   Concrete execution of function `ref` with args:
                     contents = 0
@@ -325,7 +325,7 @@ Prover result is: Valid (0.04s, 1134 steps).
                     _ = 1
                 Line 10:
                   Execution of main function terminated normally
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -336,7 +336,7 @@ Prover result is: Valid (0.04s, 1134 steps).
               File func_call.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of unimplemented function``
+                  (abstract) execution of unimplemented function with args:
                   result = 0
                   Concrete execution of function `ref` with args:
                     contents = 0
@@ -360,16 +360,18 @@ Prover result is: Valid (0.04s, 1134 steps).
                   z = {contents= 2}
                   result = ()
                 Line 13:
-                  Property failure, Assertion with:
+                  Property failure at assertion with:
                     z = {contents= 2}
-<check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Abstract RAC terminated because Missing value for variable result)
-- Selected model 1 (Concrete: bad model, Abstract: good model)
-    Summary: The contracts of some function or loop are underspecified
-- Checked model 2 (Concrete: bad model, Abstract: good model)
-    Summary: The contracts of some function or loop are underspecified
+<check-ce-summary>Results:
+- Checked model 0: UNKNOWN
+  - Concrete RAC NORMAL, no contradiction during execution
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6
+- Selected model 1: SW
+  - Concrete RAC NORMAL, no contradiction during execution
+  - Abstract RAC FAILURE, counter-example confirmed
+- Checked model 2: SW
+  - Concrete RAC NORMAL, no contradiction during execution
+  - Abstract RAC FAILURE, counter-example confirmed
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Goal Assertion from verification condition f'vc.
 Prover result is: Unknown (unknown + incomplete) (0.03s, 6083 steps).
@@ -385,7 +387,7 @@ File int.mlw:
 File func_call.mlw:
   Line 3:
     Constant z initialization
-    (abstract) execution of unimplemented function``
+    (abstract) execution of unimplemented function with args:
     result = 0
     Concrete execution of function `ref` with args:
       contents = 0
@@ -409,6 +411,6 @@ File func_call.mlw:
     z = {contents= 2}
     result = ()
   Line 13:
-    Property failure, Assertion with:
+    Property failure at assertion with:
       z = {contents= 2}
 

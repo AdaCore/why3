@@ -1,9 +1,9 @@
 File "bench/check-ce/func_call2.mlw", line 7, characters 12-21:
 Goal Postcondition from verification condition g'vc.
-Prover result is: Valid (0.05s, 1137 steps).
+Prover result is: Valid (0.04s, 1137 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call2.mlw", line 8, characters 12-26)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File func_call2.mlw:
             Line 3:
               z =
@@ -30,20 +30,20 @@ Prover result is: Valid (0.05s, 1137 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Value from model for global z at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `z` at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<rac-values>Value from model for parameter x at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
-<check-ce>Interpreting abstractly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Value from model for global z at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `z` at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<rac-values>Value from model for parameter x at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
-<check-ce>Result of checking model 0:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -73,10 +73,10 @@ Prover result is: Valid (0.05s, 1137 steps).
                     _ = 0
                     _ = 1
                 Line 8:
-                  Property failure, Postcondition of `g` with:
+                  Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -106,11 +106,11 @@ Prover result is: Valid (0.05s, 1137 steps).
                     _ = 0
                     _ = 1
                 Line 8:
-                  Property failure, Postcondition of `g` with:
+                  Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
 <check-ce>Check model 1 ("bench/check-ce/func_call2.mlw", line 8, characters 12-26)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File func_call2.mlw:
             Line 3:
               z =
@@ -137,20 +137,20 @@ Prover result is: Valid (0.05s, 1137 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Value from model for global z at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `z` at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for parameter x at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
-<check-ce>Interpreting abstractly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Value from model for global z at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `z` at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for parameter x at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
-<check-ce>Result of checking model 1:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -180,10 +180,10 @@ Prover result is: Valid (0.05s, 1137 steps).
                     _ = 0
                     _ = 1
                 Line 8:
-                  Property failure, Postcondition of `g` with:
+                  Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -213,11 +213,11 @@ Prover result is: Valid (0.05s, 1137 steps).
                     _ = 0
                     _ = 1
                 Line 8:
-                  Property failure, Postcondition of `g` with:
+                  Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
 <check-ce>Check model 2 ("bench/check-ce/func_call2.mlw", line 8, characters 12-26)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File func_call2.mlw:
             Line 3:
               z =
@@ -244,20 +244,20 @@ Prover result is: Valid (0.05s, 1137 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Value from model for global z at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `z` at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for parameter x at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
-<check-ce>Interpreting abstractly
-<rac-values>RHS evaluated for global zero at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global one at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Value from model for global z at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `z` at "bench/check-ce/func_call2.mlw", line 3, characters 8-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for parameter x at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call2.mlw", line 5, characters 7-8: 0
+<check-ce>Result of checking model 2: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -287,10 +287,10 @@ Prover result is: Valid (0.05s, 1137 steps).
                     _ = 0
                     _ = 1
                 Line 8:
-                  Property failure, Postcondition of `g` with:
+                  Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -320,19 +320,22 @@ Prover result is: Valid (0.05s, 1137 steps).
                     _ = 0
                     _ = 1
                 Line 8:
-                  Property failure, Postcondition of `g` with:
+                  Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
-<check-ce>Models:
-- Selected model 0 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
-- Checked model 1 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
+- Checked model 1: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
+- Checked model 2: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
 File "bench/check-ce/func_call2.mlw", line 8, characters 12-26:
 Goal Postcondition from verification condition g'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6004 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6004 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -364,7 +367,7 @@ File func_call2.mlw:
       _ = 0
       _ = 1
   Line 8:
-    Property failure, Postcondition of `g` with:
+    Property failure at postcondition of `g` with:
       x = 0
       result = 1
 

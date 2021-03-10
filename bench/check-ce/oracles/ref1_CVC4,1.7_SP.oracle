@@ -1,16 +1,16 @@
 File "bench/check-ce/ref1.mlw", line 5, characters 6-7:
 warning: unused variable x
 <check-ce>Check model 0 ("bench/check-ce/ref1.mlw", line 6, characters 11-16)
-<check-ce>Validating model:
+<check-ce>Checking model:
           
-<check-ce>Interpreting concretly
-<rac-values>Type default value for parameter _ at NO LOC: ()
-<check-ce>Interpreting abstractly
-<rac-values>Type default value for parameter _ at NO LOC: ()
-<rac-values>Value computed from postcondition for variable result at "bench/check-ce/ref1.mlw", line 5, characters 10-15: {contents=
+<check-ce>Giant-step RAC
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/ref1.mlw", line 5, characters 10-15 at "bench/check-ce/ref1.mlw", line 5, characters 10-15: {contents=
                                                                     1}
-<check-ce>Result of checking model 0:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+<check-ce>Small-step RAC
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               Unknown location:
                   _ = ()
               File ref1.mlw:
@@ -24,8 +24,8 @@ warning: unused variable x
                   Concrete execution of function `ref'mk` with args:
                     contents = 1
                 Line 6:
-                  Property failure, Assertion with:
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+                  Property failure at assertion with:
+            - Abstract RAC FAILURE (counter-example confirmed)
               Unknown location:
                   _ = ()
               File ref1.mlw:
@@ -38,13 +38,14 @@ warning: unused variable x
                     contents = 1
                   result = {contents= 1}
                 Line 6:
-                  Property failure, Assertion with:
-<check-ce>Models:
-- Selected model 0 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
+                  Property failure at assertion with:
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
 File "bench/check-ce/ref1.mlw", line 6, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.05s, 1019 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 1019 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 Unknown location:
@@ -60,5 +61,5 @@ File ref1.mlw:
     Concrete execution of function `ref'mk` with args:
       contents = 1
   Line 6:
-    Property failure, Assertion with:
+    Property failure at assertion with:
 
