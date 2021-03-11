@@ -80,7 +80,7 @@ module Make(TDom : TERM_DOMAIN) = struct
     let a = cleanup man a in
     let b = cleanup man b in
     let i = (max a.i b.i) + 1 in
-    if i > 0 then
+    if i > 1 then
       let a = if List.length a.abs_values > threshold then join_one man a else a in
       let b = if List.length b.abs_values > threshold then join_one man b else b in
       let c = { abs_values = a.abs_values @ b.abs_values; i; c = false; } in
