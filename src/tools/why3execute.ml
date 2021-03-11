@@ -138,10 +138,6 @@ let do_input f =
       eprintf "RAC cannot continue after %a@."
         (Pp.print_option Pretty.print_loc') l;
       exit 2
-  | Failure msg ->
-      eprintf "failure: %s@." msg;
-      exit 1
-
 
 let () =
   try

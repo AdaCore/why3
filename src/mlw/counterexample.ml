@@ -391,11 +391,6 @@ let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
       let reason = sprintf "%s RAC terminated because %s"
                      abs_Msg r.reason in
       {state= Runknown; reason; exec_log= Log.empty_log}
-  | Failure msg ->
-      (* E.g., cannot create default value for non-free type, cannot construct
-          term for constructor that is not a function *)
-      let reason = sprintf "failure: %s" msg in
-      {state= Runknown; reason; exec_log= Log.empty_log}
 
 let check_model ?timelimit reduce env pm model =
   match get_model_term_loc model with

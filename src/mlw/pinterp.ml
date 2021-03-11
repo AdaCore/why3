@@ -326,11 +326,8 @@ let ls_undefined =
 let ty_app_arg ts ix ty = match ty.ty_node with
   | Tyapp (ts', ty_args) when ts_equal ts' ts ->
       List.nth ty_args ix
-  | _ ->
-      let s = Printexc.get_callstack 100 in
-      Printexc.print_raw_backtrace stderr s;
-      flush stderr;
-      kasprintf failwith "@[<h>ty_arg: not a type application of %a: %a@]" print_ts ts print_ty ty
+  | _ -> kasprintf failwith "@[<h>ty_arg: not a type application of %a: %a@]"
+           print_ts ts print_ty ty
 
 (******************************************************************************)
 (*                                 RESULT                                     *)
@@ -2224,7 +2221,7 @@ and eval_expr' env e =
                 cannot_compute "anonymous function with precondition not supported (%a)"
                   Pretty.print_loc' e.e_loc;
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
-          | _ -> failwith "many args for exec fun" (* TODO *) )
+          | _ -> cannot_compute "many args for exec fun" (* TODO *) )
       | Cany ->
          register_any_call env e.e_loc None Mvs.empty;
          if env.rac.do_rac then
