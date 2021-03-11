@@ -247,6 +247,12 @@ let undefined_value ity =
   value (ty_of_ity ity) Vundefined
 
 let rec print_value fmt v =
+  if Debug.test_flag (Debug.lookup_flag "print_types") then
+    fprintf fmt "(%a: %a)" print_value' v print_ty (v_ty v)
+  else
+    print_value' fmt v
+
+and print_value' fmt v =
   match v.v_desc with
   | Vnum n ->
       if BigInt.ge n BigInt.zero then
