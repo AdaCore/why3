@@ -317,9 +317,8 @@ let snapshot_oldies oldies vsenv =
     Mvs.add old_pv.pv_vs (snapshot (Mvs.find pv.pv_vs vsenv)) in
   Mpv.fold aux oldies vsenv
 
-let ls_undefined =
-  let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_fsymbol (id_fresh "undefined") [] ty_a
+let t_undefined ty =
+  t_eps_close (create_vsymbol (id_fresh "undefined") ty) t_true
 
 (** [ty_app_arg ts nth ty] returns the nth argument in the type application [ty]. Fails
    when ty is not a type application of [ts] *)
@@ -1186,10 +1185,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * t
   let v_ty = ty_inst ty_mt v.v_ty in
   match v.v_desc with
   | Vundefined ->
-      (* TODO Replace ls_undefined by fs_any_function when branch
-       * fun-lits-noptree is merged:
-       * env, fs_app fs_any_function [t_tuple []] v_ty *)
-      vsenv, fs_app ls_undefined [] v_ty
+      vsenv, t_undefined v_ty
   | Vnum i ->
       if ty_equal v_ty ty_int || is_range_ty v_ty then
         vsenv, t_const (Constant.int_const i) v_ty
@@ -1257,8 +1253,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * t
         let ls_update = Theory.ns_find_ls ns [Ident.op_update ""] in
         let t_length = t_nat_const (Array.length arr) in
         let ty_elt = ty_app_arg ts_array 0 v_ty in
-        let t_undefined = fs_app ls_undefined [] ty_elt in
-        let t0 = fs_app ls_make [t_length; t_undefined] v_ty in
+        let t0 = fs_app ls_make [t_length; t_undefined ty_elt] v_ty in
         let rec loop vsenv sofar ix =
           if ix = Array.length arr then vsenv, sofar
           else
@@ -1489,7 +1484,6 @@ let task_of_term ?(vsenv=[]) env t =
   let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
   let task = List.fold_left add_used task th.Theory.th_decls in
   let used = Task.used_symbols (Task.used_theories task) in
-  let task = add_param_decl task ls_undefined in
   let known_local = Mid.filter (fun id _ -> not (Mid.mem id used)) th.Theory.th_known in
   let task, ls_mt, ls_mv = Mid.fold add_known known_local (task, ls_mt, ls_mv) in
   let task, ls_mt, ls_mv = Mrs.fold add_prog_const env.rsenv (task, ls_mt, ls_mv) in
