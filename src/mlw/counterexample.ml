@@ -370,13 +370,13 @@ let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
   with
   | Contr (ctx, t) when is_vc_term ?vc_term_loc ?vc_term_attrs ctx t ->
       let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
-      {state= Rfailure; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
+      {state= Rfailure; reason; exec_log= Log.close_log ctx.c_log_uc}
   | Contr (ctx, t) ->
       let reason = asprintf
           "Invalid assumption, %s RAC found a contradiction at different \
            location %a %a" abs_msg (Pp.print_option Pretty.print_loc') t.t_loc
           Pp.(print_option string) ctx.c_desc in
-      {state= Rstuck; reason; exec_log= Log.close_log ctx.c_env.rac.log_uc}
+      {state= Rstuck; reason; exec_log= Log.close_log ctx.c_log_uc}
   | RACStuck (env,l) ->
       let reason = asprintf
           "%s RAC, with the counterexample model cannot continue after %a" abs_Msg

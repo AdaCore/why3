@@ -842,3 +842,17 @@ Precondition of (-) has failed at "examples/tests/rac.mlw", line 515, characters
 - Defined at "WHY3DATA/stdlib/mach/int.mlw", line 67, characters 40-57
 - Term: in_bounds (a - b)
 - Variables: a -> 0, b -> 1
+
+* Premises
+** Premises.test1
+<rac-check-term-result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
+<rac-check-term-result>Precondition of `test1` cannot be evaluated at "command line expression to execute", line 1, characters 0-8
+                       - Defined at "examples/tests/rac.mlw", line 525, characters 15-19
+warning: Precondition of `test1` cannot be evaluated at "command line expression to execute", line 1, characters 0-8
+- Defined at "examples/tests/rac.mlw", line 525, characters 15-19
+
+<rac-check-term-result>Postcondition of `Tuple0` is ok at "examples/tests/rac.mlw", line 527, characters 4-6
+<rac-check-term-result>Postcondition of `test1` is ok at "command line expression to execute", line 1, characters 0-8
+                       - Defined at "examples/tests/rac.mlw", line 526, characters 14-18
+result: () = ()
+globals: 

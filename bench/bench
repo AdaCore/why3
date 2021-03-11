@@ -494,6 +494,7 @@ output="examples/tests/rac.out"
     rac "$mlw" Arrays test0 test1 test2 test3
     rac "$mlw" Variants loop_var_ok1 loop_var_ok2 loop_var_fail1 loop_var_fail2 loop_custom_variant
     rac "$mlw" TestUInt64 test
+    rac "$mlw" Premises test1
 ) > "$output"
 if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
     echo "RAC: ok"

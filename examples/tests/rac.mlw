@@ -125,7 +125,7 @@ module Loops
   let test3 ()  =
     while x < 10 do
       variant { 10 - x }
-      invariant { 5 >= x } (* failure when x = 6 *) 
+      invariant { 5 >= x } (* failure when x = 6 *)
       x <- x + 1
     done;
     assert { x = 100 }
@@ -513,4 +513,16 @@ end
 module TestUInt64
   use mach.int.UInt64
   let test () = 0 - 1
+end
+
+module Premises
+  val predicate p (x: int)
+  val predicate q (x: int)
+
+  axiom a: forall x. p x -> q x
+
+  let test1 () : unit
+    requires { p 42 }
+    ensures { q 42 }
+  = ()
 end

@@ -183,7 +183,14 @@ type env = private {
   pmodule : Pmodule.pmodule;
   funenv  : cexp Mrs.t;
   vsenv   : value Mvs.t;
-  rsenv   : value Mrs.t; (* global constants *)
+  (** An environment of local variables *)
+  rsenv   : value Mrs.t;
+  (** An environment of global constants. The values are lazy and only forced
+      when needed in the execution or in the task, to avoid the categorisation
+      of counterexamples as bad, when they contain invalid values for irrelevant
+      constants. *)
+  premises: term list list ref list ref;
+  (** The (stateful) set of checked terms in the execution context *)
   env     : Env.env;
   rac     : rac_config;
 }
@@ -199,7 +206,8 @@ type cntr_ctx = private {
   c_attr: Ident.attribute; (** Related VC attribute *)
   c_desc: string option; (** Additional context *)
   c_loc: Loc.position option; (** Position if different than term *)
-  c_env: env;
+  c_vsenv: value Mvs.t;
+  c_log_uc: Log.log_uc;
 }
 
 exception CannotCompute of {reason: string}
