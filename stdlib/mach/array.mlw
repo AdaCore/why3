@@ -167,7 +167,7 @@ module Array31
     ensures  { result.length = a.length }
     ensures  { forall i:int. 0 <= i < result.length -> result[i] = a[i] }
 
-  val fill (a: array 'a) (ofs: int31) (len: int31) (v: 'a) : unit
+  val fill (a: array 'a) (ofs: int31) (len: int31) (v: 'a) : unit writes {a}
     requires { 0 <= ofs /\ 0 <= len }
     requires { ofs + len <= a.length }
     ensures  { forall i:int.
