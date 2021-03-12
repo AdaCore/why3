@@ -355,9 +355,22 @@ let find_rs pm loc =
   find_in_list find_mod_unit pm.mod_units
 
 let is_vc_term ?vc_term_loc ?(vc_term_attrs=Sattr.empty) ctx t =
-  let loc = if ctx.c_loc <> None then ctx.c_loc else t.t_loc in
-  loc <> None && Opt.equal Loc.equal loc vc_term_loc &&
-  Sattr.mem ctx.c_attr vc_term_attrs
+  match vc_term_loc with
+  | None -> false
+  | Some vc_term_loc ->
+      (* The transformation [split_vc] introduces also premises and variables in
+         the goal, so we search for the location of the VC term within the term
+         [t] where the contradiction has been detected. *)
+      let rec has_vc_term_loc t =
+        Opt.equal Loc.equal (Some vc_term_loc) t.t_loc || match t.t_node with
+        | Tbinop (Term.Timplies, _, t) -> has_vc_term_loc t
+        | Tquant (_, tq) -> let _,_,t = t_open_quant tq in has_vc_term_loc t
+        | Tlet (_, tb) -> let _,t = t_open_bound tb in has_vc_term_loc t
+        | _ -> false in
+      Sattr.mem ctx.c_attr vc_term_attrs &&
+      match ctx.c_loc with
+      | Some loc -> Loc.equal loc vc_term_loc
+      | None -> has_vc_term_loc t
 
 let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
   let abs_msg = if rac.rac_abstract then "abstract" else "concrete" in
@@ -373,9 +386,9 @@ let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
       {state= Rfailure; reason; exec_log= Log.close_log ctx.c_log_uc}
   | Contr (ctx, t) ->
       let reason = asprintf
-          "Invalid assumption, %s RAC found a contradiction at different \
-           location %a %a" abs_msg (Pp.print_option Pretty.print_loc') t.t_loc
-          Pp.(print_option string) ctx.c_desc in
+          "Invalid assumption, %s RAC found a contradiction for %s at \
+           %a, which doesn't match the VC goal" abs_msg (describe_cntr_ctx ctx)
+          (Pp.print_option_or_default "unknown location" Pretty.print_loc') t.t_loc in
       {state= Rstuck; reason; exec_log= Log.close_log ctx.c_log_uc}
   | RACStuck (env,l) ->
       let reason = asprintf

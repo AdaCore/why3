@@ -210,6 +210,8 @@ type cntr_ctx = private {
   c_log_uc: Log.log_uc;
 }
 
+val describe_cntr_ctx : cntr_ctx -> string
+
 exception CannotCompute of {reason: string}
 (** raised when interpretation cannot continue due to unsupported
    feature *)

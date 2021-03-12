@@ -1383,13 +1383,13 @@ type pre_cntr_ctx = env -> cntr_ctx
 
 exception Contr of cntr_ctx * term
 
-let describe ctx =
+let describe_cntr_ctx ctx =
   asprintf "%s%a"
     (Strings.remove_prefix "expl:" ctx.c_attr.attr_string)
     (Pp.print_option (fun fmt -> fprintf fmt " %s")) ctx.c_desc
 
 let report_cntr_title fmt (ctx, msg) =
-  fprintf fmt "%s %s" (String.capitalize_ascii (describe ctx)) msg
+  fprintf fmt "%s %s" (String.capitalize_ascii (describe_cntr_ctx ctx)) msg
 
 let report_cntr_head fmt (ctx, msg, term) =
   fprintf fmt "@[<v>%a%t@]" report_cntr_title (ctx, msg)
@@ -1813,13 +1813,13 @@ let value_of_free_vars env ctx t =
 let check_assume_term env ctx t =
   try check_term env ctx t with Contr (ctx,t) ->
     let mid = value_of_free_vars env ctx t in
-    register_stucked env t.t_loc (describe ctx) mid;
+    register_stucked env t.t_loc (describe_cntr_ctx ctx) mid;
     raise (RACStuck (env, t.t_loc))
 
 let check_assume_terms env ctx tl =
   try check_terms env ctx tl with Contr (ctx,t) ->
     let mid = value_of_free_vars env ctx t in
-    register_stucked env t.t_loc (describe ctx) mid;
+    register_stucked env t.t_loc (describe_cntr_ctx ctx) mid;
     raise (RACStuck (env, t.t_loc))
 
 let check_assume_posts env ctx v posts =
@@ -1827,31 +1827,31 @@ let check_assume_posts env ctx v posts =
   try check_posts env ctx.c_attr ?desc:ctx.c_desc ctx.c_loc v posts
   with Contr (ctx,t) ->
     let mid = value_of_free_vars env ctx t in
-    register_stucked env t.t_loc (describe ctx) mid;
+    register_stucked env t.t_loc (describe_cntr_ctx ctx) mid;
     raise (RACStuck (env,t.t_loc))
 
 let check_term ?vsenv env ctx t =
   try check_term ?vsenv env ctx t with (Contr (ctx,t)) as e ->
     let mid = value_of_free_vars env ctx t in
-    register_failure env t.t_loc (describe ctx) mid;
+    register_failure env t.t_loc (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_terms env ctx tl =
   try check_terms env ctx tl with (Contr (ctx,t)) as e ->
     let mid = value_of_free_vars env ctx t in
-    register_failure env t.t_loc (describe ctx) mid;
+    register_failure env t.t_loc (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_posts env attr ?desc loc v posts =
   try check_posts env attr ?desc loc v posts with (Contr (ctx,t)) as e ->
     let mid = value_of_free_vars env ctx t in
-    register_failure env t.t_loc (describe ctx) mid;
+    register_failure env t.t_loc (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_assume_type_invs ?loc env ity v =
   try check_type_invs ?loc env ity v with Contr (ctx, t) ->
     let mid = value_of_free_vars env ctx t in
-    register_stucked env t.t_loc (describe ctx) mid;
+    register_stucked env t.t_loc (describe_cntr_ctx ctx) mid;
     raise (RACStuck (env, t.t_loc))
 
 (* Currently, type invariants are only check when creating values or getting
@@ -1859,7 +1859,7 @@ let check_assume_type_invs ?loc env ity v =
 let check_type_invs ?loc env ity v =
   try check_type_invs ?loc env ity v with Contr (ctx, t) as e ->
     let mid = value_of_free_vars env ctx t in
-    register_failure env t.t_loc (describe ctx) mid;
+    register_failure env t.t_loc (describe_cntr_ctx ctx) mid;
     raise e
 
 (** [oldify_variant env var] returns a pair [old_ts, oldies] where [old_ts] are
