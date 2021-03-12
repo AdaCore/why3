@@ -393,7 +393,9 @@ let destruct ~recursive pr : Task.task tlist =
 
   decl_goal_l (fun d ->
       match d.d_node with
-      | Dprop (Paxiom, dpr, ht) when Ident.id_equal dpr.pr_name pr.pr_name ->
+      | Dprop (Paxiom, dpr, ht)
+        when Ident.id_equal dpr.pr_name pr.pr_name &&
+             Ty.Stv.is_empty (t_ty_freevars Ty.Stv.empty ht) ->
           let decl_list = destruct_fmla ~recursive ht in
           List.map (fun l -> List.map (fun x ->
               match x with
