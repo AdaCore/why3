@@ -29,7 +29,8 @@ val gen_ident :
 
 val subst_quant: quant -> term_quant -> term -> term
 
-(* Transform the term (exists v, f) into f[x/v] *)
+(* Transform the term (exists v, f) into f[x/v].
+   Formula (exists v, f) must be monomorphic. *)
 val subst_exist: term -> term -> term
 
 (* Transform the term (forall v, f) into f[x/v] *)

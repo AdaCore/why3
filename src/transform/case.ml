@@ -36,6 +36,8 @@ let create_goal_trans ~expl =
 (* From task [delta |- G] and term t, build the tasks:
    [delta, t] |- G] and [delta, not t | - G] *)
 let case t name =
+  if not (Stv.is_empty (t_ty_freevars Stv.empty t)) then
+    raise (Arg_trans "case");
   let name =
     match name with
     | Some name -> name
@@ -74,7 +76,8 @@ let exists_aux g x =
 
 (* From task [delta |- exists x. G] and term t, build
    the task  [delta |- G[x -> t]].
-   Return an error if x and t are not unifiable. *)
+   Return an error if x and t are not unifiable
+   or G is polymorphic. *)
 let exists x =
   Trans.goal (fun _ g -> exists_aux g x)
 
