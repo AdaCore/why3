@@ -1608,7 +1608,7 @@ let add_registered_transformation s env old_tr goal_id =
     (* check if transformation already present with the same parameters.
        this should always fail and raise Not_found *)
     let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name &&
-                        List.fold_left2 (fun b new_arg old_arg -> new_arg = old_arg && b) true
+                        Lists.for_all2_prefix (=)
                                         (get_transfNode s transID).transf_args
                                         old_tr.transf_args)
         goal.proofn_transformations in

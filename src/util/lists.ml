@@ -51,6 +51,10 @@ let rec compare cmp l1 l2 = match l1,l2 with
   | a1::l1, a2::l2 ->
       let c = cmp a1 a2 in if c = 0 then compare cmp l1 l2 else c
 
+let rec for_all2_prefix p l1 l2 = match l1, l2 with
+  | a1::l1, a2::l2 -> p a1 a2 && for_all2_prefix p l1 l2
+  | _ -> true
+
 let map_join_left map join = function
   | x :: xl -> List.fold_left (fun acc x -> join acc (map x)) (map x) xl
   | _ -> invalid_arg "List.Lists.map_join_left"
