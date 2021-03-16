@@ -228,7 +228,7 @@ exception CannotCompute of {reason: string}
    feature *)
 exception Contr of cntr_ctx * term
 (** raised when a contradiction is detected during RAC. *)
-exception RACStuck of env * Loc.position option
+exception RACStuck of env * Loc.position option * string
 (** raised when an assumed property is not satisfied *)
 
 (** {2 Interpreter} *)

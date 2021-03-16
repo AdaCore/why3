@@ -336,7 +336,7 @@ let why3_execute_one m rs =
         asprintf "has failed: %a" report_cntr_body (ctx, term)
     | CannotCompute r ->
         asprintf "cannot compute (%s)" r.reason
-    | RACStuck (_, l) ->
+    | RACStuck (_, l, _) ->
         asprintf "got stuck at %a"
           (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
   let {Theory.th_name = th} = m.Pmodule.mod_theory in

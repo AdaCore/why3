@@ -132,11 +132,11 @@ let do_input f =
   | CannotCompute reason ->
       eprintf "Execution terminated because %s@." reason.reason;
       exit 2
-  | RACStuck (_, l) ->
+  | RACStuck (_, l, reason) ->
       (* TODO Remove this case when value origins (default vs model) can be distinguished
          in RAC *)
-      eprintf "RAC cannot continue after %a@."
-        (Pp.print_option Pretty.print_loc') l;
+      eprintf "RAC got stuck %s after %a@." reason
+        (Pp.print_option_or_default "unknown location" Pretty.print_loc') l;
       exit 2
 
 let () =

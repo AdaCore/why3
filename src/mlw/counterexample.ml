@@ -392,9 +392,8 @@ let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
            %a, which doesn't match the VC goal" abs_msg (describe_cntr_ctx ctx)
           (Pp.print_option_or_default "unknown location" Pretty.print_loc') t.t_loc in
       {state= Rstuck; reason; exec_log= Log.close_log ctx.c_log_uc}
-  | RACStuck (env,l) ->
-      let reason = asprintf
-          "%s RAC, with the counterexample model cannot continue after %a" abs_Msg
+  | RACStuck (env,l,reason) ->
+      let reason = asprintf "%s RAC got stuck %s at %a" abs_Msg reason
           (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
       {state= Rstuck; reason; exec_log= Log.close_log env.rac.log_uc}
   | CannotImportModelValue msg ->

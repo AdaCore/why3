@@ -1801,11 +1801,15 @@ let check_type_invs ?loc env ity v =
     let ctx = cntr_ctx Vc.expl_type_inv ?loc:loc () in
     check_terms env ctx def.Pdecl.itd_invariant
 
-exception RACStuck of env * Loc.position option
+exception RACStuck of env * Loc.position option * string
 (* The execution goes into RACStuck when a property that should be
    assumed is not satisfied. E.g. when executing a function, if the
    environment does not satisfy the precondition, the execution ends
    with RACStuck. *)
+
+let stuck ?loc env f = kasprintf (fun reason -> RACStuck (env, loc, reason)) f
+
+let opt_or o1 o2 = if o1 <> None then o1 else o2
 
 let value_of_free_vars env ctx t =
   let get_value get_value get_ty env x =
@@ -1827,54 +1831,58 @@ let value_of_free_vars env ctx t =
 
 let check_assume_term env ctx t =
   try check_term env ctx t with Contr (ctx,t) ->
+    let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
-    register_stucked env t.t_loc (describe_cntr_ctx ctx) mid;
-    raise (RACStuck (env, t.t_loc))
+    register_stucked env loc (describe_cntr_ctx ctx) mid;
+    raise (stuck ?loc env "due to failed assumption of %s" (describe_cntr_ctx ctx))
 
 let check_assume_terms env ctx tl =
   try check_terms env ctx tl with Contr (ctx,t) ->
+    let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
-    register_stucked env t.t_loc (describe_cntr_ctx ctx) mid;
-    raise (RACStuck (env, t.t_loc))
+    register_stucked env loc (describe_cntr_ctx ctx) mid;
+    raise (stuck ?loc env "due to failed assumption of %s" (describe_cntr_ctx ctx))
 
 let check_assume_posts env ctx v posts =
   let ctx = ctx env in
   try check_posts env ctx.c_attr ?desc:ctx.c_desc ctx.c_loc v posts
   with Contr (ctx,t) ->
+    let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
-    register_stucked env t.t_loc (describe_cntr_ctx ctx) mid;
-    raise (RACStuck (env,t.t_loc))
+    register_stucked env loc (describe_cntr_ctx ctx) mid;
+    raise (stuck ?loc env "due to failed assumption of %s" (describe_cntr_ctx ctx))
 
 let check_term ?vsenv env ctx t =
   try check_term ?vsenv env ctx t with (Contr (ctx,t)) as e ->
     let mid = value_of_free_vars env ctx t in
-    register_failure env t.t_loc (describe_cntr_ctx ctx) mid;
+    register_failure env (opt_or ctx.c_loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_terms env ctx tl =
   try check_terms env ctx tl with (Contr (ctx,t)) as e ->
     let mid = value_of_free_vars env ctx t in
-    register_failure env t.t_loc (describe_cntr_ctx ctx) mid;
+    register_failure env (opt_or ctx.c_loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_posts env attr ?desc loc v posts =
   try check_posts env attr ?desc loc v posts with (Contr (ctx,t)) as e ->
     let mid = value_of_free_vars env ctx t in
-    register_failure env t.t_loc (describe_cntr_ctx ctx) mid;
+    register_failure env (opt_or ctx.c_loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_assume_type_invs ?loc env ity v =
   try check_type_invs ?loc env ity v with Contr (ctx, t) ->
+    let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
-    register_stucked env t.t_loc (describe_cntr_ctx ctx) mid;
-    raise (RACStuck (env, t.t_loc))
+    register_stucked env loc (describe_cntr_ctx ctx) mid;
+    raise (stuck ?loc env "due to failed assumption of %s" (describe_cntr_ctx ctx))
 
 (* Currently, type invariants are only check when creating values or getting
    values from the model. TODO Check type invariants also during execution *)
 let check_type_invs ?loc env ity v =
   try check_type_invs ?loc env ity v with Contr (ctx, t) as e ->
     let mid = value_of_free_vars env ctx t in
-    register_failure env t.t_loc (describe_cntr_ctx ctx) mid;
+    register_failure env (opt_or ctx.c_loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
 
 (** [oldify_variant env var] returns a pair [old_ts, oldies] where [old_ts] are
@@ -2092,7 +2100,12 @@ let get_value : value_gen list -> string * value =
 let gen_model_variable env ?loc id ity : value_gen =
   "value from model", fun () ->
     try env.rac.get_value ?loc (check_assume_type_invs ?loc env) id ity with
-    | CannotCompute _ -> raise (RACStuck (env, loc))
+    | CannotCompute {reason} ->
+        Debug.dprintf debug_rac_values "Cannot compute getting value: %s@."
+          reason;
+        let loc = if loc <> None then loc else id.id_loc in
+        raise (stuck ?loc env "while getting value for `%a` from model (%s)"
+                 print_decoded id.id_string reason)
 
 (** Generator for a default value *)
 let gen_default def : value_gen =
@@ -2437,7 +2450,7 @@ and eval_expr' env e =
                  (* the execution cannot continue from here *)
                 register_stucked env e.e_loc
                   "Cannot continue after arbitrary iteration" Mid.empty;
-                raise (RACStuck (env,e.e_loc))
+                raise (stuck ?loc:e.e_loc env "when reaching the end of a loop iteration")
              | r -> r
            end
          else if is_false v then
@@ -2544,7 +2557,7 @@ and eval_expr' env e =
             let msg = asprintf "Iterating variable not in bounds" in
             let mid = Mid.singleton i.pv_vs.vs_name i_val in
             register_stucked env e.e_loc msg mid;
-            raise (RACStuck (env,e.e_loc)) end;
+            raise (stuck ?loc:e.e_loc env "because %s" msg) end;
           if le a i_bi && le i_bi b then begin
             register_iter_loop env e.e_loc Log.ExecAbstract;
             (* assert2 *)
