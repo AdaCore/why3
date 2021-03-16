@@ -2141,7 +2141,7 @@ let get_value' ctx_desc oloc gens =
     (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc print_value value;
   value
 
-let is_ignore_id id = id.id_string = "_"
+let is_ignore_id id = Strings.has_prefix "_" id.id_string
 
 let get_and_register_value env ?def ?loc ?posts id ity =
   let ctx_desc = asprintf "variable `%a`%t" print_decoded id.id_string
