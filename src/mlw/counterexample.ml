@@ -187,11 +187,11 @@ let trace_or_name id =
     type is cloned with different types as instantiations of the abstract type.
 
     @raise CannotImportModelValue when the value cannot be imported *)
-let rec import_model_value known th_known ity v =
+let rec import_model_value check known th_known ity v =
   let ts, l1, l2 = ity_components ity in
   let subst = its_match_regs ts l1 l2 in
   let def = Pdecl.find_its_defn known ts in
-    match v with
+  let res = match v with
       | Var v -> cannot_import "variable %s" v
       | Integer s ->
           if ity_equal ity ity_int then
@@ -213,7 +213,7 @@ let rec import_model_value known th_known ity v =
             let field_name = trace_or_name field_rs.rs_name in
             let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
             match List.assoc field_name r with
-            | v -> import_model_value known th_known field_ity v
+            | v -> import_model_value check known th_known field_ity v
             | exception Not_found ->
                 (* TODO Better create a default value? Requires an [Env.env]. *)
                 undefined_value field_ity in
@@ -224,7 +224,7 @@ let rec import_model_value known th_known ity v =
           let rs = List.find matching_name def.Pdecl.itd_constructors in
           let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
               rs.rs_cty.cty_args in
-          let vs = List.map2 (import_model_value known th_known) itys vs in
+          let vs = List.map2 (import_model_value check known th_known) itys vs in
           constr_value ity rs [] vs
       | Proj (p, x) ->
           (* {p : ity -> ty_res => x: ty_res} : ITY *)
@@ -245,7 +245,7 @@ let rec import_model_value known th_known ity v =
               "Cannot import projection %a, argument type %a is not value type \
                %a" Pretty.print_ls ls Pretty.print_ty ty_arg print_ity ity;
             raise Exit );
-          let x = import_model_value known th_known (ity_of_ty ty_res) x in
+          let x = import_model_value check known th_known (ity_of_ty ty_res) x in
           proj_value ity ls x
       | Array a ->
           let open Ty in
@@ -258,19 +258,21 @@ let rec import_model_value known th_known ity v =
             | _ -> assert false in
           let key_value ix = ix.arr_index_key, ix.arr_index_value in
           let keys, values = List.split (List.map key_value a.arr_indices) in
-          let keys = List.map (import_model_value known th_known key_ity) keys in
-          let values = List.map (import_model_value known th_known value_ity) values in
+          let keys = List.map (import_model_value check known th_known key_ity) keys in
+          let values = List.map (import_model_value check known th_known value_ity) values in
           let mv = Mv.of_list (List.combine keys values) in
-          let v0 = import_model_value known th_known value_ity a.arr_others in
+          let v0 = import_model_value check known th_known value_ity a.arr_others in
           purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
       | Undefined -> undefined_value ity
       | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
-          cannot_import "implemented for value %a" print_model_value v
+          cannot_import "implemented for value %a" print_model_value v in
+  check ity res;
+  res
 
 let get_value m known th_known =
-  fun ?loc id ity : Value.value option ->
+  fun ?loc check id ity : Value.value option ->
   let import_value me =
-    try Some (import_model_value known th_known ity me.me_value) with
+    try Some (import_model_value check known th_known ity me.me_value) with
       Exit -> None in
   match search_model_element_for_id m ?loc id with
   | me -> import_value me

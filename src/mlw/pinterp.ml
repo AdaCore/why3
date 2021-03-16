@@ -735,7 +735,8 @@ end
 (*                              RAC configuration                             *)
 (******************************************************************************)
 
-type get_value = ?loc:Loc.position -> ident -> ity -> value option
+type get_value =
+  ?loc:Loc.position -> (ity -> value -> unit) -> ident -> ity -> value option
 
 type rac_config = {
   do_rac              : bool;
@@ -747,7 +748,7 @@ type rac_config = {
   timelimit           : float option; (* seconds *)
 }
 
-let default_get_value ?loc:_ _ _ = None
+let default_get_value ?loc:_ _ _ _ = None
 
 let rac_config ~do_rac ~abstract:rac_abstract
       ?(skip_cannot_compute=true)
@@ -1604,7 +1605,9 @@ let get_value_for_quant_var env vs =
   | Some loc ->
       let value =
         if bind_univ_quant_vars then
-          let v = env.rac.get_value ~loc vs.vs_name (ity_of_ty vs.vs_ty) in
+          let check _ _ =
+            Warning.emit "Model value for all-quantified variable not checked" in
+          let v = env.rac.get_value ~loc check vs.vs_name (ity_of_ty vs.vs_ty) in
           (Opt.iter (fun v ->
                Debug.dprintf debug_rac_values
                  "Bind all-quantified variable %a to %a@."
@@ -2088,8 +2091,8 @@ let get_value : value_gen list -> string * value =
 (** Generate a value by querying the model for a variable *)
 let gen_model_variable env ?loc id ity : value_gen =
   "value from model", fun () ->
-    let res = env.rac.get_value ?loc id ity in
-    Opt.iter (check_assume_type_invs ?loc env ity) res; res
+    try env.rac.get_value ?loc (check_assume_type_invs ?loc env) id ity with
+    | CannotCompute _ -> raise (RACStuck (env, loc))
 
 (** Generator for a default value *)
 let gen_default def : value_gen =
