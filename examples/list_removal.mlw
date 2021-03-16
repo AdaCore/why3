@@ -92,7 +92,7 @@ val get (x: loc) : loc
   requires { x <> null }
   ensures  { result = mem[x] }
 
-val set (x y: loc) : unit writes {mem}
+val set (x y: loc) : unit
   requires { x <> null }
   writes   { mem }
   ensures  { mem = (old mem)[x <- y] }
