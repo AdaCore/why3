@@ -236,6 +236,18 @@ let range_value ity n =
 let string_value s = value ty_str (Vstring s)
 let bool_value b = value ty_bool (Vbool b)
 let proj_value ity ls v =
+  begin match ity_components ity, v with
+    | ({ its_def = Range r; its_ts= ts }, _, _), {v_desc= Vnum n}
+      when ls.ls_name.id_string = ts.ts_name.id_string ^ "'int"
+        && Opt.equal ty_equal ls.ls_value (Some ty_int) ->
+      begin
+        try
+          Number.(check_range { il_kind = ILitUnk; il_int = n } r);
+        with Number.OutOfRange _ ->
+          cannot_compute "projection value %s is out of range" (BigInt.to_string n)
+      end
+  | _ -> ()
+  end;
   value (ty_of_ity ity) (Vproj (ls, v))
 let constr_value ity rs fs vl =
   value (ty_of_ity ity) (Vconstr (rs, fs, List.map field vl))

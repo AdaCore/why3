@@ -49,17 +49,22 @@ val v_desc : value -> value_desc
 
 (** non defensive API for building [value]s: there are no checks that
    [ity] is compatible with the [value] being built *)
-
 (* TODO: make it defensive? *)
-val int_value : BigInt.t -> value
-val range_value : ity -> BigInt.t -> value
-val string_value : string -> value
 val bool_value : bool -> value
-val proj_value : ity -> lsymbol -> value -> value
+val int_value : BigInt.t -> value
+val string_value : string -> value
+
 val constr_value : ity -> rsymbol -> rsymbol list -> value list -> value
 val purefun_value : result_ity:ity -> arg_ity:ity -> value Mv.t -> value -> value
 val unit_value : value
 val undefined_value : ity -> value
+
+val range_value : ity -> BigInt.t -> value
+(** @raise CannotCompute when the value is not in the range *)
+
+val proj_value : ity -> lsymbol -> value -> value
+(** @raise CannotCompute when the lsymbol is the projection from a range type to
+    int, and the value is an integer outside the bounds of the range *)
 
 val field : value -> field
 val field_get : field -> value
@@ -148,7 +153,13 @@ val rac_reduce_config_lit :
   Whyconf.config -> Env.env -> ?trans:string -> ?prover:string -> ?try_negate:bool ->
   unit -> rac_reduce_config
 
-type get_value = ?loc:Loc.position -> ident -> ity -> value option
+type get_value =
+  ?loc:Loc.position -> (ity -> value -> unit) -> ident -> ity -> value option
+(** [get_value ?loc check id ity] tries to retrive a value from the oracle. The
+    [check] is called on the value and every component.
+
+    @raise CannotCompute if the value or any component is invalid (e.g., a range
+    value outside its bounds). *)
 
 type rac_config = private {
   do_rac : bool;
