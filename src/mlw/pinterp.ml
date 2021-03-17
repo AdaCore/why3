@@ -413,6 +413,8 @@ let rac_reduce_config_lit config env ?trans ?prover ?try_negate () =
 module type Log = sig
   type exec_kind = ExecAbstract | ExecConcrete
 
+  type value_or_invalid = Value of value | Invalid
+
   type log_entry_desc = private
     | Val_assumed of (ident * value)
     | Const_init of ident
@@ -420,7 +422,7 @@ module type Log = sig
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
     | Iter_loop of exec_kind
-    | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
+    | Exec_main of (rsymbol * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
     | Exec_ended
@@ -442,7 +444,7 @@ module type Log = sig
   val log_any_call : log_uc -> rsymbol option -> value Mvs.t ->
                      Loc.position option -> unit
   val log_iter_loop : log_uc -> exec_kind -> Loc.position option -> unit
-  val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Mrs.t ->
+  val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Lazy.t Mrs.t ->
                       Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
                    Loc.position option -> unit
@@ -459,6 +461,8 @@ end
 module Log : Log = struct
   type exec_kind = ExecAbstract | ExecConcrete
 
+  type value_or_invalid = Value of value | Invalid
+
   type log_entry_desc =
     | Val_assumed of (ident * value)
     | Const_init of ident
@@ -466,7 +470,7 @@ module Log : Log = struct
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
     | Iter_loop of exec_kind
-    | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
+    | Exec_main of (rsymbol * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
     | Exec_ended
@@ -508,6 +512,7 @@ module Log : Log = struct
     log_entry log_uc (Iter_loop kind) loc
 
   let log_exec_main log_uc rs mvs mrs loc =
+    let mrs = Mrs.map (fun v -> try Value (Lazy.force v) with _ -> Invalid) mrs in
     log_entry log_uc (Exec_main (rs,mvs,mrs)) loc
 
   let log_failed log_uc s mvs loc =
@@ -542,14 +547,19 @@ module Log : Log = struct
             consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
 
   let print_log_entry_desc fmt e =
-    let print_assoc key2string fmt (k,v) =
-      fprintf fmt "@[%a = %a@]"
-        print_decoded (key2string k) print_value v in
-    let print_list key2string =
-      Pp.print_list_pre Pp.newline (print_assoc key2string) in
     let vs2string vs = vs.vs_name.id_string in
     let rs2string rs = rs.rs_name.id_string in
     let id2string id = id.id_string in
+    let print_value_or_invalid fmt = function
+      | Value v -> print_value fmt v
+      | Invalid -> Pp.string fmt "invalid value" in
+    let print_assoc key2string print_value fmt (k,v) =
+      fprintf fmt "@[%a = %a@]"
+        print_decoded (key2string k) print_value v in
+    let print_list key2string =
+      Pp.print_list_pre Pp.newline (print_assoc key2string print_value) in
+    let print_list_or_invalid =
+      Pp.print_list_pre Pp.newline (print_assoc rs2string print_value_or_invalid) in
     match e.log_desc with
     | Val_assumed (id, v) ->
         fprintf fmt "@[<h2>%a = %a@]" print_decoded id.id_string print_value v;
@@ -581,7 +591,7 @@ module Log : Log = struct
         fprintf fmt "@[<h2>Execution of main function `%a` with env:%a%a@]"
           print_decoded rs.rs_name.id_string
           (print_list vs2string) (Mvs.bindings mvs)
-          (print_list rs2string) (Mrs.bindings mrs)
+          print_list_or_invalid (Mrs.bindings mrs)
     | Exec_failed (msg,mid) ->
        fprintf fmt "@[<h2>Property failure, %s with:%a@]"
          msg (print_list id2string) (Mid.bindings mid)
@@ -602,15 +612,23 @@ module Log : Log = struct
     if json then
       let open Json_base in
       let string f = kasprintf (fun s -> String s) f in
+      let vs2string vs = vs.vs_name.id_string in
+      let id2string id = id.id_string in
+      let rs2string rs = rs.rs_name.id_string in
       let print_json_kind fmt = function
         | ExecAbstract -> print_json fmt (string "ABSTRACT")
         | ExecConcrete -> print_json fmt (string "CONCRETE") in
+      let print_value_or_undefined fmt = function
+        | Value v -> print_value fmt v
+        | Invalid -> print_json fmt Null in
       let print_key_value key2string fmt (k,v) =
         fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
           (print_json_field "name" print_json) (String (key2string k))
           (print_json_field "value" print_value) v in
-      let vs2string vs = vs.vs_name.id_string in
-      let id2string id = id.id_string in
+      let print_key_value_or_undefined fmt (k,v) =
+        fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+          (print_json_field "name" print_json) (String (rs2string k))
+          (print_json_field "value" print_value_or_undefined) v in
       let print_log_entry fmt = function
         | Val_assumed (id, v) ->
             fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
@@ -650,14 +668,14 @@ module Log : Log = struct
               (print_json_field "kind" print_json) (string "ITER_LOOP")
               (print_json_field "exec" print_json_kind) kind
         | Exec_main (rs,mvs,mrs) ->
-           let mid = Mvs.fold (fun vs v mid -> Mid.add vs.vs_name v mid) mvs Mid.empty in
-           let mid = Mrs.fold (fun rs v mid -> Mid.add rs.rs_name v mid) mrs mid in
-           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
              (print_json_field "kind" print_json) (string "EXEC_MAIN")
              (print_json_field "rs" print_json)
              (string "%a" print_decoded rs.rs_name.id_string)
-             (print_json_field "env" (list (print_key_value id2string)))
-             (Mid.bindings mid)
+             (print_json_field "env" (list (print_key_value vs2string)))
+             (Mvs.bindings mvs)
+             (print_json_field "globals" (list print_key_value_or_undefined))
+             (Mrs.bindings mrs)
         | Exec_failed (reason,mid) ->
             fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
               (print_json_field "kind" print_json) (string "FAILED")
@@ -782,7 +800,7 @@ type env = {
   pmodule : Pmodule.pmodule;
   funenv  : cexp Mrs.t;
   vsenv   : value Mvs.t;
-  rsenv   : value Mrs.t; (* global constants *)
+  rsenv   : value lazy_t Mrs.t;
   premises: premises;
   env     : Env.env;
   rac     : rac_config;
@@ -1517,12 +1535,18 @@ let bind_fun rs cexp (task, ls_mv) =
 let task_of_term ?(vsenv=[]) env t =
   let open Task in let open Decl in
   let th = env.pmodule.Pmodule.mod_theory in
+  let rec t_free_sls sofar t =
+    t_fold (fun sofar t ->
+        match t.t_node with
+        | Tapp (ls, []) -> Sls.add ls sofar
+        | _ -> t_free_sls sofar t) sofar t in
+  let free_sls = t_free_sls Sls.empty t in
   let lsenv =
-    let aux1 rs v mls =
+    let aux rs v mls =
       match rs.rs_logic with
-      | RLls ls -> Mls.add ls v mls
+      | RLls ls when Sls.mem ls free_sls -> Mls.add ls v mls
       | _ -> mls in
-    Mrs.fold aux1 env.rsenv Mls.empty in
+    Mrs.fold aux env.rsenv Mls.empty in
   let add_used task td =
     let open Theory in
     match td.td_node with
@@ -1539,7 +1563,7 @@ let task_of_term ?(vsenv=[]) env t =
     match decl.d_node with
     | Dparam ls when Mls.contains lsenv ls ->
         (* Take value from lsenv (i.e. env.rsenv) for declaration *)
-        let vsenv, t = term_of_value env [] (Mls.find ls lsenv) in
+        let vsenv, t = term_of_value env [] (Lazy.force (Mls.find ls lsenv)) in
         let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
         let t = t_ty_subst ls_mt ls_mv t in
         let ldecl = Decl.make_ls_defn ls [] t in
@@ -1557,9 +1581,9 @@ let task_of_term ?(vsenv=[]) env t =
       | Decl.{d_node = Dparam _} -> true
       | _ -> false in
     match rs.rs_logic with
-    | Expr.RLls ls when is_undefined_constant ls ->
+    | Expr.RLls ls when is_undefined_constant ls && Sls.mem ls free_sls  ->
         let pr = create_prsymbol (id_fresh (asprintf "def_%a" print_rs rs)) in
-        let vsenv, t = term_of_value env [] v in
+        let vsenv, t = term_of_value env [] (Lazy.force v) in
         let task, ls_mt, ls_mv = List.fold_right bind_term vsenv (task, ls_mt, ls_mv) in
         let t = t_equ (t_app ls [] ls.ls_value) t in
         let task = add_prop_decl task Paxiom pr t in
@@ -1812,9 +1836,9 @@ let stuck ?loc env f = kasprintf (fun reason -> RACStuck (env, loc, reason)) f
 let opt_or o1 o2 = if o1 <> None then o1 else o2
 
 let value_of_free_vars env ctx t =
-  let get_value get_value get_ty env x =
+  let get_value get get_ty env x =
     let def = undefined_value (ity_of_ty (get_ty x)) in
-    snapshot (Opt.get_def def (get_value x env))  in
+    snapshot (Opt.get_def def (get x env))  in
   let mid = t_v_fold (fun mvs vs ->
     let get_ty vs = vs.vs_ty in
     let value = get_value Mvs.find_opt get_ty ctx.c_vsenv vs in
@@ -1823,7 +1847,8 @@ let value_of_free_vars env ctx t =
       let get_ty rs = ty_of_ity rs.rs_cty.cty_result in
       if tyl = [] && ty <> None then
         try let rs = restore_rs ls in
-            let value = get_value Mrs.find_opt get_ty env.rsenv rs in
+            let get x m = Opt.map Lazy.force (Mrs.find_opt x m) in
+            let value = get_value get get_ty env.rsenv rs in
             Mid.add rs.rs_name value mrs
         with Not_found -> mrs
       else mrs
@@ -2182,15 +2207,24 @@ let get_and_register_param env id ity =
   register_used_value env id.id_loc id value;
   value
 
-let get_and_register_global env eval_expr id oexp ity =
+(* For globals, RACStuck exeptions that indicate invalid model values are
+   referred lazily until their value is required in RAC or in the task. *)
+let get_and_register_global env eval_expr id oexp post ity =
   let ctx_desc = asprintf "global `%a`" print_decoded id.id_string in
   let gens = [
     gen_model_variable env id ity;
     gen_eval_expr env eval_expr id oexp;
   ] in
-  let value = get_value' ctx_desc id.id_loc gens in
-  register_used_value env id.id_loc id value;
-  value
+  try
+    let value = get_value' ctx_desc id.id_loc gens in
+    register_used_value env id.id_loc id value;
+    if env.rac.do_rac then (
+      let desc = asprintf "of global variable `%a`" print_decoded id.id_string in
+      let ctx = cntr_ctx Vc.expl_post ~desc () in
+      check_assume_posts env ctx value post );
+    lazy value
+  with RACStuck _ as e ->
+    lazy Printexc.(raise_with_backtrace e (get_raw_backtrace ()))
 
 (******************************************************************************)
 (*                              SIDE EFFECTS                                  *)
@@ -2343,7 +2377,7 @@ and eval_expr' env e =
             let ctx = cntr_ctx ?loc:e.e_loc Vc.expl_pre ~desc () in
             check_terms env ctx cty.cty_pre );
           assert (cty.cty_args = [] && pvsl = []);
-          let v = Mrs.find rs env.rsenv in
+          let v = Lazy.force (Mrs.find rs env.rsenv) in
           if env.rac.do_rac then
             check_posts env Vc.expl_post None v rs.rs_cty.cty_post;
           Normal v
@@ -2879,8 +2913,8 @@ let bind_globals ?rs_main mod_known env =
         Debug.dprintf debug_trace_exec "EVAL GLOBAL VAR %a at %a@."
           print_decoded id.id_string
           Pp.(print_option_or_default "NO LOC" print_loc') id.id_loc;
-        let v = get_and_register_global env eval_expr id (Some e) e.e_ity in
-        bind_vs pv.pv_vs v env
+        let v = get_and_register_global env eval_expr id (Some e) [] e.e_ity in
+        bind_vs pv.pv_vs (Lazy.force v) env (* TODO Don't force [v] until used *)
     | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
         Debug.dprintf debug_trace_exec "EVAL GLOBAL SYM CONST %a at %a@."
           print_decoded id.id_string
@@ -2889,12 +2923,8 @@ let bind_globals ?rs_main mod_known env =
         let oexp = match ce.c_node with
           | Cany -> None | Cfun e -> Some e
           | _ -> failwith "eval_globals: program constant cexp" in
-        let v =
-          get_and_register_global env eval_expr id oexp ce.c_cty.cty_result in
-        if env.rac.do_rac then (
-          let desc = asprintf "of global variable `%a`" print_rs rs in
-          let ctx = cntr_ctx Vc.expl_post ~desc () in
-          check_assume_posts env ctx v ce.c_cty.cty_post );
+        let v = get_and_register_global env eval_expr id oexp ce.c_cty.cty_post
+            ce.c_cty.cty_result in
         bind_rs rs v env )
     | _ -> env in
   let is_before id d (env, found_rs) =

@@ -79,6 +79,8 @@ val print_value : Format.formatter -> value -> unit
 module type Log = sig
   type exec_kind = ExecAbstract | ExecConcrete
 
+  type value_or_invalid = Value of value | Invalid
+
   type log_entry_desc = private
     | Val_assumed of (ident * value)
     | Const_init of ident
@@ -86,7 +88,7 @@ module type Log = sig
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
     | Iter_loop of exec_kind
-    | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
+    | Exec_main of (rsymbol * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
     | Exec_ended
@@ -108,7 +110,7 @@ module type Log = sig
   val log_any_call : log_uc -> rsymbol option -> value Mvs.t
                      -> Loc.position option -> unit
   val log_iter_loop : log_uc -> exec_kind -> Loc.position option -> unit
-  val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Mrs.t ->
+  val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Lazy.t Mrs.t ->
                       Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
                    Loc.position option -> unit
@@ -192,10 +194,12 @@ val rac_config :
 (** Context for the interpreter *)
 type env = private {
   pmodule : Pmodule.pmodule;
+  (** The pmodule of the VC *)
   funenv  : cexp Mrs.t;
+  (** An environment of local functions *)
   vsenv   : value Mvs.t;
   (** An environment of local variables *)
-  rsenv   : value Mrs.t;
+  rsenv   : value Lazy.t Mrs.t;
   (** An environment of global constants. The values are lazy and only forced
       when needed in the execution or in the task, to avoid the categorisation
       of counterexamples as bad, when they contain invalid values for irrelevant
@@ -203,7 +207,9 @@ type env = private {
   premises: term list list ref list ref;
   (** The (stateful) set of checked terms in the execution context *)
   env     : Env.env;
+  (** The Why3 environment *)
   rac     : rac_config;
+  (** The configuration of the RAC *)
 }
 
 (** Result of the interpreter **)
@@ -239,7 +245,7 @@ val eval_global_fundef :
   Pmodule.pmodule ->
   (rsymbol * cexp) list ->
   expr ->
-  result * value Mvs.t * value Mrs.t
+  result * value Mvs.t * value Lazy.t Mrs.t
 (** [eval_global_fundef ~rac env pkm dkm rcl e] evaluates [e] and
    returns an evaluation result and a final variable environment (for
    both local and global variables).
@@ -266,7 +272,7 @@ val report_cntr_body : Format.formatter -> cntr_ctx * term -> unit
 (** Report a contradiction context and term *)
 
 val report_eval_result :
-  expr -> Format.formatter -> result * value Mvs.t * value Mrs.t -> unit
+  expr -> Format.formatter -> result * value Mvs.t * value Lazy.t Mrs.t -> unit
 (** Report an evaluation result *)
 
 val eval_rs : rac_config -> Env.env -> Pmodule.pmodule -> rsymbol -> result * env
