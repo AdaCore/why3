@@ -28,8 +28,6 @@ val equal : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
 
 val compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
 
-val eqlength_and_for_all2 : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
-
 val cons : ('a -> 'b) -> 'b list -> 'a -> 'b list
 
 val map_join_left : ('a -> 'b) -> ('b -> 'b -> 'b) -> 'a list -> 'b
