@@ -2112,6 +2112,8 @@ let try_eval_ensures env posts =
 (*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
 (******************************************************************************)
 
+let is_ignore_id id = Strings.has_prefix "_" id.id_string
+
 (** A partial value generator with a string as a description. *)
 type value_gen = string * (unit -> value option)
 
@@ -2128,9 +2130,10 @@ let gen_model_variable env ?loc id ity : value_gen =
     | CannotCompute {reason} ->
         Debug.dprintf debug_rac_values "Cannot compute getting value: %s@."
           reason;
-        let loc = if loc <> None then loc else id.id_loc in
-        raise (stuck ?loc env "while getting value for `%a` from model (%s)"
-                 print_decoded id.id_string reason)
+        if is_ignore_id id then None else
+          let loc = if loc <> None then loc else id.id_loc in
+          raise (stuck ?loc env "while getting value for `%a` from model (%s)"
+                   print_decoded id.id_string reason)
 
 (** Generator for a default value *)
 let gen_default def : value_gen =
@@ -2178,8 +2181,6 @@ let get_value' ctx_desc oloc gens =
     (String.capitalize_ascii desc) ctx_desc
     (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc print_value value;
   value
-
-let is_ignore_id id = Strings.has_prefix "_" id.id_string
 
 let get_and_register_value env ?def ?loc ?posts id ity =
   let ctx_desc = asprintf "variable `%a`%t" print_decoded id.id_string
