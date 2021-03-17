@@ -205,17 +205,17 @@ module FromSexp = struct
 
   let var name =
     match prover_name name with
-    | Some ty -> Prover_var (ty, name)
-    | None -> Var name
+    | Some ty -> Tprover_var (ty, name)
+    | None -> Tvar name
 
   let rec term sexp =
-    try Sval (value sexp) with _ ->
+    try Tconst (value sexp) with _ ->
     try var (var_name sexp) with _ ->
-    try Array (array sexp) with _ ->
+    try Tarray (array sexp) with _ ->
     try ite sexp with _ ->
     try let_term sexp with _ ->
     try as_array sexp with _ ->
-    try Apply (application sexp) with _ ->
+    try Tapply (application sexp) with _ ->
       error sexp "term"
 
   and value sexp =
@@ -240,7 +240,7 @@ module FromSexp = struct
 
   and ite = function
     | List [Atom "ite"; t1; t2; t3] ->
-        Ite (term t1, term t2, term t3)
+        Tite (term t1, term t2, term t3)
     | sexp -> error sexp "ite"
 
   and pair_equal = function
@@ -257,12 +257,12 @@ module FromSexp = struct
         let aux = function
           | List [Atom s; t] -> s, term t
           | sexp -> error sexp "binding" in
-        Let (List.map aux bs, term t)
+        Tlet (List.map aux bs, term t)
     | sexp -> error sexp "let_term"
 
   and as_array = function
     | List [Atom "_"; Atom "as-array"; n] ->
-        To_array (Var (name n))
+        Tto_array (Tvar (name n))
     | sexp -> error sexp "as_array"
 
   and application = function
@@ -288,7 +288,7 @@ module FromSexp = struct
     | List [Atom "define-fun"; Atom n; al; iret; t] ->
         let iret = ireturn_type iret in
         let al = list arg al and t = term t in
-        Some (n, Function (al, iret, t))
+        Some (n, Dfunction (al, iret, t))
     | _ -> None
 
   let model = function

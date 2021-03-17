@@ -180,6 +180,23 @@ let trace_or_name id =
   | name -> if name = "" then id.id_string else name
   | exception Not_found -> id.id_string
 
+let import_model_const ity = function
+  | Integer s ->
+      if ity_equal ity ity_int then
+        int_value s.int_value
+      else if is_range_ty (ty_of_ity ity) then
+        range_value ity s.int_value
+      else
+        cannot_import "type %a instead of int or range type" print_ity ity
+  | String s ->
+      ity_equal_check ity ity_str;
+      string_value s
+  | Boolean b ->
+      ity_equal_check ity ity_bool;
+      bool_value b
+  | Decimal _ | Fraction _ | Float _ | Bitvector _ as v ->
+      cannot_import "not implemented for value %a" print_model_const_human v
+
 (** Import a value from the prover model to an interpreter value.
 
     @raise Exit when the type [ity] and the shape of the the value [v] do not
@@ -192,20 +209,8 @@ let rec import_model_value check known th_known ity v =
   let subst = its_match_regs ts l1 l2 in
   let def = Pdecl.find_its_defn known ts in
   let res = match v with
+      | Const c -> import_model_const ity c
       | Var v -> cannot_import "variable %s" v
-      | Integer s ->
-          if ity_equal ity ity_int then
-            int_value s.int_value
-          else if is_range_ty (ty_of_ity ity) then
-            range_value ity s.int_value
-          else
-            cannot_import "type %a instead of int or range type" print_ity ity
-      | String s ->
-          ity_equal_check ity ity_str;
-          string_value s
-      | Boolean b ->
-          ity_equal_check ity ity_bool;
-          bool_value b
       | Record r ->
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
             cannot_import "type with not exactly one constructors" in
@@ -263,9 +268,8 @@ let rec import_model_value check known th_known ity v =
           let mv = Mv.of_list (List.combine keys values) in
           let v0 = import_model_value check known th_known value_ity a.arr_others in
           purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
-      | Undefined -> undefined_value ity
-      | Decimal _ | Fraction _ | Float _ | Bitvector _ | Unparsed _ as v ->
-          cannot_import "implemented for value %a" print_model_value v in
+      | Unparsed s -> cannot_import "unparsed value %s" s
+      | Undefined -> undefined_value ity in
   check ity res;
   res
 
@@ -555,16 +559,16 @@ let rec model_value v =
   let id_name {id_string= name; id_attrs= attrs} =
     Ident.get_model_trace_string ~name ~attrs in
   match v_desc v with
-  | Vnum i -> Integer { int_value= i; int_verbatim= BigInt.to_string i }
-  | Vstring s -> String s
-  | Vbool b -> Boolean b
+  | Vnum i -> Const (Integer { int_value= i; int_verbatim= BigInt.to_string i })
+  | Vstring s -> Const (String s)
+  | Vbool b -> Const (Boolean b)
   | Vproj (ls, v) -> Proj (ls.ls_name.id_string, model_value v)
   | Varray a ->
       let aux i v = {
-        arr_index_key= Integer {
+        arr_index_key= Const (Integer {
             int_value= BigInt.of_int i;
             int_verbatim= string_of_int i
-          };
+          });
         arr_index_value= model_value v
       } in
       Array {

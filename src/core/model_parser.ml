@@ -35,7 +35,7 @@ type model_float =
   | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
   | Float_number of {hex: string option; binary: model_float_binary}
 
-type model_value =
+type model_const =
   | Boolean of bool
   | String of string
   | Integer of model_int
@@ -43,6 +43,9 @@ type model_value =
   | Bitvector of model_bv
   | Decimal of model_dec
   | Fraction of model_frac
+
+type model_value =
+  | Const of model_const
   | Array of model_array
   | Record of model_record
   | Proj of model_proj
@@ -77,7 +80,7 @@ let float_compare f1 f2 = match f1, f2 with
   | _, Float_number _ -> 1
   | f1, f2 -> compare f1 f2
 
-let compare_model_value v1 v2 = match v1, v2 with
+let compare_model_const c1 c2 = match c1, c2 with
   | Boolean b1, Boolean b2 -> compare b1 b2
   | Boolean _, _ -> -1 | _, Boolean _ -> 1
   | String s1, String s2 -> String.compare s1 s2
@@ -91,7 +94,10 @@ let compare_model_value v1 v2 = match v1, v2 with
   | Decimal d1, Decimal d2 -> (match BigInt.compare d1.dec_int d2.dec_int with 0 -> BigInt.compare d1.dec_frac d2.dec_frac | n -> n)
   | Decimal _, _ -> -1 | _, Decimal _ -> 1
   | Fraction f1, Fraction f2 -> (match BigInt.compare f1.frac_nom f2.frac_nom with 0 -> BigInt.compare f1.frac_den f2.frac_den | n -> n)
-  | Fraction _, _ -> -1 | _, Fraction _ -> 1
+
+let compare_model_value v1 v2 = match v1, v2 with
+  | Const c1, Const c2 -> compare_model_const c1 c2
+  | Const _, _ -> -1 | _, Const _ -> 1
   | _ -> 0
 
 let array_create_constant ~value = {arr_others= value; arr_indices= []}
@@ -211,8 +217,7 @@ let convert_float_value f =
       let m = ("significand", Json_base.String mant.bv_verbatim) :: m in
       Json_base.Record m
 
-let rec convert_model_value value : Json_base.json =
-  match value with
+let convert_model_const = function
   | String s ->
       let m = ("type", Json_base.String "String") :: [] in
       let m = ("val", Json_base.String s) :: m in
@@ -233,10 +238,6 @@ let rec convert_model_value value : Json_base.json =
       let m = ("type", Json_base.String "Fraction") :: [] in
       let m = ("val", Json_base.String (Format.sprintf "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den))) :: m in
       Json_base.Record m
-  | Unparsed s ->
-      let m = ("type", Json_base.String "Unparsed") :: [] in
-      let m = ("val", Json_base.String s) :: m in
-      Json_base.Record m
   | Bitvector bv ->
       let m = ("type", Json_base.String "Integer") :: [] in
       let m = ("val", Json_base.String (BigInt.to_string bv.bv_value)) :: m in
@@ -244,6 +245,14 @@ let rec convert_model_value value : Json_base.json =
   | Boolean b ->
       let m = ("type", Json_base.String "Boolean") :: [] in
       let m = ("val", Json_base.Bool b) :: m in
+      Json_base.Record m
+
+let rec convert_model_value value : Json_base.json =
+  match value with
+  | Const c -> convert_model_const c
+  | Unparsed s ->
+      let m = ("type", Json_base.String "Unparsed") :: [] in
+      let m = ("val", Json_base.String s) :: m in
       Json_base.Record m
   | Array a ->
       let l = convert_array a in
@@ -334,6 +343,22 @@ let print_integer fmt (i: BigInt.t) =
       (fun fmt -> if BigInt.sign i < 0 then pp_print_string fmt "-")
       (Number.print_in_base 16 None) (BigInt.abs i)
 
+let print_bv fmt (bv : model_bv) =
+  (* TODO Not implemented yet. Ideally, fix the differentiation made in the
+     parser between Bv_int and Bv_sharp -> convert Bv_int to Bitvector not
+     Integer. And print Bv_int exactly like Bv_sharp.
+  *)
+  fprintf fmt "%s" bv.bv_verbatim
+
+let print_model_const_human fmt = function
+  | String s -> Constant.print_string_def fmt s
+  | Integer i -> print_integer fmt i.int_value
+  | Decimal d -> fprintf fmt "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac)
+  | Fraction f -> fprintf fmt "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den)
+  | Float f -> print_float_human fmt f
+  | Boolean b -> fprintf fmt "%b" b
+  | Bitvector s -> print_bv fmt s
+
 let rec print_array_human fmt (arr : model_array) =
   let print_others fmt v =
     fprintf fmt "@[others =>@ %a@]" print_model_value_human v in
@@ -363,21 +388,9 @@ and print_proj_human fmt p =
   let s, v = p in
   fprintf fmt "@[{%s =>@ %a}@]" s print_model_value_human v
 
-and print_bv fmt (bv : model_bv) =
-  (* TODO Not implemented yet. Ideally, fix the differentiation made in the
-     parser between Bv_int and Bv_sharp -> convert Bv_int to Bitvector not
-     Integer. And print Bv_int exactly like Bv_sharp.
-  *)
-  fprintf fmt "%s" bv.bv_verbatim
-
 and print_model_value_human fmt (v : model_value) =
   match v with
-  | String s -> Constant.print_string_def fmt s
-  | Integer i -> print_integer fmt i.int_value
-  | Decimal d -> fprintf fmt "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac)
-  | Fraction f -> fprintf fmt "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den)
-  | Float f -> print_float_human fmt f
-  | Boolean b -> fprintf fmt "%b" b
+  | Const c -> print_model_const_human fmt c
   | Apply (s, []) -> fprintf fmt "%s" s
   | Apply (s, lt) ->
       fprintf fmt "@[(%s@ %a)@]" s
@@ -386,7 +399,6 @@ and print_model_value_human fmt (v : model_value) =
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Proj p -> print_proj_human fmt p
-  | Bitvector s -> print_bv fmt s
   | Var v -> fprintf fmt "%s" v
   | Undefined -> fprintf fmt "UNDEFINED"
   | Unparsed s -> fprintf fmt "%s" s
@@ -866,13 +878,13 @@ let recover_name pm fields_projs raw_name =
       (id.id_string, id.id_attrs) in
   get_model_trace_string ~name ~attrs
 
+
 (** [replace_projection const_function mv] replaces record names, projections, and application callees
    in [mv] using [const_function] *)
 let rec replace_projection (const_function : string -> string) =
   let const_function s = try const_function s with Not_found -> s in
   function
-  | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
-  | String _ | Undefined | Var _ | Unparsed _ as mv -> mv
+  | Const _ as v -> v
   | Record fs ->
       let aux (f, mv) = const_function f, replace_projection const_function mv in
       Record (List.map aux fs)
@@ -881,6 +893,7 @@ let rec replace_projection (const_function : string -> string) =
   | Array a -> Array (replace_projection_array const_function a)
   | Apply (s, l) ->
       Apply (const_function s, List.map (replace_projection const_function) l)
+  | Var _ | Undefined | Unparsed _ as v -> v
 
 and replace_projection_array const_function a =
   let for_index a =
@@ -1030,22 +1043,24 @@ class clean = object (self)
       Opt.bind (self#value me.me_value) @@ fun me_value ->
       Some {me with me_value}
   method value v = match v with
-    | Unparsed s    -> self#unparsed s | String v      -> self#string v
-    | Integer v     -> self#integer v  | Decimal v     -> self#decimal v
-    | Fraction v    -> self#fraction v | Float v       -> self#float v
-    | Boolean v     -> self#boolean v  | Bitvector v   -> self#bitvector v
+    | Const c -> self#const c
+    | Unparsed s    -> self#unparsed s
     | Proj (p, v)   -> self#proj p v   | Apply (s, vs) -> self#apply s vs
     | Array a       -> self#array a    | Record fs     -> self#record fs
     | Undefined     -> self#undefined  | Var v         -> self#var v
+  method const c = match c with
+      String v      -> self#string v  | Integer v     -> self#integer v  |
+      Decimal v     -> self#decimal v | Fraction v    -> self#fraction v |
+      Float v       -> self#float v   | Boolean v     -> self#boolean v  |
+      Bitvector v   -> self#bitvector v
+  method string v = Some (Const (String v))
+  method integer v = Some (Const (Integer v))
+  method decimal v = Some (Const (Decimal v))
+  method fraction v = Some (Const (Fraction v))
+  method float v = Some (Const (Float v))
+  method boolean v = Some (Const (Boolean v))
+  method bitvector v = Some (Const (Bitvector v))
   method var _ = None
-  method unparsed _ = None
-  method string v = Some (String v)
-  method integer v = Some (Integer v)
-  method decimal v = Some (Decimal v)
-  method fraction v = Some (Fraction v)
-  method float v = Some (Float v)
-  method boolean v = Some (Boolean v)
-  method bitvector v = Some (Bitvector v)
   method proj p v =
     Opt.bind (self#value v) @@ fun v ->
     Some (Proj (p, v))
@@ -1066,6 +1081,7 @@ class clean = object (self)
       Some (f, v) in
     opt_bind_all (List.map clean_field fs) @@ fun fs ->
     Some (Record fs)
+  method unparsed _ = None
   method undefined = Some Undefined
 end
 

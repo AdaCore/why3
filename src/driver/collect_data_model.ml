@@ -16,7 +16,7 @@ open Smtv2_model_defs
 let debug_cntex = Debug.register_flag "cntex_collection"
     ~desc:"Intermediate representation debugging for counterexamples"
 
-let is_true = function Model_parser.(Boolean true) -> true | _ -> false
+let is_true = function Model_parser.(Const (Boolean true)) -> true | _ -> false
 
 type func_def = {
   args: (ident * typ option) list;
@@ -53,40 +53,41 @@ type context = {
  *   res *)
 
 let rec eval ctx oty t =
-  let module M = Model_parser in
+  let open Model_parser in
   match t with
-  | Sval mv -> mv
-  | Prover_var (ty, v) ->
+  | Tconst c -> Const c
+  | Tunparsed s -> Unparsed s
+  | Tprover_var (ty, v) ->
       if ctx.opaque_prover_vars then
-        M.Var v
+        Var v
       else
-        Opt.get_def (M.Var v) (eval_prover_var ctx ty v)
-  | Var v ->
+        Opt.get_def (Var v) (eval_prover_var ctx ty v)
+  | Tvar v ->
       if List.mem v ctx.pm.noarg_constructors then
-        M.Apply (v, [])
+        Apply (v, [])
       else
         Mstr.find v ctx.values
-  | Ite (t1, t2, t3) ->
+  | Tite (t1, t2, t3) ->
       if is_true (eval ctx None t1) then eval ctx oty t2 else eval ctx oty t3
-  | Let (bs, t) ->
+  | Tlet (bs, t) ->
       let aux values (s, t) = Mstr.add s (eval ctx None t) values in
       let values = List.fold_left aux ctx.values bs in
       eval {ctx with values} oty t
-  | Apply ("=", [t1; t2]) ->
-      M.Boolean (eval ctx None t1 = eval ctx None t2)
-  | Apply ("or", ts) ->
-      M.Boolean List.(exists is_true (map (eval ctx None) ts))
-  | Apply ("and", ts) ->
-      M.Boolean List.(for_all is_true (map (eval ctx None) ts))
-  | Apply ("not", [t]) -> (
+  | Tapply ("=", [t1; t2]) ->
+      Const (Boolean (eval ctx None t1 = eval ctx None t2))
+  | Tapply ("or", ts) ->
+      Const (Boolean List.(exists is_true (map (eval ctx None) ts)))
+  | Tapply ("and", ts) ->
+      Const (Boolean List.(for_all is_true (map (eval ctx None) ts)))
+  | Tapply ("not", [t]) -> (
       match eval ctx None t with
-      | M.Boolean b -> M.Boolean (not b)
-      | t -> M.Apply ("not", [t]) )
-  | Apply (s, ts) -> (
+      | Const (Boolean b) -> Const (Boolean (not b))
+      | t -> Apply ("not", [t]) )
+  | Tapply (s, ts) -> (
       match Mstr.find_opt s ctx.list_records with
       | Some fs -> (* A record construction *)
           let ctx = {ctx with opaque_prover_vars= false} in
-          M.Record List.(combine fs (map (eval ctx None (* TODO ty *)) ts))
+          Record List.(combine fs (map (eval ctx None (* TODO ty *)) ts))
       | None ->
           match Mstr.find_opt s ctx.functions with
           | Some fd -> (* A function call *)
@@ -94,11 +95,11 @@ let rec eval ctx oty t =
               let values = List.fold_right2 bind_arg fd.args ts ctx.values in
               eval {ctx with values} fd.res_type fd.body
           | None -> (* Cannot reduce *)
-              M.Apply (s, List.map (eval ctx None) ts) )
-  | Array a ->
-      M.Array (eval_array {ctx with opaque_prover_vars= false} a)
-  | To_array t ->
-      M.Array (eval_to_array {ctx with opaque_prover_vars= false} t)
+              Apply (s, List.map (eval ctx None) ts) )
+  | Tarray a ->
+      Array (eval_array {ctx with opaque_prover_vars= false} a)
+  | Tto_array t ->
+      Array (eval_to_array {ctx with opaque_prover_vars= false} t)
 
 and eval_prover_var ctx ty v =
   assert (not ctx.opaque_prover_vars);
@@ -106,7 +107,7 @@ and eval_prover_var ctx ty v =
     let res =
       (* Format.eprintf "EVAL PROVER VAR' %s %s@." ty v; *)
       let aux name = function
-        | Function ([param, Some ty'], oty'', t)
+        | Dfunction ([param, Some ty'], oty'', t)
           when Mstr.mem name ctx.fields_projs && ty' = ty -> (
             let values = Mstr.add param (Model_parser.Var v) ctx.values in
             match eval {ctx with values; opaque_prover_vars= true} oty'' t, oty'' with
@@ -137,11 +138,11 @@ and eval_array ctx = function
       Model_parser.{a with arr_indices= {arr_index_key= key; arr_index_value= value} :: a.arr_indices}
 
 and eval_to_array ctx = function
-  | Var v -> (
+  | Tvar v -> (
       match Mstr.find_opt v ctx.functions with
       | Some {args= [arg, key_oty]; res_type= val_oty; body= t} ->
           let rec aux = function
-            | Ite (Apply ("=", [Var var; t1]), t2, t3) ->
+            | Tite (Tapply ("=", [Tvar var; t1]), t2, t3) ->
                 if var <> arg then Format.ksprintf failwith "eval_to_array %s - %s" arg var;
                 let a = aux t3 in
                 let ix = Model_parser.{
@@ -152,7 +153,7 @@ and eval_to_array ctx = function
             | t -> Model_parser.{arr_others= eval ctx val_oty t; arr_indices= []} in
           aux t
       | _ -> Format.ksprintf failwith "eval_to_array %s" v )
-  | Array a -> eval_array ctx a
+  | Tarray a -> eval_array ctx a
   | t -> Format.kasprintf failwith "eval_to_array: %a" print_term t
 
 
@@ -178,7 +179,7 @@ let create_list pm (table: definition Mstr.t) =
 
   let consts =
     let aux = function
-      | Function ([], oty, t) -> Some (oty, t)
+      | Dfunction ([], oty, t) -> Some (oty, t)
       | _ -> None in
     Mstr.map_filter aux table in
 
@@ -189,7 +190,7 @@ let create_list pm (table: definition Mstr.t) =
   let ctx =
     let fields_projs = fields_projs pm in
     let just_function = function
-      | Function (args, res_type, body) -> Some {args; res_type; body}
+      | Dfunction (args, res_type, body) -> Some {args; res_type; body}
       | _ -> None in
     let functions = Mstr.map_filter just_function table in
     let ctx = {functions; values= Mstr.empty; prover_values= Hstr.create 5; pm;

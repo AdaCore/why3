@@ -17,15 +17,15 @@ type ident = string
 type typ = string
 
 type term =
-  | Sval of model_value
-  | Var of ident
-  | Prover_var of typ * ident
-  | Apply of (string * term list)
-  | Array of array
-  | Ite of term * term * term
-  | Let of (string * term) list * term
-  (* | Record of string * ((ident * term) list) *)
-  | To_array of term
+  | Tconst of model_const
+  | Tvar of ident
+  | Tprover_var of typ * ident
+  | Tapply of (string * term list)
+  | Tarray of array
+  | Tite of term * term * term
+  | Tlet of (string * term) list * term
+  | Tto_array of term
+  | Tunparsed of string
 
 and array =
   | Avar of ident (* Used by let-bindings only *)
@@ -33,9 +33,9 @@ and array =
   | Astore of array * term * term
 
 type definition =
-  | Function of (ident * typ option) list * typ option * term
-  | Term of term (* corresponding value of a term *)
-  | Noelement
+  | Dfunction of (ident * typ option) list * typ option * term
+  | Dterm of term (* corresponding value of a term *)
+  | Dnoelement
 
 val add_element: (string * definition) option ->
   definition Mstr.t -> definition Mstr.t

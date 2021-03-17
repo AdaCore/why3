@@ -25,7 +25,7 @@ type model_float =
   | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
   | Float_number of {hex: string option (* e.g., 0x1.ffp99 *); binary: model_float_binary}
 
-type model_value =
+type model_const =
   | Boolean of bool
   | String of string
   | Integer of model_int
@@ -33,6 +33,9 @@ type model_value =
   | Bitvector of model_bv
   | Decimal of model_dec
   | Fraction of model_frac
+
+type model_value =
+  | Const of model_const
   | Array of model_array
   | Record of model_record
   | Proj of model_proj
@@ -75,6 +78,8 @@ val float_of_binary : model_float_binary -> model_float
 
 val print_model_value : Format.formatter -> model_value -> unit
 val print_model_value_human : Format.formatter -> model_value -> unit
+
+val print_model_const_human : Format.formatter -> model_const -> unit
 
 val debug_force_binary_floats : Debug.flag
 (** Print all floats using bitvectors in JSON output for models *)
@@ -317,8 +322,7 @@ class clean : object
   method model : model -> model
   method element : model_element -> model_element option
   method value : model_value -> model_value option
-  method var : string -> model_value option
-  method unparsed : string -> model_value option
+  method const : model_const -> model_value option
   method integer : model_int -> model_value option
   method string : string -> model_value option
   method decimal : model_dec -> model_value option
@@ -326,11 +330,13 @@ class clean : object
   method float : model_float -> model_value option
   method boolean : bool -> model_value option
   method bitvector : model_bv -> model_value option
+  method var : string -> model_value option
   method proj : string -> model_value -> model_value option
   method apply : string -> model_value list -> model_value option
   method array : model_array -> model_value option
   method record : model_record -> model_value option
   method undefined : model_value option
+  method unparsed : string -> model_value option
 end
 
 val customize_clean : #clean -> unit
