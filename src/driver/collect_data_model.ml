@@ -66,7 +66,7 @@ let rec eval ctx oty t =
       if List.mem v ctx.pm.noarg_constructors then
         Apply (v, [])
       else
-        Mstr.find v ctx.values
+        Mstr.find_def (Var v) v ctx.values
   | Tite (t1, t2, t3) ->
       if is_true (eval ctx None t1) then eval ctx oty t2 else eval ctx oty t3
   | Tlet (bs, t) ->
