@@ -410,7 +410,7 @@ let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
                      abs_Msg r.reason in
       {state= Runknown; reason; exec_log= Log.empty_log}
 
-let check_model ?timelimit reduce env pm model =
+let check_model ?timelimit ?steplimit reduce env pm model =
   match get_model_term_loc model with
   | None ->
      let reason = "model term has no location" in
@@ -426,7 +426,7 @@ let check_model ?timelimit reduce env pm model =
         let check_model_rs ~abstract =
           let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
           let get_value = get_value model mod_known th_known in
-          let rac = rac_config ~do_rac:true ~abstract ?timelimit
+          let rac = rac_config ~do_rac:true ~abstract ?timelimit ?steplimit
                       ~skip_cannot_compute:false ~reduce ~get_value () in
           let vc_term_attrs = get_model_term_attrs model in
           check_model_rs ~vc_term_loc ~vc_term_attrs rac env pm rs in
@@ -509,12 +509,12 @@ let print_dbg_model selected_ix fmt (i,_,_,mr,s) =
         print_result_state r.abstract.state r.abstract.reason
 
 let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
-    ?timelimit ?sort_models env pmodule models =
+    ?timelimit ?steplimit ?sort_models env pmodule models =
   let sort_models = Opt.get_def
       (if check then prioritize_first_good_model
        else prioritize_last_non_empty_model) sort_models in
   let check_model =
-    if check then check_model ?timelimit reduce_config env pmodule
+    if check then check_model ?timelimit ?steplimit reduce_config env pmodule
     else fun _ -> Cannot_check_model {reason="not checking CE model"} in
   let models = (* Keep at most one empty model *)
     let found_empty = ref false in

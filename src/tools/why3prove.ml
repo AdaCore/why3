@@ -32,6 +32,7 @@ let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
 let opt_rac_try_negate = ref false
 let opt_rac_timelimit = ref None
+let opt_rac_steplimit = ref None
 let opt_ce_check_verbosity = ref None
 
 let debug_print_original_model = Debug.register_info_flag "print-original-model"
@@ -152,7 +153,9 @@ let option_list =
     " try checking the negated term using the RAC prover when\n\
      the prover is defined and didn't give a result";
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
-    "<seconds> Time limit for RAC (with --check-ce)";
+    "<seconds> Time limit in seconds for RAC (with --check-ce)";
+    KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
+    "<seconds> Step limit for RAC (with --check-ce)";
     Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
     "<lvl> verbosity level for interpretation log of counterexam-\n\
      ple solver model";
@@ -310,8 +313,8 @@ let select_ce env th models =
             ~try_negate:!opt_rac_try_negate () in
         let timelimit = Opt.map float_of_int !opt_rac_timelimit in
         Counterexample.select_model ~reduce_config ?timelimit
-          ~check:!opt_check_ce_model ?verb_lvl:!opt_ce_check_verbosity
-          env pm models
+          ?steplimit:!opt_rac_steplimit ~check:!opt_check_ce_model
+          ?verb_lvl:!opt_ce_check_verbosity env pm models
     | exception Not_found -> None
   else None
 
