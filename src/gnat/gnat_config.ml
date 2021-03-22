@@ -539,6 +539,7 @@ end = struct
     ["cvc4",    { add = 15000;  mult = 35  };
      "z3",      { add = 450000; mult = 800 };
      "altergo", { add = 0;      mult = 1   };
+     "colibri", { add = 1000;   mult = 1   };
     ]
 
   let starts_with a b =
