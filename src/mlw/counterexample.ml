@@ -221,7 +221,7 @@ let rec import_model_value check known th_known ity v =
   let def = Pdecl.find_its_defn known ts in
   let res = match v with
       | Const c -> import_model_const ity c
-      | Var v -> cannot_import "variable %s" v
+      | Var _ -> raise Exit (* If the value contains variables, it's ignored *)
       | Record r ->
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
             cannot_import "type with not exactly one constructors" in
