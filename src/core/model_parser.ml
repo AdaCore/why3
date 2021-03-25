@@ -1139,17 +1139,26 @@ let model_for_positions_and_decls model ~positions =
 type model_parser = printer_mapping -> string -> model
 type raw_model_parser = printer_mapping -> string -> model_element list
 
-let debug_files fs =
-  Debug.dprintf debug "@[<hv2>Files:@ %a@]@."
-    (print_model ~filter_similar:false ~me_name_trans:why_name_trans
-       ~print_attrs:true) {model_files= fs; vc_term_loc= None; vc_term_attrs= Sattr.empty}
+let debug_elements elts =
+  let me_name_trans men = men.men_name in
+  let print_elements = print_model_elements ~sep:Pp.semi ~print_attrs:true
+      ~me_name_trans ~filter_similar:false ~print_model_value in
+  Debug.dprintf debug "@[<v>Elements:@ %a@]@." print_elements elts;
+  elts
+
+let debug_files desc files =
+  let me_name_trans men = men.men_name in
+  let print_file = print_model_file ~filter_similar:false ~print_attrs:true
+      ~print_model_value ~me_name_trans in
+   Debug.dprintf debug "@[<v>Files %s:@ %a@]@." desc
+     (Pp.print_list Pp.newline print_file) (Mstr.bindings files);
+   files
 
 let model_parser (raw: raw_model_parser) : model_parser =
   fun ({Printer.vc_term_loc; vc_term_attrs} as pm) str ->
-  raw pm str |> (* For example, Smtv2_model_parser.parse for "smtv2" *)
-  build_model_rec pm |>
-  (fun fs -> debug_files fs; fs) |>
-  map_filter_model_files !clean#element |>
+  raw pm str |> debug_elements |> (* Eg for "smtv2": Smtv2_model_parser.parse *)
+  build_model_rec pm |> debug_files "before" |>
+  map_filter_model_files !clean#element |> debug_files "after" |>
   handle_contradictory_vc pm.Printer.vc_term_loc |>
   fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
 

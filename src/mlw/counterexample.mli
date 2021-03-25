@@ -22,11 +22,16 @@ val debug_check_ce : Debug.flag
    result of checking them by interpreting the program concretly and
    abstractly using the values in the solver's model *)
 
+val debug_check_ce_summary : Debug.flag
+(** Print only a summary of checking the counterexample. *)
+
 type result_state =
   | Rnormal (** the execution terminated normally *)
-  | Rfailure (** the model leads to a counterexample *)
-  | Rstuck (** the model doesn't lead to a counterexample *)
+  | Rfailure (** the execution leads to a failure for the VC *)
+  | Rstuck (** the model doesn't lead to a counterexample or is incosistent *)
   | Runknown (** cannot decide if the model leads to a counterexample *)
+
+val print_result_state : result_state Pp.pp
 
 type result = {
     state    : result_state;
@@ -40,13 +45,13 @@ type check_model_result = private
   | Check_model_result of {abstract: result; concrete: result}
   (* the model was checked *)
 
-val print_check_model_result : ?verb_lvl:int -> check_model_result Pp.pp
-
 val check_model : ?timelimit:float -> ?steplimit:int ->
   rac_reduce_config -> Env.env -> pmodule -> model -> check_model_result
 (* interpret concrecly and abstractly the program corresponding to the
    model (the program corresponding to the model is obtained from the
    location in the model) *)
+
+val print_full_verdict : ?verb_lvl:int -> result Pp.pp
 
 (** {2 Summary of checking models} *)
 
@@ -74,6 +79,8 @@ val print_counterexample :
   ?verb_lvl:int -> ?check_ce:bool -> ?json:[< `All | `Values ] -> (model * ce_summary) Pp.pp
 (** Print a counterexample. (When the prover model is printed and [~json:`Values] is
    given, only the values are printedas JSON.) *)
+
+val print_result_summary : result Pp.pp -> (check_model_result * ce_summary) Pp.pp
 
 (** {2 Model selection} *)
 

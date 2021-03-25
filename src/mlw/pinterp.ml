@@ -1777,18 +1777,28 @@ let check_term ?vsenv env (ctx: pre_cntr_ctx) t =
         (Opt.bind env.rac.rac_reduce.rac_prover
            (fun rp -> check_term_dispatch ~try_negate rp task))
     else res in
+  let task_filename = match Sys.getenv_opt "WHY3RACTASKDIR" with
+    | Some temp_dir when Debug.test_flag debug_rac_check_term_result ->
+        let filename = Filename.temp_file ~temp_dir "gnatwhy3-task" ".why" in
+        let out = open_out filename in
+        fprintf (formatter_of_out_channel out) "%a@." Pretty.print_task task;
+        close_out out;
+        Some filename
+    | _ -> None in
+  let pp_task_filename fmt = if task_filename <> None then
+      fprintf fmt " (%s)" (Opt.get task_filename) in
   match res with
   | Some true ->
-      Debug.dprintf debug_rac_check_term_result "%a@."
-        report_cntr_head (ctx, "is ok", t)
+      Debug.dprintf debug_rac_check_term_result "%a%t@."
+        report_cntr_head (ctx, "is ok", t) pp_task_filename
   | Some false ->
-      Debug.dprintf debug_rac_check_term_result "%a@."
-        report_cntr_head (ctx, "has failed", t);
+      Debug.dprintf debug_rac_check_term_result "%a%t@."
+        report_cntr (ctx, "failed", t) pp_task_filename;
       raise (Contr (ctx, t))
   | None ->
       let msg = "cannot be evaluated" in
-      Debug.dprintf debug_rac_check_term_result "%a@."
-        report_cntr_head (ctx, msg, t);
+      Debug.dprintf debug_rac_check_term_result "%a%t@."
+        report_cntr_head (ctx, msg, t) pp_task_filename;
       if env.rac.skip_cannot_compute then
         Warning.emit "%a@." report_cntr_head (ctx, msg, t)
       else

@@ -123,13 +123,16 @@ type check_model_result =
   | Cannot_check_model of {reason: string}
   | Check_model_result of {abstract: result; concrete: result}
 
-let print_check_model_result ?verb_lvl fmt = function
-  | Cannot_check_model r ->
-      fprintf fmt "@[Cannot check model (%s)@]" r.reason
+let print_result_summary print_result fmt (mr, s) =
+  match mr with
+  | Cannot_check_model {reason} ->
+      fprintf fmt "CANNOT CHECK: %s" reason
   | Check_model_result r ->
-      fprintf fmt "@[<v>@[<hv2>- Concrete: %a@]@\n@[<hv2>- Abstract: %a@]@]"
-        (print_full_verdict ?verb_lvl) r.concrete
-        (print_full_verdict ?verb_lvl) r.abstract
+      fprintf fmt "%a@\n@[<v2>- Concrete: %a@]@\n@[<v2>- Abstract: %a@]"
+        print_ce_summary_kind s print_result r.concrete print_result r.abstract
+
+let print_check_model_result ?verb_lvl =
+  print_result_summary (print_full_verdict ?verb_lvl)
 
 let ce_summary = function
   | Cannot_check_model {reason} -> UNKNOWN reason
@@ -144,13 +147,21 @@ let ce_summary = function
           | Rnormal | Rstuck ->
               BAD
           | Runknown ->
-              UNKNOWN (r.concrete.reason^", "^r.abstract.reason) )
+              if r.concrete.reason = r.abstract.reason then
+                UNKNOWN (r.concrete.reason)
+              else
+                UNKNOWN (sprintf "concrete: %s, abstract: %s"
+                           r.concrete.reason r.abstract.reason) )
       | Runknown -> (
           match r.abstract.state with
           | Rfailure ->
               NCSW r.abstract.exec_log
           | Rnormal | Runknown ->
-              UNKNOWN (r.concrete.reason^", "^r.abstract.reason)
+              if r.concrete.reason = r.abstract.reason then
+                UNKNOWN (r.concrete.reason)
+              else
+                UNKNOWN (sprintf "concrete: %s, abstract: %s"
+                           r.concrete.reason r.abstract.reason)
           | Rstuck ->
               BAD )
 
@@ -496,17 +507,10 @@ let prioritize_first_good_model: sort_models = fun models ->
 
 let print_dbg_model selected_ix fmt (i,_,_,mr,s) =
   let mark_selected fmt =
-    let s = if selected_ix = Some i then "Selected" else "Checked" in
-    pp_print_string fmt s in
-  match mr with
-  | Cannot_check_model {reason} ->
-      fprintf fmt "- Couldn't check model: %s" reason
-  | Check_model_result r ->
-      fprintf fmt
-        "- @[<v>%t model %d: %a@\nconcrete: %a, %s@\nabstract: %a, %s@]"
-        mark_selected i print_ce_summary_kind s
-        print_result_state r.concrete.state r.concrete.reason
-        print_result_state r.abstract.state r.abstract.reason
+    Pp.string fmt (if selected_ix = Some i then "Selected" else "Checked") in
+  let pp_res fmt r = fprintf fmt "%a, %s" print_result_state r.state r.reason in
+  fprintf fmt "- @[<v>%t model %d: %a@]" mark_selected i
+    (print_result_summary pp_res) (mr, s)
 
 let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     ?timelimit ?steplimit ?sort_models env pmodule models =
@@ -535,14 +539,11 @@ let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
       (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
        *   (print_model ?me_name_trans:None ~print_attrs:false) m; *)
       let mr = check_model m in
-      Debug.dprintf debug_check_ce "@[<v2>Result of checking model %d:@\n@[%a@]@]@." i
-        (print_check_model_result ?verb_lvl) mr;
-      i,r,m,mr in
+      let s = ce_summary mr in
+      Debug.dprintf debug_check_ce "@[<v2>Result of checking model %d: %a@]@." i
+        (print_check_model_result ?verb_lvl) (mr, s);
+      i,r,m,mr,s in
     List.map add_check_model_result models in
-  let models =
-    let add_ce_summary (i,r,m,mr) =
-      i,r,m,mr,ce_summary mr in
-    List.map add_ce_summary models in
   let selected, selected_ix =
     match List.nth_opt (sort_models models) 0 with
     | None -> None, None

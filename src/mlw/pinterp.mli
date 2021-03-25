@@ -146,11 +146,17 @@ val rac_reduce_config :
   ?trans:Task.task Trans.tlist -> ?prover:rac_prover -> ?try_negate:bool ->
   unit -> rac_reduce_config
 
-(** [rac_reduce_config_lit cnf env ?trans ?prover ?try_negate ()] configures the term
-   reduction of RAC. [trans] is the name of a transformation (usually "compute_in_goal").
-   [prover] is a prover string with optional, space-sparated time limit and memory limit.
-   And with [~try_negate:true] the negated term is dispatched to the prover if the prover
-   didn't return a result for the positive form. *)
+(** [rac_reduce_config_lit cnf env ?trans ?prover ?try_negate ()] configures the
+   term reduction of RAC. [trans] is the name of a transformation (usually
+   "compute_in_goal"). [prover] is a prover string with optional, space-sparated
+   time limit and memory limit. And with [~try_negate:true] the negated term is
+   dispatched to the prover if the prover didn't return a result for the
+   positive form.
+
+    If the environment variable [WHY3RACTASKDIR] is set, it is used as a
+   directory to print all SMT tasks sent to the RAC prover, if
+   [--debug=rac-check-term-sat] is set.
+ *)
 val rac_reduce_config_lit :
   Whyconf.config -> Env.env -> ?trans:string -> ?prover:string -> ?try_negate:bool ->
   unit -> rac_reduce_config
