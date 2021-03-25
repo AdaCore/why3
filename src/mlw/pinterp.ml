@@ -2133,9 +2133,10 @@ let get_value : value_gen list -> string * value =
   let aux (s, gen) = match gen () with Some v -> Some (s, v) | None -> None in
   Lists.first aux
 
-(** Generate a value by querying the model for a variable *)
-let gen_model_variable env ?loc id ity : value_gen =
+(** Generate a value by querying the model for a variable. *)
+let gen_model_variable ?check env ?loc id ity : value_gen =
   "value from model", fun () ->
+    Opt.apply () check id;
     try env.rac.get_value ?loc (check_assume_type_invs ?loc env) id ity with
     | CannotCompute {reason} ->
         Debug.dprintf debug_rac_values "Cannot compute getting value: %s@."
@@ -2220,10 +2221,10 @@ let get_and_register_param env id ity =
 
 (* For globals, RACStuck exeptions that indicate invalid model values are
    referred lazily until their value is required in RAC or in the task. *)
-let get_and_register_global env eval_expr id oexp post ity =
+let get_and_register_global check_model_variable env eval_expr id oexp post ity =
   let ctx_desc = asprintf "global `%a`" print_decoded id.id_string in
   let gens = [
-    gen_model_variable env id ity;
+    gen_model_variable ~check:check_model_variable env id ity;
     gen_eval_expr env eval_expr id oexp;
   ] in
   try
@@ -2777,7 +2778,7 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
         register_call env loc (Some rs) mvs exec_kind;
     if env.rac.do_rac then (
       let desc = asprintf "of `%a`" print_rs rs in
-      let ctx = cntr_ctx ?loc:loc Vc.expl_pre ~desc () in
+      let ctx = cntr_ctx ?loc Vc.expl_pre ~desc () in
       (if main_function then check_assume_terms else check_terms)
         env ctx rs.rs_cty.cty_pre );
     (* Module [Expr] adds a precondition "DECR f" to each recursive function
@@ -2935,16 +2936,47 @@ and exec_call_abstract ?snapshot ?loc ?rs env cty arg_pvs ity_result =
 
 let init_real (emin, emax, prec) = Big_real.init emin emax prec
 
+module Sidpos = struct
+  include Set.Make (struct
+    type t = Ident.ident * Loc.position
+    let compare = Util.cmp [
+        Util.cmptr fst Ident.id_compare;
+        Util.cmptr snd Loc.compare;
+      ]
+  end)
+
+  let add_id id locs =
+    match id.id_loc with Some loc -> add (id, loc) locs | None -> locs
+
+  (** Currently the model can contain only one value for a variable defined in a
+     module that has been cloned several times (limitations in
+     [Printer.queried_terms]). When getting the model value for a global
+     variable, we cannot decide here if the values is intended for that
+     variable, because they the different variables share the same location.
+     Because the wrong value can make the RAC stuck and the model to be
+     considered (wrongly) BAD, we have to abort.
+
+     As of 84f534324, identifiers from cloned modules have the location of
+     the clone, but we leave the check here to identify possible other sources
+     of ambigous model elements. *)
+  let check locs id =
+    match id.id_loc with
+    | Some loc -> assert (not (mem (id, loc) locs))
+    | _ -> ()
+end
+
 let bind_globals ?rs_main mod_known env =
   let open Pdecl in
-  let eval_global id d env =
+  let eval_global id d (env, locs) =
     match d.pd_node with
     | PDlet (LDvar (pv, e)) ->
         Debug.dprintf debug_trace_exec "EVAL GLOBAL VAR %a at %a@."
           print_decoded id.id_string
           Pp.(print_option_or_default "NO LOC" print_loc') id.id_loc;
-        let v = get_and_register_global env eval_expr id (Some e) [] e.e_ity in
-        bind_vs pv.pv_vs (Lazy.force v) env (* TODO Don't force [v] until used *)
+        let v = get_and_register_global (Sidpos.check locs) env eval_expr id
+            (Some e) [] e.e_ity in
+        bind_vs pv.pv_vs (Lazy.force v) env, (* TODO Don't force [v] until used *)
+        Sidpos.add_id id locs
     | PDlet (LDsym (rs, ce)) when is_prog_constant d -> (
         Debug.dprintf debug_trace_exec "EVAL GLOBAL SYM CONST %a at %a@."
           print_decoded id.id_string
@@ -2953,10 +2985,10 @@ let bind_globals ?rs_main mod_known env =
         let oexp = match ce.c_node with
           | Cany -> None | Cfun e -> Some e
           | _ -> failwith "eval_globals: program constant cexp" in
-        let v = get_and_register_global env eval_expr id oexp ce.c_cty.cty_post
-            ce.c_cty.cty_result in
-        bind_rs rs v env )
-    | _ -> env in
+        let v = get_and_register_global (Sidpos.check locs) env eval_expr id
+            oexp ce.c_cty.cty_post ce.c_cty.cty_result in
+        bind_rs rs v env, Sidpos.add_id id locs )
+    | _ -> env, locs in
   let is_before id d (env, found_rs) =
     let found_rs_here = match d.pd_node with
       | PDlet (LDsym (rs, _)) -> Opt.equal rs_equal (Some rs) rs_main
@@ -2967,7 +2999,7 @@ let bind_globals ?rs_main mod_known env =
     let env = if found_rs then env else Mid.add id d env in
     env, found_rs in
   let mod_known, _ = Mid.fold is_before mod_known (Mid.empty, false) in
-  Mid.fold eval_global mod_known env
+  fst (Mid.fold eval_global mod_known (env, Sidpos.empty))
 
 let eval_global_fundef rac env pmodule locals e =
   with_limits @@ fun () ->

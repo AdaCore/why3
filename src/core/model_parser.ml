@@ -958,7 +958,9 @@ let build_model_rec pm (elts: model_element list) : model_files =
     let aux t =
       let attrs = Sattr.union me.me_name.men_attrs t.t_attrs in
       let name, attrs = match t.t_node with
-        | Tapp (ls, []) -> ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
+        | Tapp (ls, []) ->
+            (* Ident [ls] is recorded as [t_app ls] in [Printer.queried_terms] *)
+            ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
         | _ -> "", attrs in
       (* Replace projections with their real name *)
       let me_value = replace_projection
