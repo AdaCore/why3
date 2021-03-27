@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="wrap_lines.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="space&#39;vc" expl="VC for space" proved="true">
+ <proof prover="2"><result status="valid" time="0.06" steps="9591"/></proof>
+ </goal>
+ <goal name="newline&#39;vc" expl="VC for newline" proved="true">
+ <proof prover="2"><result status="valid" time="0.06" steps="9591"/></proof>
+ </goal>
+ <goal name="index_of&#39;vc" expl="VC for index_of" proved="true">
+ <proof prover="2"><result status="valid" time="0.08" steps="15407"/></proof>
+ </goal>
+ <goal name="wrap_lines&#39;vc" expl="VC for wrap_lines" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="wrap_lines&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="12705"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="13222"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="11456"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="10924"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.4" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="11366"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.5" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="13351"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.6" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="13524"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.7" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="12926"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="13250"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.9" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="14009"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="13694"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="13635"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="163"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="331"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="17678"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.15" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="622"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.16" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="12938"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.17" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="13542"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.18" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="12289"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.19" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="13296"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.20" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="14511"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.21" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="15243"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.22" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="18534"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.23" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="12144"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.24" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="14319"/></proof>
+  </goal>
+  <goal name="wrap_lines&#39;vc.25" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="11508"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
