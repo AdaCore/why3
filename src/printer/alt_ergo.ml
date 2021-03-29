@@ -64,7 +64,7 @@ let ident_printer () =
     "integer_log2"; "integer_round"; "is_theory_constant"; "inversion";
     "let"; "linear_dependency"; "logic";
     "max_int"; "max_real"; "min_int"; "min_real";
-    "not"; "not_theory_constant"; "or";
+    "not"; "not_theory_constant"; "of"; "or";
     "parameter"; "predicate"; "pow_real_int"; "pow_real_real";
     "prop";
     "real"; "real_of_int"; "rewriting";
