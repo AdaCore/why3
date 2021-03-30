@@ -1,0 +1,206 @@
+
+(**
+{1 VerifyThis @ ETAPS 2021 competition
+   Challenge 2: DLL to BST}
+   See https://www.pm.inf.ethz.ch/research/verifythis.html
+
+   Authors:
+   - Jean-Christophe Filliâtre (CNRS)
+   - Andrei Paskevich (Univ. Paris-Saclay)
+
+   Summary:
+
+   - all tasks verified
+
+   - balanced tree: we show 2^(h-1) <= size(t) < 2^h where h is the height
+     of the returned tree t, which implies h = O(log(size(t)))
+
+   - There are pointer-based data structures in Why3, so we devised a
+     customed memory model for this problem (see type `loc` and maps
+     `prev` and `next` below).
+
+   - The only precondition of `dll_to_bst`, namely
+
+       requires { dll prev next s head 0 (length s) }
+
+     states that, in the initial memory state, head points to a
+     well-formed doubly-linked list, whose contents (locations of list
+     cells) is represented by (injective) sequence s.
+
+   - The fact that the tree is a BST follows from the postcondition of
+     `dll_to_bst`
+
+       ensures  { inorder s t == s }
+
+     that states that the nodes of t, taken in order, are exactly
+     the cells of the input list.
+
+*)
+
+use int.Int
+use int.ComputerDivision
+use fmap.Fmap
+use seq.Seq
+use bintree.Tree
+use bintree.Size
+
+(*** SPECIFICATION STARTS HERE ********************************************)
+
+type loc
+
+val eq (x y: loc) : bool ensures { result <-> x = y }
+
+clone fmap.MapImp as I with type key = loc, val eq = eq
+
+let ([]) = I.find
+let ([]<-) (l: loc) (m: I.t 'a) (v: 'a) : unit
+  requires { I.mem l m }
+  ensures  { m = add l v (old m) }
+= I.add l v m
+
+val constant null: loc
+
+val data: I.t int
+val prev: I.t loc
+val next: I.t loc
+
+predicate valid (prev next: fmap loc loc) (s: seq loc)
+= forall i . 0 <= i < length s ->
+    s[i] <> null /\ mem s[i] prev /\ mem s[i] next /\
+    forall j . i < j < length s -> s[i] <> s[j]
+
+predicate dll (prev next: fmap loc loc) (s: seq loc) (head: loc) (lo hi: int)
+= valid prev next s /\
+  0 <= lo <= hi <= length s /\
+  (head = if lo = length s then null else s[lo]) /\
+  (forall i . lo <= i < hi - 1 -> next s[i] = s[i+1]) /\
+  (forall i . lo <  i < hi     -> prev s[i] = s[i-1]) /\
+  (lo < hi -> next s[hi - 1] = if hi = length s then null else s[hi]) /\
+  (lo < hi -> prev s[lo] = if lo = 0 then null else s[lo-1])
+
+predicate tree (prev next: fmap loc loc) (s: seq loc) (root: loc) (t: tree int) (lo hi: int)
+= valid prev next s /\
+  0 <= lo <= hi <= length s /\
+  match t with
+  | Empty ->
+      root = null /\ lo = hi
+  | Node l p r ->
+      lo <= p < hi /\ root = s[p] /\
+      tree prev next s (prev root) l lo p /\
+      tree prev next s (next root) r (p + 1) hi
+  end
+
+(*** SPECIFICATION STOPS HERE **********************************************)
+(*** beyond this point, the only thing you need to read are the contracts
+     for functions `size` and `dll_to_bst` *)
+
+let rec lemma tree_frame (prev next prev' next': fmap loc loc) (s: seq loc) (root: loc) (t: tree int) (lo hi: int)
+  requires { tree prev next s root t lo hi }
+  requires { valid prev' next' s }
+  requires { forall i. lo <= i < hi -> prev' s[i] = prev s[i] /\ next' s[i] = next s[i] }
+  ensures  { tree prev' next' s root t lo hi }
+  variant  { t }
+= match t with
+  | Empty -> ()
+  | Node l p r ->
+      tree_frame prev next prev' next' s (prev.contents root) l lo p;
+      tree_frame prev next prev' next' s (next.contents root) r (p + 1) hi
+  end
+
+use bintree.Height
+use int.Power
+
+let rec dll_to_bst_rec (ghost s: seq loc)
+  (head: loc) (ghost ihead: int) (n: int)
+: (root: loc, right: loc, ghost t: tree int)
+  requires { dll prev next s head ihead (ihead + n) }
+  ensures  { right = if ihead + n = length s then null else s[ihead + n] }
+  ensures  { tree prev next s root t ihead (ihead + n) }
+  ensures  { Fmap.S.(domain prev == old (domain prev)) }
+  ensures  { Fmap.S.(domain next == old (domain next)) }
+  ensures  { forall i. 0 <= i < ihead -> prev s[i] = old prev s[i] }
+  ensures  { forall i. ihead + n <= i < length s -> prev s[i] = old prev s[i] }
+  ensures  { forall i. 0 <= i < ihead -> next s[i] = old next s[i] }
+  ensures  { forall i. ihead + n <= i < length s -> next s[i] = old next s[i] }
+  ensures  { n > 0 -> let h = height t in power 2 (h - 1) <= n < power 2 h }
+  variant  { n }
+= if n = 0 then return null, head, Empty;
+  let nl = div n 2 in
+  let left, root, l = dll_to_bst_rec s head ihead nl in
+  root[prev] <- left;
+  let temp, right, r = dll_to_bst_rec s root[next] (ihead + nl + 1) (n - nl - 1) in
+  root[next] <- temp;
+  root, right, Node l (ihead + nl) r
+
+let rec lemma tree_size (prev next: fmap loc loc) (s: seq loc) (root: loc) (t: tree int) (lo hi: int)
+  requires { tree prev next s root t lo hi }
+  ensures  { size t = hi - lo }
+  variant  { t }
+= match t with
+  | Empty -> ()
+  | Node l p r ->
+      tree_size prev next s (prev.contents root) l lo p;
+      tree_size prev next s (next.contents root) r (p + 1) hi
+  end
+
+function inorder (s: seq loc) (t: tree int) : seq loc
+= match t with
+  | Empty      -> empty
+  | Node l p r -> inorder s l ++ cons s[p] (inorder s r)
+  end
+
+let rec lemma tree_inorder (prev next: fmap loc loc) (s: seq loc) (root: loc) (t: tree int) (lo hi: int)
+  requires { tree prev next s root t lo hi }
+  ensures  { inorder s t == s[lo..hi] }
+  variant  { t }
+= match t with
+  | Empty -> ()
+  | Node l p r ->
+      tree_inorder prev next s (prev.contents root) l lo p;
+      tree_inorder prev next s (next.contents root) r (p + 1) hi
+  end
+
+(* recursive `size` *)
+
+let rec size (ghost s: seq loc) (head: loc) (ghost ihead: int): int
+  requires { dll prev next s head ihead (length s) }
+  ensures  { result = length s - ihead }
+  variant  { length s - ihead }
+= if eq head null then 0 else 1 + size s head[next] (ihead + 1)
+
+let dll_to_bst (ghost s: seq loc) (head: loc) : (root: loc, ghost t: tree int)
+  requires { dll prev next s head 0 (length s) }
+  ensures  { tree prev next s root t 0 (length s) }
+  ensures  { size t = length s }
+  ensures  { inorder s t == s }
+  ensures  { length s > 0 -> let h = height t in
+              power 2 (h - 1) <= length s < power 2 h }
+= let n = size s head 0 in
+  let root, _, t = dll_to_bst_rec s head 0 n in
+  root, t
+
+(* iterative `size` *)
+
+let size_alt (ghost s: seq loc) (head: loc) : int
+  requires { dll prev next s head 0 (length s) }
+  ensures  { result = length s }
+= let ref p = head in
+  let ref len = 0 in
+  while not (eq p null) do
+    invariant { dll prev next s p len (length s) }
+    variant   { length s - len }
+    p <- p[next];
+    len <- len + 1
+  done;
+  len
+
+let dll_to_bst_alt (ghost s: seq loc) (head: loc) : (root: loc, ghost t: tree int)
+  requires { dll prev next s head 0 (length s) }
+  ensures  { tree prev next s root t 0 (length s) }
+  ensures  { size t = length s }
+  ensures  { inorder s t == s }
+  ensures  { length s > 0 -> let h = height t in
+              power 2 (h - 1) <= length s < power 2 h }
+= let n = size_alt s head in
+  let root, _, t = dll_to_bst_rec s head 0 n in
+  root, t

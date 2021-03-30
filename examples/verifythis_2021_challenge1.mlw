@@ -1,0 +1,383 @@
+
+(**
+{1 VerifyThis @ ETAPS 2021 competition
+   Challenge 1: Lexicographic Permutations}
+   See https://www.pm.inf.ethz.ch/research/verifythis.html
+
+   Authors:
+   - Jean-Christophe Filliâtre (CNRS)
+   - Andrei Paskevich (Univ. Paris-Saclay)
+
+   Summary:
+
+   - all tasks verified
+
+   - only one change in the code, due to the absence of do/while loop in Why3
+
+   - main idea for proving termination: show that the set of all permutations
+     is finite, by building a finite over-approximation of that set
+     (see function `all_permutations` below)
+
+*)
+
+use int.Int
+use import array.Array as A
+use import seq.Seq as S
+use int.NumOf as N
+
+(*** SPECIFICATION STARTS HERE ********************************************)
+
+type elt = int
+
+type permutation = seq elt
+
+(* lexicographic order on permutations *)
+predicate lt (p q: permutation) =
+  length p = length q > 0 /\
+  exists i. 0 <= i < length p /\
+    (forall j. 0 <= j < i -> p[j] = q[j]) /\
+    p[i] < q[i]
+
+(* lt is a total order *)
+
+let lemma lt_trans (p q r: permutation)
+  requires { lt p q } requires { lt q r } ensures { lt p r }
+= ()
+
+let lemma lt_asym (p q: permutation)
+  requires { lt p q } requires { lt q p } ensures { false }
+= ()
+
+let lemma lt_total (p q: permutation) : bool
+  requires { length p = length q }
+  ensures  { if result then lt p q else p = q \/ lt q p }
+= let n = length p in
+  for i = 0 to n-1 do
+    invariant { forall j. 0 <= j < i -> p[j] = q[j] }
+    if p[i] < q[i] then return true;
+    if p[i] > q[i] then return false;
+  done;
+  return false
+
+(* number of occurrences in a (sub-)sequence *)
+
+function iseq (x: 'a) (s: seq 'a) : int->bool =
+  fun i -> s[i] = x
+
+function occ (x: 'a) (s: seq 'a) (l u: int) : int =
+  N.numof (iseq x s) l u
+
+function occ_all (x: 'a) (s: seq 'a) : int =
+  occ x s 0 (length s)
+
+predicate is_permutation_of (p a: seq elt) =
+  length p = length a /\
+  forall x. occ_all x p = occ_all x a
+
+(*** SPECIFICATION STOPS HERE **********************************************)
+(*** beyond this point, the only thing you need to read are the contracts
+     for functions `next` and `permut` *)
+
+predicate descending (s: seq elt) (lo hi: int)
+= 0 <= lo <= hi <= length s /\
+  forall i j. lo <= i <= j < hi -> s[i] >= s[j]
+
+predicate ascending (s: seq elt) (lo hi: int)
+= 0 <= lo <= hi <= length s /\
+  forall i j. lo <= i <= j < hi -> s[i] <= s[j]
+
+let function to_seq (a: array elt) : (s: seq elt)
+  ensures { length s = A.length a }
+  ensures { forall i. 0 <= i < length s -> s[i] = A.(a[i]) }
+= let ref s = empty in
+  for k = 0 to A.length a - 1 do
+    invariant { length s = k }
+    invariant { forall i. 0 <= i < k -> s[i] = A.(a[i]) }
+    s <- snoc s A.(a[k])
+  done;
+  return s
+
+lemma is_permutation_of_refl:
+  forall p. is_permutation_of p p
+lemma is_permutation_of_sym :
+  forall p q. is_permutation_of p q -> is_permutation_of q p
+lemma is_permutation_of_tran:
+  forall p q r. is_permutation_of p q -> is_permutation_of q r ->
+                is_permutation_of p r
+
+let lemma occ_id (s1 s2: seq elt) (l u: int)
+  requires { 0 <= l <= u <= length s1 = length s2 }
+  requires { forall i. l <= i < u -> s1[i] = s2[i] }
+  ensures  { forall x. occ x s1 l u = occ x s2 l u }
+= ()
+
+let lemma occ_split (s: seq elt) (l mid u: int)
+  requires { 0 <= l <= mid <= u <= length s }
+  ensures  { forall x. occ x s l u = occ x s l mid + occ x s mid u }
+= ()
+
+let lemma occ_at (s: seq elt) (l i u: int)
+  requires { 0 <= l <= i < u <= length s }
+  ensures  { forall x. occ x s l u =
+               occ x s l i + (if x = s[i] then 1 else 0) + occ x s (i+1) u }
+= occ_split s l i u;
+  occ_split s i (i+1) u
+
+let lemma occ_none (v: elt) (s: seq elt) (l u: int)
+  requires { 0 <= l <= u <= length s }
+  requires { forall k. l <= k < u -> s[k] <> v }
+  ensures  { occ v s l u = 0 }
+= ()
+
+let lemma descending_is_last (s p: seq elt)
+  requires { descending s 0 (length s) }
+  requires { is_permutation_of p s }
+  ensures  { not (lt s p) }
+= let n = length s in
+  for i = 0 to n-1 do
+    invariant { forall j. 0 <= j < i -> s[j] = p[j] }
+    if s[i] > p[i] then return;
+    if s[i] < p[i] then (
+      let y = p[i] in
+      occ_at s 0 i n;
+      occ_at p 0 i n;
+      assert { occ y s (i+1) n > 0 };
+      assert { exists k. i < k < n /\ s[k] = y };
+      return
+    );
+  done
+
+let lemma ascending_is_first (s p: seq elt)
+  requires { ascending s 0 (length s) }
+  requires { is_permutation_of p s }
+  ensures  { not (lt p s) }
+= let n = length s in
+  for i = 0 to n-1 do
+    invariant { forall j. 0 <= j < i -> s[j] = p[j] }
+    if s[i] < p[i] then return;
+    if s[i] > p[i] then (
+      let y = p[i] in
+      occ_at s 0 i n;
+      occ_at p 0 i n;
+      assert { occ y s (i+1) n > 0 };
+      assert { exists k. i < k < n /\ s[k] = y };
+      return
+    );
+  done
+
+let swap (a: array elt) (i j: int)
+  requires  { 0 <= i < A.length a }
+  requires  { 0 <= j < A.length a }
+  ensures   { A.(a[i] = old a[j]) }
+  ensures   { A.(a[j] = old a[i]) }
+  ensures   { forall k. 0 <= k < A.length a ->
+                k <> i -> k <> j -> A.(a[k] = old a[k]) }
+  ensures   { is_permutation_of (to_seq a) (to_seq (old a)) }
+= A.(
+  let temp = a[i] in
+  a[i] <- a[j];
+  a[j] <- temp
+  );
+  let ghost s1 = pure { to_seq (old a) } in
+  let ghost s2 = pure { to_seq      a  } in
+  let ghost n = A.length a in
+  if i <= j then
+    if i = j then ()
+    else (occ_id s1 s2 0 i;
+          occ_at s1 0 i n; occ_at s2 0 i n;
+          occ_at s1 (i+1) j n; occ_at s2 (i+1) j n;
+          occ_id s1 s2 (i+1) j;
+          occ_id s1 s2 (j+1) n)
+  else (occ_id s1 s2 0 j;
+          occ_at s1 0 j n; occ_at s2 0 j n;
+          occ_at s1 (j+1) i n; occ_at s2 (j+1) i n;
+          occ_id s1 s2 (j+1) i;
+          occ_id s1 s2 (i+1) n);
+  ()
+
+let next (ghost a0: seq elt) (a: array elt) : bool
+  (* TASK 1 enforced by Why3 *)
+  (* TASK 2 ensured by absence of `diverges` clause *)
+  requires { A.length a = length a0 }
+  requires { is_permutation_of (to_seq a) a0 }
+  (* TASK 3 *)
+  ensures  { is_permutation_of (to_seq a) a0 }
+  (* TASK 4 *)
+  ensures  { not result -> forall i. 0 <= i < A.length a -> A.(a[i] = old a[i]) }
+  ensures  { not result -> forall p. is_permutation_of p a0 ->
+                            not (lt (to_seq a) p) }
+  (* TASK 5 *)
+  ensures  { result -> lt (to_seq (old a)) (to_seq a) }
+  ensures  { result -> forall p. is_permutation_of p a0 ->
+                         not (lt (to_seq (old a)) p /\ lt p (to_seq a)) }
+= label Init in
+  let n = A.length a in
+  let ref i = n - 1 in
+  while i > 0 && A.(a[i-1] >= a[i]) do
+    invariant { -1 <= i < n } variant { i }
+    invariant { i = -1 /\ n = 0 \/ i >= 0 /\ descending (to_seq a) i n }
+    i <- i - 1
+  done;
+  if i <= 0 then return false;
+  let ghost i0 = i - 1 in
+  let ghost x = A.(a[i0]) in
+  let ref j = n - 1 in
+  while A.(a[j] <= a[i-1]) do
+    invariant { i <= j < n } variant { j }
+    invariant { forall k. j < k < n -> A.(a[k]) <= x }
+    j <- j - 1
+  done;
+  let ghost z = A.(a[j]) in
+  swap a (i-1) j;
+  assert { is_permutation_of (to_seq a) a0 };
+  assert { lt (to_seq (old a)) (to_seq a) };
+  j <- n - 1;
+  label L in
+  while i < j do
+    invariant { i0 < i && i0 < j < n } variant { j - i }
+    invariant { is_permutation_of (to_seq a) a0 }
+    invariant { forall k. 0 <= k < i0 -> A.(a[k] = a[k] at Init) }
+    invariant { A.(a[i0] = z) }
+    invariant { i - i0 = n - j }
+    invariant { forall k. i <= k <= j -> A.(a[k] = a[k] at L) }
+    invariant { forall k. 0 < k < i-i0 -> A.(a[i0+k] = a[n-k] at L)
+                                        /\ A.(a[n-k] = a[i0+k] at L) }
+    swap a i j;
+    i <- i + 1;
+    j <- j - 1
+  done;
+  assert { forall k. i0 < k < n -> A.(a[k] = a[n - (k - i0)] at L) };
+  assert { ascending (to_seq a) (i0+1) n };
+  let lemma is_next (p: permutation)
+    requires { is_permutation_of p a0 }
+    requires { lt (to_seq (a at Init)) p }
+    requires { lt p (to_seq a) }
+    ensures  { false }
+  = assert { forall k. 0 <= k < i0 -> p[k] = A.(a[k] at Init) };
+    assert { x <= p[i0] <= z };
+    let a1 = pure { to_seq (a at Init) } in
+    let v = p[i0] in
+    if v = x then (
+      for l = i0+1 to n - 1 do
+        invariant { forall k. i0+1 <= k < l -> p[k] = a1[k] }
+        if p[l] <> a1[l] then (
+          assert { a1[l] < p[l] };
+          occ_id a1 p 0 l; occ_split a1 0 l n; occ_split p 0 l n;
+          occ_at a1 0 l n; occ_at p 0 l n;
+          assert { occ p[l] a1 l n = occ p[l] p l n > 0 };
+          return;
+        )
+      done
+    ) else if v = z then (
+      let a2 = to_seq a in
+      for l = i0+1 to n - 1 do
+        invariant { forall k. i0+1 <= k < l -> p[k] = a2[k] }
+        if p[l] <> a2[l] then (
+          assert { is_permutation_of p a2 };
+          assert { a2[l] > p[l] };
+          occ_id a2 p 0 l; occ_split a2 0 l n; occ_split p 0 l n;
+          occ_at a2 0 l n; occ_at p 0 l n;
+          (* if l <= j0 then (occ_split a2 l j0 n; occ_split p 0 j0 n); *)
+          assert { occ p[l] a2 l n = occ p[l] p l n };
+          assert { occ p[l] p l n > 0 };
+          assert { occ p[l] a2 (l+1) n > 0 };
+          occ_none p[l] a2 (l+1) n;
+          return;
+        )
+      done
+    )
+    else (
+      occ_split p  0 i0 n;
+      occ_split a1 0 i0 n;
+      occ_id p a1 0 i0;
+      assert { occ v p i0 n = occ v a1 i0 n > 0 };
+      occ_none v a1 i0 n;
+    )
+  in
+  return true
+
+val sort (a: array elt) : unit
+  writes  { a }
+  ensures { forall i j. 0 <= i <= j < A.length a -> A.(a[i] <= a[j]) }
+  ensures { is_permutation_of (to_seq a) (to_seq (old a)) }
+(* NOTE we could provide an implementation here,
+        but this was not part of the tasks *)
+
+use import set.Fset as FS
+
+(* this is actually an over-approximation of the sets of all permutations
+   of s, namely the set of all sequences of length |s| made with elements
+   of s *)
+let ghost function
+  all_permutations (s: permutation) : (all: fset permutation)
+  ensures { forall p. is_permutation_of p s -> mem p all }
+= let n = length s in
+  let rec enum (k: int) : fset permutation
+    requires { 0 <= k <= n }
+    ensures  { forall p.
+                 length p = k /\ (forall i. 0 <= i < k -> occ_all p[i] s > 0)
+                 -> mem p result }
+    variant  { k }
+  =
+    if k = 0 then return FS.singleton empty;
+    let now = enum (k - 1) in
+    let ref acc = FS.empty in
+    for j = 0 to n - 1 do
+      invariant { forall p.
+                 length p = k /\ (forall i. 0 <= i < k -> occ_all p[i] s > 0)
+                 /\ occ p[0] s 0 j > 0
+                 -> mem p acc }
+      acc <- FS.union acc (FS.map (cons s[j]) now)
+    done;
+    return acc
+  in
+  let all = enum n in
+  let lemma final (p: permutation) : unit
+    requires { is_permutation_of p s } ensures { mem p all }
+  = assert { forall i. 0 <= i < n -> occ_all p[i] s > 0
+      by occ_all p[i] p = occ p[i] p 0 i + 1 + occ p[i] p (i+1) n > 0 };
+    ()
+  in
+  return all
+
+let permut (a: array elt) : seq permutation
+  (* TASK 6 enforced by Why3 *)
+  (* TASK 7 ensured by absence of `diverges` clause *)
+  (* TASKS 8,9,10 *)
+  ensures { (* result only contains permutation of a *)
+            forall i. 0 <= i < length result ->
+              is_permutation_of result[i] (to_seq (old a)) }
+  ensures { (* result is sorted in strict ascending order *)
+            forall i j. 0 <= i < j < length result -> lt result[i] result[j] }
+  ensures { (* result contains any permutation of a *)
+            forall p. is_permutation_of p (to_seq (old a)) ->
+              exists i. 0 <= i < length result /\ result[i] = p }
+= let ghost a0 = to_seq a in
+  let ghost all = all_permutations a0 in
+  let ref result = empty in
+  sort a;
+  (* CHANGE: no do/while loop => unroll once *)
+  result <- snoc result (to_seq a);
+  let ghost ref last = to_seq a in
+  let ghost ref sresult = FS.singleton (to_seq a) in
+  while next a0 a do
+    invariant { length result > 0 }
+    invariant { is_permutation_of (to_seq a) a0 }
+    invariant { forall i. 0 <= i < length result ->
+                  is_permutation_of result[i] a0 }
+    invariant { last = result[length result - 1] = to_seq a }
+    invariant { is_permutation_of last a0 }
+    invariant { forall i j. 0 <= i < j < length result ->
+                  lt result[i] result[j] }
+    invariant { forall p. is_permutation_of p a0 -> lt p last ->
+                  exists i. 0 <= i < length result - 1 /\ result[i] = p }
+    invariant { forall p. mem p sresult <->
+                  exists i. 0 <= i < length result /\ result[i] = p }
+    invariant { subset sresult all }
+    variant   { cardinal all - cardinal sresult }
+    result <- snoc result (to_seq a);
+    last <- to_seq a;
+    sresult <- FS.add (to_seq a) sresult
+  done;
+  return result
+
