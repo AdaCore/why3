@@ -18,6 +18,17 @@ is as simple as
 
 Then jump to :numref:`sec.provers` to install external provers.
 
+Why3 also provides a graphical user interface (see :numref:`sec.gui`
+and :numref:`sec.ideref`), which can be installed using
+
+::
+
+   opam install why3-ide
+
+Finally, the Opam package ``why3-coq`` provides realizations of Why3's
+standard library, which are useful for doing interactive proofs using the
+Coq formal system (see :numref:`chap.itp`).
+
 Installation via Docker
 ~~~~~~~~~~~~~~~~~~~~~~~
 
