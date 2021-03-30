@@ -297,7 +297,7 @@ let get_value m known th_known =
 
 (** Identifies the rsymbol of the definition that contains the given
    position. *)
-let find_rs pm loc =
+let find_rs_by_loc pm loc =
   let open Pmodule in
   let open Pdecl in
   let rec find_in_list f = function
@@ -421,46 +421,51 @@ let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
                      abs_Msg r.reason in
       {state= Runknown; reason; exec_log= Log.empty_log}
 
-let check_model ?timelimit ?steplimit reduce env pm model =
+let check_model_rs ?timelimit ?steplimit ~abstract reduce env pm model rs =
+  Debug.dprintf debug_check_ce "@[Interpreting %s@]@."
+    (if abstract then "abstractly" else "concretely");
+  let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
+  let vc_term_loc = Opt.get (get_model_term_loc model) in
+  let vc_term_attrs = get_model_term_attrs model in
+  let get_value = get_value model mod_known th_known in
+  let rac = rac_config ~do_rac:true ~abstract ?timelimit ?steplimit
+      ~skip_cannot_compute:false ~reduce ~get_value () in
+  check_model_rs ~vc_term_loc ~vc_term_attrs rac env pm rs
+
+let find_rs pm model =
   match get_model_term_loc model with
-  | None ->
-     let reason = "model term has no location" in
-     Cannot_check_model {reason}
+  | None -> failwith "model term has no location"
   | Some vc_term_loc ->
-     (* TODO deal with VCs from goal definitions? *)
-     if Loc.equal vc_term_loc Loc.dummy_position then
-       failwith ("Pinterp.check_model: the term of the CE model has a \
-                  dummy location, it cannot be used to find the \
-                  toplevel definition");
-     match find_rs pm vc_term_loc with
-     | Some rs ->
-        let check_model_rs ~abstract =
-          let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
-          let get_value = get_value model mod_known th_known in
-          let rac = rac_config ~do_rac:true ~abstract ?timelimit ?steplimit
-                      ~skip_cannot_compute:false ~reduce ~get_value () in
-          let vc_term_attrs = get_model_term_attrs model in
-          check_model_rs ~vc_term_loc ~vc_term_attrs rac env pm rs in
-        let me_name_trans men = men.Model_parser.men_name in
-        let print_attrs = Debug.test_flag Call_provers.debug_attrs in
-        Debug.dprintf debug_check_ce
-          "@[Validating model:@\n@[<hv2>%a@]@]@\n"
-          (print_model ~filter_similar:false ~me_name_trans ~print_attrs) model;
-        Debug.dprintf debug_check_ce "@[Interpreting concretly@]@\n";
-        let concrete = check_model_rs ~abstract:false in
-        Debug.dprintf debug_check_ce "@[Interpreting abstractly@]@\n";
-        let abstract = check_model_rs ~abstract:true in
-        Check_model_result {concrete; abstract}
-     | None ->
-        let reason =
-          Format.asprintf "no corresponding routine symbol found for %a"
-            Pretty.print_loc' vc_term_loc in
-        Cannot_check_model {reason}
+      (* TODO deal with VCs from goal definitions? *)
+      if Loc.equal vc_term_loc Loc.dummy_position then
+        failwith ("Pinterp.check_model: the term of the CE model has a \
+                   dummy location, it cannot be used to find the \
+                   toplevel definition");
+      match find_rs_by_loc pm vc_term_loc with
+      | None ->
+          Format.kasprintf failwith "no corresponding routine symbol found for %a"
+            Pretty.print_loc' vc_term_loc
+      | Some rs -> rs
+
+let check_model ?timelimit ?steplimit reduce env pm model =
+  match find_rs pm model with
+  | exception Failure reason -> Cannot_check_model {reason}
+  | rs ->
+      let me_name_trans men = men.Model_parser.men_name in
+      let print_attrs = Debug.test_flag Call_provers.debug_attrs in
+      Debug.dprintf debug_check_ce
+        "@[Checking model:@\n@[<hv2>%a@]@]@\n"
+        (print_model ~filter_similar:false ~me_name_trans ~print_attrs) model;
+      let check_model_rs ~abstract =
+        check_model_rs ~abstract ?timelimit ?steplimit reduce env pm model rs in
+      let abstract = check_model_rs ~abstract:true in
+      let concrete = check_model_rs ~abstract:false in
+      Check_model_result {concrete; abstract}
 
 let select_model_last_non_empty models =
   let models = List.filter (fun (_,m) -> not (is_model_empty m)) models in
   match List.rev models with
-  | (_,m) :: _ -> Some (m, UNKNOWN "No CE checking")
+  | (_,m) :: _ -> Some m
   | [] -> None
 
 type sort_models =

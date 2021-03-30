@@ -39,17 +39,29 @@ type result = {
     exec_log : Log.exec_log;
   }
 
+val find_rs : pmodule -> model -> Expr.rsymbol
+(** Returns the rsymbol of the procedure to which the VC term of the model
+    belongs.
+
+    @raise Failure when there is no such procedure, or the VC term location is
+    empty or dummy. *)
+
+val check_model_rs : ?timelimit:float -> ?steplimit:int -> abstract:bool ->
+  rac_reduce_config -> Env.env -> pmodule -> model -> Expr.rsymbol -> result
+(** [check_model_rs ~abstract cfg env pm m rs] executes a call to the procedure
+    [rs] abstractly or concretely. *)
+
 type check_model_result = private
   | Cannot_check_model of {reason: string}
-  (* the model cannot be checked (e.g. it doesn't contain a location) *)
+    (** The model could not be checked *)
   | Check_model_result of {abstract: result; concrete: result}
-  (* the model was checked *)
+    (** The model has been checked *)
 
-val check_model : ?timelimit:float -> ?steplimit:int ->
-  rac_reduce_config -> Env.env -> pmodule -> model -> check_model_result
-(* interpret concrecly and abstractly the program corresponding to the
-   model (the program corresponding to the model is obtained from the
-   location in the model) *)
+val check_model : ?timelimit:float -> ?steplimit:int -> rac_reduce_config ->
+  Env.env -> pmodule -> model -> check_model_result
+(** interpret concrecly and abstractly the program corresponding to the model
+    (the program corresponding to the model is obtained from the location in the
+    model) *)
 
 val print_full_verdict : ?verb_lvl:int -> result Pp.pp
 
@@ -115,10 +127,9 @@ val prioritize_last_non_empty_model : sort_models
 (** {3 Compatibility} *)
 
 val select_model_last_non_empty :
-  (Call_provers.prover_answer * model) list -> (model * ce_summary) option
+  (Call_provers.prover_answer * model) list -> model option
 (** Select the last, non-empty model in the incremental list of models as done
-    before 2020. The summary is included for compatibility with [select_model]
-    and is always [UNKNOWN].
+    before 2020.
 
     Same behaviour as
     [select_model ~check:false ~sort_models:prioritize_last_non_empty_model]. *)
