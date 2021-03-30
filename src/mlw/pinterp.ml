@@ -244,7 +244,8 @@ let proj_value ity ls v =
         try
           Number.(check_range { il_kind = ILitUnk; il_int = n } r);
         with Number.OutOfRange _ ->
-          cannot_compute "projection value %s is out of range" (BigInt.to_string n)
+          cannot_compute "projection value %s is out of range of %a"
+            (BigInt.to_string n) print_ity ity
       end
   | _ -> ()
   end;
@@ -579,11 +580,9 @@ module Log : Log = struct
           print_decoded ls.ls_name.id_string
     | Exec_any (rs,mvs) ->
          fprintf fmt
-           "@[<h2>(abstract) execution of unimplemented function%s`%a`%s%a@]"
-           (if rs = None then "" else " ")
-           (Pp.print_option Ident.print_decoded)
-           (Opt.map (fun rs -> rs.rs_name.id_string) rs)
-           (if Mvs.is_empty mvs then "" else " with args:")
+           "@[<h2>(abstract) execution of unimplemented function%t%t%a@]"
+           (fun fmt -> Opt.iter (fprintf fmt " `%a`" print_rs) rs)
+           (fun fmt -> if Mvs.is_empty mvs then fprintf fmt " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
     | Iter_loop k ->
         fprintf fmt "@[<h2>%s iteration of loop@]" (exec_kind_to_string k)
@@ -593,10 +592,10 @@ module Log : Log = struct
           (print_list vs2string) (Mvs.bindings mvs)
           print_list_or_invalid (Mrs.bindings mrs)
     | Exec_failed (msg,mid) ->
-       fprintf fmt "@[<h2>Property failure, %s with:%a@]"
+       fprintf fmt "@[<h2>Property failure at %s with:%a@]"
          msg (print_list id2string) (Mid.bindings mid)
     | Exec_stucked (msg,mid) ->
-       fprintf fmt "@[<h2>Execution got stuck, %s with:%a@]"
+       fprintf fmt "@[<h2>Execution got stuck at %s with:%a@]"
          msg (print_list id2string) (Mid.bindings mid)
     | Exec_ended ->
         fprintf fmt "@[<h2>Execution of main function terminated normally@]"
@@ -1869,14 +1868,14 @@ let check_assume_term env ctx t =
     let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
     register_stucked env loc (describe_cntr_ctx ctx) mid;
-    raise (stuck ?loc env "due to failed assumption of %s" (describe_cntr_ctx ctx))
+    raise (stuck ?loc env "failure in %s" (describe_cntr_ctx ctx))
 
 let check_assume_terms env ctx tl =
   try check_terms env ctx tl with Contr (ctx,t) ->
     let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
     register_stucked env loc (describe_cntr_ctx ctx) mid;
-    raise (stuck ?loc env "due to failed assumption of %s" (describe_cntr_ctx ctx))
+    raise (stuck ?loc env "failure in %s" (describe_cntr_ctx ctx))
 
 let check_assume_posts env ctx v posts =
   let ctx = ctx env in
@@ -1885,7 +1884,7 @@ let check_assume_posts env ctx v posts =
     let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
     register_stucked env loc (describe_cntr_ctx ctx) mid;
-    raise (stuck ?loc env "due to failed assumption of %s" (describe_cntr_ctx ctx))
+    raise (stuck ?loc env "failure in %s" (describe_cntr_ctx ctx))
 
 let check_term ?vsenv env ctx t =
   try check_term ?vsenv env ctx t with (Contr (ctx,t)) as e ->
@@ -1910,7 +1909,7 @@ let check_assume_type_invs ?loc env ity v =
     let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
     register_stucked env loc (describe_cntr_ctx ctx) mid;
-    raise (stuck ?loc env "due to failed assumption of %s" (describe_cntr_ctx ctx))
+    raise (stuck ?loc env "failure in %s" (describe_cntr_ctx ctx))
 
 (* Currently, type invariants are only check when creating values or getting
    values from the model. TODO Check type invariants also during execution *)
@@ -2130,7 +2129,8 @@ type value_gen = string * (unit -> value option)
 (** [get_value gens] takes a list of generators [gen] and returns the
     description and value for the first generator whose result is not [None]. *)
 let get_value : value_gen list -> string * value =
-  let aux (s, gen) = match gen () with Some v -> Some (s, v) | None -> None in
+  let aux (s, gen) = match gen () with Some v -> Some (s, v) | None ->
+    Debug.dprintf debug_rac_values "No %s@." s; None in
   Lists.first aux
 
 (** Generate a value by querying the model for a variable. *)
@@ -3048,4 +3048,4 @@ let report_eval_result body fmt (res, vsenv, rsenv) =
       fprintf fmt "@[globals:@ %t@]" print_envs
 
 let report_cntr fmt (ctx, term) =
-  report_cntr fmt (ctx, "has failed", term)
+  report_cntr fmt (ctx, "failed", term)

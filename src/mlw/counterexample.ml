@@ -128,7 +128,7 @@ let print_result_summary print_result fmt (mr, s) =
   | Cannot_check_model {reason} ->
       fprintf fmt "CANNOT CHECK: %s" reason
   | Check_model_result r ->
-      fprintf fmt "%a@\n@[<v2>- Concrete: %a@]@\n@[<v2>- Abstract: %a@]"
+      fprintf fmt "%a@\n@[<v2>- Concrete RAC %a@]@\n@[<v2>- Abstract RAC %a@]"
         print_ce_summary_kind s print_result r.concrete print_result r.abstract
 
 let print_check_model_result ?verb_lvl =
@@ -148,9 +148,9 @@ let ce_summary = function
               BAD
           | Runknown ->
               if r.concrete.reason = r.abstract.reason then
-                UNKNOWN (r.concrete.reason)
+                UNKNOWN (sprintf "concrete RAC %s" r.concrete.reason)
               else
-                UNKNOWN (sprintf "concrete: %s, abstract: %s"
+                UNKNOWN (sprintf "concrete RAC %s, abstract RAC %s"
                            r.concrete.reason r.abstract.reason) )
       | Runknown -> (
           match r.abstract.state with
@@ -158,9 +158,9 @@ let ce_summary = function
               NCSW r.abstract.exec_log
           | Rnormal | Runknown ->
               if r.concrete.reason = r.abstract.reason then
-                UNKNOWN (r.concrete.reason)
+                UNKNOWN (sprintf "concrete RAC %s" r.concrete.reason)
               else
-                UNKNOWN (sprintf "concrete: %s, abstract: %s"
+                UNKNOWN (sprintf "concrete RAC %s, abstract RAC %s"
                            r.concrete.reason r.abstract.reason)
           | Rstuck ->
               BAD )
@@ -384,35 +384,29 @@ let is_vc_term ?vc_term_loc ?(vc_term_attrs=Sattr.empty) ctx t =
       | None -> has_vc_term_loc t
 
 let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
-  let abs_msg = if rac.rac_abstract then "abstract" else "concrete" in
-  let abs_Msg = String.capitalize_ascii abs_msg in
+  let print_oloc =
+    Pp.print_option_or_default "unknown location" Pretty.print_loc' in
   try
     let _, env = eval_rs rac env pm rs in
-    let reason = sprintf "%s RAC does not confirm the counter-example, no \
-                          contradiction during execution" abs_Msg in
+    let reason = "no contradiction during execution" in
     {state= Rnormal; reason; exec_log= Log.close_log env.rac.log_uc}
   with
   | Contr (ctx, t) when is_vc_term ?vc_term_loc ?vc_term_attrs ctx t ->
-      let reason = sprintf "%s RAC confirms the counter-example" abs_Msg in
+      let reason = "counter-example confirmed" in
       {state= Rfailure; reason; exec_log= Log.close_log ctx.c_log_uc}
   | Contr (ctx, t) ->
-      let reason = asprintf
-          "Invalid assumption, %s RAC found a contradiction for %s at \
-           %a, which doesn't match the VC goal" abs_msg (describe_cntr_ctx ctx)
-          (Pp.print_option_or_default "unknown location" Pretty.print_loc') t.t_loc in
+      let reason = asprintf "contradiction for %s at %a, which \
+        doesn't match the VC goal" (describe_cntr_ctx ctx) print_oloc t.t_loc in
       {state= Rstuck; reason; exec_log= Log.close_log ctx.c_log_uc}
   | RACStuck (env,l,reason) ->
-      let reason = asprintf "%s RAC got stuck %s at %a" abs_Msg reason
-          (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
+      let reason = asprintf "%s at %a" reason print_oloc l in
       {state= Rstuck; reason; exec_log= Log.close_log env.rac.log_uc}
   | CannotImportModelValue msg ->
-      let reason = sprintf "cannot import value from model: %s" msg in
+      let reason =
+        sprintf "cannot import value from model: %s" msg in
       {state= Runknown; reason; exec_log= Log.empty_log}
   | CannotCompute r ->
-      (* TODO E.g., bad default value for parameter and cannot evaluate
-         pre-condition *)
-      let reason = sprintf "%s RAC terminated because %s"
-                     abs_Msg r.reason in
+      let reason = sprintf "terminated because %s" r.reason in
       {state= Runknown; reason; exec_log= Log.empty_log}
 
 let check_model_rs ?timelimit ?steplimit ~abstract reduce env pm model rs =
