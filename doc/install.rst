@@ -18,6 +18,17 @@ is as simple as
 
 Then jump to :numref:`sec.provers` to install external provers.
 
+Why3 also provides a graphical user interface (see :numref:`sec.gui`
+and :numref:`sec.ideref`), which can be installed using
+
+::
+
+   opam install why3-ide
+
+Finally, the Opam package ``why3-coq`` provides realizations of Why3's
+standard library, which are useful for doing interactive proofs using the
+Coq formal system (see :numref:`chap.itp`).
+
 Installation via Docker
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -294,7 +305,7 @@ The Why3 distributions come with some configuration files for Emacs and for Vim.
 These files are typically installed in the shared data directory,
 which is given by
 
-  ::
+::
 
      why3 --print-datadir
 
@@ -308,7 +319,7 @@ directory :file:`emacs/site-lisp` for all OPAM packages. Here is a
 sample Emacs-Lisp code that can be added to your :file:`.emacs`
 configuration file.
 
-  ::
+.. code-block:: lisp
 
      (setq why3-share (if (boundp 'why3-share) why3-share (ignore-errors (car (process-lines "why3" "--print-datadir")))))
      (setq why3el
@@ -339,13 +350,13 @@ There are configuration files for ``bash`` and ``zsh``.
 
 The configuration for ``bash`` can be made from Why3 sources using
 
-  ::
+::
 
      sudo make install-bash
 
 or directly doing
 
-  ::
+::
 
      sudo /usr/bin/install -c `why3 --print-datadir`/bash/why3 /etc/bash_completion.d
 
@@ -374,7 +385,7 @@ it can be easily compiled and installed using the source code. The
 following commands are just an example of how the library can be
 compiled and installed, and can be performed in any directory.
 
-::
+.. code-block:: shell
 
     svn co svn://scm.gforge.inria.fr/svnroot/bjeannet/pkg/fixpoint
     cd fixpoint/trunk/
@@ -389,14 +400,15 @@ configuration script of Why3 should enable the compilation of the
 ``infer-loop`` utility. This can be done by passing to the Why3
 configure script the ``--enable-infer`` flag, as follows:
 
-::
+.. code-block:: console
 
-    ./configure --enable-infer
-    # ...
-    # Components
-    # ...
-    #    Invariant inference(exp): yes
-    # ...
+   $ ./configure --enable-infer
+   ...
+   Summary
+   -----------------------------------------
+   Components
+       Invariant inference(exp): yes
+   ...
 
 The line ``Invariant inference(exp)`` indicates whether the
 dependencies are correctly installed and whether the flag mentioned
