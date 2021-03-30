@@ -221,7 +221,7 @@ let rec import_model_value check known th_known ity v =
   let def = Pdecl.find_its_defn known ts in
   let res = match v with
       | Const c -> import_model_const ity c
-      | Var _ -> raise Exit (* If the value contains variables, it's ignored *)
+      | Var _ -> undefined_value ity
       | Record r ->
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
             cannot_import "type with not exactly one constructors" in
@@ -256,19 +256,16 @@ let rec import_model_value check known th_known ity v =
           let ty_arg = match ls.ls_args with [ty] -> ty | _ ->
             cannot_import "projection %a is no unary function"
               Pretty.print_ls ls in
-          if not (Ty.ty_equal ty_arg (ty_of_ity ity)) then (
-            Debug.dprintf debug_rac_values
-              "Cannot import projection %a, argument type %a is not value type \
-               %a" Pretty.print_ls ls Pretty.print_ty ty_arg print_ity ity;
-            raise Exit );
+          if not (Ty.ty_equal ty_arg (ty_of_ity ity)) then
+            cannot_import "Cannot import projection %a, argument type %a is not \
+                           value type %a"
+              Pretty.print_ls ls Pretty.print_ty ty_arg print_ity ity;
           let x = import_model_value check known th_known (ity_of_ty ty_res) x in
           proj_value ity ls x
       | Array a ->
           let open Ty in
-          if not (its_equal def.Pdecl.itd_its its_func) then (
-            Debug.dprintf debug_rac_values "Cannot import array as %a"
-              print_its def.Pdecl.itd_its;
-            raise Exit );
+          if not (its_equal def.Pdecl.itd_its its_func) then
+            cannot_import "Cannot import array as %a" print_its def.Pdecl.itd_its;
           let key_ity, value_ity = match def.Pdecl.itd_its.its_ts.ts_args with
             | [ts1; ts2] -> Mtv.find ts1 subst.isb_var, Mtv.find ts2 subst.isb_var
             | _ -> assert false in
@@ -285,12 +282,9 @@ let rec import_model_value check known th_known ity v =
   res
 
 let get_value m known th_known =
-  fun ?loc check id ity : Value.value option ->
-  let import_value me =
-    try Some (import_model_value check known th_known ity me.me_value) with
-      Exit -> None in
+  fun ?loc check id ity ->
   match search_model_element_for_id m ?loc id with
-  | me -> import_value me
+  | me -> Some (import_model_value check known th_known ity me.me_value)
   | exception Not_found -> None
 
 (** Check and select solver counterexample models *)
