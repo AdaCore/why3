@@ -175,10 +175,6 @@ val set_ptr (x:mpz_ptr) (p:ptr limb) : unit
   ensures  { mpz.abs_value_of[x] = value p (mpz.abs_size[x]) }
   ensures  { mpz.readers[x] = -1 }
   ensures  { mpz.zones[x] = zone p }
-  ensures  { min p = 0 }
-  ensures  { max p = plength p }
-  ensures  { plength p = old plength p }
-  ensures  { pelts p = old pelts p }
 
 val ghost value_of (x: mpz_ptr) : int
   ensures { result = mpz.sgn[x] * mpz.abs_value_of[x] }
