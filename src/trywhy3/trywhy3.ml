@@ -478,7 +478,7 @@ module TaskList =
     let print_msg = print "why3-msg"
 
     let print_alt_ergo_output id res =
-      let span_msg = getElement AsHtml.span (id ^ "_msg") in
+      let span_msg = getElement AsHtml.span (Printf.sprintf "id%d_msg" id) in
       match res with
         Valid -> span_msg ##. innerHTML := !!""
       | Unknown msg -> span_msg ##. innerHTML := Js.string (" (" ^ msg ^ ")")
@@ -491,7 +491,7 @@ module TaskList =
 
     let clean_task id =
       try
-        let ul = getElement_exn AsHtml.ul (id ^ "_ul") in
+        let ul = getElement_exn AsHtml.ul (Printf.sprintf "id%d_ul" id) in
         ul ##. innerHTML := !!""
       with
         Not_found -> ()
@@ -514,7 +514,7 @@ module TaskList =
       li ##. innerHTML := mk_li_content id expl
 
 
-    let task_selection = Hashtbl.create 17
+    let task_selection : (int, _) Hashtbl.t = Hashtbl.create 17
     let is_selected id = Hashtbl.mem task_selection id
     let select_task id span loc pretty =
       span ##. classList ## add !!"why3-task-selected";
@@ -543,8 +543,8 @@ module TaskList =
       Editor.set_value ~editor:Editor.task_viewer !!""
 
     let add_task id parent_id expl locs pretty =
-      attach_to_parent id (parent_id ^ "_ul") expl locs;
-      let span = getElement AsHtml.span (id ^ "_container") in
+      attach_to_parent (Printf.sprintf "id%d" id) (Printf.sprintf "id%d_ul" parent_id) expl locs;
+      let span = getElement AsHtml.span (Printf.sprintf "id%d_container" id) in
       let buffer = Editor.get_value () in
       let locs =
         List.map (fun (k, loc) -> k, Editor.why3_loc_to_range buffer loc) locs in
@@ -615,10 +615,10 @@ let handle_why3_message o =
           Dom.appendChild ul li;) sl
 
   | Theory (th_id, th_name) ->
-      TaskList.attach_to_parent th_id "why3-theory-list" th_name []
+      TaskList.attach_to_parent (Printf.sprintf "id%d" th_id) "why3-theory-list" th_name []
 
   | Task (id, parent_id, expl, _code, locs, pretty, _) ->
-      begin match Dom_html.getElementById_opt id with
+      begin match Dom_html.getElementById_opt (Printf.sprintf "id%d" id) with
       | Some _ -> ()
       | None -> TaskList.add_task id parent_id expl locs pretty
       end
@@ -627,8 +627,8 @@ let handle_why3_message o =
 
   | UpdateStatus(st, id) ->
       try
-        let span_icon = getElement AsHtml.span (id ^ "_icon") in
-        let span_msg = getElement AsHtml.span (id ^ "_msg") in
+        let span_icon = getElement AsHtml.span (Printf.sprintf "id%d_icon" id) in
+        let span_msg = getElement AsHtml.span (Printf.sprintf "id%d_msg" id) in
         let cls =
           match st with
           | StNew ->
@@ -890,7 +890,6 @@ module Session = struct
 
 end
 
-
 module Controller =
   struct
     let task_queue  = Queue.create ()
@@ -915,30 +914,87 @@ module Controller =
       alt_ergo_idle () && Queue.is_empty task_queue && not !why3_busy
 
     let process_task i w id s =
+      let open Json_base in
+      let convert v = Js.string (Format.asprintf "%a" print_json v) in
+      let input =
+        convert
+          (Record
+             ["worker_id", Int id;
+              "content",
+              List (List.map (fun x -> String x) (String.split_on_char '\n' s))]) in
+      let options =
+        convert
+          (Record
+             ["steps_bound", Int !alt_ergo_steps;
+              "input_format", String "Native";
+              "debug", Bool true]) in
       !alt_ergo_workers.(i) <- Busy (w, id);
-      w ## postMessage (marshal (id, s, !alt_ergo_steps))
+      w ## postMessage (input, options)
 
     let update_status id status =
       handle_why3_message (UpdateStatus (status, id));
       (get_why3_worker ()) ## postMessage (marshal (SetStatus (status, id)))
 
-    let init_alt_ergo_worker i =
-      let worker = Worker.create "alt_ergo_worker.js" in
+    let rec get_free_ae_worker () =
+      let rec aux i =
+        if i >= 0 then
+          match !alt_ergo_workers.(i) with
+          | Free w -> Some (i, w)
+          | Absent ->
+              let w = init_ae_worker i in
+              Some (i, w)
+          | Busy _ -> aux (i - 1)
+        else None in
+      aux (Array.length !alt_ergo_workers - 1)
+
+    and pop_task () =
+      match Queue.take task_queue with
+      | (id, s) ->
+          begin match get_free_ae_worker () with
+          | Some (i, w) -> process_task i w id s
+          | None -> ()
+          end
+      | exception Queue.Empty ->
+          if is_idle () then ToolBar.enable_compile ()
+
+    and init_ae_worker i =
+      let worker = Worker.create "alt-ergo-worker.js" in
+      let handle_result id result =
+        TaskList.print_alt_ergo_output id result;
+        let status = match result with
+          | Valid -> StValid
+          | _ -> StUnknown in
+        update_status id status;
+        pop_task () in
       worker ##. onmessage :=
         Dom.handler (fun ev ->
-            let (id, result) = unmarshal (ev ##. data) in
-            TaskList.print_alt_ergo_output id result;
-            let status = match result with
-              | Valid -> StValid
-              | _ -> StUnknown in
-            update_status id status;
-            begin match Queue.take task_queue with
-            | (id, s) -> process_task i worker id s
-            | exception Queue.Empty ->
-                !alt_ergo_workers.(i) <- Free worker;
-                if is_idle () then ToolBar.enable_compile ()
+            let lb = Lexing.from_string (Js.to_string (ev ##. data)) in
+            let result = Json_parser.value (fun x -> Json_lexer.read x) lb in
+            let id = Json_base.(get_int (get_field result "worker_id")) in
+            let result =
+              match Json_base.get_field result "status" with
+              | Json_base.Record ["Unsat", _] -> Valid
+              | Json_base.Record ["Unknown", _] -> Unknown "unknown"
+              | Json_base.Record ["Sat", _] -> Unknown "unknown"
+              | l -> Unknown (Format.asprintf "%a" Json_base.print_json l) in
+            !alt_ergo_workers.(i) <- Free worker;
+            handle_result id result;
+            Js._false);
+      worker ##. onerror :=
+        Dom.handler (fun ev ->
+            let result = Invalid (Js.to_string (ev ##. message)) in
+            begin match !alt_ergo_workers.(i) with
+            | Busy (w, id)  ->
+                w ## terminate;
+                !alt_ergo_workers.(i) <- Absent;
+                handle_result id result
+            | Free _ ->
+                worker ## terminate;
+                !alt_ergo_workers.(i) <- Absent
+            | Absent -> ()
             end;
             Js._false);
+      !alt_ergo_workers.(i) <- Free worker;
       worker
 
     let reset_workers () =
@@ -946,8 +1002,8 @@ module Controller =
           match w with
           | Busy (w, id)  ->
               w ## terminate;
-              update_status id StUnknown;
-              !alt_ergo_workers.(i) <- Absent
+              !alt_ergo_workers.(i) <- Absent;
+              update_status id StUnknown
           | Absent | Free _ -> ()
         ) !alt_ergo_workers;
       Queue.iter (fun (id, _) -> update_status id StUnknown) task_queue;
@@ -955,17 +1011,9 @@ module Controller =
       if not !why3_busy then ToolBar.enable_compile ()
 
     let push_task id s =
-      let rec aux i =
-        if i >= 0 then
-          match !alt_ergo_workers.(i) with
-          | Free w -> process_task i w id s
-          | Absent ->
-              let w = init_alt_ergo_worker i in
-              process_task i w id s
-          | Busy _ -> aux (i - 1)
-        else
-          Queue.add (id, s) task_queue in
-      aux (Array.length !alt_ergo_workers - 1)
+      match get_free_ae_worker () with
+      | Some (i, w) -> process_task i w id s
+      | None -> Queue.add (id, s) task_queue
 
     let init_why3_worker () =
       let worker = Worker.create "why3_worker.js" in
