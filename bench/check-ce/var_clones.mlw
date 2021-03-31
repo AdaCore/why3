@@ -1,0 +1,10 @@
+module M0
+  val constant n: int
+end
+
+module N
+  clone M0 as M1
+  clone M0 as M2
+  let f () =
+    assert { M1.n <> 111 \/ M2.n <> 222 }
+end

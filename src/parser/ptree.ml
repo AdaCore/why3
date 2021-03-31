@@ -351,7 +351,7 @@ type decl =
   (** Declaration of global exceptions *)
   | Dmeta of ident * metarg list
   (** Declaration of a [meta] *)
-  | Dcloneexport of qualid * clone_subst list
+  | Dcloneexport of Loc.position * qualid * clone_subst list
   (** [clone export] *)
   | Duseexport of qualid
   (** [use export] *)

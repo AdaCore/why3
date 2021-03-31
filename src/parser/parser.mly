@@ -170,7 +170,7 @@ use_clone:
     }
 | CLONE EXPORT tqualid clone_subst
     { let loc = floc $startpos $endpos in
-      let decl = Ptree.Dcloneexport($3,$4) in
+      let decl = Ptree.Dcloneexport(loc,$3,$4) in
       Typing.add_decl loc decl
     }
 | USE boption(IMPORT) m_as_list = comma_list1(use_as)

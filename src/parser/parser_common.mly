@@ -386,7 +386,8 @@ See also `plugins/cfg/cfg_parser.mly`
 | USE EXPORT tqualid
     { (Duseexport $3) }
 | CLONE EXPORT tqualid clone_subst
-    { (Dcloneexport ($3, $4)) }
+    { let loc = floc $startpos $endpos in
+      (Dcloneexport (loc,$3, $4)) }
 | USE boption(IMPORT) m_as_list = comma_list1(use_as)
     { let loc = floc $startpos $endpos in
       let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
