@@ -127,7 +127,8 @@ val restore_module : theory -> pmodule
 
 val use_export : pmodule_uc -> pmodule -> pmodule_uc
 
-val clone_export : pmodule_uc -> pmodule -> mod_inst -> pmodule_uc
+val clone_export :
+  ?loc:Loc.position -> pmodule_uc -> pmodule -> mod_inst -> pmodule_uc
 
 (** {2 Logic decls} *)
 

@@ -1068,7 +1068,7 @@ and pp_decl fmt = function
         | Mint i -> fprintf fmt "%d" i in
       let pp_args = pp_print_list ~pp_sep:(pp_sep ", ") pp_metarg in
       fprintf fmt "meta \"%a\" %a" pp_id ident pp_args args
-  | Dcloneexport (qid, substs) ->
+  | Dcloneexport (_, qid, substs) ->
       fprintf fmt "@[<hv2>clone export %a%a@]" pp_qualid qid pp_substs substs
   | Duseexport qid ->
       fprintf fmt "@[<hv2>use export %a@]" pp_qualid qid

@@ -842,7 +842,7 @@ let rec clone_expr cl sm e = e_attr_copy e (match e.e_node with
         e_var (sm_find_pv sm r), cl_find_rs cl f, e_var (sm_find_pv sm v) in
       e_assign (List.map conv asl)
   | Elet (ld, e) ->
-      let sm, ld = clone_let_defn cl sm ld in
+      let sm, ld = clone_let_defn None cl sm ld in
       e_let ld (clone_expr cl sm e)
   | Eif (e1, e2, e3) ->
       e_if (clone_expr cl sm e1) (clone_expr cl sm e2) (clone_expr cl sm e3)
@@ -900,21 +900,21 @@ and clone_cexp cl sm c = match c.c_node with
   | Cany ->
       c_any (clone_cty cl sm c.c_cty)
 
-and clone_let_defn cl sm ld = match ld with
+and clone_let_defn loc cl sm ld = match ld with
   | LDvar (v,e) ->
       let e' = clone_expr cl sm e in
-      let id = id_clone v.pv_vs.vs_name in
+      let id = id_clone ?loc v.pv_vs.vs_name in
       let ld, v' = let_var id ~ghost:v.pv_ghost e' in
       sm_save_pv sm v v', ld
   | LDsym (s,c) ->
       let c' = clone_cexp cl sm c in
-      let ld, s' = let_sym (id_clone s.rs_name)
+      let ld, s' = let_sym (id_clone ?loc s.rs_name)
         ~ghost:(rs_ghost s) ~kind:(rs_kind s) c' in
       sm_save_rs cl sm s s', ld
   | LDrec rdl ->
       let conv_rs mrs {rec_rsym = {rs_name = id} as rs} =
         let cty = clone_cty cl sm ~drop_decr:true rs.rs_cty in
-        let rs' = create_rsymbol (id_clone id) ~ghost:(rs_ghost rs) cty in
+        let rs' = create_rsymbol (id_clone ?loc id) ~ghost:(rs_ghost rs) cty in
         Mrs.add rs rs' mrs, rs' in
       let mrs, rsyml = Lists.map_fold_left conv_rs sm.sm_rs rdl in
       let rsm = { sm with sm_rs = mrs } in
@@ -1124,7 +1124,7 @@ let freeze_foreign cl reads =
     | Ityreg r -> r | _ -> assert false) frz.isb_reg in
   cl.rn_table <- Mreg.set_union cl.rn_table frz
 
-let clone_pdecl inst cl uc d = match d.pd_node with
+let clone_pdecl loc inst cl uc d = match d.pd_node with
   | PDtype tdl ->
       let add_e spv e = Spv.union spv e.e_effect.eff_reads in
       let add_d spv d = List.fold_left add_e spv d.itd_witness in
@@ -1229,7 +1229,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         | LDrec rdl -> List.fold_left (fun spv {rec_rsym = s} ->
             Spv.union spv (cty_reads s.rs_cty)) Spv.empty rdl in
       freeze_foreign cl reads;
-      let sm, ld = clone_let_defn cl (sm_of_cl cl) ld in
+      let sm, ld = clone_let_defn loc cl (sm_of_cl cl) ld in
       cl.pv_table <- sm.sm_pv; cl.rs_table <- sm.sm_rs;
       add_pdecl ~warn:false ~vc:false uc (create_let_decl ld)
   | PDexn ({xs_name = id} as xs) when Mxs.mem xs inst.mi_xs ->
@@ -1264,10 +1264,10 @@ let add_clone uc mi =
       muc_theory = theory_add_clone uc.muc_theory mi.mi_mod.mod_theory sm;
       muc_units  = Uclone mi :: uc.muc_units }
 
-let clone_export uc m inst =
+let clone_export ?loc uc m inst =
   let cl = cl_init m inst in
   let rec add_unit uc u = match u with
-    | Udecl d -> clone_pdecl inst cl uc d
+    | Udecl d -> clone_pdecl loc inst cl uc d
     | Uuse m -> use_export uc m
     | Uclone mi ->
         begin try add_clone uc { mi_mod = mi.mi_mod;

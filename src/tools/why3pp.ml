@@ -453,7 +453,7 @@ let deps_use fmt filename (modname:string) (q:Ptree.qualid) =
 let deps_decl fmt filename modname d =
   Ptree.(match d with
   | Dtype _ | Dlogic _ | Dind _ | Dprop _ | Dlet _ | Drec _ | Dexn _ | Dmeta _ -> ()
-  | Dcloneexport(q,_) | Duseexport q | Dcloneimport(_,_,q,_,_) ->
+  | Dcloneexport(_,q,_) | Duseexport q | Dcloneimport(_,_,q,_,_) ->
      deps_use fmt filename modname q
   | Duseimport(_,_, mods) ->
      List.iter (fun (q,_) -> deps_use fmt filename modname q) mods

@@ -1,0 +1,180 @@
+<check-ce>Check model 0 ("bench/check-ce/var_clones.mlw", line 9, characters 13-39)
+<check-ce>Validating model:
+          File var_clones.mlw:
+            Line 6:
+              n  = {"type": "Integer", "val": "111"}
+            Line 7:
+              n  = {"type": "Integer", "val": "222"}
+            Line 9:
+              the check fails with all inputs
+<check-ce>Interpreting concretly
+<rac-values>Value from model for global n: 111
+<rac-values>Value from model for global n: 222
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Interpreting abstractly
+<rac-values>Value from model for global n: 111
+<rac-values>Value from model for global n: 222
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Result of checking model 0:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+                Line 8:
+                  _ = ()
+                  Execution of main function f's body with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure, Assertion with:
+                    n = 111
+                    n = 222
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+                Line 8:
+                  _ = ()
+                  Execution of main function f's body with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure, Assertion with:
+                    n = 111
+                    n = 222
+<check-ce>Check model 1 ("bench/check-ce/var_clones.mlw", line 9, characters 13-39)
+<check-ce>Validating model:
+          File var_clones.mlw:
+            Line 6:
+              n  = {"type": "Integer", "val": "111"}
+            Line 7:
+              n  = {"type": "Integer", "val": "222"}
+            Line 9:
+              n_vc_constant [@model_trace:n] =
+                {"type": "Integer", "val": "222"}
+<check-ce>Interpreting concretly
+<rac-values>Value from model for global n: 111
+<rac-values>Value from model for global n: 222
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Interpreting abstractly
+<rac-values>Value from model for global n: 111
+<rac-values>Value from model for global n: 222
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Result of checking model 1:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+                Line 8:
+                  _ = ()
+                  Execution of main function f's body with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure, Assertion with:
+                    n = 111
+                    n = 222
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+                Line 8:
+                  _ = ()
+                  Execution of main function f's body with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure, Assertion with:
+                    n = 111
+                    n = 222
+<check-ce>Check model 2 ("bench/check-ce/var_clones.mlw", line 9, characters 13-39)
+<check-ce>Validating model:
+          File var_clones.mlw:
+            Line 6:
+              n  = {"type": "Integer", "val": "111"}
+            Line 7:
+              n  = {"type": "Integer", "val": "222"}
+            Line 9:
+              n_vc_constant [@model_trace:n] =
+                {"type": "Integer", "val": "222"}
+<check-ce>Interpreting concretly
+<rac-values>Value from model for global n: 111
+<rac-values>Value from model for global n: 222
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Interpreting abstractly
+<rac-values>Value from model for global n: 111
+<rac-values>Value from model for global n: 222
+<rac-values>Missing value for parameter _, continue with default value ().
+<check-ce>Result of checking model 2:
+            - Concrete: good model (Concrete RAC confirms the counter-example)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+                Line 8:
+                  _ = ()
+                  Execution of main function f's body with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure, Assertion with:
+                    n = 111
+                    n = 222
+            - Abstract: good model (Abstract RAC confirms the counter-example)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+                Line 8:
+                  _ = ()
+                  Execution of main function f's body with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure, Assertion with:
+                    n = 111
+                    n = 222
+<check-ce>Models:
+- Selected model 0 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+- Checked model 1 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+- Checked model 2 (Concrete: good model, Abstract: good model)
+    Summary: The program does not comply to the verification goal
+File "bench/check-ce/var_clones.mlw", line 9, characters 13-39:
+Goal Assertion from verification condition f'vc.
+Prover result is: Unknown (sat) (0.00s, 163 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File var_clones.mlw:
+  Line 6:
+    n = 111
+  Line 7:
+    n = 222
+  Line 8:
+    _ = ()
+    Execution of main function f's body with env:
+      _ = ()
+      n = 111
+      n = 222
+  Line 9:
+    Property failure, Assertion with:
+      n = 111
+      n = 222
+
