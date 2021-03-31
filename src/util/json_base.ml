@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Format
-open Wstdlib
 
 let char fmt = function
   | '"'  -> pp_print_string fmt "\\\""
@@ -36,31 +35,26 @@ let float fmt f = fprintf fmt "%g" f
 let print_json_field key value_pr fmt value =
   fprintf fmt "@[<hv 1>%a:@ %a@]" string key value_pr value
 
+let rec seq pr fmt = function
+  | [] -> ()
+  | [v] -> pr fmt v
+  | h::t ->
+      pr fmt h;
+      Format.fprintf fmt ",@ ";
+      seq pr fmt t
+
 let list pr fmt l =
-  if l = [] then fprintf fmt "[]"
-  else
-    fprintf fmt "@[<hv 1>%a@]"
-      (Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma pr)
-      l
+  fprintf fmt "@[<hv 1>[%a]@]" (seq pr) l
 
 let print_map_binding key_to_str value_pr fmt binding =
   let (key, value) = binding in
   print_json_field (key_to_str key) value_pr fmt value
 
 let map_bindings key_to_str value_pr fmt map_bindings =
-  if map_bindings = [] then fprintf fmt "{}"
-  else
-    fprintf fmt "@[<hv 1>%a@]"
-     (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.comma
-      (print_map_binding key_to_str value_pr)) map_bindings
-
-(* Convert a list of bindings into a map *)
-let convert_record l =
-  List.fold_left (fun m (k, x) -> Mstr.add k x m) Mstr.empty l
+  fprintf fmt "@[<hv 1>{%a}@]" (seq (print_map_binding key_to_str value_pr)) map_bindings
 
 type json =
-  | Record of json Mstr.t
-  | Proj of json Mstr.t
+  | Record of (string * json) list
   | List of json list
   | String of string
   | Int of int
@@ -70,8 +64,10 @@ type json =
 
 let rec print_json fmt v =
   match v with
-  | Record r -> map_bindings (fun x -> x) print_json fmt (Mstr.bindings r)
-  | Proj p -> map_bindings (fun x -> x) print_json fmt (Mstr.bindings p)
+  | Record r ->
+      (* FIXME: sorting is only needed because tests are doing purely syntactic checks. *)
+      let r = List.sort (fun (k1,_) (k2,_) -> String.compare k1 k2) r in
+      map_bindings (fun x -> x) print_json fmt r
   | List l -> list print_json fmt l
   | String s -> string fmt s
   | Int i -> int fmt i
@@ -83,7 +79,7 @@ let rec print_json fmt v =
 (* Get json fields. Return Not_found if no fields or field missing *)
 let get_field j s =
   match j with
-  | Record r -> Mstr.find s r
+  | Record r -> List.assoc s r
   | _ -> raise Not_found
 
 let get_string j =
