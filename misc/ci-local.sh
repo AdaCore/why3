@@ -1,5 +1,10 @@
 #!/bin/bash
 
+function section_start()
+{ echo -e "\e[0Ksection_start:`date +%s`:$1[collapsed=true]\r\e[0K\e[32;1m$2\e[0;m"; }
+function section_stop()
+{ echo -e "\e[0Ksection_end:`date +%s`:$1\r\e[0K"; }
+
 set -e
 if test "$COMPILER" != "system"; then
     opam switch $COMPILER
@@ -7,12 +12,19 @@ if test "$COMPILER" != "system"; then
 fi
 
 export OCAMLRUNPARAM=o=20,O=200
+
+section_start configure Configuration
 ./autogen.sh
 ./configure --enable-local
+section_stop configure
+
+section_start build Building
 make
+section_stop build
 
 while test $# -gt 0
 do
+    section_start "test_$1" "Testing \"$1\""
     case "$1" in
         bench)
             bin/why3 config detect
@@ -47,5 +59,6 @@ do
             examples/regtests.sh --reduced-mode
             ;;
     esac
+    section_stop "test_$1"
     shift
 done
