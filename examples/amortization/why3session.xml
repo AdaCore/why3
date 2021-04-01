@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="amortization.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="queue&#39;vc" expl="VC for queue" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="6862"/></proof>
+ </goal>
+ <goal name="client&#39;vc" expl="VC for client" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="client&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6908"/></proof>
+  </goal>
+  <goal name="client&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6926"/></proof>
+  </goal>
+  <goal name="client&#39;vc.2" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7624"/></proof>
+  </goal>
+  <goal name="client&#39;vc.3" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7120"/></proof>
+  </goal>
+  <goal name="client&#39;vc.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7398"/></proof>
+  </goal>
+  <goal name="client&#39;vc.5" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7007"/></proof>
+  </goal>
+  <goal name="client&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7565"/></proof>
+  </goal>
+  <goal name="client&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7724"/></proof>
+  </goal>
+  <goal name="client&#39;vc.8" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="7879"/></proof>
+  </goal>
+  <goal name="client&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="8218"/></proof>
+  </goal>
+  <goal name="client&#39;vc.10" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6981"/></proof>
+  </goal>
+  <goal name="client&#39;vc.11" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="8161"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
