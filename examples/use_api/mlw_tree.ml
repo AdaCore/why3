@@ -260,7 +260,7 @@ let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4]
 
 open Format
 
-let () = printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
 
 (* BEGIN{topdownf} *)
 let mlw_file =
@@ -283,7 +283,7 @@ let mlw_file =
   F.get_mlw_file uc
 (* END{topdownf} *)
 
-let () = printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
 
 (* BEGIN{topdowni} *)
 let mlw_file =
@@ -309,7 +309,7 @@ let mlw_file =
 (* Printing back the mlw file *)
 
 (* BEGIN{mlwprinter} *)
-let () = printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
 (* END{mlwprinter} *)
 
 (* BEGIN{typemodules} *)
@@ -323,7 +323,7 @@ let _mods =
   with Loc.Located (loc, e) -> (* A located exception [e] *)
     let msg = asprintf "%a" Exn_printer.exn_printer e in
     printf "%a@."
-      (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
+      (Mlw_printer.with_marker ~msg loc (Mlw_printer.pp_mlw_file ~attr:true))
       mlw_file;
     exit 1
 (* END{typemoduleserror} *)

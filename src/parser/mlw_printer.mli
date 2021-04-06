@@ -17,22 +17,22 @@ type 'a printers = { marked: 'a Pp.pp; closed: 'a Pp.pp }
 (** The [marked] printer potentially adds the marker, the [closed] printer adds
     parentheses to the potentially marked node *)
 
-val pp_pattern : Ptree.pattern printers
+val pp_pattern : attr:bool -> Ptree.pattern printers
 (** Printer for patterns *)
 
-val pp_expr : Ptree.expr printers
+val pp_expr : attr:bool -> Ptree.expr printers
 (** Printer for expressions *)
 
-val pp_term : Ptree.term printers
+val pp_term : attr:bool -> Ptree.term printers
 (** Printer for terms *)
 
-val pp_pty : Ptree.pty printers
+val pp_pty : attr:bool -> Ptree.pty printers
 (** Printer for types *)
 
-val pp_decl : Ptree.decl Pp.pp
+val pp_decl : ?attr:bool -> Ptree.decl Pp.pp
 (** Printer for declarations *)
 
-val pp_mlw_file : Ptree.mlw_file Pp.pp
+val pp_mlw_file : ?attr:bool -> Ptree.mlw_file Pp.pp
 (** Printer for mlw files *)
 
 (** {2 Markers}

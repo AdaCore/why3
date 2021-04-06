@@ -256,7 +256,7 @@ let translate (m,dl) =
 let read_channel env _path file c =
   let f : Cfg_ast.cfg_file = Cfg_lexer.parse_channel file c in
   let ptree = Modules (List.map translate f) in
-  Debug.dprintf debug "%a@." Mlw_printer.pp_mlw_file ptree;
+  Debug.dprintf debug "%a@." (Mlw_printer.pp_mlw_file ~attr:true) ptree;
   let mm = Typing.type_mlw_file env [] (file ^ ".mlw") ptree in
   mm
 
