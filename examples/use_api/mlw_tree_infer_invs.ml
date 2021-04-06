@@ -155,7 +155,7 @@ let mlw_file = Modules [ mod_M1 ]
 
 (* Printing back the mlw file *)
 
-let () = Format.printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+let () = Format.printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
 
 (*BEGIN{inv_hook}*)
 let print_to_std invs =
@@ -185,7 +185,7 @@ let mods =
   with Loc.Located (loc, e) -> (* A located exception [e] *)
     let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
     Format.printf "%a@."
-      (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
+      (Mlw_printer.with_marker ~msg loc (Mlw_printer.pp_mlw_file ~attr:true))
       mlw_file;
     exit 1
 
