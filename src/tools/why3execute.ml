@@ -124,7 +124,7 @@ let do_input f =
       let timelimit = Opt.map float_of_int !opt_rac_timelimit in
       rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute
         ?timelimit ?steplimit:!opt_rac_steplimit ~reduce () in
-    let res = eval_global_fundef rac env pmod [] expr in
+    let res = eval_global_fundef rac env pmod [] None expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
   with

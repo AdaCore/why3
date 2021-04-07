@@ -329,7 +329,7 @@ let why3_execute_one m rs =
     try
       let reduce = rac_reduce_config_lit config env ~trans:"compute_in_goal" () in
       let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
-      let res = eval_global_fundef rac_config env m [] expr in
+      let res = eval_global_fundef rac_config env m [] None expr in
       asprintf "returns %a" (report_eval_result expr) res
     with
     | Contr (ctx, term) ->

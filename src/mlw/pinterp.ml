@@ -796,18 +796,19 @@ let fold_premises f premises init =
   List.fold_right (fold_bunch f) !premises init
 
 type env = {
-  pmodule : Pmodule.pmodule;
-  funenv  : cexp Mrs.t;
-  vsenv   : value Mvs.t;
-  rsenv   : value lazy_t Mrs.t;
-  premises: premises;
-  env     : Env.env;
-  rac     : rac_config;
+  pmodule  : Pmodule.pmodule;
+  funenv   : (cexp * rec_defn list option) Mrs.t;
+  vsenv    : value Mvs.t;
+  rsenv    : value Lazy.t Mrs.t; (* global constants *)
+  premises : premises;
+  env      : Env.env;
+  rac      : rac_config;
+  old_varl : ((term * lsymbol option) list * value Mvs.t) option;
 }
 
 let default_env env rac pmodule =
   { pmodule; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty;
-    premises= ref [ref []] }
+    premises= ref [ref []]; old_varl= None }
 
 let register_used_value env loc id value =
   Log.log_val env.rac.log_uc id (snapshot value) loc
@@ -842,8 +843,8 @@ let register_ended env loc =
 
 let snapshot_vsenv = Mvs.map snapshot
 
-let add_local_funs locals env =
-  let add acc (rs, ce) = Mrs.add rs ce acc in
+let add_local_funs locals rdl env =
+  let add acc (rs, ce) = Mrs.add rs (ce, rdl) acc in
   let funenv = List.fold_left add env.funenv locals in
   {env with funenv}
 
@@ -1184,7 +1185,7 @@ let rec default_value_of_type env known ity : value =
 
 type routine_defn =
   | Builtin of (rsymbol -> value list -> value option)
-  | LocalFunction of (rsymbol * cexp) list * cexp
+  | LocalFunction of (rsymbol * cexp) list * (cexp * rec_defn list option)
   | Constructor of Pdecl.its_defn
   | Projection of Pdecl.its_defn
 
@@ -1209,10 +1210,10 @@ let find_global_definition kn rs =
   match (Mid.find rs.rs_name kn).Pdecl.pd_node with
   | Pdecl.PDtype dl -> find_constr_or_proj dl rs
   | Pdecl.PDlet (LDvar _) -> raise Not_found
-  | Pdecl.PDlet (LDsym (_, ce)) -> LocalFunction ([], ce)
+  | Pdecl.PDlet (LDsym (_, ce)) -> LocalFunction ([], (ce, None))
   | Pdecl.PDlet (LDrec dl) ->
       let locs = List.map (fun d -> d.rec_rsym, d.rec_fun) dl in
-      LocalFunction (locs, find_def rs dl)
+      LocalFunction (locs, (find_def rs dl, Some dl))
   | Pdecl.PDexn _ -> raise Not_found
   | Pdecl.PDpure -> raise Not_found
 
@@ -1353,7 +1354,7 @@ let add_premises ?post_res ?(vsenv=[]) ts env =
   let bind_fun env mt mv vs _ sofar =
     let matching_vs rs _ = id_equal rs.rs_name vs.vs_name in
     match Mrs.choose (Mrs.filter matching_vs env.funenv) with
-    | rs, { c_node= Cfun e } ->
+    | rs, ({ c_node= Cfun e }, _) ->
         let t = Opt.get (term_of_expr ~prop:false e) in
         let t = t_ty_subst mt mv t in
         let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
@@ -1507,7 +1508,7 @@ let undef_pred_decl, undef_pred_app, undef_pred_app_arg =
   decl, app, app_arg
 
 (* Add declarations from local functions in [env.funenv] *)
-let bind_fun rs cexp (task, ls_mv) =
+let bind_fun rs (cexp, _) (task, ls_mv) =
   try
     let t = match cexp.c_node with
       | Cfun e -> Opt.get_exn Exit (term_of_expr ~prop:false e)
@@ -1919,67 +1920,76 @@ let check_type_invs ?loc env ity v =
     register_failure env (opt_or ctx.c_loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
 
-(** [oldify_variant env var] returns a pair [old_ts, oldies] where [old_ts] are
-    the variant terms where all free variables have been replaced by fresh
-    variables, and [oldies] is a mapping from the fresh variables in [old_ts] to
-    snapshots of the current values of the original variables in [env]. *)
-let oldify_variant env var =
-  let ts = List.map fst var in
-  let free_vs = Mvs.keys (List.fold_left t_freevars Mvs.empty ts) in
+(** [oldify_varl env vars] returns a pair [vars', oldies] where [vars'] are the
+   variants, where all free variables have been replaced by fresh variables, and
+   [oldies] is a mapping from the fresh variables in [vars'] to snapshots of the
+   current values of the original variables in [env]. *)
+let oldify_varl env varl =
+  let free_vs = Mvs.keys (List.fold_left t_freevars Mvs.empty (List.map fst varl)) in
   let aux vs (subst, oldies) =
     let vs' = create_vsymbol (id_clone vs.vs_name) vs.vs_ty in
     let v = snapshot (Mvs.find vs env.vsenv) in
     Mvs.add vs (t_var vs') subst, Mvs.add vs' v oldies in
-  let subst, oldies =
-    List.fold_right aux free_vs (Mvs.empty, Mvs.empty) in
-  let old_ts = List.map (t_subst subst) ts in
-  old_ts, oldies
+  let subst, oldies = List.fold_right aux free_vs (Mvs.empty, Mvs.empty) in
+  List.map (fun (t, ols) -> t_subst subst t, ols) varl, oldies
 
-(** [mk_variant_term env loc old_ts var] creates a term that represents the
-    validity of variant [var] of a loop at location [loc], where [old_ts] are
-    the oldified variant terms.
-
-    TODO use Vc.decrease? *)
-let mk_variant_term env loc attr old_ts var =
-  let {Pmodule.mod_theory= {Theory.th_crcmap= crc}} = env.pmodule in
+(** [variant_term env loc olds news] creates a term representing the validity of
+    variants [news] at location [loc], where [olds] are the oldified variants. *)
+let variant_term env olds news =
   let {Pmodule.mod_theory= {Theory.th_export= ns}} =
     Pmodule.read_module env.env ["int"] "Int" in
   let ls_int_le = Theory.ns_find_ls ns [Ident.op_infix "<="] in
   let ls_int_lt = Theory.ns_find_ls ns [Ident.op_infix "<"] in
-  let rec loop old_ts var =
-    match old_ts, var with
-    | [], [] -> t_false
-    | old_t :: old_ts, (t, opt_op) :: var ->
-        let t_here =
-          match opt_op with
-          | Some op -> ps_app op [t; old_t]
-          | None ->
-              if ty_equal (t_type t) ty_int then
-                t_and (ps_app ls_int_le [t_nat_const 0; old_t])
-                  (ps_app ls_int_lt [t; old_t])
-              else
-                let crc = try ignore (Coercion.find crc (t_type t) ty_int); true
-                  with Not_found -> false in
-                if crc then failwith "coercions not supported in variants"
-                else cannot_compute "loop variant implemented only for int" in
-        t_attr_set ?loc:t.t_loc Sattr.empty
-          (t_or t_here (t_and (t_equ old_t t) (loop old_ts var)))
-    | _ -> assert false in
-  let loc = match var with
-    | (var_t, _) :: _  when var_t.t_loc <> None -> var_t.t_loc
-    | _ -> loc in
-  let rec relocate g =
-    t_attr_set ?loc g.t_attrs (TermTF.t_map (fun t -> t) relocate g) in
-  t_attr_set ?loc (Sattr.singleton attr)
-    (relocate (loop old_ts var))
+  let decrease_alg old_t t =
+    Format.eprintf "RAC not implemented for %a@." Pretty.print_ty (t_type t);
+    ignore (old_t, t); t_true in
+  let decrease_def old_t t =
+    let ty = t_type t in
+    if ty_equal (t_type old_t) ty then
+      match ty.ty_node with
+        | Tyapp (ts, _) when ts_equal ts ts_int ->
+            t_and
+              (ps_app ls_int_le [t_nat_const 0; old_t])
+              (ps_app ls_int_lt [t; old_t])
+        | Tyapp (ts, _) when is_range_type_def ts.ts_def ->
+            let ls = (* int_of_range env ts *)
+              let rs = env.pmodule.Pmodule.mod_theory.Theory.th_ranges in
+              match (Mts.find ts rs).Theory.td_node with
+              | Theory.(Meta (_, [_; MAls ls])) -> ls | _ -> assert false in
+            let proj t = fs_app ls [t] ty_int in
+            ps_app ls_int_lt [proj t; proj old_t]
+        | _ -> decrease_alg old_t t
+    else
+      decrease_alg old_t t in
+  let rec decr = function
+    | (old_t, Some old_r) :: olds, (t, Some r) :: varl when ls_equal old_r r ->
+        t_or (ps_app r [t; old_t]) (* Checking well-foundedness omitted *)
+          (t_and (t_equ old_t t) (decr (olds, varl)))
+    | (old_t, None) :: olds, (t, None) :: news ->
+        if oty_equal old_t.t_ty t.t_ty then
+          t_or (decrease_def old_t t)
+            (t_and (t_equ old_t t) (decr (olds, news)))
+        else
+          decrease_def old_t t
+    | _::_, [] -> t_true
+    | _ -> t_false in
+  decr (olds, news)
+
+let rec relocate loc t =
+  t_attr_set ?loc t.t_attrs (TermTF.t_map (fun t -> t) (relocate loc) t)
+
+let check_variant expl loc env (old_varl, oldies) varl =
+  let env = {env with vsenv=Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
+  let loc = match varl with (t,_)::_ when t.t_loc<>None -> t.t_loc | _ -> loc in
+  let t = relocate loc (variant_term env old_varl varl) in
+  check_term env (cntr_ctx expl ()) (t_attr_set ?loc (Sattr.singleton expl) t)
 
 (******************************************************************************)
 (*                           EXPRESSION EVALUATION                            *)
 (******************************************************************************)
 
 (* Assuming the real is given in pow2 and pow5 *)
-let compute_fraction {Number.rv_sig= i; Number.rv_pow2= p2; Number.rv_pow5= p5}
-  =
+let compute_fraction {Number.rv_sig= i; rv_pow2= p2; rv_pow5= p5} =
   let p2_val = BigInt.pow_int_pos_bigint 2 (BigInt.abs p2) in
   let p5_val = BigInt.pow_int_pos_bigint 5 (BigInt.abs p5) in
   let num = ref BigInt.one in
@@ -2317,6 +2327,15 @@ let with_limits f =
 (*                          EXPRESSION EVALUATION                             *)
 (******************************************************************************)
 
+let find_rec_defn rs env =
+  let open Pdecl in
+  match Mrs.find rs env.funenv with
+  | (_, rds) -> rds
+  | exception Not_found ->
+      match (Mid.find rs.rs_name env.pmodule.Pmodule.mod_known).pd_node with
+      | PDlet (LDrec rds) -> Some rds
+      | _ -> None
+
 let rec eval_expr env e =
   check_limits env.rac.limits;
   let _,l,bc,ec = Loc.get (Opt.get_def Loc.dummy_position e.e_loc) in
@@ -2442,7 +2461,7 @@ and eval_expr' env e =
         eval_expr env e2
       | r -> r )
     | LDsym (rs, ce) ->
-        let env = {env with funenv= Mrs.add rs ce env.funenv} in
+        let env = {env with funenv= Mrs.add rs (ce, None) env.funenv} in
         eval_expr env e2
     | LDrec l ->
         let env' =
@@ -2450,7 +2469,8 @@ and eval_expr' env e =
             funenv=
               List.fold_left
                 (fun acc d ->
-                  Mrs.add d.rec_sym d.rec_fun (Mrs.add d.rec_rsym d.rec_fun acc))
+                   Mrs.add d.rec_sym (d.rec_fun, Some l)
+                     (Mrs.add d.rec_rsym (d.rec_fun, Some l) acc))
                 env.funenv l } in
         eval_expr env' e2 )
   | Eif (e1, e2, e3) -> (
@@ -2464,7 +2484,7 @@ and eval_expr' env e =
         Debug.dprintf debug_trace_exec "Cannot eval if condition@.";
         Irred e )
     | r -> r )
-  | Ewhile (cond, inv, var, e1) when env.rac.rac_abstract -> begin
+  | Ewhile (cond, inv, varl, e1) when env.rac.rac_abstract -> begin
       (* arbitrary execution of an iteration taken from the counterexample
 
         while e1 do invariant {I} e2 done
@@ -2490,9 +2510,9 @@ and eval_expr' env e =
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
         (Mvs.keys env.vsenv);
       (* assert2 *)
-      let opt_old_variant =
+      let opt_old_varl =
         if env.rac.do_rac && e.e_effect.eff_oneway = Total then
-          Some (oldify_variant env var) else None in
+          Some (oldify_varl env varl) else None in
       check_assume_terms env (cntr_ctx Vc.expl_loop_keep ()) inv;
       add_premises inv env;
       match eval_expr env cond with
@@ -2505,13 +2525,8 @@ and eval_expr' env e =
                    check_terms env (cntr_ctx Vc.expl_loop_keep ()) inv;
                  add_premises inv env;
                  if env.rac.do_rac && e.e_effect.eff_oneway = Total then (
-                   let old_ts, oldies = Opt.get opt_old_variant in
-                   let vsenv =
-                     Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
-                   let env = {env with vsenv} in
-                   check_term env (cntr_ctx Vc.expl_loop_vari ())
-                     (mk_variant_term env e.e_loc Vc.expl_loop_vari old_ts var)
-                 );
+                   let oldified_varl = Opt.get opt_old_varl in
+                   check_variant Vc.expl_loop_vari e.e_loc env oldified_varl varl );
                  (* the execution cannot continue from here *)
                 register_stucked env e.e_loc
                   "Cannot continue after arbitrary iteration" Mid.empty;
@@ -2528,15 +2543,15 @@ and eval_expr' env e =
       add_premises inv env;
       res
     end
-  | Ewhile (e1, inv, var, e2) ->
+  | Ewhile (e1, inv, varl, e2) ->
       let res = with_push_premises env.premises @@ fun () -> (
       if env.rac.do_rac then
         check_terms env (cntr_ctx Vc.expl_loop_init ()) inv ;
       add_premises inv env;
       let rec iter () =
-        let opt_old_variant =
+        let opt_old_varl =
           if env.rac.do_rac && e.e_effect.eff_oneway = Total then
-            Some (oldify_variant env var) else None in
+            Some (oldify_varl env varl) else None in
         match eval_expr env e1 with
         | Normal v ->
             if is_true v then ( (* condition true *)
@@ -2547,12 +2562,8 @@ and eval_expr' env e =
                     check_terms env (cntr_ctx Vc.expl_loop_keep ()) inv;
                   add_premises inv env;
                   if env.rac.do_rac && e.e_effect.eff_oneway = Total then (
-                    let old_ts, oldies = Opt.get opt_old_variant in
-                    let vsenv =
-                      Mvs.union (fun _ _ _ -> assert false) env.vsenv oldies in
-                    let env = {env with vsenv} in
-                    check_term env (cntr_ctx Vc.expl_loop_vari ())
-                      (mk_variant_term env e.e_loc Vc.expl_loop_vari old_ts var) );
+                    let old_varl = Opt.get opt_old_varl in
+                    check_variant Vc.expl_loop_vari e.e_loc env old_varl varl );
                   iter ()
               | r -> r
             ) else if is_false v then (* condition false *)
@@ -2770,23 +2781,38 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
     else Log.ExecConcrete in
   let mvs = let aux pv v = pv.pv_vs, snapshot v in
     Mvs.of_list (List.map2 aux rs.rs_cty.cty_args arg_vs) in
+  let env =
+    if env.rac.do_rac then ( (* Check variant decrease, maybe *)
+      match find_rec_defn rs env with
+      | None -> (* Call to non-recursive function *)
+          {env with old_varl= None}
+      | Some rds ->
+          match List.find (fun rd -> rs_equal rs rd.rec_sym) rds with
+          | rd -> (* Non-recursive (initial) call to recursive function *)
+              {env with old_varl= Some (oldify_varl env rd.rec_varl)}
+          | exception Not_found ->
+              match List.find (fun rd -> rs_equal rs rd.rec_rsym) rds with
+              | rd -> (* Recursive call to recursive function *)
+                  let old_varl = Opt.get env.old_varl in
+                  check_variant Vc.expl_variant loc env old_varl rd.rec_varl;
+                  {env with old_varl= Some (oldify_varl env rd.rec_varl)} )
+    else env in
   let check_pre_and_register_call ?(any_function=false) exec_kind =
     if not main_function then
       if any_function then
         register_any_call env loc (Some rs) mvs
       else
         register_call env loc (Some rs) mvs exec_kind;
-    if env.rac.do_rac then (
-      let desc = asprintf "of `%a`" print_rs rs in
-      let ctx = cntr_ctx ?loc Vc.expl_pre ~desc () in
-      (if main_function then check_assume_terms else check_terms)
-        env ctx rs.rs_cty.cty_pre );
     (* Module [Expr] adds a precondition "DECR f" to each recursive function
        "f", which is not defined in the context of Pinterp. TODO? *)
     let not_DECR = function
-      | {t_node= Tapp (f, _)} ->
-          not (Strings.has_prefix "DECR " f.ls_name.id_string)
+      | {t_node= Tapp (f, _)} -> not (Strings.has_prefix "DECR " f.ls_name.id_string)
       | _ -> true in
+    if env.rac.do_rac then (
+      let desc = asprintf "of `%a`" print_rs rs in
+      let ctx = cntr_ctx ?loc:loc Vc.expl_pre ~desc () in
+      let pre = List.filter not_DECR rs.rs_cty.cty_pre in
+      (if main_function then check_assume_terms else check_terms) env ctx pre );
     add_premises (List.filter not_DECR rs.rs_cty.cty_pre) env in
   match exec_kind with
   | Log.ExecAbstract ->
@@ -2815,8 +2841,8 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
               check_pre_and_register_call Log.ExecConcrete;
               Normal v
           | _ -> match find_definition env rs with
-            | LocalFunction (locals, ce) -> (
-                let env = add_local_funs locals env in
+            | LocalFunction (locals, (ce, rdl)) -> (
+                let env = add_local_funs locals rdl env in
                 match ce.c_node with
                 | Capp (rs', pvl) ->
                     Debug.dprintf debug_trace_exec "@[<h>%tEXEC CALL %a: Capp %a]@."
@@ -3001,12 +3027,12 @@ let bind_globals ?rs_main mod_known env =
   let mod_known, _ = Mid.fold is_before mod_known (Mid.empty, false) in
   fst (Mid.fold eval_global mod_known (env, Sidpos.empty))
 
-let eval_global_fundef rac env pmodule locals e =
+let eval_global_fundef rac env pmodule locals rdl e =
   with_limits @@ fun () ->
   get_builtin_progs env ;
   let env = default_env env rac pmodule in
   let env = bind_globals pmodule.Pmodule.mod_known env in
-  let env = add_local_funs locals env in
+  let env = add_local_funs locals rdl env in
   let res = eval_expr env e in
   res, env.vsenv, env.rsenv
 

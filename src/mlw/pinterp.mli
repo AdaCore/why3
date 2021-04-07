@@ -202,7 +202,7 @@ val rac_config :
 type env = private {
   pmodule : Pmodule.pmodule;
   (** The pmodule of the VC *)
-  funenv  : cexp Mrs.t;
+  funenv  : (cexp * rec_defn list option) Mrs.t;
   (** An environment of local functions *)
   vsenv   : value Mvs.t;
   (** An environment of local variables *)
@@ -217,6 +217,8 @@ type env = private {
   (** The Why3 environment *)
   rac     : rac_config;
   (** The configuration of the RAC *)
+  old_varl : ((term * lsymbol option) list * value Mvs.t) option;
+  (** To check function variants *)
 }
 
 (** Result of the interpreter **)
@@ -251,9 +253,10 @@ val eval_global_fundef :
   Env.env ->
   Pmodule.pmodule ->
   (rsymbol * cexp) list ->
+  rec_defn list option ->
   expr ->
   result * value Mvs.t * value Lazy.t Mrs.t
-(** [eval_global_fundef ~rac env pkm dkm rcl e] evaluates [e] and
+(** [eval_global_fundef ~rac env pkm dkm rcl rdl e] evaluates [e] and
    returns an evaluation result and a final variable environment (for
    both local and global variables).
 
