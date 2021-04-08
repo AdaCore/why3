@@ -6,6 +6,7 @@
 <prover id="1" name="Coq" version="8.9.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -35,16 +36,16 @@
  <goal name="blit&#39;vc" expl="VC for blit" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="blit&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="1740"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="2437"/></proof>
   </goal>
   <goal name="blit&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="2371"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="2522"/></proof>
   </goal>
   <goal name="blit&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="3063"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="3078"/></proof>
   </goal>
   <goal name="blit&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="3068"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="3083"/></proof>
   </goal>
   <goal name="blit&#39;vc.4" expl="loop invariant preservation" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.01" steps="69"/></proof>
@@ -53,21 +54,21 @@
   <proof prover="2" timelimit="1"><result status="valid" time="0.01" steps="55"/></proof>
   </goal>
   <goal name="blit&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="57205"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="53592"/></proof>
   </goal>
   <goal name="blit&#39;vc.7" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="blit&#39;vc.7.0" expl="postcondition" proved="true">
    <transf name="split_all_full" proved="true" >
     <goal name="blit&#39;vc.7.0.0" expl="postcondition" proved="true">
-    <proof prover="0" timelimit="1"><result status="valid" time="0.15" steps="830554"/></proof>
+    <proof prover="0" timelimit="1"><result status="valid" time="0.15" steps="310480"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="blit&#39;vc.8" expl="out of loop bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.01" steps="2459"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="2610"/></proof>
   </goal>
  </transf>
  </goal>
@@ -180,7 +181,7 @@
    <goal name="exchange_inversion&#39;vc.2.5" expl="assertion" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="exchange_inversion&#39;vc.2.5.0" expl="assertion" proved="true">
-    <proof prover="0"><result status="valid" time="9.27" steps="25499862"/></proof>
+    <proof prover="4"><result status="valid" time="3.67" steps="362799"/></proof>
     </goal>
    </transf>
    </goal>
@@ -192,7 +193,7 @@
   <goal name="exchange_inversion&#39;vc.3" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="exchange_inversion&#39;vc.3.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="1.85" steps="5658588"/></proof>
+   <proof prover="0"><result status="valid" time="4.02" steps="10887521"/></proof>
    </goal>
   </transf>
   </goal>
@@ -201,7 +202,7 @@
    <goal name="exchange_inversion&#39;vc.4.0" expl="VC for exchange_inversion" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="exchange_inversion&#39;vc.4.0.0" expl="VC for exchange_inversion" proved="true">
-    <proof prover="0"><result status="valid" time="0.47" steps="1431132"/></proof>
+    <proof prover="0"><result status="valid" time="0.80" steps="1839523"/></proof>
     </goal>
    </transf>
    </goal>
