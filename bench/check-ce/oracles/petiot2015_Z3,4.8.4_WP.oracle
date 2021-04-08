@@ -1,298 +1,50 @@
 File "bench/check-ce/petiot2015.mlw", line 16, characters 18-35:
 Goal Variant decrease from verification condition max_rgf'vc.
-Prover result is: Valid (0.01s, 256 steps).
+Prover result is: Valid (0.00s, 254 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 16, characters 18-35:
 Goal Precondition from verification condition max_rgf'vc.
-Prover result is: Valid (0.01s, 9669 steps).
+Prover result is: Valid (0.01s, 10944 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 16, characters 18-35:
 Goal Precondition from verification condition max_rgf'vc.
-Prover result is: Valid (0.02s, 9864 steps).
+Prover result is: Valid (0.01s, 9864 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 14, characters 38-47:
 Goal Postcondition from verification condition max_rgf'vc.
-Prover result is: Valid (0.02s, 11859 steps).
+Prover result is: Valid (0.01s, 12312 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 24, characters 18-28:
 Goal Loop invariant init from verification condition g'vc.
-Prover result is: Valid (0.02s, 260 steps).
+Prover result is: Valid (0.01s, 258 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 25, characters 43-60:
 Goal Loop invariant init from verification condition g'vc.
-Prover result is: Valid (0.01s, 64 steps).
+Prover result is: Valid (0.00s, 70 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 26, characters 6-15:
 Goal Index in array bounds from verification condition g'vc.
-Prover result is: Valid (0.01s, 10920 steps).
+Prover result is: Valid (0.01s, 10873 steps).
 
-<check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 24, characters 18-28)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 23:
-              k [@introduced] = {"type": "Integer", "val": "0"}
-            Line 24:
-              the check fails with all inputs
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Missing value for parameter i, continue with default value 0.
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Missing value for parameter i, continue with default value 0.
-<check-ce>Result of checking model 0:
-            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/petiot2015.mlw", line 19, characters 15-33)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File int.mlw:
-                Line 258:
-                  Constant min_int32 initialization
-                Line 259:
-                  Constant max_int32 initialization
-              File petiot2015.mlw:
-                Line 18:
-                  a = []
-                  i = 0
-                  Execution of main function g's body with env:
-                    a = []
-                    i = 0
-                    zero = 0
-                    one = 1
-                    min_int32 = (-2147483648)
-                    max_int32 = 2147483647
-                Line 19:
-                  Execution got stuck, Precondition of g with:
-                    a = []
-                    i = 0
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/petiot2015.mlw", line 19, characters 15-33)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File int.mlw:
-                Line 258:
-                  Constant min_int32 initialization
-                Line 259:
-                  Constant max_int32 initialization
-              File petiot2015.mlw:
-                Line 18:
-                  a = []
-                  i = 0
-                  Execution of main function g's body with env:
-                    a = []
-                    i = 0
-                    zero = 0
-                    one = 1
-                    min_int32 = (-2147483648)
-                    max_int32 = 2147483647
-                Line 19:
-                  Execution got stuck, Precondition of g with:
-                    a = []
-                    i = 0
-<check-ce>Check model 1 ("bench/check-ce/petiot2015.mlw", line 24, characters 18-28)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 18:
-              i [@introduced] = {"type": "Integer", "val": "176"}
-            Line 23:
-              k [@introduced] = {"type": "Integer", "val": "177"}
-            Line 24:
-              k_vc_constant [@introduced] [@model_trace:k] =
-                {"type": "Integer", "val": "177"}
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 176
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 176
-<check-ce>Result of checking model 1:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of g cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of g cannot be evaluated)
-              
-<check-ce>Check model 2 ("bench/check-ce/petiot2015.mlw", line 24, characters 18-28)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 18:
-              i [@introduced] = {"type": "Integer", "val": "1"}
-            Line 23:
-              k [@introduced] = {"type": "Integer", "val": "2"}
-            Line 24:
-              k_vc_constant [@introduced] [@model_trace:k] =
-                {"type": "Integer", "val": "2"}
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 1
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 1
-<check-ce>Result of checking model 2:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of g cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of g cannot be evaluated)
-              
-<check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Checked model 1 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of g cannot be evaluated)
-- Selected model 2 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of g cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 24, characters 18-28:
 Goal Loop invariant preservation from verification condition g'vc.
-Prover result is: Unknown (unknown) (0.06s, 134903 steps).
-The following counterexample model could not be verified
-  (Concrete RAC terminated because Precondition of g cannot be evaluated):
-File petiot2015.mlw:
-  Line 18:
-    i = 1
-  Line 23:
-    [current iteration] k = 2
-  Line 24:
-    [current iteration] k = 2
+Prover result is: Valid (0.01s, 14558 steps).
 
-<check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 25, characters 43-60)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 25:
-              j [@introduced] = {"type": "Integer", "val": "0"}
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Missing value for parameter i, continue with default value 0.
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Missing value for parameter i, continue with default value 0.
-<check-ce>Result of checking model 0:
-            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/petiot2015.mlw", line 19, characters 15-33)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File int.mlw:
-                Line 258:
-                  Constant min_int32 initialization
-                Line 259:
-                  Constant max_int32 initialization
-              File petiot2015.mlw:
-                Line 18:
-                  a = []
-                  i = 0
-                  Execution of main function g's body with env:
-                    a = []
-                    i = 0
-                    zero = 0
-                    one = 1
-                    min_int32 = (-2147483648)
-                    max_int32 = 2147483647
-                Line 19:
-                  Execution got stuck, Precondition of g with:
-                    a = []
-                    i = 0
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/petiot2015.mlw", line 19, characters 15-33)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File int.mlw:
-                Line 258:
-                  Constant min_int32 initialization
-                Line 259:
-                  Constant max_int32 initialization
-              File petiot2015.mlw:
-                Line 18:
-                  a = []
-                  i = 0
-                  Execution of main function g's body with env:
-                    a = []
-                    i = 0
-                    zero = 0
-                    one = 1
-                    min_int32 = (-2147483648)
-                    max_int32 = 2147483647
-                Line 19:
-                  Execution got stuck, Precondition of g with:
-                    a = []
-                    i = 0
-<check-ce>Check model 1 ("bench/check-ce/petiot2015.mlw", line 25, characters 43-60)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 18:
-              i [@introduced] = {"type": "Integer", "val": "401"}
-            Line 23:
-              k [@introduced] = {"type": "Integer", "val": "402"}
-            Line 25:
-              j [@introduced] = {"type": "Integer", "val": "1"}
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 401
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 401
-<check-ce>Result of checking model 1:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of g cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of g cannot be evaluated)
-              
-<check-ce>Check model 2 ("bench/check-ce/petiot2015.mlw", line 25, characters 43-60)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 18:
-              i [@introduced] = {"type": "Integer", "val": "1"}
-            Line 23:
-              k [@introduced] = {"type": "Integer", "val": "2"}
-            Line 25:
-              j [@introduced] = {"type": "Integer", "val": "1"}
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 1
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a, continue with default value [].
-<rac-values>Value imported for i at "bench/check-ce/petiot2015.mlw", line 18, characters 24-25: 1
-<check-ce>Result of checking model 2:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of g cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of g cannot be evaluated)
-              
-<check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Checked model 1 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of g cannot be evaluated)
-- Selected model 2 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of g cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 25, characters 43-60:
 Goal Loop invariant preservation from verification condition g'vc.
-Prover result is: Unknown (unknown) (0.07s, 146256 steps).
-The following counterexample model could not be verified
-  (Concrete RAC terminated because Precondition of g cannot be evaluated):
-File petiot2015.mlw:
-  Line 18:
-    i = 1
-  Line 23:
-    [current iteration] k = 2
-  Line 25:
-    [current iteration] j = 1
+Prover result is: Valid (0.01s, 13705 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 21, characters 39-56:
 Goal Postcondition from verification condition g'vc.
-Prover result is: Valid (0.00s, 11683 steps).
+Prover result is: Valid (0.01s, 12050 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 22, characters 14-31:
 Goal Postcondition from verification condition g'vc.
-Prover result is: Valid (0.01s, 11571 steps).
+Prover result is: Valid (0.02s, 11511 steps).
 
 File bench/check-ce/petiot2015.mlw:
 Goal Out of loop bounds from verification condition g'vc.
-Prover result is: Valid (0.01s, 11613 steps).
+Prover result is: Valid (0.02s, 11613 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 38, characters 18-40:
 Goal Loop invariant init from verification condition f'vc.
@@ -304,218 +56,51 @@ Prover result is: Valid (0.01s, 10889 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 40, characters 9-13:
 Goal Index in array bounds from verification condition f'vc.
-Prover result is: Valid (0.02s, 10885 steps).
+Prover result is: Valid (0.01s, 10885 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 191 steps).
+Prover result is: Valid (0.01s, 186 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 126 steps).
+Prover result is: Valid (0.00s, 126 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 44, characters 12-16:
 Goal Index in array bounds from verification condition f'vc.
-Prover result is: Valid (0.01s, 11072 steps).
+Prover result is: Valid (0.01s, 11057 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 44, characters 4-20:
 Goal Index in array bounds from verification condition f'vc.
-Prover result is: Valid (0.02s, 11072 steps).
+Prover result is: Valid (0.02s, 11057 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 45, characters 4-9:
 Goal Precondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 11373 steps).
+Prover result is: Valid (0.01s, 10813 steps).
 
-<check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 45, characters 4-9)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 37:
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
-                [@mlw:reference_var] =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-            Line 45:
-              the check fails with all inputs
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Result of checking model 0:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of f cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of f cannot be evaluated)
-              
-<check-ce>Check model 1 ("bench/check-ce/petiot2015.mlw", line 45, characters 4-9)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 37:
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
-                [@mlw:reference_var] =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "176"}}]}}
-            Line 45:
-              i_vc_constant [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
-                [@mlw:reference_var] [@model_trace:i] =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "176"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Result of checking model 1:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of f cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of f cannot be evaluated)
-              
-<check-ce>Models:
-- Checked model 0 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of f cannot be evaluated)
-- Selected model 1 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of f cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 45, characters 4-9:
 Goal Precondition from verification condition f'vc.
-Prover result is: Step limit exceeded (1.21s).
-The following counterexample model could not be verified
-  (Concrete RAC terminated because Precondition of f cannot be evaluated):
-File petiot2015.mlw:
-  Line 37:
-    i = 176 (0XB0)
-  Line 45:
-    i = 176 (0XB0)
+Prover result is: Valid (0.02s, 19969 steps).
 
-<check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 46, characters 37-54)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 46:
-              j [@introduced] = {"type": "Integer", "val": "0"}
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Result of checking model 0:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of f cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of f cannot be evaluated)
-              
-<check-ce>Check model 1 ("bench/check-ce/petiot2015.mlw", line 46, characters 37-54)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 37:
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
-                [@mlw:reference_var] =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "401"}}]}}
-            Line 46:
-              j [@introduced] = {"type": "Integer", "val": "0"}
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Result of checking model 1:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of f cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of f cannot be evaluated)
-              
-<check-ce>Models:
-- Checked model 0 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of f cannot be evaluated)
-- Selected model 1 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of f cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 46, characters 37-54:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (1.22s).
-The following counterexample model could not be verified
-  (Concrete RAC terminated because Precondition of f cannot be evaluated):
-File petiot2015.mlw:
-  Line 37:
-    i = 401 (0X191)
-  Line 46:
-    j = 0
+Prover result is: Valid (0.02s, 13636 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.00s, 164 steps).
+Prover result is: Valid (0.01s, 162 steps).
 
-<check-ce>Check model 0 ("bench/check-ce/petiot2015.mlw", line 34, characters 6-105)
-<check-ce>Validating model:
-          
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Result of checking model 0:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of f cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of f cannot be evaluated)
-              
-<check-ce>Check model 1 ("bench/check-ce/petiot2015.mlw", line 34, characters 6-105)
-<check-ce>Validating model:
-          File petiot2015.mlw:
-            Line 34:
-              the check fails with all inputs
-            Line 37:
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/petiot2015.mlw:37:4:144]
-                [@mlw:reference_var] =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "55"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Interpreting abstractly
-<rac-values>Missing value for parameter a1, continue with default value [].
-<check-ce>Result of checking model 1:
-            - Concrete: don't know (Concrete RAC terminated because Precondition of f cannot be evaluated)
-              
-            - Abstract: don't know (Abstract RAC terminated because Precondition of f cannot be evaluated)
-              
-<check-ce>Models:
-- Checked model 0 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of f cannot be evaluated)
-- Selected model 1 (Concrete: don't know, Abstract: don't know)
-    Summary: The following counterexample model has not been verified
-    (Concrete RAC terminated because Precondition of f cannot be evaluated)
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Step limit exceeded (1.47s).
-The following counterexample model could not be verified
-  (Concrete RAC terminated because Precondition of f cannot be evaluated):
-File petiot2015.mlw:
-  Line 34:
-    the check fails with all inputs
-  Line 37:
-    i = 55 (0X37)
+Prover result is: Valid (0.02s, 17040 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 39, characters 16-17:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: Valid (0.01s, 9844 steps).
+Prover result is: Valid (0.01s, 11082 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 38, characters 18-40:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Valid (0.01s, 11145 steps).
+Prover result is: Valid (0.01s, 11130 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
@@ -523,33 +108,33 @@ Prover result is: Valid (0.01s, 174 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 125 steps).
+Prover result is: Valid (0.00s, 125 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 44, characters 12-16:
 Goal Index in array bounds from verification condition f'vc.
-Prover result is: Valid (0.02s, 10945 steps).
+Prover result is: Valid (0.01s, 10945 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 44, characters 4-20:
 Goal Index in array bounds from verification condition f'vc.
-Prover result is: Valid (0.01s, 10945 steps).
+Prover result is: Valid (0.00s, 10945 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 45, characters 4-9:
 Goal Precondition from verification condition f'vc.
-Prover result is: Valid (0.02s, 11222 steps).
+Prover result is: Valid (0.01s, 10677 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 45, characters 4-9:
 Goal Precondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 487 steps).
+Prover result is: Valid (0.01s, 418 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 46, characters 37-54:
 Goal Assertion from verification condition f'vc.
-Prover result is: Valid (0.02s, 11229 steps).
+Prover result is: Valid (0.01s, 11085 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 32, characters 14-31:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 163 steps).
+Prover result is: Valid (0.00s, 161 steps).
 
 File "bench/check-ce/petiot2015.mlw", line 34, characters 6-105:
 Goal Postcondition from verification condition f'vc.
-Prover result is: Valid (0.01s, 12363 steps).
+Prover result is: Valid (0.01s, 11787 steps).
 
