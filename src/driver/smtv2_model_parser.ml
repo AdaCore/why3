@@ -174,6 +174,13 @@ module FromSexp = struct
         ""
     | sexp -> error sexp "name"
 
+  let var = function
+    | Atom s | List [Atom "as"; Atom s; _] as sexp ->
+        if s = "" || is_name_start s.[0] then s else
+        if is_quoted s then get_quoted s else
+          error sexp "var"
+    | sexp -> error sexp "var"
+
   let ireturn_type sexp =
     try Some (name sexp) with _ ->
       None
@@ -188,7 +195,7 @@ module FromSexp = struct
 
   let rec term sexp =
     try Sval (value sexp) with _ ->
-    try Var (name sexp) with _ ->
+    try Var (var sexp) with _ ->
     try Array (array sexp) with _ ->
     try ite sexp with _ ->
     try apply_eq sexp; Sval (Unparsed "apply_eq") with _ ->
