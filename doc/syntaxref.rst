@@ -401,16 +401,48 @@ numbers it is possible to write ``[|t1;t2;t3|]`` as a shortcut for
 
 .. index:: at
 .. index:: old
+.. index:: label
 
 The "at" and "old" operators
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
-past moment of execution (see the next section for details). These
+past moment of execution. These
 operators have higher precedence than the infix operators from group 1
 (:token:`infix_op_1`): ``old i > j`` is parsed as ``(old i) > j`` and not as
 ``old (i > j)``.
+
+Within a postcondition, ``old t`` refers to
+the value of term ``t`` in the pre-state. Within the scope of a code label
+``L``, introduced with ``label L in ...``, the term ``t at L`` refers to the
+value of term ``t`` at the program point corresponding to ``L``.
+
+Note that ``old`` can be used in annotations contained in the function
+body as well (assertions, loop invariants), with the exact same meaning: it
+refers to the pre-state of the function. In particular, ``old t`` in
+a loop invariant does not refer to the program point right before the
+loop but to the function entry.
+
+Whenever ``old t`` or ``t at L`` refers to a program point at which
+none of the variables in ``t`` is defined, Why3 emits a warning "this
+\`at'/\`old' operator is never used" and the operator is
+ignored. For instance, the following code
+
+.. code-block:: whyml
+
+    let x = ref 0 in assert { old !x = !x }
+
+emits a warning and is provable, as it amounts to proving `0=0`.
+Similarly, if ``old t`` or ``t at L`` refers to a term ``t`` that is
+immutable, Why3 emits the same warning and ignores the operator.
+
+Caveat: Whenever the term ``t`` contains several variables, some of
+them being meaningful at the corresponding program point but others
+not being in scope or being immutable, there is *no warning* and the
+operator ``old``/``at`` is applied where it is defined and ignored
+elsewhere. This is convenient when writing terms such as ``old a[i]``
+where ``a`` makes sense in the pre-state but ``i`` does not.
 
 .. index:: &&, ||, by, so
 
@@ -750,46 +782,6 @@ In applications, arguments are evaluated from right to left. This
 includes applications of infix operators, with the only exception of
 lazy operators ``&&`` and ``||`` which evaluate from left to right,
 lazily.
-
-.. index:: past program states
-.. index:: at
-.. index:: old
-.. index:: label
-
-Referring to past program states using "at" and "old" operators
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Within specifications, terms are extended with
-constructs ``old`` and ``at``.  Within a postcondition, ``old t`` refers to
-the value of term ``t`` in the pre-state. Within the scope of a code label
-``L``, introduced with ``label L in ...``, the term ``t at L`` refers to the
-value of term ``t`` at the program point corresponding to ``L``.
-
-Note that ``old`` can be used in annotations contained in the function
-body as well (assertions, loop invariants), with the exact same meaning: it
-refers to the pre-state of the function. In particular, ``old t`` in
-a loop invariant does not refer to the program point right before the
-loop but to the function entry.
-
-Whenever ``old t`` or ``t at L`` refers to a program point at which
-none of the variables in ``t`` is defined, Why3 emits a warning ``this
-`at'/`old' operator is never used`` and the operator ``old``/``at`` is
-ignored. For instance, the following code
-
-.. code-block:: whyml
-
-    let x = ref 0 in assert { old !x = !x }
-
-emits a warning and is provable, as it amounts to proving `0=0`.
-Similarly, if ``old t`` or ``t at L`` refers to a term ``t`` that is
-immutable, Why3 emits the same warning and ignores the operator.
-
-Caveat: Whenever the term ``t`` contains several variables, some of
-them being meaningful at the corresponding program point but others
-not being in scope or being immutable, there is *no warning* and the
-operator ``old``/``at`` is applied where it is defined and ignored
-elsewhere. This is convenient when writing terms such as ``old a[i]``
-where ``a`` makes sense in the pre-state but ``i`` does not.
 
 .. index:: for loop, invariant; for loop
 
