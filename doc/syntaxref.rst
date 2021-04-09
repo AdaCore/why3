@@ -359,8 +359,9 @@ application is not allowed (rejected at typing).
 
 .. _rubric.collections_syntax:
 
-.. index:: bracket; syntax
-.. index:: collections; syntax; function literals
+.. index:: bracket
+.. index:: collections
+.. index:: function literals
 
 Specific syntax for collections
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -398,20 +399,54 @@ domain of the function ranges over an initial sequence of the natural
 numbers it is possible to write ``[|t1;t2;t3|]`` as a shortcut for
 ``[|0 => t1; 1 => t2; 2 => t3|]``.  Function literals cannot be empty.
 
-.. index:: at; syntax
-.. index:: old; syntax
+.. index:: pair: keyword; at
+.. index:: pair: keyword; old
+.. index:: pair: keyword; label
 
 The "at" and "old" operators
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
-past moment of execution (see the next section for details). These
+past moment of execution. These
 operators have higher precedence than the infix operators from group 1
 (:token:`infix_op_1`): ``old i > j`` is parsed as ``(old i) > j`` and not as
 ``old (i > j)``.
 
-.. index:: &&, ||, by, so
+Within a postcondition, ``old t`` refers to
+the value of term ``t`` in the pre-state. Within the scope of a code label
+``L``, introduced with ``label L in ...``, the term ``t at L`` refers to the
+value of term ``t`` at the program point corresponding to ``L``.
+
+Note that ``old`` can be used in annotations contained in the function
+body as well (assertions, loop invariants), with the exact same meaning: it
+refers to the pre-state of the function. In particular, ``old t`` in
+a loop invariant does not refer to the program point right before the
+loop but to the function entry.
+
+Whenever ``old t`` or ``t at L`` refers to a program point at which
+none of the variables in ``t`` is defined, Why3 emits a warning "this
+\`at'/\`old' operator is never used" and the operator is
+ignored. For instance, the following code
+
+.. code-block:: whyml
+
+    let x = ref 0 in assert { old !x = !x }
+
+emits a warning and is provable, as it amounts to proving `0=0`.
+Similarly, if ``old t`` or ``t at L`` refers to a term ``t`` that is
+immutable, Why3 emits the same warning and ignores the operator.
+
+Caveat: Whenever the term ``t`` contains several variables, some of
+them being meaningful at the corresponding program point but others
+not being in scope or being immutable, there is *no warning* and the
+operator ``old``/``at`` is applied where it is defined and ignored
+elsewhere. This is convenient when writing terms such as ``old a[i]``
+where ``a`` makes sense in the pre-state but ``i`` does not.
+
+.. index:: &&, ||
+.. index:: pair: keyword; by
+.. index:: pair: keyword; so
 
 Non-standard connectives
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -468,9 +503,12 @@ instead: ``A <-> B <-> C`` is transformed into a conjunction of
 a non-parenthesised implication at the right-hand side of an
 equivalence: ``A <-> B -> C`` is rejected.
 
-.. index:: conditionals; syntax
-.. index:: let; syntax
-.. index:: pattern-matching; syntax
+.. index:: conditional
+.. index:: pair: keyword; if
+.. index:: pair: keyword; then
+.. index:: pair: keyword; else
+.. index:: pair: keyword; let
+.. index:: pattern-matching
 
 Conditionals, "let" bindings and pattern-matching
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -629,7 +667,7 @@ conjunction and disjunction, respectively.
     variant: "variant" "{" `variant_term` ("," `variant_term`)* "}"   ; termination variant
     variant_term: `term` ("with" `lqualid`)?   ; variant term + WF-order
 
-.. index:: ghost expressions
+.. index:: pair: keyword; ghost
 
 Ghost expressions
 ^^^^^^^^^^^^^^^^^
@@ -652,6 +690,8 @@ multiple assignment.
 
 .. index:: auto-dereference
 .. index:: reference
+.. index:: pair: keyword; ref
+.. index:: &
 
 Auto-dereference: simplified usage of mutable variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -750,47 +790,10 @@ includes applications of infix operators, with the only exception of
 lazy operators ``&&`` and ``||`` which evaluate from left to right,
 lazily.
 
-.. index:: past program states
-.. index:: at
-.. index:: old
-.. index:: label
-
-Referring to past program states using "at" and "old" operators
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Within specifications, terms are extended with
-constructs ``old`` and ``at``.  Within a postcondition, ``old t`` refers to
-the value of term ``t`` in the pre-state. Within the scope of a code label
-``L``, introduced with ``label L in ...``, the term ``t at L`` refers to the
-value of term ``t`` at the program point corresponding to ``L``.
-
-Note that ``old`` can be used in annotations contained in the function
-body as well (assertions, loop invariants), with the exact same meaning: it
-refers to the pre-state of the function. In particular, ``old t`` in
-a loop invariant does not refer to the program point right before the
-loop but to the function entry.
-
-Whenever ``old t`` or ``t at L`` refers to a program point at which
-none of the variables in ``t`` is defined, Why3 emits a warning ``this
-`at'/`old' operator is never used`` and the operator ``old``/``at`` is
-ignored. For instance, the following code
-
-.. code-block:: whyml
-
-    let x = ref 0 in assert { old !x = !x }
-
-emits a warning and is provable, as it amounts to proving `0=0`.
-Similarly, if ``old t`` or ``t at L`` refers to a term ``t`` that is
-immutable, Why3 emits the same warning and ignores the operator.
-
-Caveat: Whenever the term ``t`` contains several variables, some of
-them being meaningful at the corresponding program point but others
-not being in scope or being immutable, there is *no warning* and the
-operator ``old``/``at`` is applied where it is defined and ignored
-elsewhere. This is convenient when writing terms such as ``old a[i]``
-where ``a`` makes sense in the pre-state but ``i`` does not.
-
-.. index:: for loop, invariant; for loop
+.. index:: pair: keyword; for
+.. index:: pair: keyword; downto
+.. index:: pair: keyword; invariant
+.. index:: invariant; for loop
 
 The “for” loop
 ^^^^^^^^^^^^^^
@@ -826,6 +829,9 @@ backwards.
 It is also possible for ``v`` to be an integer range type (see
 :numref:`sec.range_types`) instead of an integer.
 
+.. index:: pair: keyword; for
+.. index:: pair: keyword; variant
+.. index:: pair: keyword; invariant
 .. index:: for each loop, invariant; for each loop
 
 The “for each” loop
@@ -859,11 +865,12 @@ As shown above, the iterator is named ``it``. It can be referred to
 within annotations. A different name can be specified, using syntax
 ``with S as x do``.
 
-.. index:: while loop, for loop, break, continue
+.. index:: pair: keyword; while
+.. index:: pair: keyword; break
+.. index:: pair: keyword; continue
 
 Break & Continue
 ^^^^^^^^^^^^^^^^
-
 
 The ``break`` and ``continue`` statements can be used in ``while``,
 ``for`` and ``for-each`` loops, with the expected semantics. The
@@ -877,12 +884,13 @@ like in the following example:
     while true do
       variant...
       while true do
-        variant..
+        variant...
         break A (* abort the outer loop *)
       done
     done
 
-.. index:: collections; syntax; function literals
+.. index:: collections
+.. index:: function literals
 
 Function literals
 ^^^^^^^^^^^^^^^^^
@@ -910,7 +918,7 @@ u3|]`` will be translated into the following expression:
                if x'x = d'i1 then r'i1 else
                def'e
 
-.. index:: any expression
+.. index:: pair: keyword; any
 
 The ``any`` expression
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -1056,7 +1064,9 @@ A mutable field can be modified using notation ``x.a <- 42``.
 The ``writes`` clause of a function contract can list mutable fields,
 e.g., ``writes { x.a }``.
 
+.. index:: pair: keyword; invariant
 .. index:: type invariant, invariant; type
+
 .. rubric:: Type invariants
 
 Invariants can be attached to record types, as follows:
@@ -1285,6 +1295,7 @@ types cannot.
 
 
 .. index:: range type
+.. index:: pair: keyword; range
 .. _sec.range_types:
 
 Range types
@@ -1325,6 +1336,8 @@ axiom as in:
 
 This type is used in the standard library in the theories ``bv.BV8``,
 ``bv.BV16``, ``bv.BV32``, ``bv.BV64``.
+
+.. index:: pair: keyword; float
 
 Floating-point types
 ^^^^^^^^^^^^^^^^^^^^
@@ -1377,10 +1390,6 @@ specified format. The transformation also replaces all casts of the form
 
 This type is used in the standard library in the theories
 ``ieee_float.Float32`` and ``ieee_float.Float64``.
-
-
-
-
 
 Function declarations
 ^^^^^^^^^^^^^^^^^^^^^
@@ -1435,7 +1444,7 @@ in the ghost code and never translated into executable code ; or
 effects unaccounted by their specification, and thus they cannot be
 used in the ghost code.
 
-.. index:: clone
+.. index:: pair: keyword; clone
 .. index:: module cloning
 .. _Module cloning:
 

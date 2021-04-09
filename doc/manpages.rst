@@ -825,7 +825,7 @@ input. Currently, this is supported for CVC4 prover version at least
 
 The generation of counterexamples is fully integrated in Why3 IDE. The
 recommended usage is to first start a prover normally, as shown in
-:numref:`fig.ce_example0_p1`) and then click on the status icon for the
+:numref:`fig.ce_example0_p1`, and then click on the status icon for the
 corresponding proof attempt in the tree. Alternatively, one can use the
 key shortcut :kbd:`G` or type ``get-ce`` in the command entry. The result can
 be seen on :numref:`fig.ce_example0_p2`: the same prover but with the
@@ -1132,14 +1132,14 @@ session, depending on the following specific options.
    example you can count the number of proof line in all the coq edited
    files in a session with:
 
-   ::
+   .. code-block:: shell
 
         why3 session info --edited-files vstte12_bfs --print0 | xargs -0 coqwc
 
    or you can add all the edited files in your favorite repository
    with:
 
-   ::
+   .. code-block:: shell
 
         why3 session info --edited-files --print0 vstte12_bfs.mlw | \
             xargs -0 git add
@@ -1506,7 +1506,7 @@ Why3 can execute expressions in the context of a WhyML program (extension
 executing `expr`. For example, the following command executes ``Mod1.f 42``
 defined in ``myfile.mlw``:
 
-::
+.. code-block:: shell
 
    why3 execute myfile.mlw --use=Mod1 'f 42'
 
@@ -1635,7 +1635,25 @@ The ``realize`` Command
 .. program:: why3 realize
 
 Why3 can produce skeleton files for proof assistants that, once filled,
-realize the given theories. See also :numref:`sec.realizations`.
+realize the given theories. If the output files already exist, Why3 tries
+to update them instead of overwriting them, so as to preserve existing
+realizations. See also :numref:`sec.realizations`.
+
+.. option:: -D <driver>, --driver=<driver>
+
+   Use the given prover driver to produce realizations.
+
+.. option:: -F <format>, --format=<format>
+
+   Select the given input format.
+
+.. option:: -o <dir>, --output=<directory>
+
+   Write the realizations to the given directory.
+
+.. option:: -T <theory>, --theory=<theory>
+
+   Select the given theory in the input file or in the library.
 
 .. why3:tool:: wc
 .. _sec.why3wc:
@@ -1646,3 +1664,19 @@ The ``wc`` Command
 .. program:: why3 wc
 
 Why3 can give some token statistics about WhyML source files.
+
+.. option:: -l, --lines
+
+   Count lines (default).
+
+.. option:: -t, --tokens
+
+   Count tokens.
+
+.. option:: -f, --factor
+
+   Print ratio of specification over code.
+
+.. option:: -a, --do-not-skip-header
+
+   Count heading comments as well.
