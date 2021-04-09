@@ -9,4 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-val keywords: (string * Parser.token) list
+val keyword_tokens: (string * Parser.token) list
+
+(* does not include contextual tokens *)
+val keywords: string list

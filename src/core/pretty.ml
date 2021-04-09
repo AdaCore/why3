@@ -19,7 +19,7 @@ open Decl
 open Theory
 open Task
 
-let why3_keywords = List.map fst Keywords.keywords
+let why3_keywords = Keywords.keywords
 
 let coercion_attr = create_attribute "coercion"
 

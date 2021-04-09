@@ -14,7 +14,7 @@
 
   let keywords = Hashtbl.create 97
   let () =
-    List.iter (fun (x,y) -> Hashtbl.add keywords x y) Keywords.keywords
+    List.iter (fun (x,y) -> Hashtbl.add keywords x y) Keywords.keyword_tokens
 }
 
 let space = [' ' '\t' '\r']

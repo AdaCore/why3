@@ -26,8 +26,7 @@
     List.iter (fun s -> Hashtbl.add ht s ()) l;
     Hashtbl.mem ht
 
-  (* keep synchronized with src/parser/lexer.mll *)
-  let is_keyword = make_table (List.map fst Keywords.keywords)
+  let is_keyword = make_table Keywords.keywords
 
   let get_loc lb =
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)

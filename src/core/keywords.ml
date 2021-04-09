@@ -20,7 +20,7 @@ open Parser_tokens
   src/trywhy3/mode-why3.js
 *)
 
-let keywords = [
+let plain = [
     "abstract", ABSTRACT;
     "absurd", ABSURD;
     "alias", ALIAS;
@@ -50,7 +50,6 @@ let keywords = [
     "exists", EXISTS;
     "export", EXPORT;
     "false", FALSE;
-    "float", FLOAT; (* contextual *)
     "for", FOR;
     "forall", FORALL;
     "fun", FUN;
@@ -77,10 +76,8 @@ let keywords = [
     "pure", PURE;
     "raise", RAISE;
     "raises", RAISES;
-    "range", RANGE; (* contextual *)
     "reads", READS;
     "rec", REC;
-    "ref", REF; (* contextual *)
     "requires", REQUIRES;
     "return", RETURN;
     "returns", RETURNS;
@@ -99,3 +96,15 @@ let keywords = [
     "with", WITH;
     "writes", WRITES;
   ]
+
+let contextual = [
+    "float", FLOAT;
+    "range", RANGE;
+    "ref", REF;
+  ]
+
+let keyword_tokens =
+  plain @ contextual
+
+let keywords =
+  List.map fst plain
