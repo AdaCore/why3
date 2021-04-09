@@ -147,6 +147,8 @@ endif
 # see http://caml.inria.fr/mantis/view.php?id=4991
 CMIHACK = -intf-suffix .cmi
 
+CMP_CP = cmp $< $@ || cp $< $@
+
 # external libraries common to all binaries
 
 EXTOBJS = menhirLib
@@ -318,44 +320,44 @@ $(LIBDEP): $(LIBGENERATED)
 
 ifeq (@new_dynlink@,yes)
 src/util/dynlink_wrapper.ml: src/util/dynlink_new.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/util/dynlink_wrapper.ml: src/util/dynlink_old.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 # Mlmpfr
 
 ifeq (@found_mlmpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 # Ocamlzip
 
 ifeq (@enable_zip@,yes)
 src/session/compress.ml: src/session/compress_z.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/session/compress.ml: src/session/compress_none.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 # pp_sexp_conv
 
 ifeq (@enable_pp_sexp@, yes)
 src/util/mysexplib.ml: src/util/mysexplib-real.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-real.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/util/mysexplib.ml: src/util/mysexplib-dummy.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-dummy.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 .PHONY: initialize_messages update-parsing-error-handling
@@ -398,7 +400,7 @@ endif
 
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 GENERATED += src/util/re.ml
 endif
 
@@ -845,10 +847,10 @@ install_local:: bin/why3ide.$(SHAREDBEST)
 
 ifeq (@GTKVERSION@,2)
 src/ide/gtkcompat.ml: src/ide/gtkcompat2.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 GENERATED += $(IDEGENERATED)
@@ -978,7 +980,7 @@ COQVERSIONSPECIFIC=
 COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
 
 $(COQVERSIONSPECIFICTARGETS): %: %.@coq_compat_version@
-	cp $< $@
+	$(CMP_CP)
 
 clean::
 	rm -f $(COQVERSIONSPECIFICTARGETS)
@@ -1278,7 +1280,7 @@ ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECI
 ISABELLEREALIZEDRV=drivers/isabelle@ISABELLEVERSION@-realize.drv
 
 $(ISABELLEVERSIONSPECIFICTARGETS): %: %.@ISABELLEVERSION@
-	cp $< $@
+	$(CMP_CP)
 
 clean::
 	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
