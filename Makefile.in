@@ -201,6 +201,9 @@ endif
 .PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
 
+.SUFFIXES:
+
+MAKEINC =
 CLEANDIRS =
 CLEANLIBS =
 GENERATED =
@@ -418,11 +421,7 @@ lib/why3/why3.cmx: $(LIBCMX) lib/why3/why3.cmo
 
 # clean and depend
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(LIBDEP)
-endif
-
-depend: $(LIBDEP)
+MAKEINC += $(LIBDEP)
 
 CLEANDIRS += src $(addprefix src/, $(LIBDIRS))
 CLEANLIBS += lib/why3/why3
@@ -607,11 +606,7 @@ lib/plugins/cfg.cmo: $(addsuffix .cmo, $(CFGMODULES))
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(PLUGDEP)
-endif
-
-depend: $(PLUGDEP)
+MAKEINC += $(PLUGDEP)
 
 CLEANDIRS += plugins $(addprefix plugins/, $(PLUGDIRS)) lib/plugins
 GENERATED += $(PLUGGENERATED)
@@ -677,11 +672,7 @@ share/drivers:
 share/stdlib:
 	ln -snf ../stdlib share/stdlib
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(TOOLSDEP)
-endif
-
-depend: $(TOOLSDEP)
+MAKEINC += $(TOOLSDEP)
 
 CLEANDIRS += src/tools
 GENERATED += $(TOOLSGENERATED)
@@ -823,11 +814,7 @@ bin/why3ide.cma:  $(IDECMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(IDEDEP)
-endif
-
-depend: $(IDEDEP)
+MAKEINC += $(IDEDEP)
 
 CLEANDIRS += src/ide
 
@@ -891,11 +878,7 @@ bin/why3webserver.cma:  $(WEBSERVCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(WEBSERVDEP)
-endif
-
-depend: $(WEBSERVDEP)
+MAKEINC += $(WEBSERVDEP)
 
 CLEANDIRS += src/ide
 
@@ -937,11 +920,7 @@ bin/why3session.cma:  $(SESSIONCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(SESSIONDEP)
-endif
-
-depend: $(SESSIONDEP)
+MAKEINC += $(SESSIONDEP)
 
 CLEANDIRS += src/why3session
 
@@ -978,11 +957,7 @@ bin/why3shell.cma:  $(SHELLCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(SHELLDEP)
-endif
-
-depend: $(SHELLDEP)
+MAKEINC += $(SHELLDEP)
 
 uninstall-bin::
 	rm -f $(TOOLDIR)/why3shell.$(SHAREDBEST)
@@ -1186,13 +1161,9 @@ install:: install-coq
 
 all: coq
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
--include $(COQVD)
+MAKEINC += $(COQVD)
 endif
-endif
-
-depend: $(COQVD)
 
 endif
 
@@ -1488,9 +1459,7 @@ bin/isabelle_client.byte: lib/why3/why3.cma $(ISABELLECCMO)
 install_no_local::
 	cp -f bin/isabelle_client.@OCAMLBEST@ $(BINDIR)/isabelle_client$(EXE)
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(ISABELLECDEP)
-endif
+MAKEINC += $(ISABELLECDEP)
 
 clean::
 	rm -f bin/isabelle_client.byte bin/isabelle_client.opt bin/isabelle_client
@@ -1555,11 +1524,7 @@ bin/why3pp.cma:  $(PRETTYPRINTCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(PRETTYPRINTDEP)
-endif
-
-depend: $(PRETTYPRINTDEP)
+MAKEINC += $(PRETTYPRINTDEP)
 
 uninstall-bin::
 	rm -f $(TOOLDIR)/why3pp.$(SHAREDBEST)
@@ -1598,11 +1563,7 @@ bin/why3doc.cma:  $(WHY3DOCCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(WHY3DOCDEP)
-endif
-
-depend: $(WHY3DOCDEP)
+MAKEINC += $(WHY3DOCDEP)
 
 CLEANDIRS += src/why3doc
 GENERATED += $(WHY3DOCGENERATED)
@@ -1759,11 +1720,7 @@ $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo alt_ergo_worker.cmo):
 
 $(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(TRYWHY3DEP)
-endif
-
-depend: $(TRYWHY3DEP)
+MAKEINC += $(TRYWHY3DEP)
 
 clean::
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte \
@@ -2278,9 +2235,13 @@ distclean: clean
 	rm -f config.status config.cache config.log \
 	    src/util/config.ml $(AUTOCONF_FILES)
 
-depend:
-	rm -f $^
-	$(MAKE) $^
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+ifneq "$(MAKECMDGOALS)" "depend"
+-include $(MAKEINC)
+endif
+endif
+
+depend: $(MAKEINC)
 
 clean::
 	rm -f $(GENERATED)
