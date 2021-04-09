@@ -10,7 +10,7 @@
 (********************************************************************)
 
 {
-  open Parser
+  open Parser_tokens
 
   let keywords = Hashtbl.create 97
   let () =

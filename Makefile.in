@@ -209,19 +209,21 @@ GENERATED =
 # Why3 library
 ##############
 
-LIBGENERATED = src/util/config.ml \
-	       src/util/rc.ml src/util/lexlib.ml src/util/mysexplib.ml \
-	       src/util/json_parser.mli src/util/json_parser.ml \
-	       src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
-	       src/util/dynlink_wrapper.ml \
-	       src/parser/lexer.ml \
-	       src/parser/parser.mli src/parser/parser.ml \
-	       src/parser/parser_messages.ml \
-	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	       src/driver/driver_lexer.ml \
-         src/driver/sexp.ml \
-				 src/session/compress.ml src/session/xml.ml \
-	       src/session/strategy_parser.ml
+LIBGENERATED = \
+	src/util/config.ml \
+	src/util/rc.ml src/util/lexlib.ml src/util/mysexplib.ml \
+	src/util/json_parser.mli src/util/json_parser.ml \
+	src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
+	src/util/dynlink_wrapper.ml \
+	src/parser/lexer.ml \
+	src/core/parser_tokens.mli src/core/parser_tokens.ml \
+	src/parser/parser.mli src/parser/parser.ml \
+	src/parser/parser_messages.ml \
+	src/driver/driver_parser.mli src/driver/driver_parser.ml \
+	src/driver/driver_lexer.ml \
+	src/driver/sexp.ml \
+	src/session/compress.ml src/session/xml.ml \
+	src/session/strategy_parser.ml
 
 LIB_UTIL = mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl diffmap \
@@ -234,8 +236,10 @@ ifeq (@enable_re@,no)
 LIB_UTIL += re
 endif
 
-LIB_CORE = ident ty term pattern decl coercion theory \
-	   task pretty dterm env trans printer model_parser
+LIB_CORE = \
+	ident ty term pattern decl coercion theory \
+	parser_tokens \
+	task pretty dterm env trans printer model_parser
 
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
 		whyconf autodetection smtv2_model_defs collect_data_model sexp smtv2_model_parser
@@ -2126,15 +2130,20 @@ clean::
 	$(SHOW) 'Menhir $<'
 	$(HIDE)$(MENHIR) --table --explain --strict $<
 
-src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
+# the % below are not a typo; they are a way to force Make to consider all the targets at once
+src/c%re/parser_tokens.ml src/c%re/parser_tokens.mli: src/parser/parser_common.mly
 	$(SHOW) 'Menhir $^'
-	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser $^
+	$(HIDE)$(MENHIR) --base src/core/parser_tokens --only-tokens $^
 
-plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
+src/p%rser/parser.ml src/p%rser/parser.mli: $(PARSERS)
+	$(SHOW) 'Menhir $^'
+	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser \
+		--external-tokens Parser_tokens $^
+
+pl%gins/cfg/cfg_parser.ml pl%gins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
 	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser \
 		--external-tokens Cfg_tokens $^
-
 
 %.dep: %.ml %.mli
 	$(SHOW) 'Ocamldep $<'

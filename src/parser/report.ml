@@ -65,7 +65,7 @@ exception Found of string
 
 let message_from_token token =
   match token with
-  | Parser.MODULE ->
+  | Parser_tokens.MODULE ->
       raise (Found "Trying to open a module inside a module")
   | _ -> ()
 
