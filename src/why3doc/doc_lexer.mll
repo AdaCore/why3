@@ -27,7 +27,7 @@
     Hashtbl.mem ht
 
   (* keep synchronized with src/parser/lexer.mll *)
-  let is_keyword1 = make_table [
+  let is_keyword = make_table [
     "abstract"; "any"; "as"; "at"; "axiom";
     "begin"; "break"; "by";
     "clone"; "coinductive"; "constant"; "continue";
@@ -42,9 +42,8 @@
     "scope"; "so";
     "then"; "theory"; "to"; "true"; "try"; "type";
     "use"; "val"; "while"; "with";
-  ]
 
-  let is_keyword2 = make_table [ "absurd"; "alias"; "assert"; "assume";
+    "absurd"; "alias"; "assert"; "assume";
     "check"; "diverges"; "ensures"; "invariant";
     "raises"; "reads"; "requires"; "returns"; "variant"; "writes"; ]
 
@@ -52,10 +51,8 @@
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
 
   let print_ident ?(parentheses=false) fmt lexbuf s =
-    if is_keyword1 s then
-      fprintf fmt "<span class=\"keyword1\">%s</span>" s
-    else if is_keyword2 s then
-      fprintf fmt "<span class=\"keyword2\">%s</span>" s
+    if is_keyword s then
+      fprintf fmt "<span class=\"keyword\">%s</span>" s
     else begin
       let loc =
         let loc = get_loc lexbuf in
