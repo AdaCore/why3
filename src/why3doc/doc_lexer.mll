@@ -27,25 +27,7 @@
     Hashtbl.mem ht
 
   (* keep synchronized with src/parser/lexer.mll *)
-  let is_keyword = make_table [
-    "abstract"; "any"; "as"; "at"; "axiom";
-    "begin"; "break"; "by";
-    "clone"; "coinductive"; "constant"; "continue";
-    "do"; "done"; "downto";
-    "else"; "end"; "epsilon"; "exception"; "exists"; "export";
-    "false"; "float"; "for"; "forall"; "fun"; "function";
-    "ghost"; "goal"; "if"; "import"; "in"; "inductive";
-    "label"; "lemma"; "let";
-    "match"; "meta"; "module"; "mutable"; "not";
-    "old"; "partial"; "predicate"; "private"; "pure";
-    "raise"; "range"; "rec"; "ref"; "return";
-    "scope"; "so";
-    "then"; "theory"; "to"; "true"; "try"; "type";
-    "use"; "val"; "while"; "with";
-
-    "absurd"; "alias"; "assert"; "assume";
-    "check"; "diverges"; "ensures"; "invariant";
-    "raises"; "reads"; "requires"; "returns"; "variant"; "writes"; ]
+  let is_keyword = make_table (List.map fst Keywords.keywords)
 
   let get_loc lb =
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
