@@ -359,8 +359,9 @@ application is not allowed (rejected at typing).
 
 .. _rubric.collections_syntax:
 
-.. index:: bracket; syntax
-.. index:: collections; syntax; function literals
+.. index:: bracket
+.. index:: collections
+.. index:: function literals
 
 Specific syntax for collections
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -398,8 +399,8 @@ domain of the function ranges over an initial sequence of the natural
 numbers it is possible to write ``[|t1;t2;t3|]`` as a shortcut for
 ``[|0 => t1; 1 => t2; 2 => t3|]``.  Function literals cannot be empty.
 
-.. index:: at; syntax
-.. index:: old; syntax
+.. index:: at
+.. index:: old
 
 The "at" and "old" operators
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -468,9 +469,9 @@ instead: ``A <-> B <-> C`` is transformed into a conjunction of
 a non-parenthesised implication at the right-hand side of an
 equivalence: ``A <-> B -> C`` is rejected.
 
-.. index:: conditionals; syntax
-.. index:: let; syntax
-.. index:: pattern-matching; syntax
+.. index:: conditionals
+.. index:: let
+.. index:: pattern-matching
 
 Conditionals, "let" bindings and pattern-matching
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -882,7 +883,8 @@ like in the following example:
       done
     done
 
-.. index:: collections; syntax; function literals
+.. index:: collections
+.. index:: function literals
 
 Function literals
 ^^^^^^^^^^^^^^^^^
