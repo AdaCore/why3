@@ -91,6 +91,25 @@ end
 module ListProvers = struct
 
   let run () =
+    let open Whyconf in
+    let config, _ = Args.complete_initialization () in
+    Format.printf "@[<v>%a@]@."
+      (Pp.print_iter2 Mprover.iter Pp.newline Pp.nothing print_prover Pp.nothing)
+      (get_provers config)
+
+  let cmd = {
+      cmd_desc = "list all the detected provers";
+      cmd_usage = "\nList all the provers present in why3.conf.";
+      cmd_name = "list-provers";
+      cmd_run = run;
+      cmd_anon_fun = None;
+    }
+
+end
+
+module ListSupportedProvers = struct
+
+  let run () =
     Format.printf "@[<v>%a@]@."
       (Pp.print_list Pp.newline Pp.string)
       (List.sort String.compare (Autodetection.list_binaries ()))
@@ -126,6 +145,7 @@ let cmds = [
     AddProver.cmd;
     DetectProvers.cmd;
     ListProvers.cmd;
+    ListSupportedProvers.cmd;
     ShowConfig.cmd;
   ]
 
