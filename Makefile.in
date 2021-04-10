@@ -485,6 +485,9 @@ install-lib::
 %.elc: %.el
 	$(EMACS) --batch --no-init-file -f batch-byte-compile $<
 
+clean::
+	rm -f share/emacs/why3.elc
+
 uninstall-emacs:
 	rm -f $(DATADIR)/emacs/site-lisp/why3.el
 	rm -f $(DATADIR)/emacs/site-lisp/why3.elc
@@ -1047,7 +1050,8 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 coq: $(COQVO) drivers/coq-realizations.aux lib/coq/version
 
 clean-coq:
-	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES)) lib/coq/version
+	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES)) lib/coq/version \
+		$(foreach f,$(COQLIBS_FILES),$(dir $f).$(notdir $f).aux)
 
 clean:: clean-coq
 
@@ -1900,7 +1904,7 @@ endif
 endif
 
 clean::
-	rm -rf doc/html doc/latex; \
+	rm -rf doc/html doc/latex
 	rm -rf doc/generated/*.dot
 
 else
