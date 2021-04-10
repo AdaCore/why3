@@ -163,10 +163,10 @@ let meta_float = register_meta "float_type" [MTtysymbol; MTlsymbol; MTlsymbol]
     ~desc:"Projection@ and@ finiteness@ of@ a@ floating-point@ type."
 
 let meta_projection = register_meta "model_projection" [MTlsymbol]
-  ~desc:"Declares@ the@ projection."
+  ~desc:"Declare@ the@ projection."
 
 let meta_record = register_meta "model_record" [MTlsymbol]
-  ~desc:"Declares@ the@ record field."
+  ~desc:"Declare@ the@ record field."
 
 (** Theory *)
 

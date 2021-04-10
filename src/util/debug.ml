@@ -98,7 +98,7 @@ module Args = struct
     let opt_list_flags = ref false in
     let desc =
       KLong "list-debug-flags", Hnd0 (fun () -> opt_list_flags := true),
-      " list known debug flags" in
+      " list known flags ('*' marks those used by --debug-all)" in
     let list () =
       if !opt_list_flags then begin
         let list =
@@ -109,8 +109,7 @@ module Args = struct
             p (if info then " *" else "")
             Pp.formatted desc
         in
-        Format.eprintf "@[<hov 2>Known debug flags \
-            ('*' marks the flags selected by --debug-all):@\n%a@]@."
+        Format.printf "@[<v>%a@]@."
           (Pp.print_list Pp.newline print)
           (List.sort Pervasives.compare list);
       end;

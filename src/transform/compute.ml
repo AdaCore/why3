@@ -15,10 +15,10 @@ open Reduction_engine
 open Args_wrapper
 
 let meta_rewrite = Theory.register_meta "rewrite" [Theory.MTprsymbol]
-  ~desc:"Declares@ the@ given@ proposition@ as@ a@ rewrite@ rule."
+  ~desc:"Declare@ the@ given@ proposition@ as@ a@ rewrite@ rule."
 
 let meta_rewrite_def = Theory.register_meta "rewrite_def" [Theory.MTlsymbol]
-  ~desc:"Declares@ the@ definition@ of@ the@ symbol@ as@ a@ rewrite@ rule."
+  ~desc:"Declare@ the@ definition@ of@ the@ symbol@ as@ a@ rewrite@ rule."
 
 let meta_compute_max_steps = Theory.register_meta_excl "compute_max_steps"
   [Theory.MTint]

@@ -30,7 +30,7 @@ let expl_reification_check = Ident.create_attribute "expl:reification check"
 
 let meta_decision_procedure =
   Theory.register_meta
-    ~desc:"decision procedure, used for reflection"
+    ~desc:"Declare a decision procedure, used for reflection."
     "reflection"
     [ Theory.MTid ]
 

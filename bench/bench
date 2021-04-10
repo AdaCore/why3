@@ -156,7 +156,7 @@ drivers () {
 }
 
 valid_goals () {
-    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
+    bin/why3$suffix config list-provers | grep -q Alt-Ergo || return 0
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
@@ -166,7 +166,7 @@ valid_goals () {
 }
 
 invalid_goals () {
-    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
+    bin/why3$suffix config list-provers | grep -q Alt-Ergo || return 0
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
@@ -325,8 +325,8 @@ extract_and_test_c () {
 
 list_stuff () {
     pgm="bin/why3$suffix"
-    printf "  $1... "
-    simple_test $pgm $1
+    printf "  $*... "
+    simple_test $pgm "$@"
 }
 
 test_mlw_printer () {
@@ -596,12 +596,13 @@ echo ""
 fi
 
 if enabled list; then
-echo "=== Checking --list-* ==="
-list_stuff --list-transforms
-list_stuff --list-printers
-list_stuff --list-provers
-list_stuff --list-formats
-list_stuff --list-metas
+echo "=== Checking lists ==="
+list_stuff show attributes
+list_stuff show formats
+list_stuff show metas
+list_stuff show printers
+list_stuff show transformations
+list_stuff config list-provers
 list_stuff --list-debug-flags
 echo ""
 fi

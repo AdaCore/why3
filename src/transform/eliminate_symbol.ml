@@ -14,7 +14,7 @@ open Decl
 open Theory
 
 let meta_elim_ls = register_meta "ls:eliminate" [MTlsymbol]
-    ~desc:"Removes@ any@ expression@ containing@ a@ specific@ lsymbol."
+    ~desc:"Remove@ any@ expression@ containing@ a@ specific@ lsymbol."
 
 let eliminate_symbol _env =
   Trans.on_tagged_ls meta_elim_ls

@@ -12,7 +12,6 @@
 open Format
 open Why3
 open Whyconf
-open Theory
 
 let opt_list_transforms = ref false
 let opt_list_printers = ref false
@@ -24,19 +23,7 @@ let opt_list_attrs = ref false
 let option_list =
   let open Getopt in
   Args.common_options @
-  [ KLong "list-transforms", Hnd0 (fun () -> opt_list_transforms := true),
-    " list known transformations";
-    KLong "list-printers", Hnd0 (fun () -> opt_list_printers := true),
-    " list known printers";
-    KLong "list-provers", Hnd0 (fun () -> opt_list_provers := true),
-    " list known provers";
-    KLong "list-formats", Hnd0 (fun () -> opt_list_formats := true),
-    " list known input formats";
-    KLong "list-metas", Hnd0 (fun () -> opt_list_metas := true),
-    " list known metas";
-    KLong "list-attributes", Hnd0 (fun () -> opt_list_attrs := true),
-    " list used attributes";
-    KLong "print-libdir", Hnd0 (fun () -> printf "%s@." Config.libdir; exit 0),
+  [ KLong "print-libdir", Hnd0 (fun () -> printf "%s@." Config.libdir; exit 0),
     " print location of binary components (plugins, etc)";
     KLong "print-datadir", Hnd0 (fun _ -> printf "%s@." Config.datadir; exit 0),
     " print location of non-binary data (modules, etc)";
@@ -123,82 +110,12 @@ let command cur =
     Printf.eprintf "Failed to load %s: %s\n%!" cmd (Dynlink.error_message e);
     exit 1
 
-let () = try
-  let i = Getopt.parse_many option_list Sys.argv 1 in
-  if i < Array.length Sys.argv then command i;
-  let config,_ = Args.complete_initialization () in
-
-  (* listings *)
-
-  let sort_pair (x,_) (y,_) = String.compare x y in
-  let opt_list = ref false in
-  if !opt_list_transforms then begin
-    opt_list := true;
-    let print_trans_desc fmt (x,r) =
-      fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r in
-    printf "@[<hov 2>Known non-splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline2 print_trans_desc)
-      (List.sort sort_pair (Trans.list_transforms ()));
-    printf "@[<hov 2>Known splitting transformations:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline2 print_trans_desc)
-      (List.sort sort_pair (Trans.list_transforms_l ()));
-    let list_transform_with_arg =
-      Trans.list_transforms_with_args () @
-      Trans.list_transforms_with_args_l () in
-    printf "@[<hov 2>Known transformations with arguments:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline2 print_trans_desc)
-      (List.sort sort_pair list_transform_with_arg)
-  end;
-  if !opt_list_printers then begin
-    opt_list := true;
-    let print_printer_desc fmt (s,f) =
-      fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" s Pp.formatted f in
-    printf "@[<hov 2>Known printers:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline2 print_printer_desc)
-      (List.sort sort_pair (Printer.list_printers ()))
-  end;
-  if !opt_list_formats then begin
-    opt_list := true;
-    let print1 fmt s = fprintf fmt "%S" s in
-    let print fmt (p, l, f) =
-      fprintf fmt "@[%s [%a]@\n  @[%a@]@]"
-        p (Pp.print_list Pp.comma print1) l
-        Pp.formatted f
-    in
-    printf "@[Known input formats:@\n  @[%a@]@]@."
-      (Pp.print_list Pp.newline2 print)
-      (List.sort (fun (u,_,_) (v,_,_) -> String.compare u v)
-         (Env.list_formats Env.base_language))
-  end;
-  if !opt_list_provers then begin
-    opt_list := true;
-    let print = Pp.print_iter2 Mprover.iter Pp.newline Pp.nothing
-      print_prover Pp.nothing in
-    let provers = get_provers config in
-    printf "@[<hov 2>Known provers:@\n%a@]@." print provers
-  end;
-  if !opt_list_metas then begin
-    opt_list := true;
-    let print fmt m = fprintf fmt "@[<h 2>%s %s%a@\n@[<hov>%a@]@]"
-      (let s = m.meta_name in
-        if String.contains s ' ' then "\"" ^ s ^ "\"" else s)
-      (if m.meta_excl then "(flag) " else "")
-      (Pp.print_list Pp.space Pretty.print_meta_arg_type) m.meta_type
-      Pp.formatted m.meta_desc
-    in
-    let cmp m1 m2 = String.compare m1.meta_name m2.meta_name in
-    printf "@[<hov 2>Known metas:@\n%a@]@\n@."
-      (Pp.print_list Pp.newline2 print) (List.sort cmp (Theory.list_metas ()))
-  end;
-  if !opt_list_attrs then begin
-    opt_list := true;
-    let l = List.sort String.compare (Ident.list_attributes ()) in
-    List.iter (fun x -> Format.eprintf "%s@." x) l
-  end;
-  if !opt_list then exit 0;
-
-  do_usage ();
-
+let () =
+  try
+    let i = Getopt.parse_many option_list Sys.argv 1 in
+    if i < Array.length Sys.argv then command i;
+    ignore (Args.complete_initialization ());
+    do_usage ()
   with
   | e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;

@@ -47,14 +47,14 @@ The following commands are available:
     purposes.
 
 :why3:tool:`session`
-    Dump various informations from a proof session, and possibly
-    modifies the session.
+    Dump various information from a proof session, and possibly
+    modify it.
+
+:why3:tool:`show`
+    Show all the currently registered formats, printers, transformations, etc.
 
 :why3:tool:`wc`
     Give some token statistics about a WhyML file.
-
-All these commands are also available as standalone executable files, if
-needed.
 
 The commands accept a common subset of command-line options. In
 particular, option :option:`--help` displays the usage and options.
@@ -73,32 +73,12 @@ particular, option :option:`--help` displays the usage and options.
 
 .. option:: --list-debug-flags
 
-   List known debug flags.
-
-.. option:: --list-transforms
-
-   List known transformations.
-
-.. option:: --list-printers
-
-   List known printers.
-
-.. option:: --list-provers
-
-   List known provers.
-
-.. option:: --list-formats
-
-   List known input formats.
-
-.. option:: --list-metas
-
-   List known metas. See also :numref:`sec.meta` for a description of
-   some of those metas.
+   List all the known debug flags. Flags marked by a star are those
+   enabled by option :option:`--debug-all`.
 
 .. option:: --debug-all
 
-   Set all debug flags (except flags that change the behavior).
+   Enable all the debug flags that do not change the behavior.
 
 .. option:: --debug=<flag>,...
 
@@ -153,6 +133,9 @@ The available subcommands are as follows:
 :why3:tool:`config detect`
    Automatically detect installed provers.
 
+:why3:tool:`config list-provers`
+   List the provers described in :file:`why3.conf`.
+
 :why3:tool:`config list-supported-provers`
    List the names of all supported provers.
 
@@ -201,6 +184,15 @@ supported by Why3. It also creates a configuration file if none exists.
 Automatically detected provers are stored in the configuration file under
 ``[detected_binary]`` sections.
 
+.. why3:tool:: config list-provers
+
+Command ``list-provers``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+This command lists the names, versions, and alternatives of all the
+provers present in :file:`why3.conf`. Those are the values expected by
+:option:`why3 prove --prover`.
+
 .. why3:tool:: config list-supported-provers
 
 Command ``list-supported-provers``
@@ -241,10 +233,10 @@ The :why3:tool:`prove` command executes the following steps:
 
 #. Parse and typecheck the given files using the correct parser in order
    to obtain a set of Why3 theories for each file. It uses the filename
-   extension or the :option:`--format` option to choose among the available
-   parsers. :option:`why3 --list-formats` lists the registered parsers. WhyML
-   modules are turned into theories containing verification conditions
-   as goals.
+   extension or the :option:`--format` option to choose among the
+   available parsers. Command :why3:tool:`why3 show formats` lists the
+   registered parsers. WhyML modules are turned into theories containing
+   verification conditions as goals.
 
 #. Extract the selected goals inside each of the selected theories into
    tasks. The goals and theories are selected using options
@@ -255,15 +247,15 @@ The :why3:tool:`prove` command executes the following steps:
    selected. If no goals are selected in a theory, then every goal is
    considered as selected.
 
-#. Apply the transformations requested with :option:`--apply-transform` in
-   their order of appearance on the command line.
-   :option:`why3 --list-transforms` lists the known transformations; plugins
-   can add more of them.
+#. Apply the transformations requested with :option:`--apply-transform`
+   in their order of appearance on the command line.
+   Command :why3:tool:`why3 show transformations` lists the known
+   transformations; plugins can register more of them.
 
 #. Apply the driver selected with the :option:`--driver` option, or the
    driver of the prover selected with the :option:`--prover` option.
-   :option:`why3 --list-provers` lists the known provers, the ones that appear
-   in the configuration file.
+   Command :why3:tool:`why3 config list-provers` lists the provers
+   that appear in the configuration file.
 
 #. If option :option:`--prover` is given, call the selected prover on each
    generated task and print the results. If option :option:`--driver` is
@@ -1654,6 +1646,59 @@ realizations. See also :numref:`sec.realizations`.
 .. option:: -T <theory>, --theory=<theory>
 
    Select the given theory in the input file or in the library.
+
+.. why3:tool:: show
+.. _sec.why3show:
+
+The ``show`` Command
+--------------------
+
+The :program:`why3 show` command can display various information about
+Why3. Specific information is selected by the given subcommand:
+
+::
+
+   why3 show <subcommand>
+
+.. why3:tool:: show attributes
+
+Command ``attributes``
+~~~~~~~~~~~~~~~~~~~~~~
+
+This command lists the currently registered WhyML attributes. See
+also :numref:`sec.attributes`.
+
+.. why3:tool:: show formats
+
+Command ``formats``
+~~~~~~~~~~~~~~~~~~~
+
+This command lists the currently registered input formats. See
+also :option:`why3 prove --format`.
+
+.. why3:tool:: show metas
+
+Command ``metas``
+~~~~~~~~~~~~~~~~~
+
+This command lists the currently registered meta directives. See
+also :numref:`sec.metas`.
+
+.. why3:tool:: show printers
+
+Command ``printers``
+~~~~~~~~~~~~~~~~~~~~
+
+This command lists the currently registered printers, which can be used
+inside prover drivers. See also :numref:`sec.drivers`.
+
+.. why3:tool:: show transformations
+
+Command ``transformations``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This command lists the currently registered transformations. See
+also :option:`why3 prove --apply-transform` and :numref:`sec.transformations`.
 
 .. why3:tool:: wc
 .. _sec.why3wc:
