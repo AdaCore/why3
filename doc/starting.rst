@@ -243,11 +243,10 @@ follows.
 
 .. code-block:: console
 
-    > why3 --list-provers
-    Known provers:
-      Alt-Ergo 1.30
-      CVC4 1.5
-      Coq 8.6
+    > why3 config list-provers
+    Alt-Ergo 1.30
+    CVC4 1.5
+    Coq 8.6
 
 The first word of each line is a unique identifier for the associated
 prover. We thus have now the three provers Alt-Ergo :cite:`ergo`,
@@ -256,7 +255,7 @@ CVC4 :cite:`barrett11cade`, and Coq :cite:`CoqArt`.
 Let us assume that we want to run Alt-Ergo on the HelloProof example.
 The command to type and its output are as follows, where the :option:`why3 prove -P`
 option is followed by the unique prover identifier (as shown by
-:option:`why3 --list-provers` option).
+:why3:tool:`why3 config list-provers`).
 
 .. code-block:: console
 
@@ -284,7 +283,7 @@ do as follows.
 
 .. code-block:: console
 
-    > why3 --list-transforms
+    > why3 show transformations
     Known non-splitting transformations:
       [...]
 
