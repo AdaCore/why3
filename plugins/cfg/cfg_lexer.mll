@@ -11,7 +11,7 @@
 
 (* This is a copy of [src/parser/lexer.mll], with the following minor changes:
 
-* [open Parser] -> [open Cfg_tokens]
+* [open Parser_tokens] -> [open Cfg_parser]
 
 * addition of keywords:
 
@@ -24,20 +24,12 @@
 
 {
   open Why3
-  open Cfg_tokens
+  open Cfg_parser
 
   let keywords = Hashtbl.create 97
   let () =
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
-      (* keep the following files synchronized:
-
-         doc/ext/why3.py
-         src/trywhy3/mode-why3.js
-         src/why3doc/doc_lexer.mll
-         share/emacs/why3.el
-         share/vim/syntax/why3.vim
-       *)
       [
         "cfg", CFG;
         "goto", GOTO;

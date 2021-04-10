@@ -147,6 +147,8 @@ endif
 # see http://caml.inria.fr/mantis/view.php?id=4991
 CMIHACK = -intf-suffix .cmi
 
+CMP_CP = cmp $< $@ || cp $< $@
+
 # external libraries common to all binaries
 
 EXTOBJS = menhirLib
@@ -201,6 +203,9 @@ endif
 .PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
 
+.SUFFIXES:
+
+MAKEINC =
 CLEANDIRS =
 CLEANLIBS =
 GENERATED =
@@ -209,19 +214,21 @@ GENERATED =
 # Why3 library
 ##############
 
-LIBGENERATED = src/util/config.ml \
-	       src/util/rc.ml src/util/lexlib.ml src/util/mysexplib.ml \
-	       src/util/json_parser.mli src/util/json_parser.ml \
-	       src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
-	       src/util/dynlink_wrapper.ml \
-	       src/parser/lexer.ml \
-	       src/parser/parser.mli src/parser/parser.ml \
-	       src/parser/parser_messages.ml \
-	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	       src/driver/driver_lexer.ml \
-         src/driver/sexp.ml \
-				 src/session/compress.ml src/session/xml.ml \
-	       src/session/strategy_parser.ml
+LIBGENERATED = \
+	src/util/config.ml \
+	src/util/rc.ml src/util/lexlib.ml src/util/mysexplib.ml \
+	src/util/json_parser.mli src/util/json_parser.ml \
+	src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
+	src/util/dynlink_wrapper.ml \
+	src/parser/lexer.ml \
+	src/core/parser_tokens.mli src/core/parser_tokens.ml \
+	src/parser/parser.mli src/parser/parser.ml \
+	src/parser/parser_messages.ml \
+	src/driver/driver_parser.mli src/driver/driver_parser.ml \
+	src/driver/driver_lexer.ml \
+	src/driver/sexp.ml \
+	src/session/compress.ml src/session/xml.ml \
+	src/session/strategy_parser.ml
 
 LIB_UTIL = mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl diffmap \
@@ -234,8 +241,10 @@ ifeq (@enable_re@,no)
 LIB_UTIL += re
 endif
 
-LIB_CORE = ident ty term pattern decl coercion theory \
-	   task pretty dterm env trans printer model_parser
+LIB_CORE = \
+	ident ty term pattern decl coercion theory \
+	parser_tokens keywords \
+	task pretty dterm env trans printer model_parser
 
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
 		whyconf autodetection smtv2_model_defs collect_data_model sexp smtv2_model_parser
@@ -311,44 +320,44 @@ $(LIBDEP): $(LIBGENERATED)
 
 ifeq (@new_dynlink@,yes)
 src/util/dynlink_wrapper.ml: src/util/dynlink_new.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/util/dynlink_wrapper.ml: src/util/dynlink_old.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 # Mlmpfr
 
 ifeq (@found_mlmpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 # Ocamlzip
 
 ifeq (@enable_zip@,yes)
 src/session/compress.ml: src/session/compress_z.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/session/compress.ml: src/session/compress_none.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 # pp_sexp_conv
 
 ifeq (@enable_pp_sexp@, yes)
 src/util/mysexplib.ml: src/util/mysexplib-real.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-real.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/util/mysexplib.ml: src/util/mysexplib-dummy.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-dummy.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 .PHONY: initialize_messages update-parsing-error-handling
@@ -391,7 +400,7 @@ endif
 
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 GENERATED += src/util/re.ml
 endif
 
@@ -414,11 +423,7 @@ lib/why3/why3.cmx: $(LIBCMX) lib/why3/why3.cmo
 
 # clean and depend
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(LIBDEP)
-endif
-
-depend: $(LIBDEP)
+MAKEINC += $(LIBDEP)
 
 CLEANDIRS += src $(addprefix src/, $(LIBDIRS))
 CLEANLIBS += lib/why3/why3
@@ -480,6 +485,9 @@ install-lib::
 %.elc: %.el
 	$(EMACS) --batch --no-init-file -f batch-byte-compile $<
 
+clean::
+	rm -f share/emacs/why3.elc
+
 uninstall-emacs:
 	rm -f $(DATADIR)/emacs/site-lisp/why3.el
 	rm -f $(DATADIR)/emacs/site-lisp/why3.elc
@@ -504,15 +512,16 @@ endif
 # Why3 plugins
 ##################
 
-PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
-		plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
-		plugins/python/py_lexer.ml \
-		plugins/python/py_parser.ml plugins/python/py_parser.mli \
-		plugins/microc/mc_lexer.ml \
-		plugins/microc/mc_parser.ml plugins/microc/mc_parser.mli \
-		plugins/cfg/cfg_lexer.ml \
-		plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli \
-		plugins/parser/dimacs.ml
+PLUGGENERATED = \
+	plugins/tptp/tptp_lexer.ml \
+	plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
+	plugins/python/py_lexer.ml \
+	plugins/python/py_parser.ml plugins/python/py_parser.mli \
+	plugins/microc/mc_lexer.ml \
+	plugins/microc/mc_parser.ml plugins/microc/mc_parser.mli \
+	plugins/cfg/cfg_lexer.ml \
+	plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli \
+	plugins/parser/dimacs.ml
 
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
@@ -520,7 +529,7 @@ PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_ast py_parser py_lexer py_main
 PLUG_MICROC = mc_ast mc_parser mc_lexer mc_printer mc_main
-PLUG_CFG = cfg_ast cfg_tokens cfg_parser cfg_lexer cfg_main
+PLUG_CFG = cfg_ast cfg_parser cfg_lexer cfg_main
 
 PLUGINS = genequlin dimacs tptp python microc cfg
 
@@ -603,11 +612,7 @@ lib/plugins/cfg.cmo: $(addsuffix .cmo, $(CFGMODULES))
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(PLUGDEP)
-endif
-
-depend: $(PLUGDEP)
+MAKEINC += $(PLUGDEP)
 
 CLEANDIRS += plugins $(addprefix plugins/, $(PLUGDIRS)) lib/plugins
 GENERATED += $(PLUGGENERATED)
@@ -673,11 +678,7 @@ share/drivers:
 share/stdlib:
 	ln -snf ../stdlib share/stdlib
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(TOOLSDEP)
-endif
-
-depend: $(TOOLSDEP)
+MAKEINC += $(TOOLSDEP)
 
 CLEANDIRS += src/tools
 GENERATED += $(TOOLSGENERATED)
@@ -819,11 +820,7 @@ bin/why3ide.cma:  $(IDECMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(IDEDEP)
-endif
-
-depend: $(IDEDEP)
+MAKEINC += $(IDEDEP)
 
 CLEANDIRS += src/ide
 
@@ -853,10 +850,10 @@ install_local:: bin/why3ide.$(SHAREDBEST)
 
 ifeq (@GTKVERSION@,2)
 src/ide/gtkcompat.ml: src/ide/gtkcompat2.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 else
 src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
-	cp $< $@
+	$(CMP_CP)
 endif
 
 GENERATED += $(IDEGENERATED)
@@ -887,11 +884,7 @@ bin/why3webserver.cma:  $(WEBSERVCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(WEBSERVDEP)
-endif
-
-depend: $(WEBSERVDEP)
+MAKEINC += $(WEBSERVDEP)
 
 CLEANDIRS += src/ide
 
@@ -933,11 +926,7 @@ bin/why3session.cma:  $(SESSIONCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(SESSIONDEP)
-endif
-
-depend: $(SESSIONDEP)
+MAKEINC += $(SESSIONDEP)
 
 CLEANDIRS += src/why3session
 
@@ -974,11 +963,7 @@ bin/why3shell.cma:  $(SHELLCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(SHELLDEP)
-endif
-
-depend: $(SHELLDEP)
+MAKEINC += $(SHELLDEP)
 
 uninstall-bin::
 	rm -f $(TOOLDIR)/why3shell.$(SHAREDBEST)
@@ -998,7 +983,7 @@ COQVERSIONSPECIFIC=
 COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
 
 $(COQVERSIONSPECIFICTARGETS): %: %.@coq_compat_version@
-	cp $< $@
+	$(CMP_CP)
 
 clean::
 	rm -f $(COQVERSIONSPECIFICTARGETS)
@@ -1065,7 +1050,8 @@ COQVD = $(addsuffix .vd, $(COQLIBS_FILES))
 coq: $(COQVO) drivers/coq-realizations.aux lib/coq/version
 
 clean-coq:
-	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES)) lib/coq/version
+	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES)) lib/coq/version \
+		$(foreach f,$(COQLIBS_FILES),$(dir $f).$(notdir $f).aux)
 
 clean:: clean-coq
 
@@ -1182,13 +1168,9 @@ install:: install-coq
 
 all: coq
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
--include $(COQVD)
+MAKEINC += $(COQVD)
 endif
-endif
-
-depend: $(COQVD)
 
 endif
 
@@ -1302,7 +1284,7 @@ ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECI
 ISABELLEREALIZEDRV=drivers/isabelle@ISABELLEVERSION@-realize.drv
 
 $(ISABELLEVERSIONSPECIFICTARGETS): %: %.@ISABELLEVERSION@
-	cp $< $@
+	$(CMP_CP)
 
 clean::
 	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
@@ -1484,9 +1466,7 @@ bin/isabelle_client.byte: lib/why3/why3.cma $(ISABELLECCMO)
 install_no_local::
 	cp -f bin/isabelle_client.@OCAMLBEST@ $(BINDIR)/isabelle_client$(EXE)
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(ISABELLECDEP)
-endif
+MAKEINC += $(ISABELLECDEP)
 
 clean::
 	rm -f bin/isabelle_client.byte bin/isabelle_client.opt bin/isabelle_client
@@ -1551,11 +1531,7 @@ bin/why3pp.cma:  $(PRETTYPRINTCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(PRETTYPRINTDEP)
-endif
-
-depend: $(PRETTYPRINTDEP)
+MAKEINC += $(PRETTYPRINTDEP)
 
 uninstall-bin::
 	rm -f $(TOOLDIR)/why3pp.$(SHAREDBEST)
@@ -1594,11 +1570,7 @@ bin/why3doc.cma:  $(WHY3DOCCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(WHY3DOCDEP)
-endif
-
-depend: $(WHY3DOCDEP)
+MAKEINC += $(WHY3DOCDEP)
 
 CLEANDIRS += src/why3doc
 GENERATED += $(WHY3DOCGENERATED)
@@ -1755,11 +1727,7 @@ $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo alt_ergo_worker.cmo):
 
 $(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(TRYWHY3DEP)
-endif
-
-depend: $(TRYWHY3DEP)
+MAKEINC += $(TRYWHY3DEP)
 
 clean::
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte \
@@ -1936,7 +1904,7 @@ endif
 endif
 
 clean::
-	rm -rf doc/html doc/latex; \
+	rm -rf doc/html doc/latex
 	rm -rf doc/generated/*.dot
 
 else
@@ -2126,15 +2094,20 @@ clean::
 	$(SHOW) 'Menhir $<'
 	$(HIDE)$(MENHIR) --table --explain --strict $<
 
-src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
+# the % below are not a typo; they are a way to force Make to consider all the targets at once
+src/c%re/parser_tokens.ml src/c%re/parser_tokens.mli: src/parser/parser_common.mly
 	$(SHOW) 'Menhir $^'
-	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser $^
+	$(HIDE)$(MENHIR) --base src/core/parser_tokens --only-tokens $^
 
-plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
+src/p%rser/parser.ml src/p%rser/parser.mli: $(PARSERS)
 	$(SHOW) 'Menhir $^'
-	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser \
-		--external-tokens Cfg_tokens $^
+	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser \
+		--external-tokens Parser_tokens $^
 
+pl%gins/cfg/cfg_parser.ml pl%gins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
+	$(SHOW) 'Menhir $^'
+	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser $^
+	$(HIDE)for f in plugins/cfg/cfg_parser.mli plugins/cfg/cfg_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
 
 %.dep: %.ml %.mli
 	$(SHOW) 'Ocamldep $<'
@@ -2269,9 +2242,13 @@ distclean: clean
 	rm -f config.status config.cache config.log \
 	    src/util/config.ml $(AUTOCONF_FILES)
 
-depend:
-	rm -f $^
-	$(MAKE) $^
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+ifneq "$(MAKECMDGOALS)" "depend"
+-include $(MAKEINC)
+endif
+endif
+
+depend: $(MAKEINC)
 
 clean::
 	rm -f $(GENERATED)

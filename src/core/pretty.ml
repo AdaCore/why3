@@ -19,12 +19,7 @@ open Decl
 open Theory
 open Task
 
-let why3_keywords =
-  ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
-   "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
-   "scope"; "import"; "export"; "end";
-   "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
-   "let"; "in"; "match"; "with"; "as"; "epsilon" ]
+let why3_keywords = Keywords.keywords
 
 let coercion_attr = create_attribute "coercion"
 

@@ -10,99 +10,11 @@
 (********************************************************************)
 
 {
-  open Parser
+  open Parser_tokens
 
   let keywords = Hashtbl.create 97
   let () =
-    List.iter
-      (fun (x,y) -> Hashtbl.add keywords x y)
-      (* keep the following files synchronized:
-
-         doc/ext/why3.py
-         src/trywhy3/mode-why3.js
-         src/why3doc/doc_lexer.mll
-         share/emacs/why3.el
-         share/vim/syntax/why3.vim
-       *)
-      [
-        "abstract", ABSTRACT;
-        "absurd", ABSURD;
-        "alias", ALIAS;
-        "any", ANY;
-        "as", AS;
-        "assert", ASSERT;
-        "assume", ASSUME;
-        "at", AT;
-        "axiom", AXIOM;
-        "begin", BEGIN;
-        "break", BREAK;
-        "by", BY;
-        "check", CHECK;
-        "clone", CLONE;
-        "coinductive", COINDUCTIVE;
-        "constant", CONSTANT;
-        "continue", CONTINUE;
-        "diverges", DIVERGES;
-        "do", DO;
-        "done", DONE;
-        "downto", DOWNTO;
-        "else", ELSE;
-        "end", END;
-        "ensures", ENSURES;
-        "epsilon", EPSILON;
-        "exception", EXCEPTION;
-        "exists", EXISTS;
-        "export", EXPORT;
-        "false", FALSE;
-        "float", FLOAT; (* contextual *)
-        "for", FOR;
-        "forall", FORALL;
-        "fun", FUN;
-        "function", FUNCTION;
-        "ghost", GHOST;
-        "goal", GOAL;
-        "if", IF;
-        "import", IMPORT;
-        "in", IN;
-        "inductive", INDUCTIVE;
-        "invariant", INVARIANT;
-        "label", LABEL;
-        "lemma", LEMMA;
-        "let", LET;
-        "match", MATCH;
-        "meta", META;
-        "module", MODULE;
-        "mutable", MUTABLE;
-        "not", NOT;
-        "old", OLD;
-        "partial", PARTIAL;
-        "predicate", PREDICATE;
-        "private", PRIVATE;
-        "pure", PURE;
-        "raise", RAISE;
-        "raises", RAISES;
-        "range", RANGE; (* contextual *)
-        "reads", READS;
-        "rec", REC;
-        "ref", REF; (* contextual *)
-        "requires", REQUIRES;
-        "return", RETURN;
-        "returns", RETURNS;
-        "scope", SCOPE;
-        "so", SO;
-        "then", THEN;
-        "theory", THEORY;
-        "to", TO;
-        "true", TRUE;
-        "try", TRY;
-        "type", TYPE;
-        "use", USE;
-        "val", VAL;
-        "variant", VARIANT;
-        "while", WHILE;
-        "with", WITH;
-        "writes", WRITES;
-      ]
+    List.iter (fun (x,y) -> Hashtbl.add keywords x y) Keywords.keyword_tokens
 }
 
 let space = [' ' '\t' '\r']
