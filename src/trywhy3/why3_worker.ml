@@ -10,7 +10,7 @@
 (********************************************************************)
 
 
-(* Interface to Why3 and Alt-Ergo *)
+(* Interface to Why3 *)
 
 let why3_conf_file = "/trywhy3.conf"
 
@@ -154,7 +154,7 @@ module Task =
 
     let gen_id =
       let c = ref 0 in
-      fun () -> incr c; "id" ^ (string_of_int !c)
+      fun () -> incr c; !c
 
     let task_text t =
       Pp.string_of Pretty.print_task t
@@ -190,7 +190,7 @@ module Task =
 				     tid:: acc) [] tasks in
       Hashtbl.add task_table th_id  {
           task = Theory th;
-          parent_id = "theory-list";
+          parent_id = 0;
           status = StNew;
           subtasks = List.rev task_ids;
           loc = [];

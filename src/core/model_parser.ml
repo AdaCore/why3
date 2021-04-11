@@ -153,127 +153,118 @@ let debug_force_binary_floats = Debug.register_flag "model_force_binary_floats"
 let convert_float_value f =
   match f with
   | Plus_infinity ->
-      let m = Mstr.add "cons" (Json_base.String "Plus_infinity") Mstr.empty in
-      Json_base.Record m
+      Json_base.Record ["cons", Json_base.String "Plus_infinity"]
   | Minus_infinity ->
-      let m = Mstr.add "cons" (Json_base.String "Minus_infinity") Mstr.empty in
-      Json_base.Record m
+      Json_base.Record ["cons", Json_base.String "Minus_infinity"]
   | Plus_zero ->
-      let m = Mstr.add "cons" (Json_base.String "Plus_zero") Mstr.empty in
-      Json_base.Record m
+      Json_base.Record ["cons", Json_base.String "Plus_zero"]
   | Minus_zero ->
-      let m = Mstr.add "cons" (Json_base.String "Minus_zero") Mstr.empty in
-      Json_base.Record m
+      Json_base.Record ["cons", Json_base.String "Minus_zero"]
   | Not_a_number ->
-      let m = Mstr.add "cons" (Json_base.String "Not_a_number") Mstr.empty in
-      Json_base.Record m
+      Json_base.Record ["cons", Json_base.String "Not_a_number"]
   | Float_number {binary= {sign; exp; mant}} when Debug.test_flag debug_force_binary_floats ->
-      let m = Mstr.add "cons" (Json_base.String "Float_value") Mstr.empty in
-      let m = Mstr.add "sign" (Json_base.String (binary_of_bv sign)) m in
-      let m = Mstr.add "exponent" (Json_base.String (binary_of_bv exp)) m in
-      let m = Mstr.add "significand" (Json_base.String (binary_of_bv mant)) m in
+      let m = ("cons", Json_base.String "Float_value") :: [] in
+      let m = ("sign", Json_base.String (binary_of_bv sign)) :: m in
+      let m = ("exponent", Json_base.String (binary_of_bv exp)) :: m in
+      let m = ("significand", Json_base.String (binary_of_bv mant)) :: m in
       Json_base.Record m
   | Float_number {hex= Some hex} ->
-      let m = Mstr.add "cons" (Json_base.String "Float_hexa") Mstr.empty in
-      let m = Mstr.add "str_hexa" (Json_base.String hex) m in
-      let m = Mstr.add "value" (Json_base.Float (float_of_string hex)) m in
+      let m = ("cons", Json_base.String "Float_hexa") :: [] in
+      let m = ("str_hexa", Json_base.String hex) :: m in
+      let m = ("value", Json_base.Float (float_of_string hex)) :: m in
       Json_base.Record m
   | Float_number {binary= {sign; exp; mant}} ->
-      let m = Mstr.add "cons" (Json_base.String "Float_value") Mstr.empty in
-      let m = Mstr.add "sign" (Json_base.String sign.bv_verbatim) m in
-      let m = Mstr.add "exponent" (Json_base.String exp.bv_verbatim) m in
-      let m = Mstr.add "significand" (Json_base.String mant.bv_verbatim) m in
+      let m = ("cons", Json_base.String "Float_value") :: [] in
+      let m = ("sign", Json_base.String sign.bv_verbatim) :: m in
+      let m = ("exponent", Json_base.String exp.bv_verbatim) :: m in
+      let m = ("significand", Json_base.String mant.bv_verbatim) :: m in
       Json_base.Record m
 
 let rec convert_model_value value : Json_base.json =
   match value with
   | String s ->
-      let m = Mstr.add "type" (Json_base.String "String") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String s) m in
+      let m = ("type", Json_base.String "String") :: [] in
+      let m = ("val", Json_base.String s) :: m in
       Json_base.Record m
   | Integer r ->
-      let m = Mstr.add "type" (Json_base.String "Integer") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String (BigInt.to_string r.int_value)) m in
+      let m = ("type", Json_base.String "Integer") :: [] in
+      let m = ("val", Json_base.String (BigInt.to_string r.int_value)) :: m in
       Json_base.Record m
   | Float f ->
-      let m = Mstr.add "type" (Json_base.String "Float") Mstr.empty in
-      let m = Mstr.add "val" (convert_float_value f) m in
+      let m = ("type", Json_base.String "Float") :: [] in
+      let m = ("val", convert_float_value f) :: m in
       Json_base.Record m
   | Decimal d ->
-      let m = Mstr.add "type" (Json_base.String "Decimal") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String (Format.sprintf "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac))) m in
+      let m = ("type", Json_base.String "Decimal") :: [] in
+      let m = ("val", Json_base.String (Format.sprintf "%s.%s" (BigInt.to_string d.dec_int) (BigInt.to_string d.dec_frac))) :: m in
       Json_base.Record m
   | Fraction f ->
-      let m = Mstr.add "type" (Json_base.String "Fraction") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String (Format.sprintf "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den))) m in
+      let m = ("type", Json_base.String "Fraction") :: [] in
+      let m = ("val", Json_base.String (Format.sprintf "%s/%s" (BigInt.to_string f.frac_nom) (BigInt.to_string f.frac_den))) :: m in
       Json_base.Record m
   | Unparsed s ->
-      let m = Mstr.add "type" (Json_base.String "Unparsed") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String s) m in
+      let m = ("type", Json_base.String "Unparsed") :: [] in
+      let m = ("val", Json_base.String s) :: m in
       Json_base.Record m
   | Bitvector bv ->
-      let m = Mstr.add "type" (Json_base.String "Integer") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.String (BigInt.to_string bv.bv_value)) m in
+      let m = ("type", Json_base.String "Integer") :: [] in
+      let m = ("val", Json_base.String (BigInt.to_string bv.bv_value)) :: m in
       Json_base.Record m
   | Boolean b ->
-      let m = Mstr.add "type" (Json_base.String "Boolean") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.Bool b) m in
+      let m = ("type", Json_base.String "Boolean") :: [] in
+      let m = ("val", Json_base.Bool b) :: m in
       Json_base.Record m
   | Array a ->
       let l = convert_array a in
-      let m = Mstr.add "type" (Json_base.String "Array") Mstr.empty in
-      let m = Mstr.add "val" (Json_base.List l) m in
+      let m = ("type", Json_base.String "Array") :: [] in
+      let m = ("val", Json_base.List l) :: m in
       Json_base.Record m
   | Apply (s, lt) ->
       let lt = List.map convert_model_value lt in
       let slt =
-        let m = Mstr.add "list" (Json_base.List lt) Mstr.empty in
-        let m = Mstr.add "apply" (Json_base.String s) m in
+        let m = ("list", Json_base.List lt) :: [] in
+        let m = ("apply", Json_base.String s) :: m in
         Json_base.Record m in
-      let m = Mstr.add "type" (Json_base.String "Apply") Mstr.empty in
-      let m = Mstr.add "val" slt m in
+      let m = ("type", Json_base.String "Apply") :: [] in
+      let m = ("val", slt) :: m in
       Json_base.Record m
   | Record r -> convert_record r
   | Proj p -> convert_proj p
   | Undefined ->
-      let m = Mstr.add "type" (Json_base.String "Undefined") Mstr.empty in
+      let m = ["type", Json_base.String "Undefined"] in
       Json_base.Record m
 
 and convert_array a =
-  let m_others =
-    Mstr.add "others" (convert_model_value a.arr_others) Mstr.empty in
+  let m_others = ["others", convert_model_value a.arr_others] in
   convert_indices a.arr_indices @ [Json_base.Record m_others]
 
 and convert_indices indices =
   match indices with
   | [] -> []
   | index :: tail ->
-      let m =
-        Mstr.add "indice" (convert_model_value index.arr_index_key) Mstr.empty
-      in
-      let m = Mstr.add "value" (convert_model_value index.arr_index_value) m in
+      let m = ("indice", convert_model_value index.arr_index_key) :: [] in
+      let m = ("value", convert_model_value index.arr_index_value) :: m in
       Json_base.Record m :: convert_indices tail
 
 and convert_record r =
-  let m = Mstr.add "type" (Json_base.String "Record") Mstr.empty in
-  let fields = convert_fields r in
-  let m_field = Mstr.add "Field" fields Mstr.empty in
-  let m = Mstr.add "val" (Json_base.Record m_field) m in
+  let m = ["type", Json_base.String "Record"] in
+  let m_field = ["Field", convert_fields r] in
+  let m = ("val", Json_base.Record m_field) :: m in
   Json_base.Record m
 
 and convert_proj p =
   let proj_name, value = p in
-  let m = Mstr.add "type" (Json_base.String "Proj") Mstr.empty in
-  let m = Mstr.add "proj_name" (Json_base.String proj_name) m in
-  let m = Mstr.add "value" (convert_model_value value) m in
-  Json_base.Proj m
+  let m = ("type", Json_base.String "Proj") :: [] in
+  let m = ("proj_name", Json_base.String proj_name) :: m in
+  let m = ("value", convert_model_value value) :: m in
+  Json_base.Record m
 
 and convert_fields fields =
   Json_base.List
     (List.map
        (fun (f, v) ->
-         let m = Mstr.add "field" (Json_base.String f) Mstr.empty in
-         let m = Mstr.add "value" (convert_model_value v) m in
+         let m = ("field", Json_base.String f) :: [] in
+         let m = ("value", convert_model_value v) :: m in
          Json_base.Record m)
        fields)
 

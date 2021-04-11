@@ -41,7 +41,7 @@ json_object:
 | LEFTBRC RIGHTBRC { Json_base.Null }
 (* Left recursive rule are more efficient *)
 | LEFTBRC members RIGHTBRC {
-  Json_base.Record (Json_base.convert_record (List.rev $2)) }
+  Json_base.Record (List.rev $2) }
 
 members:
 | json_pair { [ $1 ] }

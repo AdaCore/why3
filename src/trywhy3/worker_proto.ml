@@ -11,7 +11,7 @@
 
 module Js = Js_of_ocaml.Js
 
-type id = string
+type id = int
 type loc = int * int * int * int
 type why3_loc = string * (int * int * int) (* kind, line, column, length *)
 type status = StNew | StValid | StUnknown
