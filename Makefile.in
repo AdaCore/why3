@@ -1593,7 +1593,7 @@ install_local:: bin/why3doc.$(SHAREDBEST)
 
 ifeq ($(DEBUGJS),yes)
  JSOO_DEBUG=--pretty --debug-info --source-map
- JS_MAPS=trywhy3.map  why3_worker.map
+ JS_MAPS=trywhy3.map why3_worker.map
 else
  JSOO_DEBUG=
  JS_MAPS=
@@ -1610,7 +1610,7 @@ $(TRYWHY3DEP) $(TRYWHY3CMO): INCLUDES += -I src/trywhy3
 
 TRYWHY3_PACK = \
 	trywhy3.js trywhy3.html trywhy3.css \
-	why3_worker.js \
+	why3_worker.js alt-ergo-worker.js \
 	README.md examples/ \
 	trywhy3_custom.css gen_index.sh \
 	ace-builds/src-min-noconflict/ace.js \
