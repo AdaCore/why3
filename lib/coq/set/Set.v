@@ -41,7 +41,7 @@ Definition mem {a:Type} {a_WT:WhyType a} (x:a) (s:a -> Init.Datatypes.bool) :
     Prop :=
   ((s x) = Init.Datatypes.true).
 
-Hint Unfold mem.
+Hint Unfold mem : core.
 
 (* Why3 assumption *)
 Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:a -> Init.Datatypes.bool)
