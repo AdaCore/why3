@@ -238,6 +238,14 @@ let _ =
   if Gnat_config.debug then Debug.(set_flag (lookup_flag "gnat_ast"));
   Debug.set_flag Model_parser.debug_force_binary_floats;
   Model_parser.customize_clean (new Gnat_counterexamples.clean);
+  ( try
+      let log = Sys.getenv "GNATWHY3LOG" in
+      let out = open_out_gen [Open_text; Open_creat; Open_append] 0o666 log in
+      let fmt = Format.formatter_of_out_channel out in
+      Debug.set_debug_formatter fmt;
+      Format.fprintf fmt "@.@.===== %s@." Gnat_config.filename;
+      Warning.set_hook (fun ?loc:_ line -> Format.fprintf fmt "%s@." line)
+    with Not_found -> () );
   Util.init_timing ();
   try
     let c = Gnat_objectives.init_cont () in

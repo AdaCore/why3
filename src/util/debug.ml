@@ -22,11 +22,18 @@ let fst3 (flag,_,_) = flag
 let snd3 (_,info,_) = info
 let thd3 (_,_,desc) = desc
 
+let enabled_flags =
+  Wstdlib.Sstr.of_list
+    (match Sys.getenv "WHY3DEBUG" with
+     | s -> String.split_on_char ',' s
+     | exception Not_found -> [])
+
 let gen_register_flag (desc : Pp.formatted) s info =
   try
     fst3 (Hashtbl.find flag_table s)
   with Not_found ->
-    let flag = { flag_name = s; flag_value = false } in
+    let flag_value = Wstdlib.Sstr.mem s enabled_flags in
+    let flag = { flag_name = s; flag_value } in
     Hashtbl.replace flag_table s (flag,info,desc);
     flag
 
