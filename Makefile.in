@@ -147,7 +147,7 @@ endif
 # see http://caml.inria.fr/mantis/view.php?id=4991
 CMIHACK = -intf-suffix .cmi
 
-CMP_CP = cmp $< $@ || cp $< $@
+CMP_CP = cmp -s $< $@ || cp $< $@
 
 # external libraries common to all binaries
 
