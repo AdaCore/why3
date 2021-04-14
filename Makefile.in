@@ -2022,10 +2022,6 @@ clean::
 	$(SHOW) 'Ocamllex $<'
 	$(HIDE)$(OCAMLLEX) $<
 
-%.ml %.mli: %.mly
-	$(SHOW) 'Menhir $<'
-	$(HIDE)$(MENHIR) --table --explain --strict $<
-
 # the % below are not a typo; they are a way to force Make to consider all the targets at once
 src/c%re/parser_tokens.ml src/c%re/parser_tokens.mli: src/parser/parser_common.mly
 	$(SHOW) 'Menhir $^'
@@ -2040,6 +2036,10 @@ pl%gins/cfg/cfg_parser.ml pl%gins/cfg/cfg_parser.mli: src/parser/parser_common.m
 	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser $^
 	$(HIDE)for f in plugins/cfg/cfg_parser.mli plugins/cfg/cfg_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
+
+%.ml %.mli: %.mly
+	$(SHOW) 'Menhir $<'
+	$(HIDE)$(MENHIR) --table --explain --strict $<
 
 %.dep: %.ml %.mli
 	$(SHOW) 'Ocamldep $<'
