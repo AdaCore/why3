@@ -970,6 +970,8 @@ let build_model_rec pm (elts: model_element list) : model_files =
       let attrs, me_value = !remove_field (attrs, me_value) in
       (* Transform value flattened by eval_match (one field record) back to records *)
       let attrs, me_value = read_one_fields ~attrs me_value in
+      let name = get_model_trace_string ~name ~attrs in
+      let name = List.hd (Strings.bounded_split '@' name 2) in
       let me_name = create_model_element_name name attrs Other in
       {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
     match Mstr.find_opt me.me_name.men_name pm.queried_terms with

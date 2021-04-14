@@ -29,9 +29,7 @@ let get_field_attr attr =
   | _ -> None
 
 let for_field clean (f, v) =
-  let prefixes = ["us_split_fields"; "us_split_discrs";
-                  "__split_discrs"; "__split_fields"] in
-  if List.exists (fun s -> Strings.has_prefix s f) prefixes then
+  if List.mem f ["__split_discrs"; "__split_fields"] then
     match v with
     | Record fs ->
         let for_field (f, v) =
