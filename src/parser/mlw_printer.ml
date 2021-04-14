@@ -869,11 +869,11 @@ and pp_term ~attr =
             (pp_term ~attr).marked
         in
         let pp_triggers =
-          pp_print_opt_list ~prefix:" [" ~sep:" | " ~suffix:"]"
+          pp_print_opt_list ~prefix:"@ [" ~sep:" | " ~suffix:"]"
             pp_terms
         in
-        fprintf fmt "@[<hv 2>%s%a%a%s@ %a@]" quant (pp_binders ~attr) binders
-          pp_triggers triggers sep (pp_term ~attr).marked t
+        fprintf fmt "@[<hv 2>%s@[<hv>%a%a@]%s@ %a@]" quant (pp_binders ~attr)
+          binders pp_triggers triggers sep (pp_term ~attr).marked t
     | Tattr (ATstr att, t) when att = Ident.funlit ->
         pp_t_funlit ~attr fmt t
     | Tattr (att, t) ->
@@ -898,9 +898,9 @@ and pp_term ~attr =
     | Tscope (qid, t) ->
         pp_scope ~attr (pp_term ~attr) fmt qid t
     | Tat (t, {id_str="'Old"; id_loc;_}) ->
-        fprintf fmt "%aold %a" pp_maybe_marker id_loc (pp_term ~attr).marked t
+        fprintf fmt "%aold %a" pp_maybe_marker id_loc (pp_term ~attr).closed t
     | Tat (t, id) ->
-        fprintf fmt "%a at %a" (pp_term ~attr).marked t (pp_id ~attr) id in
+        fprintf fmt "%a at %a" (pp_term ~attr).closed t (pp_id ~attr) id in
   let marked fmt t = pp_maybe_marked (fun t -> t.term_loc) raw fmt t in
   let closed fmt = pp_closed term_closed marked fmt in
   { closed; marked }
