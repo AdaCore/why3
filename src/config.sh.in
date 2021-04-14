@@ -31,7 +31,7 @@ let datadir   = $datadir
 let localdir  = $localdir
 " > $config.new
 
-if [ cmp $config $config.new ]; then
+if cmp -s $config $config.new; then
     rm $config.new
 else
     mv $config.new $config
