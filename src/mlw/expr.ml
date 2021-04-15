@@ -377,7 +377,9 @@ let e_attr_copy { e_attrs = attrs; e_loc = loc } e =
 
 let proxy_attrs = Sattr.singleton proxy_attr
 
-let rec e_attr_push ?loc l e = match e.e_node with
+let rec e_attr_push ?loc l e =
+  let loc = if e.e_loc = None then loc else e.e_loc in
+  match e.e_node with
   | (Elet (LDvar ({pv_vs = {vs_name = id}},_) as ld, e1)
   |  Elet (LDsym ({rs_name = id},_) as ld, e1))
     when Sattr.mem proxy_attr id.id_attrs ->
