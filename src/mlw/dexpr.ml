@@ -1303,12 +1303,14 @@ let cty_of_spec loc env bl mask dsp dity =
   (* Check for unused variables *)
   check_unused_vars_fun bl dsp None;
   let cty = create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity in
-  (* check that oldies are affected by the writes *)
-  let check_affected _ pv =
-    if not (pv_affected cty.cty_effect.eff_writes pv) then Warning.emit ?loc
-      "variable %s is used under `old` but is not modified by the function"
-        pv.pv_vs.vs_name.id_string in
-  Mpv.iter check_affected cty.cty_oldies;
+  (* Not useful in SPARK:
+   *  (\* check that oldies are affected by the writes *\)
+   * let check_affected _ pv =
+   *   if not (pv_affected cty.cty_effect.eff_writes pv) then Warning.emit ?loc
+   *     "variable %s is used under `old` but is not modified by the function"
+   *       pv.pv_vs.vs_name.id_string in
+   * Mpv.iter check_affected cty.cty_oldies; *)
+  ignore loc;
   cty
 
 (** Expressions *)
