@@ -192,7 +192,7 @@ let rec remove_positive_foralls vc_var f =
   match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
       let (decl, fres) = remove_positive_foralls vc_var f2 in
-      (decl, t_implies f1 fres)
+      (decl, t_attr_copy f (t_implies f1 fres))
 (*  | Tbinop (Tor, f1, f2) ->
       let (decl1, fres1) = remove_positive_foralls vc_var f1 in
       let (decl2, fres2) = remove_positive_foralls vc_var f2 in
@@ -200,7 +200,7 @@ let rec remove_positive_foralls vc_var f =
   | Tbinop (Tand, f1, f2) ->
       let (decl1, fres1) = remove_positive_foralls vc_var f1 in
       let (decl2, fres2) = remove_positive_foralls vc_var f2 in
-      (decl1 @ decl2, t_and fres1 fres2)
+      (decl1 @ decl2, t_attr_copy f (t_and fres1 fres2))
   | Tquant (Tforall, fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =
