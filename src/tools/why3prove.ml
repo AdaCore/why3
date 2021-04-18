@@ -330,11 +330,11 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
       | None -> fprintf fmt "File %s:@\n" fname
       | Some loc -> Loc.report_position fmt loc );
     ( if expls = [] then
-        fprintf fmt "@[<hov>Verification@ condition@ @{<bold>%s@}.@]" goal_name
+        fprintf fmt "@[<hov>Goal@ @{<bold>%s@}.@]" goal_name
       else
         let expls = String.capitalize_ascii (String.concat ", " expls) in
         fprintf fmt
-          "@[<hov>Goal@ @{<bold>%s@}@ from@ verification@ condition@ @{<bold>%s@}.@]"
+          "@[<hov>Sub-goal@ @{<bold>%s@}@ of@ goal@ @{<bold>%s@}.@]"
           expls goal_name );
     fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
       (Call_provers.print_prover_result ~json:false) res;
