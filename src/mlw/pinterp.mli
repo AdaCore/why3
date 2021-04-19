@@ -49,17 +49,22 @@ val v_desc : value -> value_desc
 
 (** non defensive API for building [value]s: there are no checks that
    [ity] is compatible with the [value] being built *)
-
 (* TODO: make it defensive? *)
-val int_value : BigInt.t -> value
-val range_value : ity -> BigInt.t -> value
-val string_value : string -> value
 val bool_value : bool -> value
-val proj_value : ity -> lsymbol -> value -> value
+val int_value : BigInt.t -> value
+val string_value : string -> value
+
 val constr_value : ity -> rsymbol -> rsymbol list -> value list -> value
 val purefun_value : result_ity:ity -> arg_ity:ity -> value Mv.t -> value -> value
 val unit_value : value
 val undefined_value : ity -> value
+
+val range_value : ity -> BigInt.t -> value
+(** @raise CannotCompute when the value is not in the range *)
+
+val proj_value : ity -> lsymbol -> value -> value
+(** @raise CannotCompute when the lsymbol is the projection from a range type to
+    int, and the value is an integer outside the bounds of the range *)
 
 val field : value -> field
 val field_get : field -> value
@@ -74,6 +79,8 @@ val print_value : Format.formatter -> value -> unit
 module type Log = sig
   type exec_kind = ExecAbstract | ExecConcrete
 
+  type value_or_invalid = Value of value | Invalid
+
   type log_entry_desc = private
     | Val_assumed of (ident * value)
     | Const_init of ident
@@ -81,7 +88,7 @@ module type Log = sig
     | Exec_pure of (lsymbol * exec_kind)
     | Exec_any of (rsymbol option * value Mvs.t)
     | Iter_loop of exec_kind
-    | Exec_main of (rsymbol * value Mvs.t * value Mrs.t)
+    | Exec_main of (rsymbol * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
     | Exec_ended
@@ -103,7 +110,7 @@ module type Log = sig
   val log_any_call : log_uc -> rsymbol option -> value Mvs.t
                      -> Loc.position option -> unit
   val log_iter_loop : log_uc -> exec_kind -> Loc.position option -> unit
-  val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Mrs.t ->
+  val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Lazy.t Mrs.t ->
                       Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
                    Loc.position option -> unit
@@ -139,16 +146,28 @@ val rac_reduce_config :
   ?trans:Task.task Trans.tlist -> ?prover:rac_prover -> ?try_negate:bool ->
   unit -> rac_reduce_config
 
-(** [rac_reduce_config_lit cnf env ?trans ?prover ?try_negate ()] configures the term
-   reduction of RAC. [trans] is the name of a transformation (usually "compute_in_goal").
-   [prover] is a prover string with optional, space-sparated time limit and memory limit.
-   And with [~try_negate:true] the negated term is dispatched to the prover if the prover
-   didn't return a result for the positive form. *)
+(** [rac_reduce_config_lit cnf env ?trans ?prover ?try_negate ()] configures the
+   term reduction of RAC. [trans] is the name of a transformation (usually
+   "compute_in_goal"). [prover] is a prover string with optional, space-sparated
+   time limit and memory limit. And with [~try_negate:true] the negated term is
+   dispatched to the prover if the prover didn't return a result for the
+   positive form.
+
+    If the environment variable [WHY3RACTASKDIR] is set, it is used as a
+   directory to print all SMT tasks sent to the RAC prover, if
+   [--debug=rac-check-term-sat] is set.
+ *)
 val rac_reduce_config_lit :
   Whyconf.config -> Env.env -> ?trans:string -> ?prover:string -> ?try_negate:bool ->
   unit -> rac_reduce_config
 
-type import_value = ?name:string -> ?loc:Loc.position -> ity -> value option
+type get_value =
+  ?loc:Loc.position -> (ity -> value -> unit) -> ident -> ity -> value option
+(** [get_value ?loc check id ity] tries to retrive a value from the oracle. The
+    [check] is called on the value and every component.
+
+    @raise CannotCompute if the value or any component is invalid (e.g., a range
+    value outside its bounds). *)
 
 type rac_config = private {
   do_rac : bool;
@@ -159,10 +178,12 @@ type rac_config = private {
   (** continue when term cannot be checked *)
   rac_reduce : rac_reduce_config;
   (** configuration for reducing terms *)
-  get_value : import_value;
+  get_value : get_value;
   (** import values when they are needed *)
   log_uc : Log.log_uc;
   (** log *)
+  limits : float option * int option;
+  (** Timeout in seconds and step limit for RAC execution *)
 }
 
 val rac_config :
@@ -170,7 +191,9 @@ val rac_config :
   abstract:bool ->
   ?skip_cannot_compute:bool ->
   ?reduce:rac_reduce_config ->
-  ?get_value:(?name:string -> ?loc:Loc.position -> ity -> value option) ->
+  ?get_value:get_value ->
+  ?timelimit:float ->
+  ?steplimit:int ->
   unit -> rac_config
 
 (** {2 Interpreter environment and results} *)
@@ -178,11 +201,24 @@ val rac_config :
 (** Context for the interpreter *)
 type env = private {
   pmodule : Pmodule.pmodule;
-  funenv  : cexp Mrs.t;
+  (** The pmodule of the VC *)
+  funenv  : (cexp * rec_defn list option) Mrs.t;
+  (** An environment of local functions *)
   vsenv   : value Mvs.t;
-  rsenv   : value Mrs.t; (* global constants *)
+  (** An environment of local variables *)
+  rsenv   : value Lazy.t Mrs.t;
+  (** An environment of global constants. The values are lazy and only forced
+      when needed in the execution or in the task, to avoid the categorisation
+      of counterexamples as bad, when they contain invalid values for irrelevant
+      constants. *)
+  premises: term list list ref list ref;
+  (** The (stateful) set of checked terms in the execution context *)
   env     : Env.env;
+  (** The Why3 environment *)
   rac     : rac_config;
+  (** The configuration of the RAC *)
+  old_varl : ((term * lsymbol option) list * value Mvs.t) option;
+  (** To check function variants *)
 }
 
 (** Result of the interpreter **)
@@ -193,17 +229,21 @@ type result = private
 
 (** Context of a contradiction during RAC *)
 type cntr_ctx = private {
-  c_desc: string;
-  c_trigger_loc: Loc.position option;
-  c_env: env
+  c_attr: Ident.attribute; (** Related VC attribute *)
+  c_desc: string option; (** Additional context *)
+  c_loc: Loc.position option; (** Position if different than term *)
+  c_vsenv: value Mvs.t;
+  c_log_uc: Log.log_uc;
 }
+
+val describe_cntr_ctx : cntr_ctx -> string
 
 exception CannotCompute of {reason: string}
 (** raised when interpretation cannot continue due to unsupported
    feature *)
 exception Contr of cntr_ctx * term
 (** raised when a contradiction is detected during RAC. *)
-exception RACStuck of env * Loc.position option
+exception RACStuck of env * Loc.position option * string
 (** raised when an assumed property is not satisfied *)
 
 (** {2 Interpreter} *)
@@ -213,9 +253,10 @@ val eval_global_fundef :
   Env.env ->
   Pmodule.pmodule ->
   (rsymbol * cexp) list ->
+  rec_defn list option ->
   expr ->
-  result * value Mvs.t * value Mrs.t
-(** [eval_global_fundef ~rac env pkm dkm rcl e] evaluates [e] and
+  result * value Mvs.t * value Lazy.t Mrs.t
+(** [eval_global_fundef ~rac env pkm dkm rcl rdl e] evaluates [e] and
    returns an evaluation result and a final variable environment (for
    both local and global variables).
 
@@ -241,7 +282,7 @@ val report_cntr_body : Format.formatter -> cntr_ctx * term -> unit
 (** Report a contradiction context and term *)
 
 val report_eval_result :
-  expr -> Format.formatter -> result * value Mvs.t * value Mrs.t -> unit
+  expr -> Format.formatter -> result * value Mvs.t * value Lazy.t Mrs.t -> unit
 (** Report an evaluation result *)
 
 val eval_rs : rac_config -> Env.env -> Pmodule.pmodule -> rsymbol -> result * env

@@ -124,3 +124,8 @@ let is_sexp_simple_token s =
           loop (pred i)
       | _ -> false ) in
   String.length s > 0 && loop (pred (String.length s))
+
+let iter_first (type a) iter f =
+  let exception Found of a in
+  let f x = match f x with Some y -> raise (Found y) | None -> () in
+  try iter f; raise Not_found with Found y -> y

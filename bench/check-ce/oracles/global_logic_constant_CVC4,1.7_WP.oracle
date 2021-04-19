@@ -1,437 +1,532 @@
 <check-ce>Check model 0 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File global_logic_constant.mlw:
             Line 5:
-              v1  = {"type": "Integer", "val": "-1"}
+              v1 = {"type": "Integer", "val": "-1"}
             Line 8:
-              v1_vc_constant [@model_trace:v1] =
-                {"type": "Integer", "val": "0"}
-<check-ce>Interpreting concretly
-<rac-values>Value from model for global v1: (-1)
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>Value from model for global v1: (-1)
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Result of checking model 0:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+              v1_vc_constant = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: (-1)
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: (-1)
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = (-1)
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 7:
                   _ = ()
-                  Execution of main function f1's body with env:
+                  Execution of main function `f1` with env:
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = (-1)
                 Line 8:
-                  Property failure, Postcondition of f1 with:
+                  Property failure at postcondition of `f1` with:
                     result = (-1)
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = (-1)
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 7:
                   _ = ()
-                  Execution of main function f1's body with env:
+                  Execution of main function `f1` with env:
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = (-1)
                 Line 8:
-                  Property failure, Postcondition of f1 with:
+                  Property failure at postcondition of `f1` with:
                     result = (-1)
 <check-ce>Check model 1 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File global_logic_constant.mlw:
             Line 5:
-              v1  = {"type": "Integer", "val": "-1"}
+              v1 = {"type": "Integer", "val": "-1"}
             Line 8:
-              v1_vc_constant [@model_trace:v1] =
-                {"type": "Integer", "val": "-1"}
-<check-ce>Interpreting concretly
-<rac-values>Value from model for global v1: (-1)
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>Value from model for global v1: (-1)
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Result of checking model 1:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+              v1_vc_constant = {"type": "Integer", "val": "-1"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: (-1)
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: (-1)
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = (-1)
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 7:
                   _ = ()
-                  Execution of main function f1's body with env:
+                  Execution of main function `f1` with env:
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = (-1)
                 Line 8:
-                  Property failure, Postcondition of f1 with:
+                  Property failure at postcondition of `f1` with:
                     result = (-1)
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = (-1)
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 7:
                   _ = ()
-                  Execution of main function f1's body with env:
+                  Execution of main function `f1` with env:
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = (-1)
                 Line 8:
-                  Property failure, Postcondition of f1 with:
+                  Property failure at postcondition of `f1` with:
                     result = (-1)
 <check-ce>Check model 2 ("bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File global_logic_constant.mlw:
             Line 5:
-              v1  = {"type": "Integer", "val": "-1"}
+              v1 = {"type": "Integer", "val": "-1"}
             Line 8:
-              v1_vc_constant [@model_trace:v1] =
-                {"type": "Integer", "val": "-1"}
-<check-ce>Interpreting concretly
-<rac-values>Value from model for global v1: (-1)
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>Value from model for global v1: (-1)
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+              v1_vc_constant = {"type": "Integer", "val": "-1"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: (-1)
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: (-1)
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 2: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = (-1)
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 7:
                   _ = ()
-                  Execution of main function f1's body with env:
+                  Execution of main function `f1` with env:
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = (-1)
                 Line 8:
-                  Property failure, Postcondition of f1 with:
+                  Property failure at postcondition of `f1` with:
                     result = (-1)
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = (-1)
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 7:
                   _ = ()
-                  Execution of main function f1's body with env:
+                  Execution of main function `f1` with env:
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = (-1)
                 Line 8:
-                  Property failure, Postcondition of f1 with:
+                  Property failure at postcondition of `f1` with:
                     result = (-1)
-<check-ce>Models:
-- Selected model 0 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
-- Checked model 1 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
+- Checked model 1: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
+- Checked model 2: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
 File "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24:
 Goal Postcondition from verification condition f1'vc.
-Prover result is: Unknown (sat) (0.05s, 4833 steps).
+Prover result is: Unknown (sat) (0.06s, 4833 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File global_logic_constant.mlw:
   Line 5:
     v1 = (-1)
+Unknown location:
+    _ = ()
+File global_logic_constant.mlw:
   Line 7:
     _ = ()
-    Execution of main function f1's body with env:
+    Execution of main function `f1` with env:
       _ = ()
       zero = 0
       one = 1
       v1 = (-1)
   Line 8:
-    Property failure, Postcondition of f1 with:
+    Property failure at postcondition of `f1` with:
       result = (-1)
 
 <check-ce>Check model 0 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File global_logic_constant.mlw:
             Line 5:
-              v1  = {"type": "Integer", "val": "0"}
+              v1 = {"type": "Integer", "val": "0"}
             Line 11:
-              v2 [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              v2 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 14:
-              v2_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:v2] =
+              v2_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value from model for global v1: 0
-<rac-values>Value from model for global v2: {contents= (-1)}
-<rac-values>Missing value for parameter _1, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>Value from model for global v1: 0
-<rac-values>Value from model for global v2: {contents= (-1)}
-<rac-values>Missing value for parameter _1, continue with default value ().
-<check-ce>Result of checking model 0:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: 0
+<rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 11, characters 10-12: {contents=
+                                                                    (-1)}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: 0
+<rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 11, characters 10-12: {contents=
+                                                                    (-1)}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = 0
                 Line 11:
                   v2 = {contents= (-1)}
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 13:
                   _ = ()
-                  Execution of main function f2's body with env:
+                  Execution of main function `f2` with env:
                     v2 = {contents= (-1)}
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = 0
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= (-1)}
                 Line 14:
-                  Property failure, Postcondition of f2 with:
+                  Property failure at postcondition of `f2` with:
                     result = (-1)
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = 0
                 Line 11:
                   v2 = {contents= (-1)}
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 13:
                   _ = ()
-                  Execution of main function f2's body with env:
+                  Execution of main function `f2` with env:
                     v2 = {contents= (-1)}
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = 0
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= (-1)}
                 Line 14:
-                  Property failure, Postcondition of f2 with:
+                  Property failure at postcondition of `f2` with:
                     result = (-1)
 <check-ce>Check model 1 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File global_logic_constant.mlw:
             Line 5:
-              v1  = {"type": "Integer", "val": "0"}
+              v1 = {"type": "Integer", "val": "0"}
             Line 11:
-              v2 [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              v2 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 14:
-              v2_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:v2] =
+              v2_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value from model for global v1: 0
-<rac-values>Value from model for global v2: {contents= (-1)}
-<rac-values>Missing value for parameter _1, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>Value from model for global v1: 0
-<rac-values>Value from model for global v2: {contents= (-1)}
-<rac-values>Missing value for parameter _1, continue with default value ().
-<check-ce>Result of checking model 1:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: 0
+<rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 11, characters 10-12: {contents=
+                                                                    (-1)}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: 0
+<rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 11, characters 10-12: {contents=
+                                                                    (-1)}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = 0
                 Line 11:
                   v2 = {contents= (-1)}
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 13:
                   _ = ()
-                  Execution of main function f2's body with env:
+                  Execution of main function `f2` with env:
                     v2 = {contents= (-1)}
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = 0
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= (-1)}
                 Line 14:
-                  Property failure, Postcondition of f2 with:
+                  Property failure at postcondition of `f2` with:
                     result = (-1)
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = 0
                 Line 11:
                   v2 = {contents= (-1)}
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 13:
                   _ = ()
-                  Execution of main function f2's body with env:
+                  Execution of main function `f2` with env:
                     v2 = {contents= (-1)}
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = 0
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= (-1)}
                 Line 14:
-                  Property failure, Postcondition of f2 with:
+                  Property failure at postcondition of `f2` with:
                     result = (-1)
 <check-ce>Check model 2 ("bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File global_logic_constant.mlw:
             Line 5:
-              v1  = {"type": "Integer", "val": "0"}
+              v1 = {"type": "Integer", "val": "0"}
             Line 11:
-              v2 [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              v2 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 14:
-              v2_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:v2] =
+              v2_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value from model for global v1: 0
-<rac-values>Value from model for global v2: {contents= (-1)}
-<rac-values>Missing value for parameter _1, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>Value from model for global v1: 0
-<rac-values>Value from model for global v2: {contents= (-1)}
-<rac-values>Missing value for parameter _1, continue with default value ().
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: 0
+<rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 11, characters 10-12: {contents=
+                                                                    (-1)}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: 0
+<rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 11, characters 10-12: {contents=
+                                                                    (-1)}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 2: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = 0
                 Line 11:
                   v2 = {contents= (-1)}
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 13:
                   _ = ()
-                  Execution of main function f2's body with env:
+                  Execution of main function `f2` with env:
                     v2 = {contents= (-1)}
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = 0
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= (-1)}
                 Line 14:
-                  Property failure, Postcondition of f2 with:
+                  Property failure at postcondition of `f2` with:
                     result = (-1)
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File global_logic_constant.mlw:
                 Line 5:
                   v1 = 0
                 Line 11:
                   v2 = {contents= (-1)}
+              Unknown location:
+                  _ = ()
+              File global_logic_constant.mlw:
                 Line 13:
                   _ = ()
-                  Execution of main function f2's body with env:
+                  Execution of main function `f2` with env:
                     v2 = {contents= (-1)}
                     _ = ()
                     zero = 0
                     one = 1
                     v1 = 0
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= (-1)}
                 Line 14:
-                  Property failure, Postcondition of f2 with:
+                  Property failure at postcondition of `f2` with:
                     result = (-1)
-<check-ce>Models:
-- Selected model 0 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
-- Checked model 1 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: good model)
-    Summary: The program does not comply to the verification goal
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
+- Checked model 1: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
+- Checked model 2: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
 File "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24:
 Goal Postcondition from verification condition f2'vc.
 Prover result is: Unknown (unknown + incomplete) (0.04s, 6064 steps).
@@ -440,25 +535,30 @@ The program does not comply to the verification goal, for example during the
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File global_logic_constant.mlw:
   Line 5:
     v1 = 0
   Line 11:
     v2 = {contents= (-1)}
+Unknown location:
+    _ = ()
+File global_logic_constant.mlw:
   Line 13:
     _ = ()
-    Execution of main function f2's body with env:
+    Execution of main function `f2` with env:
       v2 = {contents= (-1)}
       _ = ()
       zero = 0
       one = 1
       v1 = 0
   Line 15:
-    Concrete execution of contents with args:
+    Concrete execution of function `contents` with args:
       arg = {contents= (-1)}
   Line 14:
-    Property failure, Postcondition of f2 with:
+    Property failure at postcondition of `f2` with:
       result = (-1)
 

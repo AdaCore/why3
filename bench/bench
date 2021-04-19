@@ -379,12 +379,14 @@ rac () {
     echo
     echo "* $mod"
     echo -n "  $mod:" >&2
-    for func in $@; do
-        echo "** $mod.$func"
-        echo -n " $func" >&2
+    for expr in "$@"; do
+        echo -n " $expr" >&2
+        # Add () as argument if there is none
+        [[ $expr != *" "* ]] && expr="$expr ()"
+        echo "** $mod.$expr"
         bin/why3"$suffix" execute --rac --rac-prover=cvc4 --rac-try-negate \
                 --debug=rac-check-term-result \
-                "${RACARGS[@]}" "$file" --use="$mod" "$func ()" 2>&1 |\
+                "${RACARGS[@]}" "$file" --use="$mod" "$expr" 2>&1 |\
             sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" |\
             sed "s|$(bin/why3$suffix --print-libdir)|WHY3LIB|g"
     done
@@ -494,6 +496,8 @@ output="examples/tests/rac.out"
     rac "$mlw" Arrays test0 test1 test2 test3
     rac "$mlw" Variants loop_var_ok1 loop_var_ok2 loop_var_fail1 loop_var_fail2 loop_custom_variant
     rac "$mlw" TestUInt64 test
+    rac "$mlw" Premises test1
+    rac "$mlw" FunctionVariant 'test1 2' 'test2 2' 'test3 2' 'test4 2' 'test5 2'
 ) > "$output"
 if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
     echo "RAC: ok"

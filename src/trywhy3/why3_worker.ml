@@ -329,14 +329,14 @@ let why3_execute_one m rs =
     try
       let reduce = rac_reduce_config_lit config env ~trans:"compute_in_goal" () in
       let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
-      let res = eval_global_fundef rac_config env m [] expr in
+      let res = eval_global_fundef rac_config env m [] None expr in
       asprintf "returns %a" (report_eval_result expr) res
     with
     | Contr (ctx, term) ->
         asprintf "has failed: %a" report_cntr_body (ctx, term)
     | CannotCompute r ->
         asprintf "cannot compute (%s)" r.reason
-    | RACStuck (_, l) ->
+    | RACStuck (_, l, _) ->
         asprintf "got stuck at %a"
           (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
   let {Theory.th_name = th} = m.Pmodule.mod_theory in

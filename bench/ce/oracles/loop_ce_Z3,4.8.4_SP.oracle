@@ -80,18 +80,18 @@ File loop_ce.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 23:
-    a [@field:0:contents] [@introduced] [@mlw:reference_var]
-      [@model_trace:a] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
     a at X [@at:X] [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents]
       [@introduced] [@mlw:reference_var] [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    a [@field:0:contents] [@introduced] [@mlw:reference_var]
+      [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
 
 File "bench/ce/loop_ce.mlw", line 20, characters 31-44:
 Goal Postcondition from verification condition g'vc.

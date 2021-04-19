@@ -1,723 +1,504 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant init from verification condition f'vc.
-Prover result is: Valid (0.05s, 1022 steps).
+Prover result is: Valid (0.02s, 1022 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: Valid (0.01s, 1332 steps).
+Prover result is: Valid (0.02s, 1332 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File while.mlw:
             Line 4:
-              z [@introduced] = {"type": "Integer", "val": "0"}
+              z = {"type": "Integer", "val": "0"}
             Line 8:
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/while.mlw:8:2:161]
-                [@mlw:reference_var] =
+              i =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/while.mlw:8:2:161]
-                [@mlw:reference_var] =
+              i =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              x1 [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/while.mlw:8:2:161]
-                [@mlw:reference_var] =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 10:
-              x1_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:x1] =
+              x1_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 12:
-              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 15:
-              i [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              i =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 5, characters 15-16 at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 6, characters 15-16 at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
                                                                     0}
-<rac-values>Value from model for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+<rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
                                                                     0}
-<rac-values>Value type default for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
-                                                                    0}
-<rac-values>Value from model for i at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
-                                                                    0}
-<check-ce>Result of checking model 0:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
+<check-ce>Result of checking model 0: UNKNOWN
+            - Concrete RAC NORMAL (no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File while.mlw:
                 Line 4:
                   z = 0
-                  Execution of main function f's body with env:
+                  z = 0
+                  Execution of main function `f` with env:
                     z = 0
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 8:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (<) with args:
+                  Concrete execution of function `(<)` with args:
                     _ = 0
                     _ = 2
                   Concrete iteration of loop
                 Line 11:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 12:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 8:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of (<) with args:
+                  Concrete execution of function `(<)` with args:
                     _ = 1
                     _ = 2
                   Concrete iteration of loop
                 Line 11:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 14:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 1
                     _ = 1
                 Line 8:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 2}
-                  Concrete execution of (<) with args:
+                  Concrete execution of function `(<)` with args:
                     _ = 2
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/while.mlw", line 8, characters 2-161)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File while.mlw:
-                Line 4:
-                  z = 0
-                  Execution of main function f's body with env:
-                    z = 0
-                    zero = 0
-                    one = 1
-                Line 5:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 6:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 7:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 8:
-                  Abstract iteration of loop
-                  x1 = {contents= 0}
-                  x2 = {contents= 0}
-                  i = {contents= 0}
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (<) with args:
-                    _ = 0
-                    _ = 2
-                  Concrete iteration of loop
-                Line 11:
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (=) with args:
-                    x = 0
-                    y = 0
-                Line 12:
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (+) with args:
-                    _ = 0
-                    _ = 1
-                Line 15:
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (+) with args:
-                    _ = 0
-                    _ = 1
-                Line 8:
-                  Execution got stuck, Cannot continue after arbitrary iteration with:
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+              
 <check-ce>Check model 1 ("bench/check-ce/while.mlw", line 10, characters 25-32)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File while.mlw:
             Line 4:
-              z [@introduced] = {"type": "Integer", "val": "0"}
+              z = {"type": "Integer", "val": "0"}
             Line 8:
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/while.mlw:8:2:161]
-                [@mlw:reference_var] =
+              i =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/while.mlw:8:2:161]
-                [@mlw:reference_var] =
+              i =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              x1 [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/while.mlw:8:2:161]
-                [@mlw:reference_var] =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-2"}}]}}
             Line 10:
-              x1_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:x1] =
+              x1_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 12:
-              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 15:
-              i [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              i =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 5, characters 15-16 at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 6, characters 15-16 at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
                                                                     0}
-<rac-values>Value from model for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+<rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
                                                                     (-2)}
-<rac-values>Value type default for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
-                                                                    0}
-<rac-values>Value from model for i at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
-                                                                    0}
-<check-ce>Result of checking model 1:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
+<check-ce>Result of checking model 1: UNKNOWN
+            - Concrete RAC NORMAL (no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File while.mlw:
                 Line 4:
                   z = 0
-                  Execution of main function f's body with env:
+                  z = 0
+                  Execution of main function `f` with env:
                     z = 0
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 8:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (<) with args:
+                  Concrete execution of function `(<)` with args:
                     _ = 0
                     _ = 2
                   Concrete iteration of loop
                 Line 11:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 12:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 8:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of (<) with args:
+                  Concrete execution of function `(<)` with args:
                     _ = 1
                     _ = 2
                   Concrete iteration of loop
                 Line 11:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 14:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 1
                     _ = 1
                 Line 8:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 2}
-                  Concrete execution of (<) with args:
+                  Concrete execution of function `(<)` with args:
                     _ = 2
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/while.mlw", line 10, characters 16-32)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File while.mlw:
-                Line 4:
-                  z = 0
-                  Execution of main function f's body with env:
-                    z = 0
-                    zero = 0
-                    one = 1
-                Line 5:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 6:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 7:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 8:
-                  Abstract iteration of loop
-                  x1 = {contents= (-2)}
-                  x2 = {contents= 0}
-                  i = {contents= 0}
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (<) with args:
-                    _ = 0
-                    _ = 2
-                  Concrete iteration of loop
-                Line 11:
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (=) with args:
-                    x = 0
-                    y = 0
-                Line 12:
-                  Concrete execution of contents with args:
-                    arg = {contents= (-2)}
-                  Concrete execution of (+) with args:
-                    _ = (-2)
-                    _ = 1
-                Line 15:
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (+) with args:
-                    _ = 0
-                    _ = 1
-                Line 10:
-                  Property failure, Loop invariant preservation with:
-                    x1 = {contents= (-1)}
-                    i = {contents= 1}
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+              
 <check-ce>Check model 2 ("bench/check-ce/while.mlw", line 10, characters 25-32)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File while.mlw:
             Line 4:
-              z [@introduced] = {"type": "Integer", "val": "0"}
+              z = {"type": "Integer", "val": "0"}
             Line 8:
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/while.mlw:8:2:161]
-                [@mlw:reference_var] =
+              i =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              i [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/while.mlw:8:2:161]
-                [@mlw:reference_var] =
+              i =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              x1 [@field:0:contents] [@introduced]
-                [@loop:bench/check-ce/while.mlw:8:2:161]
-                [@mlw:reference_var] =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-2"}}]}}
             Line 10:
-              x1_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:x1] =
+              x1_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 12:
-              x1 [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 15:
-              i [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              i =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for z at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 5, characters 15-16 at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 6, characters 15-16 at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from post condition for result of ref at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
                                                                     0}
-<rac-values>Value from model for x1 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
+<rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
                                                                     (-2)}
-<rac-values>Value type default for x2 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
-                                                                    0}
-<rac-values>Value from model for i at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
-                                                                    0}
-<check-ce>Result of checking model 2:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
+<check-ce>Result of checking model 2: UNKNOWN
+            - Concrete RAC NORMAL (no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File while.mlw:
                 Line 4:
                   z = 0
-                  Execution of main function f's body with env:
+                  z = 0
+                  Execution of main function `f` with env:
                     z = 0
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
                 Line 8:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (<) with args:
+                  Concrete execution of function `(<)` with args:
                     _ = 0
                     _ = 2
                   Concrete iteration of loop
                 Line 11:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 12:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 8:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of (<) with args:
+                  Concrete execution of function `(<)` with args:
                     _ = 1
                     _ = 2
                   Concrete iteration of loop
                 Line 11:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of (=) with args:
+                  Concrete execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 14:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 1
                     _ = 1
                 Line 8:
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 2}
-                  Concrete execution of (<) with args:
+                  Concrete execution of function `(<)` with args:
                     _ = 2
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract: good model (Abstract RAC found a contradiction at different location "bench/check-ce/while.mlw", line 10, characters 16-32)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File while.mlw:
-                Line 4:
-                  z = 0
-                  Execution of main function f's body with env:
-                    z = 0
-                    zero = 0
-                    one = 1
-                Line 5:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 6:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 7:
-                  Abstract execution of ref with args:
-                    contents = 0
-                  result = {contents= 0}
-                Line 8:
-                  Abstract iteration of loop
-                  x1 = {contents= (-2)}
-                  x2 = {contents= 0}
-                  i = {contents= 0}
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (<) with args:
-                    _ = 0
-                    _ = 2
-                  Concrete iteration of loop
-                Line 11:
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (=) with args:
-                    x = 0
-                    y = 0
-                Line 12:
-                  Concrete execution of contents with args:
-                    arg = {contents= (-2)}
-                  Concrete execution of (+) with args:
-                    _ = (-2)
-                    _ = 1
-                Line 15:
-                  Concrete execution of contents with args:
-                    arg = {contents= 0}
-                  Concrete execution of (+) with args:
-                    _ = 0
-                    _ = 1
-                Line 10:
-                  Property failure, Loop invariant preservation with:
-                    x1 = {contents= (-1)}
-                    i = {contents= 1}
-<check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Selected model 1 (Concrete: bad model, Abstract: good model)
-    Summary: The contracts of some function or loop are underspecified
-- Checked model 2 (Concrete: bad model, Abstract: good model)
-    Summary: The contracts of some function or loop are underspecified
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+              
+<check-ce-summary>Results:
+- Checked model 0: UNKNOWN
+  - Concrete RAC NORMAL, no contradiction during execution
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161
+- Checked model 1: UNKNOWN
+  - Concrete RAC NORMAL, no contradiction during execution
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161
+- Selected model 2: UNKNOWN
+  - Concrete RAC NORMAL, no contradiction during execution
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
 Prover result is: Unknown (unknown + incomplete) (0.03s, 6190 steps).
-The contracts of some function or loop are underspecified, for example during
-  the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-  Line 14:
-    Constant one initialization
+The following counterexample model could not be verified
+  (concrete RAC no contradiction during execution, abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161):
 File while.mlw:
   Line 4:
     z = 0
-    Execution of main function f's body with env:
-      z = 0
-      zero = 0
-      one = 1
-  Line 5:
-    Abstract execution of ref with args:
-      contents = 0
-    result = {contents= 0}
-  Line 6:
-    Abstract execution of ref with args:
-      contents = 0
-    result = {contents= 0}
-  Line 7:
-    Abstract execution of ref with args:
-      contents = 0
-    result = {contents= 0}
   Line 8:
-    Abstract iteration of loop
-    x1 = {contents= (-2)}
-    x2 = {contents= 0}
-    i = {contents= 0}
-    Concrete execution of contents with args:
-      arg = {contents= 0}
-    Concrete execution of (<) with args:
-      _ = 0
-      _ = 2
-    Concrete iteration of loop
-  Line 11:
-    Concrete execution of contents with args:
-      arg = {contents= 0}
-    Concrete execution of (=) with args:
-      x = 0
-      y = 0
-  Line 12:
-    Concrete execution of contents with args:
-      arg = {contents= (-2)}
-    Concrete execution of (+) with args:
-      _ = (-2)
-      _ = 1
-  Line 15:
-    Concrete execution of contents with args:
-      arg = {contents= 0}
-    Concrete execution of (+) with args:
-      _ = 0
-      _ = 1
+    [before iteration] i = 0
+    [current iteration] i = 0
+    [before iteration] x1 = -2
   Line 10:
-    Property failure, Loop invariant preservation with:
-      x1 = {contents= (-1)}
-      i = {contents= 1}
+    [current iteration] x1 = -1
+  Line 12:
+    [current iteration] x1 = -1
+  Line 15:
+    [current iteration] i = 1
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Goal Loop variant decrease from verification condition f'vc.
-Prover result is: Valid (0.01s, 1327 steps).
+Prover result is: Valid (0.02s, 1327 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Valid (0.02s, 1264 steps).
+Prover result is: Valid (0.01s, 1264 steps).
 

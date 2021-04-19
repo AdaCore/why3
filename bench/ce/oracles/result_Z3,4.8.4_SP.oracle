@@ -38,11 +38,6 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File result.mlw:
   Line 16:
-    A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
     A [@at:'Old:loc:bench/ce/result.mlw:18] [@field:0:contents] [@introduced]
       [@model] [@model_trace:A] =
       {"type": "Record",
@@ -56,17 +51,17 @@ File result.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 18:
-    A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
     old A [@at:'Old] [@at:'Old:loc:bench/ce/result.mlw:18]
       [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+    A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 19:
     A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
       {"type": "Record",

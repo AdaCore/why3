@@ -90,17 +90,17 @@ File record_one_field.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 31:
     x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "43"}
-    y [@introduced] [@model_trace:y] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:31]
       [@introduced] [@model_trace:y] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    y [@introduced] [@model_trace:y] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 33:
     y [@introduced] =
       {"type": "Record",
@@ -139,17 +139,17 @@ File record_one_field.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 42:
-    x23 [@introduced] [@model_trace:x23] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
     old x23 [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
       [@introduced] [@model_trace:x23] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+    x23 [@introduced] [@model_trace:x23] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:42]
       [@introduced] [@model_trace:y] =
       {"type": "Record",
@@ -359,14 +359,14 @@ File record_one_field.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 50:
-    x [@introduced] [@loop:bench/ce/record_one_field.mlw:55:2:96]
-      [@model_trace:x] [@vc:written:55:2:96:bench/ce/record_one_field.mlw] =
+    old x [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:50]
+      [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-    old x [@at:'Old] [@at:'Old:loc:bench/ce/record_one_field.mlw:50]
-      [@introduced] [@model_trace:x] =
+    x [@introduced] [@loop:bench/ce/record_one_field.mlw:55:2:96]
+      [@model_trace:x] [@vc:written:55:2:96:bench/ce/record_one_field.mlw] =
       {"type": "Record",
        "val":
         {"Field":

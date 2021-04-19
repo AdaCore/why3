@@ -36,6 +36,8 @@ let opt_parser = ref None
 let opt_enable_rac = ref false
 let opt_rac_prover = ref None
 let opt_rac_try_negate = ref false
+let opt_rac_timelimit = ref None
+let opt_rac_steplimit = ref None
 let opt_rac_fail_cannot_check = ref false
 
 let use_modules = ref []
@@ -57,6 +59,10 @@ let option_list =
     KLong "rac-try-negate", Hnd0 (fun () -> opt_rac_try_negate := true),
     " try checking the negated term using the RAC prover when\n\
      the prover is defined and didn't give a result";
+    KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
+    "<seconds> Time limit in seconds for RAC (with --rac)";
+    KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
+    "<seconds> Step limit for RAC (with --rac)";
     KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_fail_cannot_check := true),
     " Fail when a assertion cannot be checked";
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
@@ -115,8 +121,10 @@ let do_input f =
         let trans = "compute_in_goal" and prover = !opt_rac_prover and try_negate = !opt_rac_try_negate in
         rac_reduce_config_lit config env ~trans ?prover ~try_negate () in
       let skip_cannot_compute = not !opt_rac_fail_cannot_check in
-      rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute ~reduce () in
-    let res = eval_global_fundef rac env pmod [] expr in
+      let timelimit = Opt.map float_of_int !opt_rac_timelimit in
+      rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute
+        ?timelimit ?steplimit:!opt_rac_steplimit ~reduce () in
+    let res = eval_global_fundef rac env pmod [] None expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
   with
@@ -127,16 +135,12 @@ let do_input f =
   | CannotCompute reason ->
       eprintf "Execution terminated because %s@." reason.reason;
       exit 2
-  | RACStuck (_, l) ->
+  | RACStuck (_, l, reason) ->
       (* TODO Remove this case when value origins (default vs model) can be distinguished
          in RAC *)
-      eprintf "RAC cannot continue after %a@."
-        (Pp.print_option Pretty.print_loc') l;
+      eprintf "RAC got stuck %s after %a@." reason
+        (Pp.print_option_or_default "unknown location" Pretty.print_loc') l;
       exit 2
-  | Failure msg ->
-      eprintf "failure: %s@." msg;
-      exit 1
-
 
 let () =
   try

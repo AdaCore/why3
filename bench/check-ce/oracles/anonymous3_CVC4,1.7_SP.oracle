@@ -1,165 +1,189 @@
 <check-ce>Check model 0 ("bench/check-ce/anonymous3.mlw", line 7, characters 12-22)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File anonymous3.mlw:
             Line 6:
-              y [@introduced] = {"type": "Integer", "val": "0"}
+              y = {"type": "Integer", "val": "0"}
             Line 7:
-              y_vc_constant [@introduced] [@model_trace:y] =
-                {"type": "Integer", "val": "0"}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for y at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for y at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
-<check-ce>Result of checking model 0:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+              y_vc_constant = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous3.mlw:
                 Line 6:
                   y = 0
-                  Execution of main function g's body with env:
+                  y = 0
+                  Execution of main function `g` with env:
                     y = 0
                     zero = 0
                     one = 1
                 Line 8:
-                  Concrete execution of f with args:
+                  Concrete execution of function `f` with args:
                     x = 0
-                  Concrete execution of (@) with args:
-                    u = ({x -> 0} fun y -> y + x)
+                  Concrete execution of function `(@)` with args:
+                    u = (fun y -> y + x) with x = 0
                     u = 0
                 Line 4:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
                 Line 7:
-                  Property failure, Postcondition of g with:
+                  Property failure at postcondition of `g` with:
                     y = 0
                     result = 0
-            - Abstract: don't know (Abstract RAC terminated because postcondition for default value cannot be evaluated)
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous3.mlw", line 7, characters 12-22)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File anonymous3.mlw:
             Line 6:
-              y [@introduced] = {"type": "Integer", "val": "0"}
+              y = {"type": "Integer", "val": "0"}
             Line 7:
-              y_vc_constant [@introduced] [@model_trace:y] =
-                {"type": "Integer", "val": "0"}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for y at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for y at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
-<check-ce>Result of checking model 1:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+              y_vc_constant = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous3.mlw:
                 Line 6:
                   y = 0
-                  Execution of main function g's body with env:
+                  y = 0
+                  Execution of main function `g` with env:
                     y = 0
                     zero = 0
                     one = 1
                 Line 8:
-                  Concrete execution of f with args:
+                  Concrete execution of function `f` with args:
                     x = 0
-                  Concrete execution of (@) with args:
-                    u = ({x -> 0} fun y -> y + x)
+                  Concrete execution of function `(@)` with args:
+                    u = (fun y -> y + x) with x = 0
                     u = 0
                 Line 4:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
                 Line 7:
-                  Property failure, Postcondition of g with:
+                  Property failure at postcondition of `g` with:
                     y = 0
                     result = 0
-            - Abstract: don't know (Abstract RAC terminated because postcondition for default value cannot be evaluated)
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5)
               
 <check-ce>Check model 2 ("bench/check-ce/anonymous3.mlw", line 7, characters 12-22)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File anonymous3.mlw:
             Line 6:
-              y [@introduced] = {"type": "Integer", "val": "0"}
+              y = {"type": "Integer", "val": "0"}
             Line 7:
-              y_vc_constant [@introduced] [@model_trace:y] =
-                {"type": "Integer", "val": "0"}
-<check-ce>Interpreting concretly
-<rac-values>Value imported for y at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
-<check-ce>Interpreting abstractly
-<rac-values>Value imported for y at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+              y_vc_constant = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
+<check-ce>Result of checking model 2: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous3.mlw:
                 Line 6:
                   y = 0
-                  Execution of main function g's body with env:
+                  y = 0
+                  Execution of main function `g` with env:
                     y = 0
                     zero = 0
                     one = 1
                 Line 8:
-                  Concrete execution of f with args:
+                  Concrete execution of function `f` with args:
                     x = 0
-                  Concrete execution of (@) with args:
-                    u = ({x -> 0} fun y -> y + x)
+                  Concrete execution of function `(@)` with args:
+                    u = (fun y -> y + x) with x = 0
                     u = 0
                 Line 4:
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 0
                 Line 7:
-                  Property failure, Postcondition of g with:
+                  Property failure at postcondition of `g` with:
                     y = 0
                     result = 0
-            - Abstract: don't know (Abstract RAC terminated because postcondition for default value cannot be evaluated)
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5)
               
-<check-ce>Models:
-- Selected model 0 (Concrete: good model, Abstract: don't know)
-    Summary: The program does not comply to the verification goal
-- Checked model 1 (Concrete: good model, Abstract: don't know)
-    Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: don't know)
-    Summary: The program does not comply to the verification goal
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5
+- Checked model 1: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5
+- Checked model 2: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5
 File "bench/check-ce/anonymous3.mlw", line 7, characters 12-22:
 Goal Postcondition from verification condition g'vc.
-Prover result is: Unknown (unknown + incomplete) (0.07s, 5023 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 5023 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File anonymous3.mlw:
   Line 6:
     y = 0
-    Execution of main function g's body with env:
+    y = 0
+    Execution of main function `g` with env:
       y = 0
       zero = 0
       one = 1
   Line 8:
-    Concrete execution of f with args:
+    Concrete execution of function `f` with args:
       x = 0
-    Concrete execution of (@) with args:
-      u = ({x -> 0} fun y -> y + x)
+    Concrete execution of function `(@)` with args:
+      u = (fun y -> y + x) with x = 0
       u = 0
   Line 4:
-    Concrete execution of (+) with args:
+    Concrete execution of function `(+)` with args:
       _ = 0
       _ = 0
   Line 7:
-    Property failure, Postcondition of g with:
+    Property failure at postcondition of `g` with:
       y = 0
       result = 0
 

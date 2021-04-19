@@ -1,8 +1,8 @@
 <check-ce>Check model 0 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File anonymous2.mlw:
             Line 8:
-              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -10,192 +10,173 @@
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 9:
               the check fails with all inputs
-<check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
-<rac-values>Missing value for parameter x, continue with default value 0.
-<check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
-<rac-values>Missing value for parameter x, continue with default value 0.
-<check-ce>Result of checking model 0:
-            - Concrete: bad model (Concrete RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous2.mlw", line 6, characters 13-18)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File anonymous2.mlw:
-                Line 3:
-                  Constant z initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
-                Line 5:
-                  x = 0
-                  Execution of main function f's body with env:
-                    z = {contents= 0}
-                    x = 0
-                    zero = 0
-                    one = 1
-                Line 6:
-                  Execution got stuck, Precondition of f with:
-                    x = 0
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/anonymous2.mlw", line 6, characters 13-18)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File anonymous2.mlw:
-                Line 3:
-                  Constant z initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
-                Line 5:
-                  x = 0
-                  Execution of main function f's body with env:
-                    z = {contents= 0}
-                    x = 0
-                    zero = 0
-                    one = 1
-                Line 6:
-                  Execution got stuck, Precondition of f with:
-                    x = 0
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14 at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/anonymous2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14 at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/anonymous2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<check-ce>Result of checking model 0: UNKNOWN
+            - Concrete RAC UNKNOWN (terminated because missing value for parameter `x`)
+              
+            - Abstract RAC UNKNOWN (terminated because missing value for parameter `x`)
+              
 <check-ce>Check model 1 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
-<check-ce>Validating model:
+<check-ce>Checking model:
           File anonymous2.mlw:
             Line 5:
-              x [@introduced] = {"type": "Integer", "val": "1"}
+              x = {"type": "Integer", "val": "1"}
             Line 8:
-              z [@field:0:contents] [@introduced] [@mlw:reference_var] =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 9:
-              z_vc_constant [@field:0:contents] [@introduced]
-                [@mlw:reference_var] [@model_trace:z] =
+              z_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>Value type default for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
-<rac-values>Value imported for x at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
-<check-ce>Interpreting abstractly
-<rac-values>Value type default for result at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
-<rac-values>Value imported for x at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
-<rac-values>Value from model for z at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: {contents=
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14 at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/anonymous2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<rac-values>Value type default for result of h at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: ()
-<check-ce>Result of checking model 1:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+<rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
+<rac-values>Value from model for variable `z` at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: {contents=
+                                                                    0}
+<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: ()
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14 at "bench/check-ce/anonymous2.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/anonymous2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
+<check-ce>Result of checking model 1: SW
+            - Concrete RAC NORMAL (no contradiction during execution)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous2.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
+                  z = {contents= 0}
                 Line 5:
                   x = 1
-                  Execution of main function f's body with env:
+                  x = 1
+                  Execution of main function `f` with env:
                     z = {contents= 0}
                     x = 1
                     zero = 0
                     one = 1
                 Line 8:
-                  Concrete execution of h with args:
+                  Concrete execution of function `h` with args:
                     y = 1
-                  Concrete execution of contents with args:
+                  Concrete execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of (+) with args:
+                  Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 5:
                   Execution of main function terminated normally
-            - Abstract: good model (Abstract RAC confirms the counter-example)
+            - Abstract RAC FAILURE (counter-example confirmed)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File anonymous2.mlw:
                 Line 3:
                   Constant z initialization
-                  (abstract) execution of any function
+                  (abstract) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of ref with args:
+                  Concrete execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Concrete execution of function `ref'mk` with args:
                     contents = 0
+                  z = {contents= 0}
                 Line 5:
                   x = 1
-                  Execution of main function f's body with env:
+                  x = 1
+                  Execution of main function `f` with env:
                     z = {contents= 0}
                     x = 1
                     zero = 0
                     one = 1
                 Line 8:
-                  Abstract execution of h with args:
+                  Abstract execution of function `h` with args:
                     y = 1
                   z = {contents= 0}
                   result = ()
                 Line 9:
-                  Property failure, Assertion with:
+                  Property failure at assertion with:
                     z = {contents= 0}
-<check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Selected model 1 (Concrete: bad model, Abstract: good model)
-    Summary: The contracts of some function or loop are underspecified
+<check-ce-summary>Results:
+- Checked model 0: UNKNOWN
+  - Concrete RAC UNKNOWN, terminated because missing value for parameter `x`
+  - Abstract RAC UNKNOWN, terminated because missing value for parameter `x`
+- Selected model 1: SW
+  - Concrete RAC NORMAL, no contradiction during execution
+  - Abstract RAC FAILURE, counter-example confirmed
 File "bench/check-ce/anonymous2.mlw", line 9, characters 11-16:
 Goal Assertion from verification condition f'vc.
-Prover result is: Step limit exceeded (0.76s).
+Prover result is: Step limit exceeded (0.77s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File anonymous2.mlw:
   Line 3:
     Constant z initialization
-    (abstract) execution of any function
+    (abstract) execution of unimplemented function with args:
     result = 0
-    Concrete execution of ref with args:
+    Concrete execution of function `ref` with args:
       contents = 0
-    Concrete execution of ref'mk with args:
+    Concrete execution of function `ref'mk` with args:
       contents = 0
+    z = {contents= 0}
   Line 5:
     x = 1
-    Execution of main function f's body with env:
+    x = 1
+    Execution of main function `f` with env:
       z = {contents= 0}
       x = 1
       zero = 0
       one = 1
   Line 8:
-    Abstract execution of h with args:
+    Abstract execution of function `h` with args:
       y = 1
     z = {contents= 0}
     result = ()
   Line 9:
-    Property failure, Assertion with:
+    Property failure at assertion with:
       z = {contents= 0}
 

@@ -25,7 +25,7 @@ type model_float =
   | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
   | Float_number of {hex: string option (* e.g., 0x1.ffp99 *); binary: model_float_binary}
 
-type model_value =
+type model_const =
   | Boolean of bool
   | String of string
   | Integer of model_int
@@ -33,10 +33,14 @@ type model_value =
   | Bitvector of model_bv
   | Decimal of model_dec
   | Fraction of model_frac
+
+type model_value =
+  | Const of model_const
   | Array of model_array
   | Record of model_record
   | Proj of model_proj
   | Apply of string * model_value list
+  | Var of string
   | Undefined
   | Unparsed of string
 
@@ -73,6 +77,9 @@ val array_add_element :
 val float_of_binary : model_float_binary -> model_float
 
 val print_model_value : Format.formatter -> model_value -> unit
+val print_model_value_human : Format.formatter -> model_value -> unit
+
+val print_model_const_human : Format.formatter -> model_const -> unit
 
 val debug_force_binary_floats : Debug.flag
 (** Print all floats using bitvectors in JSON output for models *)
@@ -84,15 +91,25 @@ val debug_force_binary_floats : Debug.flag
 *)
 
 type model_element_kind =
-| Result (* Result of a function call (if the counter-example is for postcondition)  *)
-| Old (* Old value of function argument (if the counter-example is for postcondition) *)
-| At of string (* Value at label *)
-| Error_message (* The model element represents error message, not source-code element.
-                   The error message is saved in the name of the model element.*)
-| Loop_before
-| Loop_previous_iteration
-| Loop_current_iteration
-| Other
+  | Result
+  (** Result of a function call (if the counter-example is for postcondition) *)
+  | Old
+  (** Old value of function argument (if the counter-example is for
+      postcondition) *)
+  | At of string
+  (** Value at label *)
+  | Loop_before
+  (** Value from before the loop *)
+  | Loop_previous_iteration
+  (** Value from before current loop iteration *)
+  | Loop_current_iteration
+  (** Value from current loop iteration *)
+  | Error_message
+  (** The model element represents error message, not source-code element. The
+     error message is saved in the name of the model element.*)
+  | Other
+
+val print_model_kind : Format.formatter -> model_element_kind -> unit
 
 (** Information about the name of the model element *)
 type model_element_name = {
@@ -148,9 +165,13 @@ val get_model_elements : model -> model_element list
 val get_model_term_loc : model -> Loc.position option
 val get_model_term_attrs : model -> Ident.Sattr.t
 
-val get_model_element : model -> string -> Loc.position -> model_element option
-val get_model_element_by_id : model -> Ident.ident -> model_element option
-val get_model_element_by_loc : model -> Loc.position -> model_element option
+(** {2 Search model elements} *)
+
+val search_model_element_for_id :
+  model -> ?loc:Loc.position -> Ident.ident -> model_element
+(** [search_model_element_for_id m ?loc id] searches for a model element for
+    identifier [id], at the location [id.id_loc], or at [loc], when given.
+    @raise Not_found when there is no such model element. *)
 
 (** {2 Printing the model} *)
 
@@ -295,13 +316,13 @@ val model_for_positions_and_decls : model ->
 ***************************************************************
 *)
 
-(** Method clean#model cleans a model from unparsed values and handles contradictory VCs
-   ("the check fails with all inputs"). *)
+(** Method clean#model cleans a model from unparsed values and handles
+   contradictory VCs ("the check fails with all inputs"). *)
 class clean : object
   method model : model -> model
   method element : model_element -> model_element option
   method value : model_value -> model_value option
-  method unparsed : string -> model_value option
+  method const : model_const -> model_value option
   method integer : model_int -> model_value option
   method string : string -> model_value option
   method decimal : model_dec -> model_value option
@@ -309,11 +330,13 @@ class clean : object
   method float : model_float -> model_value option
   method boolean : bool -> model_value option
   method bitvector : model_bv -> model_value option
+  method var : string -> model_value option
   method proj : string -> model_value -> model_value option
   method apply : string -> model_value list -> model_value option
   method array : model_array -> model_value option
   method record : model_record -> model_value option
   method undefined : model_value option
+  method unparsed : string -> model_value option
 end
 
 val customize_clean : #clean -> unit
