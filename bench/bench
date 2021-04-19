@@ -33,7 +33,7 @@ while [ $# != 0 ]; do
             echo "and is one of the following:"
             echo "  badfiles drivers execution extraction goodfiles invalidgoals list"
             echo "  mlwprinter rac realizations replay replay-without-shapes stdlib"
-            echo "  validgoals validsplitgoals."
+            echo "  steplimit validgoals validsplitgoals."
             exit 1
     esac
 done
@@ -178,6 +178,28 @@ invalid_goals () {
             exit 1
         fi
         echo "ok"
+    done
+}
+
+step_limit () {
+    pgm="bin/why3$suffix prove"
+    test -d $1 || exit 1
+    # FIXME: no reproducible test for Z3 yet, since Z3 replies
+    # "unknown" when step limit reached
+    provers=`why3 config list-provers | grep 'Alt-Ergo 2\.[0-9]\|CVC4 1\.[6-9]' | tr ' ' ',' | tr -d '()'`
+    for f in $1/*.mlw; do
+        for p in $provers ; do
+            printf "  $f (steps limit for $p)... "
+            if $pgm --stepslimit 10 -P $p $f | \
+                    grep -q "Prover result is: Step limit exceeded" ; then
+                echo "ok"
+            else
+                echo "failed!"
+                echo $pgm --stepslimit 10 -P $p $f
+                $pgm --stepslimit 10 -P $p $f
+                exit 1
+            fi
+        done
     done
 }
 
@@ -439,6 +461,12 @@ fi
 if enabled invalidgoals; then
 echo "=== Checking invalid goals ==="
 invalid_goals bench/invalid
+echo ""
+fi
+
+if enabled steplimit; then
+echo "=== Checking step limits ==="
+step_limit bench/steplimit
 echo ""
 fi
 
