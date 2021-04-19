@@ -1,10 +1,10 @@
 Strongest Postcondition
 File bench/ce/array_mono.mlw:
-Verification condition array'vc.
+Goal array'vc.
 Prover result is: Valid.
 
 File "bench/ce/array_mono.mlw", line 36, characters 4-8:
-Goal Index in array bounds from verification condition f1'vc.
+Sub-goal Index in array bounds of goal f1'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -29,11 +29,11 @@ File array_mono.mlw:
           [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
 
 File "bench/ce/array_mono.mlw", line 41, characters 4-14:
-Goal Index in array bounds from verification condition f2'vc.
+Sub-goal Index in array bounds of goal f2'vc.
 Prover result is: Valid.
 
 File "bench/ce/array_mono.mlw", line 40, characters 14-26:
-Goal Postcondition from verification condition f2'vc.
+Sub-goal Postcondition of goal f2'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):

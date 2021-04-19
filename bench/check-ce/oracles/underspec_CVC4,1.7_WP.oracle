@@ -1,5 +1,5 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
-Goal Loop invariant init from verification condition f'vc.
+Sub-goal Loop invariant init of goal f'vc.
 Prover result is: Valid (0.04s, 1016 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
@@ -298,8 +298,8 @@ Prover result is: Valid (0.04s, 1016 steps).
   - Concrete RAC NORMAL, no contradiction during execution
   - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
-Goal Loop invariant preservation from verification condition f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6176 steps).
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6176 steps).
 The following counterexample model could not be verified
   (concrete RAC no contradiction during execution, abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139):
 File underspec.mlw:
@@ -312,12 +312,12 @@ File underspec.mlw:
     [current iteration] x1 = 0
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
-Goal Loop invariant preservation from verification condition f'vc.
+Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Valid (0.02s, 1208 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
-Goal Postcondition from verification condition g'vc.
-Prover result is: Valid (0.02s, 1134 steps).
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Valid (0.01s, 1134 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Checking model:
@@ -690,7 +690,7 @@ Prover result is: Valid (0.02s, 1134 steps).
   - Concrete RAC NORMAL, no contradiction during execution
   - Abstract RAC FAILURE, counter-example confirmed
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
-Goal Assertion from verification condition f'vc.
+Sub-goal Assertion of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (0.03s, 6083 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
