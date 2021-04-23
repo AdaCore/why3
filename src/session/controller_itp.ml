@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -37,7 +37,8 @@ let print_status fmt st =
   | Undone            -> fprintf fmt "Undone"
   | Scheduled         -> fprintf fmt "Scheduled"
   | Running           -> fprintf fmt "Running"
-  | Done r            -> fprintf fmt "Done(%a)" (Call_provers.print_prover_result ~json:false) r
+  | Done r            -> fprintf fmt "Done(@[<h>%a@])"
+                           (Call_provers.print_prover_result ~json:false) r
   | Interrupted       -> fprintf fmt "Interrupted"
   | Detached          -> fprintf fmt "Detached"
   | InternalFailure e ->
@@ -446,6 +447,7 @@ let timeout_handler () =
   (* examine all the prover tasks in progress *)
   (* When no tasks are there, probably no tasks were scheduled and the server
      was not launched so getting results could fail. *)
+  let need_update = ref false in
   if Hashtbl.length prover_tasks_in_progress != 0 then begin
     let results = Call_provers.get_new_results ~blocking:S.blocking in
     List.iter (fun (call, prover_update) ->
@@ -475,7 +477,8 @@ let timeout_handler () =
             if ptp.tp_started then decr number_of_running_provers;
             (* inform the callback *)
             ptp.tp_callback (InternalFailure (exn))
-        end
+        end;
+        need_update := !need_update || prover_update != Call_provers.NoUpdates
       | exception Not_found -> ()
         (* We probably received ProverStarted after ProverFinished,
            because what is sent to and received from the server is
@@ -503,7 +506,7 @@ let timeout_handler () =
     done;
     Queue.transfer q prover_tasks_edited;
   end;
-  update_observer ();
+  if !need_update then update_observer ();
   true
 
 
@@ -519,12 +522,13 @@ let idle_handler () =
           S.multiplier * !session_max_tasks)
       then
         let spa = Queue.pop scheduled_proof_attempts in
-        try build_prover_call spa
+        try
+          build_prover_call spa;
+          update_observer ()
         with e when not (Debug.test_flag Debug.stack_trace) ->
           spa.spa_callback (InternalFailure e)
     with Queue.Empty -> idle_handler_running := false
   end;
-  update_observer ();
   !idle_handler_running
 
 let interrupt () =
@@ -1078,25 +1082,25 @@ type report =
 let print_report fmt (r: report) =
   match r with
   | Result (new_r, old_r) ->
-    Format.fprintf fmt "new_result = %a, old_result = %a@."
+    Format.fprintf fmt "new_result = %a, old_result = %a"
       (Call_provers.print_prover_result ~json:false) new_r
       (Call_provers.print_prover_result ~json:false) old_r
   | CallFailed e ->
-    Format.fprintf fmt "Callfailed %a@." Exn_printer.exn_printer e
+    Format.fprintf fmt "Callfailed %a" Exn_printer.exn_printer e
   | Replay_interrupted ->
-    Format.fprintf fmt "Interrupted@."
+    Format.fprintf fmt "Interrupted"
   | Prover_not_installed ->
-    Format.fprintf fmt "Prover not installed@."
+    Format.fprintf fmt "Prover not installed"
   | Edited_file_absent _ ->
-    Format.fprintf fmt "No edited file@."
+    Format.fprintf fmt "No edited file"
   | No_former_result new_r ->
-    Format.fprintf fmt "new_result = %a, no former result@."
+    Format.fprintf fmt "new_result = %a, no former result"
       (Call_provers.print_prover_result ~json:false) new_r
 
 (* TODO to be removed when we have a better way to print *)
 let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
   let pp_elem fmt (id, pr, rl, report) =
-    fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %d, Result: %a@."
+    fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %d, Result: @[<h>%a@]"
       (Obj.magic id) Whyconf.print_prover pr
       rl.Call_provers.limit_time print_report report
   in
@@ -1276,7 +1280,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                                    Exn_printer.exn_printer exn
                   | Done res ->
                      assert (res.Call_provers.pr_answer = Call_provers.Valid);
-                     Debug.dprintf debug "Bisecting: %a.@."
+                     Debug.dprintf debug "@[<h>Bisecting: %a.@]@."
                        (Call_provers.print_prover_result ~json:false) res
                   end
                 in

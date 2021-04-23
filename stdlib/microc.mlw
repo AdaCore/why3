@@ -37,7 +37,7 @@ module MicroC
     requires { [@expl:check division by zero] y <> 0 }
     ensures  { result = div x y }
 
-  val (/=) (ref x: int) (y: int) : unit
+  val (/=) (ref x: int) (y: int) : unit writes {x}
     requires { [@expl:check division by zero] y <> 0 }
     ensures  { x = div (old x) y }
 

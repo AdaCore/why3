@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -70,6 +70,13 @@ val ffalse : 'a -> bool
 
 val ttrue : 'a -> bool
 (** [ttrue] constant function [true] *)
+
+(** [iter_first iter f] returns the first result of [f] that is inhabitated,
+    when applied on the elements encountered by iterator [iter]. Generalisation
+    of [Lists.first].
+
+    @raise Not_found if no such element is encountered by the iterator. *)
+val iter_first : (('a -> unit) -> 'b) -> ('a -> 'c option) -> 'c
 
 (** {3 Lexical comparison using projections}
 

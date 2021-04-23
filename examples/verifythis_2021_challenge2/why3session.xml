@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="verifythis_2021_challenge2.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="I.eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
+ <proof prover="3"><result status="valid" time="0.05" steps="16674"/></proof>
+ </goal>
+ <goal name="mixfix []&lt;-&#39;vc" expl="VC for mixfix []&lt;-" proved="true">
+ <proof prover="3"><result status="valid" time="0.06" steps="16719"/></proof>
+ </goal>
+ <goal name="tree_frame&#39;vc" expl="VC for tree_frame" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="tree_frame&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.10" steps="28395"/></proof>
+  </goal>
+  <goal name="tree_frame&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="27968"/></proof>
+  </goal>
+  <goal name="tree_frame&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="25813"/></proof>
+  </goal>
+  <goal name="tree_frame&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.19" steps="28189"/></proof>
+  </goal>
+  <goal name="tree_frame&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.10" steps="28653"/></proof>
+  </goal>
+  <goal name="tree_frame&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.11" steps="27888"/></proof>
+  </goal>
+  <goal name="tree_frame&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="25872"/></proof>
+  </goal>
+  <goal name="tree_frame&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.17" steps="28164"/></proof>
+  </goal>
+  <goal name="tree_frame&#39;vc.8" expl="postcondition" proved="true">
+  <transf name="unfold" proved="true" arg1="tree">
+   <goal name="tree_frame&#39;vc.8.0" expl="VC for tree_frame" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="tree_frame&#39;vc.8.0.0" expl="VC for tree_frame" proved="true">
+    <proof prover="3"><result status="valid" time="0.06" steps="25906"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.1" expl="VC for tree_frame" proved="true">
+    <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.2" expl="VC for tree_frame" proved="true">
+    <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.3" expl="VC for tree_frame" proved="true">
+    <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.4" expl="VC for tree_frame" proved="true">
+    <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.5" expl="VC for tree_frame" proved="true">
+    <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.6" expl="VC for tree_frame" proved="true">
+    <proof prover="3"><result status="valid" time="0.13" steps="27915"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.7" expl="VC for tree_frame" proved="true">
+    <proof prover="3"><result status="valid" time="0.11" steps="27896"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.8" expl="VC for tree_frame" proved="true">
+    <proof prover="3"><result status="valid" time="0.14" steps="27930"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.9" expl="VC for tree_frame" proved="true">
+    <proof prover="3"><result status="valid" time="0.12" steps="29625"/></proof>
+    </goal>
+    <goal name="tree_frame&#39;vc.8.0.10" expl="VC for tree_frame" proved="true">
+    <proof prover="3"><result status="valid" time="0.13" steps="29713"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="dll_to_bst_rec&#39;vc" expl="VC for dll_to_bst_rec" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="dll_to_bst_rec&#39;vc.0" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="29268"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.11" steps="31405"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.10" steps="31556"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="28964"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="28977"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="28966"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="28979"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="29106"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="22899"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.10" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.10" steps="26269"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="33213"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.18" steps="53579"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="54927"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.14" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.11" steps="33755"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.15" expl="precondition" proved="true">
+  <transf name="unfold" proved="true" arg1="dll">
+   <goal name="dll_to_bst_rec&#39;vc.15.0" expl="VC for dll_to_bst_rec" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="dll_to_bst_rec&#39;vc.15.0.0" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="1"><result status="valid" time="1.45" steps="1477"/></proof>
+    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,min,max,get1,set1,([]&#39;),([&lt;-]&#39;&#39;),(==&#39;&#39;),subset,is_empty2,singleton1,disjoint,(==&#39;),mapsto,is_empty1,([&lt;-]&#39;),size1,([]),singleton,cons,snoc,(++),is_empty,size,height,dll,nl,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,extensionality1,subset_refl,subset_trans,is_empty_empty1,empty_is_empty,mem_singleton,remove_def,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,extensionality,mem_mapsto,mk_domain,mk_contents,is_empty_empty,add_contents_k,add_contents_other,find_def,remove_contents,remove_domain,length_nonnegative,(==)&#39;spec,create&#39;spec,empty&#39;def,set&#39;spec,set&#39;def,([&lt;-])&#39;def,singleton&#39;spec,cons&#39;spec,snoc&#39;spec,([..])&#39;spec,([..])&#39;def,([_..])&#39;def,([.._])&#39;def,(++)&#39;spec,is_empty&#39;spec,size_nonneg,size_empty,height_nonneg,tree_frame,Requires,H,Ensures11,Ensures9,Ensures8,Ensures7,Ensures6,Ensures5,Ensures4,Ensures3,Ensures2,Ensures">
+     <goal name="dll_to_bst_rec&#39;vc.15.0.0.0" expl="VC for dll_to_bst_rec" proved="true">
+     <proof prover="1"><result status="valid" time="0.52" steps="170"/></proof>
+     <proof prover="2"><result status="valid" time="0.01" steps="61"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.15.0.1" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.10" steps="33824"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.15.0.2" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.15" steps="41248"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.15.0.3" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.12" steps="33772"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.15.0.4" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="2"><result status="valid" time="0.15" steps="644"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.15.0.5" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.16" steps="40997"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.15.0.6" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="1.00" steps="154414"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.15.0.7" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.14" steps="34455"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.15.0.8" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.84" steps="130952"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.16" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.41" steps="71248"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.17" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="30611"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.18" expl="postcondition" proved="true">
+  <transf name="unfold" proved="true" arg1="tree">
+   <goal name="dll_to_bst_rec&#39;vc.18.0" expl="VC for dll_to_bst_rec" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="dll_to_bst_rec&#39;vc.18.0.0" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="1"><result status="valid" time="1.40" steps="1349"/></proof>
+    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,min,max,get1,set1,([]&#39;),([&lt;-]&#39;&#39;),(==&#39;&#39;),subset,is_empty2,singleton1,disjoint,(==&#39;),mapsto,is_empty1,([&lt;-]&#39;),size1,([]),singleton,cons,snoc,(++),is_empty,size,height,dll,nl,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Div_1,Mod_1,Mod_inf,Div_mult,Mod_mult,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,extensionality1,subset_refl,subset_trans,is_empty_empty1,empty_is_empty,mem_singleton,remove_def,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,extensionality,mem_mapsto,mk_domain,mk_contents,is_empty_empty,add_contents_k,add_contents_other,find_def,remove_contents,remove_domain,length_nonnegative,(==)&#39;spec,create&#39;spec,empty&#39;def,set&#39;spec,set&#39;def,([&lt;-])&#39;def,singleton&#39;spec,cons&#39;spec,snoc&#39;spec,([..])&#39;spec,([..])&#39;def,([_..])&#39;def,([.._])&#39;def,(++)&#39;spec,is_empty&#39;spec,size_nonneg,size_empty,height_nonneg,tree_frame,Requires,H,Ensures23,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures9,Ensures8,Ensures7,Ensures6,Ensures5,Ensures4,Ensures3,Ensures2,Ensures">
+     <goal name="dll_to_bst_rec&#39;vc.18.0.0.0" expl="VC for dll_to_bst_rec" proved="true">
+     <proof prover="1"><result status="valid" time="0.53" steps="176"/></proof>
+     <proof prover="2"><result status="valid" time="0.01" steps="61"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.18.0.1" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.13" steps="35686"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.18.0.2" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.13" steps="35671"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.18.0.3" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.14" steps="35698"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.18.0.4" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.12" steps="35678"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.18.0.5" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.13" steps="46394"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.18.0.6" expl="VC for dll_to_bst_rec" proved="true">
+    <proof prover="3"><result status="valid" time="0.19" steps="46389"/></proof>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.18.0.7" expl="VC for dll_to_bst_rec" proved="true">
+    <transf name="apply" proved="true" arg1="tree_frame" arg2="with" arg3="prev2.to_fmap,next2.to_fmap">
+     <goal name="dll_to_bst_rec&#39;vc.18.0.7.0" expl="apply premises" proved="true">
+     <proof prover="2"><result status="valid" time="0.06" steps="561"/></proof>
+     <proof prover="3"><result status="valid" time="0.15" steps="46180"/></proof>
+     </goal>
+     <goal name="dll_to_bst_rec&#39;vc.18.0.7.1" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="1.40" steps="1349"/></proof>
+     <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,min,max,get1,set1,([]&#39;),([&lt;-]&#39;&#39;),(==&#39;&#39;),subset,is_empty2,singleton1,disjoint,(==&#39;),mapsto,is_empty1,([&lt;-]&#39;),size1,([]),singleton,cons,snoc,(++),is_empty,size,height,dll,nl,p,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,extensionality1,subset_refl,subset_trans,is_empty_empty1,empty_is_empty,mem_singleton,remove_def,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,extensionality,mem_mapsto,mk_domain,mk_contents,is_empty_empty,add_contents_k,add_contents_other,find_def,remove_contents,remove_domain,length_nonnegative,(==)&#39;spec,create&#39;spec,empty&#39;def,set&#39;spec,set&#39;def,([&lt;-])&#39;def,singleton&#39;spec,cons&#39;spec,snoc&#39;spec,([..])&#39;spec,([..])&#39;def,([_..])&#39;def,([.._])&#39;def,(++)&#39;spec,is_empty&#39;spec,size_nonneg,size_empty,height_nonneg,tree_frame,Requires,H,Ensures23,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures9,Ensures8,Ensures7,Ensures6,Ensures5,Ensures4,Ensures3,Ensures2,Ensures">
+      <goal name="dll_to_bst_rec&#39;vc.18.0.7.1.0" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.54" steps="176"/></proof>
+      <proof prover="2"><result status="valid" time="0.01" steps="61"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="dll_to_bst_rec&#39;vc.18.0.7.2" expl="apply premises" proved="true">
+     <proof prover="0"><result status="valid" time="2.10"/></proof>
+     <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,min,max,get1,set1,([&lt;-]&#39;&#39;),(==&#39;&#39;),subset,is_empty2,singleton1,disjoint,(==&#39;),mem,is_empty1,([&lt;-]&#39;),size1,([]),singleton,cons,snoc,(++),is_empty,size,height,dll,nl,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,extensionality1,subset_refl,subset_trans,is_empty_empty1,empty_is_empty,add_def,mem_singleton,remove_def,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,extensionality,mk_domain,mk_contents,is_empty_empty,add_contents_k,add_domain,find_def,remove_contents,remove_domain,(==)&#39;spec,create&#39;spec,empty&#39;def,set&#39;spec,set&#39;def,([&lt;-])&#39;def,singleton&#39;spec,cons&#39;spec,snoc&#39;spec,([..])&#39;spec,([..])&#39;def,([_..])&#39;def,([.._])&#39;def,(++)&#39;spec,is_empty&#39;spec,size_nonneg,size_empty,height_nonneg,tree_frame,Requires,H,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures12,Ensures11,Ensures9,Ensures8,Ensures6,Ensures4,Ensures3,Ensures2,Ensures">
+      <goal name="dll_to_bst_rec&#39;vc.18.0.7.2.0" expl="apply premises" proved="true">
+      <proof prover="0"><result status="valid" time="0.04"/></proof>
+      <proof prover="2"><result status="valid" time="0.02" steps="218"/></proof>
+      <proof prover="4"><result status="valid" time="0.02" steps="39823"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="dll_to_bst_rec&#39;vc.18.0.8" expl="VC for dll_to_bst_rec" proved="true">
+    <transf name="apply" proved="true" arg1="tree_frame" arg2="with" arg3="prev.to_fmap,next1.to_fmap">
+     <goal name="dll_to_bst_rec&#39;vc.18.0.8.0" expl="apply premises" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="37"/></proof>
+     <proof prover="3"><result status="valid" time="0.10" steps="31590"/></proof>
+     <proof prover="4"><result status="valid" time="0.04" steps="167259"/></proof>
+     </goal>
+     <goal name="dll_to_bst_rec&#39;vc.18.0.8.1" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="1.40" steps="1349"/></proof>
+     <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,min,max,get1,set1,([]&#39;),([&lt;-]&#39;&#39;),(==&#39;&#39;),subset,is_empty2,singleton1,disjoint,(==&#39;),mapsto,is_empty1,([&lt;-]&#39;),size1,([]),singleton,cons,snoc,(++),is_empty,size,height,dll,nl,p,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Div_1,Mod_1,Mod_inf,Div_mult,Mod_mult,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,extensionality1,subset_refl,subset_trans,is_empty_empty1,empty_is_empty,mem_singleton,remove_def,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,extensionality,mem_mapsto,mk_domain,mk_contents,is_empty_empty,add_contents_k,add_contents_other,find_def,remove_contents,remove_domain,length_nonnegative,(==)&#39;spec,create&#39;spec,empty&#39;def,set&#39;spec,set&#39;def,([&lt;-])&#39;def,singleton&#39;spec,cons&#39;spec,snoc&#39;spec,([..])&#39;spec,([..])&#39;def,([_..])&#39;def,([.._])&#39;def,(++)&#39;spec,is_empty&#39;spec,size_nonneg,size_empty,height_nonneg,tree_frame,Requires,H,Ensures23,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures9,Ensures8,Ensures7,Ensures6,Ensures5,Ensures4,Ensures3,Ensures2,Ensures">
+      <goal name="dll_to_bst_rec&#39;vc.18.0.8.1.0" expl="apply premises" proved="true">
+      <proof prover="1"><result status="valid" time="0.53" steps="176"/></proof>
+      <proof prover="2"><result status="valid" time="0.01" steps="61"/></proof>
+      <proof prover="4"><result status="valid" time="0.02" steps="209515"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="dll_to_bst_rec&#39;vc.18.0.8.2" expl="apply premises" proved="true">
+     <proof prover="4"><result status="valid" time="0.06" steps="321491"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.46" steps="79479"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.20" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.36" steps="78265"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.21" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.13" steps="218052"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.22" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.10" steps="204920"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.23" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.06" steps="202821"/></proof>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.24" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.82"/></proof>
+  <proof prover="5"><result status="valid" time="1.48"/></proof>
+  <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,min,max,get1,set1,([&lt;-]&#39;&#39;),(==&#39;&#39;),subset,singleton1,disjoint,(==&#39;),mem,is_empty1,([&lt;-]&#39;),size1,([]),singleton,cons,snoc,(++),is_empty,size,height,dll,nl,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Div_1,Mod_1,Mod_inf,Div_mult,Mod_mult,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,extensionality1,subset_refl,subset_trans,is_empty_empty1,add_def,mem_singleton,remove_def,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,extensionality,mk_domain,mk_contents,is_empty_empty,add_domain,find_def,remove_contents,remove_domain,(==)&#39;spec,create&#39;spec,empty&#39;def,set&#39;spec,set&#39;def,([&lt;-])&#39;def,singleton&#39;spec,cons&#39;spec,snoc&#39;spec,([..])&#39;spec,([..])&#39;def,([_..])&#39;def,([.._])&#39;def,(++)&#39;spec,is_empty&#39;spec,size_nonneg,size_empty,height_nonneg,tree_frame,Requires,H2,Ensures27,Ensures26,Ensures25,Ensures24,Ensures23,Ensures22,Ensures21,Ensures19,Ensures17,Ensures16,Ensures14,Ensures13,Ensures12,Ensures11,Ensures10,Ensures8,Ensures6,Ensures4,Ensures3,Ensures2,Ensures1,Ensures">
+   <goal name="dll_to_bst_rec&#39;vc.24.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.04"/></proof>
+   <proof prover="2"><result status="valid" time="0.04" steps="211"/></proof>
+   <proof prover="3"><result status="valid" time="0.09" steps="13412"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="43117"/></proof>
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="dll_to_bst_rec&#39;vc.25" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.60" steps="93264"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="tree_size&#39;vc" expl="VC for tree_size" proved="true">
+ <proof prover="3"><result status="valid" time="0.10" steps="29426"/></proof>
+ </goal>
+ <goal name="tree_inorder&#39;vc" expl="VC for tree_inorder" proved="true">
+ <proof prover="2"><result status="valid" time="0.19" steps="1014"/></proof>
+ </goal>
+ <goal name="size&#39;vc" expl="VC for size" proved="true">
+ <proof prover="3"><result status="valid" time="0.26" steps="58739"/></proof>
+ </goal>
+ <goal name="dll_to_bst&#39;vc" expl="VC for dll_to_bst" proved="true">
+ <proof prover="3"><result status="valid" time="0.17" steps="40513"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="dll_to_bst&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="27404"/></proof>
+  </goal>
+  <goal name="dll_to_bst&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="27440"/></proof>
+  </goal>
+  <goal name="dll_to_bst&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="30049"/></proof>
+  </goal>
+  <goal name="dll_to_bst&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="33684"/></proof>
+  </goal>
+  <goal name="dll_to_bst&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.14" steps="326"/></proof>
+  </goal>
+  <goal name="dll_to_bst&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="30285"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="size_alt&#39;vc" expl="VC for size_alt" proved="true">
+ <proof prover="3"><result status="valid" time="0.26" steps="61679"/></proof>
+ </goal>
+ <goal name="dll_to_bst_alt&#39;vc" expl="VC for dll_to_bst_alt" proved="true">
+ <proof prover="3"><result status="valid" time="0.17" steps="40768"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="dll_to_bst_alt&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="27627"/></proof>
+  </goal>
+  <goal name="dll_to_bst_alt&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.09" steps="27656"/></proof>
+  </goal>
+  <goal name="dll_to_bst_alt&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="30265"/></proof>
+  </goal>
+  <goal name="dll_to_bst_alt&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.14" steps="33904"/></proof>
+  </goal>
+  <goal name="dll_to_bst_alt&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.13" steps="342"/></proof>
+  </goal>
+  <goal name="dll_to_bst_alt&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="30471"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

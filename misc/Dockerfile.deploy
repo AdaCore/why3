@@ -36,19 +36,20 @@ RUN ./autogen.sh && \
     make
 
 USER root
-RUN make install
+RUN make install && \
+    install -T misc/deployed-wrapper.sh /usr/local/bin/why3-wrapper.sh
 
 
 # Stage 3: deployed image; to be cached (for its first layers)
 
-FROM debian:buster
+FROM debian:buster-slim
 
 USER root
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends libcanberra-gtk3-module libgtksourceview-3.0-1 libgomp1 zlib1g && \
+    apt-get install -yq --no-install-recommends libcanberra-gtk3-module libgtk-3-bin libgtksourceview-3.0-1 libgomp1 zlib1g && \
     apt-get clean
 
 RUN adduser --disabled-password --gecos '' guest
@@ -61,10 +62,12 @@ COPY --from=artifact /usr/local/bin/why3 /usr/local/bin/
 COPY --from=artifact /usr/local/lib/why3 /usr/local/lib/why3
 COPY --from=artifact /usr/local/share/why3 /usr/local/share/why3
 
+COPY --from=artifact /usr/local/bin/why3-wrapper.sh /usr/local/bin/
+
 USER guest
 ENV HOME /home/guest
 WORKDIR /home/guest
 
-RUN why3 config --detect
+RUN why3 config detect
 
-ENTRYPOINT [ "why3" ]
+ENTRYPOINT [ "why3-wrapper.sh" ]

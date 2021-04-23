@@ -1,0 +1,202 @@
+<check-ce>Check model 0 ("bench/check-ce/var_clones.mlw", line 9, characters 13-39)
+<check-ce>Checking model:
+          File var_clones.mlw:
+            Line 6:
+              n = {"type": "Integer", "val": "111"}
+            Line 7:
+              n = {"type": "Integer", "val": "222"}
+            Line 9:
+              the check fails with all inputs
+<check-ce>Giant-step RAC
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 6, characters 2-16: 111
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 7, characters 2-16: 222
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Small-step RAC
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 6, characters 2-16: 111
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 7, characters 2-16: 222
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+              Unknown location:
+                  _ = ()
+              File var_clones.mlw:
+                Line 8:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure at assertion with:
+                    n = 111
+                    n = 222
+            - Abstract RAC FAILURE (counter-example confirmed)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+              Unknown location:
+                  _ = ()
+              File var_clones.mlw:
+                Line 8:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure at assertion with:
+                    n = 111
+                    n = 222
+<check-ce>Check model 1 ("bench/check-ce/var_clones.mlw", line 9, characters 13-39)
+<check-ce>Checking model:
+          File var_clones.mlw:
+            Line 6:
+              n = {"type": "Integer", "val": "111"}
+            Line 7:
+              n = {"type": "Integer", "val": "222"}
+            Line 9:
+              n_vc_constant = {"type": "Integer", "val": "222"}
+<check-ce>Giant-step RAC
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 6, characters 2-16: 111
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 7, characters 2-16: 222
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Small-step RAC
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 6, characters 2-16: 111
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 7, characters 2-16: 222
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+              Unknown location:
+                  _ = ()
+              File var_clones.mlw:
+                Line 8:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure at assertion with:
+                    n = 111
+                    n = 222
+            - Abstract RAC FAILURE (counter-example confirmed)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+              Unknown location:
+                  _ = ()
+              File var_clones.mlw:
+                Line 8:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure at assertion with:
+                    n = 111
+                    n = 222
+<check-ce>Check model 2 ("bench/check-ce/var_clones.mlw", line 9, characters 13-39)
+<check-ce>Checking model:
+          File var_clones.mlw:
+            Line 6:
+              n = {"type": "Integer", "val": "111"}
+            Line 7:
+              n = {"type": "Integer", "val": "222"}
+            Line 9:
+              n_vc_constant = {"type": "Integer", "val": "222"}
+<check-ce>Giant-step RAC
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 6, characters 2-16: 111
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 7, characters 2-16: 222
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Small-step RAC
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 6, characters 2-16: 111
+<rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 7, characters 2-16: 222
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 2: NC
+            - Concrete RAC FAILURE (counter-example confirmed)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+              Unknown location:
+                  _ = ()
+              File var_clones.mlw:
+                Line 8:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure at assertion with:
+                    n = 111
+                    n = 222
+            - Abstract RAC FAILURE (counter-example confirmed)
+              File var_clones.mlw:
+                Line 6:
+                  n = 111
+                Line 7:
+                  n = 222
+              Unknown location:
+                  _ = ()
+              File var_clones.mlw:
+                Line 8:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    n = 111
+                    n = 222
+                Line 9:
+                  Property failure at assertion with:
+                    n = 111
+                    n = 222
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
+- Checked model 1: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
+- Checked model 2: NC
+  - Concrete RAC FAILURE, counter-example confirmed
+  - Abstract RAC FAILURE, counter-example confirmed
+File "bench/check-ce/var_clones.mlw", line 9, characters 13-39:
+Goal Assertion from verification condition f'vc.
+Prover result is: Unknown (sat) (0.01s, 163 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File var_clones.mlw:
+  Line 6:
+    n = 111
+  Line 7:
+    n = 222
+Unknown location:
+    _ = ()
+File var_clones.mlw:
+  Line 8:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+      n = 111
+      n = 222
+  Line 9:
+    Property failure at assertion with:
+      n = 111
+      n = 222
+

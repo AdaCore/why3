@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,36 +12,33 @@
 open Wstdlib
 open Model_parser
 
-type variable = string
+type ident = string
+
+type typ = string
 
 type term =
-  | Sval of model_value
-  | Apply of (string * term list)
-  | Array of array
-  | Var of variable
-  | Function_var of variable (* Function parameter *)
-  | Prover_var of variable (* Variable introduced by prover (e.g. @x or x!0) *)
-  | Ite of term * term * term * term
-  | Record of string * ((string * term) list)
-  | To_array of term
+  | Tconst of model_const
+  | Tvar of ident
+  | Tprover_var of typ * ident
+  | Tapply of (string * term list)
+  | Tarray of array
+  | Tite of term * term * term
+  | Tlet of (string * term) list * term
+  | Tto_array of term
+  | Tunparsed of string
 
 and array =
-  | Avar of variable (* Used by let-bindings only *)
+  | Avar of ident (* Used by let-bindings only *)
   | Aconst of term
   | Astore of array * term * term
 
 type definition =
-  | Function of (variable * string option) list * term
-  | Term of term (* corresponding value of a term *)
-  | Noelement
+  | Dfunction of (ident * typ option) list * typ option * term
+  | Dterm of term (* corresponding value of a term *)
+  | Dnoelement
 
 val add_element: (string * definition) option ->
   definition Mstr.t -> definition Mstr.t
-
-val make_local: (variable * string option) list -> term -> term
-(** For a definition of function f, local variables being in vars_lists and the
-    returned term being t, this function changes the term to give an appropriate
-    tag to variables that are actually local. *)
 
 val substitute: (string * term) list -> term -> term
 (** Substitute variables by terms. Used for let bindings of z3 *)

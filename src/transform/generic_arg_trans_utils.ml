@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -29,6 +29,9 @@ exception Remove_unknown of (decl * Ident.ident)
 let gen_ident = Ident.id_fresh
 
 let subst_quant c tq x : term =
+  if c = Texists &&
+     not (Ty.Stv.is_empty (t_ty_freevars Ty.Stv.empty (t_quant c tq)))
+  then raise (Arg_trans "subst_quant");
   let (vsl, tr, te) = t_open_quant tq in
   (match vsl with
   | hdv :: tl ->
@@ -48,6 +51,9 @@ let subst_quant c tq x : term =
 
 
 let subst_quant_list quant term_quant list_term : term =
+  if quant = Texists &&
+     not (Ty.Stv.is_empty (t_ty_freevars Ty.Stv.empty (t_quant quant term_quant)))
+  then raise (Arg_trans "subst_quant_list");
   let (vsl, triggers, te) = t_open_quant term_quant in
   (* TODO this create_mvs function should be a fold. It also can and
      should  be removed because we can use first_order_matching on list
@@ -79,7 +85,8 @@ let subst_quant_list quant term_quant list_term : term =
   | Ty.TypeMismatch (ty1, ty2) ->
       raise (Arg_trans_type ("subst_quant_list", ty1, ty2))
 
-(* Transform the term (exists v, f) into f[x/v] *)
+(* Transform the term (exists v, f) into f[x/v].
+   Formula (exists v, f) must be monomorphic. *)
 let subst_exist t x =
   match t.t_node with
   | Tquant (Texists, tq) ->

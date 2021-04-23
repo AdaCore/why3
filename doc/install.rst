@@ -18,6 +18,17 @@ is as simple as
 
 Then jump to :numref:`sec.provers` to install external provers.
 
+Why3 also provides a graphical user interface (see :numref:`sec.gui`
+and :numref:`sec.ideref`), which can be installed using
+
+::
+
+   opam install why3-ide
+
+Finally, the Opam package ``why3-coq`` provides realizations of Why3's
+standard library, which are useful for doing interactive proofs using the
+Coq formal system (see :numref:`chap.itp`).
+
 Installation via Docker
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -51,6 +62,23 @@ It certainly makes sense to turn this command line into a shell script for easie
 
     #!/bin/sh
     exec docker run --rm --network host --user `id -u` --volume $HOME/.Xauthority:/home/guest/.Xauthority --env DISPLAY=$DISPLAY --volume `pwd`:/data --workdir /data why3 "$@"
+
+It is also possible to run the graphical user interface from within a web
+browser, thus alleviating the need for a X server. To do so, just set the
+environment variable ``WHY3IDE`` to ``web`` and publish port 8080:
+
+.. code-block:: shell
+
+   docker run --rm -p 8080:8080 --env WHY3IDE=web --user `id -u` --volume `pwd`:/data --workdir /data why3 ide foo.mlw
+
+You can now point your web browser to http://localhost:8080/. As before,
+this can be turned into a shell script for easier use:
+
+.. code-block:: shell
+
+    #!/bin/sh
+    exec docker --rm -p 8080:8080 --env WHY3IDE=web --user `id -u` --volume `pwd`:/data --workdir /data why3 "$@"
+
 
 Installation from Source Distribution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -122,7 +150,7 @@ Installation can be tested as follows:
 
 #. install some external provers (see :numref:`sec.provers` below)
 
-#. run :option:`why3 config --detect`
+#. run :why3:tool:`why3 config`
 
 #. run some examples from the distribution, e.g., you should obtain the
    following (provided the required provers are installed on your
@@ -194,7 +222,7 @@ to run the following command:
 
 ::
 
-    why3 config --detect
+    why3 config
 
 It scans your :envvar:`PATH` for provers and updates your configuration file
 (see :numref:`sec.why3config`) accordingly.
@@ -207,19 +235,18 @@ CVC4 1.4 and CVC4 1.5 at the same time. The automatic detection of
 provers looks for typical names for their executable command, e.g., :program:`cvc4`
 for CVC3. However, if you install several versions of the same prover it
 is likely that you would use specialized executable names, such as
-:program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, option
-:option:`why3 config --add-prover` can be
-added to specify names of prover executables:
+:program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, the command
+:why3:tool:`why3 config add-prover` can be
+used to specify names of prover executables:
 
 ::
 
-    why3 config --add-prover cvc4 cvc4-dev /usr/local/bin/cvc4-dev
+    why3 config add-prover CVC4 /usr/local/bin/cvc4-dev cvc4-dev
 
-the first argument (here ``cvc4``) must be one of the family of provers
-known. The list of these famillies can be obtain using
-:option:`why3 config --list-prover-families`.
-
-as they are in fact listed in the file :file:`provers-detection-data.conf`,
+the first argument (here ``CVC4``) must be one of the known provers. The
+list of these names can be obtained
+using :why3:tool:`why3 config list-supported-provers`.
+They can also be found in the file :file:`provers-detection-data.conf`,
 typically located in :file:`/usr/local/share/why3` after installation. See
 :numref:`sec.proverdetectiondata` for details.
 
@@ -268,6 +295,72 @@ stored in the configuration. The :why3:tool:`session` command performs move or
 copy operations on proof attempts in a fine-grained way, using filters,
 as detailed in :numref:`sec.why3session`.
 
+
+.. _sec.installeditormodes:
+
+Configure Editors for editing WhyML sources
+-------------------------------------------
+
+The Why3 distributions come with some configuration files for Emacs and for Vim.
+These files are typically installed in the shared data directory,
+which is given by
+
+::
+
+     why3 --print-datadir
+
+Emacs
+~~~~~
+
+The Why3 distributions come with a mode for Emacs in a file
+:file:`why3.el`. That file is typically found in sub-directory
+:file:`emacs`. Under OPAM, this file is installed in a shared
+directory :file:`emacs/site-lisp` for all OPAM packages. Here is a
+sample Emacs-Lisp code that can be added to your :file:`.emacs`
+configuration file.
+
+.. code-block:: lisp
+
+     (setq why3-share (if (boundp 'why3-share) why3-share (ignore-errors (car (process-lines "why3" "--print-datadir")))))
+     (setq why3el
+      (let ((f (expand-file-name "emacs/why3.elc" why3-share)))
+        (if (file-readable-p f) f
+          (let ((f (expand-file-name "emacs/site-lisp/why3.elc" opam-share)))
+            (if (file-readable-p f) f nil)))))
+     (when why3el
+       (require 'why3)
+       (autoload 'why3-mode why3el "Major mode for Why3." t)
+       (setq auto-mode-alist (cons '("\\.mlw$" . why3-mode) auto-mode-alist)))
+
+Vim
+~~~
+
+Some configuration files are present in the share data directory, under sub-directory :file:`vim`.
+
+
+.. _sec.installshellmodes:
+
+Configure Shells for auto-completion of Why3 command arguments
+--------------------------------------------------------------
+
+Some configuration files for shells are distributed in the shared data directory,
+which is given by ``why3 --print-data-dir``.
+
+There are configuration files for ``bash`` and ``zsh``.
+
+The configuration for ``bash`` can be made from Why3 sources using
+
+::
+
+     sudo make install-bash
+
+or directly doing
+
+::
+
+     sudo /usr/bin/install -c `why3 --print-datadir`/bash/why3 /etc/bash_completion.d
+
+
 .. _sec.installinferloop:
 
 Inference of Loop Invariants
@@ -292,7 +385,7 @@ it can be easily compiled and installed using the source code. The
 following commands are just an example of how the library can be
 compiled and installed, and can be performed in any directory.
 
-::
+.. code-block:: shell
 
     svn co svn://scm.gforge.inria.fr/svnroot/bjeannet/pkg/fixpoint
     cd fixpoint/trunk/
@@ -307,14 +400,15 @@ configuration script of Why3 should enable the compilation of the
 ``infer-loop`` utility. This can be done by passing to the Why3
 configure script the ``--enable-infer`` flag, as follows:
 
-::
+.. code-block:: console
 
-    ./configure --enable-infer
-    # ...
-    # Components
-    # ...
-    #    Invariant inference(exp): yes
-    # ...
+   $ ./configure --enable-infer
+   ...
+   Summary
+   -----------------------------------------
+   Components
+       Invariant inference(exp): yes
+   ...
 
 The line ``Invariant inference(exp)`` indicates whether the
 dependencies are correctly installed and whether the flag mentioned

@@ -38,26 +38,31 @@ sphinx-image:
   tags:
     - shell
 
-.docker_template: &docker_definition
+.docker_template:
   image: "$BUILD_IMAGE"
+  dependencies: []
   tags:
     - docker
 
-.build_template: &build_definition
-  stage: build
-  script:
-    - misc/ci-local.sh
-  <<: *docker_definition
-
 build-system:
+  stage: build
   variables:
     COMPILER: system
-  <<: *build_definition
+  script:
+    - misc/ci-local.sh
+  extends: .docker_template
 
 build-latest:
+  stage: build
   variables:
     COMPILER: latest
-  <<: *build_definition
+  script:
+    - misc/ci-local.sh doc
+  artifacts:
+    paths:
+      - doc/generated
+    expire_in: 1 day
+  extends: .docker_template
 
 bench-system:
   variables:
@@ -65,7 +70,7 @@ bench-system:
   stage: test
   script:
     - misc/ci-local.sh bench doc
-  <<: *docker_definition
+  extends: .docker_template
 
 bench-latest:
   variables:
@@ -73,7 +78,7 @@ bench-latest:
   stage: test
   script:
     - misc/ci-local.sh ide bench
-  <<: *docker_definition
+  extends: .docker_template
 
 full:
   stage: test
@@ -81,7 +86,7 @@ full:
     COMPILER: full
   script:
     - misc/ci-local.sh ide doc web_ide bench
-  <<: *docker_definition
+  extends: .docker_template
 
 nightly-bench:
   stage: nightly
@@ -89,7 +94,7 @@ nightly-bench:
     COMPILER: bench
   script:
     - misc/ci-local.sh nightly-bench-reduced
-  <<: *docker_definition
+  extends: .docker_template
 
 ce-bench:
   stage: nightly
@@ -97,7 +102,7 @@ ce-bench:
     COMPILER: bench
   script:
     - misc/ci-local.sh ce-bench
-  <<: *docker_definition
+  extends: .docker_template
 
 opam:
   stage: build
@@ -108,7 +113,7 @@ opam:
     - opam install -v why3
     - opam install -v why3-ide
     - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
-  <<: *docker_definition
+  extends: .docker_template
 
 opam-latest:
   stage: test
@@ -119,7 +124,7 @@ opam-latest:
     - opam install -v why3
     - opam install -v why3-ide
     - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
-  <<: *docker_definition
+  extends: .docker_template
 
 opam-full:
   stage: test
@@ -132,7 +137,7 @@ opam-full:
     - opam install -v why3-ide
     - opam install -v why3-coq
     - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
-  <<: *docker_definition
+  extends: .docker_template
 
 deploy:
   stage: deploy
@@ -157,24 +162,31 @@ deploy:
   tags:
     - shell
 
-.sphinx_template: &sphinx_definition
+doc:
+  stage: test
   image: "$SPHINX_IMAGE"
+  dependencies:
+    - build-latest
+  script:
+    - sphinx-build -W --keep-going -b html doc public
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 day
   tags:
     - docker
 
-doc:
-  stage: build
-  script:
-    - make -f doc.Makefile public/index.html
-  <<: *sphinx_definition
-
 pages:
   stage: deploy
+  dependencies:
+    - doc
   script:
-    - make -f doc.Makefile public/index.html
+    - echo "Already in public/"
   artifacts:
     paths:
-    - public
+      - public
+    expire_in: 1 day
   only:
     - master
-  <<: *sphinx_definition
+  tags:
+    - docker

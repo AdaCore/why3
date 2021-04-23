@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,10 +13,9 @@ open Format
 open Why3
 open Pmodule
 
-let usage_msg = sprintf
-  "Usage: %s [options] <file> <expr>\n\
-   Execute the expression in the given file (and --use the necessary modules).\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg =
+  "<file> <expr>\n\
+   Execute the expression in the given file (and --use the necessary modules)."
 
 let opt_file = ref None
 let opt_exec = ref ""
@@ -36,6 +35,9 @@ let opt_parser = ref None
 
 let opt_enable_rac = ref false
 let opt_rac_prover = ref None
+let opt_rac_try_negate = ref false
+let opt_rac_timelimit = ref None
+let opt_rac_steplimit = ref None
 let opt_rac_fail_cannot_check = ref false
 
 let use_modules = ref []
@@ -54,13 +56,20 @@ let option_list =
     "<prover> use <prover> to check assertions in RAC when term\n\
      reduction is insufficient, with optional, comma-\n\
      separated time and memory limit (e.g. 'cvc4,2,1000')";
+    KLong "rac-try-negate", Hnd0 (fun () -> opt_rac_try_negate := true),
+    " try checking the negated term using the RAC prover when\n\
+     the prover is defined and didn't give a result";
+    KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
+    "<seconds> Time limit in seconds for RAC (with --rac)";
+    KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
+    "<seconds> Step limit for RAC (with --rac)";
     KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_fail_cannot_check := true),
     " Fail when a assertion cannot be checked";
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
     "<qualified_module> use module in the execution";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt usage_msg
 
 let () =
@@ -101,31 +110,37 @@ let do_input f =
   let prog_parsed = Lexer.parse_expr lb in
   let expr = Typing.type_expr_in_muc muc prog_parsed in
 
+  let pmod = Pmodule.close_module muc in
+
   (* execute expression *)
   let open Pinterp in
   Opt.iter init_real !prec;
   try
     let rac =
       let reduce =
-        let trans = "compute_in_goal" and prover = !opt_rac_prover in
-        rac_reduce_config_lit config env ~trans ?prover () in
+        let trans = "compute_in_goal" and prover = !opt_rac_prover and try_negate = !opt_rac_try_negate in
+        rac_reduce_config_lit config env ~trans ?prover ~try_negate () in
       let skip_cannot_compute = not !opt_rac_fail_cannot_check in
-      rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute ~reduce () in
-    let res = eval_global_fundef rac env
-        muc.muc_known muc.muc_theory.Theory.uc_known [] expr in
+      let timelimit = Opt.map float_of_int !opt_rac_timelimit in
+      rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute
+        ?timelimit ?steplimit:!opt_rac_steplimit ~reduce () in
+    let res = eval_global_fundef rac env pmod [] None expr in
     printf "%a@." (report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
-  with | Contr (ctx, term) ->
-          Pretty.forget_all ();
-          printf "%a@." report_cntr_body (ctx, term) ;
-          exit 1
-       | CannotCompute reason ->
-          printf "RAC terminated because %s@." reason.reason
-       | Failure msg ->
-          printf "failure: %s@." msg
-       | RACStuck (_, l) ->
-          printf "RAC, with the counterexample model cannot continue after %a@."
-            (Pp.print_option Pretty.print_loc') l
+  with
+  | Contr (ctx, term) ->
+      Pretty.forget_all ();
+      eprintf "%a@." report_cntr (ctx, term);
+      exit 1
+  | CannotCompute reason ->
+      eprintf "Execution terminated because %s@." reason.reason;
+      exit 2
+  | RACStuck (_, l, reason) ->
+      (* TODO Remove this case when value origins (default vs model) can be distinguished
+         in RAC *)
+      eprintf "RAC got stuck %s after %a@." reason
+        (Pp.print_option_or_default "unknown location" Pretty.print_loc') l;
+      exit 2
 
 let () =
   try

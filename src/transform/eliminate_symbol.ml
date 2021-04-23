@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -14,7 +14,7 @@ open Decl
 open Theory
 
 let meta_elim_ls = register_meta "ls:eliminate" [MTlsymbol]
-    ~desc:"Removes@ any@ expression@ containing@ a@ specific@ lsymbol."
+    ~desc:"Remove@ any@ expression@ containing@ a@ specific@ lsymbol."
 
 let eliminate_symbol _env =
   Trans.on_tagged_ls meta_elim_ls

@@ -29,7 +29,13 @@ let version   = \"@VERSION@\"
 let libdir    = $libdir
 let datadir   = $datadir
 let localdir  = $localdir
-" > $config
+" > $config.new
+
+if cmp -s $config $config.new; then
+    rm $config.new
+else
+    mv $config.new $config
+fi
 
 echo "
 OCAMLBEST   = @OCAMLBEST@

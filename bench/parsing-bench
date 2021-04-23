@@ -28,27 +28,27 @@ if test "$files" = "" ; then
 fi
 
 run () {
-    printf " $1 "
+    printf "  $1... "
     f="$1"
     $dir/../bin/why3.opt prove --parse-only "$1.mlw" 2> "$f.out"
     if cmp "$f.oracle" "$f.out" > /dev/null 2>&1 ; then
-     echo "ok"
-  else
-     if $updateoracle; then
-        echo "Updating oracle for $1"
-        mv "$f.out" "$f.oracle"
-     else
-       echo "FAILED!"
-       echo "diff is the following:"
-       touch "$f.oracle"
-       diff -u "$f.oracle" "$f.out"
-     fi
-  fi
+        echo "ok"
+    else
+        if $updateoracle; then
+            echo "Updating oracle for $1"
+            mv "$f.out" "$f.oracle"
+        else
+            echo "failed!"
+            echo "diff is the following:"
+            touch "$f.oracle"
+            diff -u "$f.oracle" "$f.out"
+            exit 1
+        fi
+    fi
 }
 
 for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
-    printf "Parsing files\n";
     run $filedir/$filebase
 done

@@ -1,0 +1,146 @@
+
+(** This micro challenge was proposed by Mattias Ulbrich (KIT)
+    during his KeY tutorial at VerifyThis 2021. *)
+
+module WrapLines
+
+  use int.Int
+  use array.Array
+
+  type char
+
+  val constant space: char
+  val constant newline: char
+
+  val (=) (x y: char) : bool ensures { result <-> x = y }
+
+  (* Returns the index in s that has value c and
+     is at least from, if it exists, and -1 otherwise. *)
+  let index_of (s: array char) (c: char) (from: int) : int
+    requires { 0 <= from <= length s }
+    ensures  { result = -1 /\
+                (forall i. from <= i < length s -> s[i] <> c)
+            \/ from <= result < length s /\ s[result] = c /\
+                (forall i. from <= i < result -> s[i] <> c) }
+  = let ref k = from in
+    while k < length s do
+      invariant { from <= k <= length s }
+      invariant { forall i. from <= i < k -> s[i] <> c }
+      variant   { length s - k }
+      if s[k] = c then return k;
+      k <- k + 1
+    done;
+    return -1
+
+  (* Every line (but the last) has at least line_length characters: *)
+  predicate at_least_line_length (s: array char) (line_length: int)
+  = forall i j. -1 <= i < j < length s ->
+    (i = -1 \/ i <= 0 /\ s[i] = newline) -> s[j] = newline -> j - i >= line_length
+
+  let wrap_lines (s: array char) (line_length: int) : unit
+    (* initially, no newline at all *)
+    requires { forall i. 0 <= i < length s -> s[i] <> newline }
+    (* the only changes in s are turning ' ' into '\n' *)
+    ensures  { forall i. 0 <= i < length s -> s[i] <> old s[i] ->
+                old s[i] = space /\ s[i] = newline }
+    ensures  { at_least_line_length s line_length }
+  = let ref last_nl = -1 in
+    let ref last_sp = index_of s space 0 in
+    while last_sp <> -1 do
+      invariant { -1 <= last_nl < length s }
+      invariant { last_sp = -1
+              \/ last_nl < last_sp < length s /\ s[last_sp] = space }
+      invariant { forall i. last_nl < i < length s -> s[i] = old s[i] }
+      invariant { forall i. 0 <= i < length s -> s[i] <> old s[i] ->
+                    old s[i] = space /\ s[i] = newline }
+      invariant { forall i. last_nl < i < last_sp -> s[i] <> newline }
+      invariant { at_least_line_length s line_length }
+      variant   { if last_sp = -1 then 0 else length s - last_sp }
+      if last_sp - last_nl > line_length then (
+        s[last_sp] <- newline;
+        last_nl <- last_sp
+      );
+      last_sp <- index_of s space (last_sp + 1)
+    done
+
+  (*
+    Implement a wrap_lines method such that
+    * The original file may already contain '\n'
+    * Every line has at most L characters or does not have a space
+    * If there is an introduced newline character there is no space or
+        newline that could have given a longer line.
+  *)
+
+  let wrap_lines_plus (s: array char) (line_length : int) : unit
+    requires { line_length >= 0 }
+    (* we only convert spaces into newlines *)
+    ensures  { forall i. 0 <= i < length s -> s[i] <> old s[i] ->
+                old s[i] = space /\ s[i] = newline }
+    (* no line segment longer than line_length characters has a space *)
+    ensures  { forall i. 0 <= i < length s - line_length ->
+                (forall j. i <= j <= i + line_length -> s[j] <> newline) ->
+                (forall j. i <= j <= i + line_length -> s[j] <> space) }
+    (* no line is broken by an introduced newline if there is
+       a further breakpoint (newline, space or EOF) within
+       (line_length + 1) characters in the original file *)
+    ensures  { forall i. -1 <= i < length s -> (0 <= i -> s[i] = newline) ->
+                forall j. i < j <= length s -> j <= i + line_length + 1 ->
+                  (j < length s -> old s[j] = space \/ old s[j] = newline) ->
+                    forall k. i < k < j -> s[k] = old s[k] }
+  = let ref last_nl = -1 in (* last seen newline or -1 *)
+    let ref last_sp = -1 in (* last seen space, newline or -1 *)
+    (* scan the file and at each breakpoint, decide whether we
+       should have broken the line at the last space character *)
+    for ind = 0 to length s - 1 do
+      invariant { -1 <= last_nl <= last_sp < ind }
+      invariant { 0 <= last_nl -> s[last_nl] = newline }
+      invariant { last_nl < last_sp -> s[last_sp] = space }
+      invariant { forall i. last_nl < i < ind -> s[i] <> newline }
+      invariant { forall i. last_sp < i < ind -> s[i] <> space }
+      invariant { forall i. 0 <= i < ind -> s[i] <> old s[i] ->
+                    old s[i] = space /\ s[i] = newline }
+      invariant { forall i. ind <= i < length s -> s[i] = old s[i] }
+      invariant { forall i. 0 <= i < last_sp - line_length ->
+                    (forall j. i <= j <= i + line_length -> s[j] <> newline) ->
+                    (forall j. i <= j <= i + line_length -> s[j] <> space) }
+      invariant { forall i. -1 <= i < length s -> (0 <= i -> s[i] = newline) ->
+                  forall j. i < j <= length s -> j <= i + line_length + 1 ->
+                    (j < length s -> old s[j] = space \/ old s[j] = newline) ->
+                      forall k. i < k < j -> s[k] = old s[k] }
+      if s[ind] = newline then begin
+        if last_nl < last_sp && last_nl + line_length + 1 < ind then
+        begin
+          s[last_sp] <- newline;
+        end;
+        last_nl <- ind;
+        last_sp <- ind;
+      end else
+      if s[ind] = space then begin
+        if last_nl < last_sp && last_nl + line_length + 1 < ind then
+        begin
+          s[last_sp] <- newline;
+          last_nl <- last_sp;
+        end;
+        last_sp <- ind;
+      end
+    done;
+    if last_nl < last_sp && last_nl + line_length + 1 < length s then
+      s[last_sp] <- newline
+
+end
+
+module WrapLinesOCaml
+
+  use int.Int
+  use string.Char
+  use string.OCaml
+  use array.Array
+
+  let constant space: char = chr 32
+  let constant newline: char = chr 10
+
+  clone export WrapLines with
+    type char = char, val space = space,
+    val newline = newline, val (=) = eq_char
+
+end

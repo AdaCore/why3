@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -39,7 +39,6 @@ type t =
       mutable search_color : string;
       mutable iconset : string;
       mutable config : Whyconf.config;
-      original_config : Whyconf.config;
       (* mutable altern_provers : prover option Mprover.t; *)
       (* mutable replace_prover : conf_replace_prover; *)
       mutable hidden_provers : string list;
@@ -48,8 +47,8 @@ type t =
       mutable session_nb_processes : int;
     }
 
-val load_config : Whyconf.config -> Whyconf.config -> unit
-(** [load_config config original_config] creates and saves IDE config *)
+val load_config : Whyconf.config -> unit
+(** [load_config config] creates and saves IDE config *)
 
 val init : unit -> unit
 

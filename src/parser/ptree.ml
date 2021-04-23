@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -352,7 +352,7 @@ type decl =
   (** Declaration of global exceptions *)
   | Dmeta of ident * metarg list
   (** Declaration of a [meta] *)
-  | Dcloneexport of qualid * clone_subst list
+  | Dcloneexport of Loc.position * qualid * clone_subst list
   (** [clone export] *)
   | Duseexport of qualid
   (** [use export] *)

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,10 +16,9 @@ open Whyconf
 open Theory
 open Task
 
-let usage_msg = sprintf
-  "Usage: %s [options] [[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
-   Run some transformation or prover on the given goals.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg =
+  "Usage: [[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
+   Run some transformation or prover on the given goals."
 
 let opt_queue = Queue.create ()
 
@@ -30,16 +29,17 @@ let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
 let opt_json : [< `All | `Values ] option ref = ref None
 let opt_check_ce_model = ref false
-let opt_print_original_model = ref false
-let opt_print_derived_model = ref false
 let opt_rac_prover = ref None
+let opt_rac_try_negate = ref false
+let opt_rac_timelimit = ref None
+let opt_rac_steplimit = ref None
 let opt_ce_check_verbosity = ref None
 
-let () = (* Instead of additional command line parameters *)
-  if Opt.get_def "" (Sys.getenv_opt "WHY3PRINTORIGINALMODEL") = "yes" then
-    opt_print_original_model := true;
-  if Opt.get_def "" (Sys.getenv_opt "WHY3PRINTDERIVEDMODEL") = "yes" then
-    opt_print_derived_model := true
+let debug_print_original_model = Debug.register_info_flag "print-original-model"
+    ~desc:"Print original counterexample model when --check-ce"
+
+let debug_print_derived_model = Debug.register_info_flag "print-derived-model"
+    ~desc:"Print derived counterexample model when --check-ce"
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -101,6 +101,7 @@ let opt_parser = ref None
 let opt_prover = ref None
 let opt_output = ref None
 let opt_timelimit = ref None
+let opt_stepslimit = ref None
 let opt_memlimit = ref None
 let opt_command = ref None
 let opt_task = ref None
@@ -120,6 +121,8 @@ let option_list =
     "<format> select input format (default: \"why\")";
     Key ('t', "timelimit"), Hnd1 (AInt, fun i -> opt_timelimit := Some i),
     "<sec> set the prover's time limit (default=10, no limit=0)";
+    Key ('s', "stepslimit"), Hnd1 (AInt, fun i -> opt_stepslimit := Some i),
+    "<steps> set the prover's step limit (default: no limit)";
     Key ('m', "memlimit"), Hnd1 (AInt, fun i -> opt_memlimit := Some i),
     "<MiB> set the prover's memory limit (default: no limit)";
     Key ('a', "apply-transform"), Hnd1 (AString, add_opt_trans),
@@ -146,6 +149,13 @@ let option_list =
     "<prover> use <prover> to check assertions in RAC when term\n\
      reduction is insufficient, with optional, comma-\n\
      separated time and memory limit (e.g. 'cvc4,2,1000')";
+    KLong "rac-try-negate", Hnd0 (fun () -> opt_rac_try_negate := true),
+    " try checking the negated term using the RAC prover when\n\
+     the prover is defined and didn't give a result";
+    KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
+    "<seconds> Time limit in seconds for RAC (with --check-ce)";
+    KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
+    "<seconds> Step limit for RAC (with --check-ce)";
     Key ('v',"verbosity"), Hnd1(AInt, fun i -> opt_ce_check_verbosity := Some i),
     "<lvl> verbosity level for interpretation log of counterexam-\n\
      ple solver model";
@@ -156,7 +166,7 @@ let option_list =
      wards compatiblity with --json)";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let opt_driver = ref (match !opt_driver with
@@ -184,6 +194,10 @@ let () = try
       eprintf "Option '-t'/'--timelimit' requires a prover.@.";
       exit 1
     end;
+    if !opt_stepslimit <> None then begin
+      eprintf "Option '-t'/'--stepslimit' requires a prover.@.";
+      exit 1
+    end;
     if !opt_memlimit <> None then begin
       eprintf "Option '-m'/'--memlimit' requires a prover.@.";
       exit 1
@@ -200,8 +214,8 @@ let () = try
   | Some s ->
     let filter_prover = Whyconf.parse_filter_prover s in
     let prover = Whyconf.filter_one_prover config filter_prover in
-    opt_command :=
-      Some (String.concat " " (prover.command :: prover.extra_options));
+    let with_steps = !opt_stepslimit <> None in
+    opt_command := Some (Whyconf.get_complete_command prover ~with_steps);
     opt_driver := Some (prover.driver, prover.extra_drivers)
   | None ->
       ()
@@ -224,6 +238,8 @@ let timelimit = match !opt_timelimit with
   | None -> 10
   | Some i when i <= 0 -> 0
   | Some i -> i
+
+let stepslimit = Opt.get_def 0 !opt_stepslimit
 
 let memlimit = match !opt_memlimit with
   | None -> 0
@@ -276,8 +292,8 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
         fprintf fmt
           "@[<hov>Goal@ @{<bold>%s@}@ from@ verification@ condition@ @{<bold>%s@}.@]"
           expls goal_name );
-    fprintf fmt "@\n";
-    Call_provers.print_prover_result ~json:false fmt res;
+    fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
+      (Call_provers.print_prover_result ~json:false) res;
     (match ce with
      | Some ce ->
         Counterexample.print_counterexample ?verb_lvl:!opt_ce_check_verbosity
@@ -287,40 +303,54 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
 
 let unproved = ref false
 
+let select_ce env th models =
+  if models <> [] then
+    match Pmodule.restore_module th with
+    | pm ->
+        let reduce_config =
+          Pinterp.rac_reduce_config_lit config env
+            ~trans:"compute_in_goal" ?prover:!opt_rac_prover
+            ~try_negate:!opt_rac_try_negate () in
+        let timelimit = Opt.map float_of_int !opt_rac_timelimit in
+        Counterexample.select_model ~reduce_config ?timelimit
+          ?steplimit:!opt_rac_steplimit ~check:!opt_check_ce_model
+          ?verb_lvl:!opt_ce_check_verbosity env pm models
+    | exception Not_found -> None
+  else None
+
+let print_other_models (m, ce_summary) =
+  let print_model fmt m =
+    let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
+    if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
+    else Model_parser.print_model (* json values *) fmt m ~print_attrs in
+  ( match ce_summary with
+    | Counterexample.(NC _ | SW _ | NCSW _ | BAD) ->
+        if Debug.test_flag debug_print_original_model then
+          printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
+    | _ -> () );
+  ( match ce_summary with
+    | Counterexample.(NC log | SW log | NCSW log) ->
+        if Debug.test_flag debug_print_derived_model then
+          printf "@[<v>Derived model:@\n%a@]@\n@." print_model
+            (Counterexample.model_of_exec_log ~original_model:m log)
+    | _ -> () )
+
 let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
   let open Call_provers in
   let limit =
-    { empty_limit with
-      limit_time = timelimit;
-      limit_mem = memlimit } in
+    { limit_time = timelimit;
+      limit_mem = memlimit;
+      limit_steps = stepslimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
         let call = Driver.prove_task ~command ~limit drv task in
         let res = wait_on_call call in
-        let reduce_config =
-          let trans = "compute_in_goal" and prover = !opt_rac_prover in
-          Pinterp.rac_reduce_config_lit config env ~trans ?prover () in
-        let pm = Pmodule.restore_module th in
-        let ce = Counterexample.select_model ~check:!opt_check_ce_model
-            ?verb_lvl:!opt_ce_check_verbosity ~reduce_config env pm res.pr_models in
+        let ce = select_ce env th res.pr_models in
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
         printf "%a@." (print_result ?json:!opt_json)
           (fname, t.Term.t_loc, goal_name, expls, res, ce);
-        let print_model fmt m =
-          let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
-          if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
-          else Model_parser.print_model (* json values *) fmt m ~print_attrs in
-        let print_other_models (m, ce_summary) =
-          match ce_summary with
-            | Counterexample.(NCCE log | SWCE log | NCCE_SWCE log) ->
-                if !opt_print_original_model then
-                  printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
-                if !opt_print_derived_model then
-                  printf "@[<v>Derived model:@\n%a@]@\n@." print_model
-                    (Counterexample.model_of_exec_log ~original_model:m log)
-            | _ -> () in
         Opt.iter print_other_models ce;
         if res.pr_answer <> Valid then unproved := true
     | None, None ->
@@ -424,7 +454,7 @@ let do_input env drv = function
 let () =
   try
     if Util.terminal_has_color then (
-      set_formatter_tag_functions Util.ansi_color_tags;
+      Format.set_formatter_tag_functions Util.ansi_color_tags;
       set_mark_tags true );
     let load (f,ef) = load_driver_raw (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in

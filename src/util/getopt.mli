@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -55,6 +55,10 @@ type opt = key * handler * doc
 
 exception GetoptFailure of string
 
+val commands: string list ref
+(** [commands] hold the name of the currently running command,
+    [Sys.argv.(0)] by default. *)
+
 val parse_one : opt list -> string array -> int -> int
 (** [parse_one opts args i] parses argument [args.(i)] using the option
     list [opts]. If the argument is not an option (or if it is option
@@ -86,7 +90,7 @@ val format : ?margin:int -> opt list -> string
     at column [margin] (25 by default). If an option does not support
     arguments, its description string should start with a space. *)
 
-val handle_exn : string array -> string -> unit
+val handle_exn : string -> unit
 (** [handle_exn args exn] terminates the program after printing the content
-    of the [GetoptFailure] exception. [args.(0)] is used as the program name
-    for the error message. *)
+    of the [GetoptFailure] exception. The content of [commands] is used as
+    the program name for the error message. *)

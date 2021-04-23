@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -29,13 +29,20 @@ type interface_map = interface Mid.t
 type interface_export_map = interface Mid.t
 type blacklist = string list
 
-(* Makes it possible to estabilish traceability from names
-in the output of the printer to elements of AST in its input. *)
+type field_info = {
+  field_name: string; (** Printed field name *)
+  field_trace: string; (** Model trace of the field, or [""] *)
+  field_ident: ident option; (** Identifier of the field *)
+}
+
+(* The printer mapping collects information during printing that is necessary to
+   trace names in the output of the printer to elements of AST in its input. *)
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
-  vc_term_attrs : Sattr.t;
   (* The position of the term that triggers the VC *)
+  vc_term_attrs : Sattr.t;
+  (* The attributes of the term that triggers the VC *)
   queried_terms : Term.term Mstr.t;
   (* The list of terms that were queried for the counter-example
      by the printer *)
@@ -46,17 +53,19 @@ type printer_mapping = {
   (* These corresponds to meta_record_def (tagged on field function definition).
      The difference with projections is that you are not allowed to reconstruct
      two projections into a record (at counterexample parsing level). *)
-  list_records: ((string * string) list) Mstr.t;
+  list_records : field_info list Mstr.t;
+  (* Descriptions of the fields of all records. *)
+  noarg_constructors: string list;
   (* List of constructors with no arguments that can be confused for variables
      during parsing. *)
-  noarg_constructors: string list;
+  set_str: Sattr.t Mstr.t
   (* List of attributes corresponding to a printed constants (that was on the
      immediate term, not inside the ident) *)
-  set_str: Sattr.t Mstr.t
 }
 
+
 (** Return the union of projections and fields of a printer_mapping *)
-val list_projs : printer_mapping -> ident Mstr.t
+val fields_projs : printer_mapping -> ident Mstr.t
 
 type printer_args = {
   env        : Env.env;

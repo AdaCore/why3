@@ -12,17 +12,15 @@ let f () =
       x2 <- x2 + 1
   done
 
-(*
-make -j 4; why3 prove my_examples/ce-rac/for.mlw -P cvc4-ce
-make -j 4; why3 execute my_examples/ce-rac/for.mlw --use=Top --rac "f ()"
-*)
 
 (*
-counterexamle: x1 = -1 at the beggining of the loop
-It is a true counterexample because the underspecification (weak loop invariant);
-If the program is interpreted (w. rac) from the initial state, it does not fail,
-because it doesn't reach an iteration where x1 = -2.
-If the particular iteration given by the counterexample is interpreted, then the
-invariant will fail, and we can conclude that the program is underspecified.
-*)
+counterexamle: `x1 = -1`, `i = 0` at the beggining of the loop.
 
+The execution of `f` with the counterexample:
+- terminates normally if executed concretly;
+- terminates in error if executed abstractly (invariant preservation
+  fails)
+
+It is a real counterexample due to underspecification (weak loop
+invariant).
+*)

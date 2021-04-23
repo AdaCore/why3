@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -122,6 +122,13 @@ module_decl:
     }
 | use_clone { () }
 
+module_decl_parsing_only:
+| scope_head_parsing_only module_decl_parsing_only* END
+    { let loc,import,qid = $1 in (Dscope(loc,import,qid,$2))}
+| IMPORT uqualid { (Dimport $2) }
+| d = pure_decl | d = prog_decl | d = meta_decl { d }
+| use_clone_parsing_only { $1 }
+
 (* Do not open inside another module *)
 
 mlw_module_no_decl:
@@ -163,7 +170,7 @@ use_clone:
     }
 | CLONE EXPORT tqualid clone_subst
     { let loc = floc $startpos $endpos in
-      let decl = Ptree.Dcloneexport($3,$4) in
+      let decl = Ptree.Dcloneexport(loc,$3,$4) in
       Typing.add_decl loc decl
     }
 | USE boption(IMPORT) m_as_list = comma_list1(use_as)

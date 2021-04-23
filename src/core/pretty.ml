@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -19,12 +19,7 @@ open Decl
 open Theory
 open Task
 
-let why3_keywords =
-  ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
-   "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
-   "scope"; "import"; "export"; "end";
-   "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
-   "let"; "in"; "match"; "with"; "as"; "epsilon" ]
+let why3_keywords = Keywords.keywords
 
 let coercion_attr = create_attribute "coercion"
 
@@ -164,7 +159,10 @@ let forget_all () =
   if do_forget_all then forget_all tprinter;
   if do_forget_all then forget_all pprinter
 
-let print_attr fmt a = fprintf fmt "[@%s]" a.attr_string
+let print_attr fmt a =
+  (* `%@` prints a single `@` *)
+  fprintf fmt "[%@%s]" a.attr_string
+
 let print_attrs = print_iter1 Sattr.iter space print_attr
 
 let print_loc fmt l =

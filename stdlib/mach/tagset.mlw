@@ -1,7 +1,14 @@
 (** {1 Tag Sets}
 
-  experimental
+Tag sets are finite sets with a tag function that maps each element to
+a unique integer. They also feature the ability to iterate over the elements.
+*)
 
+
+(** {2 Interface for the keys}
+
+The equality of the `tag` values must imply the equality of the
+corresponding elements.
 *)
 
 module S
@@ -19,6 +26,8 @@ module S
   axiom tag_correct: forall x y. tag x = tag y -> x = y
 
 end
+
+(** {2 Interface of a TagSet} *)
 
 module TagSetIntf
 
@@ -108,6 +117,8 @@ module TagSetIntf
   end
 
 end
+
+(** {2 Implementation of a TagSet} *)
 
 module TagSet
 
@@ -296,7 +307,7 @@ module TagSet
            k
   end
 
-(*
+(***
   clone TagSetIntf with
         type S.key = key,
         val S.tag = tag,
@@ -315,29 +326,31 @@ module TagSet
 
 end
 
-(* module T *)
+(***
+module T
 
-(*        use mach.int.Int63 *)
+       use mach.int.Int63
 
-(*        type t = *)
-(*        | A *)
-(*        | B *)
+       type t =
+       | A
+       | B
 
-(*        let function tag (x:t) : int63 = match x with A -> 0 | B -> 1 end *)
-(*        clone TagSet with type S.key = t, val S.tag = tag *)
+       let function tag (x:t) : int63 = match x with A -> 0 | B -> 1 end
+       clone TagSet with type S.key = t, val S.tag = tag
 
-(*        let test () = *)
-(*            let s = create 10 A in *)
-(*            add s A; *)
-(*            let iter1 = Iterator.create s in *)
-(*            assert { not (Iterator.is_empty iter1) }; *)
-(*            let b = Iterator.is_empty iter1 in *)
-(*            assert { not b }; *)
-(*            let x = Iterator.next iter1 in *)
-(*            assert { x = A }; *)
-(*            add s B; *)
-(*            let x = Iterator.next iter1 in *)
-(*            assert { x = A } *)
+       let test () =
+           let s = create 10 A in
+           add s A;
+           let iter1 = Iterator.create s in
+           assert { not (Iterator.is_empty iter1) };
+           let b = Iterator.is_empty iter1 in
+           assert { not b };
+           let x = Iterator.next iter1 in
+           assert { x = A };
+           add s B;
+           let x = Iterator.next iter1 in
+           assert { x = A }
 
 
-(* end *)
+end
+*)

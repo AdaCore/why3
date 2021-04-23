@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -293,13 +293,15 @@ let rec generalize hd =
               t_attr_add  (Sattr.min_elt expl) f in
       [], Task.add_decl task (create_prop_decl Pgoal pr f)
   | Theory.Decl ({d_node =
-      ( Dparam ({ls_args = []; ls_value = Some _} as ls)
-      | Dlogic [{ls_args = []; ls_value = Some _} as ls, _])} as d)
-    when Sattr.mem Inlining.intro_attr ls.ls_name.id_attrs ->
+      ( Dparam ({ls_args = []; ls_value = Some ty} as ls)
+      | Dlogic [{ls_args = []; ls_value = Some ty} as ls, _])} as d)
+    when Sattr.mem Inlining.intro_attr ls.ls_name.id_attrs &&
+         Stv.is_empty (Ty.ty_freevars Stv.empty ty) ->
       let pl, task = apply_prev generalize hd in
       d::pl, Task.add_meta task meta_intro_ls [Theory.MAls ls]
-  | Theory.Decl ({d_node = Dprop (Paxiom, pr, _)} as d)
-    when Sattr.mem Inlining.intro_attr pr.pr_name.id_attrs ->
+  | Theory.Decl ({d_node = Dprop (Paxiom, pr, ax)} as d)
+    when Sattr.mem Inlining.intro_attr pr.pr_name.id_attrs &&
+         Stv.is_empty (Term.t_ty_freevars Stv.empty ax) ->
       let pl, task = apply_prev generalize hd in
       d::pl, Task.add_meta task meta_intro_pr [Theory.MApr pr]
   (* We only reattach the local premises right before the goal.
@@ -323,7 +325,8 @@ let () = Trans.register_transform "generalize_introduced" generalize_intro
     Contributed by Nicolas Jeannerod [niols@niols.fr] *)
 let rec eliminate_exists_aux pr t =
   match t.t_node with
-  | Tquant (Texists, q) ->
+  | Tquant (Texists, q)
+    when Stv.is_empty (t_ty_freevars Stv.empty t) ->
      let vsl, _, t' = t_open_quant q in
      let intro_var subst vs =
        let id = id_clone ~attrs:intro_attrs vs.vs_name in
@@ -359,6 +362,9 @@ let simplify_intros =
 
 let split_vc =
   Trans.compose_l
+(*** do test:
+    (Trans.compose Simplify_formula.simplify_trivial_wp_quantification
+ *)
     (Trans.compose generalize_intro Split_goal.split_goal_right)
     (Trans.singleton simplify_intros)
 

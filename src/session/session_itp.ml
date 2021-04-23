@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -544,7 +544,7 @@ open Format
 open Ident
 
 let print_proof_attempt fmt pa =
-  fprintf fmt "%a tl=%d %a"
+  fprintf fmt "@[<h>%a tl=%d %a@]"
           Whyconf.print_prover pa.prover
           pa.limit.Call_provers.limit_time
           (Pp.print_option (Call_provers.print_prover_result ~json:false))
@@ -1400,33 +1400,26 @@ let read_xml_and_shapes gs xml_fn compressed_fn =
     raise (ShapesFileError ("cannot open shapes file for reading: " ^ msg))
 end
 
-module ReadShapesNoCompress = ReadShapes(Compress.Compress_none)
-module ReadShapesCompress = ReadShapes(Compress.Compress_z)
-
 let read_file_session_and_shapes gs dir xml_filename =
   let compressed_shape_filename =
-      Filename.concat dir compressed_shape_filename
-    in
-    if Sys.file_exists compressed_shape_filename then
-      if Compress.compression_supported then
-        ReadShapesCompress.read_xml_and_shapes gs
-          xml_filename compressed_shape_filename
-      else
-        begin
-          Warning.emit "[Warning] could not read goal shapes because \
-                        Why3 was not compiled with compress support@.";
-          Xml.from_file xml_filename, None
-        end
+    Filename.concat dir compressed_shape_filename in
+  if Sys.file_exists compressed_shape_filename then
+    if Compress.compression_supported then
+      let module RS = ReadShapes(Compress.Compress_z) in
+      RS.read_xml_and_shapes gs xml_filename compressed_shape_filename
     else
-      let shape_filename = Filename.concat dir shape_filename in
-      if Sys.file_exists shape_filename then
-        ReadShapesNoCompress.read_xml_and_shapes gs
-          xml_filename shape_filename
-      else
-        begin
-          Warning.emit "[Warning] could not find goal shapes file@.";
-          Xml.from_file xml_filename, None
-        end
+      let () =
+        Warning.emit "[Warning] could not read goal shapes because \
+                      Why3 was not compiled with compress support@." in
+      Xml.from_file xml_filename, None
+  else
+    let shape_filename = Filename.concat dir shape_filename in
+    if Sys.file_exists shape_filename then
+      let module RS = ReadShapes(Compress.Compress_none) in
+      RS.read_xml_and_shapes gs xml_filename shape_filename
+    else
+      let () = Warning.emit "[Warning] could not find goal shapes file@." in
+      Xml.from_file xml_filename, None
 
 let build_session ?sum_shape_version (s : session) xml : unit =
   match xml.Xml.name with
@@ -1615,7 +1608,7 @@ let add_registered_transformation s env old_tr goal_id =
     (* check if transformation already present with the same parameters.
        this should always fail and raise Not_found *)
     let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name &&
-                        List.fold_left2 (fun b new_arg old_arg -> new_arg = old_arg && b) true
+                        Lists.equal (=)
                                         (get_transfNode s transID).transf_args
                                         old_tr.transf_args)
         goal.proofn_transformations in

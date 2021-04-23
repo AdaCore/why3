@@ -93,6 +93,8 @@ keyword as shown in :numref:`fig.gui.infer`.
 .. figure:: images/gui-infer.png
    :alt: The GUI with inferred invariants (after split).
 
+   The GUI with inferred invariants (after split).
+
 Alternatively, attributes can be used in ``let`` declarations so that
 invariants are inferred for all the loops in that declaration. In this
 case, it is possible to select the desired domain and widening

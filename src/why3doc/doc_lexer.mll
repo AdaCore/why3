@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,36 +26,14 @@
     List.iter (fun s -> Hashtbl.add ht s ()) l;
     Hashtbl.mem ht
 
-  (* keep synchronized with src/parser/lexer.mll *)
-  let is_keyword1 = make_table [
-    "abstract"; "any"; "as"; "at"; "axiom";
-    "begin"; "break"; "by";
-    "clone"; "coinductive"; "constant"; "continue";
-    "do"; "done"; "downto";
-    "else"; "end"; "epsilon"; "exception"; "exists"; "export";
-    "false"; "float"; "for"; "forall"; "fun"; "function";
-    "ghost"; "goal"; "if"; "import"; "in"; "inductive";
-    "label"; "lemma"; "let";
-    "match"; "meta"; "module"; "mutable"; "not";
-    "old"; "partial"; "predicate"; "private"; "pure";
-    "raise"; "range"; "rec"; "ref"; "return";
-    "scope"; "so";
-    "then"; "theory"; "to"; "true"; "try"; "type";
-    "use"; "val"; "while"; "with";
-  ]
-
-  let is_keyword2 = make_table [ "absurd"; "alias"; "assert"; "assume";
-    "check"; "diverges"; "ensures"; "invariant";
-    "raises"; "reads"; "requires"; "returns"; "variant"; "writes"; ]
+  let is_keyword = make_table Keywords.keywords
 
   let get_loc lb =
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
 
   let print_ident ?(parentheses=false) fmt lexbuf s =
-    if is_keyword1 s then
-      fprintf fmt "<span class=\"keyword1\">%s</span>" s
-    else if is_keyword2 s then
-      fprintf fmt "<span class=\"keyword2\">%s</span>" s
+    if is_keyword s then
+      fprintf fmt "<span class=\"keyword\">%s</span>" s
     else begin
       let loc =
         let loc = get_loc lexbuf in

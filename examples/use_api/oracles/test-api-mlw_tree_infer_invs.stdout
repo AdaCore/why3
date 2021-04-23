@@ -1,6 +1,6 @@
 module M1
-  use  int.Int
-  use  ref.Refint
+  use int.Int
+  use ref.Refint
   
   let f [@infer] (x : ref int)
     requires { Int.( <= ) (Refint.( ! ) x) 100 }

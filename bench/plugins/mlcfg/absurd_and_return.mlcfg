@@ -1,0 +1,19 @@
+(*
+	Regression test which verifies that return and absurd are usuable
+	in CFG modules in normal declarations.
+*)
+
+module AbsurdAndReturnInMlCfg
+
+	let uses_return () = return ()
+
+	let not_true () = absurd
+
+	let cfg uses_absurd (b : bool) : () =
+	{
+		switch (b)
+		| True -> absurd
+		| False -> return ()
+		end
+	}
+end

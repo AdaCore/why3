@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -127,7 +127,8 @@ val restore_module : theory -> pmodule
 
 val use_export : pmodule_uc -> pmodule -> pmodule_uc
 
-val clone_export : pmodule_uc -> pmodule -> mod_inst -> pmodule_uc
+val clone_export :
+  ?loc:Loc.position -> pmodule_uc -> pmodule -> mod_inst -> pmodule_uc
 
 (** {2 Logic decls} *)
 

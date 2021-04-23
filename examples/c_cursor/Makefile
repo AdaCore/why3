@@ -10,21 +10,15 @@ else
   endif
 endif
 
+.PHONY: clean extract
+
 clean:
 	rm -rf build
 
-dir:
+extract:
 	mkdir -p build
-
-why3:
-	make -C ../..
-
-extract: why3 dir
 	$(WHY3) extract -D cursor.drv -D c -L . --recursive --modular \
 		--interface --debug=c_no_error_msgs -o build/ ccursor.PtrCursor
 
-cfiles: extract
+build/tests: build/ptrcursor.c
 	gcc -Wall -g -pedantic -Wno-unused-function -std=c11 build/ptrcursor.c -Ibuild -o build/tests
-
-tests: cfiles
-	./build/tests

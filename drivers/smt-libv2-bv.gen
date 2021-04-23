@@ -87,6 +87,12 @@ theory bv.BV_Gen
   syntax function urem "(bvurem %1 %2)"
   remove prop to_uint_urem
 
+  syntax function sdiv "(bvsdiv %1 %2)"
+  (*remove prop to_int_sdiv*)
+
+  syntax function srem "(bvsrem %1 %2)"
+  (*remove prop to_int_srem*)
+
   (** Bitvector alternatives for shifts, rotations and nth *)
 
   syntax function lsr_bv "(bvlshr %1 %2)"

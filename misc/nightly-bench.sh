@@ -75,7 +75,7 @@ else
 fi
 
 # detection of provers
-bin/why3 config --detect &> $OUT
+bin/why3 config detect &> $OUT
 if test "$?" != "0" ; then
     echo "Prover detection failed" >> $REPORT
     cat $OUT >> $REPORT
@@ -90,7 +90,7 @@ perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 
 # add uninstalled prover substitution policies
 
-COQVER=$(bin/why3 --list-provers | sed -n -e 's/  Coq (\?\([0-9.]\+\).*/\1/p')
+COQVER=$(bin/why3 config list-provers | sed -n -e 's/  Coq (\?\([0-9.]\+\).*/\1/p')
 echo "Coq version detected: $COQVER" >> $REPORT
 if test "$COQVER" != "" ; then
   sed misc/bench-coq-why3-conf -e "s/@COQVER@/$COQVER/g" >> why3.conf

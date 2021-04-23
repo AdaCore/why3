@@ -1,0 +1,25 @@
+
+module M
+
+use int.Int
+
+let rec cfg f (x : int) : unit
+  requires { x >= 0 }
+  variant { 2 * x + 1 }
+=
+  {
+  return g x
+  }
+
+
+with g (y:int) : unit
+  requires { y >= 0 }
+  variant { 2 * y }
+=
+  {
+  switch (y=0)
+  | True -> return ()
+  | False -> return f (y-1)
+  end
+  }
+end

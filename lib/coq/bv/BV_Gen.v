@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1610,6 +1610,29 @@ Lemma to_uint_urem :
   apply Mod_bound; trivial.
   rewrite Z.abs_eq; apply to_uint_bounds.
 Qed.
+
+(* abstract sdiv and srem while we have no realization yet *)
+Definition sdiv_abstract : t -> t -> t.
+  admit.
+Admitted.
+
+Definition srem_abstract : t -> t -> t.
+  admit.
+Admitted.
+
+
+
+(* Why3 goal *)
+Definition sdiv : t -> t -> t.
+Proof.
+  exact sdiv_abstract.
+Defined.
+
+(* Why3 goal *)
+Definition srem : t -> t -> t.
+Proof.
+  exact srem_abstract.
+Defined.
 
 (* Why3 goal *)
 Definition lsr_bv : t -> t -> t.

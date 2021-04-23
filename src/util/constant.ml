@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -31,8 +31,8 @@ let compare_const ?(structural=true) c1 c2 =
   | _, _ ->
       Pervasives.compare c1 c2
 
-let int_const n =
-  ConstInt { il_kind = ILitUnk; il_int = n }
+let int_const ?(il_kind=ILitUnk) n =
+  ConstInt { il_kind; il_int = n }
 
 let int_const_of_int n =
   int_const (BigInt.of_int n)

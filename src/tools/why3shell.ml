@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -143,7 +143,7 @@ let print_proof_attempt fmt pa_id =
   match pa.node_proof with
   | None -> fprintf fmt "%s" pa.node_name
   | Some _pr ->
-    fprintf fmt "%s %a"
+    fprintf fmt "@[<h>%s %a@]"
       pa.node_name
       (Pp.print_option (Call_provers.print_prover_result ~json:false))
       (get_result pa.node_proof)
@@ -387,18 +387,17 @@ let spec =
    " remove all printing to stdout"]
 
 (* --help *)
-let usage_str = Format.sprintf
-  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]\n\
-   Launch a command-line interface for Why3.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_str =
+  "[<file.xml>|<f1.why> <f2.mlw> ...]\n\
+   Launch a command-line interface for Why3."
 
 (* Parse files *)
-let config, base_config, env =
-  let config, base_config, env =
+let config, env =
+  let config, env =
     Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
   if Queue.is_empty files then
     Whyconf.Args.exit_with_usage spec usage_str;
-  (config, base_config, env)
+  (config, env)
 
 let () =
   let fmt = if !quiet then str_formatter else std_formatter in

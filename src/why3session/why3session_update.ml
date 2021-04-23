@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -36,7 +36,7 @@ let do_action ~env ~session action =
      Sys.rename src dst
 
 let run_update () =
-  let _,_,env = Whyconf.Args.complete_initialization () in
+  let _,env = Whyconf.Args.complete_initialization () in
   iter_files
     (fun fname ->
      let session = read_session fname in

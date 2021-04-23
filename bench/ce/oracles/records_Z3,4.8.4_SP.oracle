@@ -1,37 +1,46 @@
 Strongest Postcondition
 File "bench/ce/records.mlw", line 15, characters 14-24:
 Goal Postcondition from verification condition record_match_eval_test1'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
+  Line 14:
+    x [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "2"}},
+           {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 15:
     result [@introduced] = {"type": "Integer", "val": "2"}
 
 File "bench/ce/records.mlw", line 15, characters 14-24:
 Goal Postcondition from verification condition record_match_eval_test1'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/records.mlw", line 23, characters 14-24:
 Goal Postcondition from verification condition record_match_eval_test2'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
   Line 22:
     x [@introduced] =
-      {"proj_name": ".my_field_f",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "2"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "2"}}]}}
   Line 23:
     x [@introduced] [@model_trace:x] =
-      {"proj_name": ".my_field_f",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "2"}}
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "2"}}]}}
 
 File "bench/ce/records.mlw", line 28, characters 14-18:
 Goal Postcondition from verification condition record_match_eval_test3'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -42,9 +51,10 @@ File ref.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -52,9 +62,10 @@ File ref.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 File records.mlw:
   Line 27:
     x [@field:0:contents] [@introduced] =
@@ -63,9 +74,10 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 28:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
@@ -73,9 +85,10 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 30:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -83,13 +96,14 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 
 File "bench/ce/records.mlw", line 33, characters 14-22:
 Goal Postcondition from verification condition record_match_eval_test4'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -100,9 +114,10 @@ File ref.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -110,9 +125,10 @@ File ref.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 File records.mlw:
   Line 32:
     x [@field:0:contents] [@introduced] =
@@ -121,9 +137,10 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 33:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
@@ -131,9 +148,10 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 35:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -141,13 +159,14 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 
 File "bench/ce/records.mlw", line 42, characters 13-22:
 Goal Assertion from verification condition record_match_eval_test44'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -220,12 +239,12 @@ File records.mlw:
 
 File "bench/ce/records.mlw", line 39, characters 14-22:
 Goal Postcondition from verification condition record_match_eval_test44'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/records.mlw", line 48, characters 14-26:
 Goal Postcondition from verification condition
 test_record_match_eval_test5'vc.
-Prover result is: timeout or unknown.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -236,9 +255,10 @@ File ref.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -246,9 +266,10 @@ File ref.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 File records.mlw:
   Line 45:
     re [@field:0:contents] [@introduced] =
@@ -257,9 +278,10 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 47:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -267,9 +289,10 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 48:
     re [@field:0:contents] [@introduced] [@model_trace:re] =
       {"type": "Record",
@@ -277,18 +300,20 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 50:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -296,13 +321,14 @@ File records.mlw:
         {"Field":
           [{"field": "contents",
             "value":
-             {"proj_name": "g",
-              "type": "Proj",
-              "value": {"type": "Boolean", "val": false}}}]}}
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 
 File "bench/ce/records.mlw", line 65, characters 14-24:
 Goal Postcondition from verification condition record_match_eval_test1'vc.
-Prover result is: unknown (sat).
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
@@ -318,11 +344,11 @@ File records.mlw:
 
 File "bench/ce/records.mlw", line 65, characters 14-24:
 Goal Postcondition from verification condition record_match_eval_test1'vc.
-Prover result is: valid.
+Prover result is: Valid.
 
 File "bench/ce/records.mlw", line 73, characters 14-24:
 Goal Postcondition from verification condition record_match_eval_test2'vc.
-Prover result is: unknown (sat).
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
@@ -343,7 +369,7 @@ File records.mlw:
 
 File "bench/ce/records.mlw", line 78, characters 14-17:
 Goal Postcondition from verification condition record_match_eval_test3'vc.
-Prover result is: unknown (sat).
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
@@ -371,7 +397,7 @@ File records.mlw:
 
 File "bench/ce/records.mlw", line 83, characters 14-22:
 Goal Postcondition from verification condition record_match_eval_test4'vc.
-Prover result is: unknown (sat).
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:

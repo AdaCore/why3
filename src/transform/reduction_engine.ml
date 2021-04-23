@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -110,11 +110,13 @@ let simpl_mul _ls t1 t2 _ty =
   raise Undetermined
 
 let simpl_div _ls t1 t2 _ty =
+  if is_zero t2 then raise Undetermined;
   if is_zero t1 then t1 else
   if is_one t2 then t1 else
   raise Undetermined
 
 let simpl_mod _ls t1 t2 _ty =
+  if is_zero t2 then raise Undetermined;
   if is_zero t1 then t1 else
   if is_one t2 then Int (BigInt.zero) else
   raise Undetermined

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1601,7 +1601,8 @@ let xprinter = create_ident_printer []
 let forget_reg r = forget_id rprinter r.reg_name
 
 let print_reg_name fmt r =
-  fprintf fmt "@@%s" (id_unique rprinter r.reg_name)
+  (* `%@` prints a single `@` *)
+  fprintf fmt "%@%s" (id_unique rprinter r.reg_name)
 
 let print_args pr fmt tl = if tl <> [] then
   fprintf fmt "@ %a" (Pp.print_list Pp.space pr) tl

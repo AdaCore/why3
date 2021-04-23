@@ -1,0 +1,6 @@
+
+use ieee_float.Float64
+
+let rec f (): Float64.t
+  ensures { Float64.eq result (-1.0 : Float64.t) }
+  = Float64.neg (1.0:Float64.t)

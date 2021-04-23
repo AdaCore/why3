@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -346,6 +346,8 @@ let sanitizer head rest n = sanitizer' head rest rest n
 let proxy_attr = create_attribute "mlw:proxy_symbol"
 
 let useraxiom_attr = create_attribute "useraxiom"
+
+let funlit = create_attribute "funlit"
 
 let model_projected_attr = create_attribute "model_projected"
 let model_vc_post_attr = create_attribute "model_vc_post"

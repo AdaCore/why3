@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -3726,7 +3726,8 @@ Proof.
   assert (- pow2sb <= pow2sb <= pow2sb)%Z.
   split; auto with zarith.
   assert (0 < pow2sb)%Z.
-  apply (Z.pow_pos_nonneg 2 sb); auto with zarith.
+  apply (Z.pow_pos_nonneg 2 sb).
+  easy.
   apply Z.lt_le_incl, Hsb'.
   auto with zarith.
 

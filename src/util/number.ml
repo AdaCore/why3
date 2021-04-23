@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -174,16 +174,25 @@ let char_of_int i =
     Char.chr (i + Char.code 'A' - 10)
 
 let print_in_base radix digits fmt i =
-  let radix = BigInt.of_int radix in
   assert (BigInt.ge i BigInt.zero);
-  let rec aux digits i =
-    if BigInt.eq i BigInt.zero then
-      for _i = 1 to digits do Format.pp_print_char fmt '0' done
-    else
-      let d,m = BigInt.euclidean_div_mod i radix in
-      aux (digits - 1) d;
-      Format.pp_print_char fmt (char_of_int (BigInt.to_int m)) in
-  aux (Opt.get_def 1 digits) i
+  let digits = Opt.get_def 1 digits in
+  let is_small_int = BigInt.is_int i in
+  if is_small_int && radix = 8 then
+    Format.fprintf fmt "%0*o" digits (BigInt.to_int i)
+  else if is_small_int && radix = 10 then
+    Format.fprintf fmt "%0*i" digits (BigInt.to_int i)
+  else if is_small_int && radix = 16 then
+    Format.fprintf fmt "%0*X" digits (BigInt.to_int i)
+  else
+    let radix = BigInt.of_int radix in
+    let rec aux digits i =
+      if BigInt.eq i BigInt.zero then
+        for _i = 1 to digits do Format.pp_print_char fmt '0' done
+      else
+        let d,m = BigInt.euclidean_div_mod i radix in
+        aux (digits - 1) d;
+        Format.pp_print_char fmt (char_of_int (BigInt.to_int m)) in
+    aux digits i
 
 let to_small_integer i =
   BigInt.to_int i.il_int
@@ -454,13 +463,16 @@ let compute_float c fp =
 
   (* get [s] and [e] such that "c = s * 2 ^ e" *)
   let s, e = float_parser c in
-  let s, e = ref s, ref e in
 
   (* if s = 0 stop now *)
-  if eq !s zero then
-    zero, zero
+  if eq s zero then
+    false, zero, zero (* FIXME: could return -0.0 sometimes ? *)
 
-  else begin
+  else
+    begin
+    let sign = lt s zero in
+    let s, e = ref (abs s), ref e in
+
 
     (* if s is too big or e is too small, try to remove trailing zeros
        in s and incr e *)
@@ -491,7 +503,7 @@ let compute_float c fp =
         (to_string !s) (to_string (sub emax one)) (print_in_base 2 (Some (to_int eb))) zero
       (print_in_base 2 (Some (to_int (sub sb one)))) !s;
 
-      zero, !s
+      sign, zero, !s
 
     end else begin
       (* normal case *)
@@ -517,7 +529,7 @@ let compute_float c fp =
       assert (le zero fs && lt fs (pow_int_pos_bigint 2 (sub sb one))
               && le zero fe && lt fe (sub (pow_int_pos_bigint 2 eb) one));
 
-      fe, fs
+      sign, fe, fs
     end
   end
 
@@ -571,4 +583,3 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Integer literal %a is out of range"
               (print_int_constant full_support) c
   | _ -> raise exn)
-

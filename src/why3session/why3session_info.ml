@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -422,7 +422,7 @@ let print_hist stats =
 (****** run on all files  ******)
 
 let run () =
-  let _,_,_ = Whyconf.Args.complete_initialization () in
+  let _,_ = Whyconf.Args.complete_initialization () in
   let stats = new_proof_stats () in
   let r0 = ref [] and r1 = ref [] in
   iter_files (run_one stats r0 r1);

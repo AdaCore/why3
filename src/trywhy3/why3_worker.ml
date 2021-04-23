@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -10,7 +10,7 @@
 (********************************************************************)
 
 
-(* Interface to Why3 and Alt-Ergo *)
+(* Interface to Why3 *)
 
 let why3_conf_file = "/trywhy3.conf"
 
@@ -75,8 +75,10 @@ module Why3Task = Task (* prevent shadowing *)
 
 module Task =
   struct
-    type task_info =
-      { task : [ `Theory of Theory.theory | `Task of Task.task ];
+    type task_kind = Theory of Theory.theory | Task of Task.task
+
+    type task_info = {
+        task : task_kind;
 	parent_id : id;
 	mutable status : status;
 	mutable subtasks : id list;
@@ -152,7 +154,7 @@ module Task =
 
     let gen_id =
       let c = ref 0 in
-      fun () -> incr c; "id" ^ (string_of_int !c)
+      fun () -> incr c; !c
 
     let task_text t =
       Pp.string_of Pretty.print_task t
@@ -168,9 +170,9 @@ module Task =
           end
       in
       let task_info =
-        { task = `Task(task);
+        { task = Task task;
 	  parent_id = parent_id;
-	  status = `New;
+	  status = StNew;
 	  subtasks = [];
 	  loc = id_loc @  (collect_locs task);
 	  expl = expl;
@@ -186,18 +188,20 @@ module Task =
       let task_ids = List.fold_left (fun acc t ->
 				     let tid = register_task th_id t in
 				     tid:: acc) [] tasks in
-      Hashtbl.add task_table th_id  { task = `Theory(th);
-				      parent_id = "theory-list";
-				      status = `New;
-				      subtasks = List.rev task_ids;
-				      loc = [];
-				      expl = th_name;
-                                      pretty = "";
-                                    };
+      Hashtbl.add task_table th_id  {
+          task = Theory th;
+          parent_id = 0;
+          status = StNew;
+          subtasks = List.rev task_ids;
+          loc = [];
+          expl = th_name;
+          pretty = "";
+        };
       th_id
 
-    let get_task = function `Task t -> t
-                          | `Theory _ -> log ("called get_task on a theory !"); assert false
+    let get_task = function
+      | Task t -> t
+      | Theory _ -> log ("called get_task on a theory !"); assert false
 
     let set_status id st =
       let rec loop id st acc =
@@ -213,12 +217,13 @@ module Task =
 	          List.fold_left
 	            (fun (an, au) id ->
 	             let info = Hashtbl.find task_table id in
-	             (an || info.status = `New), (au || info.status = `Unknown))
+	             (an || info.status = StNew), (au || info.status = StUnknown))
 	            (false, false) par_info.subtasks
 	        in
-	        let par_status = if has_new then `New else if
-			           has_unknown then `Unknown
-			         else `Valid
+	        let par_status =
+                  if has_new then StNew
+                  else if has_unknown then StUnknown
+                  else StValid
 	        in
 	        if par_info.status <> par_status then
 	          loop info.parent_id par_status acc
@@ -248,12 +253,13 @@ let rec why3_prove ?(steps= ~-1) id =
   let open Task in
   let t = get_info id in
   match t.subtasks with
-    [] ->  t.status <- `Unknown;
-	  let task = get_task t.task in
-	  let msg = Task (id, t.parent_id, t.expl, task_to_string task, t.loc, t.pretty, steps) in
-	  W.send msg;
-	  let l = set_status id `New in
-          List.iter W.send l
+  | [] ->
+      t.status <- StUnknown;
+      let task = get_task t.task in
+      let msg = Worker_proto.Task (id, t.parent_id, t.expl, task_to_string task, t.loc, t.pretty, steps) in
+      W.send msg;
+      let l = set_status id StNew in
+      List.iter W.send l
   | l -> List.iter (why3_prove ~steps) l
 
 
@@ -265,7 +271,7 @@ let why3_split id =
     begin
       match Trans.apply split_trans (get_task t.task), t.task with
 	[], _ -> ()
-      | [ child ], `Task(orig) when Why3.Task.task_equal child orig -> ()
+      | [ child ], Task orig when Why3.Task.task_equal child orig -> ()
       | subtasks, _ ->
           t.subtasks <- List.map (fun t -> register_task id t) subtasks;
           List.iter (why3_prove ?steps:None) t.subtasks
@@ -280,7 +286,7 @@ let why3_clean id =
     let t = get_info id in
     List.iter clean_task t.subtasks;
     t.subtasks <- [];
-    let l = set_status id `Unknown in
+    let l = set_status id StUnknown in
     List.iter W.send l
   with
     Not_found -> ()
@@ -289,7 +295,7 @@ let why3_prove_all () =
   Hashtbl.iter
     (fun _ info ->
      match info.Task.task with
-       `Theory _ -> List.iter (fun i -> why3_prove i) info.Task.subtasks
+     | Task.Theory _ -> List.iter (fun i -> why3_prove i) info.Task.subtasks
      | _ -> ()) Task.task_table
 
 
@@ -308,50 +314,49 @@ let why3_parse_theories theories =
      let th_id = Task.register_theory th_name th in
      W.send (Theory(th_id, th_name));
      let subs = (Task.get_info th_id).Task.subtasks in
-     W.send (UpdateStatus( (if subs == [] then `Valid else `New) , th_id));
+     W.send (UpdateStatus( (if subs == [] then StValid else StNew) , th_id));
      List.iter (fun i -> why3_prove i) subs
     ) theories
 
+let why3_execute_one m rs =
+  let open Expr in
+  let open Pinterp in
+  let e_unit = e_exec (c_app (rs_tuple 0) [] [] (Ity.ity_tuple [])) in
+  let (let_defn,pv) = let_var (Ident.id_fresh "o") e_unit in
+  let e_rs_unit = e_exec (c_app rs [pv] [] rs.rs_cty.Ity.cty_result) in
+  let expr = e_let let_defn e_rs_unit in
+  let result =
+    try
+      let reduce = rac_reduce_config_lit config env ~trans:"compute_in_goal" () in
+      let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
+      let res = eval_global_fundef rac_config env m [] None expr in
+      asprintf "returns %a" (report_eval_result expr) res
+    with
+    | Contr (ctx, term) ->
+        asprintf "has failed: %a" report_cntr_body (ctx, term)
+    | CannotCompute r ->
+        asprintf "cannot compute (%s)" r.reason
+    | RACStuck (_, l, _) ->
+        asprintf "got stuck at %a"
+          (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
+  let {Theory.th_name = th} = m.Pmodule.mod_theory in
+  let mod_name = th.Ident.id_string in
+  let mod_loc = Opt.get_def Loc.dummy_position th.Ident.id_loc in
+  (mod_loc, mod_name ^ ".main " ^ result)
+
 let why3_execute modules =
-    let mods =
-      Wstdlib.Mstr.fold
-        (fun _k m acc ->
-           let th = m.Pmodule.mod_theory in
-           let mod_name = th.Theory.th_name.Ident.id_string in
-           let fun_name = "main" in
-           try
-             let open Expr in
-             let open Pinterp in
-             let e_unit = e_exec (c_app (rs_tuple 0) [] [] (Ity.ity_tuple [])) in
-             let (let_defn,pv) = let_var (Ident.id_fresh "o") e_unit in
-
-             let rs = Pmodule.ns_find_rs m.Pmodule.mod_export [mod_name;fun_name] in
-             let e_rs_unit = e_exec (c_app rs [pv] [] rs.rs_cty.Ity.cty_result) in
-             let expr = e_let let_defn e_rs_unit in
-
-             let result =
-               try
-                 let reduce =
-                   let trans = "compute_in_goal" and prover = None in
-                   rac_reduce_config_lit config env ~trans ?prover () in
-                 let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
-                 let res = eval_global_fundef rac_config env m.Pmodule.mod_known m.Pmodule.mod_theory.Theory.th_known [] expr in
-                 asprintf "%a@." (report_eval_result expr) res
-               with
-               | Contr (ctx, term) -> asprintf "%a@." report_cntr (ctx, term)
-               | CannotCompute r -> asprintf "Cannot compute (%s)" r.reason
-               | RACStuck (_, l) -> asprintf "Got stuck at %a" (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
-             let loc = Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc in
-             (loc, mod_name ^ ".main() returns " ^ result)
-             :: acc
-           with Not_found -> acc)
-        modules [] in
-    let result =
-      if mods = [] then
-        Error "No main function found"
-      else
-        let s = List.sort (fun (l1,_) (l2,_) -> Loc.compare l2 l1) mods in
-        Result (List.rev_map snd s) in
+  let mods =
+    Wstdlib.Mstr.fold (fun _ m acc ->
+        match Pmodule.ns_find_rs m.Pmodule.mod_export ["main"] with
+        | rs -> why3_execute_one m rs :: acc
+        | exception Not_found -> acc)
+      modules [] in
+  let result =
+    if mods = [] then
+      Error "No main function found"
+    else
+      let s = List.sort (fun (l1,_) (l2,_) -> Loc.compare l2 l1) mods in
+      Result (List.rev_map snd s) in
   W.send result
 
 
@@ -379,9 +384,9 @@ let why3_run f format lang code =
 		      (Printexc.to_string e)))
 
 let handle_message = function
-  | Transform (`Split, id) -> why3_split id
-  | Transform (`Prove(steps), id) -> why3_prove ~steps id
-  | Transform (`Clean, id) -> why3_clean id
+  | Transform (Split, id) -> why3_split id
+  | Transform (Prove steps, id) -> why3_prove ~steps id
+  | Transform (Clean, id) -> why3_clean id
   | ProveAll -> why3_prove_all ()
   | ParseBuffer (format, code) ->
       Task.clear_warnings ();

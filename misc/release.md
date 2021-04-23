@@ -68,7 +68,7 @@
   - update TryWhy3
     ```
     make trywhy3
-    make trywhy3_package
+    make trywhy3.tar.gz
     tar xzf trywhy3.tar.gz -C $DEST/try/ --strip-components=1
     ```
 

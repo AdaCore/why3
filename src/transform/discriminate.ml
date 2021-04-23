@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -34,25 +34,28 @@ let meta_lsinst = register_meta "encoding:lsinst" [MTlsymbol;MTlsymbol]
 let meta_select_inst = register_meta_excl "select_inst" [MTstring]
   ~desc:"Specify@ the@ types@ to@ mark@ with@ 'encoding:inst':@;  \
     @[\
-      - none: @[don't@ mark@ any@ type@ automatically@]@\n\
-      - goal: @[mark@ every@ closed@ type@ in@ the@ goal@]@\n\
-      - all:  @[mark@ every@ closed@ type@ in@ the@ task.@]\
+      - none:  @[don't@ mark@ any@ type@ automatically@]@\n\
+      - goal:  @[mark@ every@ closed@ type@ in@ the@ goal@]@\n\
+      - local: @[mark@ every@ closed@ type@ in@ the@ local@ context@]@\n\
+      - all:   @[mark@ every@ closed@ type@ in@ the@ task.@]\
     @]"
 
 let meta_select_lskept = register_meta_excl "select_lskept" [MTstring]
   ~desc:"Specify@ the@ symbols@ to@ mark@ with@ 'encoding:lskept':@;  \
     @[\
-      - none: @[don't@ mark@ any@ symbol@ automatically@]@\n\
-      - goal: @[mark@ every@ polymorphic@ symbol@ in@ the@ goal@]@\n\
-      - all:  @[mark@ every@ polymorphic@ symbol@ in@ the@ task.@]\
+      - none:  @[don't@ mark@ any@ symbol@ automatically@]@\n\
+      - goal:  @[mark@ every@ polymorphic@ symbol@ in@ the@ goal@]@\n\
+      - local: @[mark@ every@ polymorphic@ symbol@ in@ the@ local@ context@]@\n\
+      - all:   @[mark@ every@ polymorphic@ symbol@ in@ the@ task.@]\
     @]"
 
 let meta_select_lsinst = register_meta_excl "select_lsinst" [MTstring]
   ~desc:"Specify@ the@ symbols@ to@ mark@ with@ 'encoding:lsinst':@;  \
     @[\
-      - none: @[don't@ mark@ any@ symbol@ automatically@]@\n\
-      - goal: @[mark@ every@ monomorphic@ instance@ in@ the@ goal@]@\n\
-      - all:  @[mark@ every@ monomorphic@ instance@ in@ the@ task.@]\
+      - none:  @[don't@ mark@ any@ symbol@ automatically@]@\n\
+      - goal:  @[mark@ every@ monomorphic@ instance@ in@ the@ goal@]@\n\
+      - local: @[mark@ every@ monomorphic@ instance@ in@ the@ local@ context@]@\n\
+      - all:   @[mark@ every@ monomorphic@ instance@ in@ the@ task.@]\
     @]"
 
 let meta_select_inst_default =

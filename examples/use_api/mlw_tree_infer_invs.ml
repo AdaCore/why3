@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,8 +17,7 @@ API calls
 ******************)
 
 open Why3
-let config : Whyconf.config =
-  Whyconf.(load_default_config_if_needed (read_config None))
+let config = Whyconf.init_config None
 let main : Whyconf.main = Whyconf.get_main config
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 open Ptree
@@ -156,7 +155,7 @@ let mlw_file = Modules [ mod_M1 ]
 
 (* Printing back the mlw file *)
 
-let () = Format.printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+let () = Format.printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
 
 (*BEGIN{inv_hook}*)
 let print_to_std invs =
@@ -186,7 +185,7 @@ let mods =
   with Loc.Located (loc, e) -> (* A located exception [e] *)
     let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
     Format.printf "%a@."
-      (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
+      (Mlw_printer.with_marker ~msg loc (Mlw_printer.pp_mlw_file ~attr:true))
       mlw_file;
     exit 1
 

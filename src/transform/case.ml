@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -36,6 +36,8 @@ let create_goal_trans ~expl =
 (* From task [delta |- G] and term t, build the tasks:
    [delta, t] |- G] and [delta, not t | - G] *)
 let case t name =
+  if not (Stv.is_empty (t_ty_freevars Stv.empty t)) then
+    raise (Arg_trans "case");
   let name =
     match name with
     | Some name -> name
@@ -74,9 +76,12 @@ let exists_aux g x =
 
 (* From task [delta |- exists x. G] and term t, build
    the task  [delta |- G[x -> t]].
-   Return an error if x and t are not unifiable. *)
+   Return an error if x and t are not unifiable
+   or G is polymorphic. *)
 let exists x =
   Trans.goal (fun _ g -> exists_aux g x)
+
+let intro_attrs = Sattr.singleton Inlining.intro_attr
 
 (* TODO temporary *)
 let rec intros list_name pr f =
@@ -91,7 +96,7 @@ let rec intros list_name pr f =
         | "" :: tl -> "H", tl
         | name :: tl -> name, tl
       in
-      let id = create_prsymbol (id_fresh name) in
+      let id = create_prsymbol (id_fresh ~attrs:intro_attrs name) in
       let d = create_prop_decl Paxiom id f1 in
       d :: intros tl pr f2
   | Tquant (Tforall,fq) ->
@@ -111,7 +116,9 @@ let rec intros list_name pr f =
         | [], _ -> (subst, decls, vsl, [])
         | _, [] -> (subst, decls, [], list_name)
         | name :: list_name, var :: vsl ->
-            let name = if name = "" then id_clone var.vs_name else id_fresh name in
+            let name = if name = ""
+              then id_clone ~attrs:intro_attrs var.vs_name
+              else id_fresh ~attrs:intro_attrs name in
             let subst, decl = intro_var name subst var in
             subst_decls (subst, decl :: decls) list_name vsl
       in
@@ -128,7 +135,8 @@ let rec intros list_name pr f =
   | Tlet (t,fb) ->
       let vs,f = t_open_bound fb in
       let name =  List.hd list_name in
-      let ls = create_lsymbol (id_fresh name) [] (Some vs.vs_ty) in
+      let id = id_fresh ~attrs:intro_attrs name in
+      let ls = create_lsymbol id [] (Some vs.vs_ty) in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
       d :: intros (List.tl list_name) pr f

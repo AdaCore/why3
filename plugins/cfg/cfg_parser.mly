@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,6 +17,7 @@
   let floc s e = Loc.extract (s,e)
 
   let mk_cfginstr d s e = { cfg_instr_desc = d; cfg_instr_loc = floc s e }
+  let mk_cfgterm d s e = { cfg_term_desc = d; cfg_term_loc = floc s e }
 
 %}
 
@@ -25,8 +26,8 @@
 
 %start cfgfile
 %type <Cfg_ast.cfg_file> cfgfile
-%type <Cfg_ast.cfg_instr list> sequence
-%type <(Ptree.pattern * Cfg_ast.cfg_instr list) list> cases
+%type <Cfg_ast.cfg_instr list * Cfg_ast.cfg_term> sequence
+%type <Cfg_ast.switch_branch list> cases
 
 %%
 
@@ -79,23 +80,31 @@ block:
 ;
 
 sequence:
-  | semicolon_list1(instr) { $1 }
+  | terminator { ([], $1) }
+  | x=instr SEMICOLON xl = sequence { (x :: fst xl, snd xl) }
 ;
 
 instr:
-  | GOTO uident
-    { mk_cfginstr (CFGgoto $2) $startpos $endpos }
   | contract_expr
     { mk_cfginstr (CFGexpr $1) $startpos $endpos }
-  | SWITCH LEFTPAR contract_expr RIGHTPAR cases END
-    { mk_cfginstr (CFGswitch ($3,$5)) $startpos $endpos }
   | INVARIANT ident LEFTBRC term RIGHTBRC
     { mk_cfginstr (CFGinvariant [$2,$4]) $startpos $endpos }
 ;
 
+terminator :
+  | GOTO uident
+    { mk_cfgterm (CFGgoto $2) $startpos $endpos }
+  | SWITCH LEFTPAR contract_expr RIGHTPAR cases END
+    { mk_cfgterm (CFGswitch ($3,$5)) $startpos $endpos }
+  | RETURN contract_expr
+    { mk_cfgterm (CFGreturn $2) $startpos $endpos }
+  | ABSURD
+    { mk_cfgterm CFGabsurd $startpos $endpos }
+;
+
 cases:
-  | BAR match_case(sequence)
+  | BAR match_case(terminator)
     { [$2] }
-  | BAR match_case(sequence) cases
+  | BAR match_case(terminator) cases
     { $2 :: $3 }
 ;

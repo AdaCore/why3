@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -64,7 +64,7 @@ let ident_printer () =
     "integer_log2"; "integer_round"; "is_theory_constant"; "inversion";
     "let"; "linear_dependency"; "logic";
     "max_int"; "max_real"; "min_int"; "min_real";
-    "not"; "not_theory_constant"; "or";
+    "not"; "not_theory_constant"; "of"; "or";
     "parameter"; "predicate"; "pow_real_int"; "pow_real_real";
     "prop";
     "real"; "real_of_int"; "rewriting";

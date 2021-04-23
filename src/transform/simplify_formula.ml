@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -94,9 +94,9 @@ let rec fmla_find_subst boundvars var sign f =
     | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 (* Simplify out equalities that could be selected. *)
-let rec equ_simp f = t_attr_copy f (match f.t_node with
+let rec equ_simp ?eq f = t_attr_copy f (match f.t_node with
   | Tbinop (op, f1, f2) ->
-       begin match op, equ_simp f1, equ_simp f2 with
+       begin match op, equ_simp ?eq f1, equ_simp ?eq f2 with
        | Tor, { t_node = Tfalse }, f
        | Tor, f, { t_node = Tfalse }
        | Tand, { t_node = Ttrue }, f
@@ -105,24 +105,36 @@ let rec equ_simp f = t_attr_copy f (match f.t_node with
        | op, f1, f2 -> t_binary op f1 f2
        end
   | Tapp (p,[f1;f2]) when ls_equal p ps_equ ->
-       t_equ_simp (equ_simp f1) (equ_simp f2)
-  | _ -> t_map equ_simp f)
+     begin match (eq,f1,f2) with
+     | (Some(vs,ts),{t_node=Tvar v},t)
+          when vs_equal vs v && t_equal ts t ->
+        t_true
+     | (Some(vs,ts),t,{t_node=Tvar v})
+          when vs_equal vs v && t_equal ts t ->
+        t_true
+     | _ ->
+        t_equ_simp (equ_simp ?eq f1) (equ_simp ?eq f2)
+     end
+  | _ -> t_map (equ_simp ?eq) f)
 
 let rec fmla_quant ~keep_model_vars sign f = function
   | [] -> [], f
   | vs::l ->
      let vsl, f = fmla_quant ~keep_model_vars sign f l in
-     if keep_model_vars && has_a_model_attr vs.vs_name then
-      vs::vsl, f
-     else if t_v_occurs vs f = 0 then
+     if t_v_occurs vs f = 0 then
       vsl, f
      else
       try
         fmla_find_subst (Svs.singleton vs) vs sign f;
         vs::vsl, f
       with Subst_found t ->
-        let f = t_subst_single vs t f in
-        vsl, equ_simp f
+        if keep_model_vars && has_a_model_attr vs.vs_name then
+          let f = equ_simp ~eq:(vs,t) f in
+          let f = t_let t (t_close_bound vs f) in
+          vsl, f
+        else
+          let f = t_subst_single vs t f in
+          vsl, equ_simp f
 
 let rec fmla_remove_quant ~keep_model_vars f =
   match f.t_node with
@@ -158,6 +170,10 @@ let () = Trans.register_transform
     @[\
      - @[transform \\exists x. x == y /\\ F@ into F[y/x],@]@\n\
      - @[transform \\forall x. x <> y \\/ F@ into F[y/x].@]@]"
+
+let () = Trans.register_transform
+  "simplify_trivial_wp_quantification" simplify_trivial_wp_quantification
+  ~desc:"@[Simplify@ trivial@ quantifications, but keeps CE relevant variables@]"
 
 let simplify_trivial_quantification_in_goal =
   Trans.goal

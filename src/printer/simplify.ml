@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -77,8 +77,9 @@ and print_fmla info fmt f = match f.t_node with
       | Some s ->
           syntax_arguments s (print_term info) fmt tl
       | None ->
-          fprintf fmt "(EQ (%a@ %a) |@@true|)"
-            print_ident ls.ls_name (print_list space (print_term info)) tl
+         (* `%@` prints a single `@` *)
+         fprintf fmt "(EQ (%a@ %a) |%@true|)"
+           print_ident ls.ls_name (print_list space (print_term info)) tl
     end
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "FORALL" | Texists -> "EXISTS" in

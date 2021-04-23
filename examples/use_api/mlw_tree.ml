@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,8 +18,7 @@ API calls
 
 (* BEGIN{buildenv} *)
 open Why3
-let config : Whyconf.config =
-  Whyconf.(load_default_config_if_needed (read_config None))
+let config : Whyconf.config = Whyconf.init_config None
 let main : Whyconf.main = Whyconf.get_main config
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 open Ptree
@@ -261,7 +260,7 @@ let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4]
 
 open Format
 
-let () = printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
 
 (* BEGIN{topdownf} *)
 let mlw_file =
@@ -284,7 +283,7 @@ let mlw_file =
   F.get_mlw_file uc
 (* END{topdownf} *)
 
-let () = printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
 
 (* BEGIN{topdowni} *)
 let mlw_file =
@@ -310,7 +309,7 @@ let mlw_file =
 (* Printing back the mlw file *)
 
 (* BEGIN{mlwprinter} *)
-let () = printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+let () = printf "%a@." (Mlw_printer.pp_mlw_file ~attr:true) mlw_file
 (* END{mlwprinter} *)
 
 (* BEGIN{typemodules} *)
@@ -324,7 +323,7 @@ let _mods =
   with Loc.Located (loc, e) -> (* A located exception [e] *)
     let msg = asprintf "%a" Exn_printer.exn_printer e in
     printf "%a@."
-      (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
+      (Mlw_printer.with_marker ~msg loc (Mlw_printer.pp_mlw_file ~attr:true))
       mlw_file;
     exit 1
 (* END{typemoduleserror} *)
@@ -347,11 +346,10 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 
 let alt_ergo : Whyconf.config_prover =
-  let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
-  (** all provers that have the name "Alt-Ergo" *)
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.3.0" in
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    eprintf "Prover Alt-Ergo not installed or not configured@.";
+    eprintf "Prover Alt-Ergo 2.3.0 not installed or not configured@.";
     exit 1
   end else
     snd (Whyconf.Mprover.max_binding provers)

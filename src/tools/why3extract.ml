@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,10 +16,9 @@ open Pmodule
 open Compile
 open Theory
 
-let usage_msg = sprintf
-    "Usage: %s [options] -D <driver> [<file>.<Module>*.<symbol>?|-]\n\
-     Extract some WhyML code to the target language.\n"
-    (Filename.basename Sys.argv.(0))
+let usage_msg =
+  "-D <driver> [<file>.<Module>*.<symbol>?|-]\n\
+   Extract some WhyML code to the target language."
 
 type extract_target =
   | File   of string
@@ -79,7 +78,7 @@ let option_list =
     "<file|dir> destination of extracted code";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =

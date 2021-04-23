@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -29,7 +29,8 @@ val gen_ident :
 
 val subst_quant: quant -> term_quant -> term -> term
 
-(* Transform the term (exists v, f) into f[x/v] *)
+(* Transform the term (exists v, f) into f[x/v].
+   Formula (exists v, f) must be monomorphic. *)
 val subst_exist: term -> term -> term
 
 (* Transform the term (forall v, f) into f[x/v] *)
