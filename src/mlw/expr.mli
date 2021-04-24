@@ -90,7 +90,7 @@ type prog_pattern = private {
 
 type pre_pattern =
   | PPwild
-  | PPvar of preid * bool
+  | PPvar of preid * bool (** preid * if ghost *)
   | PPapp of rsymbol * pre_pattern list
   | PPas  of pre_pattern * preid * bool
   | PPor  of pre_pattern * pre_pattern

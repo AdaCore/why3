@@ -1098,8 +1098,7 @@ and pp_type_decl ~attr fmt d =
   fprintf fmt "%a%a%a%a%a"
     pp_maybe_marker d.td_loc (pp_id ~attr) d.td_ident
     (pp_print_opt_list ~every:" '" (pp_id ~attr)) d.td_params pp_def d.td_def
-    (pp_print_opt_list ~prefix:"@ @[<hv 2>by {@ " ~sep:";@ " ~suffix:"@] }"
-       (pp_field ~attr (pp_expr ~attr))) d.td_wit
+    (pp_opt ~prefix:"@ @[<hv 2>by@ " ~suffix:"@]" (pp_expr ~attr).closed) d.td_wit
 
 and pp_ind_decl ~attr fmt d =
   let pp_ind_decl_case fmt (loc, id, t) =

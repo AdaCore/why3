@@ -1,0 +1,76 @@
+module T
+
+       use int.Int
+
+       type t1 = {
+         x1 : int;
+         y1 : int;
+       }
+       invariant { x1 < y1 }
+       by { y1 = 1; x1 = 0 }
+
+       type t2 = {
+         x2 : int;
+         y2 : int;
+       }
+       invariant { x2 < y2 }
+       by (if true then { x2 = 1; y2 = 0 } else { y2 = 1; x2 = 0 })
+
+end
+
+module T2
+
+
+       type set 'a = abstract {
+           mutable mem: 'a -> bool
+       }
+
+       val empty (): set 'a
+         ensures { forall x. not (result.mem x) }
+
+       val add (s:set 'a) (v:'a) : unit
+         ensures { forall x. s.mem x <-> (old s.mem x \/ x = v) }
+         writes { s.mem }
+
+       type t 'a = {
+         set : set 'a;
+         ele : 'a;
+       }
+       invariant { set.mem ele }
+       by let set = empty () in
+          let ele = any (r:'a) ensures { true } in
+          add set ele;
+          { set = set; ele = ele }
+
+
+end
+
+
+module T3
+
+       type var = private {
+          id: int
+       }
+
+       type set = abstract {
+           mutable mem: int -> bool
+       }
+
+       val all_var: set
+
+       val new_var () : var
+         ensures { old (not (all_var.mem result.id)) }
+         ensures { forall x. all_var.mem x <-> (old (all_var.mem x) \/  x = result.id) }
+         writes { all_var.mem }
+
+       type t = {
+          v1: var;
+          v2: var;
+       }
+       invariant { v1.id <> v2.id }
+       by let v1 = new_var () in
+          let v2 = new_var () in
+          { v1 = v1; v2 = v2 }
+
+
+end

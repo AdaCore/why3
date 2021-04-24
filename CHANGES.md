@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Input Formats
+  * Witness expression for type invariant is generalized (#286,!428)
+
 Version 1.4.0, March 13, 2021
 -----------------------------
 

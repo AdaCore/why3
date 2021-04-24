@@ -1005,7 +1005,7 @@ A WhyML input file is a (possibly empty) list of modules
       : | "<" "float" `integer` `integer` ">"   ; float type
     type_case: `uident` `attribute`* `type_param`*
     record_field: "ghost"? "mutable"? `lident_nq` `attribute`* ":" `type`
-    type_witness: "by" "{" `lident_nq` "=" `expr` (";" `lident_nq` "=" `expr`)* "}"
+    type_witness: "by" `expr`
     vis_mut: ("abstract" | "private")? "mutable"?
     pgm_decl: ":" `type`   ; global variable
       : | `param` (`spec`* `param`)+ ":" `type` `spec`*   ; abstract function
@@ -1094,6 +1094,11 @@ keyword ``by``, as follows:
       by { a = 42; b = true }
 
 It generates a simpler VC, where fields are instantiated accordingly.
+
+For more complicated case, the witness can be more general than just a record, but
+the record can be used only as the resulting expression. Indeed the record does
+not exists yet, so the witness is in fact a tuple with the fields in the same
+order than in the definition. The record is just syntaxic sugar.
 
 In programs, a type invariant is assumed to
 hold at function entry and must be restored at function exit.

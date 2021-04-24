@@ -468,8 +468,8 @@ type_decl:
       td_loc = floc $startpos $endpos } }
 
 type_witness:
-| (* epsilon *)                           { [] }
-| BY LEFTBRC field_list1(expr) RIGHTBRC   { $3 }
+| (* epsilon *)                           { None }
+| BY expr   { Some $2 }
 
 ty_var:
 | attrs(quote_lident) { $1 }

@@ -89,7 +89,7 @@ let type_a : Ptree.decl =
     td_vis = Public;
     td_mut = false;
     td_inv = [];
-    td_wit = [];
+    td_wit = None;
     td_def = TDrange (c22, c46);
   }]
 

@@ -419,7 +419,7 @@ let itd_ref =
   let tv = create_tvsymbol (id_fresh "a") in
   let pj = create_pvsymbol (id_fresh "contents") (ity_var tv) in
   create_plain_record_decl ~priv:false ~mut:true (id_fresh "ref")
-                                            [tv] [true, pj] [] []
+                                            [tv] [true, pj] [] None
 
 let its_ref = itd_ref.itd_its
 let rs_ref_cons = List.hd itd_ref.itd_constructors
@@ -1083,7 +1083,7 @@ let clone_type_decl inst cl tdl kn =
         let mv = List.fold_left2 add Mvs.empty pjl fdl in
         List.map (clone_term cl mv) d.itd_invariant in
       let clone_wit = clone_expr cl (sm_of_cl cl) in
-      let wit = List.map clone_wit d.itd_witness in
+      let wit = Opt.map clone_wit d.itd_witness in
       let itd = create_plain_record_decl id' ts.ts_args
         ~priv:s.its_private ~mut:s.its_mutable fdl inv wit in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
@@ -1127,7 +1127,7 @@ let freeze_foreign cl reads =
 let clone_pdecl loc inst cl uc d = match d.pd_node with
   | PDtype tdl ->
       let add_e spv e = Spv.union spv e.e_effect.eff_reads in
-      let add_d spv d = List.fold_left add_e spv d.itd_witness in
+      let add_d spv d = Opt.fold add_e spv d.itd_witness in
       freeze_foreign cl (List.fold_left add_d Spv.empty tdl);
       let ndl, vcl = clone_type_decl inst cl tdl uc.muc_known in
       let uc = List.fold_left add_vc uc vcl in
