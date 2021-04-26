@@ -95,7 +95,7 @@ build/gmp%bench: tests.c build/libwmp.a
 build/minigmp%bench: tests.c build/libwmp.a
 	$(CC) $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -lm -o $@
 
-BENCHS = toomb sqrtrem millerrabin toomu add mul div powm toomm
+BENCHS = toomb sqrtrem millerrabin toomu add mul div powm toomm zgetset
 
 
 WHY3BENCHFILES = $(addprefix bench/why3, $(BENCHS))
