@@ -360,11 +360,12 @@ let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
   try
     let paid = Whyconf.Hprover.find proof_attempt_set prover in
     let pa = Session_itp.get_proof_attempt_node s paid in
+    let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason (get_objective g)) in
     (* only count non-obsolete proof attempts with identical
        options *)
     (not pa.Session_itp.proof_obsolete &&
     pa.Session_itp.limit =
-      Gnat_config.limit ~prover ~warning:false)
+      Gnat_config.limit ~prover ~warning:warn)
   with Not_found -> false
 
 let all_provers_tried s g =
