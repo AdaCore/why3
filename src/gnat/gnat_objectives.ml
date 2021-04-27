@@ -907,29 +907,6 @@ let schedule_goal ~cntexample ~callback c g =
     else find_best_untried_prover c.Controller_itp.controller_session g in
   schedule_goal_with_prover ~callback c g p
 
-let clean_automatic_proofs c =
-  let seen = GoalSet.empty () in
-  let s = c.Controller_itp.controller_session in
-  (fun g ->
-    if not (GoalSet.mem seen g) then begin
-      GoalSet.add seen g;
-      List.iter (fun prover ->
-        Whyconf.Hprover.iter (fun _prover panid ->
-          let pan = Session_itp.get_proof_attempt_node s panid in
-          if not pan.Session_itp.proof_obsolete &&
-            pan.Session_itp.prover = prover &&
-            pan.Session_itp.limit =
-              Gnat_config.limit ~prover ~warning:false
-          then
-            Controller_itp.remove_subtree c (Session_itp.APa panid)
-              ~removed:(fun _ -> ()) ~notification:(fun _ -> ())
-          else
-            ())
-          (Session_itp.get_proof_attempt_ids s g)) Gnat_config.provers
-    end)
-
-
-
 let all_split_leaf_goals () =
   assert false (* TODO *)
   (* ??? disabled for now *)

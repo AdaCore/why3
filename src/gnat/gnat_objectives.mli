@@ -179,9 +179,6 @@ val all_split_leaf_goals : unit -> unit
 (* special-purpose function for "all_split" mode (see gnat_config.mli),
    where all split VCs are saved to disk, and no prover is called. *)
 
-val clean_automatic_proofs : Controller_itp.controller -> goal_id -> unit
-(* deletes previous proof attempts of the selected provers for this goal *)
-
 val goal_has_splits : Session_itp.session -> goal_id -> bool
 
 val is_valid_not_ce: Session_itp.session -> Session_itp.proofNodeID -> bool
