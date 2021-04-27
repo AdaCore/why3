@@ -1,0 +1,55 @@
+module Zrealloc2
+
+use int.Int
+use int.Power
+use int.EuclideanDivision
+use map.Map
+use mach.int.Int32GMP
+use mach.c.C
+use lemmas.Lemmas
+use util.Util
+use compare.Compare
+use mach.int.UInt64GMP
+use int.Abs
+use mpz.Z
+use mpz.Zutil
+
+
+function alloc_of_bits (bits: int) : int
+= if bits <= 0 then 1 else div (bits + 63) 64
+
+let partial wmpz_realloc2 (x:mpz_ptr) (bits:uint64) : unit
+  requires { mpz.readers[x] = 0 }
+  requires { div (bits - 1) 64 < max_int32 }
+  requires { 1 <= mpz.alloc[x] }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.readers[x] = 0 }
+  ensures  { mpz.alloc[x] = alloc_of_bits bits }
+  ensures  { if alloc_of_bits bits >= old mpz.abs_size[x]
+             then mpz.abs_size[x] = old mpz.abs_size[x]
+                  /\ mpz.abs_value_of[x] = old mpz.abs_value_of[x]
+             else mpz.abs_size[x] = 0 }
+=
+  let ghost obits = bits in
+  let bits = bits - (if bits <> 0 then 1 else 0) in
+  let new_alloc = UInt64GMP.to_int32 (1 + (bits / 64)) in
+  assert { new_alloc = alloc_of_bits obits };
+  let p = get_write_ptr x in
+  assert { forall y. y <> x -> mpz_unchanged y mpz (old mpz) };
+  let ghost op = { p } in
+  let ghost os = abs_size_of x in
+  let q = realloc p new_alloc in
+  c_assert (is_not_null q);
+  if Int32.(>) (abs_size_of x) new_alloc
+  then begin
+    set_size_0 x; (* data has shrunk, reset x to 0 *)
+  end
+  else begin
+    value_sub_frame (pelts q) (pelts op) 0 (p2i os);
+  end;
+  set_alloc x new_alloc;
+  set_ptr x q;
+  release_writer x q
+
+
+end

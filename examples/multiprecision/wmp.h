@@ -35,6 +35,7 @@ static inline void wmpz_init (wmpz_ptr p)  {
 
 void wmpz_clear (wmpz_ptr);
 wmp_ptr wmpz_realloc (wmpz_ptr, wmp_size_t);
+void wmpz_realloc2 (wmpz_ptr, uint64_t);
 
 void wmpz_set_ui (wmpz_ptr, uint64_t);
 void wmpz_set_si (wmpz_ptr, int64_t);
@@ -56,6 +57,8 @@ int32_t wmpz_cmpabs_ui (wmpz_srcptr, uint64_t);
 int32_t wmpz_sgn (wmpz_srcptr);
 void wmpz_abs (wmpz_ptr, wmpz_srcptr);
 
+void wmpz_neg (wmpz_ptr, wmpz_srcptr);
+
 void wmpz_add (wmpz_ptr, wmpz_srcptr, wmpz_srcptr);
 void wmpz_add_ui (wmpz_ptr, wmpz_srcptr, uint64_t);
 
@@ -67,7 +70,7 @@ void wmpz_mul (wmpz_ptr, wmpz_srcptr, wmpz_srcptr);
 void wmpz_mul_si (wmpz_ptr, wmpz_srcptr, int64_t);
 void wmpz_mul_ui (wmpz_ptr, wmpz_srcptr, uint64_t);
 
-void wmpz_mul2exp (wmpz_ptr, wmpz_srcptr, uint64_t);
+void wmpz_mul_2exp (wmpz_ptr, wmpz_srcptr, uint64_t);
 void wmpz_tdiv_q_2exp (wmpz_ptr, wmpz_srcptr, uint64_t);
 
 void wmpz_tdiv_qr (wmpz_ptr quot, wmpz_ptr rem, wmpz_srcptr, wmpz_srcptr);
