@@ -37,7 +37,7 @@ why3:
 	make -C ../..
 
 MLWFILES = \
-  mpz_get_str mpz_set_str mpz_div2exp mpz_mul2exp mpz_div mpz_mul mpz_sub mpz_add mpz_getset mpz_abs mpz_cmp mpz_cmpabs mpz \
+  mpz_get_str mpz_set_str mpz_div2exp mpz_mul2exp mpz_div mpz_mul mpz_sub mpz_add mpz_getset mpz_abs mpz_cmp mpz_cmpabs mpz_neg mpz_realloc2 mpz \
   set_str get_str base_info powm sqrtrem sqrt toom logical div mul sub add compare util
 
 build/extracted: $(addsuffix .mlw, $(MLWFILES))
