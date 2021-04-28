@@ -1,4 +1,4 @@
-(** Why3 driver for Colibri (with floating point support) *)
+(** Why3 driver for COLIBRI (with floating point support) *)
 
 prelude ";; produced by colibri.drv ;;"
 prelude "(set-logic ALL)"
@@ -13,15 +13,6 @@ import "smt-libv2-floats.gen"
 
 steps "Steps : \\([0-9]+.?[0-9]*\\)" 1
 steplimitexceeded "(Step limit reached)"
-
-
-theory BuiltIn
-(* Since quantifiers are all removed we can fully discriminate *)
-  meta "select_inst_default" "all"
-  meta "select_lskept_default" "all"
-  meta "select_lsinst_default" "all"
-  meta "select_kept_default" "all"
-end
 
 theory bool.Bool
   meta "inline:no" function andb
@@ -39,6 +30,7 @@ theory int.Int
   remove prop CompatOrderMult
 end
 
+transformation "monomorphise_goal"
 transformation "compile_match"
 transformation "inline_trivial"
 transformation "simplify_trivial_quantification"
