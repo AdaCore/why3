@@ -979,6 +979,11 @@ module ExprSimplifications = struct
        let pv = restore_pv v in
        e_let (Lvar (pv, e1)) e2 e.e_ity MaskVisible
          e.e_mlty e.e_effect e.e_attrs
+    | Ematch (e1, [Ptuple p, { e_node = Eapp (rs, l, _) }], []) when Expr.is_rs_tuple rs ->
+        let eq x y = match x, y with
+          | Pvar v1, { e_node = Evar v2 } -> vs_equal v1 v2.pv_vs
+          | _, _ -> false in
+        if Lists.equal eq p l then e1 else e
     | _ -> e
 
   let let_def ld = ld_map expr ld
