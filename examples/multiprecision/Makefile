@@ -60,9 +60,10 @@ EXTRACTED = build/extracted build/sqrtinit.h build/binverttab.h
 extract: $(EXTRACTED)
 
 CFILES = \
-  zutil.c z.c zcmp.c zcmpabs.c zabs.c zadd.c zsub.c zmul.c zdiv.c zmul2exp.c zdiv2exp.c zget_str.c zset_str.c \
+  zutil.c z.c zcmp.c zcmpabs.c zabs.c zneg.c zrealloc2.c \
+  zadd.c zsub.c zmul.c zdiv.c zmul2exp.c zdiv2exp.c zget_str.c zset_str.c \
   set.c get_str.c set_str.c baseinfo.c powm.c sqrt.c sqrt1.c toom.c div.c \
-  logical.c logicalold.c logicalutil.c mul_basecase.c sub.c sub_1.c add.c add_1.c \
+  logical.c logicalold.c mul_basecase.c sub.c sub_1.c add.c add_1.c \
   compare.c util.c utilold.c
 
 ifneq ($(OVERLAY),gmp)

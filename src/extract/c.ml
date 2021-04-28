@@ -1371,6 +1371,7 @@ module MLToC = struct
     | Ematch (_e1, [Pvar _v, _e2], []) ->
        assert false (* simplified at Compile *)
     | Ematch (({e_node = Eapp(rs,_, _)} as e1), [Ptuple rets,e2], [])
+    | Ematch ({e_node = Eblock [{e_node = Eapp(rs, _, _)} as e1]}, [Ptuple rets, e2], [])
          when List.for_all
                 (function | Pwild (*ghost*) | Pvar _ -> true |_-> false)
                 rets
@@ -1675,7 +1676,7 @@ module MLToC = struct
        if Debug.test_noflag debug_c_no_error_msgs
        then
          Format.eprintf
-           "Could not translate declaration of %s. Unsupported : %s@."
+           "Could not translate declaration of %s. Unsupported: %s@."
            !current_decl_name s;
        []
 
