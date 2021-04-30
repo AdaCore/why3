@@ -658,8 +658,8 @@
      <goal name="remove_products&#39;vc.29.0.4.1" expl="false case" proved="true">
      <transf name="unfold" proved="true" arg1="all_eliminated_marked_partial" arg2="in" arg3="Requires4">
       <goal name="remove_products&#39;vc.29.0.4.1.0" expl="false case" proved="true">
-      <proof prover="3" timelimit="10"><result status="valid" time="7.39"/></proof>
-      <proof prover="10" timelimit="10"><result status="valid" time="7.11" steps="571172"/></proof>
+      <proof prover="3" timelimit="10"><result status="valid" time="6.40"/></proof>
+      <proof prover="10" timelimit="10"><result status="valid" time="6.04" steps="571172"/></proof>
       </goal>
      </transf>
      </goal>
@@ -1655,7 +1655,7 @@
   </goal>
   <goal name="t&#39;vc.5" expl="type invariant" proved="true">
   <proof prover="9"><result status="valid" time="0.02" steps="62"/></proof>
-  <proof prover="10"><result status="valid" time="0.12" steps="59985"/></proof>
+  <proof prover="10"><result status="valid" time="0.24" steps="59985"/></proof>
   </goal>
   <goal name="t&#39;vc.6" expl="type invariant" proved="true">
   <proof prover="9"><result status="valid" time="0.00" steps="26"/></proof>
@@ -3113,7 +3113,7 @@
    <transf name="split_vc" proved="true" >
     <goal name="euler_sieve&#39;vc.70.0.0" expl="assertion" proved="true">
     <proof prover="9"><result status="valid" time="0.56" steps="417"/></proof>
-    <proof prover="10"><result status="valid" time="2.16" steps="240397"/></proof>
+    <proof prover="10"><result status="valid" time="1.84" steps="240397"/></proof>
     </goal>
     <goal name="euler_sieve&#39;vc.70.0.1" expl="assertion" proved="true">
     <proof prover="9"><result status="valid" time="0.54" steps="402"/></proof>
@@ -4037,7 +4037,7 @@
     <goal name="euler_sieve&#39;vc.166.0.5" expl="loop invariant preservation" proved="true">
     <transf name="case" proved="true" arg1="(i &lt;&gt; p)">
      <goal name="euler_sieve&#39;vc.166.0.5.0" expl="true case (loop invariant preservation)" proved="true">
-     <proof prover="9" timelimit="10"><result status="valid" time="9.37" steps="5018"/></proof>
+     <proof prover="9" timelimit="10"><result status="valid" time="7.97" steps="5018"/></proof>
      </goal>
      <goal name="euler_sieve&#39;vc.166.0.5.1" expl="false case (loop invariant preservation)" proved="true">
      <proof prover="9"><result status="valid" time="1.33" steps="1288"/></proof>
@@ -4190,15 +4190,19 @@
   <goal name="euler_sieve&#39;vc.185" expl="loop invariant preservation" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="euler_sieve&#39;vc.185.0" expl="loop invariant preservation" proved="true">
-   <transf name="split_vc" proved="true" >
+   <transf name="introduce_premises" proved="true" >
     <goal name="euler_sieve&#39;vc.185.0.0" expl="loop invariant preservation" proved="true">
-    <transf name="case" proved="true" arg1="(j = cnt1)">
-     <goal name="euler_sieve&#39;vc.185.0.0.0" expl="true case (loop invariant preservation)" proved="true">
-     <proof prover="9"><result status="valid" time="3.50" steps="3803"/></proof>
-     </goal>
-     <goal name="euler_sieve&#39;vc.185.0.0.1" expl="false case (loop invariant preservation)" proved="true">
-     <proof prover="9"><result status="valid" time="0.30" steps="463"/></proof>
-     <proof prover="10"><result status="valid" time="0.32" steps="68156"/></proof>
+    <transf name="split_all_full" proved="true" >
+     <goal name="euler_sieve&#39;vc.185.0.0.0" expl="loop invariant preservation" proved="true">
+     <transf name="case" proved="true" arg1="(j = cnt1)">
+      <goal name="euler_sieve&#39;vc.185.0.0.0.0" expl="true case (loop invariant preservation)" proved="true">
+      <proof prover="10"><result status="valid" time="0.26" steps="73461"/></proof>
+      </goal>
+      <goal name="euler_sieve&#39;vc.185.0.0.0.1" expl="false case (loop invariant preservation)" proved="true">
+      <proof prover="9"><result status="valid" time="0.22" steps="473"/></proof>
+      <proof prover="10"><result status="valid" time="0.24" steps="75206"/></proof>
+      </goal>
+     </transf>
      </goal>
     </transf>
     </goal>

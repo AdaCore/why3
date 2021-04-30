@@ -72,7 +72,7 @@ function inversions (m: matrix int) : int
 
 let lemma inv_nonneg (m: matrix int)
   ensures { 0 <= inversions m }
-= let zero = pure { fun (i:int) -> 0 } in
+= let zero = pure { fun (_:int) -> 0 } in
   assert { forall i j k.
     zero k <= numof (fun l -> lt i j k l /\ m i j > m k l) 0 m.columns };
   assert { forall i j.
