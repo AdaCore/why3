@@ -131,9 +131,14 @@ type check =
     already_proved : bool
   }
 
+type extra_info =
+  { pretty_node : int option;
+    inlined     : bool;
+  }
+
 type vc_info =
-  { check : check;
-    extra_info : int option
+  { check      : check;
+    extra_info : extra_info;
   }
 
 type limit_mode =
@@ -350,6 +355,7 @@ type gp_label =
   | Gp_Pretty_Ada of int
   | Gp_Shape of string
   | Gp_Already_Proved
+  | Gp_Inline
 
 let parse_check_string s l =
   match l with
@@ -397,6 +403,10 @@ let read_label s =
           begin
             Some (Gp_Already_Proved)
           end
+       | ["GP_Inline"] ->
+          begin
+            Some (Gp_Inline)
+          end
        | _ ->
           let msg = "found malformed GNATprove label, " in
           let s =
@@ -410,7 +420,8 @@ type my_expl =
      mutable extra_node     : int option;
      mutable check_sloc     : Gnat_loc.loc option;
      mutable shape          : string option;
-     mutable already_proved : bool
+     mutable already_proved : bool;
+     mutable inline         : bool
    }
 (* The type that is used to extract information from a VC, is filled up field
    by field *)
@@ -422,13 +433,14 @@ let default_expl =
      extra_node     = None;
      shape          = None;
      already_proved = false;
+     inline         = false;
    }
 let read_vc_labels acc s =
    (* This function takes a set of labels and extracts a "node_info" from that
       set. We start with an empty record; We fill it up by iterating over all
       labels of the node. *)
-   let b = acc in
-   Ident.Sattr.iter
+     let b = acc in
+     Ident.Sattr.iter
      (fun x ->
         let s = x.Ident.attr_string in
         match read_label s with
@@ -445,6 +457,8 @@ let read_vc_labels acc s =
            b.shape <- Some shape
         | Some Gp_Already_Proved ->
            b.already_proved <- true
+        | Some Gp_Inline ->
+           b.inline <- true
         | None ->
             ()
      ) s;
@@ -498,8 +512,9 @@ let search_labels t =
   match extract_check b with
   | None -> None
   | Some c ->
-    Some { check = c;
-           extra_info = b.extra_node }
+    Some { check      = c;
+           extra_info = { pretty_node = b.extra_node; inlined = b.inline }
+         }
 
 let to_filename fmt check =
   List.iter (fun x ->

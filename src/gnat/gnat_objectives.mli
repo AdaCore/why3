@@ -71,7 +71,7 @@ val is_interesting : goal_id -> bool
 
 val get_objective : goal_id -> objective
 (* get the objective associated with a goal_id *)
-val get_extra_info   : goal_id -> int option
+val get_extra_info   : goal_id -> Gnat_expl.extra_info
 
 (* Scheduling and proof *)
 val next : objective -> goal_id list

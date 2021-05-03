@@ -1,15 +1,53 @@
-open Term
 open Decl
+open Ident
+open Task
+open Term
+open Theory
+open Ty
+
+let inlined_attr = create_attribute "GP_Inline"
 
 let apply_append fn acc l =
   List.fold_left (fun l e -> fn e :: l) acc (List.rev l)
+
+let is_bool_true t =
+  match t.t_node with
+  | Tapp (ls, []) when ls_equal ls fs_bool_true -> true
+  | _ -> false
+
+let is_bool_false t =
+  match t.t_node with
+  | Tapp (ls, []) when ls_equal ls fs_bool_false -> true
+  | _ -> false
 
 let rec split acc f =
   match f.t_node with
   | Ttrue ->
       f :: acc
-  | Tfalse | Tapp _ | Tnot _ | Tquant (Texists, _) | Tbinop (Tor, _, _) ->
+  | Tfalse | Tnot _ | Tquant (Texists, _) | Tbinop (Tor, _, _) ->
       f :: acc
+  | Tapp (equ, [{t_node = Tif (c,t,e)} ;r])
+    when ls_equal equ ps_equ && is_bool_true t && is_bool_false e ->
+    (* the unfolding transformation creates terms of the form
+          (if P = True then True else False) = True)
+       where P is an expression that we want to split further.  We recognize
+       such expressions and (want to) simplify them to just "P".  However, we
+       introduce a dummy "let" binding so that the labels attached to "P" are
+       separated from the labels attached to the larger equality. *)
+      if is_bool_true r then begin
+        (* The t_attr_copy below may copy enclosing labels at the same node
+          as more specific labels. This messes up reporting (which is the
+          objective of splitting). We insert a dummy "let" binding here so that
+          the attributes end up at different nodes and the more relevant one is
+          further down in the tree.
+        *)
+        let v = create_vsymbol (id_fresh "dummy") ty_bool in
+        let c = t_let t_bool_true (t_close_bound v c) in
+        let f = t_attr_copy f c in
+        split acc f
+      end else
+        f :: acc
+  | Tapp _ -> f :: acc
   | Tbinop (Tand, f1, f2) ->
       split (split acc (t_attr_copy f f2)) (t_attr_copy f f1)
   | Tbinop (Timplies, f1, f2) ->
@@ -92,13 +130,173 @@ let split_conj_axioms = Trans.decl split_axioms None
 
 let split_conj_axioms_name = "split_conj_axioms"
 
+let inline_attr = Ident.create_attribute "inline_marker"
+
+let should_unfold ls =
+  Sattr.mem inline_attr (ls.ls_name.id_attrs)
+
+(* copied relocate and t_unfold from inlining.ml *)
+let rec relocate loc t =
+  t_map (relocate loc) (t_attr_set ?loc t.t_attrs t)
+
+let t_unfold loc env fs tl ty =
+  match Mls.find_opt fs env with
+  | None ->
+      assert false
+  | Some (vl,e) ->
+      let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
+      let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl tl in
+      let mt = oty_match mt e.t_ty ty in
+      t_ty_subst mt mv (relocate loc e)
+
+let is_true t =
+  match t.t_node with
+  | Ttrue -> true
+  | Tapp (ls, []) when ls_equal ls fs_bool_true -> true
+  | _ -> false
+
+(* simple traversal function to unfold marked symbols using the map given by
+   [env]. When we unfold, we call the function recursively using (n-1) to achieve
+   n total unfoldings. *)
+let rec unfold_right n env f =
+  if n = 0 then f else
+  match f.t_node with
+  | Ttrue | Tfalse | Tnot _ | Tquant (Texists, _) | Tbinop (Tor, _, _) | Tvar _ | Tconst _  -> f
+  | Tbinop (Tand, f1, f2) ->
+    t_attr_copy f (t_and (unfold_right n env f1) (unfold_right n env f2))
+  | Tbinop (Timplies, f1, f2) ->
+    t_attr_copy f (t_implies f1 (unfold_right n env f2))
+  | Tbinop (Tiff,f1,f2) ->
+    t_attr_copy f (t_iff (unfold_right n env f1) (unfold_right n env f2))
+  | Tif (fif,fthen,felse) ->
+    t_attr_copy f (t_if fif (unfold_right n env fthen) (unfold_right n env felse))
+  | Tlet (t,fb) ->
+      let vs,f1,close = t_open_bound_cb fb in
+      t_attr_copy f (t_let t (close vs (unfold_right n env f1)))
+  | Tcase (t,bl) ->
+      unfold_case n env f t bl
+  | Tquant (Tforall,fq) ->
+      let vsl,trl,f1,close = t_open_quant_cb fq in
+      t_attr_copy f (t_forall (close vsl trl (unfold_right n env f1)))
+  | Tapp (ls, tl) ->
+    let tl = List.map (unfold_right n env) tl in
+    if should_unfold ls then
+      let f = t_attr_copy f (t_unfold f.t_loc env ls tl f.t_ty) in
+      unfold_right (n-1) env f
+    else
+      t_attr_copy f (t_app ls tl f.t_ty)
+  | Teps fb ->
+      let vs,f1,close = t_open_bound_cb fb in
+      t_attr_copy f (t_eps (close vs (unfold_right n env f1)))
+
+and unfold_case n env forig t bl =
+  let bl = List.map (fun b ->
+    let pt, f, close = t_open_branch_cb b in
+    close pt (unfold_right n env f))
+    bl
+  in
+  t_attr_copy forig (t_case t bl)
+
+
+let is_all_vars tl =
+  List.for_all (fun t ->
+    match t.t_node with
+    | Tvar _ -> true
+    | _ -> false
+    ) tl
+
+let extract_def env vs lhs rhs =
+  match lhs.t_node with
+  | Tapp (ls, tl) when is_all_vars tl && should_unfold ls ->
+      Mls.add ls (vs, rhs) env
+  | _ -> env
+
+(* function to extract a definition from an axiom. It supports the two cases
+     f(x1 ... xn) = rhs
+  and
+    f(x1 ... xn) = True <-> rhs
+
+  In the latter case, because rhs is a proposition while f returns a boolean,
+  we need to wrap "rhs" in an if expression:
+    if rhs then True else False
+*)
+
+let extract_def_from_axiom env t =
+  match t.t_node with
+  | Tquant (Tforall, tq) ->
+    begin
+      let vs, _, t = t_open_quant tq in
+      match t.t_node with
+      | Tbinop (Tiff, lhs, rhs) ->
+        let rhs = t_attr_add inlined_attr rhs in
+        begin match lhs.t_node with
+        | Tapp (ls, [a; b]) ->
+          if ls_equal ls ps_equ then begin
+            if is_true b then begin
+              extract_def env vs a (t_if rhs t_bool_true t_bool_false)
+            end else extract_def env vs lhs rhs
+          end else extract_def env vs lhs rhs
+        | _ ->
+          let rhs = t_attr_add inlined_attr rhs in
+          extract_def env vs lhs rhs
+        end
+      | Tapp (ls, [lhs; rhs]) when ls_equal ls ps_equ ->
+        let rhs = t_attr_add inlined_attr rhs in
+        extract_def env vs lhs rhs
+      | _ -> env
+    end
+  | _ -> env
+
+
+(* Function to traverse all declarations and build a map
+     symbol -> definition
+   for all symbols that are to be unfolded. *)
+let fold env d =
+  match d.td_node with
+    | Decl d ->
+    begin match d.d_node with
+      | Dlogic [ls,ld]
+        when should_unfold ls ->
+          let vl,e = open_ls_defn ld in
+          Mls.add ls (vl,e) env
+      | Dprop (Paxiom, _, t) ->
+          let env = extract_def_from_axiom env t in
+          env
+      | _ -> env
+    end
+    | _ -> env
+
+(* Transformation to unfold marked symbols in the goal. We unfold just one
+   level currently. *)
+let unfold_trans = Trans.store (fun task ->
+  let goal, task = task_separate_goal task in
+  let env = task_fold fold Mls.empty task in
+  match goal.td_node with
+      | Decl d ->
+        begin match d.d_node with
+        | Dprop (Pgoal,sym,t) ->
+          begin try
+            let g = (unfold_right 1 env t) in
+            add_tdecl task (create_decl (create_prop_decl Pgoal sym g))
+          with _ ->
+            add_tdecl task goal
+          end
+        | _ -> assert false
+        end
+      | _ -> assert false)
 
 let () =
   Trans.register_transform split_conj_axioms_name split_conj_axioms
   ~desc:"Split def and post axioms generated by SPARK tools"
 
+
 let () =
   let trans =
-    Trans.compose_l Split_goal.split_goal_right split_conj in
+    Trans.compose_l
+      Split_goal.split_goal_right
+      (Trans.compose_l
+        (Trans.singleton unfold_trans)
+          split_conj)
+  in
   Trans.register_transform_l "split_goal_wp_conj" trans
     ~desc:"split goal followed by conjunction split"

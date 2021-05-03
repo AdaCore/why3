@@ -35,7 +35,7 @@ open Why3
      result = { "id"             : int,
                 "reason"         : string,
                 "result"         : bool,
-                "extra_info"     : int,
+                "extra_info"     : extra_info,
                 "vc_file"        : string,
                 "editor_cmd"     : string,
                 "check_tree"     : list goal,
@@ -50,6 +50,9 @@ open Why3
    should be present at the same time. If present, "vc_file" contains the name
    of a VC file to be used for manual proof, and "editor_cmd" the command to
    spawn for an external editor for this VC.
+
+     extra_info = { "node" : int,
+                    "inline" : bool }
 
   The counter example information is stored in the cntexmp field. At the top
   level, this is a mapping from file names to linesentry record.
@@ -104,7 +107,7 @@ type result_info =
      subgoals proven by transformations (except trivial_true).
      The second integer is the number of subgoals proven by trivial_true. *)
   | Not_Proved of
-       int option *                    (* VC Info for the unproved goal *)
+       Gnat_expl.extra_info *          (* VC Info for the unproved goal *)
        Model_parser.model option *     (* counterexample model *)
        (string * string) option        (* for manual provers,
                                           pair of (vc_file, editor_cmd) *)

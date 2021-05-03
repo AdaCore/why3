@@ -13,7 +13,7 @@ type stats = prover_stat Whyconf.Hprover.t
 type result_info =
   | Proved of stats * int * int
   | Not_Proved of
-       int option *
+       Gnat_expl.extra_info *
        Model_parser.model option *
        (string * string) option
 
@@ -23,7 +23,7 @@ type msg =
     stats_checker : int;
     stats_trivial : int;
     check_tree    : Json_base.json;
-    extra_info    : int option;
+    extra_info    : Gnat_expl.extra_info;
     cntexmp_model : Model_parser.model option;
     manual_proof  : (string * string) option
   }
@@ -59,7 +59,11 @@ let register check check_tree result =
   let valid, extra_info, stats, model, manual =
     match result with
     | Proved (stats, stats_checker, stat_trivial) ->
-        true, None, Some (stats, stats_checker, stat_trivial), None, None
+        true,
+        {Gnat_expl.pretty_node = None; inlined = false},
+        Some (stats, stats_checker, stat_trivial),
+        None,
+        None
     | Not_Proved (extra_info, model, manual) ->
         false, extra_info, None, model, manual
   in
@@ -79,11 +83,6 @@ let register check check_tree result =
       manual_proof  = manual } in
     Gnat_expl.HCheck.add msg_set check msg
   end
-
-let get_info info  =
-    match info with
-    | None -> 0
-    | Some info -> info
 
 let spark_counterexample_transform me_name =
   (* Just return the name of the model element. Transformation of model
@@ -144,14 +143,27 @@ let print_stats fmt (stats, stat_checker, stat_trivial) =
 let sort_messages (l : (Gnat_expl.check * msg) list) =
   List.sort (fun x y -> compare (fst x).Gnat_expl.id (fst y).Gnat_expl.id) l
 
+let opt_int fmt i = int fmt (Opt.get_def 0 i)
+
+let print_extra_info fmt i =
+ let print_info fmt (i, inline) =
+  Format.fprintf fmt "{%a, %a}"
+    (print_json_field "node" opt_int) i
+    (print_json_field "inline" bool) inline
+  in
+  match i with
+  | { Gnat_expl.pretty_node = i; inlined = inline } ->
+    Format.fprintf fmt ", %a" (print_json_field "extra_info" print_info) (i, inline)
+  
+
 let print_json_msg fmt (check, m) =
-  Format.fprintf fmt "{%a, %a, %a, %a, %a%a%a%a}"
+  Format.fprintf fmt "{%a, %a, %a, %a%a%a%a%a}"
     (print_json_field "id" int) check.Gnat_expl.id
     (print_json_field "reason" string)
       (Gnat_expl.reason_to_ada check.Gnat_expl.reason)
     (print_json_field "result" bool) m.result
-    (print_json_field "extra_info" int) (get_info m.extra_info)
     (print_json_field "check_tree" Json_base.print_json) m.check_tree
+    print_extra_info m.extra_info
     print_stats (m.stats, m.stats_checker, m.stats_trivial)
     print_cntexmp_model m.cntexmp_model
     print_manual_proof_info m.manual_proof

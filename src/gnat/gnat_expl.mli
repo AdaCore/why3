@@ -79,9 +79,14 @@ type check =
    A check can be proved already (e.g. by CodePeer).
    *)
 
+type extra_info = 
+  { pretty_node : int option;
+    inlined     : bool;
+  }
+
 type vc_info =
-  { check : check;
-    extra_info : int option
+  { check      : check;
+    extra_info : extra_info;
   }
 (* A VC info is the info attached to a VC. This is the corresponding check as
    well as extra information (the Ada node for pretty printing) that is proper to
@@ -108,6 +113,8 @@ type gp_label =
   | Gp_Already_Proved
   (* label "GP_Already_Proved" used to indicate that this VC doesn't require
      proof *)
+  | Gp_Inline
+  (* label "GP_Inline" used to indicate that this location might be inlined *)
 
 val read_label : string -> gp_label option
 (* parse a string into a gp_label; abort if the label starts with "GP_" but

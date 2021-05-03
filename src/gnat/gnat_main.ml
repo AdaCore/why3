@@ -173,7 +173,7 @@ let report_messages c obj =
       let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
       let extra_info =
         match unproved_goal with
-        | None -> None
+        | None -> { Gnat_expl.pretty_node = None; inlined = false }
         | Some g -> Gnat_objectives.get_extra_info g
       in
       Gnat_report.Not_Proved (extra_info, model, manual_info) in
@@ -269,7 +269,7 @@ let _ =
         (* we should never get here *)
         ()
     end;
-    Gnat_scheduler.main_loop (ending c);
+    Gnat_scheduler.main_loop (ending c)
   with e when Debug.test_flag Debug.stack_trace -> raise e
   | Out_of_memory as e -> raise e
   | e ->
