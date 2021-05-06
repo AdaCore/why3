@@ -531,7 +531,7 @@ PLUG_MICROC = mc_ast mc_parser mc_lexer mc_printer mc_main
 PLUG_CFG = cfg_ast cfg_tokens cfg_parser cfg_lexer cfg_main
 PLUG_ADA = ada_nametable ada_parser ada_lexer ada_main
 
-PLUGINS = genequlin dimacs tptp python microc cfg ada gnat_json
+PLUGINS = genequlin dimacs tptp python microc cfg ada_terms gnat_json
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
@@ -574,7 +574,7 @@ PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
 	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
 	      $(CFGMODULES) \
-        $(ADAMODULES) $(GNATJSONMODULES)
+	      $(ADAMODULES) $(GNATJSONMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
@@ -618,8 +618,8 @@ lib/plugins/microc.cmxs: $(MICROCCMX)
 lib/plugins/microc.cmo: $(MICROCCMO)
 lib/plugins/cfg.cmxs: $(addsuffix .cmx, $(CFGMODULES))
 lib/plugins/cfg.cmo: $(addsuffix .cmo, $(CFGMODULES))
-lib/plugins/ada.cmxs: $(ADACMX)
-lib/plugins/ada.cmo: $(ADACMO)
+lib/plugins/ada_terms.cmxs: $(ADACMX)
+lib/plugins/ada_terms.cmo: $(ADACMO)
 lib/plugins/gnat_json.cmxs: $(GNATJSONCMX)
 lib/plugins/gnat_json.cmo: $(GNATJSONCMO)
 

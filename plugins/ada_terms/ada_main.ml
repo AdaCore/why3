@@ -192,10 +192,10 @@ let () =
     Pmodule.mlw_language ada_format ["adb"] Lexer.read_channel
 
 let register_ada_terms format =
-  Itp_server.add_registered_lang format ada_ext_printer;
   let open Ada_lexer in
-  Args_wrapper.set_argument_parsing_functions format
-    ~parse_term ~parse_term_list ~parse_list_ident ~parse_qualid ~parse_list_qualid
+  Args_wrapper.set_argument_parsing_functions format ~parse_term
+    ~parse_term_list ~parse_list_ident ~parse_qualid ~parse_list_qualid
 
 let () =
-  List.iter register_ada_terms [ada_format; Lexer.whyml_format]
+  Itp_server.add_registered_lang ada_format ada_ext_printer;
+  List.iter register_ada_terms [ada_format; "gnat-json"]

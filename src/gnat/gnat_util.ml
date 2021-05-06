@@ -103,9 +103,9 @@ let build_env_from_config ~load_plugins ~proof_dir config =
   let config_main = Whyconf.get_main config in
   ( if load_plugins then
       Whyconf.load_plugins config_main
-    else (* At least load the gnat_json plugin *)
-      let dirs = Whyconf.[pluginsdir (get_main config)] in
-      Plugin.load ~dirs "gnat_json" );
+    else (* At least load the gnatwhy3 plugins *)
+      let dirs = [Whyconf.pluginsdir (Whyconf.get_main config)] in
+      List.iter (Plugin.load ~dirs) ["gnat_json"; "ada_terms"] );
   let base_loadpath = spark_loadpath @ Whyconf.loadpath config_main in
   let extended_loadpath =
     match proof_dir with
