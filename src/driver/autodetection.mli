@@ -23,6 +23,7 @@ val list_binaries : unit -> string list
 
 module Prover_autodetection_data: sig
   type t
+  val from_file: string -> t
 end
 
 module Detected_binary: sig

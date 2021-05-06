@@ -47,7 +47,7 @@ val read_config : string option -> config
 val init_config : ?extra_config:string list -> string option -> config
 (** [init_config ?extra_config conf_file]
 
-    Add the automatically generated part of the configuration, and load plugins
+    Add the automatically generated part of the configuration.
 
 *)
 
