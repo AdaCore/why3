@@ -242,19 +242,9 @@ let wp_case t bl =
 let wp_forall vl wp = t_forall_close_simp vl [] wp
 let sp_exists vl sp = t_exists_close_simp vl [] sp
 
-(**)
 let t_let_close_simp v t f =
-  if relevant_for_counterexample v.vs_name then
-    begin
-      (* Format.eprintf "[Vc.t_let_close_simp] %a -> no simp@." Pretty.print_vs v; *)
-      t_let_close v t f
-    end
-  else
-    begin
-      (* Format.eprintf "[Vc.t_let_close_simp] %a -> simp@." Pretty.print_vs v; *)
-      t_let_close_simp v t f
-    end
-(**)
+  let keep = relevant_for_counterexample v.vs_name in
+  t_let_close_simp_keep_var ~keep v t f
 
 let wp_let v t wp =
   if pv_is_unit v then t_subst_single v.pv_vs t_void wp
@@ -362,14 +352,9 @@ let sp_of_inv loc attrs expl pl =
 
 let sp_of_pre pl = sp_of_inv None Sattr.empty expl_pre pl
 
-let sp_of_post loc attrs expl ?use_pv ity ql =
-  let v = match use_pv with
-    | Some v -> v
-    | None -> res_of_post loc ity ql
-  in
-  let t = t_var v.pv_vs in
+let sp_of_post loc attrs expl v ql = let t = t_var v.pv_vs in
   let push q = push_stop loc attrs expl (open_post_with t q) in
-  v, t_and_l (List.map push ql)
+  t_and_l (List.map push ql)
 
 (* definitions of local let-functions are inserted in the VC
    as premises for the subsequent code (in the same way as
@@ -659,18 +644,17 @@ let rec k_expr env lps e res xmap =
         let pinv = if trusted then [] else inv_of_pvs env e.e_loc rds in
         let qinv = if trusted then [] else inv_of_pvs env e.e_loc aff in
         let k_of_post expl v ql =
-          (* Format.eprintf "[Vc.k_of_post] v = %a@." print_pv_attr v; *)
-          let vv, sp = sp_of_post loc attrs expl v.pv_ity ql in
-          (* Format.eprintf "[Vc.k_of_post] vv = %a, sp = %a@." print_pv_attr vv Pretty.print_term sp; *)
+          let sp = sp_of_post loc attrs expl v ql in
           let sp = t_subst sbs sp (* rename oldies *) in
           let rinv = if trusted then [] else
-            inv_of_pvs env e.e_loc (Spv.singleton vv) in
+            inv_of_pvs env e.e_loc (Spv.singleton v) in
           let k =
-            match term_of_post ~prop:false vv.pv_vs sp with
+            match term_of_post ~prop:false v.pv_vs sp with
             | Some (t, sp) ->
-               Klet (vv, t_tag t, List.fold_right sp_and rinv sp)
-            | None ->  Kval ([vv], List.fold_right sp_and rinv sp) in
-          Kseq(k,0,Klet(v, t_var vv.pv_vs, t_true))
+               Klet (v, t_tag t, List.fold_right sp_and rinv sp)
+            | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
+          let vv = res_of_post loc v.pv_ity ql in
+          Kseq(k,0,Klet(vv, t_var v.pv_vs, t_true))
           in
         let k = k_of_post expl_post res cty.cty_post in
         (* in abstract blocks, exceptions without postconditions
@@ -756,8 +740,8 @@ let rec k_expr env lps e res xmap =
           | RLls _ -> assert false (* not applicable *)
           | RLnone -> vl, k
           | RLlemma ->
-             let (* v = res_of_cty loc c.c_cty and *) q = c.c_cty.cty_post in
-             let v, q = sp_of_post None Sattr.empty expl_post c.c_cty.cty_result q in
+             let v = res_of_cty loc c.c_cty and q = c.c_cty.cty_post in
+             let q = sp_of_post None Sattr.empty expl_post v q in
               let q = if pv_is_unit v
                 then t_subst_single v.pv_vs t_void q
                 else t_exists_close_simp [v.pv_vs] [] q in
@@ -765,7 +749,7 @@ let rec k_expr env lps e res xmap =
           | RLpv v ->
               let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
               let q = cty_exec_post (cty_enrich_post c) in
-              let _, q = sp_of_post None Sattr.empty expl_post ~use_pv:v v.pv_ity q in
+              let q = sp_of_post None Sattr.empty expl_post v q in
               v::vl, add_axiom c.c_cty q k in
         let vl, k = match ld with
           | LDrec rdl ->
@@ -1625,8 +1609,18 @@ let mk_vc_decl ({known_map = kn} as env) id f =
   let f = simp_cast_projections env f in
   create_pure_decl (create_prop_decl Pgoal pr f)
 
+let rec is_trivial_vc f =
+  match f.t_node with
+  | Ttrue -> true
+  | Tlet (_,tb) -> let _,t = t_open_bound tb in is_trivial_vc t
+  | Tquant(Tforall,tq) -> let _,_,t = t_open_quant tq in is_trivial_vc t
+  | Tbinop(Timplies,_,t) -> is_trivial_vc t
+  | _ -> false
+
+
 let add_vc_decl kn id f vcl =
-  if can_simp f then vcl else mk_vc_decl kn id f :: vcl
+  if not (Sattr.mem annot_attr f.t_attrs) && is_trivial_vc f
+  then vcl else mk_vc_decl kn id f :: vcl
 
 let infer_invs = ref (fun _ _ _ _ _ _ -> [])
 let set_infer_invs f = infer_invs := f

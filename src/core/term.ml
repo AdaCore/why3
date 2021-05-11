@@ -1619,23 +1619,44 @@ let small t = match t.t_node with
 *)
   | _ -> false
 
-let t_let_simp e ((v,b,t) as bt) =
+let t_let_simp_keep_var ~keep e ((v,b,t) as bt) =
   let n = t_v_occurs v t in
   if n = 0 then
-    t_subst_unsafe b.bv_subst t else
+    let t = t_subst_unsafe b.bv_subst t in
+    if keep then t_let_close v e t else
+      (*if relevant_for_counterexample v.vs_name
+      then failwith "t_let_simp_keep_var"
+      else *) t
+  else
   if n = 1 || small e then begin
     vs_check v e;
-    t_subst_unsafe (Mvs.add v e b.bv_subst) t
+    let t = t_subst_unsafe (Mvs.add v e b.bv_subst) t in
+    if keep then t_let_close v e t else
+      (*if relevant_for_counterexample v.vs_name
+      then failwith "t_let_simp_keep_var"
+      else *) t
   end else
     t_let e bt
 
-let t_let_close_simp v e t =
+let t_let_simp = t_let_simp_keep_var ~keep:false
+
+let t_let_close_simp_keep_var ~keep v e t =
   let n = t_v_occurs v t in
-  if n = 0 then t else
+  if n = 0 then
+    if keep then t_let_close v e t else
+      (* if relevant_for_counterexample v.vs_name
+      then failwith "t_let_close_simp_keep_var"
+      else *) t else
   if n = 1 || small e then
-    t_subst_single v e t
+    let t = t_subst_single v e t in
+    if keep then t_let_close v e t else
+      (* if relevant_for_counterexample v.vs_name
+      then failwith "t_let_close_simp_keep_var"
+      else *) t
   else
     t_let_close v e t
+
+let t_let_close_simp = t_let_close_simp_keep_var ~keep:false
 
 let t_case_simp t bl =
   let e0,tl = match bl with

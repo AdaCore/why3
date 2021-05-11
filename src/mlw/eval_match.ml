@@ -135,17 +135,8 @@ let let_map fn env t1 tb =
   (* TODO/FIXME? convert (let x = if f then True else False in h)
      into (forall x. (x = True <-> f) -> h) ? *)
   (**)
-  if relevant_for_counterexample x.vs_name then
-    begin
-      (* Format.eprintf "[Eval_match.let_map] %a -> no simp@." Pretty.print_vs x; *)
-      t_let t1 (close x t2)
-    end
-  else
-    (**)
-    begin
-      (* Format.eprintf "[Eval_match.let_map] %a -> simp@." Pretty.print_vs x; *)
-      t_let_simp t1 (close x t2)
-    end
+  let keep = relevant_for_counterexample x.vs_name in
+  t_let_simp_keep_var ~keep t1 (close x t2)
 
 let branch_map fn env t1 bl =
   let mk_b b =
