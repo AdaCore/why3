@@ -751,13 +751,17 @@ let bounds ls_lt t1 t2 =
 let reduce_bounded_quant ls_lt limit t sigma st rem =
   match st, rem with (* st = a < vs < b :: _; rem = -> :: forall vs :: _ *)
   | Term {t_node= Tbinop (Tand, t1, t2)} :: st,
-    (Kbinop Timplies, _) :: (Kquant (Tforall, [vs], _), _) :: rem
+    ((Kbinop Timplies, _) :: (Kquant (Tforall as quant, [vs], _), _) :: rem |
+     (Kbinop Tand, _)     :: (Kquant (Texists as quant, [vs], _), _) :: rem)
     when Ty.ty_equal vs.vs_ty Ty.ty_int ->
+      let t_empty, binop = match quant with
+        | Tforall -> t_true, Tand
+        | Texists -> t_false, Tor in
       let a, vs', b = bounds ls_lt t1 t2 in
       if not (vs_equal vs vs') then raise Exit;
       if BigInt.(gt (sub b a) (of_int limit)) then raise Exit;
       if BigInt.gt a b then (* empty range *)
-        {value_stack= Term t_true :: st; cont_stack= rem}
+        {value_stack= Term t_empty :: st; cont_stack= rem}
       else
         let rec loop rem i =
           if BigInt.lt i a then
@@ -765,7 +769,7 @@ let reduce_bounded_quant ls_lt limit t sigma st rem =
           else
             let t_i = t_const (Constant.int_const i) Ty.ty_int in
             let rem = (* conjunction for all i > a *)
-              if BigInt.gt i a then (Kbinop Tand, t_true) :: rem else rem in
+              if BigInt.gt i a then (Kbinop binop, t_true) :: rem else rem in
             let rem = (Keval (t, Mvs.add vs t_i sigma), t_true) :: rem in
             loop rem (BigInt.pred i) in
         {value_stack= st; cont_stack= loop rem b}
