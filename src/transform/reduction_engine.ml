@@ -392,6 +392,7 @@ type params =
   { compute_defs : bool;
     compute_builtin : bool;
     compute_def_set : Term.Sls.t;
+    compute_max_quantifier_domain : int;
   }
 
 type engine =
@@ -779,7 +780,8 @@ let rec reduce engine c =
   match c.value_stack, c.cont_stack with
   | _, [] -> assert false
   | st, (Keval (t,sigma),orig) :: rem -> (
-      try reduce_bounded_quant engine.ls_lt 10 t sigma st rem with Exit ->
+      let limit = engine.params.compute_max_quantifier_domain in
+      try reduce_bounded_quant engine.ls_lt limit t sigma st rem with Exit ->
         reduce_eval engine st t ~orig sigma rem )
   | [], (Kif _, _) :: _ -> assert false
   | v :: st, (Kif(t2,t3,sigma), orig) :: rem ->

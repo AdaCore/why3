@@ -33,6 +33,7 @@ let prec = ref None
 
 let opt_parser = ref None
 
+let opt_metas = ref []
 let opt_enable_rac = ref false
 let opt_rac_prover = ref None
 let opt_rac_try_negate = ref false
@@ -42,10 +43,23 @@ let opt_rac_fail_cannot_check = ref false
 
 let use_modules = ref []
 
+let add_opt_meta meta =
+  let meta_name, meta_arg =
+    try
+      let index = String.index meta '=' in
+      (String.sub meta 0 index),
+      Some (String.sub meta (index+1) (String.length meta - (index + 1)))
+    with Not_found ->
+      meta, None
+  in
+  opt_metas := (meta_name,meta_arg)::!opt_metas
+
 let option_list =
   let open Getopt in
   [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
     "<format> select input format (default: \"why\")";
+    Key ('M', "meta"), Hnd1 (AString, add_opt_meta),
+    "<meta>[=<string>|<int>] add a meta to every task during RAC";
     KLong "real", Hnd1 (APair (',', AInt, APair (',', AInt, AInt)),
       fun (i1, (i2, i3)) -> prec := Some (i1, i2, i3)),
     "<emin>,<emax>,<prec> set format used for real computations (e.g.,\n\
@@ -118,8 +132,9 @@ let do_input f =
   try
     let rac =
       let reduce =
-        let trans = "compute_in_goal" and prover = !opt_rac_prover and try_negate = !opt_rac_try_negate in
-        rac_reduce_config_lit config env ~trans ?prover ~try_negate () in
+        let trans = "compute_in_goal" and prover = !opt_rac_prover
+        and try_negate = !opt_rac_try_negate and metas = !opt_metas in
+        rac_reduce_config_lit config env ~metas ~trans ?prover ~try_negate () in
       let skip_cannot_compute = not !opt_rac_fail_cannot_check in
       let timelimit = Opt.map float_of_int !opt_rac_timelimit in
       rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute

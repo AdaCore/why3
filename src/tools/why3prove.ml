@@ -222,9 +222,11 @@ let () = try
   end;
   let add_meta task (meta,s) =
     let meta = lookup_meta meta in
-    let args = match s with
-      | Some s -> [MAstr s]
-      | None -> []
+    let args = match meta.meta_type, s with
+      | [MTstring], Some s -> [MAstr s]
+      | [MTint], Some s -> [MAint (int_of_string s)]
+      | [], None -> []
+      | _ -> failwith "meta argument not implemented"
     in
     Task.add_meta task meta args
   in
