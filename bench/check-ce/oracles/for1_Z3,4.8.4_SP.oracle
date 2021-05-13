@@ -1,9 +1,9 @@
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
-Goal Loop invariant init from verification condition f'vc.
-Prover result is: Valid (0.01s, 25 steps).
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid (0.02s, 25 steps).
 
 File "bench/check-ce/for1.mlw", line 7, characters 18-24:
-Goal Loop invariant preservation from verification condition f'vc.
+Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Valid (0.01s, 1593 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for1.mlw", line 4, characters 12-22)
@@ -219,8 +219,8 @@ Prover result is: Valid (0.01s, 1593 steps).
   - Concrete RAC NORMAL, no contradiction during execution
   - Abstract RAC FAILURE, counter-example confirmed
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
-Goal Postcondition from verification condition f'vc.
-Prover result is: Step limit exceeded (0.94s).
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Step limit exceeded (1.12s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
@@ -255,6 +255,6 @@ File for1.mlw:
       result = 0
 
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
-Goal Postcondition from verification condition f'vc.
+Sub-goal Postcondition of goal f'vc.
 Prover result is: Valid (0.01s, 51 steps).
 

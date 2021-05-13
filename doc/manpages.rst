@@ -252,6 +252,10 @@ The :why3:tool:`prove` command executes the following steps:
    Command :why3:tool:`why3 show transformations` lists the known
    transformations; plugins can register more of them.
 
+#. If the option :option:`--sub-goal` is provided, only the sub-goals that
+   correspond to the given line number (and explanation) are retained after
+   applying the transformations.
+
 #. Apply the driver selected with the :option:`--driver` option, or the
    driver of the prover selected with the :option:`--prover` option.
    Command :why3:tool:`why3 config list-provers` lists the provers
@@ -309,6 +313,17 @@ Options
 .. option:: -a <transform>, --apply-transform=<transform>
 
    Apply the given transformation to the goals.
+
+.. option:: -g [<file>][:<line>][@<expl>], --sub-goal=[<file>][:<line>][@<expl>]
+
+   Retain only sub-goals at the given location (and with the given explanation)
+   after applying the transformations. The file can be omitted and defaults to
+   the input file. E.g., ``why3 prove --sub-goal=:123@Precondition file.mlw`` to
+   prove only the preconditions in line 123 in file ``file.mlw``.The explanation
+   of a goal is shown the normal output of ``why3 prove``: ::
+
+       File "file.mlw", line 123, characters 0-1:
+       Sub-goal <expl> from goal f'vc.
 
 .. option:: -P <prover>, --prover=<prover>
 
