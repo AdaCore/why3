@@ -377,15 +377,28 @@ let rac_prover ~command driver limit =
   Rac_prover {command; driver; limit}
 
 type rac_reduce_config = {
+  rac_metas : (Theory.meta * Theory.meta_arg list) list;
   rac_trans: Task.task Trans.tlist option;
   rac_prover: rac_prover option;
   rac_try_negate: bool;
 }
 
-let rac_reduce_config ?trans:rac_trans ?prover:rac_prover ?try_negate:(rac_try_negate=false) () =
-  {rac_trans; rac_prover; rac_try_negate}
+let rac_reduce_config ?metas:(rac_metas=[]) ?trans:rac_trans
+    ?prover:rac_prover ?try_negate:(rac_try_negate=false) () =
+  {rac_metas; rac_trans; rac_prover; rac_try_negate}
 
-let rac_reduce_config_lit config env ?trans ?prover ?try_negate () =
+let rac_reduce_config_lit config env ?(metas=[]) ?trans ?prover ?try_negate () =
+  let metas =
+    let aux (meta, s) =
+      let open Theory in
+      let meta = lookup_meta meta in
+      let args = match meta.meta_type, s with
+        | [MTstring], Some s -> [MAstr s]
+        | [MTint], Some s -> [MAint (int_of_string s)]
+        | [], None -> []
+        | _ -> failwith "meta argument not implemented" in
+      meta, args in
+    List.map aux metas in
   let trans =
     let aux s = Trans.lookup_transform_l s env in
     Opt.map aux trans in
@@ -405,7 +418,7 @@ let rac_reduce_config_lit config env ?trans ?prover ?try_negate () =
       let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
       rac_prover ~command driver limit in
     Opt.map aux prover in
-  rac_reduce_config ?trans ?prover ?try_negate ()
+  rac_reduce_config ~metas ?trans ?prover ?try_negate ()
 
 (******************************************************************************)
 (*                             Execution log                                  *)
@@ -1532,7 +1545,7 @@ let bind_fun rs (cexp, _) (task, ls_mv) =
     task, ls_mv
   with Exit -> task, ls_mv
 
-let task_of_term ?(vsenv=[]) env t =
+let task_of_term ?(vsenv=[]) metas env t =
   let open Task in let open Decl in
   let th = env.pmodule.Pmodule.mod_theory in
   let rec t_free_sls sofar t =
@@ -1603,6 +1616,7 @@ let task_of_term ?(vsenv=[]) env t =
   let task, ls_mt, ls_mv = Mvs.fold (bind_value env) env.vsenv (task, ls_mt, ls_mv) in
   let task = fold_premises add_premise env.premises task in
   let t = t_ty_subst ls_mt ls_mv t in
+  let task = List.fold_left (fun t (m, a) -> Task.add_meta t m a) task metas in
   let task =
     if t.t_ty = None then (* Add a formula as goal directly ... *)
       let prs = create_prsymbol (id_fresh "goal") in
@@ -1692,7 +1706,7 @@ let compute_term ?vsenv env t =
   match env.rac.rac_reduce.rac_trans with
   | None -> t
   | Some trans ->
-      let task, ls_mv = task_of_term ?vsenv env t in
+      let task, ls_mv = task_of_term ?vsenv env.rac.rac_reduce.rac_metas env t in
       if t.t_ty = None then (* [t] is a formula *)
         let tasks = trans_and_bind_quants env trans task in
         match List.map Task.task_goal_fmla tasks with
@@ -1765,7 +1779,7 @@ let check_term ?vsenv env (ctx: pre_cntr_ctx) t =
   Debug.dprintf debug_rac_check_sat "@[<hv2>Check term: %a %a@]@." print_term t
     Pp.(print_list space (fun fmt vs -> fprintf fmt "@[%a=%a@]" print_vs vs print_value (get_vs env vs)))
     (Mvs.keys (t_freevars Mvs.empty t)) ;
-  let task, _ = task_of_term ?vsenv env t in
+  let task, _ = task_of_term ?vsenv env.rac.rac_reduce.rac_metas env t in
   let res = (* Try checking the term using computation first ... *)
     Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Computed %b.@." b; b)
       (Opt.bind env.rac.rac_reduce.rac_trans

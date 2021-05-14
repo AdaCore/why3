@@ -143,10 +143,12 @@ type rac_reduce_config
    not progress. *)
 
 val rac_reduce_config :
-  ?trans:Task.task Trans.tlist -> ?prover:rac_prover -> ?try_negate:bool ->
+  ?metas:(Theory.meta * Theory.meta_arg list) list ->
+  ?trans:Task.task Trans.tlist ->
+  ?prover:rac_prover -> ?try_negate:bool ->
   unit -> rac_reduce_config
 
-(** [rac_reduce_config_lit cnf env ?trans ?prover ?try_negate ()] configures the
+(** [rac_reduce_config_lit cnf env ?metas ?trans ?prover ?try_negate ()] configures the
    term reduction of RAC. [trans] is the name of a transformation (usually
    "compute_in_goal"). [prover] is a prover string with optional, space-sparated
    time limit and memory limit. And with [~try_negate:true] the negated term is
@@ -158,7 +160,9 @@ val rac_reduce_config :
    [--debug=rac-check-term-sat] is set.
  *)
 val rac_reduce_config_lit :
-  Whyconf.config -> Env.env -> ?trans:string -> ?prover:string -> ?try_negate:bool ->
+  Whyconf.config -> Env.env ->
+  ?metas:(string * string option) list -> ?trans:string ->
+  ?prover:string -> ?try_negate:bool ->
   unit -> rac_reduce_config
 
 type get_value =
