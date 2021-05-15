@@ -2886,8 +2886,10 @@ and exec_call ?(main_function=false) ?loc env rs arg_pvs ity_result =
             | Constructor its_def ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
                 check_pre_and_register_call Log.ExecConcrete;
-                let mt = List.fold_left2 ty_match Mtv.empty
-                    (List.map (fun pv -> pv.pv_vs.vs_ty) rs.rs_cty.cty_args) (List.map v_ty arg_vs) in
+                let aux mt pv v =
+                  ty_match mt pv.pv_vs.vs_ty (ty_inst mt (v_ty v)) in
+                let mt =
+                  List.fold_left2 aux Mtv.empty rs.rs_cty.cty_args arg_vs in
                 let ty = ty_inst mt (ty_of_ity ity_result) in
                 let vs = List.map field arg_vs in
                 let v = value ty (Vconstr (rs, its_def.Pdecl.itd_fields, vs)) in
