@@ -52,6 +52,20 @@ let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, r
   fprintf fmt "%a%a%a" (fst delims) ()
     (Pp.print_list sep pp_binding)
     l (snd delims) ()
+[@@warning "-32"]
+
+let pp_typed pp ty fmt x =
+  fprintf fmt "%a: %a" pp x print_ty (ty x)
+[@@warning "-32"]
+
+let pp_mt fmt mt =
+  pp_bindings print_tv print_ty fmt (Mtv.bindings mt)
+[@@warning "-32"]
+
+let pp_mv fmt mv =
+  pp_bindings (pp_typed print_vs (fun vs -> vs.vs_ty))
+    (pp_typed print_term t_type) fmt (Mvs.bindings mv)
+[@@warning "-32"]
 
 let pp_indent fmt =
   match Printexc.(backtrace_slots (get_callstack 100)) with
@@ -1274,10 +1288,14 @@ let rec term_of_value ?(ty_mt=Mtv.empty) env vsenv v : (vsymbol * term) list * t
       let t = t_equ (fs_app ls [t_var vs] ty_x) t_x in
       vsenv, t_eps (t_close_bound vs t)
   | Vconstr (rs, field_rss, fs) -> (
+      let match_field mt pv f =
+        ty_match mt pv.pv_vs.vs_ty (ty_inst mt (field_get f).v_ty) in
+      let ty_mt = List.fold_left2 match_field ty_mt rs.rs_cty.cty_args fs in
       let term_of_field vsenv f = term_of_value ~ty_mt env vsenv (field_get f) in
       let vsenv, fs = Lists.map_fold_left term_of_field vsenv fs in
       match rs_kind rs with
-      | RKfunc -> vsenv, fs_app (ls_of_rs rs) fs v_ty
+      | RKfunc ->
+          vsenv, fs_app (ls_of_rs rs) fs v_ty
       | RKnone when Strings.has_suffix "'mk" rs.rs_name.id_string ->
           let vs = create_vsymbol (id_fresh "v") v_ty in
           let for_field rs = t_equ (t_app_infer (ls_of_rs rs) [t_var vs]) in
@@ -1358,12 +1376,13 @@ let add_premises ?post_res ?(vsenv=[]) ts env =
   let match_free_var env vs _ (vsenv, mt, mv) =
     let v = get_vs env vs in
     let vsenv, t = term_of_value env vsenv v in
-    let vs' = create_vsymbol (id_clone vs.vs_name) (v_ty v) in
-    let mt = ty_match mt vs.vs_ty (v_ty v) in
+    let ty = ty_inst mt (v_ty v) in
+    let vs' = create_vsymbol (id_clone vs.vs_name) ty in
+    let mt = ty_match mt (ty_inst mt vs.vs_ty) ty in
     let mv = Mvs.add vs (vs', t) mv in
     vsenv, mt, mv in
-  let bind_vs (vs, t1) t2 =
-    t_let_close vs t1 t2 in
+  let bind_vs mt mv (vs, t1) t2 =
+    t_let_close vs (t_ty_subst mt mv t1) t2 in
   let bind_fun env mt mv vs _ sofar =
     let matching_vs rs _ = id_equal rs.rs_name vs.vs_name in
     match Mrs.choose (Mrs.filter matching_vs env.funenv) with
@@ -1396,8 +1415,8 @@ let add_premises ?post_res ?(vsenv=[]) ts env =
     let mv_t = Mvs.map (fun (vs', _) -> t_var vs') mv in
     let vsenv = List.map (fun (vs, t) -> Mvs.find_def vs vs mv_vs, t_ty_subst mt mv_t t) vsenv in
     let t = t_ty_subst mt mv_t t in
-    let t = Mvs.fold (fun _ -> bind_vs) mv t in
-    let t = List.fold_left (fun t vs_t -> bind_vs vs_t t) t vsenv in
+    let t = Mvs.fold (fun _ -> bind_vs mt mv_t) mv t in
+    let t = List.fold_left (fun t vs_t -> bind_vs mt mv_t vs_t t) t vsenv in
     let t = Mvs.fold (bind_fun env mt mv_t) free_funs t in
     t in
   add_premises (List.map close_term ts) env.premises
@@ -1498,7 +1517,7 @@ let bind_value env vs v (task, ls_mt, ls_mv) =
     if ty_closed v.v_ty then
       v.v_ty, Mtv.empty, ty_match ls_mt vs.vs_ty v.v_ty
     else
-      vs.vs_ty, ty_match Mtv.empty v.v_ty vs.vs_ty, ls_mt in
+      ty_inst ls_mt vs.vs_ty, ty_match Mtv.empty v.v_ty vs.vs_ty, ls_mt in
   let ls = create_fsymbol (id_clone vs.vs_name) [] ty in
   let ls_mv = Mvs.add vs (fs_app ls [] ty) ls_mv in
   let vsenv, t = term_of_value ~ty_mt env [] v in
