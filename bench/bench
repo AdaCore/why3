@@ -498,6 +498,7 @@ output="examples/tests/rac.out"
     rac "$mlw" TestUInt64 test
     rac "$mlw" Premises test1
     rac "$mlw" FunctionVariant 'test1 2' 'test2 2' 'test3 2' 'test4 2' 'test5 2'
+    rac "$mlw" ArrayList main
 ) > "$output"
 if git diff --exit-code --src-prefix=EXPECTED/ --dst-prefix=ACTUAL/ "$output"; then
     echo "RAC: ok"
