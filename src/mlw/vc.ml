@@ -59,11 +59,15 @@ let print_pv_attr fmt v =
 
 let model_trace_result_attributes = Sattr.singleton (create_model_trace_attr "result")
 
-
-let res_of_post loc ity ql =
-  (* Format.eprintf "[Vc.res_of_post] loc = %a@."
-   *   (Pp.print_option Loc.report_position) loc; *)
-  (* let s = Format.asprintf "%a'result" Ident.print_decoded id.id_string in *)
+let explicit_result loc ce ity =
+  let name = match ce.c_node with
+    | Capp (rs, _) ->
+       Format.asprintf "%a'result" Ident.print_decoded rs.rs_name.id_string
+    | Cpur (ls, _) ->
+       Format.asprintf "%a'result" Ident.print_decoded ls.ls_name.id_string
+    | Cfun _ -> "anonymous'result"
+    | Cany -> "any'result"
+  in
   let attrs =
     match loc with
     | Some l ->
@@ -71,9 +75,10 @@ let res_of_post loc ity ql =
        Sattr.add a model_trace_result_attributes
     | None -> model_trace_result_attributes
   in
-  let pv = create_pvsymbol (result_id ?loc ~attrs ~ql ()) ity in
-  (* Format.eprintf "[Vc.res_of_post] pv = %a@." print_pv_attr pv; *)
-  pv
+  create_pvsymbol (id_fresh ?loc ~attrs name) ity
+
+
+let res_of_post loc ity ql = create_pvsymbol (result_id ?loc ~ql ()) ity
 
 let res_of_cty loc cty = res_of_post loc cty.cty_result cty.cty_post
 
@@ -635,7 +640,7 @@ let rec k_expr env lps e res xmap =
           | pl -> wp_of_pre loc attrs pl, (oldies, Mvs.empty) in
         let trusted = match ce.c_node with
           | (Capp ({rs_logic = RLls ls}, _) | Cpur (ls, _))
-            when ce.c_cty.cty_args = [] (* fully applied *) ->
+               when ce.c_cty.cty_args = [] (* fully applied *) ->
               Typeinv.is_trusted_constructor env.known_map ls ||
               Typeinv.is_trusted_projection env.known_map ls e.e_ity
           | _ -> false in
@@ -653,7 +658,7 @@ let rec k_expr env lps e res xmap =
             | Some (t, sp) ->
                Klet (v, t_tag t, List.fold_right sp_and rinv sp)
             | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
-          let vv = res_of_post loc v.pv_ity ql in
+          let vv = explicit_result loc ce v.pv_ity in
           Kseq(k,0,Klet(vv, t_var v.pv_vs, t_true))
           in
         let k = k_of_post expl_post res cty.cty_post in
