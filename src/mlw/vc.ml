@@ -1620,6 +1620,10 @@ let rec is_trivial_vc f =
   | Tlet (_,tb) -> let _,t = t_open_bound tb in is_trivial_vc t
   | Tquant(Tforall,tq) -> let _,_,t = t_open_quant tq in is_trivial_vc t
   | Tbinop(Timplies,_,t) -> is_trivial_vc t
+  | Tbinop(Tand,t1,t2) -> is_trivial_vc t1 && is_trivial_vc t2
+  | Tcase(_,tbl) ->
+     List.for_all (fun tb -> let _,t = t_open_branch tb in is_trivial_vc t) tbl
+  | Tif(_,t1,t2) -> is_trivial_vc t1 && is_trivial_vc t2
   | _ -> false
 
 
