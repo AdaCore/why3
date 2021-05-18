@@ -391,7 +391,7 @@ module Sorted
     forall s1 s2: seq t.
     (sorted s1 /\ sorted s2 /\
       (forall i j: int. 0 <= i < length s1 /\ 0 <= j < length s2 ->
-      le s1[i] s2[i])) <-> sorted (s1 ++ s2)
+      le s1[i] s2[j])) <-> sorted (s1 ++ s2)
 
   lemma sorted_snoc:
     forall x: t, s: seq t.

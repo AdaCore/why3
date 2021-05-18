@@ -58,16 +58,13 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
                 so p * d1 <= p * (d2 - 1) = radix - p) };
     r
 
-  let lsld_ext (x cnt:limb) : (limb,limb)
-    requires { 0 <= cnt < Limb.length }
+  let lsld_ext [@extraction:inline] (x cnt:limb) : (limb,limb)
+    requires { 0 < cnt < Limb.length }
     returns { (r,d) -> uint64'int r + radix * uint64'int d = (power 2 cnt) * x }
     returns { (r,_d) -> mod (l2i r) (power 2 cnt) = 0 }
     returns { (r,_d) -> l2i r <= radix - (power 2 cnt) }
     returns { (_r,d) -> l2i d < power 2 cnt }
   =
-    if cnt = 0 then (x, 0)
-    else
-    begin
     let (r:limb,d:limb) = lsld x cnt in
     let ghost p = power 2 (l2i cnt) in
     let ghost q = power 2 (Limb.length - l2i cnt) in
@@ -115,7 +112,6 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
              so d < p
              };
     (r,d)
-    end
 
   let clz_ext [@extraction:inline] (x:limb) : int32
     requires { x > 0 }

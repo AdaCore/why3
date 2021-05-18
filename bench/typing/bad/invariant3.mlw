@@ -1,0 +1,29 @@
+module T3
+
+       type var = private {
+          id: int
+       }
+
+       type set = abstract {
+           mutable mem: int -> bool
+       }
+
+       val all_var: set
+
+       val new_var () : var
+         ensures { old (not (all_var.mem result.id)) }
+         ensures { forall x. all_var.mem x <-> (old (all_var.mem x) \/  x = result.id) }
+         writes { all_var.mem }
+
+       type t = {
+          v1: var;
+          v2: var;
+       }
+       invariant { v1.id <> v2.id }
+       by let v1 = new_var () in
+          let v2 = new_var () in
+          if v1.id = 0 then () else
+          { v1 = v1; v2 = v2 }
+
+
+end

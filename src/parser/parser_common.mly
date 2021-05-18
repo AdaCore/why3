@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -386,7 +386,8 @@ See also `plugins/cfg/cfg_parser.mly`
 | USE EXPORT tqualid
     { (Duseexport $3) }
 | CLONE EXPORT tqualid clone_subst
-    { (Dcloneexport ($3, $4)) }
+    { let loc = floc $startpos $endpos in
+      (Dcloneexport (loc,$3, $4)) }
 | USE boption(IMPORT) m_as_list = comma_list1(use_as)
     { let loc = floc $startpos $endpos in
       let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
@@ -467,8 +468,8 @@ type_decl:
       td_loc = floc $startpos $endpos } }
 
 type_witness:
-| (* epsilon *)                           { [] }
-| BY LEFTBRC field_list1(expr) RIGHTBRC   { $3 }
+| (* epsilon *)                           { None }
+| BY expr   { Some $2 }
 
 ty_var:
 | attrs(quote_lident) { $1 }
@@ -966,14 +967,12 @@ assign_expr:
 | expr %prec below_LARROW         { $1 }
 | expr LARROW expr
     { let loc = floc $startpos $endpos in
-      let rec down ll rl = match ll, rl with
+      let rec down attrs assgns ll rl = match ll, rl with
         | ({expr_desc = Eident q} as e1)::ll, e2::rl ->
-           let e1 = {e1 with expr_desc = Easref q} in
-           let (attrs,l) = down ll rl in
-           (attrs, (e1, None, e2) :: l)
+            let e1 = {e1 with expr_desc = Easref q} in
+            down attrs ((e1, None, e2) :: assgns) ll rl
         | {expr_desc = Eidapp (q, [e1])}::ll, e2::rl ->
-           let (attrs,l) = down ll rl in
-           (attrs, (e1, Some q, e2) :: l)
+            down attrs ((e1, Some q, e2) :: assgns) ll rl
         | {expr_desc = Eidapp (Qident id, [_;_]); expr_loc = loc}::_, _::_ ->
             begin match Ident.sn_decode id.id_str with
               | Ident.SNget _ -> Loc.errorm ~loc
@@ -981,18 +980,14 @@ assign_expr:
               | _ -> Loc.errorm ~loc
                   "Invalid left expression in an assignment"
             end
-        | {expr_desc = Eattr(attr, e)}::ll, rl ->
-           let (attrs,l) = down (e::ll) rl in
-           (attr::attrs,l)
+        | {expr_desc = Eattr (attr, e)}::ll, rl ->
+            down (attr::attrs) assgns (e::ll) rl
         | {expr_loc = loc}::_, _::_ -> Loc.errorm ~loc
             "Invalid left expression in an assignment"
-        | [], [] -> ([],[])
+        | [], [] ->
+            let attr e a = Eattr (a, {expr_desc = e; expr_loc = loc}) in
+            List.fold_left attr (Eassign (List.rev assgns)) attrs
         | _ -> Loc.errorm ~loc "Invalid parallel assignment"
-      in
-      let eassign (attrs,l) =
-        List.fold_left
-          (fun e a -> Eattr(a, { expr_desc = e ; expr_loc = loc }))
-          (Eassign l) attrs
       in
       let d = match $1.expr_desc, $3.expr_desc with
         | Eidapp (Qident id, [e1;e2]), _ ->
@@ -1002,9 +997,9 @@ assign_expr:
               | _ -> Loc.errorm ~loc:$1.expr_loc
                   "Invalid left expression in an assignment"
             end
-        | Etuple ll, Etuple rl -> eassign (down ll rl)
+        | Etuple ll, Etuple rl -> down [] [] ll rl
         | Etuple _, _ -> Loc.errorm ~loc "Invalid parallel assignment"
-        | _, _ -> eassign (down [$1] [$3]) in
+        | _, _ -> down [] [] [$1] [$3] in
       { expr_desc = d; expr_loc = loc } }
 
 expr:

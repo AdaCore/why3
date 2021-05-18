@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -49,14 +49,11 @@ val print_json_field :
 (* given a field name, a value and a printer for the value, print a json
    mapping (field assignment). Do not print anything else. *)
 
-val convert_record : (string * 'a) list -> 'a Wstdlib.Mstr.t
-
 (* for more complex applications it may be convenient to build a an
    explicit JSON object. Use this type for that and the print_json
    function to print it *)
 type json =
-  | Record of json Wstdlib.Mstr.t
-  | Proj of json Wstdlib.Mstr.t
+  | Record of (string * json) list
   | List of json list
   | String of string
   | Int of int

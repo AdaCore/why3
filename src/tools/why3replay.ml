@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -60,10 +60,7 @@ let set_opt_smoke = function
   | Some _ -> assert false
   | None -> opt_smoke := SD_Top
 
-let usage_msg = Format.sprintf
-  "Usage: %s [options] <dir>\n\
-   Replay the session stored in the given directory.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg = "<dir>\nReplay the session stored in the given directory."
 
 let option_list =
   let open Getopt in
@@ -88,7 +85,7 @@ let option_list =
 
 let add_file f = Queue.push f files
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_file usage_msg
 
 module C = Controller_itp.Make(Unix_scheduler.Unix_scheduler)

@@ -1,5 +1,5 @@
 
-(* Euclidean division *)
+(** Euclidean division *)
 
 module Division
 
@@ -8,16 +8,75 @@ module Division
 
   let division (a b: int) : int
     requires { 0 <= a && 0 < b }
-    ensures  { exists r: int. result * b + r = a && 0 <= r < b }
+    ensures  { exists r. result * b + r = a && 0 <= r < b }
   =
-    let q = ref 0 in
-    let r = ref a in
-    while !r >= b do
-      invariant { !q * b + !r = a && 0 <= !r }
-      variant   { !r }
+    let ref q = 0 in
+    let ref r = a in
+    while r >= b do
+      invariant { q * b + r = a && 0 <= r }
+      variant   { r }
       incr q;
       r -= b
     done;
-    !q
+    q
 
+end
+
+(** Euclidean division from Hoare's seminal paper
+    "An Axiomatic Basis for Computer Programming"
+    (Communications of the ACM 12(10), 1969).
+
+    Hoare's proof of Euclidean division is performed under the nine
+    axioms for arithmetic given below, which are all valid for several
+    models of machine arithmetic (infinite arithmetic, strict
+    interpretation, firm boundary, modulo arithmetic).
+
+    Notes:
+    - Axioms A2 and A4 (commutativity and associativity of multiplication)
+      are actually not needed for the proof.
+    - Hoare is not proving termination.
+*)
+
+module Hoare
+
+  type integer
+
+  val constant zero: integer
+  val constant one: integer
+  val function (+) (x y: integer) : integer
+  val function (-) (x y: integer) : integer
+  val function (*) (x y: integer) : integer
+  val predicate (<=) (x y: integer)
+
+  axiom A1: forall x y. x + y = y + x
+  axiom A2: forall x y. x * y = y * x
+  axiom A3: forall x y z. (x + y) + z = x + (y + z)
+  axiom A4: forall x y z. (x * y) * z = x * (y * z)
+  axiom A5: forall x y z. x * (y + z) = x * y + x * z
+  axiom A6: forall x y. y <= x -> (x - y) + y = x
+  axiom A7: forall x. x + zero = x
+  axiom A8: forall x. x * zero = zero
+  axiom A9: forall x. x * one = x
+
+  let division (x y: integer) : (q: integer, r: integer)
+    ensures  { not (y <= r) }
+    ensures  { x = r + y * q }
+    diverges
+  =
+    let ref r = x in
+    let ref q = zero in
+    while y <= r do
+      invariant { x = r + y * q }
+      r <- r - y;
+      q <- one + q
+    done;
+    q, r
+
+end
+
+module HoareSound
+  use int.Int
+  clone Hoare with type integer = int, val zero = zero,
+    val one = one, val (+) = (+), val (-) = (-), val (*) = (*),
+    val (<=) = (<=), lemma .
 end

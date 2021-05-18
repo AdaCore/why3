@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1604,7 +1604,7 @@ let add_registered_transformation s env old_tr goal_id =
     (* check if transformation already present with the same parameters.
        this should always fail and raise Not_found *)
     let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name &&
-                        List.fold_left2 (fun b new_arg old_arg -> new_arg = old_arg && b) true
+                        Lists.equal (=)
                                         (get_transfNode s transID).transf_args
                                         old_tr.transf_args)
         goal.proofn_transformations in

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,42 +22,66 @@ val debug_check_ce : Debug.flag
    result of checking them by interpreting the program concretly and
    abstractly using the values in the solver's model *)
 
-type verdict = private
-  | Good_model (** the model leads to a counterexample *)
-  | Bad_model  (** the model doesn't lead to a counterexample *)
-  | Dont_know  (** cannot decide if the model leads to a counterexample *)
+val debug_check_ce_summary : Debug.flag
+(** Print only a summary of checking the counterexample. *)
 
-type full_verdict = private {
-    verdict  : verdict;
+type result_state =
+  | Rnormal (** the execution terminated normally *)
+  | Rfailure (** the execution leads to a failure for the VC *)
+  | Rstuck (** the model doesn't lead to a counterexample or is incosistent *)
+  | Runknown (** cannot decide if the model leads to a counterexample *)
+
+val print_result_state : result_state Pp.pp
+
+type result = {
+    state    : result_state;
     reason   : string;
     exec_log : Log.exec_log;
   }
 
+val find_rs : pmodule -> model -> Expr.rsymbol
+(** Returns the rsymbol of the procedure to which the VC term of the model
+    belongs.
+
+    @raise Failure when there is no such procedure, or the VC term location is
+    empty or dummy. *)
+
+val check_model_rs : ?timelimit:float -> ?steplimit:int -> abstract:bool ->
+  rac_reduce_config -> Env.env -> pmodule -> model -> Expr.rsymbol -> result
+(** [check_model_rs ~abstract cfg env pm m rs] executes a call to the procedure
+    [rs] abstractly or concretely. *)
+
 type check_model_result = private
   | Cannot_check_model of {reason: string}
-  (* the model cannot be checked (e.g. it doesn't contain a location) *)
-  | Check_model_result of {abstract: full_verdict; concrete: full_verdict}
-  (* the model was checked *)
+    (** The model could not be checked *)
+  | Check_model_result of {abstract: result; concrete: result}
+    (** The model has been checked *)
 
-val print_check_model_result : ?verb_lvl:int -> check_model_result Pp.pp
+val check_model : ?timelimit:float -> ?steplimit:int -> rac_reduce_config ->
+  Env.env -> pmodule -> model -> check_model_result
+(** interpret concrecly and abstractly the program corresponding to the model
+    (the program corresponding to the model is obtained from the location in the
+    model) *)
 
-val check_model :
-  rac_reduce_config -> Env.env -> pmodule -> model -> check_model_result
-(* interpret concrecly and abstractly the program corresponding to the
-   model (the program corresponding to the model is obtained from the
-   location in the model) *)
+val print_full_verdict : ?verb_lvl:int -> result Pp.pp
 
 (** {2 Summary of checking models} *)
 
 type ce_summary =
-  | NCCE of Log.exec_log (** Non-conformity between program and annotations: the
-                             CE shows that the program doesn't comply to the
-                             verification goal. *)
-  | SWCE of Log.exec_log (** Sub-contract weakness: The contracts of some
-                             function or loop are underspecified. *)
-  | NCCE_SWCE of Log.exec_log (** Non-conformity or sub-contract weakness. *)
-  | BAD_CE (** Bad counterexample. *)
-  | UNKNOWN of string (** The counterexample has not been verified. *)
+  | NC of Log.exec_log
+  (** Non-conformity between program and annotations: the CE shows that the
+      program doesn't comply to the verification goal. *)
+  | SW of Log.exec_log
+  (** Sub-contract weakness: The contracts of some function or loop are
+      underspecified. *)
+  | NCSW of Log.exec_log
+  (** Non-conformity or sub-contract weakness. *)
+  | BAD
+  (** Bad counterexample. *)
+  | UNKNOWN of string
+  (** The counterexample has not been verified. *)
+
+val ce_summary : check_model_result -> ce_summary
 
 val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 
@@ -68,6 +92,8 @@ val print_counterexample :
 (** Print a counterexample. (When the prover model is printed and [~json:`Values] is
    given, only the values are printedas JSON.) *)
 
+val print_result_summary : result Pp.pp -> (check_model_result * ce_summary) Pp.pp
+
 (** {2 Model selection} *)
 
 type sort_models
@@ -75,8 +101,8 @@ type sort_models
 
 val select_model :
   ?verb_lvl:int -> ?check:bool -> ?reduce_config:rac_reduce_config ->
-  ?sort_models:sort_models -> Env.env -> pmodule ->
-  (Call_provers.prover_answer * model) list ->
+  ?timelimit:float -> ?steplimit:int -> ?sort_models:sort_models ->
+  Env.env -> pmodule -> (Call_provers.prover_answer * model) list ->
   (model * ce_summary) option
 (** [select ~check ~conservative ~reduce_config env pm ml] chooses a model from
     [ml]. [check] is set to false by default and indicates if interpretation
@@ -103,7 +129,9 @@ val prioritize_last_non_empty_model : sort_models
 val select_model_last_non_empty :
   (Call_provers.prover_answer * model) list -> model option
 (** Select the last, non-empty model in the incremental list of models as done
-    before 2020. Same behaviour as
+    before 2020.
+
+    Same behaviour as
     [select_model ~check:false ~sort_models:prioritize_last_non_empty_model]. *)
 
 (** {2 Conversion to [Model_parser.model] }*)

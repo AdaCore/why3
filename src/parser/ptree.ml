@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -219,7 +219,8 @@ and expr_desc =
   | Eexn of ident * pty * Ity.mask * expr
   (** local declaration of an exception *)
   | Eoptexn of ident * Ity.mask * expr
-  (** TODO: document *)
+  (** local declaration of optionally used exception, used by why3 for builtin
+     exceptions *)
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (** [for] loop *)
   | Eassert of Expr.assertion_kind * term
@@ -284,7 +285,7 @@ type type_decl = {
   td_vis    : visibility; (** visibility, for records only *)
   td_mut    : bool;       (** mutability, for records or abstract types *)
   td_inv    : invariant;  (** invariant, for records only *)
-  td_wit    : (qualid * expr) list;  (** witness for the invariant *)
+  td_wit    : expr option;  (** witness for the invariant *)
   td_def    : type_def;
 }
 [@@deriving sexp_of]
@@ -352,7 +353,7 @@ type decl =
   (** Declaration of global exceptions *)
   | Dmeta of ident * metarg list
   (** Declaration of a [meta] *)
-  | Dcloneexport of qualid * clone_subst list
+  | Dcloneexport of Loc.position * qualid * clone_subst list
   (** [clone export] *)
   | Duseexport of qualid
   (** [use export] *)

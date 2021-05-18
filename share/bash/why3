@@ -39,12 +39,12 @@ _why3()
             return 0
             ;;
         -P|--prover)
-            provers=$($1 --list-provers | sed -n -e 's/^  \([^ ]\+\).*/\1/p' | uniq)
+            provers=$($1 config list-provers | sed -n -e 's/^\([^ ]\+\).*/\1/p' | uniq)
             COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
             return 0
             ;;
         -F|--format)
-            formats=$($1 --list-formats | sed -n -e 's/^  \([^ ]\+\).*/\1/p')
+            formats=$($1 show formats | sed -n -e 's/^\([^ ]\+\).*/\1/p')
             COMPREPLY=( $( compgen -W "$formats" -- "$cur" ) )
             return 0
             ;;
@@ -52,16 +52,14 @@ _why3()
             return 0
             ;;
         -a|--apply-transform)
-            transforms=$($1 --list-transforms | grep '^  [^ ]')
+            transforms=$($1 show transformations | grep -e '^  [^ ]')
             COMPREPLY=( $( compgen -W "$transforms" -- "$cur" ) )
             return 0
             ;;
         -M|--meta)
-            metas=$($1 --list-metas | grep '^  [^ ]' |
-                grep -v '\[\(function/predicate\|type\) symbol\]' |
-                grep -v '\[\(type\|proposition\|integer\)\]' |
-                grep -v '\] \[' | sed -e 's/(flag) //' |
-                sed -e 's/ \[string\]/=/')
+            metas=$($1 show metas |
+                grep -e '^[^ ]\+\( (flag)\)\?\( \[string\]\)\?$' |
+                sed -e 's/ (flag)//;s/ \[string\]/=/')
             COMPREPLY=( $( compgen -W "$metas" -- "$cur") )
             return 0
             ;;
@@ -77,8 +75,8 @@ _why3()
             _filedir
             return 0
             ;;
-        --add-prover)
-            ids=$($1 --list-prover-families | grep '^  [^ ]')
+        add-prover)
+            ids=$($1 config list-supported-provers)
             COMPREPLY=( $( compgen -W "$ids" -- "$cur") )
             return 0
             ;;
@@ -87,12 +85,12 @@ _why3()
             return 0
             ;;
         --debug)
-            flags=$($1 --list-debug-flags | sed -n -e 's/^  \([^ ]\+\).*/\1/p')
+            flags=$($1 --list-debug-flags | sed -n -e 's/^\([^ ]\+\).*/\1/p')
             COMPREPLY=( $( compgen -W "$flags" -- "$cur" ) )
             return 0
             ;;
         --filter-prover)
-            provers=$(${1/session/} --list-provers | sed -n -e 's/^  \([^ ]\+\).*/\1/p')
+            provers=$($1 config list-provers | sed -n -e 's/^\([^ ]\+\).*/\1/p' | uniq)
             COMPREPLY=( $( compgen -W "$provers" -- "$cur" ) )
             return 0
             ;;
@@ -104,8 +102,8 @@ _why3()
             COMPREPLY=( $( compgen -W 'simpletree table' -- "$cur" ) )
             return 0
             ;;
-        session)
-            cmds=$($1 session --help | sed -n -e 's/^  \([^ ]\+\).*/\1/p')
+        config|session|show)
+            cmds=$($1 $prev --help | sed -n -e 's/^  \([^ ]\+\).*/\1/p')
             COMPREPLY=( $( compgen -W "$cmds --help -h" -- "$cur" ) )
             return 0
             ;;

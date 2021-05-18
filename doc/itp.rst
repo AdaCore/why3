@@ -1,3 +1,5 @@
+.. _chap.itp:
+
 Interactive Proof Assistants
 ============================
 

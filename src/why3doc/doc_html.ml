@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -33,8 +33,7 @@ let style_css fname =
 \n.why3doc a:hover { color: red; text-decoration: none; background-color: #5FFF88 }\
 \n.why3doc a:active { color: red; text-decoration: underline }\
 \n.why3doc .comment { color: #990000 }\
-\n.why3doc .keyword1 { color: purple; font-weight: bold }\
-\n.why3doc .keyword2 { color: blue; font-weight: bold }\
+\n.why3doc .keyword { color: purple; font-weight: bold }\
 \n.why3doc .superscript { font-size: smaller }\
 \n.why3doc .subscript { font-size: smaller }\
 \n.why3doc .warning { color: red; font-weight: bold }\

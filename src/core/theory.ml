@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -163,10 +163,10 @@ let meta_float = register_meta "float_type" [MTtysymbol; MTlsymbol; MTlsymbol]
     ~desc:"Projection@ and@ finiteness@ of@ a@ floating-point@ type."
 
 let meta_projection = register_meta "model_projection" [MTlsymbol]
-  ~desc:"Declares@ the@ projection."
+  ~desc:"Declare@ the@ projection."
 
 let meta_record = register_meta "model_record" [MTlsymbol]
-  ~desc:"Declares@ the@ record field."
+  ~desc:"Declare@ the@ record field."
 
 (** Theory *)
 

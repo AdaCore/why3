@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -184,12 +184,11 @@ let parse_one opts args i =
           f (args.(i + 1));
           i + 2
 
-let handle_exn args err =
-  if Array.length args <> 0 then
-    let p = Filename.basename args.(0) in
-    Printf.eprintf "%s: %s\nTry '%s --help' for more information.\n%!" p err p
-  else
-    Printf.eprintf "%s\nTry '--help' for more information.\n%!" err;
+let commands = ref [Filename.basename Sys.argv.(0)]
+
+let handle_exn err =
+  let p = String.concat " " !commands in
+  Printf.eprintf "%s: %s\nTry '%s --help' for more information.\n%!" p err p;
   exit 1
 
 let parse_many opts args i =
@@ -203,7 +202,7 @@ let parse_many opts args i =
   try
     aux i
   with GetoptFailure exn ->
-    handle_exn args exn
+    handle_exn exn
 
 let parse_all ?(i = 1) opts extra args =
   let nargs = Array.length args in
@@ -222,4 +221,4 @@ let parse_all ?(i = 1) opts extra args =
   try
     aux i
   with GetoptFailure exn ->
-    handle_exn args exn
+    handle_exn exn

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -283,7 +283,7 @@ end
 
 
 let run () =
-  let _,_,_ = Whyconf.Args.complete_initialization () in
+  let _,_ = Whyconf.Args.complete_initialization () in
   match !opt_style with
     | Table -> iter_files (run_file Table.print_session)
     | SimpleTree -> iter_files (run_file Simple.print_session)

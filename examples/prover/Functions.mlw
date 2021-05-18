@@ -1,5 +1,15 @@
 
+module Config
+
+  meta "select_inst" "goal"
+  meta "select_lskept" "goal"
+  meta "select_lsinst" "goal"
+
+end
+
 module Func
+
+  use Config
 
   predicate extensionalEqual (f g:'a -> 'b) =
     forall x:'a. f x = g x

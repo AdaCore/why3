@@ -1,0 +1,200 @@
+
+(**
+{1 VerifyThis @ ETAPS 2021 competition
+   Challenge 3: Shearsort}
+   See https://www.pm.inf.ethz.ch/research/verifythis.html
+
+   Authors:
+   - Jean-Christophe Filliâtre (CNRS)
+   - Andrei Paskevich (Univ. Paris-Saclay)
+
+   Summary:
+
+   - sequential code only (no parallelism in Why3)
+
+   - termination verified under some assumptions over the number of
+     inversions in functions `sort_row` and `sort_column`
+
+   - *CHANGE IN CODE*
+
+     We were not able to show that ceil(log(n))+1 steps suffices.
+
+     Therefore, we replaced the `repeat` loop infinite loop from which
+     we exit as soon as none of the calls to `sort_column` makes a
+     change to the matrix.
+
+     We argue that this does not increase the complexity. Indeed, it can be
+     proved, independently, that the loops will never execute more than
+     ceil(log(n))+1 steps. Actually, our change even *improves* the
+     performance of the code, as we may perform fewer steps in some cases
+     (e.g. when the matrix is already snake-sorted).
+
+*)
+
+use int.Int
+use int.ComputerDivision
+use matrix.Matrix
+use map.Occ
+use int.NumOf
+use int.Sum
+
+meta coercion function elts
+
+(*** SPECIFICATION STARTS HERE ********************************************)
+
+function mocc (x: int) (m: matrix int) : int =
+  sum (fun i -> occ x (m i) 0 m.columns) 0 m.rows
+
+predicate lt (i j k l: int)
+= i < k \/
+  i = k /\ if mod i 2 = 0 then j < l else l < j
+
+predicate snake_order (m: matrix int)
+= let rw = m.rows in
+  let cl = m.columns in
+  forall i j k l.
+  0 <= i < rw -> 0 <= j < cl ->
+  0 <= k < rw -> 0 <= l < cl ->
+  lt i j k l -> m i j <= m k l
+
+function inversions (m: matrix int) : int
+= sum (fun i ->
+    sum (fun j ->
+      sum (fun k ->
+           numof (fun l -> lt i j k l /\ m i j > m k l) 0 m.columns)
+        0 m.rows)
+      0 m.columns)
+    0 m.rows
+
+(*** SPECIFICATION STOPS HERE **********************************************)
+(*** beyond this point, the only thing you need to read are the contracts
+     for functions `sort_row`, `sort_column`, `shearsort` below *)
+
+let lemma inv_nonneg (m: matrix int)
+  ensures { 0 <= inversions m }
+= let zero = pure { fun (_:int) -> 0 } in
+  assert { forall i j k.
+    zero k <= numof (fun l -> lt i j k l /\ m i j > m k l) 0 m.columns };
+  assert { forall i j.
+    zero j <= sum (fun k ->
+           numof (fun l -> lt i j k l /\ m i j > m k l) 0 m.columns)
+        0 m.rows };
+  assert { forall i.
+    zero i <= sum (fun j -> sum (fun k ->
+           numof (fun l -> lt i j k l /\ m i j > m k l) 0 m.columns)
+        0 m.rows)
+      0 m.columns };
+  assert { 0 = sum zero 0 m.rows <= inversions m };
+  ()
+
+predicate sorted_row (m: matrix int) (row: int) (ascending: bool) =
+  0 <= row < m.rows /\
+  if ascending then
+               forall j l. 0 <= j <= l < m.columns -> m row j <= m row l
+             else
+               forall j l. 0 <= j <= l < m.columns -> m row j >= m row l
+
+val sort_row (m: matrix int) (row: int) (ascending: bool) : unit
+  requires { 0 <= row < m.rows }
+  writes   { m }
+  ensures  { (* frame *)
+             forall i j. 0 <= i < m.rows ->  0 <= j < m.columns ->
+               i <> row -> m i j = old m i j }
+  ensures  { forall x. mocc x m = mocc x (old m) }
+  ensures  { sorted_row m row ascending }
+  ensures  { inversions m <= old inversions m }
+
+predicate sorted_column (m: matrix int) (column: int) =
+  0 <= column < m.columns /\
+  forall i k. 0 <= i <= k < m.rows -> m i column <= m k column
+
+val sort_column (m: matrix int) (column: int) : (nochange: bool)
+  requires { 0 <= column < m.columns }
+  writes   { m }
+  ensures  { (* frame *)
+             forall i j. 0 <= i < m.rows -> 0 <= j < m.columns ->
+               j <> column -> m i j = old m i j }
+  ensures  { forall x. mocc x m = mocc x (old m) }
+  ensures  { nochange -> forall i. 0 <= i < m.rows ->
+               m i column = old m i column }
+  ensures  { sorted_column m column }
+  ensures  { inversions m <= old inversions m }
+  ensures  { not nochange -> inversions m < old inversions m }
+
+let shearsort (n: int) (m: matrix int) : unit
+  requires { m.rows = m.columns = n }
+  writes   { m }
+  (* TASK 3 *)
+  ensures  { snake_order m }
+  (* TASK 2 *)
+  ensures  { forall x. mocc x m = mocc x (old m) }
+= label Init in
+  while true do (* <-- CHANGE instead of ceil(log(n))+1 steps *)
+    invariant  { forall x. mocc x m = mocc x (old m) }
+    variant    { inversions m }
+    label L1 in
+    for i = 0 to n - 1 do
+      invariant  { forall k. 0 <= k < i -> sorted_row m k (mod k 2 = 0) }
+      invariant  { forall x. mocc x m = mocc x (old m) }
+      invariant  { inversions m <= (inversions m at L1) }
+      sort_row m i (mod i 2 = 0)
+    done;
+    label L2 in
+    let ref nochange = true in
+    for j = 0 to n - 1 do
+      invariant  { nochange ->
+                   forall i j. 0 <= i < m.rows -> 0 <= j < m.columns ->
+                     m i j = (m i j at L2) }
+      invariant  { forall l. 0 <= l < j -> sorted_column m l }
+      invariant  { forall x. mocc x m = mocc x (old m) }
+      invariant  { inversions m <= (inversions m at L2) }
+      invariant  { not nochange -> inversions m < (inversions m at L2) }
+      let nch = sort_column m j in
+      if not nch then nochange <- false
+    done;
+    if nochange then break
+  done;
+  let lemma ordered (i j k l: int)
+    requires { 0 <= i < n } requires { 0 <= j < n }
+    requires { 0 <= k < n } requires { 0 <= l < n }
+    requires { lt i j k l } ensures  { m i j <= m k l }
+  = if i = k then return;
+    assert { sorted_column m j };
+    assert { sorted_column m l };
+    if j <= l then (
+      if mod i 2 = 0 then
+        assert { m i j <= m i l <= m k l }
+      else (
+        assert { mod (i+1) 2 = 0 };
+        assert { sorted_row m (i+1) true };
+        assert { m i j <= m (i+1) j <= m (i+1) l <= m k l }
+      )
+    )
+  in
+  ()
+
+(* Notes
+
+The verification tasks for shearsort are:
+
+1. Verify that shearsort terminates, and is memory safe.
+   PARTIAL: memory safety DONE (enforced by Why3)
+            termination using hypotheses over number of inversions
+
+2. Verify that shearsort permutes the input matrix.
+   DONE
+
+3. Verify that shearsort sorts the matrix in a snake-like manner.
+   DONE
+
+4. Verify that (parallel) shearsort satisfies the same specification
+   as sequenti al shearsort, in which all parallel for-loops are replaced
+   by sequential ones.
+
+5. Verify that shearsort and alternative-shearsort satisfy the same
+   specification.
+
+6. Extra: give implementations to sort-row, sort-column and transpose,
+   and verify these as well.
+
+*)

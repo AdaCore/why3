@@ -1,0 +1,24 @@
+module T2
+
+
+       type set 'a = abstract {
+           mutable mem: 'a -> bool
+       }
+
+       val empty (): set 'a
+         ensures { forall x. not (result.mem x) }
+
+       val add (s:set 'a) (v:'a) : unit
+         ensures { forall x. s.mem x <-> (old s.mem x \/ x = v) }
+         writes { s.mem }
+
+       type t 'a = {
+         set : set 'a;
+         ele : 'a;
+       }
+       invariant { set.mem ele }
+       by let a =  { set = set; ele = ele } in
+          a
+
+
+end

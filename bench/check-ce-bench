@@ -53,7 +53,8 @@ colorize() {
 nondet_types=""
 
 remove_solver_details () {
-    sed 's/[0-9]\+\.[0-9]\+s//g' \
+    sed 's/ ([0-9.]\+s, [0-9])\.$/./' \
+  | sed 's/[0-9]\+\.[0-9]\+s//g' \
   | sed 's/[0-9]\+ steps//g' \
   | sed 's/Prover result is: Timeout.*$\|Unknown (\(unknown\|incomplete\|unknown + \(incomplete\|interrupted\)\)).*$\|Out of memory\.$\|Step limit exceeded.*$/Prover result is: Unknown or time\/memory\/step limit./'
 }
@@ -80,7 +81,8 @@ run () {
     # Call why3 prove to create CE (and accept return value of 2 for unproven goals)
     ($dir/../bin/why3"$suffix" prove --apply-transform=split_vc \
        --prover="$prover" --stepslimit=$steps --check-ce --verbosity=5 \
-       --library="$2" "${file_path}.mlw" --debug=check-ce,rac-values \
+       --library="$2" "${file_path}.mlw" \
+       --debug=check-ce,check-ce-summary,rac-values \
        || [ $? -eq 2 ]) 2>&1 \
      | sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" \
      > "$f.out"

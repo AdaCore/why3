@@ -336,7 +336,7 @@ int main () {
   mpz_t q, r, u, v, w, refzq, refzr, refw, cp;
   int nb, nb_iter, base;
   char * sp, * refsp;
-  double elapsed;
+  double elapsed, elapsed2, duration;
   mpz_init(cp);
   mpz_init(u);
   mpz_init(v);
@@ -698,13 +698,14 @@ int main () {
 
 #ifdef TEST_DIV
 #ifdef BENCH
-  printf ("#an bn t(µs)\n");
+  printf ("#an bn t(µs) dt(µs)\n");
 #endif
   for (an = 2; an <= max_div; an += 1)
     {
       for (bn = 1; bn <= an; bn += 1)
         {
           elapsed = 0;
+          elapsed2 = 0;
           nb_iter = 1000;
           for (int iter = 0; iter != nb_iter; ++iter) {
             init_valid (ap, bp, an, bn);
@@ -730,16 +731,20 @@ int main () {
 #ifdef BENCH
               }
             gettimeofday(&end, NULL);
-            elapsed +=
+            duration =
               (end.tv_sec - begin.tv_sec) * 1000000.0
               + (end.tv_usec - begin.tv_usec);
+            duration /= nb;
+            elapsed += duration;
+            elapsed2 += duration * duration;
 #endif
           }
-          elapsed = elapsed / (nb * nb_iter);
+          elapsed /= nb_iter;
+          elapsed2 /= nb_iter;
 #ifdef BENCH
-          printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
+          printf ("%d %d %g %g\n", (int)an, (int)bn, elapsed, sqrt(elapsed2 - elapsed*elapsed));
           if (an==bn)
-            printf ("\n"); //for gnuplot
+            printf ("\n\n"); //for gnuplot
 #endif
 #ifdef COMPARE
             rn = bn;
@@ -772,12 +777,12 @@ int main () {
 #ifdef COMPARE
   printf ("division ok\n");
 #endif
-#endif
+#endif // TEST_DIV
+
 #ifdef TEST_SQRT1
 #ifdef BENCH
   printf ("#t(s)\n");
 #endif
-
       elapsed = 0;
       an = bn = rn = 1;
       for (int iter = 0; iter != 500; ++iter) {
@@ -1265,12 +1270,10 @@ int main () {
 #ifdef TEST_MILLERRABIN
 #define REPS 25
   nb_iter = 50;
-  elapsed = 0;
-  int i = 0;
-  int len;
-  for (len = 16; len <= 200; len=(int)ceil(len * 1.1)){
+  for (int len = 16; len <= 200; len = (int)ceil(len * 1.1)) {
 #ifdef BENCH
-    for (i = 0; i < nb_iter; i++) {
+    elapsed = 0;
+    for (int i = 0; i < nb_iter; i++) {
 #endif
       mr_candidate(cp, len);
 #ifdef BENCH
@@ -1286,7 +1289,7 @@ int main () {
         + (end.tv_usec - begin.tv_usec);
     }
     elapsed = elapsed/nb_iter;
-    printf ("%d   %g\n", len, elapsed);
+    printf ("%d %g\n", len, elapsed);
 #endif
 #ifdef COMPARE
     refc = mpz_millerrabin(cp,REPS);
@@ -1299,63 +1302,84 @@ int main () {
 #ifdef COMPARE
   printf ("Miller-Rabin ok\n");
 #endif
-#endif
+#endif // TEST_MILLERRABIN
+
 #ifdef TEST_ZGETSET
-  elapsed = 0;
-  for (len = 1; len < max_getset; len=(int)ceil(len * 1.1)){
+  nb_iter = 1000;
+  for (int len = 1; len < max_getset; len = (int)ceil(len * 1.1)) {
+#ifdef BENCH
+    elapsed = 0;
+    for (base = 2; base <= 36; base++) {
+#else
     for (base = -36; base <= 62; base++) {
       if (-2 < base && base < 2)
         continue;
-      init_mpz_1(u,len);
+#endif
+      for (int iter = 0; iter != nb_iter; ++iter) {
+        init_mpz_1(u,len);
 #ifdef BENCH
-      gettimeofday(&begin, NULL);
+        nb = 500 / len;
+        gettimeofday(&begin, NULL);
+        for (int i = 0; i != nb; ++i) {
 #endif
-      wmpz_get_str(sp, base, u);
-      mpz_get_str(refsp, base, u);
-#ifdef COMPARE
-      if (strcmp(sp, refsp)) {
-        printf ("ERROR in wmpz_get_str, len = %d, base = %d :\n", len, base);
-        mpn_dump (PTR(u), len);
-        printf ("sp %s refsp %s\n", sp, refsp);
-        abort ();
-      }
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+          mpz_get_str(refsp, base, u);
 #endif
-      c = wmpz_set_str(w, refsp, abs (base));
-      refc = mpz_set_str(refw, refsp, abs (base));
+#ifdef TEST_WHY3
+          wmpz_get_str(sp, base, u);
+#endif
 #ifdef COMPARE
-      if (c != refc) {
-        printf ("ERROR in wmpz_set_str, c = %ld refc = %ld : \n", c, refc);
-        printf ("base %d, sp %s, refsp %s, strlen %lu\n",
-                base, sp, refsp, strlen(refsp));
-        printf ("w:   "); mpn_dump (PTR(w), abs SIZ(w));
-        printf ("refw: "); mpn_dump (PTR(refw), abs SIZ(refw));
-        abort();
-      }
-      if (mpz_cmp(w, refw))
-        {
-          printf ("ERROR, an = %d\n", SIZ(u));
-          printf ("a: "); mpn_dump (PTR(u), len);
-          printf ("r:   "); mpn_dump (PTR(w), abs SIZ(w));
-          printf ("ref: "); mpn_dump (PTR(refw), abs SIZ(refw));
-          abort();
+          if (strcmp(sp, refsp)) {
+            printf ("ERROR in wmpz_get_str, len = %d, base = %d :\n", len, base);
+            mpn_dump (PTR(u), len);
+            printf ("sp %s refsp %s\n", sp, refsp);
+            abort ();
+          }
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+          refc = mpz_set_str(refw, refsp, abs (base));
+#endif
+#ifdef TEST_WHY3
+          c = wmpz_set_str(w, refsp, abs (base));
+#endif
+#ifdef COMPARE
+          if (c != refc) {
+            printf ("ERROR in wmpz_set_str, c = %ld refc = %ld : \n", c, refc);
+            printf ("base %d, sp %s, refsp %s, strlen %lu\n",
+                    base, sp, refsp, strlen(refsp));
+            printf ("w:   "); mpn_dump (PTR(w), abs SIZ(w));
+            printf ("refw: "); mpn_dump (PTR(refw), abs SIZ(refw));
+            abort();
+          }
+          if (mpz_cmp(w, refw)) {
+            printf ("ERROR, an = %d\n", SIZ(u));
+            printf ("a: "); mpn_dump (PTR(u), len);
+            printf ("r:   "); mpn_dump (PTR(w), abs SIZ(w));
+            printf ("ref: "); mpn_dump (PTR(refw), abs SIZ(refw));
+            abort();
+          }
+#endif
+#ifdef BENCH
         }
+        gettimeofday(&end, NULL);
+        duration =
+          (end.tv_sec - begin.tv_sec) * 1000000.0
+          + (end.tv_usec - begin.tv_usec);
+        elapsed += duration / nb;
 #endif
-#ifdef BENCH
-      gettimeofday(&end, NULL);
-      elapsed +=
-        (end.tv_sec - begin.tv_sec) * 1000000.0
-        + (end.tv_usec - begin.tv_usec);
-#endif
+      }
     }
-  }
 #ifdef BENCH
-  printf ("%d   %g\n", len, elapsed);
+    elapsed = elapsed / nb_iter;
+    printf ("%d %g\n", len, elapsed);
 #endif
+  }
 #ifdef COMPARE
   printf ("mpz get/set_str ok\n");
 #endif
-#endif
+#endif // TEST_ZGETSET
+
   //TMP_FREE;
   //tests_end ();
-    return 0;
-  }
+  return 0;
+}

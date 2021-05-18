@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -192,7 +192,7 @@ let rec remove_positive_foralls vc_var f =
   match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
       let (decl, fres) = remove_positive_foralls vc_var f2 in
-      (decl, t_implies f1 fres)
+      (decl, t_attr_copy f (t_implies f1 fres))
 (*  | Tbinop (Tor, f1, f2) ->
       let (decl1, fres1) = remove_positive_foralls vc_var f1 in
       let (decl2, fres2) = remove_positive_foralls vc_var f2 in
@@ -200,7 +200,7 @@ let rec remove_positive_foralls vc_var f =
   | Tbinop (Tand, f1, f2) ->
       let (decl1, fres1) = remove_positive_foralls vc_var f1 in
       let (decl2, fres2) = remove_positive_foralls vc_var f2 in
-      (decl1 @ decl2, t_and fres1 fres2)
+      (decl1 @ decl2, t_attr_copy f (t_and fres1 fres2))
   | Tquant (Tforall, fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =

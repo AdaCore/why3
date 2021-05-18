@@ -3,57 +3,44 @@ Instructions to build TryWhy3
 
   * Install Ace
 
-      - get the sources of Ace and put them in directory `src/trywhy3/`
-
+      - put the sources of Ace in directory `src/trywhy3` and copy
+        the `mode-why3.js` file into them:
 
             cd src/trywhy3
             git clone git://github.com/ajaxorg/ace-builds.git
-
-      - copy the `mode-why3.js` file to the `ace-builds/src-min-noconflict/` directory:
-
-            cp mode-why3.js ace-builds/src-min-noconflict
+            cp mode-why3.js ace-builds/src-min-noconflict/
 
   * Install Alt-Ergo
 
-      - get the sources of Alt-Ergo 2.0 and put them in directory `src/trywhy3/`,
-        e.g., in `src/trywhy3/alt-ergo/`
+      - put the sources of Alt-Ergo in directory `src/trywhy3` and
+        compile the JavaScript worker:
 
             cd src/trywhy3
-            wget http://alt-ergo.ocamlpro.com/http/alt-ergo-2.0.0/alt-ergo-2.0.0.tar.gz
-            tar xzf alt-ergo-2.0.0.tar.gz
-            mv alt-ergo-2.0.0 alt-ergo
-
-      - apply the patch `alt-ergo.patch`
-
+            git clone git://github.com/OCamlPro/alt-ergo.git
             cd alt-ergo
-            patch -p1 < ../alt-ergo.patch
+            opam exec make js-worker
+            mv alt-ergo-worker.js ..
 
-      - compile Alt-Ergo
-
-            ./configure
-            make byte
-
-  * If necessary, change the following line of `Makefile.in` to point to Alt-Ergo sources
-
-        ALTERGODIR=src/trywhy3/alt-ergo
+      - alternatively, recover `alt-ergo-worker.js` from a GitHub workflow
+        at https://github.com/OCamlPro/alt-ergo/actions/workflows/build_js.yml
+        and put it in directory `src/trywhy3`.
 
   * Compile with
 
         make trywhy3
 
-  * You can build a package with
+  * Test by opening http://0.0.0.0:8080/trywhy3.html after starting a local server:
+
+        cd src/trywhy3
+        python3 -m http.server 8080
+
+  * (Optional) Build a package with
 
         make trywhy3.tar.gz
 
-    this creates a tarball containing a directory `trywhy3/` which you can put on a web server.
-    You may want to add a symbolic link from `index.html` to `trywhy3.html` (or rename the file).
-
-  * From directory `trywhy3/`, you can test by running
-
-        python3 -m http.server 8080
-
-    and opening `http://0.0.0.0:8080/trywhy3.html` in a browser.
-
+    This creates a tarball containing a directory `trywhy3/` which you
+    can put on a web server. You may want to add a symbolic link from
+    `index.html` to `trywhy3.html` (or rename the file).
 
 Customization
 -------------

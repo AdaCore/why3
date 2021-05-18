@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,10 +16,7 @@ let () = Debug.set_flag Glob.flag
 
 (* command line parsing *)
 
-let usage_msg = sprintf
-  "Usage: %s [options] <file>...\n\
-   Produce HTML documentation for the given files.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg = "<file>...\nProduce HTML documentation for the given files."
 
 let opt_output = ref None
 let opt_index = ref None (* default behavior *)
@@ -43,7 +40,7 @@ let option_list =
     " only produce the body of the HTML document";
   ]
 
-let _,_,env =
+let _,env =
   Whyconf.Args.initialize option_list
     (fun x -> Queue.add x opt_queue) usage_msg
 
@@ -118,10 +115,3 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3doc.opt"
-End:
-*)
-

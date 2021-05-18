@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1287,7 +1287,7 @@ let check_unused_vars_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
 
 (** Abstract values *)
 
-let cty_of_spec env bl mask dsp dity =
+let cty_of_spec loc env bl mask dsp dity =
   let ity = ity_of_dity dity in
   let bl = binders env.ghs bl in
   let env = add_binders env bl in
@@ -1302,7 +1302,14 @@ let cty_of_spec env bl mask dsp dity =
   let xq = create_xpost dsp.ds_xpost in
   (* Check for unused variables *)
   check_unused_vars_fun bl dsp None;
-  create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity
+  let cty = create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity in
+  (* check that oldies are affected by the writes *)
+  let check_affected _ pv =
+    if not (pv_affected cty.cty_effect.eff_writes pv) then Warning.emit ?loc
+      "variable %s is used under `old` but is not modified by the function"
+        pv.pv_vs.vs_name.id_string in
+  Mpv.iter check_affected cty.cty_oldies;
+  cty
 
 (** Expressions *)
 
@@ -1483,8 +1490,9 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       check_fun env.inr None dsp c;
       proxy c
   | DEany (bl,dity,msk,dsp) ->
+      let loc = Opt.get_def de0.de_loc uloc in
       let env = {env with ghs = env.ghs || env.lgh} in
-      proxy (c_any (cty_of_spec env bl msk dsp dity))
+      proxy (c_any (cty_of_spec loc env bl msk dsp dity))
   | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->
       let ld, env = var_defn uloc env dldf in
       cexp uloc env de (LD (LS ld) :: lpl)

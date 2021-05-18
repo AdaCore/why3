@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -58,7 +58,6 @@ type t =
       mutable iconset : string;
       (** colors *)
       mutable config : Whyconf.config;
-      original_config : Whyconf.config;
       (* mutable altern_provers : altern_provers; *)
       (* mutable replace_prover : conf_replace_prover; *)
       mutable hidden_provers : string list;
@@ -214,9 +213,9 @@ let set_locs_flag =
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
-let load_config config original_config =
+let load_config config =
   let main = get_main config in
-  let ide  = match Whyconf.get_section config "ide" with
+  let ide  = match Whyconf.User.get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s
   in
@@ -250,7 +249,6 @@ let load_config config original_config =
     search_color = ide.ide_search_color;
     iconset = ide.ide_iconset;
     config         = config;
-    original_config = original_config;
     hidden_provers = ide.ide_hidden_provers;
     session_time_limit = Whyconf.timelimit main;
     session_mem_limit = Whyconf.memlimit main;
@@ -260,7 +258,7 @@ let load_config config original_config =
 let get_config t =
   Debug.dprintf debug "[config] saving IDE config file@.";
   (* taking original config, without the extra_config *)
-  let config = t.original_config in
+  let config = t.config in
   (* copy possibly modified settings to original config *)
   let new_main = Whyconf.get_main t.config in
   let time = Whyconf.timelimit new_main in
@@ -305,7 +303,7 @@ let get_config t =
   let ide = set_string ide "search_color" t.search_color in
   let ide = set_string ide "iconset" t.iconset in
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
-  Whyconf.set_section config "ide" ide
+  Whyconf.User.set_section config "ide" ide
 
 let save_config t =
   Whyconf.save_config (get_config t)
@@ -316,8 +314,8 @@ let config,load_config =
     match !config with
       | None -> invalid_arg "configuration not yet loaded"
       | Some conf -> conf),
-  (fun conf base_conf ->
-    let c = load_config conf base_conf in
+  (fun conf ->
+    let c = load_config conf in
     config := Some c)
 
 let save_config () = save_config (config ())
@@ -345,12 +343,21 @@ let add_modifiable_sans_font_view v =
 let add_modifiable_mono_font_view v =
   modifiable_mono_font_views := v :: !modifiable_mono_font_views
 
+let disable_size_spec =
+  match Sys.getenv "GDK_BACKEND" with
+  | "broadway" -> true
+  | _ -> false
+  | exception Not_found -> false
+
 let change_font size =
 (*
   Tools.resize_images (!Colors.font_size * 2 - 4);
 *)
-  let sff = sans_font_family ^ " " ^ string_of_int size in
-  let mff = mono_font_family ^ " " ^ string_of_int size in
+  let size_spec s =
+    if disable_size_spec then s
+    else s ^ " " ^ string_of_int size in
+  let sff = size_spec sans_font_family in
+  let mff = size_spec mono_font_family in
   List.iter (fun v -> v#modify_font_by_name sff) !modifiable_sans_font_views;
   List.iter (fun v -> v#modify_font_by_name mff) !modifiable_mono_font_views
 
@@ -665,7 +672,7 @@ let show_about_window ~parent () =
                 "Piotr Trojanek";
                 "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2020 Inria, CNRS, Paris-Sud University"
+      ~copyright:"Copyright 2010-2021 Inria, CNRS, Paris-Saclay University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
       ~website:"http://why3.lri.fr/"
       ~website_label:"http://why3.lri.fr/"
@@ -1046,7 +1053,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
   in
   let remove button p () =
     button#destroy ();
-    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config));
+    c.config <- Whyconf.User.remove_user_policy c.config p;
   in
   let iter p policy =
     let label =
@@ -1137,8 +1144,8 @@ let editors_page c (notebook:GPack.notebook) =
     editor_entry#connect#changed
       ~callback:
       (fun () ->
-       c.config <- Whyconf.set_main c.config
-	(Whyconf.set_default_editor main editor_entry#text))
+       c.config <- Whyconf.User.set_default_editor c.config
+           editor_entry#text)
   in
   let frame = GBin.frame ~label:"Specific editors" ~packing:vbox_pack () in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
@@ -1184,18 +1191,9 @@ let editors_page c (notebook:GPack.notebook) =
             in
 	    (* Debug.dprintf debug "prover %a: selected editor '%s'@." *)
             (*   print_prover p data; *)
-            let provers = Whyconf.get_provers c.config in
-            let pi =
-              if String.equal pi.editor data
-              then pi (* keep detected_at_startup if no change *)
-              else { pi with
-                     editor = data;
-                     detected_at_startup = false;
-                   }
-            in
-              c.config <-
-                Whyconf.set_provers c.config
-                  (Mprover.add p pi provers)
+            c.config <-
+              Whyconf.User.update_prover_editor c.config
+                p data
       )
     in
     ()
@@ -1245,9 +1243,8 @@ let preferences ~parent (c : t) =
   begin
     match answer with
     | `SAVE ->
-      c.config <- Whyconf.set_main c.config
-        (Whyconf.set_limits (Whyconf.get_main c.config)
-           c.session_time_limit c.session_mem_limit c.session_nb_processes);
+      c.config <- Whyconf.User.set_limits c.config
+           ~time:c.session_time_limit ~mem:c.session_mem_limit ~j:c.session_nb_processes;
       save_config ();
       Itp_server.set_partial_config (get_config (config ()))
     | `CLOSE | `DELETE_EVENT ->
@@ -1279,46 +1276,38 @@ let uninstalled_prover_dialog ~parent ~callback c unknown =
                  ~title:"Why3: Uninstalled prover" ()
   in
   let vbox = dialog#vbox in
-  let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
-  let hbox = GPack.hbox ~packing:vbox_pack () in
-  let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   let height = parent#misc#allocation.Gtk.height * 3 / 4 in
   let scrollview =
     GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC ~height
-      ~packing:hbox_pack ()
+      ~packing:vbox#add ()
   in
   let () = scrollview#set_shadow_type `OUT in
-  let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
+  let vbox = GPack.vbox ~spacing:5 ~packing:scrollview#add_with_viewport () in
+  let vbox_pack =
+    vbox#pack ?fill:None ?expand:None ?from:None ?padding:None
+  in
   (* header *)
-  let hb = GPack.hbox ~packing:vbox#add () in
+  let hb = GPack.hbox ~packing:vbox_pack () in
   let _ = GMisc.image ~stock:`DIALOG_WARNING ~packing:hb#add () in
   let (_:GMisc.label) =
     let text =
       Pp.sprintf "The prover %a is not installed"
         Whyconf.print_prover unknown
     in
-    GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add ()
+    GMisc.label ~ypad:10 ~text ~xalign:0.5 ~packing:hb#add ()
   in
   let (_:GMisc.label) =
     let text =
-      "WARNING: this policy will not be taken into account immediately \
-        but only if you replay again the proofs."
+      "WARNING: This policy will not be taken into account immediately \
+       but only if you replay again the proofs. Do not forget to save \
+       preferences to preserve this policy for future sessions."
     in
-    GMisc.label ~text ~line_wrap:true ~packing:vbox#add ()
-  in
-  let (_:GMisc.label) =
-    let text =
-      "WARNING: do not forget to save preferences to keep this policy in future sessions"
-    in
-    GMisc.label ~text ~line_wrap:true ~packing:vbox#add ()
+    GMisc.label ~ypad:5 ~text ~line_wrap:true ~packing:vbox_pack ()
   in
   (* choices *)
-  let vbox_pack =
-    vbox#pack ~fill:true ~expand:true ?from:None ?padding:None
-  in
   let label = "Please select a policy for associated proof attempts" in
   let policy_frame = GBin.frame ~label ~packing:vbox_pack () in
-  let choice = ref 1 in
+  let choice = ref 0 in
   let prover_choosed = ref None in
   let set_prover prover () = prover_choosed := Some prover in
   let box =
@@ -1344,11 +1333,12 @@ let uninstalled_prover_dialog ~parent ~callback c unknown =
   let first = ref None in
   let alternatives_section acc label alternatives =
     if alternatives <> [] then
-      let frame = GBin.frame ~label ~packing:vbox#add () in
+      let frame = GBin.frame ~label ~packing:vbox_pack () in
       let box =
         GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
           ~packing:frame#add ()
       in
+      box#set_homogeneous true;
       let iter_alter prover =
         let choice_button =
           let label = Pp.string_of_wnl print_prover prover in
@@ -1377,11 +1367,16 @@ let uninstalled_prover_dialog ~parent ~callback c unknown =
   let show_provers () = List.iter (fun b -> b#set_sensitive true) boxes in
   if versions<>[] || names<>[] then
     begin
-      choice_keep#set_active false;
       choice1#set_active true;
+      choice := 1;
     end
   else
     hide_provers();
+  if boxes = [] then
+    begin
+      choice1#misc#set_sensitive false;
+      choice2#misc#set_sensitive false;
+    end;
   ignore (choice_keep#connect#toggled
             ~callback:(fun () -> choice := 0; hide_provers ()));
   ignore (choice1#connect#toggled
@@ -1391,7 +1386,7 @@ let uninstalled_prover_dialog ~parent ~callback c unknown =
   ignore (choice3#connect#toggled
             ~callback:(fun () -> choice := 3; hide_provers ()));
   dialog#add_button "Ok" `CLOSE ;
-  ignore (dialog#run ());
+  if dialog#run () = `DELETE_EVENT then choice := 0;
   dialog#destroy ();
   let policy =
     match !choice, !prover_choosed with
@@ -1401,7 +1396,7 @@ let uninstalled_prover_dialog ~parent ~callback c unknown =
     | 3,_ -> CPU_remove
     | _ -> assert false
   in
-  c.config <- set_prover_upgrade_policy c.config unknown policy;
+  c.config <- Whyconf.User.set_prover_upgrade_policy c.config unknown policy;
   let () = callback unknown policy in
   ()
 

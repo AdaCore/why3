@@ -1,6 +1,6 @@
 Strongest Postcondition
 File "bench/ce/ref_ex.mlw", line 7, characters 14-25:
-Goal Postcondition from verification condition test_post'vc.
+Sub-goal Postcondition of goal test_post'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -29,7 +29,7 @@ File ref_ex.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
 File "bench/ce/ref_ex.mlw", line 13, characters 14-29:
-Goal Postcondition from verification condition test_post2'vc.
+Sub-goal Postcondition of goal test_post2'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -44,17 +44,17 @@ File ref_ex.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 13:
     x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "43"}
-    y [@field:0:contents] [@introduced] [@model_trace:y] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:13]
       [@field:0:contents] [@introduced] [@model_trace:y] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    y [@field:0:contents] [@introduced] [@model_trace:y] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 15:
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -63,7 +63,7 @@ File ref_ex.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
 
 File "bench/ce/ref_ex.mlw", line 24, characters 12-36:
-Goal Postcondition from verification condition incr'vc.
+Sub-goal Postcondition of goal incr'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -97,17 +97,17 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 24:
-    x23 [@field:0:contents] [@introduced] [@model_trace:x23] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
     old x23 [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:24]
       [@field:0:contents] [@introduced] [@model_trace:x23] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+    x23 [@field:0:contents] [@introduced] [@model_trace:x23] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:24]
       [@field:0:contents] [@introduced] [@model_trace:y] =
       {"type": "Record",
@@ -134,7 +134,7 @@ File ref_ex.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
 
 File "bench/ce/ref_ex.mlw", line 38, characters 14-36:
-Goal Loop invariant init from verification condition test_loop'vc.
+Sub-goal Loop invariant init of goal test_loop'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -191,11 +191,11 @@ File ref_ex.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 
 File "bench/ce/ref_ex.mlw", line 39, characters 12-14:
-Goal Loop variant decrease from verification condition test_loop'vc.
+Sub-goal Loop variant decrease of goal test_loop'vc.
 Prover result is: Valid.
 
 File "bench/ce/ref_ex.mlw", line 38, characters 14-36:
-Goal Loop invariant preservation from verification condition test_loop'vc.
+Sub-goal Loop invariant preservation of goal test_loop'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -262,7 +262,7 @@ File ref_ex.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
 File "bench/ce/ref_ex.mlw", line 32, characters 12-23:
-Goal Postcondition from verification condition test_loop'vc.
+Sub-goal Postcondition of goal test_loop'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -304,14 +304,14 @@ File ref_ex.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 32:
-    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96]
-      [@model_trace:x] [@vc:written:37:2:96:bench/ce/ref_ex.mlw] =
+    old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:32]
+      [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-    old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:32]
-      [@field:0:contents] [@introduced] [@model_trace:x] =
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96]
+      [@model_trace:x] [@vc:written:37:2:96:bench/ce/ref_ex.mlw] =
       {"type": "Record",
        "val":
         {"Field":

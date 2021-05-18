@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -142,7 +142,6 @@ type config_prover = {
   interactive : bool;
   extra_options : string list;
   extra_drivers : string list;
-  detected_at_startup : bool;
   configure_build : string;
   build_commands : string list;
 }
@@ -151,11 +150,6 @@ type config_editor = {
   editor_name : string;
   editor_command : string;
   editor_options : string list;
-}
-
-type detected_prover = {
-  exec_name  : string;
-  version : string;
 }
 
 (** Strategies *)
@@ -167,10 +161,8 @@ type config_strategy = {
   strategy_shortcut : string;
 }
 
-let get_strategies ?(default=[]) rc =
-  match get_simple_family rc "strategy" with
-    | [] -> default
-    | s -> s
+let get_strategies rc =
+  get_simple_family rc "strategy"
 
 let set_strategy _ s family =
   let section = empty_section in
@@ -195,9 +187,6 @@ type main = {
   (* add the standard library in the loadpath (default true) *)
   load_default_plugins  : bool;
   (* autoload the plugins in libdir (default true) *)
-  load_default_config  : bool;
-  (* generate on the fly provers, editors, shortcut config from
-     previously detected provers data (default true) *)
   timelimit : int;
   (* default prover time limit in seconds (0 unlimited) *)
   memlimit  : int;
@@ -297,10 +286,9 @@ let load_plugins main =
 
 type config = {
   conf_file : string;       (* "/home/innocent_user/.why3.conf" *)
-  config    : Rc.t;
+  user_rc : Rc.t; (* from .why3.conf without extra_config *)
   main      : main;
   provers   : config_prover Mprover.t;
-  detected_provers : detected_prover list;
   prover_shortcuts : prover Mstr.t;
   editors   : config_editor Meditor.t;
   provers_upgrade_policy : prover_upgrade_policy Mprover.t;
@@ -315,7 +303,6 @@ let empty_main =
     loadpath = [];
     stdlib = true;
     load_default_plugins = true;
-    load_default_config = true;
     timelimit = 5;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
@@ -324,147 +311,20 @@ let empty_main =
                       with Not_found -> "editor %f");
   }
 
-let set_main rc main =
-  let section = empty_section in
-  let section = set_int section "magic" magicnumber in
-  let section = set_string ~default:empty_main.libdir
-    section "libdir" main.libdir in
-  let section = set_string ~default:empty_main.datadir
-      section "datadir" main.datadir in
-  let section = set_bool ~default:true section "stdlib" main.stdlib in
-  let section = set_bool ~default:true section "load_default_plugins" main.load_default_plugins in
-  let section = set_bool ~default:true section "load_default_config" main.load_default_config in
-  let section = set_stringl section "loadpath" main.loadpath in
-  let section = set_int section "timelimit" main.timelimit in
-  let section = set_int section "memlimit" main.memlimit in
-  let section =
-    set_int section "running_provers_max" main.running_provers_max in
-  let section = set_stringl section "plugin" main.plugins in
-  let section = set_string section "default_editor" main.default_editor in
-  set_section rc "main" section
-
-exception NonUniqueId
-
-let set_prover _ (prover,shortcuts) family =
-  let section = empty_section in
-  let section = set_string section "name" prover.prover.prover_name in
-  let section = set_string section "command" prover.command in
-  let section =
-    Opt.fold (fun s c -> set_string s "command_steps" c) section prover.command_steps
-  in
-  let section = set_string section "driver" prover.driver in
-  let section = set_string section "version" prover.prover.prover_version in
-  let section =
-    set_string ~default:"" section "alternative" prover.prover.prover_altern in
-  let section = set_string section "editor" prover.editor in
-  let section = set_bool section "interactive" prover.interactive in
-  let section = set_bool section "in_place" prover.in_place in
-  let section = set_stringl section "shortcut" shortcuts in
-  section::family
-
-let set_provers rc provers =
-  let family = Mprover.fold set_prover provers [] in
-  set_simple_family rc "prover" family
-
-let set_detected_prover prover =
-  let section = empty_section in
-  let section = set_string section "exec_name" prover.exec_name in
-  let section = set_string section "version" prover.version in
-  section
-
-let set_detected_provers rc detected_provers =
-  let family = List.map set_detected_prover detected_provers in
-  set_simple_family rc "detected_prover" family
-
-let set_prover_shortcut prover shortcuts family =
-  let section = empty_section in
-  let section = set_string section "name" prover.prover_name in
-  let section = set_string section "version" prover.prover_version in
-  let section =
-    set_string ~default:"" section "alternative" prover.prover_altern in
-  let section = set_stringl section "shortcut" shortcuts in
-  section::family
-
-let set_prover_shortcuts rc shortcuts =
-  let family = Mprover.fold set_prover_shortcut shortcuts [] in
-  set_simple_family rc "shortcut" family
-
-let set_provers_shortcuts rc shortcuts provers =
-  (* inverse the shortcut map *)
-  let shortcuts = Mstr.fold (fun shortcut prover acc ->
-    Mprover.change (function
-    | None -> Some [shortcut]
-    | Some l -> Some (shortcut::l)) prover acc) shortcuts Mprover.empty in
-  (* the shortcut to unknown prover *)
-  let shortcuts_prover_unknown = Mprover.set_diff shortcuts provers in
-  let rc = set_prover_shortcuts rc shortcuts_prover_unknown in
-  (* merge the known *)
-  let _,shortcuts_provers_known =
-    Mprover.mapi_fold (fun k v acc ->
-      let acc = Mprover.next_ge_enum k acc in
-      match Mprover.val_enum acc with
-      | None -> acc,(v,[])
-      | Some (ks,vs) ->
-        let c = Prover.compare k ks in
-        if c = 0 then acc,(v,vs)
-        else (* c < 0 *) acc,(v,[])
-    ) provers (Mprover.start_enum shortcuts) in
-  let rc = set_provers rc shortcuts_provers_known in
-  rc
-
-let set_editor id editor (ids, family) =
-  if Sstr.mem id ids then raise NonUniqueId;
-  let section = empty_section in
-  let section = set_string section "name" editor.editor_name in
-  let section = set_string section "command" editor.editor_command in
-  (Sstr.add id ids, (id, section)::family)
-
-let set_editors rc editors =
-  let _,family = Meditor.fold set_editor editors (Sstr.empty,[]) in
-  set_family rc "editor" family
-
-let set_prover_upgrade_policy prover policy (i, family) =
-  let section = empty_section in
-  let section = set_string section "name" prover.prover_name in
-  let section = set_string section "version" prover.prover_version in
-  let section = set_string section "alternative" prover.prover_altern in
-  let section =
-    match policy with
-      | CPU_keep ->
-        set_string section "policy" "keep"
-      | CPU_remove ->
-        set_string section "policy" "remove"
-      | CPU_upgrade p ->
-        let section = set_string section "target_name" p.prover_name in
-        let section = set_string section "target_version" p.prover_version in
-        let section = set_string section "target_alternative" p.prover_altern in
-        set_string section "policy" "upgrade"
-      | CPU_duplicate p ->
-        let section = set_string section "target_name" p.prover_name in
-        let section = set_string section "target_version" p.prover_version in
-        let section = set_string section "target_alternative" p.prover_altern in
-        set_string section "policy" "duplicate"
-  in
-  (i+1,("policy" ^ string_of_int i, section)::family)
-
-let set_policies rc policy =
-  let _,family =
-    Mprover.fold set_prover_upgrade_policy policy (0,[])
-  in
-  set_family rc "uninstalled_prover" family
-
+exception ConfigFailure of string (* filename *) * string
 exception DuplicateShortcut of string
 
-let add_prover_shortcuts acc prover shortcuts =
-  List.fold_left (fun acc shortcut ->
-    if shortcut.[0] = '^' then
-      invalid_arg "prover shortcut can't start with a ^";
-    Mstr.add_new (DuplicateShortcut shortcut) shortcut prover acc
-  ) acc shortcuts
+module RC_load = struct
+
+  let add_prover_shortcuts acc prover shortcuts =
+    List.fold_left (fun acc shortcut ->
+        if shortcut.[0] = '^' then
+          invalid_arg "prover shortcut can't start with a ^";
+        Mstr.add_new (DuplicateShortcut shortcut) shortcut prover acc
+      ) acc shortcuts
 
 
-let load_prover (provers,shortcuts) section =
-  try
+  let load_prover_id section =
     let name = get_string section "name" in
     let version = get_string ~default:"" section "version" in
     let altern = get_string ~default:"" section "alternative" in
@@ -474,207 +334,417 @@ let load_prover (provers,shortcuts) section =
         prover_altern = altern;
       }
     in
-    let provers = Mprover.add prover
-      { prover  = prover;
-        command = get_string section "command";
-	command_steps = get_stringo section "command_steps";
-        driver  = get_string section "driver";
-        in_place = get_bool ~default:false section "in_place";
-        editor  = get_string ~default:"" section "editor";
-        interactive = get_bool ~default:false section "interactive";
-        extra_options = [];
-        extra_drivers = [];
-        detected_at_startup = false;
-        configure_build = get_string ~default:"" section "configure_build";
-        build_commands = get_stringl ~default:[] section "build_commands";
-      } provers in
-    let lshort = get_stringl section ~default:[] "shortcut" in
-    let shortcuts = add_prover_shortcuts shortcuts prover lshort in
-    provers,shortcuts
-  with MissingField s ->
-    Warning.emit "[Warning] cannot load a prover: missing field '%s'@." s;
-    provers,shortcuts
+    prover
 
-
-let load_detected_prover acc section =
-  try
-    let v = {
-      exec_name = get_string section "exec_name";
-      version = get_string section "version"
-    } in
-    v::acc
-  with MissingField s ->
-    Warning.emit "[Warning] cannot load a detected_prover section: missing field '%s'@." s;
-    acc
-
-let load_shortcut acc section =
-  try
-    let name = get_string section "name" in
-    let version = get_string section "version" in
-    let altern = get_string ~default:"" section "alternative" in
-    let shortcuts = get_stringl section "shortcut" in
-    let prover = { prover_name = name;
-                   prover_version = version;
-                   prover_altern = altern} in
-    add_prover_shortcuts acc prover shortcuts
-  with MissingField s ->
-    Warning.emit "[Warning] cannot load shortcut: missing field '%s'@." s;
-    acc
-
-let load_editor editors (id, section) =
-  try
-    Meditor.add id
-      { editor_name = get_string ~default:id section "name";
-        editor_command = get_string section "command";
-        editor_options = [];
-      } editors
-  with MissingField s ->
-    Warning.emit "[Warning] cannot load an editor: missing field '%s'@." s;
-    editors
-
-let load_policy acc (_,section) =
-  try
-    let source =
-      {prover_name = get_string section "name";
-       prover_version = get_string section "version";
-       prover_altern = get_string ~default:"" section "alternative"
-      } in
+  let load_prover (provers,shortcuts) section =
     try
-      match get_string section "policy" with
-      | "keep" -> Mprover.add source CPU_keep acc
-      | "remove" -> Mprover.add source CPU_remove acc
-      | "upgrade" ->
-        let target =
-          { prover_name = get_string section "target_name";
-            prover_version = get_string section "target_version";
-            prover_altern = get_string ~default:"" section "target_alternative";
+      let prover = load_prover_id section in
+      let info =
+        match Mprover.find_opt prover provers with
+        | None ->
+          { prover  = prover;
+            command = get_string section "command";
+	    command_steps = get_stringo section "command_steps";
+            driver  = get_string section "driver";
+            in_place = get_bool ~default:false section "in_place";
+            editor  = get_string ~default:"" section "editor";
+            interactive = get_bool ~default:false section "interactive";
+            extra_options = [];
+            extra_drivers = [];
+            configure_build = get_string ~default:"" section "configure_build";
+            build_commands = get_stringl ~default:[] section "build_commands";
           }
-        in
-        Mprover.add source (CPU_upgrade target) acc
-      | "duplicate" ->
-        let target =
-          { prover_name = get_string section "target_name";
-            prover_version = get_string section "target_version";
-            prover_altern = get_string ~default:"" section "target_alternative";
+        | Some info ->
+          { prover  = prover;
+            command = get_string ~default:info.command section "command";
+            command_steps = get_stringo ?default:info.command_steps section "command_steps";
+            driver  = get_string ~default:info.driver section "driver";
+            in_place = get_bool ~default:info.in_place section "in_place";
+            editor  = get_string ~default:info.editor section "editor";
+            interactive = get_bool ~default:info.interactive section "interactive";
+            extra_options = info.extra_options;
+            extra_drivers = info.extra_drivers;
+            configure_build = get_string ~default:"" section "configure_build";
+            build_commands = get_stringl ~default:[] section "build_commands";
           }
-        in
-        Mprover.add source (CPU_duplicate target) acc
-      | _ -> raise Not_found
-    with Not_found -> acc
-      with MissingField s ->
-        Warning.emit "[Warning] cannot load a policy: missing field '%s'@." s;
-        acc
+      in
+      let provers = Mprover.add prover info provers in
+      let lshort = get_stringl section ~default:[] "shortcut" in
+      let shortcuts = add_prover_shortcuts shortcuts prover lshort in
+      provers,shortcuts
+    with MissingField s ->
+      Warning.emit "[Warning] cannot load a prover: missing field '%s'@." s;
+      provers,shortcuts
 
-let load_strategy strategies section =
-  try
-    let name = get_string section "name" in
-    let name =
+  let load_shortcut acc section =
+    try
+      let name = get_string section "name" in
+      let version = get_string section "version" in
+      let altern = get_string ~default:"" section "alternative" in
+      let shortcuts = get_stringl section "shortcut" in
+      let prover = { prover_name = name;
+                     prover_version = version;
+                     prover_altern = altern} in
+      add_prover_shortcuts acc prover shortcuts
+    with MissingField s ->
+      Warning.emit "[Warning] cannot load shortcut: missing field '%s'@." s;
+      acc
+
+  let load_editor editors (id, section) =
+    try
+      let info = match Meditor.find_opt id editors with
+      | None ->
+          { editor_name = get_string ~default:id section "name";
+            editor_command = get_string section "command";
+            editor_options = [];
+          }
+      | Some info ->
+          { editor_name = get_string ~default:info.editor_name section "name";
+            editor_command = get_string ~default:info.editor_command section "command";
+            editor_options = (get_stringl section "options")@info.editor_options;
+          }
+      in
+      Meditor.add id info editors
+    with MissingField s ->
+      Warning.emit "[Warning] cannot load an editor: missing field '%s'@." s;
+      editors
+
+  let load_policy acc (_,section) =
+    try
+      let source =
+        {prover_name = get_string section "name";
+         prover_version = get_string section "version";
+         prover_altern = get_string ~default:"" section "alternative"
+        } in
       try
-        let (_:int) = String.index name ' ' in
-        Warning.emit "[Warning] found a space character in strategy name '%s': replaced by '_'@." name;
-        String.map (function ' ' -> '_' | c -> c) name
-      with Not_found -> name
-    in
-    let desc = get_string section "desc" in
-    let shortcut = get_string ~default:"" section "shortcut" in
-    let code = get_string section "code" in
-    Mstr.add
-      name
-      { strategy_name = name;
-        strategy_desc = desc;
-        strategy_code = code;
-        strategy_shortcut = shortcut;
-      }
-      strategies
-  with
-    MissingField s ->
-    Warning.emit "[Warning] cannot load a strategy: missing field '%s'@." s;
-    strategies
+        match get_string section "policy" with
+        | "keep" -> Mprover.add source CPU_keep acc
+        | "remove" -> Mprover.add source CPU_remove acc
+        | "upgrade" ->
+            let target =
+              { prover_name = get_string section "target_name";
+                prover_version = get_string section "target_version";
+                prover_altern = get_string ~default:"" section "target_alternative";
+              }
+            in
+            Mprover.add source (CPU_upgrade target) acc
+        | "duplicate" ->
+            let target =
+              { prover_name = get_string section "target_name";
+                prover_version = get_string section "target_version";
+                prover_altern = get_string ~default:"" section "target_alternative";
+              }
+            in
+            Mprover.add source (CPU_duplicate target) acc
+        | _ -> raise Not_found
+      with Not_found -> acc
+    with MissingField s ->
+      Warning.emit "[Warning] cannot load a policy: missing field '%s'@." s;
+      acc
 
-let load_main dirname section =
-  if get_int ~default:0 section "magic" <> magicnumber then
-    raise WrongMagicNumber;
-  { libdir    = get_string ~default:empty_main.libdir section "libdir";
-    datadir   = get_string ~default:empty_main.datadir section "datadir";
-    libobjdir = Config.libobjdir;
-    loadpath  = List.map (Sysutil.concat dirname)
-        (get_stringl ~default:[] section "loadpath");
-    stdlib = get_bool ~default:true section "stdlib";
-    load_default_plugins = get_bool ~default:true section "load_default_plugins";
-    load_default_config = get_bool ~default:true section "load_default_config";
-    timelimit = get_int ~default:empty_main.timelimit section "timelimit";
-    memlimit  = get_int ~default:empty_main.memlimit section "memlimit";
-    running_provers_max = get_int ~default:empty_main.running_provers_max
-                                  section "running_provers_max";
-    plugins = get_stringl ~default:[] section "plugin";
-    default_editor = get_string ~default:empty_main.default_editor section "default_editor";
-  }
+  let load_strategy strategies section =
+    try
+      let name = get_string section "name" in
+      let name =
+        try
+          let (_:int) = String.index name ' ' in
+          Warning.emit "[Warning] found a space character in strategy name '%s': replaced by '_'@." name;
+          String.map (function ' ' -> '_' | c -> c) name
+        with Not_found -> name
+      in
+      let desc = get_string section "desc" in
+      let shortcut = get_string ~default:"" section "shortcut" in
+      let code = get_string section "code" in
+      Mstr.add
+        name
+        { strategy_name = name;
+          strategy_desc = desc;
+          strategy_code = code;
+          strategy_shortcut = shortcut;
+        }
+        strategies
+    with
+      MissingField s ->
+        Warning.emit "[Warning] cannot load a strategy: missing field '%s'@." s;
+        strategies
+
+  let load_main old dirname section =
+    if get_int ~default:0 section "magic" <> magicnumber then
+      raise WrongMagicNumber;
+    { libdir    = get_string ~default:old.libdir section "libdir";
+      datadir   = get_string ~default:old.datadir section "datadir";
+      libobjdir = Config.libobjdir;
+      loadpath  =
+        begin match List.map (Sysutil.concat dirname)
+                (get_stringl ~default:[] section "loadpath") with
+        | [] -> old.loadpath
+        | l -> l end;
+      stdlib = get_bool ~default:old.stdlib section "stdlib";
+      load_default_plugins = get_bool ~default:old.load_default_plugins section "load_default_plugins";
+      timelimit = get_int ~default:old.timelimit section "timelimit";
+      memlimit  = get_int ~default:old.memlimit section "memlimit";
+      running_provers_max = get_int ~default:old.running_provers_max
+          section "running_provers_max";
+      plugins = get_stringl ~default:old.plugins section "plugin";
+      default_editor = get_string ~default:old.default_editor section "default_editor";
+    }
+
+  let get_dirname filename =
+    Filename.dirname (Sysutil.concat (Sys.getcwd ()) filename)
+
+  let config_from_rc config filename rc =
+    let dirname = get_dirname filename in
+    let main =
+      match get_section rc "main" with
+      | None      -> config.main
+      | Some main -> load_main config.main dirname main
+    in
+    let provers = get_simple_family rc "prover" in
+    let provers,shortcuts = List.fold_left load_prover
+        (config.provers,config.prover_shortcuts) provers in
+    let fam_shortcuts = get_simple_family rc "shortcut" in
+    let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
+    let editors = get_family rc "editor" in
+    let editors = List.fold_left load_editor config.editors editors in
+    let policy = get_family rc "uninstalled_prover" in
+    let policy = List.fold_left load_policy config.provers_upgrade_policy policy in
+    let strategies = get_strategies rc in
+    let strategies = List.fold_left load_strategy config.strategies strategies in
+    { conf_file = filename;
+      user_rc    = rc;
+      main      = main;
+      provers   = provers;
+      prover_shortcuts = shortcuts;
+      editors   = editors;
+      provers_upgrade_policy = policy;
+      strategies = strategies;
+    }
+
+end
+
+module RC_save = struct
+  let set_limits ~time ~mem ~j section =
+    let section =
+      match get_into section "magic" with
+      | None -> set_int section "magic" magicnumber
+      | _ -> section
+    in
+    let section = set_int section "timelimit" time in
+    let section = set_int section "memlimit" mem in
+    let section =
+      set_int section "running_provers_max" j in
+    section
+
+  let set_default_editor default section =
+    set_string section "default_editor" default
+
+  let set_main rc main =
+    let section = empty_section in
+    let section = set_int section "magic" magicnumber in
+    let section = set_string ~default:empty_main.libdir
+        section "libdir" main.libdir in
+    let section = set_string ~default:empty_main.datadir
+        section "datadir" main.datadir in
+    let section = set_bool ~default:empty_main.stdlib section "stdlib" main.stdlib in
+    let section = set_bool ~default:empty_main.load_default_plugins
+        section "load_default_plugins" main.load_default_plugins in
+    let section = set_stringl section "loadpath" main.loadpath in
+    let section = set_stringl section "plugin" main.plugins in
+    let section = set_default_editor main.default_editor section  in
+    let section = set_limits ~time:main.timelimit ~mem:main.memlimit ~j:main.running_provers_max section in
+    set_section rc "main" section
+
+  let set_prover_id section prover =
+    let section = set_string section "name" prover.prover_name in
+    let section = set_string section "version" prover.prover_version in
+    let section =
+      set_string ~default:"" section "alternative" prover.prover_altern in
+    section
+
+  let set_prover _ (prover,shortcuts) family =
+    let section = empty_section in
+    let section = set_prover_id section prover.prover in
+    let section = set_string section "command" prover.command in
+    let section = set_stringo section "command_steps" prover.command_steps
+    in
+    let section = set_string section "driver" prover.driver in
+    let section = set_string section "editor" prover.editor in
+    let section = set_bool section "interactive" prover.interactive in
+    let section = set_bool section "in_place" prover.in_place in
+    let section = set_stringl section "shortcut" shortcuts in
+    section::family
+
+  let update_prover_editor rc prover editor =
+    let family = Rc.get_simple_family rc "prover" in
+    let update_section section =
+      let section = set_string section "editor" editor in
+      section
+    in
+    let rec aux acc = function
+      | [] ->
+          let section = set_prover_id empty_section prover in
+          let section = update_section section in
+          List.rev_append acc [section]
+      | s::l -> begin
+          match RC_load.load_prover_id s with
+          | exception MissingField field ->
+              Warning.emit "[Warning] missing field '%s' in user configuration@." field;
+              aux (s::acc) l
+          | p when Prover.equal p prover ->
+              let s = update_section s in
+              List.rev_append acc (s::l)
+          | _ -> aux (s::acc) l
+        end
+    in
+    Rc.set_simple_family rc "prover" (aux [] family)
+
+  let set_provers rc provers =
+    let family = Mprover.fold set_prover provers [] in
+    set_simple_family rc "prover" family
+
+  let set_prover_shortcut prover shortcuts family =
+    let section = empty_section in
+    let section = set_string section "name" prover.prover_name in
+    let section = set_string section "version" prover.prover_version in
+    let section =
+      set_string ~default:"" section "alternative" prover.prover_altern in
+    let section = set_stringl section "shortcut" shortcuts in
+    section::family
+
+  let set_prover_shortcuts rc shortcuts =
+    let family = Mprover.fold set_prover_shortcut shortcuts [] in
+    set_simple_family rc "shortcut" family
+
+  let set_provers_shortcuts rc shortcuts provers =
+    (* inverse the shortcut map *)
+    let shortcuts = Mstr.fold (fun shortcut prover acc ->
+        Mprover.change (function
+            | None -> Some [shortcut]
+            | Some l -> Some (shortcut::l)) prover acc) shortcuts Mprover.empty in
+    (* the shortcut to unknown prover *)
+    let shortcuts_prover_unknown = Mprover.set_diff shortcuts provers in
+    let rc = set_prover_shortcuts rc shortcuts_prover_unknown in
+    (* merge the known *)
+    let _,shortcuts_provers_known =
+      Mprover.mapi_fold (fun k v acc ->
+          let acc = Mprover.next_ge_enum k acc in
+          match Mprover.val_enum acc with
+          | None -> acc,(v,[])
+          | Some (ks,vs) ->
+              let c = Prover.compare k ks in
+              if c = 0 then acc,(v,vs)
+              else (* c < 0 *) acc,(v,[])
+        ) provers (Mprover.start_enum shortcuts) in
+    let rc = set_provers rc shortcuts_provers_known in
+    rc
+
+  exception NonUniqueId
+
+  let set_editor id editor (ids, family) =
+    if Sstr.mem id ids then raise NonUniqueId;
+    let section = empty_section in
+    let section = set_string section "name" editor.editor_name in
+    let section = set_string section "command" editor.editor_command in
+    (Sstr.add id ids, (id, section)::family)
+
+  let set_editors rc editors =
+    let _,family = Meditor.fold set_editor editors (Sstr.empty,[]) in
+    set_family rc "editor" family
+
+  let set_prover_upgrade_policy prover policy (i, family) =
+    let section = empty_section in
+    let section = set_string section "name" prover.prover_name in
+    let section = set_string section "version" prover.prover_version in
+    let section = set_string section "alternative" prover.prover_altern in
+    let section =
+      match policy with
+      | CPU_keep ->
+          set_string section "policy" "keep"
+      | CPU_remove ->
+          set_string section "policy" "remove"
+      | CPU_upgrade p ->
+          let section = set_string section "target_name" p.prover_name in
+          let section = set_string section "target_version" p.prover_version in
+          let section = set_string section "target_alternative" p.prover_altern in
+          set_string section "policy" "upgrade"
+      | CPU_duplicate p ->
+          let section = set_string section "target_name" p.prover_name in
+          let section = set_string section "target_version" p.prover_version in
+          let section = set_string section "target_alternative" p.prover_altern in
+          set_string section "policy" "duplicate"
+    in
+    (i+1,("policy" ^ string_of_int i, section)::family)
+
+  let set_policies rc policy =
+    let _,family =
+      Mprover.fold set_prover_upgrade_policy policy (0,[])
+    in
+    set_family rc "uninstalled_prover" family
+
+end
+
+let empty_rc =
+  RC_save.set_main Rc.empty empty_main
 
 let read_config_rc conf_file =
-  let filename = match conf_file with
-    | Some filename -> filename
-    | None -> begin try Sys.getenv "WHY3CONFIG" with Not_found ->
-          if Sys.file_exists default_conf_file then default_conf_file
-          else raise Exit
-        end
+  let read filename =
+    filename,
+    if filename = "" then empty_rc
+    else Rc.from_file filename
   in
-  let rc =
-    if filename = "" then set_main Rc.empty empty_main
-    else Rc.from_file filename in
-  filename, rc
+  match conf_file with
+  | Some filename -> read filename
+  | None -> begin try read (Sys.getenv "WHY3CONFIG") with Not_found ->
+      if Sys.file_exists default_conf_file then read default_conf_file
+      else default_conf_file, empty_rc
+    end
 
-exception ConfigFailure of string (* filename *) * string
-
-let get_dirname filename =
-  Filename.dirname (Sysutil.concat (Sys.getcwd ()) filename)
-
-let get_config (filename,rc) =
-  let dirname = get_dirname filename in
-  let rc, main =
-    match get_section rc "main" with
-      | None      -> raise (ConfigFailure (filename, "no main section"))
-      | Some main -> rc, load_main dirname main
-  in
-  let provers = get_simple_family rc "prover" in
-  let provers,shortcuts = List.fold_left load_prover
-      (Mprover.empty,Mstr.empty) provers in
-  let detected_provers =
-    List.fold_left load_detected_prover
-      [] (get_simple_family rc "detected_prover") in
-  let fam_shortcuts = get_simple_family rc "shortcut" in
-  let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
-  let editors = get_family rc "editor" in
-  let editors = List.fold_left load_editor Meditor.empty editors in
-  let policy = get_family rc "uninstalled_prover" in
-  let policy = List.fold_left load_policy Mprover.empty policy in
-  let strategies = get_strategies ~default:[] rc in
-  let strategies = List.fold_left load_strategy Mstr.empty strategies in
-  { conf_file = filename;
-    config    = rc;
-    main      = main;
-    provers   = provers;
-    detected_provers;
-    prover_shortcuts = shortcuts;
-    editors   = editors;
-    provers_upgrade_policy = policy;
-    strategies = strategies;
+let empty_config conf_file =
+  {
+    conf_file;
+    user_rc = Rc.empty;
+    main = empty_main;
+    provers = Mprover.empty;
+    prover_shortcuts = Mstr.empty;
+    editors = Meditor.empty;
+    provers_upgrade_policy = Mprover.empty;
+    strategies = Mstr.empty;
   }
 
 let default_config conf_file =
-  get_config (conf_file, set_main Rc.empty empty_main)
+  RC_load.config_from_rc (empty_config conf_file) conf_file empty_rc
 
-let read_config conf_file =
-  let filenamerc =
-    try
-      read_config_rc conf_file
-    with Exit ->
-      default_conf_file, set_main Rc.empty empty_main
-  in
+let read_config_aux config filename rc =
   try
-    get_config filenamerc
+    RC_load.config_from_rc config filename rc
   with e when not (Debug.test_flag Debug.stack_trace) ->
     let s = Format.asprintf "%a" Exn_printer.exn_printer e in
-    raise (ConfigFailure (fst filenamerc, s))
+    raise (ConfigFailure (filename, s))
+
+let read_config conf_file =
+  let filename,rc = read_config_rc conf_file in
+  try
+    RC_load.config_from_rc (empty_config filename) filename rc
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+    raise (ConfigFailure (filename, s))
+
+let rc_of_config { main;
+                   provers;
+                   prover_shortcuts;
+                   editors;
+                   provers_upgrade_policy;
+                   strategies;
+                   conf_file = _;
+                   user_rc = _;
+                 } =
+  let rc = Rc.empty in
+  let rc = RC_save.set_main rc main in
+  let rc = set_strategies rc strategies in
+  let rc = RC_save.set_provers_shortcuts rc prover_shortcuts provers in
+  let rc = RC_save.set_editors rc editors in
+  let rc = RC_save.set_policies rc provers_upgrade_policy in
+  rc
 
 (** filter prover *)
 type regexp_desc = { reg : Re.Str.regexp; desc : string}
@@ -752,11 +822,11 @@ let filter_one_prover whyconf fp =
     raise (ProverAmbiguity (whyconf,fp,provers))
 
 
-(** merge config *)
+(** add extra config *)
 
-let merge_config config filename =
-  Format.eprintf "[Config] reading extra configuration file %s@." filename;
-  let dirname = get_dirname filename in
+let add_extra_config config filename =
+  Debug.dprintf debug "reading extra configuration file %s@." filename;
+  let dirname = RC_load.get_dirname filename in
   let rc = Rc.from_file filename in
   (* modify main *)
   let main = match get_section rc "main" with
@@ -770,7 +840,7 @@ let merge_config config filename =
   (* get more strategies *)
   let more_strategies = get_strategies rc in
   let strategies =
-    List.fold_left load_strategy config.strategies more_strategies
+    List.fold_left RC_load.load_strategy config.strategies more_strategies
   in
   (* modify provers *)
   let create_filter_prover section =
@@ -789,11 +859,12 @@ let merge_config config filename =
   (* add provers *)
   let provers = List.fold_left
     (fun provers (fp, section) ->
+      Debug.dprintf debug "handling prover modifiers for %a@." print_filter_prover fp;
       Mprover.mapi (fun p c  ->
-        Debug.dprintf debug "Whyconf: handling prover modifiers for %a@." print_prover p;
         if not (filter_prover fp p) then c
-        else begin
-          Debug.dprintf debug "Whyconf: prover modifiers found for %a@." print_prover p;
+        else
+          begin
+            Debug.dprintf debug "prover modifiers found for %a@." print_prover p;
           let opt = get_stringl ~default:[] section "option" in
           let drv = get_stringl ~default:[] section "driver" in
           let bcmd = get_stringl ~default:[] section "build_command" in
@@ -805,7 +876,7 @@ let merge_config config filename =
         provers
     ) config.provers prover_modifiers in
   let provers,shortcuts =
-    List.fold_left load_prover
+    List.fold_left RC_load.load_prover
       (provers,config.prover_shortcuts) (get_simple_family rc "prover") in
   (* modify editors *)
   let editor_modifiers = get_family rc "editor_modifiers" in
@@ -818,7 +889,7 @@ let merge_config config filename =
         Some { c with editor_options = opt @ c.editor_options }) id  editors
     ) config.editors editor_modifiers in
   (* add editors *)
-  let editors = List.fold_left load_editor editors (get_family rc "editor") in
+  let editors = List.fold_left RC_load.load_editor editors (get_family rc "editor") in
   { config with main = main; provers = provers; strategies = strategies;
     prover_shortcuts = shortcuts; editors = editors }
 
@@ -826,12 +897,11 @@ let save_config config =
   let filename = config.conf_file in
   if filename <> "" then begin
     Sysutil.backup_file filename;
-    to_file filename config.config
+    to_file filename config.user_rc
   end
 
 let get_main config = config.main
 let get_provers config = config.provers
-let get_detected_provers config = config.detected_provers
 let get_prover_config config prover =
   Mprover.find prover (get_provers config)
 let get_prover_shortcuts config = config.prover_shortcuts
@@ -841,50 +911,103 @@ let get_prover_upgrade_policy config p =
 
 let set_main config main =
   {config with
-    config = set_main config.config main;
     main = main;
   }
 
+module User = struct
+  let update_section rc section f =
+    Opt.get_def empty_section (Rc.get_section rc section)
+    |> f
+    |> Rc.set_section rc section
+
+  let update_prover_editor config prover editor =
+    match Mprover.find_opt prover config.provers with
+    | None ->
+        invalid_arg "Update the editor of a non existing prover"
+    | Some info ->
+        if info.editor = editor then config
+        else
+          let info = { info with editor } in
+          { config with
+            provers = Mprover.add prover info config.provers;
+            user_rc = RC_save.update_prover_editor config.user_rc prover editor;
+          }
+
+  let set_default_editor config editor =
+    { config with
+      user_rc = update_section config.user_rc "main"
+        @@ RC_save.set_default_editor editor;
+      main = set_default_editor config.main editor;
+    }
+
+  let set_limits ~time ~mem ~j config =
+    { config with
+      user_rc = update_section config.user_rc "main"
+        @@ RC_save.set_limits ~time ~mem ~j;
+      main = set_limits config.main time mem j;
+    }
+
+  let set_prover_upgrade_policy config prover target =
+    (** kept simple because no auto upgrade policy *)
+    let m = Mprover.add prover target config.provers_upgrade_policy in
+    {config with
+     user_rc = RC_save.set_policies config.user_rc m;
+     provers_upgrade_policy = m;
+    }
+
+  let remove_user_policy config prover =
+    (** kept simple because no auto upgrade policy *)
+    let m = Mprover.remove prover config.provers_upgrade_policy in
+    {config with
+     user_rc = RC_save.set_policies config.user_rc m;
+     provers_upgrade_policy = m;
+    }
+
+  let get_section config name = assert (name <> "main");
+    get_section config.user_rc name
+
+  let get_simple_family config name = assert (name <> "prover");
+    get_simple_family config.user_rc name
+
+  let get_family config name = assert (name <> "prover");
+    get_family config.user_rc name
+
+  let set_section config name section = assert (name <> "main");
+    {config with user_rc = set_section config.user_rc name section}
+
+  let set_simple_family config name section =
+    {config with user_rc = set_simple_family config.user_rc name section}
+
+  let set_family config name section = assert (name <> "prover");
+    {config with user_rc = set_family config.user_rc name section}
+
+end
+
 let set_provers config ?shortcuts provers =
   let shortcuts = Opt.get_def config.prover_shortcuts shortcuts in
-  let rc_config =
-    let provers = Mprover.filter (fun _ c -> not c.detected_at_startup) provers in
-    set_provers_shortcuts config.config shortcuts provers;
-  in
   {config with
-   config = rc_config;
    provers = provers;
    prover_shortcuts = shortcuts;
   }
 
-let set_detected_provers config detected_provers =
-  {config with
-    config = set_detected_provers config.config detected_provers;
-    detected_provers;
-  }
-
 let set_prover_shortcuts config shortcuts =
   {config with
-    config = set_provers_shortcuts config.config shortcuts config.provers;
     prover_shortcuts = shortcuts;
   }
 
 let set_editors config editors =
   { config with
-    config = set_editors config.config editors;
     editors = editors;
   }
 
 let set_prover_upgrade_policy config prover target =
   let m = Mprover.add prover target config.provers_upgrade_policy in
   {config with
-    config = set_policies config.config m;
     provers_upgrade_policy = m;
   }
 
 let set_policies config policies =
   { config with
-    config = set_policies config.config policies;
     provers_upgrade_policy = policies }
 
 
@@ -911,24 +1034,10 @@ let get_strategies config = config.strategies
 let add_strategy c strat =
   let f = get_strategies c in
   let strategies = Mstr.add strat.strategy_name strat f in
-  { c with strategies = strategies;
-           config = set_strategies c.config strategies }
+  { c with strategies = strategies }
 
 
 (******)
-
-let get_section config name = assert (name <> "main");
-  get_section config.config name
-
-let get_family config name = assert (name <> "prover");
-  get_family config.config name
-
-
-let set_section config name section = assert (name <> "main");
-  {config with config = set_section config.config name section}
-
-let set_family config name section = assert (name <> "prover");
-  {config with config = set_family config.config name section}
 
 let set_stdlib stdlib config =
   {config with main = {config.main with stdlib}}
@@ -936,16 +1045,12 @@ let set_stdlib stdlib config =
 let set_load_default_plugins load_default_plugins config =
   {config with main = {config.main with load_default_plugins}}
 
-let set_load_default_config load_default_config config =
-  {config with main = {config.main with load_default_config}}
-
-
 let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
       Format.fprintf fmt "error in config file %s: %s" f s
   | WrongMagicNumber ->
       Format.fprintf fmt "outdated config file; rerun 'why3 config'"
-  | NonUniqueId ->
+  | RC_save.NonUniqueId ->
     Format.fprintf fmt "InternalError: two provers share the same id"
   | ProverNotFound (config,fp) ->
     fprintf fmt "No prover in %s corresponds to \"%a\"@."
@@ -964,15 +1069,23 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Shortcut %s appears twice in the configuration file" s
   | _ -> raise e)
 
-let provers_from_detected_provers =
-  ref (fun _ -> invalid_arg
+let provers_from_detected_provers :
+  (save_to:string -> Rc.t -> config) ref =
+  ref (fun ~save_to:_ _ -> invalid_arg
           "provers_from_detected_provers: Must be filled by Autodetection")
 
 
 let add_builtin_provers config = !provers_from_detected_provers config
 
-let load_default_config_if_needed config =
-  if config.main.load_default_config then add_builtin_provers config else config
+let init_config ?(extra_config=[]) ofile =
+  let save_to,rc = read_config_rc ofile in
+  (* Add the automatic provers, shortcuts, strategy, ... *)
+  let config = add_builtin_provers ~save_to rc in
+  (* load the user configuration, priority over automatic values *)
+  let config = read_config_aux config save_to rc in
+  (* Add extra-config *)
+  let config = List.fold_left add_extra_config config extra_config in
+  config
 
 module Args = struct
   let first_arg = ref 1
@@ -981,6 +1094,9 @@ module Args = struct
   let opt_loadpath = ref []
   let opt_stdlib = ref true
   let opt_load_default_plugins = ref true
+
+  let add_command s =
+    Getopt.commands := !Getopt.commands @ [s]
 
   let common_options =
     let open Getopt in
@@ -1000,32 +1116,40 @@ module Args = struct
     ]
 
   let do_usage options header footer =
-    Printf.printf "%s\n%s" header (Getopt.format options);
+    Printf.printf "Usage:";
+    List.iter (Printf.printf " %s") !Getopt.commands;
+    Printf.printf " [options]";
+    if header = "" then Printf.printf "\n\n"
+    else if header.[String.length header - 1] <> '\n' then
+      Printf.printf " %s\n\n" header
+    else Printf.printf " %s\n" header;
+    Printf.printf "%s" (Getopt.format options);
     if footer <> "" then Printf.printf "\n%s" footer;
     Printf.printf "%!"
 
   let all_options options header footer =
-    let options = common_options @ options in
-    let open Getopt in
-    (Key ('h', "help"), Hnd0 (fun () -> do_usage options header footer; exit 0),
-     " display this help and exit") ::
-      options
+    let options = ref (common_options @ options) in
+    let help =
+      let open Getopt in
+      (Key ('h', "help"), Hnd0 (fun () -> do_usage !options header footer; exit 0),
+       " display this help and exit") in
+    options := help :: !options;
+    !options
 
   let complete_initialization () =
     Debug.Args.set_flags_selected ~silent:true ();
-    let base_config = read_config !opt_config in
-    let config = { base_config with conf_file = "" } in
-    let config = List.fold_left merge_config config !opt_extra in
+    let config = init_config ~extra_config:(!opt_extra) !opt_config in
+    (* Set option if they are false *)
     let apply_not_default f o b = if !o then b else f !o b in
     let config = apply_not_default set_stdlib opt_stdlib config in
     let config = apply_not_default set_load_default_plugins opt_load_default_plugins config in
     let main = get_main config in
+    let lp = List.rev_append !opt_loadpath (loadpath main) in
+    let config = set_main config (set_loadpath main lp) in
     load_plugins main;
     Debug.Args.set_flags_selected ();
     if Debug.Args.option_list () then exit 0;
-    let lp = List.rev_append !opt_loadpath (loadpath main) in
-    let config = load_default_config_if_needed config in
-    config, base_config, Env.create_env lp
+    config, Env.create_env lp
 
   let initialize ?(extra_help="") options default usage =
     let options = all_options options usage extra_help in
@@ -1033,7 +1157,7 @@ module Args = struct
     complete_initialization ()
 
   let exit_with_usage ?(exit_code=1) ?(extra_help="") options usage =
-    let options = common_options @ options in
+    let options = all_options options usage extra_help in
     do_usage options usage extra_help;
     exit exit_code
 end

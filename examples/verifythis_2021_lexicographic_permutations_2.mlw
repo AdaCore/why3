@@ -1,0 +1,466 @@
+
+(**
+{1 VerifyThis @ ETAPS 2021 competition
+   Challenge 1: Lexicographic Permutations}
+   See https://www.pm.inf.ethz.ch/research/verifythis.html
+
+   Authors:
+   - Quentin Garchery (Université Paris-Saclay)
+   - Xavier Denis (Université Paris-Saclay)
+*)
+
+
+module ArrayListConversions
+   use int.Int
+   use array.Array
+   use export array.ArrayEq
+   use list.List as L
+   use list.Nth
+   use list.Length as L
+   use option.Option
+
+
+let rec function to_list_from (i : int) (a : array int) : L.list int
+    variant { length a - i }
+    requires { 0 <= i <= length a }
+    ensures { L.length result = length a - i }
+    ensures { forall k. 0 <= k < length a - i -> nth k result = Some a[k+i] }
+    =
+    if i = length a then L.Nil else L.Cons a[i] (to_list_from (i+1) a)
+
+let function to_list a = to_list_from 0 a
+
+let lemma to_list_array_eq (a1 a2 : array int) : unit
+    requires { array_eq a1 a2 }
+    ensures { to_list a1 = to_list a2 }
+    =
+    let rec lemma to_list_array_eq_from (a1 a2 : array int) (i : int) : unit
+        variant { length a1 - i }
+        requires { 0 <= i <= length a1}
+        requires { array_eq a1 a2 }
+        ensures { to_list_from i a1 = to_list_from i a2 }
+        =
+        if i < length a1 then to_list_array_eq_from a1 a2 (i+1) in
+    to_list_array_eq_from a1 a2 0
+
+let function of_list (l : L.list int) : array int
+    ensures { length result = L.length l }
+    ensures { forall k. 0 <= k < L.length l -> nth k l = Some result[k] }
+    =
+    let a = make (L.length l) 0 in
+    let rec update_from l' i
+        variant { l' }
+        writes { a }
+        requires { 0 <= i }
+        requires { L.length l' = L.length l - i }
+        requires { forall k. 0 <= k < L.length l' -> nth (k+i) l = nth k l' }
+        ensures { forall k. i <= k < L.length l -> nth k l = Some a[k] }
+        ensures { forall k. 0 <= k < i -> a[k] = old a[k] }
+        =
+        match l' with
+        | L.Nil -> ()
+        | L.Cons v t ->
+          a[i] <- v;
+          assert { forall k. 0 < k < L.length t ->
+                   nth (k+i+1) l = nth k t
+                   by nth ((k+1)+i) l = nth (k+1) l' };
+          update_from t (i+1)
+        end in
+    update_from l 0;
+    a
+
+let rec lemma eq_nth (l1 l2 : L.list 'a)
+    requires { L.length l1 = L.length l2 }
+    requires { forall k. 0 <= k < L.length l1 -> nth k l1 = nth k l2 }
+    ensures { l1 = l2 }
+    =
+    match l1, l2 with
+    | L.Cons a1 t1, L.Cons a2 t2 ->
+      assert { a1 = a2 && L.length t1 = L.length t2 };
+      assert { forall k. 0 <= k < L.length t1 ->
+               nth k t1 = nth k t2
+               by nth (k+1) l1 = nth (k+1) l2 };
+      eq_nth t1 t2
+    | L.Nil, L.Nil -> ()
+    | _ -> assert {false}; ()
+    end
+
+
+lemma of_to_list : forall a. array_eq (of_list (to_list a)) a
+
+lemma to_of_list : forall l. to_list (of_list l) = l
+
+meta remove_prop axiom eq_nth
+
+end
+
+module BoxedIntArrays
+use int.Int
+use int.Abs
+use int.MinMax
+use int.Power
+use array.Array
+use array.ArrayPermut
+
+predicate boxed (u : int) (a : array int) =
+   forall i. 0 <= i < length a -> 2 * abs a[i] < u
+
+lemma boxed_permut : forall a a' u.
+      boxed u a ->
+      permut_all a a' ->
+      boxed u a'
+
+let function greater a
+    ensures { result >= 0 }
+    ensures { forall i. 0 <= i < length a -> 2 * abs a[i] < result }
+    =
+    let rec function great a l
+        variant { length a - l }
+        requires { 0 <= l <= length a }
+        ensures { result >= 0 }
+        ensures { forall i. l <= i < length a -> 2 * abs a[i] < result }
+        =
+        if l = length a then 0
+        else let r = great a (l+1) in
+             max r (2 * abs a[l] + 1) in
+    great a 0
+
+lemma boxed_greater : forall a.
+      boxed (greater a) a
+
+let function maxi base (a : array int)
+    requires { boxed base a }
+    =
+    power base (length a)
+
+end
+
+module Permut
+
+use int.Int
+use array.Array
+use array.ArrayPermut
+use array.ArrayExchange
+use array.ArrayEq
+
+use array.IntArraySorted
+clone array.Sorted as Decr with type elt = int, predicate le = (>=)
+
+predicate le (a1 a2 : array int) =
+   length a1 = length a2 &&
+   exists i. 0 <= i <= length a1 &&
+   (forall j. 0 <= j < i -> a1[j] = a2[j])
+   && (i < length a1 -> a1[i] < a2[i])
+
+predicate lt (a1 a2 : array int) =
+   le a1 a2 && not array_eq a1 a2
+
+let rec function find_eq (a1 a2 : array int) (i : int) : int
+    variant { length a1 - i }
+    requires { length a1 = length a2 }
+    requires { 0 <= i <= length a1 }
+    requires { array_eq_sub a1 a2 0 i }
+    ensures { 0 <= result <= length a1 }
+    ensures { array_eq_sub a1 a2 0 result }
+    ensures { result < length a1 -> a1[result] <> a2[result] }
+    =
+    if i = length a1 || a1[i] <> a2[i] then i
+    else find_eq a1 a2 (i+1)
+
+lemma lt_trans : forall a1 a2 a3 : array int.
+      lt a1 a2 -> lt a2 a3 -> lt a1 a3
+      by let i = find_eq a1 a2 0 in
+         let j = find_eq a2 a3 0 in
+         i < length a1 && j < length a1
+         so i <= j -> array_eq_sub a1 a3 0 i && a1[i] < a3[i]
+         so j < i -> array_eq_sub a1 a3 0 j && a1[j] < a3[j]
+
+let function find_le a1 a2
+    ensures { result <-> le a1 a2 }
+    =
+    length a1 = length a2 &&
+    let i = find_eq a1 a2 0 in
+    i = length a1 || a1[i] < a2[i]
+
+lemma eq_le_compat : forall a1 a2 b1 b2 : array int.
+      array_eq a1 b1 -> array_eq a2 b2 ->
+      le a1 a2 -> le b1 b2
+      by let i = find_eq a1 a2 0 in
+         array_eq_sub b1 b2 0 i &&
+         i < length a1 ->
+         b1[i] <= b2[i]
+
+lemma eq_lt_compat : forall a1 a2 b1 b2 : array int.
+      array_eq a1 b1 -> array_eq a2 b2 ->
+      lt a1 a2 -> lt b1 b2
+
+lemma le_or_lt : forall a1 a2 : array int.
+      length a1 = length a2 ->
+      le a1 a2 \/ lt a2 a1
+      by not le a1 a2 ->
+         let i = find_eq a1 a2 0 in
+         i < length a1 && a1[i] > a2[i]
+         && array_eq_sub a1 a2 0 i
+
+lemma lt_not_le : forall a1 a2 : array int.
+      lt a1 a2 -> not le a2 a1
+      by let i = find_eq a1 a2 0 in
+         i < length a1 && a1[i] < a2[i]
+         && array_eq_sub a1 a2 0 i
+
+let lemma eq_sub_permut (a1 a2 : array int) (u : int)
+    requires { permut_all a1 a2 }
+    requires { array_eq_sub a1 a2 0 u }
+    ensures { permut_sub a1 a2 u (length a1) }
+    =
+    let rec lemma eq_sub_permut_ind (a1 a2 : array int) (i1 i2 i3 : int)
+        variant { i2 - i1 }
+        requires { i1 <= i2 <= i3 }
+        requires { permut_sub a1 a2 i1 i3 }
+        requires { array_eq_sub a1 a2 i1 i2 }
+        ensures { permut_sub a1 a2 i2 i3 }
+        =
+        if i1 < i2 then
+        eq_sub_permut_ind a1 a2 (i1+1) i2 i3 in
+    eq_sub_permut_ind a1 a2 0 u (length a1)
+
+
+lemma le_permut_sorted : forall a1 a2 i.
+      length a1 = length a2 ->
+      permut_sub a1 a2 i (length a1) ->
+      sorted_sub a1 i (length a1) ->
+      le a1 a2
+      by let i' = find_eq a1 a2 0 in
+         i' >= i
+         so i' < length a1 -> permut_sub a1 a2 i' (length a1)
+         so a1[i'] <= a2[i']
+
+lemma le_permut_decr_sorted : forall a1 a2 i.
+      length a1 = length a2 ->
+      permut_sub a1 a2 i (length a1) ->
+      Decr.sorted_sub a1 i (length a1) ->
+      le a2 a1
+      by let i' = find_eq a1 a2 0 in
+         i' >= i
+         so i' < length a1 -> permut_sub a1 a2 i' (length a1)
+         so a1[i'] >= a2[i']
+
+let next (a : array int)
+    writes { a }
+    ensures { permut_all a (old a) }
+    ensures { not result -> a = old a &&
+              forall a'. permut_all a a' -> le a a' -> array_eq a a'
+              by Decr.sorted a }
+    ensures { result ->
+              lt (old a) a &&
+              forall a'. permut_all (old a) a' ->
+              lt (old a) a' -> le a a' }
+    =
+    let ref i = length a - 1 in
+    while (i > 0 && a[i-1] >= a[i]) do
+          variant { i }
+          invariant { i <= length a - 1}
+          invariant { Decr.sorted_sub a i (length a) }
+          i <- i-1
+    done;
+    if i <= 0 then false else
+    begin
+    let ref j = length a - 1 in
+    while (a[j] <= a[i-1]) do
+          variant { j }
+          invariant { i <= j <= length a - 1 }
+          invariant { forall k. j < k < length a -> a[k] <= a[i-1] }
+          j <- j-1
+    done;
+
+    assert { a[j] > a[i-1] };
+    assert { forall k. i <= k < length a -> a[k] > a[i-1] -> a[k] >= a[j] };
+    let ghost i0 = i in
+
+    let ref temp = a[i-1] in
+    a[i-1] <- a[j];
+    a[j] <- temp;
+    assert { exchange a (old a) (i-1) j };
+    j <- length a - 1;
+
+    label L in
+    while (i<j) do
+          variant { j-i }
+          invariant { i0 <= i < length a }
+          invariant { i0 <= j < length a }
+          invariant { permut_all a (a at L) }
+          invariant { array_eq_sub a (a at L) 0 i0 }
+          invariant { forall k1 k2. i0 <= k1 < k2 < i -> a[k1] <= a[k2] }
+          invariant { forall k1 k2. i <= k1 < k2 < j+1 -> a[k1] >= a[k2] }
+          invariant { forall k1 k2. j+1 <= k1 < k2 < length a -> a[k1] <= a[k2] }
+          invariant { forall k1 k2. i0 <= k1 < i -> i <= k2 <= j ->
+                      a[k1] <= a[k2] }
+          invariant { forall k1 k2. i <= k1 <=j -> j < k2 < length a ->
+                      a[k1] <= a[k2] }
+          invariant { forall k1 k2. i0 <= k1 < i -> j < k2 < length a ->
+                      a[k1] <= a[k2] }
+          label StartLoop in
+          temp <- a[i];
+          a[i] <- a[j];
+          a[j] <- temp;
+          assert { exchange a (a at StartLoop) i j };
+          i <- i+1;
+          j <- j-1
+    done;
+    assert { sorted_sub a i0 (length a) };
+    assert { forall a'. permut_all (old a) a' ->
+              lt (old a) a' -> le a a'
+              by let i = find_eq (old a) a' 0 in
+                 if i = length a
+                 then array_eq (old a) a' so le a a'
+                 else if i < i0-1
+                 then a'[i] > (old a)[i] so le a a'
+                 else if i > i0-1
+                 then a'[i0-1] = (old a)[i0-1] < a[i0-1] so false
+                 else i = i0-1
+                 so if a'[i0-1] <> a[i0-1]
+                    then (old a)[i0-1] < a'[i0-1]
+                         so permut_sub (old a) a' (i0 -1) (length a)
+                         so a[i0-1] <= a'[i0-1]
+                         so le a a'
+                    else array_eq_sub a a' 0 (i0-1)
+                         so array_eq_sub a a' 0 i0
+                         so permut_sub a a' i0 (length a)
+                         so le a a' };
+    true
+    end
+
+use queue.Queue as Queue
+use list.List as L
+use int.Abs
+use int.Power
+
+use BoxedIntArrays
+
+val sort (a : array int) : unit
+    writes { a }
+    ensures { permut_all a (old a) }
+    ensures { sorted a }
+
+let rec function as_num base a i
+    variant { length a - i }
+    requires { boxed base a }
+    requires { 0 <= i <= length a }
+    ensures { 2 * abs result < power base (length a - i) }
+    =
+    if i = length a then 0
+    else begin
+    let rest = as_num base a (i+1) in
+    assert { 2 * abs (a[i] * power base (length a - 1 - i) + rest) <=
+             2 * abs a[i] * power base (length a - 1 - i) + 2 * abs rest <
+             (2 * abs a[i] + 1) * power base (length a - 1 - i) <=
+             base * power base (length a - 1 - i) <=
+             power base (length a - i)
+             by (forall x y : int. x >= 0 -> y >= 0 -> x * y >= 0)
+             so forall x y z : int. x <= y -> z >= 0 -> x * z <= y * z
+                by (y - x) * z >= 0 };
+    a[i] * power base (length a - 1 - i) + rest end
+
+let function as_number base a
+    requires { boxed base a }
+    ensures { abs result <= maxi base a }
+    =
+    as_num base a 0
+
+let rec lemma as_number_ind (a a' : array int) (base i j : int)
+    variant { j - i }
+    requires { 0 <= i <= j < length a }
+    requires { boxed base a }
+    requires { boxed base a' }
+    requires { array_eq_sub a a' 0 j }
+    requires { a[j] < a'[j] }
+    ensures { as_num base a i < as_num base a' i }
+    =
+    if i < j then (assert { a[i] = a'[i] }; as_number_ind a a' base (i+1) j) else
+    assert { as_num base a i = a[i] * power base (length a - 1 - i) +
+                               as_num base a (i+1) /\
+             as_num base a' i = a'[i] * power base (length a - 1 - i) +
+                                as_num base a' (i+1) /\
+             2 * (as_num base a (i+1) - as_num base a' (i+1)) <=
+             2 * abs (as_num base a (i+1)) + 2 * abs (as_num base a' (i+1)) <
+             2 * power base (length a - 1 - i) <=
+             2 * (a'[i] - a[i]) * power base (length a - 1 - i) }
+
+let lemma as_number_strict a a' base
+    requires { length a = length a'}
+    requires { boxed base a }
+    requires { boxed base a' }
+    requires { lt a a' }
+    ensures { as_number base a < as_number base a' }
+    =
+    let n = length a in
+    for i = 0 to n - 1 do
+        invariant { array_eq_sub a a' 0 i }
+        if a[i] <> a'[i] then (as_number_ind a a' base 0 i; return)
+    done
+
+use seq.Seq
+use seq.Mem
+use ArrayListConversions
+
+lemma seq_snoc_mem : forall s : seq 'a, x y.
+      mem x (snoc s y) <-> mem x s \/ x = y
+
+let permut (a : Array.array int) : Queue.t (L.list int)
+    ensures { forall i1 i2. 0 <= i1 < i2 < length result ->
+              lt (of_list result[i1]) (of_list result[i2]) }
+    ensures { forall a'. permut_all a a' -> mem (to_list a') result }
+    =
+    let ghost base = greater a in
+    let res = Queue.create () in
+    if length a = 0 then
+    begin Queue.push L.Nil res;
+          assert { forall a'. permut_all a a' -> mem (to_list a') res };
+          res end
+    else begin
+    sort a;
+    let ref cont = true in
+    let ghost ref cont_int = 1 in
+    assert { forall a'. permut_all a' a -> lt a' a -> false
+             by permut_sub a a' 0 (Array.length a) };
+    while cont do
+          invariant { permut_all a (old a) }
+          invariant { boxed base a }
+          invariant { cont_int = 1 <-> cont }
+          invariant { cont -> forall a'. permut_all a' a -> lt a' a ->
+                      mem (to_list a') res }
+          invariant { not cont -> forall a'. permut_all a' a -> le a' a ->
+                      mem (to_list a') res}
+          invariant { cont -> forall a'. mem (to_list a') res -> lt a' a }
+          invariant { not cont -> forall a'. permut_all a a' -> le a a' ->
+                      array_eq a a' }
+          invariant { forall i1 i2. 0 <= i1 < i2 < length res ->
+                      lt (of_list res[i1]) (of_list res[i2]) }
+          variant { cont_int, maxi base a - as_number base a }
+          label SL in
+          Queue.push (to_list a) res;
+          cont <- next a;
+          if cont then begin
+          assert { forall a'. permut_all a' a -> lt a' a ->
+                   mem (to_list a') res
+                   by not le a a'
+                   so le a' (a at SL) };
+          assert { forall a'. mem (to_list a') res -> lt a' a
+                   by le a a' -> lt (a at SL) a'
+                      so not mem (to_list a') (res at SL)
+                      so to_list a' = to_list (a at SL)
+                      so lt a' a };
+          () end
+          else cont_int <- 0;
+          assert { boxed base a };
+          assert { forall i1 i2. 0 <= i1 < i2 < length res ->
+                      lt (of_list res[i1]) (of_list res[i2])
+                      by i2 = length res - 1 ->
+                         array_eq (of_list res[i2]) (a at SL)
+                         && lt (of_list res[i1]) (a at SL)};
+
+    done;
+    res
+    end
+
+end

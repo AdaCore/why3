@@ -1,36 +1,46 @@
 
-(* Insertion sort. *)
+(** Insertion sort.
+
+    Surprinsingly, the verification of insertion sort is more difficult
+    than the proof of other, more efficient, sorting algorithms.
+
+    One reason is that insertion sort proceeds by shifting elements,
+    which means that, within the inner loop, the array is *not* a permutation
+    of the initial array. Below we make use of the functional array update
+    a[j <- v] to state that, if ever we put back `v` at index `j`, we get
+    an array that is a permutation of the original array.
+*)
 
 module InsertionSort
 
   use int.Int
-  use ref.Ref
   use array.Array
   use array.IntArraySorted
   use array.ArrayPermut
   use array.ArrayEq
 
-  let insertion_sort (a: array int)
-    ensures { sorted a /\ permut_all (old a) a }
+  let insertion_sort (a: array int) : unit
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
   = for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
       invariant { sorted_sub a 0 i /\ permut_all (old a) a }
       let v = a[i] in
-      let j = ref i in
-      while !j > 0 && a[!j - 1] > v do
-        invariant { 0 <= !j <= i }
-        invariant { permut_all (old a) a[!j <- v] }
-        invariant { forall k1 k2: int.
-             0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> a[k1] <= a[k2] }
-        invariant { forall k: int. !j+1 <= k <= i -> v < a[k] }
-        variant { !j }
+      let ref j = i in
+      while j > 0 && a[j - 1] > v do
+        invariant { 0 <= j <= i }
+        invariant { permut_all (old a) a[j <- v] }
+        invariant { forall k1 k2.
+             0 <= k1 <= k2 <= i -> k1 <> j -> k2 <> j -> a[k1] <= a[k2] }
+        invariant { forall k. j+1 <= k <= i -> v < a[k] }
+        variant { j }
         label L in
-        a[!j] <- a[!j - 1];
-        assert { exchange (a at L)[!j <- v] a[!j-1 <- v] (!j - 1) !j };
-        j := !j - 1
+        a[j] <- a[j - 1];
+        assert { exchange (a at L)[j <- v] a[j-1 <- v] (j - 1) j };
+        j <- j - 1
       done;
-      assert { forall k: int. 0 <= k < !j -> a[k] <= v };
-      a[!j] <- v
+      assert { forall k. 0 <= k < j -> a[k] <= v };
+      a[j] <- v
     done
 
   let test1 () =
@@ -65,7 +75,6 @@ end
 module InsertionSortGen
 
   use int.Int
-  use ref.Ref
   use array.Array
   use array.ArrayPermut
   use array.ArrayEq
@@ -88,27 +97,64 @@ module InsertionSortGen
   predicate sorted (a : array elt) =
     M.sorted_sub a.elts 0 a.length
 
-  let insertion_sort (a: array elt)
-    ensures { sorted a /\ permut_all (old a) a }
+  let insertion_sort (a: array elt) : unit
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
   = for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
-      invariant { sorted_sub a 0 i /\ permut_all (old a) a }
+      invariant { sorted_sub a 0 i }
+      invariant { permut_all (old a) a }
       let v = a[i] in
-      let j = ref i in
-      while !j > 0 && not (le a[!j - 1] v) do
-        invariant { 0 <= !j <= i }
-        invariant { permut_all (old a) a[!j <- v] }
-        invariant { forall k1 k2: int.
-             0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> le a[k1] a[k2] }
-        invariant { forall k: int. !j+1 <= k <= i -> le v a[k] }
-        variant { !j }
+      let ref j = i in
+      while j > 0 && not (le a[j - 1] v) do
+        invariant { 0 <= j <= i }
+        invariant { permut_all (old a) a[j <- v] }
+        invariant { forall k1 k2.
+             0 <= k1 <= k2 <= i -> k1 <> j -> k2 <> j -> le a[k1] a[k2] }
+        invariant { forall k. j+1 <= k <= i -> le v a[k] }
+        variant { j }
         label L in
-        a[!j] <- a[!j - 1];
-        assert { exchange (a at L)[!j <- v] a[!j-1 <- v] (!j - 1) !j };
-        j := !j - 1
+        a[j] <- a[j - 1];
+        assert { exchange (a at L)[j <- v] a[j-1 <- v] (j - 1) j };
+        j <- j - 1
       done;
-      assert { forall k: int. 0 <= k < !j -> le a[k] v };
-      a[!j] <- v
+      assert { forall k. 0 <= k < j -> le a[k] v };
+      a[j] <- v
+    done
+
+end
+
+(** Using swaps (instead of shifting) is less efficient but at least
+    we can expect the loop invariant for the inner loop to be
+    simpler. And indeed it is.
+
+    The invariant below was suggested by Xavier Leroy (Collège de France).
+
+    Without surprise, the proof of the permutation property is also simpler.
+*)
+
+module InsertionSortSwaps
+
+  use int.Int
+  use array.Array
+  use array.ArraySwap
+  use array.ArrayPermut
+
+  let insertion_sort (a: array int) : unit
+    ensures { forall p q. 0 <= p <= q < length a -> a[p] <= a[q] }
+    ensures { permut_all (old a) a }
+  = for i = 1 to length a - 1 do
+      invariant { forall p q. 0 <= p <= q < i -> a[p] <= a[q] }
+      invariant { permut_all (old a) a }
+      let ref j = i in
+      while j > 0 && a[j - 1] > a[j] do
+        invariant { 0 <= j <= i }
+        invariant { permut_all (old a) a }
+        invariant { forall p q. 0 <= p <= q <= i -> q <> j -> a[p] <= a[q] }
+        variant   { j }
+        swap a (j - 1) j;
+        j <- j - 1
+      done
     done
 
 end

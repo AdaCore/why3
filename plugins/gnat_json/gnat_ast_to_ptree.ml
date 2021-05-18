@@ -1153,7 +1153,7 @@ let rec mk_declaration (node : declaration_id) =
             def, Ptree.Public in
       [D.mk_type [{
            td_ident = ident; td_params = args; td_def = def; td_mut = false;
-           td_loc = get_pos (); td_inv = []; td_wit = []; td_vis = vis
+           td_loc = get_pos (); td_inv = []; td_wit = None; td_vis = vis
          }]]
   | Function_decl _ as desc ->
       mk_function_decl {info=node.info; desc}
@@ -1324,10 +1324,10 @@ let read_channel env path filename c =
   (* Defer printing of mlw file until after the typing, to set the marker of located
      exceptions *)
   let print_mlw_file ?mark () =
-    let pp =
-      match mark with
-      | Some (msg, pos) -> Mlw_printer.(with_marker ~msg pos pp_mlw_file)
-      | None -> Mlw_printer.pp_mlw_file in
+    let pp = Mlw_printer.pp_mlw_file ~attr:false in
+    let pp = match mark with
+      | None -> pp
+      | Some (msg, pos) -> Mlw_printer.with_marker ~msg pos pp in
     let out = open_out mlw_filename in
     Format.fprintf (Format.formatter_of_out_channel out) "%a@." pp mlw_file;
     close_out out in

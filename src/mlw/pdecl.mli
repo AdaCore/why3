@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,12 +22,13 @@ type its_defn = private {
   itd_fields       : rsymbol list;
   itd_constructors : rsymbol list;
   itd_invariant    : term list;
-  itd_witness      : expr list;
+  (** The expression is a tuple where each elements corresponds to a field *)
+  itd_witness      : expr option;
 }
 
 val create_plain_record_decl : priv:bool -> mut:bool ->
   preid -> tvsymbol list -> (bool * pvsymbol) list ->
-  term list -> expr list -> its_defn
+  term list -> expr option -> its_defn
 (** [create_plain_record_decl ~priv ~mut id args fields invl witn]
     creates a declaration for a non-recursive record type, possibly
     private and/or mutable. The known record fields are listed with
@@ -41,8 +42,9 @@ val create_plain_record_decl : priv:bool -> mut:bool ->
     The [invl] parameter contains the list of invariant formulas that may
     only depend on free variables from [fields]. If the type is private,
     then every field occurring in [invl] must have an immutable type.
-    The [witn] parameter provides a witness expression for each field
-    of a plain record type (can be empty if there is no user witness).
+    The [witn] parameter provides an expression which computes a tuple
+    that gives a witness for each field of a plain record type (can be
+    None if there is no user witness).
     Abstract types are considered to be private records with no fields. *)
 
 val create_rec_record_decl : itysymbol -> pvsymbol list -> its_defn

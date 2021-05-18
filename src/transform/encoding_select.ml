@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,6 +11,7 @@
 
 open Wstdlib
 open Ty
+open Ident
 open Term
 open Decl
 open Theory
@@ -20,14 +21,26 @@ open Discriminate
 
 let register pr l = List.iter (fun (n,f) -> Hstr.replace pr n (Util.const f)) l
 
-let register pr none goal all =
-  register pr ["none",none; "goal",goal; "all",all]
+let register pr none goal local all =
+  register pr ["none",none; "goal",goal; "local",local; "all",all]
 
 (** {2 select Kept} *)
 
 let trans_on_goal fn = Trans.store (function
   | Some { task_decl = { td_node = Decl { d_node = Dprop (_,_,f) }}} -> fn f
   | _ -> assert false)
+
+let is_local = function
+  | {d_node = Dprop (Pgoal,_,_)} ->
+      true
+  | {d_node =
+      ( Dparam ({ls_args = []; ls_value = Some _} as ls)
+      | Dlogic [{ls_args = []; ls_value = Some _} as ls, _])} ->
+      Ident.Sattr.mem Inlining.intro_attr ls.ls_name.id_attrs
+  | {d_node = Dprop (Paxiom, pr, _)} ->
+      Ident.Sattr.mem Inlining.intro_attr pr.pr_name.id_attrs
+  | _ ->
+      false
 
 module Kept = struct
   (* we ignore the type of the result as we are
@@ -38,16 +51,21 @@ module Kept = struct
 
   let add_kept = t_app_fold add_kept
 
+  let local_kept task sty = match task.task_decl.td_node with
+    | Decl d when is_local d -> decl_fold add_kept sty d
+    | _ -> sty
+
   let all_kept task sty = match task.task_decl.td_node with
     | Decl d -> decl_fold add_kept sty d
     | _ -> sty
 
   let kept_none = Trans.return Sty.empty
   let kept_goal = trans_on_goal (add_kept Sty.empty)
+  let kept_local = Trans.fold local_kept Sty.empty
   let kept_all  = Trans.fold all_kept Sty.empty
 
-  let () = register ft_select_kept kept_none kept_goal kept_all
-  let () = register ft_select_inst kept_none kept_goal kept_all
+  let () = register ft_select_kept kept_none kept_goal kept_local kept_all
+  let () = register ft_select_inst kept_none kept_goal kept_local kept_all
 end
 
 (** {2 select Lskept} *)
@@ -68,6 +86,13 @@ module Lskept = struct
     let ls_tvs_v = List.fold_left add_ty_v Stv.empty ls_sig in
     if Stv.subset ls_tvs_v ls_tvs_t then Sls.add ls sls else sls
 
+  let local_lskept task sls = match task.task_decl.td_node with
+    | Decl ({ d_node = Dparam ls } as d) when is_local d ->
+        add_lskept sls ls
+    | Decl ({ d_node = Dlogic l } as d) when is_local d ->
+        List.fold_left (fun sls (ls,_) -> add_lskept sls ls) sls l
+    | _ -> sls
+
   let all_lskept task sls = match task.task_decl.td_node with
     | Decl { d_node = Dparam ls } ->
         add_lskept sls ls
@@ -79,9 +104,11 @@ module Lskept = struct
 
   let lskept_none = Trans.return Sls.empty
   let lskept_goal = trans_on_goal (add_lskept Sls.empty)
+  let lskept_local = Trans.fold local_lskept Sls.empty
   let lskept_all  = Trans.fold all_lskept Sls.empty
 
-  let () = register ft_select_lskept lskept_none lskept_goal lskept_all
+  let () =
+    register ft_select_lskept lskept_none lskept_goal lskept_local lskept_all
 end
 
 (** {2 select Lsinst} *)
@@ -96,13 +123,19 @@ module Lsinst = struct
 
   let add_lsinst mls t = t_app_fold add_lsinst mls t
 
+  let local_lsinst task mls = match task.task_decl.td_node with
+    | Decl d when is_local d -> decl_fold add_lsinst mls d
+    | _ -> mls
+
   let all_lsinst task mls = match task.task_decl.td_node with
     | Decl d -> decl_fold add_lsinst mls d
     | _ -> mls
 
   let lsinst_none = Trans.return Lsmap.empty
   let lsinst_goal = trans_on_goal (add_lsinst Lsmap.empty)
+  let lsinst_local = Trans.fold local_lsinst Lsmap.empty
   let lsinst_all  = Trans.fold all_lsinst Lsmap.empty
 
-  let () = register ft_select_lsinst lsinst_none lsinst_goal lsinst_all
+  let () =
+    register ft_select_lsinst lsinst_none lsinst_goal lsinst_local lsinst_all
 end

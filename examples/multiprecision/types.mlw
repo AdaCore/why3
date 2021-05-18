@@ -1,5 +1,14 @@
+module Config
+
+  meta "select_inst" "goal"
+  meta "select_lskept" "goal"
+  meta "select_lsinst" "goal"
+
+end
+
 module Types
 
+  use Config
   use mach.c.C
   use mach.int.Int32
   use import mach.int.UInt64GMP as Limb

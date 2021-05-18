@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -418,9 +418,7 @@ let set_output = function
 
 let prefix = ref "WHY"
 
-let usage_msg = sprintf
-  "Usage: %s [options] [--output=latex|mlw|sexp|dep] [--kind=inductive] [--prefix=<prefix>] <filename> [<Module>.]<type> ...\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg = "<filename> [<Module>.]<type> ..."
 
 let spec =
   let open Why3.Getopt in
@@ -458,7 +456,7 @@ let deps_use fmt filename (modname:string) (q:Ptree.qualid) =
 let deps_decl fmt filename modname d =
   Ptree.(match d with
   | Dtype _ | Dlogic _ | Dind _ | Dprop _ | Dlet _ | Drec _ | Dexn _ | Dmeta _ -> ()
-  | Dcloneexport(q,_) | Duseexport q | Dcloneimport(_,_,q,_,_) ->
+  | Dcloneexport(_,q,_) | Duseexport q | Dcloneimport(_,_,q,_,_) ->
      deps_use fmt filename modname q
   | Duseimport(_,_, mods) ->
      List.iter (fun (q,_) -> deps_use fmt filename modname q) mods
@@ -484,7 +482,7 @@ let deps_file fmt header filename f =
   if header then fprintf fmt "}@."
 
 
-let _, _, _ =
+let _, _ =
   Whyconf.Args.initialize spec add_filename_then_path usage_msg
 
 let () =
@@ -505,7 +503,7 @@ let () =
          | Sexp, None, 0 ->
              Why3pp_sexp.why3pp_sexp stdout mlw_file
          | _, _, _ ->
-             Getopt.handle_exn Sys.argv "invalid arguments"
+             Getopt.handle_exn "invalid arguments"
         )
     | None ->
-        Getopt.handle_exn Sys.argv "missing filename"
+        Getopt.handle_exn "missing filename"

@@ -76,7 +76,7 @@ run () {
         sed 's/ *([0-9]\+\.[0-9]\+s, [0-9]\+ steps)//g' | \
         # This ad hoc sed removes diff between Timeout and Unknown (unknown)
         # when running from platform with different speed.
-        sed 's/Prover result is: \(Timeout\.\|Unknown (\(unknown\|incomplete\|unknown + \(incomplete\|interrupted\)\))\.\|Out of memory.\|Step limit exceeded ([^)]*)\.\)$/Prover result is: Unknown or time\/memory\/step limit./' | \
+        sed 's/Prover result is: \(Timeout\.\|Unknown (\(unknown\|incomplete\|unknown + \(incomplete\|interrupted\)\))\.\|Out of memory.\|Step limit exceeded\.\|Step limit exceeded ([^)]*)\.\)$/Prover result is: Unknown or time\/memory\/step limit./' | \
         # Remove steps informations
         sed -r 's/Unknown \(sat\).*$/Unknown \(sat\)/' | \
         sed -r 's/Valid \(.*$/Valid/' >> "$f.out"
@@ -92,15 +92,12 @@ run () {
             echo "FAILED!"
             # echo "Oracle is ${str_oracle}"
             # echo "Output is ${str_out}"
-            if $is_xfail; then
-                echo "Failed but bench is ok because asserted as an XFAIL."
-            else
-                echo "diff is the following:"
-                echo "$f"
-                diff -u "${oracle_file}" "$f.out"|colorize
-                success=false
-            fi
-        fi
+	    echo "diff is the following:"
+	    echo "$f"
+	    echo diff -u "${oracle_file}" "$f.out"
+	    diff -u "${oracle_file}" "$f.out"|colorize
+	    success=false
+	fi
     fi
 }
 

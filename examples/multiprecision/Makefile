@@ -37,7 +37,7 @@ why3:
 	make -C ../..
 
 MLWFILES = \
-  mpz_get_str mpz_set_str mpz_div2exp mpz_mul2exp mpz_div mpz_mul mpz_sub mpz_add mpz_getset mpz_abs mpz_cmp mpz_cmpabs mpz \
+  mpz_get_str mpz_set_str mpz_div2exp mpz_mul2exp mpz_div mpz_mul mpz_sub mpz_add mpz_getset mpz_abs mpz_cmp mpz_cmpabs mpz_neg mpz_realloc2 mpz \
   set_str get_str base_info powm sqrtrem sqrt toom logical div mul sub add compare util
 
 build/extracted: $(addsuffix .mlw, $(MLWFILES))
@@ -60,9 +60,10 @@ EXTRACTED = build/extracted build/sqrtinit.h build/binverttab.h
 extract: $(EXTRACTED)
 
 CFILES = \
-  zutil.c z.c zcmp.c zcmpabs.c zabs.c zadd.c zsub.c zmul.c zdiv.c zmul2exp.c zdiv2exp.c zget_str.c zset_str.c \
+  zutil.c z.c zcmp.c zcmpabs.c zabs.c zneg.c zrealloc2.c \
+  zadd.c zsub.c zmul.c zdiv.c zmul2exp.c zdiv2exp.c zget_str.c zset_str.c \
   set.c get_str.c set_str.c baseinfo.c powm.c sqrt.c sqrt1.c toom.c div.c \
-  logical.c logicalold.c logicalutil.c mul_basecase.c sub.c sub_1.c add.c add_1.c \
+  logical.c logicalold.c mul_basecase.c sub.c sub_1.c add.c add_1.c \
   compare.c util.c utilold.c
 
 ifneq ($(OVERLAY),gmp)
@@ -95,7 +96,7 @@ build/gmp%bench: tests.c build/libwmp.a
 build/minigmp%bench: tests.c build/libwmp.a
 	$(CC) $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -lm -o $@
 
-BENCHS = toomb sqrtrem millerrabin toomu add mul div powm toomm
+BENCHS = toomb sqrtrem millerrabin toomu add mul div powm toomm zgetset
 
 
 WHY3BENCHFILES = $(addprefix bench/why3, $(BENCHS))

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -20,10 +20,9 @@ In particular, it tests the clone feature
 open Why3
 
 let () = Debug.set_flag Debug.stack_trace
-let config : Whyconf.config =
-  Whyconf.(load_default_config_if_needed (read_config None))
-let main : Whyconf.main = Whyconf.get_main config
-let env : Env.env = Env.create_env (Whyconf.loadpath main)
+let config = Whyconf.init_config None
+let main = Whyconf.get_main config
+let env = Env.create_env (Whyconf.loadpath main)
 open Ptree
 
 let () = Typing.open_file env [] (* empty pathname *)
@@ -90,7 +89,7 @@ let type_a : Ptree.decl =
     td_vis = Public;
     td_mut = false;
     td_inv = [];
-    td_wit = [];
+    td_wit = None;
     td_def = TDrange (c22, c46);
   }]
 

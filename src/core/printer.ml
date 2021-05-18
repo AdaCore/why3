@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -70,20 +70,26 @@ type blacklist = string list
 
 type 'a pp = Pp.formatter -> 'a -> unit
 
-type printer_mapping = {
-  lsymbol_m     : string -> Term.lsymbol;
-  vc_term_loc   : Loc.position option;
-  vc_term_attrs : Sattr.t;
-  queried_terms : Term.term Mstr.t;
-  list_projections: Ident.ident Mstr.t;
-  list_fields: Ident.ident Mstr.t;
-  list_records: ((string * string) list) Mstr.t;
-  noarg_constructors: string list;
-  set_str: Sattr.t Mstr.t
+type field_info = {
+  field_name: string;
+  field_trace: string;
+  field_ident: ident option;
 }
 
-let list_projs pm =
-  Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_projections pm.list_fields
+type printer_mapping = {
+  lsymbol_m          : string -> Term.lsymbol;
+  vc_term_loc        : Loc.position option;
+  vc_term_attrs      : Sattr.t;
+  queried_terms      : Term.term Mstr.t;
+  list_projections   : Ident.ident Mstr.t;
+  list_fields        : Ident.ident Mstr.t;
+  list_records       : field_info list Mstr.t;
+  noarg_constructors : string list;
+  set_str            : Sattr.t Mstr.t
+}
+
+let fields_projs pm =
+  Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_fields pm.list_projections
 
 type printer_args = {
   env        : Env.env;

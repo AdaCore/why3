@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -131,6 +131,9 @@ let ident_printer () =
       "map"; "bv"; "default";
       "difference";
 
+     (* From CVC4 *)
+      "char"; "choose";
+
      (* Counterexamples specific keywords *)
       "lambda"; "LAMBDA"; "model";
 
@@ -161,7 +164,7 @@ type info = {
   info_version : version;
   meta_model_projection : Sls.t;
   meta_record_def : Sls.t;
-  mutable list_records : ((string * string) list) Mstr.t;
+  mutable list_records : field_info list Mstr.t;
   (* For algebraic type counterexamples: constructors with no arguments can be
      misunderstood for variables *)
   mutable noarg_constructors: string list;
@@ -686,7 +689,7 @@ let print_constructor_decl info fmt (ls,args) =
               | Some pr ->
                   let field_name = sprintf "%a" (print_ident info) pr.ls_name in
                   fprintf fmt "(%s" field_name;
-                  let trace_name =
+                  let field_trace =
                     try
                       let attr = Sattr.choose (Sattr.filter (fun l ->
                         Strings.has_prefix "model_trace:" l.attr_string)
@@ -695,11 +698,11 @@ let print_constructor_decl info fmt (ls,args) =
                     with
                       Not_found -> ""
                   in
-                  (field_name, trace_name)
+                  {field_name; field_trace; field_ident= Some pr.ls_name}
               | None ->
                   let field_name = sprintf "%a_proj_%d" (print_ident info) ls.ls_name i in (* FIXME: is it possible to generate 2 same value with _proj_ inside it ? Need sanitizing and uniquifying ? *)
                   fprintf fmt "(%s" field_name;
-                  (field_name, "")
+                  {field_name; field_trace= ""; field_ident= None}
             in
             fprintf fmt " %a)" (print_type info) ty;
             (field_name :: acc, succ i)) ([], 1) ls.ls_args args

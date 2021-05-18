@@ -24,17 +24,17 @@ module ResizableArraySpec
   val ([]) (r: rarray 'a) (i: int) : 'a
     requires { 0 <= i < r.length } ensures { result = r[i] }
 
-  val ([]<-) (r: rarray 'a) (i: int) (v: 'a) : unit
+  val ([]<-) (r: rarray 'a) (i: int) (v: 'a) : unit writes {r}
     requires { 0 <= i < r.length } ensures { r = (old r)[i <- v] }
 
-  val resize (r: rarray 'a) (len: int) : unit
+  val resize (r: rarray 'a) (len: int) : unit writes {r}
     requires { 0 <= len }
     ensures  { r.length = len }
     ensures  { forall i: int.
                0 <= i < old r.length -> i < len -> r[i] = (old r)[i] }
 
-  val append (r1: rarray 'a) (r2: rarray 'a) : unit
-    ensures { r1.length = old r1.length + r2.length }
+  val append (r1: rarray 'a) (r2: rarray 'a) : unit writes {r1}
+    ensures { r1.length = (old r1.length) + r2.length }
     ensures { forall i: int. 0 <= i < r1.length ->
                (i < old r1.length  -> r1[i] = (old r1)[i]) /\
                (old r1.length <= i -> r1[i] = r2[i - old r1.length]) }

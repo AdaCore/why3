@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -76,7 +76,7 @@ val get_family : t -> string -> family
 
 val get_simple_family : t -> string -> simple_family
 (** [get_simple_family rc name] return all the sections of the simple
-    family [name] in [rc]
+    family [name] in [rc]. [] if none are present.
     @raise ExtraParameters if [name] also corresponds to family in [rc]
 *)
 
@@ -108,7 +108,7 @@ val get_int : ?default:int -> section -> string -> int
     @raise Multiple_value if the key appears multiple time.
 *)
 
-val get_into : section -> string -> int option
+val get_into : ?default:int -> section -> string -> int option
 
 val get_intl : ?default:int list -> section -> string -> int list
 (** [get_intl ~default section key] one key to many value
@@ -126,8 +126,14 @@ val set_int : ?default:int -> section -> string -> int -> section
 *)
 
 val set_intl : ?default:int list -> section -> string -> int list -> section
-(** [set_int ?default section key lvalue] add the associations [key] to all the
-    [lvalue] in the section if value is not default.
+(** [set_intl ?default section key lvalue] add the associations [key] to all the
+    [lvalue] in the section if the value is not default.
+    Remove all former associations with this [key]
+*)
+
+val set_into : ?default:int -> section -> string -> int option -> section
+(** [set_int ?default section key value] add the associations [key] to
+    [value] in the section if value is not default or None.
     Remove all former associations with this [key]
 *)
 
@@ -137,13 +143,16 @@ val get_bool : ?default:bool -> section -> string -> bool
 val get_booll : ?default:bool list -> section -> string -> bool list
 (** Same as {!get_intl} but on bool *)
 
-val get_boolo : section -> string -> bool option
+val get_boolo : ?default:bool -> section -> string -> bool option
 
 val set_bool : ?default:bool -> section -> string -> bool -> section
 (** Same as {!set_int} but on bool *)
 
 val set_booll : ?default:bool list -> section -> string -> bool list -> section
 (** Same as {!set_intl} but on bool *)
+
+val set_boolo : ?default:bool -> section -> string -> bool option -> section
+(** Same as {!set_into} but on bool *)
 
 
 val get_string : ?default:string -> section -> string -> string
@@ -152,7 +161,7 @@ val get_string : ?default:string -> section -> string -> string
 val get_stringl : ?default:string list -> section -> string -> string list
 (** Same as {!get_intl} but on string *)
 
-val get_stringo : section -> string -> string option
+val get_stringo : ?default:string -> section -> string -> string option
 
 val set_string : ?escape_eol:bool -> ?default:string -> section -> string -> string -> section
 (** Same as {!set_int} but on string. [escape_eol] indicates if special
@@ -160,6 +169,10 @@ val set_string : ?escape_eol:bool -> ?default:string -> section -> string -> str
 
 val set_stringl : ?escape_eol:bool -> ?default:string list ->
   section -> string -> string list -> section
+
+val set_stringo : ?escape_eol:bool -> ?default:string ->
+  section -> string -> string option -> section
+
 (** Same as {!set_intl} but on string *)
 
 (* val ident  : ?default:string      -> section -> string -> string *)

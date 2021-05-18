@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -447,6 +447,7 @@ let timeout_handler () =
   (* examine all the prover tasks in progress *)
   (* When no tasks are there, probably no tasks were scheduled and the server
      was not launched so getting results could fail. *)
+  let need_update = ref false in
   if Hashtbl.length prover_tasks_in_progress != 0 then begin
     let results = Call_provers.get_new_results ~blocking:S.blocking in
     List.iter (fun (call, prover_update) ->
@@ -476,7 +477,8 @@ let timeout_handler () =
             if ptp.tp_started then decr number_of_running_provers;
             (* inform the callback *)
             ptp.tp_callback (InternalFailure (exn))
-        end
+        end;
+        need_update := !need_update || prover_update != Call_provers.NoUpdates
       | exception Not_found -> ()
         (* We probably received ProverStarted after ProverFinished,
            because what is sent to and received from the server is
@@ -504,7 +506,7 @@ let timeout_handler () =
     done;
     Queue.transfer q prover_tasks_edited;
   end;
-  update_observer ();
+  if !need_update then update_observer ();
   true
 
 
@@ -520,12 +522,13 @@ let idle_handler () =
           S.multiplier * !session_max_tasks)
       then
         let spa = Queue.pop scheduled_proof_attempts in
-        try build_prover_call spa
+        try
+          build_prover_call spa;
+          update_observer ()
         with e when not (Debug.test_flag Debug.stack_trace) ->
           spa.spa_callback (InternalFailure e)
     with Queue.Empty -> idle_handler_running := false
   end;
-  update_observer ();
   !idle_handler_running
 
 let interrupt () =

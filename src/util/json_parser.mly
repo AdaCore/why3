@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -41,7 +41,7 @@ json_object:
 | LEFTBRC RIGHTBRC { Json_base.Null }
 (* Left recursive rule are more efficient *)
 | LEFTBRC members RIGHTBRC {
-  Json_base.Record (Json_base.convert_record (List.rev $2)) }
+  Json_base.Record (List.rev $2) }
 
 members:
 | json_pair { [ $1 ] }

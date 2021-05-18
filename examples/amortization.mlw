@@ -1,0 +1,72 @@
+
+(** A simple example of amortization.
+
+    From Chris Okasaki's "Purely Functional Data Structures"
+    Chapter 5 -- Fundamentals of Amortization
+
+    This is an abstraction where
+
+    - we do not implement the operations and we do not model the contents
+      of the queue (irrelevant here);
+
+    - we assume that push is O(1) (contrary to Okasaki's code, which has
+      an internal invariant |f|>=|r|).
+*)
+
+use int.Int
+use list.ListRich
+
+(** Global clock. Function `tick` is unused below but one must imagine
+    that it would be called at each function call and each loop iteration. *)
+
+val ghost ref clock: int
+
+val ghost tick () : unit
+  writes { clock } ensures { clock = old clock + 1 }
+
+(** Queue abstraction. *)
+
+type elt = int
+
+type queue = abstract {
+  ghost    size: int;
+  ghost credits: int;
+}
+  invariant { size >= 0 }
+  invariant { 0 <= credits <= size }
+
+val empty () : (q: queue)
+  ensures { q.size = 0 }
+  ensures { q.credits = 0 }
+
+val push (_: elt) (q: queue) : (r: queue)
+  writes  { clock }
+  ensures { r.size = q.size + 1 }
+  ensures { clock = old clock + 1 }
+  ensures { r.credits = q.credits + 1 }
+
+val pop (q: queue) : (_: elt, r: queue)
+  requires { q.size > 0 }
+  writes   { clock }
+  ensures  { r.size = q.size - 1 }
+  ensures  { r.credits <= q.credits }
+  ensures  { clock = old clock + 1 + r.credits - q.credits }
+
+(** Test client: Let us show that if we insert n values in a queue,
+    then remove all of them, the total cost is O(n). *)
+
+let client (n: int) : unit
+  requires { n >= 0 }
+  ensures  { clock <= old clock + 2*n }
+= let ref q = empty () in
+  for k = 0 to n-1 do
+    invariant { q.size = q.credits = k }
+    invariant { clock = old clock + k }
+    q <- push 42 q
+  done;
+  for k = 0 to n-1 do
+    invariant { q.size = n-k }
+    invariant { clock = old clock + q.credits + k }
+    let _, r = pop q in
+    q <- r
+  done

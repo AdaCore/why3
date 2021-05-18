@@ -1,0 +1,682 @@
+
+(**
+{1 VerifyThis @ ETAPS 2021 competition
+   Challenge 3: Shearsort}
+   See https://www.pm.inf.ethz.ch/research/verifythis.html
+
+   Author: Martin Clochard (ETH Zurich)
+*)
+
+module ShearSort
+
+  use int.Sum
+  use int.Int
+  use int.NumOf
+  use int.Power
+  use int.ComputerDivision
+  use map.Map as MP
+  use map.MapExt as MP
+  use array.Array
+  use matrix.Matrix as M
+  use map.Occ
+  use map.MapPermut
+
+  function column (m: M.matrix 'a) (j:int) : int -> 'a = fun i -> m.M.elts i j
+
+  function moccf (x:'a) (e:int -> int -> 'a) (c:int) : int -> int =
+    fun (i:int) -> occ x (e i) 0 c
+  function mocc (x:'a) (e:int -> int -> 'a) (r c:int) : int =
+    sum (moccf x e c) 0 r
+
+  let rec ghost transpose_count (x:'a) (e1 e2:int -> int -> 'a) (r c:int) : unit
+    requires { 0 <= r && 0 <= c }
+    requires { forall i j:int. 0 <= i < r /\ 0 <= j < c ->
+      e1 i j = e2 j i }
+    ensures { mocc x e1 r c = mocc x e2 c r }
+    variant { r }
+  = if r = 0 then begin
+      assert { mocc x e2 c r = 0
+        by forall j:int. 0 <= j && j < c ->
+          moccf x e2 r j = 0
+      }
+    end else begin
+      let rm = r - 1 in
+      let f = pure{moccf x e2 r} in
+      let g = pure{moccf x e2 rm} in
+      let rec ghost scan (j:int) : unit
+        requires { 0 <= j <= c }
+        ensures  { sum f 0 j = sum g 0 j + occ x (e1 rm) 0 j }
+        variant { j }
+      = if j <> 0 then scan (j-1)
+      in
+      scan c;
+      transpose_count x e1 e2 rm c
+    end
+
+  val sort(a: array int) : unit
+    writes { a }
+    ensures { forall i j:int. 0 <= i <= j < a.length ->
+      a[i] <= a[j] }
+    ensures { permut a.elts (old a).elts 0 a.length }
+
+  let ghost permut_swap (a b:int -> 'a)(x y l u:int)
+    requires { l <= x < u && l <= y < u }
+    requires { forall i:int. l <= i <= u && i <> x && i <> y ->
+      a i = b i }
+    requires { a x = b y && a y = b x }
+    ensures { permut a b l u }
+  = let c = MP.(a[x <- a y][y <- a x]) in
+    assert { MP.(a == a[x <- a x][y <- a y]) };
+    assert { permut a c l u };
+    assert { forall i: int. l <= i < u -> b i = c i };
+    assert { permut b c l u }
+
+  function compose (g:'b -> 'c) (f:'a -> 'b) : 'a -> 'c =
+    fun x -> g (f x)
+
+  let rec ghost numoff_occ (a:int -> 'a) (l u:int) (p q:'a -> bool) (x:'a)
+    requires { l <= u }
+    requires { p x }
+    requires { forall y:'a. q y <-> p y /\ y <> x }
+    ensures { numof (compose p a) l u = numof (compose q a) l u + occ x a l u }
+    variant { u - l }
+  = if l <> u then numoff_occ a (l+1) u p q x
+
+  let rec ghost permut_numoff (a b:int -> 'a) (l u:int) (p:'a -> bool)
+    requires { l <= u }
+    requires { permut a b l u }
+    ensures { numof (compose p a) l u = numof (compose p b) l u }
+    variant { numof (compose p b) l u, numof (compose p a) l u}
+  = if pure {numof (compose p a) l u } = 0 then begin
+      if pure {numof (compose p b) l u} <> 0 then permut_numoff b a l u p
+    end else begin
+      let rec find (i:int) : int
+        requires { i <= u }
+        requires { numof (compose p a) i u > 0 }
+        ensures { i <= result <= u }
+        ensures { compose p a result }
+        ensures { occ (a result) a i u > 0 }
+        variant { u - i }
+      = if compose p a i then i else find (i+1)
+      in
+      let j = find l in
+      let v = a j in
+      let q = MP.(p[v <- false]) in
+      numoff_occ a l u p q v;
+      numoff_occ b l u p q v;
+      permut_numoff a b l u q
+    end
+
+  let sort_row(m : M.matrix int) (i: int) (ascending: bool) : unit
+    requires { 0 <= i < m.M.rows }
+    writes { m }
+    ensures { forall j k:int.
+      0 <= j /\ j < m.M.rows /\ 0 <= k < m.M.columns /\ j <> i ->
+      m.M.elts j k = (old m).M.elts j k }
+    ensures { forall j k: int. 0 <= j <= k < m.M.columns ->
+      let a = m.M.elts i j in let b = m.M.elts i k in
+      if ascending then a <= b else b <= a }
+    ensures { permut (m.M.elts i) ((old m).M.elts i) 0 m.M.columns }
+  =
+    let a = make m.M.columns 0 in
+    for j = 0 to m.M.columns - 1 do
+      invariant { forall k:int. 0 <= k < j ->
+        a.elts k = m.M.elts i k }
+      a[j]<- M.get m i j
+    done;
+    assert { permut a.elts (m.M.elts i) 0 a.length };
+    sort a;
+    label L in
+    if not(ascending) then begin
+      let ref u = 0 in
+      let ref v = a.length - 1 in
+      while u < v do
+        invariant { 0 <= u <= v + 1 <= a.length }
+        invariant { u + v = a.length - 1 }
+        invariant { forall j:int. u <= j <= v ->
+          a.elts j = (a.elts at L) j
+        }
+        invariant { forall j:int. 0 <= j < u \/ v < j < a.length ->
+          a.elts j = (a.elts at L) (a.length - 1 - j)
+        }
+        invariant { permut (a.elts at L) a.elts 0 a.length }
+        variant { v - u }
+        let e = a.elts in
+        let tmp = a[v] in
+        a[v] <- a[u];
+        a[u] <- tmp;
+        permut_swap a.elts e u v 0 a.length;
+        u <- u + 1;
+        v <- v - 1
+      done
+    end;
+    for j = 0 to m.M.columns - 1 do
+      invariant { forall k:int. 0 <= k < j ->
+        a.elts k = m.M.elts i k }
+      invariant { forall k l:int.
+        0 <= k < m.M.rows /\ 0 <= l < m.M.columns /\ k <> i ->
+        m.M.elts k l = (m at L).M.elts k l }
+      M.set m i j a[j]
+    done;
+    assert { permut a.elts (m.M.elts i) 0 a.length }
+
+ let sort_column(m : M.matrix int) (j: int) : unit
+    requires { 0 <= j < m.M.columns }
+    writes { m }
+    ensures { forall i k:int.
+      0 <= i /\ i < m.M.rows /\ 0 <= k < m.M.columns /\ k <> j ->
+      m.M.elts i k = (old m).M.elts i k }
+    ensures { forall i k: int. 0 <= i <= k < m.M.rows ->
+      m.M.elts i j <= m.M.elts k j }
+    ensures { permut (column m j) (column (old m) j) 0 m.M.rows }
+  = let a = make m.M.rows 0 in
+    for i = 0 to m.M.rows - 1 do
+      invariant { forall k:int. 0 <= k < i ->
+        a.elts k = m.M.elts k j }
+      a[i]<- M.get m i j
+    done;
+    assert { permut a.elts (column m j) 0 a.length };
+    sort a;
+    label L in
+    for i = 0 to m.M.rows - 1 do
+      invariant { forall k:int. 0 <= k < i ->
+        a.elts k = m.M.elts k j }
+      invariant { forall k l:int.
+        0 <= k < m.M.rows /\ 0 <= l < m.M.columns /\ l <> j ->
+        m.M.elts k l = (m at L).M.elts k l }
+      M.set m i j a[i]
+    done;
+    assert { permut a.elts (column m j) 0 a.length }
+
+  (* Isolate the loops sorting all rows/columns in isolated functions
+     for modular verification (also makes easier to verify alternative
+     implementation with transpose) *)
+  let sort_all_rows(m : M.matrix int) : unit
+    writes { m }
+    ensures { forall i:int. 0 <= i < m.M.rows ->
+      permut (m.M.elts i) ((old m).M.elts i) 0 m.M.columns }
+    ensures { forall i j k:int. 0 <= i < m.M.rows /\
+      0 <= j <= k < m.M.columns ->
+      let a = m.M.elts i j in let b = m.M.elts i k in
+      if mod i 2 = 0 then a <= b else b <= a }
+  = label L in
+    for tid = 0 to m.M.rows - 1 do
+      invariant { forall i:int. 0 <= i < m.M.rows ->
+        permut (m.M.elts i) ((m at L).M.elts i) 0 m.M.columns }
+      invariant { forall i j k:int. 0 <= i < tid /\
+        0 <= j <= k < m.M.columns ->
+        let a = m.M.elts i j in let b = m.M.elts i k in
+        if mod i 2 = 0 then a <= b else b <= a }
+      label L2 in
+      let ascending = mod tid 2 = 0 in
+      sort_row m tid ascending;
+      assert { forall i:int. 0 <= i < m.M.rows ->
+        permut (m.M.elts i) ((m at L2).M.elts i) 0 m.M.columns }
+    done
+
+  val transpose (m: M.matrix int) : unit
+    requires { m.M.rows = m.M.columns }
+    writes { m }
+    ensures { forall i j:int. 0 <= i < m.M.rows /\
+      0 <= j < m.M.columns -> (old m).M.elts i j = m.M.elts j i }
+
+  let sort_all_columns (m : M.matrix int) : unit
+    writes { m }
+    ensures { forall j:int. 0 <= j < m.M.columns ->
+      permut (column m j) (column (old m) j) 0 m.M.rows }
+    ensures { forall i j k:int. 0 <= i <= k < m.M.rows /\
+      0 <= j < m.M.columns ->
+      m.M.elts i j <= m.M.elts k j }
+  = label L in
+    if any bool ensures { result \/ m.M.rows = m.M.columns } then begin
+      for tid = 0 to m.M.columns - 1 do
+        invariant { forall j:int. 0 <= j < m.M.columns ->
+          permut (column m j) (column (old m) j) 0 m.M.rows }
+        invariant { forall i j k:int. 0 <= i <= k < m.M.rows /\
+          0 <= j < tid -> m.M.elts i j <= m.M.elts k j }
+        label L2 in
+        sort_column m tid;
+        assert { forall j:int. 0 <= j < m.M.columns ->
+          permut (column m j) (column (m at L2) j) 0 m.M.rows }
+      done
+    end else begin
+      let n = m.M.rows in
+      transpose m;
+      assert { forall j:int. 0 <= j < n ->
+        permut (column (old m) j) (m.M.elts j) 0 n
+        by forall i:int. 0 <= i < n ->
+        column (old m) j i = m.M.elts j i
+      };
+      for tid = 0 to m.M.columns - 1 do
+        invariant { forall j:int. 0 <= j < n ->
+          permut (m.M.elts j) (column (old m) j) 0 n }
+        invariant { forall i j k:int. 0 <= i <= k < n /\
+          0 <= j < tid -> m.M.elts j i <= m.M.elts j k }
+        label L2 in
+        sort_row m tid true;
+        assert { forall j:int. 0 <= j < n ->
+          permut (m.M.elts j) ((m.M.elts at L2) j) 0 n }
+      done;
+      let et2 = pure{m.M.elts} in
+      transpose m;
+      assert {
+        forall j:int. 0 <= j < n ->
+          permut (column m j) (et2 j) 0 n
+          by forall i:int. 0 <= i < n ->
+          column m j i = et2 j i
+      }
+    end
+
+  predicate below_column (e:int -> int -> int) (col v row:int) =
+    e row col <= v
+  predicate above_column (e:int -> int -> int) (col v row:int) =
+    e row col > v
+
+  let shear_sort(m: M.matrix int) : unit
+    ensures {
+      forall i j1 j2 k:int.
+        0 <= i < k < m.M.rows &&
+        0 <= j1 < m.M.columns && 0 <= j2 < m.M.columns ->
+        m.M.elts i j1 <= m.M.elts k j2
+    }
+    ensures {
+      forall i j k:int.
+        0 <= i < m.M.rows && 0 <= j <= k < m.M.columns ->
+        if mod i 2 = 0 then m.M.elts i j <= m.M.elts i k else
+        m.M.elts i k <= m.M.elts i j
+    }
+    ensures {
+      forall x:int.
+        mocc x (old m.M.elts) m.M.rows m.M.columns
+        = mocc x m.M.elts m.M.rows m.M.columns
+    }
+    writes { m }
+  = label L0 in
+    let n = m.M.rows in
+    let ghost c = m.M.columns in
+    (* FIX: n need to be non-zero for the log to be computable ! *)
+    if n <> 0 then
+    (* Compute log_2(n). *)
+    let ref l = 0 in
+    let ref p = n - 1 in
+    while p <> 0 do
+      invariant { l >= 0 && p >= 0 }
+      invariant { l <> 0 -> power 2 (l-1) <= n }
+      invariant { p * power 2 l < n <= power 2 l * (p+1) }
+      variant { p }
+      l <- l + 1;
+      let ghost q = p in
+      p <- div p 2;
+      assert { 2 * p <= q <= 2 * p + 1 };
+      assert { p * power 2 l
+               = (2 * p) * power 2 (l-1)
+               <= q * power 2 (l-1) < n };
+      assert { (p+1) * power 2 l
+               = (2 * p + 2) * power 2 (l-1)
+               >= (q + 1) * power 2 (l-1) >= n }
+    done;
+    (* Check against defining property of ceil(log2(n)) *)
+    assert { power 2 l >= n };
+    assert { l <> 0 -> power 2 (l-1) <= n };
+    (* Maximum width of the gap between zero rows and one rows
+       under 0-1 abstractions. *)
+    let ghost ref k = n in
+    let ghost ref zeros = pure { fun (_:int) -> 0 } in
+    let ghost ref ones = pure { fun (_:int) -> n } in
+    let ghost column_sorted () : unit
+      requires { forall v:int. 0 <= zeros v <= ones v <= n }
+      requires { forall v:int. ones v <= zeros v + 1 }
+      requires { forall v i j:int.
+        0 <= i < zeros v /\ 0 <= j < c ->
+        m.M.elts i j <= v }
+      requires { forall v i j:int.
+        ones v <= i < n /\ 0 <= j < c ->
+        m.M.elts i j > v }
+      ensures { forall i j1 j2 k:int.
+        0 <= i < k < n && 0 <= j1 < c && 0 <= j2 < c ->
+        m.M.elts i j1 <= m.M.elts k j2 }
+    =
+      let rec lemma aux (i j1 j2 k:int)
+        requires { 0 <= i < k < n && 0 <= j1 < c && 0 <= j2 < c }
+        ensures { m.M.elts i j1 <= m.M.elts k j2 }
+      = let v = m.M.elts k j2 in
+        if m.M.elts i j1 > v then begin
+          assert { ones v >= i &&
+            zeros v <= k + 1 &&
+            false }
+        end
+      in ()
+    in
+    (* Repeat l+1 times. *)
+    for ind = 0 to l do
+      invariant { forall v:int. 0 <= zeros v <= ones v <= n }
+      invariant { forall v:int. ones v <= zeros v + k }
+      invariant { forall v i j:int.
+        0 <= i < zeros v /\ 0 <= j < c ->
+        m.M.elts i j <= v (* p(v)(m.M.elts i j) = 0 *) }
+      invariant { forall v i j:int.
+        ones v <= i < n /\ 0 <= j < c ->
+        m.M.elts i j > v (* p(v)(m.M.elts i j) = 1 *) }
+      invariant { k > 0 }
+      invariant { (k-1) * power 2 ind < n <= k * power 2 ind }
+      invariant { ind > l ->
+        forall i j k:int.
+        0 <= i < n /\ 0 <= j <= k < c ->
+        let a = m.M.elts i j in
+        let b = m.M.elts i k in
+        if mod i 2 = 0 then a <= b else b <= a }
+      invariant { forall x:int.
+        mocc x (m.M.elts at L0) n c
+        = mocc x m.M.elts n c }
+      let e0 = m.M.elts in
+      sort_all_rows m;
+      let e = m.M.elts in
+      assert { forall v i j:int. 0 <= i < zeros v /\ 0 <= j < c ->
+        e i j <= v
+        by occ (e i j) (e i) 0 c > 0
+        so occ (e i j) (e0 i) 0 c > 0
+        so exists k. 0 <= k /\ k < c /\ e0 i k = e i j
+        so e0 i k <= v
+      };
+      assert { forall v i j:int.
+        ones v <= i < n /\ 0 <= j < c ->
+        e i j > v
+        by occ (e i j) (e i) 0 c > 0
+        so occ (e i j) (e0 i) 0 c > 0
+        so exists k. 0 <= k /\ k < c /\ e0 i k = e i j
+        so e0 i k > v
+      };
+      assert { forall x:int.
+        mocc x e0 n c = mocc x e n c
+        by forall i:int. 0 <= i < n ->
+          moccf x e0 c i = moccf x e c i
+      };
+      let zs = zeros in
+      let os = ones in
+      let kd = div (k+1) 2 in
+      let ghost function nzo (v:int) : (int,int)
+        ensures { match result with nz, no ->
+          0 <= nz <= no <= n &&
+          no <= nz + kd &&
+          forall j:int. 0 <= j < c ->
+            numof (below_column e j v) 0 n >= nz /\
+            numof (above_column e j v) 0 n >= n - no
+          end
+        }
+      =
+        let z = zs v in
+        let rec lemma fillz (i:int) (j:int)
+          requires { 0 <= i <= z /\ 0 <= j < c }
+          ensures { numof (below_column e j v) 0 i >= i }
+          variant { i }
+        = if i <> 0 then begin
+            assert { below_column e j v (i-1) };
+            assert { numof (below_column e j v) (i-1) i = 1 };
+            fillz (i-1) j
+          end
+        in
+        let o = os v in
+        let rec lemma fillo (i:int) (j:int)
+          requires { o <= i <= n /\ 0 <= j < c }
+          ensures { numof (above_column e j v) i n >= n - i }
+          variant { n - i }
+        = if i <> n then begin
+            assert { above_column e j v i };
+            assert { numof (above_column e j v) i (i+1) = 1 };
+            fillo (i+1) j
+          end
+        in
+        let ref nz = z in
+        let ref no = o in
+        let ref index = z in
+        while index + 1 < o do
+          invariant { z <= index /\ index <= o }
+          invariant { nz >= z /\ no <= o }
+          invariant { index - z = 2 * (nz - z + o - no) }
+          invariant { forall j:int. 0 <= j < c ->
+            numof (below_column e j v) 0 index >= nz /\
+            numof (above_column e j v) 0 index
+            + numof (above_column e j v) o n >= n - no }
+          variant { o - index }
+          let rec select (r1 r2:int -> int) (b:bool) : bool
+            requires { forall j k:int. 0 <= j <= k < c ->
+              if b then r1 j <= r1 k else r1 k <= r1 j }
+            requires { forall j k:int. 0 <= j <= k < c ->
+              if b then r2 k <= r2 j else r2 j <= r2 k }
+            ensures { result -> forall i:int. 0 <= i < c ->
+              r1 i <= v || r2 i <= v }
+            ensures { not(result) -> forall i:int. 0 <= i < c ->
+              r1 i > v || r2 i > v }
+            variant { if b then 0 else 1 }
+          =
+            if not(b) then select r2 r1 true else
+            let ref i = 0 in
+            while i <> c && r1 i <= v && r2 i > v do
+              invariant { 0 <= i <= c }
+              invariant { forall j:int. 0 <= j < i ->
+                r1 j <= v && r2 j > v }
+              variant { c - i }
+              i <- i + 1
+            done;
+            i = c || r2 i <= v
+          in
+          if select (e index) (e (index + 1)) (mod index 2 = 0) then begin
+            nz <- nz + 1;
+            assert { forall j:int. 0 <= j < c ->
+              numof (below_column e j v) index (index+2) > 0 }
+          end else begin
+            no <- no - 1;
+            assert { forall j:int. 0 <= j < c ->
+              numof (above_column e j v) index (index+2) > 0 }
+          end;
+          index <- index + 2
+        done;
+        nz, no
+      in
+      let ghost function newz (v:int) : int
+        ensures { result = match nzo v with (x,_) -> x end }
+      = match nzo v with (x,_) -> x end
+      in
+      let ghost function newo (v:int) : int
+        ensures { result = match nzo v with (_,y) -> y end }
+      = match nzo v with (_,y) -> y end
+      in
+      let lemma newzo (v:int)
+        ensures { let nz = newz v in let no = newo v in
+          0 <= nz <= no <= n &&
+          no <= nz + kd &&
+          forall j:int. 0 <= j < c ->
+            numof (below_column e j v) 0 n >= nz /\
+            numof (above_column e j v) 0 n >= n - no
+        }
+      = let (x,y) = nzo v in assert { newz v = x /\ newo v = y }
+      in
+      let cl1 = pure {column m} in
+      assert { forall v j:int. 0 <= j < c ->
+        MP.(below_column e j v == compose ((>=) v) (cl1 j))
+        /\ MP.(above_column e j v == compose ((<) v) (cl1 j)) };
+      if ind = l then column_sorted ();
+      zeros <- pure{newz};
+      ones <- pure{newo};
+      sort_all_columns m;
+      label L in
+      let cl2 = pure {column m} in
+      let rec lemma column_permutation (x:int) : unit
+        ensures { mocc x (m.M.elts at L) n c = mocc x e n c }
+      = transpose_count x e cl1 n c;
+        transpose_count x (pure{m.M.elts at L}) cl2 n c;
+        assert { mocc x cl1 c n = mocc x cl2 c n
+          by forall j:int. 0 <= j < c ->
+            moccf x cl1 n j = moccf x cl2 n j }
+      in
+      if ind = l then begin
+        let lemma column_preserved (j:int)
+          requires { 0 <= j < c }
+          ensures { forall i:int. 0 <= i < n ->
+            m.M.elts i j = e i j }
+        = let rec ghost no_occ (m:int -> int) (i:int) (x:int) : unit
+            requires { 0 <= i <= n }
+            requires { forall u v:int. i <= u <= v < n ->
+              m u <= m v }
+            requires { forall u:int. i <= u < n -> m u > x }
+            ensures { occ x m i n = 0 }
+            variant { n - i }
+          = if i <> n then no_occ m (i+1) x
+          in
+          let rec ghost scan (i:int) : unit
+            requires { 0 <= i <= n }
+            requires { permut (cl1 j) (cl2 j) i n }
+            ensures { forall k:int. i <= k < n ->
+              cl1 j k = cl2 j k }
+            variant { n - i }
+          = if i <> n then
+            let u = cl1 j i in let v = cl2 j i in
+            if u < v then no_occ (cl2 j) i u else
+            if v < u then no_occ (cl1 j) i v else
+            scan (i+1)
+          in
+          scan 0
+        in
+        ()
+      end;
+      let e = m.M.elts in
+      assert { forall v j:int. 0 <= j < c ->
+        MP.(below_column e j v == compose ((>=) v) (cl2 j))
+        /\ MP.(above_column e j v == compose ((<) v) (cl2 j)) };
+      let rec ghost auxT (v i j:int) : unit
+        requires { 0 <= i < n }
+        requires { numof (below_column e j v) (i+1) n > 0 /\ 0 <= j < c }
+        requires { cl2 j i > v }
+        ensures { false }
+        variant { n - i }
+      =
+        auxT v (i+1) j
+      in
+      let lemma auxT1 (v i j:int) : unit
+        requires { 0 <= i < zeros v }
+        requires { 0 <= j < c }
+        ensures { cl2 j i <= v }
+      = if cl2 j i > v then begin
+          permut_numoff (cl1 j) (cl2 j) 0 n ((>=) v);
+          assert {
+            let a = numof (below_column e j v) 0 i in
+            let b = numof (below_column e j v) i n in
+            numof (below_column e j v) 0 n = a + b
+            && a <= i
+            && b > 0
+          };
+          auxT v i j
+        end
+      in
+      let rec ghost auxB (v i j:int) : unit
+        requires { 0 <= i < n }
+        requires { numof (above_column e j v) 0 i > 0 /\ 0 <= j < c }
+        requires { cl2 j i <= v }
+        ensures { false }
+        variant { i }
+      =
+        auxB v (i-1) j
+      in
+      let lemma auxB1 (v i j:int) : unit
+        requires { ones v <= i < n }
+        requires { 0 <= j < c }
+        ensures { cl2 j i > v }
+      = if cl2 j i <= v then begin
+          permut_numoff (cl1 j) (cl2 j) 0 n ((<) v);
+          assert {
+            let a = numof (above_column e j v) 0 (i+1) in
+            let b = numof (above_column e j v) (i+1) n in
+            numof (above_column e j v) 0 n = a + b
+            && b <= n - i
+            && a > 0
+          };
+          auxB v i j
+        end
+      in
+      assert { 2 * kd <= k+1 <= 2 * kd + 1 };
+      assert { (kd-1) * power 2 (ind+1)
+               = (2 * kd - 2) * power 2 ind
+               <= (k-1) * power 2 ind < n };
+      assert { kd * power 2 (ind+1)
+               = 2 * kd * power 2 ind
+               >= k * power 2 ind >= n };
+      k <- kd
+    done;
+    column_sorted ()
+
+
+
+end
+
+(* Duplicated from Why3's gallery. *)
+module Quicksort
+
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.IntArraySorted
+  use array.ArraySwap
+  use array.ArrayPermut
+  use array.ArrayEq
+
+  predicate qs_partition (a1 a2: array int) (l m r: int) (v: int) =
+    permut_sub a1 a2 l r /\
+    (forall j: int. l <= j < m -> a2[j] < v) /\
+    (forall j: int. m < j < r -> v <= a2[j]) /\
+    a2[m] = v
+
+  (* partitioning à la Bentley, that is
+
+     l            i          m          r
+    +-+----------+----------+----------+
+    |v|   < v    |    ?     |   >= v   |
+    +-+----------+----------+----------+     *)
+
+  let rec quick_rec (a: array int) (l: int) (r: int) : unit
+    requires { 0 <= l <= r <= length a }
+    ensures  { sorted_sub a l r }
+    ensures  { permut_sub (old a) a l r }
+    variant  { r - l }
+  = if l + 1 < r then begin
+      let v = a[l] in
+      let m = ref l in
+      label L in
+      for i = l + 1 to r - 1 do
+        invariant { a[l] = v /\ l <= !m < i }
+        invariant { forall j:int. l < j <= !m -> a[j] < v }
+        invariant { forall j:int. !m < j <  i -> a[j] >= v }
+        invariant { permut_sub (a at L) a l r }
+        label K in
+        if a[i] < v then begin
+          m := !m + 1;
+          swap a i !m;
+          assert { permut_sub (a at K) a l r }
+        end
+      done;
+      label M in
+      swap a l !m;
+      assert { qs_partition (a at M) a l !m r v };
+      label N in
+      quick_rec a l !m;
+      assert { qs_partition (a at N) a l !m r v };
+      label O in
+      quick_rec a (!m + 1) r;
+      assert { qs_partition (a at O) a l !m r v };
+      assert { qs_partition (a at N) a l !m r v };
+    end
+
+  let quicksort (a: array int) =
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
+    quick_rec a 0 (length a)
+
+end
+
+(* Instantiate leftover sort routine. *)
+module ShearSortComplete
+  use Quicksort
+
+  clone ShearSort with val sort = quicksort
+
+end
+

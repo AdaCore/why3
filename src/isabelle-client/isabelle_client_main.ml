@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -122,18 +122,17 @@ let handle_interrupt _ =
   | Some (sock, task) ->
       send_request_string sock
         ("cancel " ^ string_of_json
-           (Json_base.Record (Json_base.convert_record
-              [("task", Json_base.String task)])) ^ "\n")
+           (Json_base.(Record ["task", String task])) ^ "\n")
 
 let session_start sock session dirs include_sessions =
   send_request_string sock
     ("session_start " ^ string_of_json
-       (Json_base.Record (Json_base.convert_record
+       (Json_base.Record
           ([("session", Json_base.String session)] @
            (if dirs = [] then []
             else [("dirs", make_string_list dirs)]) @
            (if include_sessions = [] then []
-            else [("include_sessions", make_string_list include_sessions)])))) ^ "\n");
+            else [("include_sessions", make_string_list include_sessions)]))) ^ "\n");
   let task = wait_for_msg sock
     (function
        ("OK", r) -> Some (get_string_field r "task")
@@ -160,8 +159,7 @@ let session_start sock session dirs include_sessions =
 let session_stop sock session_id =
   send_request_string sock
     ("session_stop " ^ string_of_json
-       (Json_base.Record (Json_base.convert_record
-          [("session_id", Json_base.String session_id)])) ^ "\n");
+       (Json_base.(Record ["session_id", Json_base.String session_id])) ^ "\n");
   let task = wait_for_msg sock
     (function
        ("OK", r) -> Some (get_string_field r "task")
@@ -193,10 +191,10 @@ let base_name s =
 let use_theory sock session_id thy =
   send_request_string sock
     ("use_theories " ^ string_of_json
-       (Json_base.Record (Json_base.convert_record
-          [("session_id", Json_base.String session_id);
-           ("theories", Json_base.List [Json_base.String thy]);
-           ("check_limit", Json_base.Int (!check_limit_opt))])) ^ "\n");
+       (Json_base.(Record
+          [("session_id", String session_id);
+           ("theories", List [String thy]);
+           ("check_limit", Int (!check_limit_opt))])) ^ "\n");
   let task = wait_for_msg sock
     (function
        ("OK", r) -> Some (get_string_field r "task")
@@ -226,9 +224,9 @@ let use_theory sock session_id thy =
 let purge_theory sock session_id thy =
   send_request_string sock
     ("purge_theories " ^ string_of_json
-       (Json_base.Record (Json_base.convert_record
-          [("session_id", Json_base.String session_id);
-           ("theories", Json_base.List [Json_base.String thy])])) ^ "\n");
+       (Json_base.(Record
+          [("session_id", String session_id);
+           ("theories", List [String thy])])) ^ "\n");
   wait_for_msg sock
     (function
        ("OK", _) -> Some ()

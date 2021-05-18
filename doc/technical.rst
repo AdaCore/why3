@@ -163,7 +163,7 @@ Transformations
 
 This section documents the available transformations. Note that the set
 of available transformations in your own installation is given
-by :option:`why3 --list-transforms`.
+by :why3:tool:`why3 show transformations`.
 
 .. why3:transform:: apply
 
@@ -1441,7 +1441,7 @@ are:
 To examplify this basic programming language, we give below the default
 strategies that are attached to the default buttons of the IDE, assuming
 that the provers Alt-Ergo 2.3.0, CVC4 1.7 and Z3 4.8.4 were detected by
-the :option:`why3 config --detect` command
+the :why3:tool:`why3 config` command.
 
 Split_VC
     is bound to the 1-line strategy
@@ -1535,6 +1535,8 @@ Auto level 3
     we restart from the beginning, if it fails then provers are tried
     again with 30s and 4 Gb.
 
+.. _sec.attributes:
+
 WhyML Attributes
 ----------------
 
@@ -1564,7 +1566,7 @@ WhyML Attributes
 
 .. why3:attribute:: vc:white_box
 
-.. _sec.meta:
+.. _sec.metas:
 
 Why3 Metas
 ----------

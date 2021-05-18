@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,10 +15,15 @@ open Reduction_engine
 open Args_wrapper
 
 let meta_rewrite = Theory.register_meta "rewrite" [Theory.MTprsymbol]
-  ~desc:"Declares@ the@ given@ proposition@ as@ a@ rewrite@ rule."
+  ~desc:"Declare@ the@ given@ proposition@ as@ a@ rewrite@ rule."
 
 let meta_rewrite_def = Theory.register_meta "rewrite_def" [Theory.MTlsymbol]
-  ~desc:"Declares@ the@ definition@ of@ the@ symbol@ as@ a@ rewrite@ rule."
+  ~desc:"Declare@ the@ definition@ of@ the@ symbol@ as@ a@ rewrite@ rule."
+
+let meta_compute_max_quantifier_domain =
+ Theory.register_meta_excl "compute_max_domain_size" [Theory.MTint]
+  ~desc:"Maximal@ domain@ size@ for@ the@ reduction@ of@ bounded@ \
+         quantifications"
 
 let meta_compute_max_steps = Theory.register_meta_excl "compute_max_steps"
   [Theory.MTint]
@@ -91,27 +96,33 @@ let collect_rules_trans p env : Reduction_engine.engine Trans.trans =
         ))
 
 let normalize_goal_transf ?pr_norm ?step_limit p env : 'a Trans.trans =
-  let tr = collect_rules_trans p env in
-  Trans.on_meta_excl meta_compute_max_steps
-    (function
+  let tr = Trans.on_meta_excl meta_compute_max_quantifier_domain @@ function
+      | None -> Trans.return p
+      | Some [Theory.MAint n] ->
+          Trans.return {p with compute_max_quantifier_domain = n}
+      | _ ->  assert false in
+  let tr = Trans.bind tr (fun p -> collect_rules_trans p env) in
+  let tr = Trans.on_meta_excl meta_compute_max_steps @@ function
       | None ->
           Trans.bind tr (fun engine -> normalize_hyp_or_goal ?pr_norm ?step_limit engine)
       | Some [Theory.MAint n] -> compute_max_steps := n;
           Trans.bind tr (fun engine -> normalize_hyp_or_goal ?pr_norm ?step_limit engine)
-      | _ ->  assert false)
+      | _ ->  assert false in
+  tr
+
+let default_param = {
+  compute_defs = false;
+  compute_builtin = false;
+  compute_def_set = Term.Mls.empty;
+  compute_max_quantifier_domain = 10;
+}
 
 let normalize_goal_transf_all env =
-  let p = { compute_defs = true;
-            compute_builtin = true;
-            compute_def_set = Term.Mls.empty;
-          } in
+  let p = { default_param with compute_defs = true; compute_builtin = true } in
   normalize_goal_transf p env
 
 let normalize_goal_transf_few env =
-  let p = { compute_defs = false;
-            compute_builtin = true;
-            compute_def_set = Term.Mls.empty;
-          } in
+  let p = { default_param with compute_builtin = true } in
   normalize_goal_transf p env
 
 let () =
@@ -125,10 +136,7 @@ let () =
     the@ user-specified@ rules."
 
 let normalize_hyp step_limit pr_norm env =
-  let p = { compute_defs = true;
-            compute_builtin = true;
-            compute_def_set = Term.Mls.empty;
-          } in
+  let p = { default_param with compute_defs = true; compute_builtin = true } in
   normalize_goal_transf ?pr_norm ?step_limit p env
 
 let () = wrap_and_register
@@ -153,10 +161,7 @@ let () = wrap_and_register
     (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp None)
 
 let normalize_hyp_few step_limit pr_norm env =
-  let p = { compute_defs = false;
-            compute_builtin = true;
-            compute_def_set = Term.Mls.empty;
-          } in
+  let p = { default_param with compute_builtin = true } in
   normalize_goal_transf ?pr_norm ?step_limit p env
 
 let () = wrap_and_register
@@ -190,10 +195,7 @@ let simplify check_ls env : 'a Trans.trans =
         | _ -> acc)
       [] t
     in
-    let p = { compute_defs = false;
-              compute_builtin = true;
-              compute_def_set = Term.Mls.empty;
-            } in
+    let p = { default_param with compute_builtin = true } in
     List.fold_left
       (fun e (pr,t) ->
         try add_rule t e

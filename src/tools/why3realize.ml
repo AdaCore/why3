@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,10 +15,9 @@ open Why3
 (* Ignore unused variables in why3realize too *)
 let () = Debug.set_flag Dterm.debug_ignore_unused_var
 
-let usage_msg = sprintf
-  "Usage: %s [options] -D <driver> -o <dir> -T <theory> ...\n\
-   Output realization skeletons for the given theories or update them.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg =
+  "-D <driver> -o <dir> -T <theory> ...\n\
+   Output realization skeletons for the given theories or update them."
 
 let opt_queue = Queue.create ()
 
@@ -57,7 +56,7 @@ let option_list =
     "<dir> write the realizations to <dir>";
   ]
 
-let config, _, env =
+let config, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =
