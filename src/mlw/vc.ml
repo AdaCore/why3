@@ -92,6 +92,7 @@ let wp_attr = Ident.create_attribute "vc:wp"
 let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
 let nt_attr = Ident.create_attribute "vc:divergent"
+let trace_for_ce_attr = Ident.create_attribute "vc:ce_trace"
 
 let vc_attrs =
   Sattr.add nt_attr (Sattr.add kp_attr (Sattr.add wb_attr
@@ -112,6 +113,7 @@ type vc_env = {
   exn_count : int ref;
   divergent : bool;
   inferinvs : (expr * term) list;   (* inferred invariants *)
+  trace_for_ce : bool;
 }
 
 let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs = {
@@ -127,6 +129,7 @@ let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs =
   exn_count = ref 0;
   divergent = false;
   inferinvs = invs;
+  trace_for_ce = false;
 }
 
 let acc env r t =
@@ -658,8 +661,11 @@ let rec k_expr env lps e res xmap =
             | Some (t, sp) ->
                Klet (v, t_tag t, List.fold_right sp_and rinv sp)
             | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
-          let vv = explicit_result loc ce v.pv_ity in
-          Kseq(k,0,Klet(vv, t_var v.pv_vs, t_true))
+          if env.trace_for_ce then
+            let vv = explicit_result loc ce v.pv_ity in
+            Kseq(k,0,Klet(vv, t_var v.pv_vs, t_true))
+          else
+            k
           in
         let k = k_of_post expl_post res cty.cty_post in
         (* in abstract blocks, exceptions without postconditions
@@ -968,6 +974,9 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
   (* do not check termination if asked nicely *)
   let env = if Sattr.mem nt_attr e.e_attrs then
     { env with divergent = true } else env in
+  (* generate traceability info for counterexamples if asked *)
+  let env = if Sattr.mem trace_for_ce_attr e.e_attrs then
+    { env with trace_for_ce = true } else env in
   let k = k_expr env lps e res xmap in
   let k = Kseq (k, 0, add_qinv res q) in
   let k = Mxs.fold (fun _ ((i,r), xq) k ->
