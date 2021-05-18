@@ -476,16 +476,17 @@ let prioritize_first_good_model: sort_models = fun models ->
       | BAD | UNKNOWN _ -> false in
     List.partition is_good models in
   if good_models = [] then
-    (* No interesting models, prioritize the last, non-empty model
-       as it was done before 2020, but penalize bad models. *)
+    (* No good models. Prioritize the last, non-empty model as it was done
+       before 2020, but penalize bad models. *)
     let ce_summary_index = function
-      | UNKNOWN _ -> 0 | BAD -> 1 | NC _
-      | SW _ | NCSW _ -> assert false in
+      | UNKNOWN _ -> 0 | BAD -> 1
+      | NC _ | SW _ | NCSW _ -> assert false in
     let compare = cmp [
         cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
         cmptr (fun (i,_,_,_,_) -> -i) (-);
       ] in
-    List.sort compare other_models
+    let not_empty (_,_,m,_,_) = not (Model_parser.is_model_empty m) in
+    List.sort compare (List.filter not_empty other_models)
   else
     let ce_summary_index = function
       | NC _ -> 0 | SW _ -> 1 | NCSW _ -> 2
