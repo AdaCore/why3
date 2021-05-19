@@ -251,7 +251,7 @@ let wp_forall vl wp = t_forall_close_simp vl [] wp
 let sp_exists vl sp = t_exists_close_simp vl [] sp
 
 let t_let_close_simp v t f =
-  let keep = relevant_for_counterexample v.vs_name in
+  let keep = false (* relevant_for_counterexample v.vs_name *) in
   t_let_close_simp_keep_var ~keep v t f
 
 let wp_let v t wp =

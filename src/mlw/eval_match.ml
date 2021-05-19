@@ -135,7 +135,7 @@ let let_map fn env t1 tb =
   (* TODO/FIXME? convert (let x = if f then True else False in h)
      into (forall x. (x = True <-> f) -> h) ? *)
   (**)
-  let keep = relevant_for_counterexample x.vs_name in
+  let keep = false (* relevant_for_counterexample x.vs_name *) in
   t_let_simp_keep_var ~keep t1 (close x t2)
 
 let branch_map fn env t1 bl =
