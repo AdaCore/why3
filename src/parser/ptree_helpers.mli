@@ -54,6 +54,8 @@ val eapply : ?loc:position -> expr -> expr -> expr
 
 val evar : ?loc:position -> qualid -> expr
 
+val empty_spec : spec
+
 (** {2 declarations} *)
 
 val use : ?loc:Loc.position -> import:bool -> string list -> decl

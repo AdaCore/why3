@@ -32,3 +32,14 @@ Model is {"myfile.my_ext":
                "attrs": ["model_trace:my_B"],
                "value": {"type": "Boolean", "val": false},
                "kind": "other"}]}}
+
+The program does not comply to the verification goal, for example during the
+  following execution:
+File .:
+  Line 0:
+    Execution of main function `f` with env:
+      x = 42
+File id:
+  Line 5:
+    Property failure at assertion with:
+      x = 42

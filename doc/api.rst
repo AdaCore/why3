@@ -898,3 +898,15 @@ the JSON output as follows:
    End:
    LocalWords:  prover provers untyped disjunction programmatically invariants
    LocalWords:  uncommented OCaml AST
+
+Checking counterexamples
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Counterexamples can be checked using the API, too. Here is an example for the
+selecting a counterexample from the result ``pr`` of proving a sub-goal of
+pmodule ``pm``:
+
+.. literalinclude:: ../examples/use_api/counterexample.ml
+   :language: ocaml
+   :start-after: BEGIN{check_ce}
+   :end-before: END{check_ce}
