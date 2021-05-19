@@ -56,7 +56,7 @@ type goal_id = Session_itp.proofNodeID
 (* This is the type of identifier of goal. They can be queried from the session
    through Session_itp functions *)
 
-val add_to_objective : objective -> goal_id -> unit
+val add_to_objective : Gnat_expl.vc_info -> goal_id -> unit
 (* register the goal with the given objective. If this is the
    first time we register a goal for given objective, the objective is
    registered as well. Only do the registering if the objective is to de
@@ -71,6 +71,7 @@ val is_interesting : goal_id -> bool
 
 val get_objective : goal_id -> objective
 (* get the objective associated with a goal_id *)
+val get_extra_info   : goal_id -> int option
 
 (* Scheduling and proof *)
 val next : objective -> goal_id list

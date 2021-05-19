@@ -95,7 +95,7 @@ let empty_objective () =
 let explmap : objective_rec Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 (* maps proof objectives to goals *)
 
-let goalmap : Gnat_expl.check GoalMap.t = GoalMap.create 17
+let goalmap : Gnat_expl.vc_info GoalMap.t = GoalMap.create 17
 (* maps goals to their objectives *)
 
 let total_nb_goals : int ref = ref 0
@@ -119,37 +119,40 @@ let find e =
       r
 
 let add_to_objective ~toplevel ex go =
+  let check = ex.Gnat_expl.check in
   (* add a goal to an objective.
    * A goal can be "top-level", that is a direct goal coming from WP, or not
    * top-level, that is obtained by transformation. *)
    let filter_line =
       match Gnat_config.limit_line with
       | Some (Gnat_expl.Limit_Line l) ->
-         Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
+         Gnat_loc.equal_line l (Gnat_expl.get_loc check)
       | Some (Gnat_expl.Limit_Check c) ->
-         (c.Gnat_expl.reason = Gnat_expl.get_reason ex)
-         && (Gnat_loc.equal_orig_loc c.Gnat_expl.sloc (Gnat_expl.get_loc ex))
+         (c.Gnat_expl.reason = Gnat_expl.get_reason check)
+         && (Gnat_loc.equal_orig_loc c.Gnat_expl.sloc (Gnat_expl.get_loc check))
       | None -> true
    in
    let filter_region =
       match Gnat_config.limit_region with
       | Some r ->
-         Gnat_loc.in_region r (Gnat_expl.get_loc ex)
+         Gnat_loc.in_region r (Gnat_expl.get_loc check)
       | None -> true
    in
    if filter_line && filter_region then begin
       incr total_nb_goals;
       GoalMap.add goalmap go ex;
-      let obj = find ex in
+      let obj = find check in
       GoalSet.add obj.to_be_scheduled go;
       GoalSet.add obj.to_be_proved go;
       if toplevel then GoalSet.add obj.toplevel go;
    end
 
-let get_objective goal = GoalMap.find goalmap goal
+let get_vc_info goal = GoalMap.find goalmap goal
+let get_objective goal = (get_vc_info goal).Gnat_expl.check
+let get_extra_info goal = (get_vc_info goal).Gnat_expl.extra_info
 
 let add_clone derive goal =
-   let obj = get_objective derive in
+   let obj = get_vc_info derive in
    add_to_objective ~toplevel:false obj goal
 
 

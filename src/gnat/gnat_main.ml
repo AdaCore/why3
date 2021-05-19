@@ -32,12 +32,12 @@ let register_goal cont goal_id =
   let s = cont.Controller_itp.controller_session in
   let task = Session_itp.get_task s goal_id in
   let fml = Task.task_goal_fmla task in
-  let is_trivial s goal_id =
+  let is_trivial =
     Session_itp.pn_proved s goal_id &&
     let tr_list = Session_itp.get_transformations s goal_id in
     List.exists (fun x -> Session_itp.get_transf_name s x = "trivial_true") tr_list
   in
-  match is_trivial s goal_id, Gnat_expl.search_labels fml with
+  match is_trivial, Gnat_expl.search_labels fml with
   | true, None ->
       Gnat_objectives.set_not_interesting goal_id
   | false, None ->
@@ -48,10 +48,12 @@ let register_goal cont goal_id =
         else base_msg in
       Gnat_util.abort_with_message ~internal:true msg
   | _, Some c ->
-      if c.Gnat_expl.already_proved then
-        Gnat_objectives.set_not_interesting goal_id
-      else
-        Gnat_objectives.add_to_objective c goal_id
+      begin
+        if c.Gnat_expl.check.Gnat_expl.already_proved then
+          Gnat_objectives.set_not_interesting goal_id
+        else
+          Gnat_objectives.add_to_objective c goal_id
+      end
 
 let rec handle_vc_result c goal result =
    (* This function is called when the prover has returned from a VC.
@@ -160,7 +162,6 @@ let report_messages c obj =
         else
           Opt.map (fun pa -> Session_itp.get_proof_attempt_parent s pa) unproved_pa
       in
-      let unproved_task = Opt.map (fun x -> Session_itp.get_task s x) unproved_goal in
       let model =
         match Opt.map (Session_itp.get_proof_attempt_node s) unproved_pa with
         | Some ({ Session_itp.proof_state = Some pr }) ->
@@ -170,7 +171,12 @@ let report_messages c obj =
         | _ -> None
       in
       let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
-      Gnat_report.Not_Proved (unproved_task, model, manual_info) in
+      let extra_info =
+        match unproved_goal with
+        | None -> None
+        | Some g -> Gnat_objectives.get_extra_info g
+      in
+      Gnat_report.Not_Proved (extra_info, model, manual_info) in
   Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
 
 (* Escaping all debug printings *)

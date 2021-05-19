@@ -131,6 +131,11 @@ type check =
     already_proved : bool
   }
 
+type vc_info =
+  { check : check;
+    extra_info : int option
+  }
+
 type limit_mode =
   | Limit_Check of check
   | Limit_Line of Gnat_loc.loc
@@ -410,17 +415,19 @@ type my_expl =
 (* The type that is used to extract information from a VC, is filled up field
    by field *)
 
-let read_vc_labels s =
+let default_expl =
+   { check_id       = None;
+     check_reason   = None;
+     check_sloc     = None;
+     extra_node     = None;
+     shape          = None;
+     already_proved = false;
+   }
+let read_vc_labels acc s =
    (* This function takes a set of labels and extracts a "node_info" from that
       set. We start with an empty record; We fill it up by iterating over all
       labels of the node. *)
-   let b = { check_id       = None;
-             check_reason   = None;
-             check_sloc     = None;
-             extra_node     = None;
-             shape          = None;
-             already_proved = false;
-           } in
+   let b = acc in
    Ident.Sattr.iter
      (fun x ->
         let s = x.Ident.attr_string in
@@ -454,8 +461,9 @@ let read_vc_labels s =
      end;
      b
 
-let extract_check s =
-     match read_vc_labels s with
+(* Transform an object of my_expl type into a check *)
+let extract_check b =
+     match b with
      | { check_id = Some id ;
          check_reason = Some reason;
          check_sloc = Some sloc;
@@ -464,24 +472,34 @@ let extract_check s =
            Some (mk_check ?shape reason id sloc ap)
      | _ -> None
 
-let extract_sloc s = (read_vc_labels s).check_sloc
+(* Copied from Termcode and modified to use an accumulator. Traverse the
+   "right" side of the term and call the callback on the attributes. We stop
+   when we can't descend further in the term. *)
+let search_attrs callback acc =
+  let rec aux acc f =
+    if f.t_ty <> None then acc
+    else if Ident.Sattr.mem Term.stop_split f.Term.t_attrs then acc
+    else
+      let acc = callback acc f.Term.t_attrs in
+      match f.t_node with
+        | Term.Ttrue | Term.Tfalse | Term.Tapp _ -> acc
+        | Term.Tbinop (Term.Timplies, _, f) -> aux acc f
+        | Term.Tlet _ | Term.Tcase _ | Term.Tquant (Term.Tforall, _) ->
+          Term.t_fold aux acc f
+        | _ -> acc
+  in
+  aux acc
 
-let rec extract_msg t =
-   match t.t_node with
-   | Tbinop (Timplies,_, t) -> extract_msg t
-   | Tlet (_,tb) | Teps tb ->
-         let _, t = t_open_bound tb in
-         extract_msg t
-   | Tquant (_,tq) ->
-         let _,_,t = t_open_quant tq in
-         extract_msg t
-   | _ ->
-         read_vc_labels t.t_attrs
-
-let get_extra_info task =
-  let f = Task.task_goal_fmla task in
-  let info = extract_msg f in
-  info.extra_node
+(* Search the labels in the tree and extract the vc_info. Return None if not
+   enough info was found. *)
+let search_labels t =
+  (* need to copy default_expl here to use our own object *)
+  let b = search_attrs read_vc_labels ({default_expl with check_id = None}) t in
+  match extract_check b with
+  | None -> None
+  | Some c ->
+    Some { check = c;
+           extra_info = b.extra_node }
 
 let to_filename fmt check =
   List.iter (fun x ->
@@ -489,21 +507,6 @@ let to_filename fmt check =
       Format.fprintf fmt "%s_%d_%d_" file line col;
   ) check.sloc;
   Format.fprintf fmt "%s" (reason_to_string check.reason)
-
-let search_labels =
-  let extract_wrap l =
-    match extract_check l with
-    | None -> []
-    | Some x -> [x] in
-  let search = Termcode.search_attrs extract_wrap in
-  fun f ->
-    try
-    begin match search f with
-    | [] -> None
-    | [x] -> Some x
-    | _ -> assert false
-    end
-  with Exit -> None
 
 let parse_line_spec s =
    try

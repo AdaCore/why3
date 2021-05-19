@@ -73,11 +73,19 @@ type check =
     shape          : string;
     already_proved : bool
   }
-(* a check is equal to a check ID as provided by gnat2why, as well as a reason.
+(* A check is equal to a check ID as provided by gnat2why, as well as a reason.
    We need the reason because in the case of a loop invariant, there is a
    single check id, but in fact two checks (initialization and preservation).
    A check can be proved already (e.g. by CodePeer).
    *)
+
+type vc_info =
+  { check : check;
+    extra_info : int option
+  }
+(* A VC info is the info attached to a VC. This is the corresponding check as
+   well as extra information (the Ada node for pretty printing) that is proper to
+   this VC (as opposed to other VCs for the same check). *)
 
 type limit_mode =
   | Limit_Check of check
@@ -133,17 +141,7 @@ val mk_check : ?shape:string -> reason -> id -> Gnat_loc.loc -> bool -> check
 module MCheck : Extmap.S with type key = check
 module HCheck : Hashtbl.S with type key = check
 
-val extract_check : Ident.Sattr.t -> check option
-(* from a label set, extract the check info, if any *)
-
-val extract_sloc : Ident.Sattr.t -> Gnat_loc.loc option
-(* from a label set, extract the sloc info it contains, if any *)
-
-val get_extra_info : Task.task -> int option
-(* from a task node, extract the Gp_Pretty_Ada info that is contained in the
- * rightmost goal node, if any *)
-
-val search_labels: Why3.Term.term -> check option
+val search_labels: Why3.Term.term -> vc_info option
 (* Search for check labels inside a term *)
 
 val parse_line_spec : string -> limit_mode

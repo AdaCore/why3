@@ -13,7 +13,7 @@ type stats = prover_stat Whyconf.Hprover.t
 type result_info =
   | Proved of stats * int * int
   | Not_Proved of
-       Task.task option *
+       int option *
        Model_parser.model option *
        (string * string) option
 
@@ -60,11 +60,7 @@ let register check check_tree result =
     match result with
     | Proved (stats, stats_checker, stat_trivial) ->
         true, None, Some (stats, stats_checker, stat_trivial), None, None
-    | Not_Proved (task, model, manual) ->
-        let extra_info =
-          match task with
-          | None -> None
-          | Some t -> Gnat_expl.get_extra_info t in
+    | Not_Proved (extra_info, model, manual) ->
         false, extra_info, None, model, manual
   in
   if (Gnat_expl.HCheck.mem msg_set check) then assert false
