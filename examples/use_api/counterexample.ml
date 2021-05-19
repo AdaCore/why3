@@ -122,8 +122,9 @@ let () = printf "@[On task 1, CVC4,1.7 answers %a@."
 
 let () = printf "Model is %t@."
     (fun fmt ->
-       match result1.Call_provers.pr_models with
-       | [(_,m)] -> (* TODO select_model *)
+       match Counterexample.select_model_last_non_empty
+                result1.Call_provers.pr_models with
+       | Some m ->
            Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None fmt m
-       | _ -> fprintf fmt "unavailable")
+       | None -> fprintf fmt "unavailable")
 (* END{ce_callprover} *)
