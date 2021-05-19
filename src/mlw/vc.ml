@@ -250,18 +250,18 @@ let wp_case t bl =
 let wp_forall vl wp = t_forall_close_simp vl [] wp
 let sp_exists vl sp = t_exists_close_simp vl [] sp
 
-let t_let_close_simp v t f =
-  let keep = false (* relevant_for_counterexample v.vs_name *) in
+let t_let_close_simp env v t f =
+  let keep = env.trace_for_ce && relevant_for_counterexample v.vs_name in
   t_let_close_simp_keep_var ~keep v t f
 
-let wp_let v t wp =
+let wp_let env v t wp =
   if pv_is_unit v then t_subst_single v.pv_vs t_void wp
-                  else t_let_close_simp v.pv_vs t wp
+                  else t_let_close_simp env v.pv_vs t wp
 
-let sp_let v t sp rd =
+let sp_let env v t sp rd =
   if pv_is_unit v then t_subst_single v.pv_vs t_void sp else
   if Spv.mem v rd then sp_and (t_equ (t_var v.pv_vs) t) sp else
-  t_let_close_simp v.pv_vs t sp
+  t_let_close_simp env v.pv_vs t sp
 
 (* variant decrease preconditions *)
 
@@ -463,7 +463,7 @@ let rec k_print fmt k = match k with
    We need this for simple conjunctions, disjunctions, and
    pattern-matching exprs, to avoid considering each branch
    separately; also to have a single substitutable term. *)
-let term_of_kode res k =
+let term_of_kode env res k =
   let rec get_stack st k = match k with
     | Klet (v, t, f) when pv_equal v res -> st, Some (t, f), 0, Kcont 0
     | Klet (v, t, _) -> (v, Some t) :: st, None, 0, k
@@ -488,7 +488,7 @@ let term_of_kode res k =
   match d with
   | Some (t, f) ->
       let unwind t ({pv_vs = v}, d) = match d with
-        | Some d -> t_let_close_simp v d t
+        | Some d -> t_let_close_simp env v d t
         | None when t_v_occurs v t > 0 -> raise Exit
         | None -> t in
       let t = List.fold_left unwind t st in
@@ -790,8 +790,8 @@ let rec k_expr env lps e res xmap =
           if s then try
             if not (ity_equal e.e_ity ity_bool) ||
               ity_fragile e.e_ity then raise Exit;
-            let t1, f1, k1 = term_of_kode res k1 in
-            let t2, f2, k2 = term_of_kode res k2 in
+            let t1, f1, k1 = term_of_kode env res k1 in
+            let t2, f2, k2 = term_of_kode env res k2 in
             let test = t_equ (t_var v.pv_vs) t_bool_true in
             (* with both branches simple, define a resulting term *)
             let t = t_if_simp test t1 t2 and f = sp_if test f1 f2 in
@@ -1364,17 +1364,17 @@ let wrt_exists vl f = wrt_rename sp_exists vl f
    the range of [wr_i], or otherwise in [rdm(i)]. Every
    variable in the range of [wr_i] is free in [sp_i]. *)
 
-let rec sp_expr kn k rdm dst = match k with
+let rec sp_expr env k rdm dst = match k with
   | Kseq (Klet (v, t, f), 0, k2)
     when not (has_a_model_attr v.pv_vs.vs_name) ->
-      let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
+      let wp2, sp2, rd2 = sp_expr env k2 rdm dst in
       let rd1 = t_freepvs (t_freepvs rd2 t) f in
-      let wp = wp_let v t (sp_implies f wp2) in
+      let wp = wp_let env v t (sp_implies f wp2) in
       let close _ (sp, wr) rd =
-        Some (sp_let v t (sp_and f sp) rd, wr) in
+        Some (sp_let env v t (sp_and f sp) rd, wr) in
       wp, Mint.inter close sp2 rdm, Spv.remove v rd1
   | Kseq (k1, i, k2) ->
-      let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
+      let wp2, sp2, rd2 = sp_expr env k2 rdm dst in
       (* log new "written" variables added to dst *)
       let new_written = ref [] in
       let mk_written v =
@@ -1392,7 +1392,7 @@ let rec sp_expr kn k rdm dst = match k with
       let fresh_wr2 v _ = mk_written v in
       let fresh_rd2 v _ = if v.pv_ity.ity_pure then None
                           else Some (mk_written v) in
-      let wp1, sp1, rd1 = sp_expr kn k1 (Mint.add i rd2 rdm)
+      let wp1, sp1, rd1 = sp_expr env k1 (Mint.add i rd2 rdm)
         (Mpv.set_union (Mpv.set_union (Mpv.mapi fresh_wr2 wr2)
         (Mpv.mapi_filter fresh_rd2 (Mpv.set_diff rd2 dst))) dst) in
       (* retrieve the postcondition and the write effect for the
@@ -1438,13 +1438,13 @@ let rec sp_expr kn k rdm dst = match k with
       List.iter (Hvs.remove ht_written) !new_written;
       wp_and wp1 wp2, sp_combine_map sp1 sp2, rd1
   | Kpar (k1, k2) ->
-      let wp1, sp1, rd1 = sp_expr kn k1 rdm dst in
-      let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
+      let wp1, sp1, rd1 = sp_expr env k1 rdm dst in
+      let wp2, sp2, rd2 = sp_expr env k2 rdm dst in
       wp_and wp1 wp2, sp_combine_map sp1 sp2, Spv.union rd1 rd2
   | Kif (v, k1, k2) ->
       let test = t_equ (t_var v.pv_vs) t_bool_true in
-      let wp1, sp1, rd1 = sp_expr kn k1 rdm dst in
-      let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
+      let wp1, sp1, rd1 = sp_expr env k1 rdm dst in
+      let wp2, sp2, rd2 = sp_expr env k2 rdm dst in
       let join _ sp1 sp2 = match sp1, sp2 with
         | Some (sp1, wr1), Some (sp2, wr2) ->
             let sp1 = sp_complete sp1 wr1 wr2 in
@@ -1458,7 +1458,7 @@ let rec sp_expr kn k rdm dst = match k with
   | Kcase (v, bl) ->
       let t = t_var v.pv_vs in
       let branch (p, k) (wpl, spl, wrm, rds) =
-        let wp, sp, rd = sp_expr kn k rdm dst in
+        let wp, sp, rd = sp_expr env k rdm dst in
         let wpl = t_close_branch p wp :: wpl in
         let spl = (p, sp) :: spl in
         let join _ wr1 wr2 = Some (Mpv.set_union wr1 wr2) in
@@ -1481,8 +1481,8 @@ let rec sp_expr kn k rdm dst = match k with
   | Khavoc (wr, loc, attrs) ->
       let rd = Mint.find 0 rdm in
       let dst = Mpv.set_inter dst (pvs_affected wr rd) in
-      if Mpv.is_empty dst then sp_expr kn (Kcont 0) rdm dst else
-      let regs = name_regions kn wr dst in
+      if Mpv.is_empty dst then sp_expr env (Kcont 0) rdm dst else
+      let regs = name_regions env.known_map wr dst in
       let () = print_dst dst; print_regs regs in
       let add _ t fvs = t_freevars fvs t in
       let fvs = Mreg.fold add regs Mvs.empty in
@@ -1490,7 +1490,7 @@ let rec sp_expr kn k rdm dst = match k with
       let loc_attr = wrt_mk_loc_attr loc attrs in
       let update {pv_vs = o; pv_ity = ity} n sp =
         wrt_add_loc_attr n loc_attr;
-        let t, fl = havoc kn wr regs (t_var o) ity [] in
+        let t, fl = havoc env.known_map wr regs (t_var o) ity [] in
         sp_and (t_and_l (cons_t_simp (t_var n) t fl)) sp in
       let sp = Mpv.fold update dst t_true in
       let sp = sp_exists (Mvs.keys fvs) sp in
@@ -1502,7 +1502,7 @@ let rec sp_expr kn k rdm dst = match k with
       t_true, Mint.singleton 0 (sp, dst), rd
   | Klet (v, t, f) ->
       let rd = Mint.find 0 rdm in
-      let sp = sp_let v t f rd in
+      let sp = sp_let env v t f rd in
       let rd = Spv.remove v (t_freepvs rd sp) in
       t_true, Mint.singleton 0 (sp, Mpv.empty), rd
   | Kval (vl, f) ->
@@ -1519,50 +1519,50 @@ let rec sp_expr kn k rdm dst = match k with
   | Kcont i ->
       t_true, Mint.singleton i (t_true, Mpv.empty), Mint.find i rdm
   | Kaxiom k ->
-      let f = wp_expr kn k Mint.empty in
+      let f = wp_expr env k Mint.empty in
       let f = vc_expl None Sattr.empty expl_lemma f in
       let rd = t_freepvs (Mint.find 0 rdm) f in
       t_true, Mint.singleton 0 (f, Mpv.empty), rd
   | Ktag (Off expl, k) ->
-      let wp, sp, rd = sp_expr kn k rdm dst in
+      let wp, sp, rd = sp_expr env k rdm dst in
       wp_solder expl wp, sp, rd
   | Ktag (Out out, k) ->
-      sp_expr kn k (Mint.set_inter rdm out) dst
+      sp_expr env k (Mint.set_inter rdm out) dst
   | Ktag (WP, k) ->
       assert (Mint.is_empty rdm);
-      let f = wp_expr kn k Mint.empty in
+      let f = wp_expr env k Mint.empty in
       f, Mint.empty, t_freepvs Spv.empty f
   | Ktag ((Push _|SP), _) -> assert false (* cannot happen *)
 
-and wp_expr kn k q = match k with
+and wp_expr env k q = match k with
   | Kseq (k1, i, k2) ->
-      wp_expr kn k1 (Mint.add i (wp_expr kn k2 q) q)
+      wp_expr env k1 (Mint.add i (wp_expr env k2 q) q)
   | Kpar (k1, k2) ->
-      wp_and (wp_expr kn k1 q) (wp_expr kn k2 q)
+      wp_and (wp_expr env k1 q) (wp_expr env k2 q)
   | Kif ({pv_vs = v}, k1, k2) ->
       let test = t_equ (t_var v) t_bool_true in
-      wp_if test (wp_expr kn k1 q) (wp_expr kn k2 q)
+      wp_if test (wp_expr env k1 q) (wp_expr env k2 q)
   | Kcase ({pv_vs = v}, bl) ->
-      let branch (p,k) = t_close_branch p (wp_expr kn k q) in
+      let branch (p,k) = t_close_branch p (wp_expr env k q) in
       wp_case (t_var v) (List.map branch bl)
   | Khavoc (wr, loc, attrs) ->
       let q = Mint.find 0 q in
       let dst = dst_of_wp loc attrs wr q in
       if Mpv.is_empty dst then q else
-      let regs = name_regions kn wr dst in
+      let regs = name_regions env.known_map wr dst in
       let () = print_dst dst; print_regs regs in
       let add _ t fvs = t_freevars fvs t in
       let fvs = Mreg.fold add regs Mvs.empty in
       let update {pv_vs = o; pv_ity = ity} n q =
-        let t, fl = havoc kn wr regs (t_var o) ity [] in
+        let t, fl = havoc env.known_map wr regs (t_var o) ity [] in
         if Mvs.mem n fvs then
           sp_implies (t_and_l (cons_t_simp (t_var n) t fl)) q
-        else t_let_close_simp n t (sp_implies (t_and_l fl) q) in
+        else t_let_close_simp env n t (sp_implies (t_and_l fl) q) in
       let q = t_subst (adjustment dst) q in
       let q = Mpv.fold update dst q in
       wp_forall (Mvs.keys fvs) q
   | Klet (v, t, f) ->
-      wp_let v t (sp_implies f (Mint.find 0 q))
+      wp_let env v t (sp_implies f (Mint.find 0 q))
   | Kval (vl, f) ->
       let q = sp_implies f (Mint.find 0 q) in
       wp_forall (List.map (fun v -> v.pv_vs) vl) q
@@ -1573,16 +1573,16 @@ and wp_expr kn k q = match k with
   | Kcont i ->
       Mint.find i q
   | Kaxiom k ->
-      let f = wp_expr kn k Mint.empty in
+      let f = wp_expr env k Mint.empty in
       let f = vc_expl None Sattr.empty expl_lemma f in
       sp_implies f (Mint.find 0 q)
   | Ktag (Off expl, k) ->
-      wp_solder expl (wp_expr kn k q)
+      wp_solder expl (wp_expr env k q)
   | Ktag (Out out, k) ->
-      wp_expr kn k (Mint.set_inter q out)
+      wp_expr env k (Mint.set_inter q out)
   | Ktag (SP, k) ->
       let k = Mint.fold (fun i q k -> Kseq (k, i, Kstop q)) q k in
-      let wp, _, _ = sp_expr kn k Mint.empty Mpv.empty in wp
+      let wp, _, _ = sp_expr env k Mint.empty Mpv.empty in wp
   | Ktag ((Push _|WP), _) -> assert false (* cannot happen *)
 
 let rec simp_cast_projections env t = match t.t_node with
@@ -1597,13 +1597,13 @@ let rec simp_cast_projections env t = match t.t_node with
 
 (** VCgen *)
 
-let vc_kode {known_map = kn} vc_wp k =
+let vc_kode env vc_wp k =
   if Debug.test_flag debug_vc then
     Format.eprintf "K @[%a@]@\n" k_print k;
   let k = reflow vc_wp k in
   if Debug.test_flag debug_reflow then
     Format.eprintf "R @[%a@]@\n" k_print k;
-  wp_expr kn k Mint.empty
+  wp_expr env k Mint.empty
 
 let vc_fun env vc_wp cty e =
   vc_kode env vc_wp (k_fun env Mls.empty cty e)
@@ -1611,7 +1611,7 @@ let vc_fun env vc_wp cty e =
 let vc_rec env vc_wp rdl =
   List.map (vc_kode env vc_wp) (k_rec env Mls.empty rdl)
 
-let mk_vc_decl ({known_map = kn} as env) id f =
+let mk_vc_decl ({known_map = kn; trace_for_ce } as env) id f =
   let {id_string = nm; id_attrs = attrs; id_loc = loc} = id in
   let attrs = if attrs_has_expl attrs then attrs else
     Sattr.add (Ident.create_attribute ("expl:VC for " ^ nm)) attrs in
@@ -1619,7 +1619,7 @@ let mk_vc_decl ({known_map = kn} as env) id f =
   let f = wp_forall (Mvs.keys (t_freevars Mvs.empty f)) f in
   let f = Typeinv.inject kn f in
   let f = if Debug.test_flag debug_no_eval then f else
-          Eval_match.eval_match kn f in
+          Eval_match.eval_match ~trace_for_ce kn f in
   let f = simp_cast_projections env f in
   create_pure_decl (create_prop_decl Pgoal pr f)
 

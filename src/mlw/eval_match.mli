@@ -18,4 +18,4 @@ val ty_constructors : known_map -> ty -> Decl.constructor list
 val cs_fields : known_map -> lsymbol -> lsymbol option list
 val select_field : lsymbol -> lsymbol option list -> 'a list -> 'a
 
-val eval_match : known_map -> term -> term
+val eval_match : trace_for_ce:bool -> known_map -> term -> term
