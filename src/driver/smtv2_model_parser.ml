@@ -291,14 +291,20 @@ module FromSexp = struct
         Some (n, Dfunction (al, iret, t))
     | _ -> None
 
-  let model = function
-    | [] ->
-        None
-    | [List (Atom "model" :: decls)] | [List decls] ->
-        Some (Mstr.of_list (Lists.map_filter decl decls))
-    | _ ->
-        failwith ("Cannot read S-expression as model: " ^
-                  "must be a single list `(model ...)` or `(...)`")
+  let is_model_decl = function Atom "define-fun" -> true | _ -> false
+
+  let model sexp =
+    if sexp = [] then None else
+    let decls, rest = match sexp with
+      | List (Atom "model" :: decls) :: rest -> decls, rest
+      | List decls :: rest when List.exists (Sexp.exists is_model_decl) decls ->
+          decls, rest
+      | _ -> failwith "Cannot read S-expression as model: model not first" in
+    if List.exists (Sexp.exists is_model_decl) rest then
+      failwith
+        "Cannot read S-expression as model: next model not separated \
+         (missing separator in driver?)";
+    Some (Mstr.of_list (Lists.map_filter decl decls))
 end
 
 (* Parses the model returned by CVC4 and Z3. *)

@@ -171,14 +171,25 @@ let print_report ses (id,p,l,r) =
 
 
 let same_result r1 r2 =
-  match r1.Call_provers.pr_answer, r2.Call_provers.pr_answer with
-    | Call_provers.Valid, Call_provers.Valid -> true
-    | Call_provers.Invalid, Call_provers.Invalid -> true
-    | Call_provers.Timeout, Call_provers.Timeout -> true
-    | Call_provers.OutOfMemory, Call_provers.OutOfMemory -> true
-    | Call_provers.Unknown _, Call_provers.Unknown _-> true
-    | Call_provers.Failure _, Call_provers.Failure _-> true
-    | _ -> false
+  let open Call_provers in
+  match r1.pr_answer, r2.pr_answer with
+    | Valid, Valid
+    | Invalid, Invalid
+    | Timeout, Timeout
+    | OutOfMemory, OutOfMemory
+    | StepLimitExceeded, StepLimitExceeded
+    | Unknown _, Unknown _
+    | Failure _, Failure _
+    | HighFailure, HighFailure
+      -> true
+    | Valid, _ | _, Valid
+    | Invalid, _ | _, Invalid
+    | Timeout, _ | _, Timeout
+    | OutOfMemory, _ | _, OutOfMemory
+    | StepLimitExceeded, _ | _, StepLimitExceeded
+    | Unknown _, _ | _, Unknown _
+    | Failure _, _ | _, Failure _
+      -> false
 
 let save cont =
   Debug.dprintf debug "Saving session...@?";
