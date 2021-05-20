@@ -340,19 +340,34 @@ let reason_to_string reason =
    | VC_Dead_Code                 -> "dead_code"
 
 type gp_label =
+  | Gp_Check of int * reason * Gnat_loc.loc
   | Gp_Sloc of Gnat_loc.loc
   | Gp_Subp of Gnat_loc.loc
-  | Gp_VC_Id of int
-  | Gp_Reason of reason
   | Gp_Pretty_Ada of int
   | Gp_Shape of string
   | Gp_Already_Proved
 
+let parse_check_string s l =
+  match l with
+  | id::reason_string::sloc_rest ->
+    begin try
+      Gp_Check (int_of_string id, reason_from_string reason_string, Gnat_loc.parse_loc sloc_rest)
+    with e when Debug.test_flag Debug.stack_trace -> raise e
+    | Failure _ ->
+       let s =
+         Format.sprintf "GP_Check: cannot parse string: %s" s in
+        Gnat_util.abort_with_message ~internal:true s
+    end
+  | _ ->
+       let s =
+         Format.sprintf "GP_Check: cannot parse string: %s" s in
+        Gnat_util.abort_with_message ~internal:true s
+
 let read_label s =
     if Strings.has_prefix "GP_" s then
        match Gnat_util.colon_split s with
-       | ["GP_Reason"; reason] ->
-             Some (Gp_Reason (reason_from_string reason))
+       | "GP_Check" :: rest ->
+             Some (parse_check_string s rest)
        | ["GP_Pretty_Ada"; msg] ->
            begin try
              Some (Gp_Pretty_Ada (int_of_string msg))
@@ -360,14 +375,6 @@ let read_label s =
            | Failure _ ->
              let s =
                Format.sprintf "GP_Pretty_Ada: cannot parse string: %s" s in
-              Gnat_util.abort_with_message ~internal:true s
-           end
-       | ["GP_Id"; msg] ->
-           begin try
-             Some (Gp_VC_Id (int_of_string msg))
-           with e when Debug.test_flag Debug.stack_trace -> raise e
-           | Failure _ ->
-             let s = Format.sprintf "GP_VC_Id: cannot parse string: %s" s in
               Gnat_util.abort_with_message ~internal:true s
            end
        | "GP_Sloc" :: rest ->
@@ -405,6 +412,7 @@ type my_expl =
      mutable check_reason   : reason option;
      mutable extra_node     : int option;
      mutable check_sloc     : Gnat_loc.loc option;
+     mutable other_sloc     : Gnat_loc.loc option;
      mutable shape          : string option;
      mutable already_proved : bool
    }
@@ -418,6 +426,7 @@ let read_vc_labels s =
    let b = { check_id       = None;
              check_reason   = None;
              check_sloc     = None;
+             other_sloc     = None;
              extra_node     = None;
              shape          = None;
              already_proved = false;
@@ -426,14 +435,14 @@ let read_vc_labels s =
      (fun x ->
         let s = x.Ident.attr_string in
         match read_label s with
-        | Some Gp_Reason reason ->
-            b.check_reason <- Some reason
-        | Some Gp_VC_Id i ->
-            b.check_id <- Some i
+        | Some Gp_Check (id, reason, sloc) ->
+            b.check_reason <- Some reason;
+            b.check_id <- Some id;
+            b.check_sloc <- Some sloc;
         | Some Gp_Pretty_Ada node ->
             b.extra_node <- Some node
         | Some Gp_Sloc loc ->
-            b.check_sloc <- Some loc
+            b.other_sloc <- Some loc
         | Some Gp_Subp _ ->
              Gnat_util.abort_with_message ~internal:true
                  "read_vc_labels: GP_Subp unexpected here"

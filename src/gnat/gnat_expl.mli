@@ -87,14 +87,12 @@ type subp_entity = Gnat_loc.loc
 
 (* the type of labels that are used by gnatprove and recognized by gnatwhy3 *)
 type gp_label =
+  | Gp_Check of int * reason * Gnat_loc.loc
+  (* used to indicate the ID, VC Kind and sloc of a VC *)
   | Gp_Sloc of Gnat_loc.loc
   (* generic location label "GP_Sloc" *)
   | Gp_Subp of Gnat_loc.loc
   (* label "GP_Subp" used to indicate the location of the subprogram *)
-  | Gp_VC_Id of int
-  (* label "GP_VC_Id" used to indicate the id of a VC *)
-  | Gp_Reason of reason
-  (* label "GP_Reason" used to indicate the kind of a VC *)
   | Gp_Pretty_Ada of int
   (* label "GP_Pretty_Ada" used to give an Ada source node for some
      predicate *)
