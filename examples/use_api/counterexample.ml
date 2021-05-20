@@ -128,3 +128,57 @@ let () = printf "Model is %t@."
            Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None fmt m
        | None -> fprintf fmt "unavailable")
 (* END{ce_callprover} *)
+
+(* Construct program:
+   module M =
+     let f (x: int) = assert { x <> 42 }
+   end *)
+let mlw_file =
+  let loc () = (* The counterexample selections requires unique locations *)
+    Mlw_printer.id_loc () in
+  let open Ptree in
+  let open Ptree_helpers in
+  let let_f =
+    let equ = Qident (ident ~loc:(loc ()) Ident.op_equ) in
+    let t_x = tvar ~loc:(loc ()) (Qident (ident "x")) in
+    let t_42 = tconst ~loc:(loc ()) 42 in
+    let t = term ~loc:(loc ()) (Tidapp (equ, [t_x; t_42])) in
+    let t = term ~loc:(loc ()) (Tnot t) in
+    let body = expr ~loc:(loc ()) (Eassert (Expr.Assert, t)) in
+    let pty_int = PTtyapp (Qident (ident "int"), []) in
+    let arg = loc (), Some (ident ~loc:(loc ()) "x"), false, Some pty_int in
+    let efun =
+      Efun ([arg], None, pat Ptree.Pwild, Ity.MaskVisible, empty_spec, body) in
+    let e = expr ~loc:(loc ()) efun in
+    Dlet (ident "f", false, Expr.RKnone, e) in
+  Decls [let_f]
+
+let pm =
+  let pms = Typing.type_mlw_file env [] "myfile.mlw" mlw_file in
+  Wstdlib.Mstr.find "" pms
+
+let task =
+  match Task.split_theory pm.Pmodule.mod_theory None None with
+  | [task] -> task
+  | _ -> failwith "Not exactly one task"
+
+let pr =
+  Call_provers.wait_on_call
+    (Driver.prove_task ~limit:Call_provers.empty_limit
+       ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
+    cvc4_driver task)
+
+(* BEGIN{check_ce} *)
+let () =
+  let reduce_config =
+    let trans = "compute_in_goal" and prover = "cvc4" and try_negate = true in
+    Pinterp.rac_reduce_config_lit ~trans ~prover ~try_negate config env () in
+  let check = true in
+  match Counterexample.select_model ~check ~reduce_config
+          env pm pr.Call_provers.pr_models with
+  | Some model_summary ->
+      printf "%a@." (Counterexample.print_counterexample
+                       ~check_ce:check ?verb_lvl:None ?json:None) model_summary
+  | None ->
+      printf "No model@."
+(* END{check_ce} *)
