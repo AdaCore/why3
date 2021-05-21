@@ -1634,7 +1634,7 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.con
 	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 \
 		--file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
-		`find stdlib -name "*.mlw" -printf " --file=%p:/%p"` \
+	  `find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
 	+dynlink.js +toplevel.js $<
 
 src/trywhy3/why3_worker.byte: $(WHY3CMA) lib/plugins/python.cmo lib/plugins/microc.cmo \
