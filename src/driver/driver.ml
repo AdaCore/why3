@@ -251,7 +251,7 @@ exception UnknownSpec of string
 
 let filename_regexp = Re.Str.regexp "%\\(.\\)"
 
-let get_filename drv input_file theory_name goal_name =
+let get_filename drv ~input_file ~theory_name ~goal_name =
   let sanitize = Ident.sanitizer
     Ident.char_to_alnumus Ident.char_to_alnumus in
   let file = match drv.drv_filename with
@@ -268,10 +268,10 @@ let get_filename drv input_file theory_name goal_name =
   Re.Str.global_substitute filename_regexp replace file
 
 let file_of_task drv input_file theory_name task =
-  get_filename drv input_file theory_name (task_goal task).pr_name.id_string
+  get_filename drv ~input_file ~theory_name ~goal_name:(task_goal task).pr_name.id_string
 
 let file_of_theory drv input_file th =
-  get_filename drv input_file th.th_name.Ident.id_string "null"
+  get_filename drv ~input_file ~theory_name:th.th_name.Ident.id_string ~goal_name:"null"
 
 let call_on_buffer ~command ~limit ~gen_new_file ?inplace ~filename
     ~printer_mapping drv buffer =
@@ -388,7 +388,10 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
           | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
-        true, get_filename drv fn "T" pr.pr_name.id_string
+        true, get_filename drv
+          ~input_file:fn
+          ~theory_name:"T"
+          ~goal_name:pr.pr_name.id_string
     | _ ->
         (* Example: cvc4 without ?save_to argument
            No file were provided. We have to generate a new one.
@@ -398,7 +401,10 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
           | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
-        true, get_filename drv fn "T" pr.pr_name.id_string
+        true, get_filename drv
+          ~input_file:fn
+          ~theory_name:"T"
+          ~goal_name:pr.pr_name.id_string
 
 let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
