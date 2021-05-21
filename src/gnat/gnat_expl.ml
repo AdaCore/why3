@@ -341,7 +341,6 @@ let reason_to_string reason =
 
 type gp_label =
   | Gp_Check of int * reason * Gnat_loc.loc
-  | Gp_Sloc of Gnat_loc.loc
   | Gp_Subp of Gnat_loc.loc
   | Gp_Pretty_Ada of int
   | Gp_Shape of string
@@ -377,13 +376,6 @@ let read_label s =
                Format.sprintf "GP_Pretty_Ada: cannot parse string: %s" s in
               Gnat_util.abort_with_message ~internal:true s
            end
-       | "GP_Sloc" :: rest ->
-           begin try Some (Gp_Sloc (Gnat_loc.parse_loc rest))
-           with e when Debug.test_flag Debug.stack_trace -> raise e
-           | Failure _ ->
-             let s = Format.sprintf "GP_Sloc: cannot parse string: %s" s in
-              Gnat_util.abort_with_message ~internal:true s
-           end
        | ["GP_Subp" ; file ; line ] ->
            begin try
              Some (Gp_Subp (Gnat_loc.mk_loc_line file (int_of_string line)))
@@ -412,7 +404,6 @@ type my_expl =
      mutable check_reason   : reason option;
      mutable extra_node     : int option;
      mutable check_sloc     : Gnat_loc.loc option;
-     mutable other_sloc     : Gnat_loc.loc option;
      mutable shape          : string option;
      mutable already_proved : bool
    }
@@ -426,7 +417,6 @@ let read_vc_labels s =
    let b = { check_id       = None;
              check_reason   = None;
              check_sloc     = None;
-             other_sloc     = None;
              extra_node     = None;
              shape          = None;
              already_proved = false;
@@ -441,8 +431,6 @@ let read_vc_labels s =
             b.check_sloc <- Some sloc;
         | Some Gp_Pretty_Ada node ->
             b.extra_node <- Some node
-        | Some Gp_Sloc loc ->
-            b.other_sloc <- Some loc
         | Some Gp_Subp _ ->
              Gnat_util.abort_with_message ~internal:true
                  "read_vc_labels: GP_Subp unexpected here"
