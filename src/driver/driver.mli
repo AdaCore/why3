@@ -38,6 +38,13 @@ val file_of_theory : driver -> string -> Theory.theory -> string
 (** [file_of_theory d f th] produces a filename
     for the prover of driver [d], for a theory [th] from filename [f] *)
 
+val get_filename : driver ->
+  input_file:string ->
+  theory_name:string ->
+  goal_name:string ->
+  string
+(** Mangles a filename for the prover of the given driver *)
+
 (* unused outside ?
 val call_on_buffer :
   command      : string ->
