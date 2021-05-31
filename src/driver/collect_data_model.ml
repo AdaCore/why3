@@ -101,23 +101,27 @@ let rec eval ctx oty t =
   | Tto_array t ->
       Array (eval_to_array {ctx with opaque_prover_vars= false} t)
 
-and eval_prover_var ctx ty v =
+and eval_prover_var ?(seen=Mstr.empty) ctx ty v =
+  (* The parameter [seen] records the names of (field and projection) functions
+     (as map keys) and argument prover variables (in the map values), to detect
+     unbounded recursion in the definitions of prover variables. *)
+  let update_seen v old = Some (Sstr.add v (Opt.get_def Sstr.empty old)) in
+  let not_seen fn v = not (Sstr.mem v (Mstr.find_def Sstr.empty fn seen)) in
   assert (not ctx.opaque_prover_vars);
   try Some (Hstr.find ctx.prover_values v) with Not_found ->
     let res =
-      (* Format.eprintf "EVAL PROVER VAR' %s %s@." ty v; *)
-      let aux name = function
+      let aux fn = function
         | Dfunction ([param, Some ty'], oty'', t)
-          when Mstr.mem name ctx.fields_projs && ty' = ty -> (
+          when Mstr.mem fn ctx.fields_projs && ty' = ty && not_seen fn v ->
             let values = Mstr.add param (Model_parser.Var v) ctx.values in
-            match eval {ctx with values; opaque_prover_vars= true} oty'' t, oty'' with
-                | Model_parser.Var v, Some ty'' -> eval_prover_var ctx ty'' v
-                | mv, _ -> Some mv )
+            let ctx' = {ctx with values; opaque_prover_vars= true} in
+            ( match eval ctx' oty'' t, oty'' with
+              | Model_parser.Var v, Some ty'' ->
+                  let seen = Mstr.change (update_seen v) fn seen in
+                  eval_prover_var ~seen ctx ty'' v
+              | mv, _ -> Some mv )
         | _ -> None in
       let fs = Mstr.bindings (Mstr.mapi_filter aux ctx.table) in
-      (* Format.eprintf "EVAL VAR %s %s: %a@." v ty Pp.(print_list space string) (List.map fst fs); *)
-      (* Format.eprintf "FIELDS for %s: %a@." v
-       *   Pp.(print_list space (print_pair string Model_parser.print_model_value)) fs; *)
       if fs = [] then
         None
       else if List.for_all (fun (f, _) -> Mstr.mem f ctx.pm.list_fields) fs then
