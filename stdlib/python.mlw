@@ -30,14 +30,14 @@ module Python
   val range (l u: int) : list int
     requires { [@expl:valid range] l <= u }
     ensures  { Array.length result = u - l }
-    ensures  { forall i. l <= i < u -> result[i] = i }
+    ensures  { forall i. 0 <= i < u - l -> result[i] = l + i }
 
   (* ad-hoc facts about exchange *)
 
   use map.Occ
 
-  function occurrence (v: 'a) (l: list 'a) : int =
-    Occ.occ v l.Array.elts 0 l.Array.length
+  function occurrence (v: 'a) (l: list 'a) (lo hi: int) : int =
+    Occ.occ v l.Array.elts lo hi
 
   (* Python's division and modulus according are neither Euclidean division,
      nor computer division, but something else defined in
