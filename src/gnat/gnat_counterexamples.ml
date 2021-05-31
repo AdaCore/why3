@@ -134,3 +134,10 @@ let post_clean = object (self)
       | [] -> None
       | fs -> Some (Record fs)
 end
+
+let model_to_model (m, summary) =
+  let open Check_ce in
+  match summary with
+  | (NC | SW | NC_SW), log ->
+      Some (model_of_exec_log ~original_model:m log, summary)
+  | _ -> None

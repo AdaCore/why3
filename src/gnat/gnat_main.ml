@@ -146,6 +146,39 @@ let all_split_subp c subp =
    C.all_split_leaf_goals ();
    Gnat_objectives.clear ()
 
+let maybe_giant_step_rac ctr parent model =
+  if not Gnat_config.giant_step_rac then None else (
+    Debug.dprintf Check_ce.debug_check_ce_summary "Running giant-step RAC@.";
+    let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
+    let pm =
+      parent |> Session_itp.find_th ctr.Controller_itp.controller_session |>
+      Session_itp.theory_name |> Theory.restore_theory |> Pmodule.restore_module
+    in
+    let check_term = Rac.Why.mk_check_term_lit cnf env
+        ?why_prover:Gnat_config.rac_prover () in
+    let compute_term = Rac.Why.mk_compute_term_lit env () in
+    let rac = Pinterp.mk_rac check_term in
+    let oracle = Check_ce.oracle_of_model pm model in
+    let env = Pinterp.mk_empty_env env pm in
+    let timelimit = Opt.map float_of_int Gnat_config.rac_timelimit in
+    let ctx = Pinterp.mk_ctx env ?timelimit ~giant_steps:true ~do_rac:true ~rac
+        ~oracle ~compute_term () in
+    match Model_parser.get_model_term_loc model with
+    | None ->
+        if Gnat_config.debug then Warning.emit "Model without location@.";
+        None
+    | Some loc ->
+        match Check_ce.find_rs pm loc with
+        | exception Failure str -> Warning.emit "%s@." str; None
+        | None ->
+            if Gnat_config.debug then Warning.emit "No procedure found for model@.";
+            None
+        | Some rs ->
+            let res = Check_ce.rac_execute ctx rs in
+            Debug.dprintf Check_ce.debug_check_ce "%a@."
+              (Check_ce.print_rac_result ?verb_lvl:None) res;
+            Some res )
+
 let report_messages c obj =
   let s = c.Controller_itp.controller_session in
   let result =
@@ -165,13 +198,16 @@ let report_messages c obj =
       in
       let model =
         match Opt.map (Session_itp.get_proof_attempt_node s) unproved_pa with
-        | Some ({ Session_itp.proof_state = Some pr }) ->
-            Check_ce.select_model_last_non_empty
-              (List.filter (fun (pa,_) -> pa <> Call_provers.StepLimitExceeded)
-                 pr.Call_provers.pr_models)
+        | Some { Session_itp.proof_state = Some pr; parent } ->
+            let not_step_limit (pa,_) = pa <> Call_provers.StepLimitExceeded in
+            let models = List.filter not_step_limit pr.Call_provers.pr_models in
+            let model = Check_ce.select_model_last_non_empty models in
+            Opt.map (fun m -> m, maybe_giant_step_rac c parent m) model
         | _ -> None
       in
-      let model = Opt.map Gnat_counterexamples.post_clean#model model in
+      let model =
+        Opt.map (fun (m,st) -> Gnat_counterexamples.post_clean#model m, st)
+          model in
       let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
       let extra_info =
         match unproved_goal with
@@ -236,6 +272,7 @@ let save_session_and_exit c signum =
 let _ =
   if Gnat_config.debug then Debug.(set_flag (lookup_flag "gnat_ast"));
   Debug.set_flag Model_parser.debug_force_binary_floats;
+  Debug.set_flag Pinterp.debug_disable_builtin_mach;
   Model_parser.customize_clean Gnat_counterexamples.clean;
   List.iter Introduction.push_attributes_with_prefix
     ["GP_Check:"; "GP_Pretty_Ada:"; "GP_Shape:"; "GP_Sloc:";

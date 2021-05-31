@@ -38,6 +38,9 @@ let opt_proof_dir : string option ref = ref None
 let opt_ce_mode = ref false
 let opt_ce_prover = ref "cvc4_ce"
 let opt_warn_prover = ref None
+let opt_giant_step_rac : bool ref = ref false
+let opt_rac_timelimit = ref (Some 120)
+let opt_rac_prover = ref (Some "cvc4")
 
 let opt_limit_line : Gnat_expl.limit_mode option ref = ref None
 let opt_limit_region : Gnat_loc.region option ref = ref None
@@ -67,6 +70,19 @@ let set_filename s =
    else
       Gnat_util.abort_with_message ~internal:true
       "Only one file name should be given."
+
+let set_giant_step_rac = function
+  | "on" -> opt_giant_step_rac := true
+  | "off" -> opt_giant_step_rac := false
+  | _ -> Gnat_util.abort_with_message ~internal:true
+           "argument for option --giant-step-rac should be one of \
+           (yes|no)."
+
+let set_rac_prover str =
+  opt_rac_prover := if str = "" then None else Some str
+
+let set_rac_timelimit i =
+  opt_rac_timelimit := if i <= 0 then None else Some i
 
 let set_proof_mode s =
    if s = "no_wp" then
@@ -218,6 +234,15 @@ let options = Arg.align [
           " Specify additionnal configuration file";
    "--counterexample", Arg.String set_ce_mode,
           " on if the counterexample for unproved VC should be get, off elsewhere";
+   "--giant-step-rac", Arg.String set_giant_step_rac,
+          " Execute giant-step RAC for counterexample. Possible values: \
+           no (disabled, by default), yes.";
+   "--rac-timelimit", Arg.Int set_rac_timelimit,
+          Format.asprintf "<steps> Timelimit for RAC when checking counter\
+          examples (default: %a, non-positive values disable the timelimit)"
+          Pp.(print_option_or_default "none" int) !opt_rac_timelimit;
+   "--rac-prover", Arg.String set_rac_prover,
+   " Prover to check terms in RAC when they cannot be reduced (none by default)";
    "--ce-prover", Arg.Set_string opt_ce_prover,
           " Give a specific prover for counterexamples";
    "--warn-prover", Arg.String set_warn_prover,
@@ -482,6 +507,12 @@ let () =
   | _ -> ()
 
 let counterexamples = !opt_ce_mode
+
+let giant_step_rac = !opt_giant_step_rac
+
+let rac_timelimit = !opt_rac_timelimit
+
+let rac_prover = !opt_rac_prover
 
 let manual_prover =
   (* sanity check - we don't allow combining
