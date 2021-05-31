@@ -30,7 +30,7 @@ type ce_summary =
   | NC of Log.exec_log
   | SW of Log.exec_log
   | NCSW of Log.exec_log
-  | BAD
+  | BAD of Log.exec_log
   | UNKNOWN of string
 
 let print_ce_summary_kind fmt s =
@@ -39,7 +39,7 @@ let print_ce_summary_kind fmt s =
     | SW _ -> "SW"
     | NCSW _ -> "NCSW"
     | UNKNOWN _ -> "UNKNOWN"
-    | BAD -> "BAD" in
+    | BAD _ -> "BAD" in
   pp_print_string fmt str
 
 let print_ce_summary_title ?check_ce fmt = function
@@ -54,7 +54,7 @@ let print_ce_summary_title ?check_ce fmt = function
        ("The@ program@ does@ not@ comply@ to@ the@ verification@ \
          goal,@ or@ the@ contracts@ of@ some@ loop@ or@ function@ are@ \
          too@ weak")
-  | BAD ->
+  | BAD _ ->
      Format.fprintf fmt
        "Sorry,@ we@ don't@ have@ a@ good@ counterexample@ for@ you@ :("
   | UNKNOWN reason ->
@@ -89,7 +89,7 @@ let print_ce_summary_values ?verb_lvl ?json ~print_attrs model fmt s =
             if json = None then print_model_human fmt m
             else print_model (* json values *) fmt m in
           fprintf fmt "@[%a@]" (print_model ~print_attrs) model
-      | BAD -> ()
+      | BAD _ -> ()
     )
   | Some `All -> (
       match s with
@@ -98,10 +98,10 @@ let print_ce_summary_values ?verb_lvl ?json ~print_attrs model fmt s =
             print_model_field model print_log_field log
       | UNKNOWN _ ->
           fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
-      | BAD -> ()
+      | BAD _ -> ()
     )
 
-type result_state = Rnormal | Rfailure | Rstuck | Runknown
+type result_state = Rnormal | Rfailure of cntr_ctx * term | Rstuck | Runknown
 
 type result = {
     state    : result_state;
@@ -111,7 +111,7 @@ type result = {
 
 let print_result_state fmt = function
   | Rnormal -> fprintf fmt "NORMAL"
-  | Rfailure -> fprintf fmt "FAILURE"
+  | Rfailure _ -> fprintf fmt "FAILURE"
   | Rstuck -> fprintf fmt "STUCK"
   | Runknown -> fprintf fmt "UNKNOWN"
 
@@ -134,18 +134,42 @@ let print_result_summary print_result fmt (mr, s) =
 let print_check_model_result ?verb_lvl =
   print_result_summary (print_full_verdict ?verb_lvl)
 
-let ce_summary = function
-  | Cannot_check_model {reason} -> UNKNOWN reason
+let is_vc_term ~vc_term_loc ~vc_term_attrs ctx t =
+  match vc_term_loc with
+  | None -> false
+  | Some vc_term_loc ->
+      (* The transformation [split_vc] introduces also premises and variables in
+         the goal, so we search for the location of the VC term within the term
+         [t] where the contradiction has been detected. *)
+      let rec has_vc_term_loc t =
+        Opt.equal Loc.equal (Some vc_term_loc) t.t_loc || match t.t_node with
+        | Tbinop (Term.Timplies, _, t) -> has_vc_term_loc t
+        | Tquant (_, tq) -> let _,_,t = t_open_quant tq in has_vc_term_loc t
+        | Tlet (_, tb) -> let _,t = t_open_bound tb in has_vc_term_loc t
+        | _ -> false in
+      Sattr.mem ctx.c_attr vc_term_attrs &&
+      match ctx.c_loc with
+      | Some loc -> Loc.equal loc vc_term_loc
+      | None -> has_vc_term_loc t
+
+let ce_summary ~vc_term_loc ~vc_term_attrs = function
+  | Cannot_check_model {reason} ->
+      UNKNOWN reason
   | Check_model_result r ->
       match r.concrete.state with
-      | Rfailure -> NC r.concrete.exec_log
-      | Rstuck -> BAD
+      | Rfailure (ctx, t) ->
+          if is_vc_term ~vc_term_loc ~vc_term_attrs ctx t then
+            NC r.concrete.exec_log
+          else
+            BAD r.concrete.exec_log
+      | Rstuck ->
+          BAD r.concrete.exec_log
       | Rnormal -> (
           match r.abstract.state with
-          | Rfailure ->
+          | Rfailure _ ->
               SW r.abstract.exec_log
-          | Rnormal | Rstuck ->
-              BAD
+          | Rstuck -> BAD r.abstract.exec_log
+          | Rnormal -> BAD r.abstract.exec_log
           | Runknown ->
               if r.concrete.reason = r.abstract.reason then
                 UNKNOWN (sprintf "concrete RAC %s" r.concrete.reason)
@@ -154,7 +178,7 @@ let ce_summary = function
                            r.concrete.reason r.abstract.reason) )
       | Runknown -> (
           match r.abstract.state with
-          | Rfailure ->
+          | Rfailure _ ->
               NCSW r.abstract.exec_log
           | Rnormal | Runknown ->
               if r.concrete.reason = r.abstract.reason then
@@ -163,7 +187,7 @@ let ce_summary = function
                 UNKNOWN (sprintf "concrete RAC %s, abstract RAC %s"
                            r.concrete.reason r.abstract.reason)
           | Rstuck ->
-              BAD )
+              BAD r.abstract.exec_log )
 
 let print_counterexample ?verb_lvl ?check_ce ?json fmt (model,ce_summary) =
   fprintf fmt "@ @[<hov2>%a%t@]"
@@ -365,25 +389,13 @@ let find_rs_by_loc pm loc =
     | Udecl pd -> find_pdecl pd in
   find_in_list find_mod_unit pm.mod_units
 
-let is_vc_term ?vc_term_loc ?(vc_term_attrs=Sattr.empty) ctx t =
-  match vc_term_loc with
-  | None -> false
-  | Some vc_term_loc ->
-      (* The transformation [split_vc] introduces also premises and variables in
-         the goal, so we search for the location of the VC term within the term
-         [t] where the contradiction has been detected. *)
-      let rec has_vc_term_loc t =
-        Opt.equal Loc.equal (Some vc_term_loc) t.t_loc || match t.t_node with
-        | Tbinop (Term.Timplies, _, t) -> has_vc_term_loc t
-        | Tquant (_, tq) -> let _,_,t = t_open_quant tq in has_vc_term_loc t
-        | Tlet (_, tb) -> let _,t = t_open_bound tb in has_vc_term_loc t
-        | _ -> false in
-      Sattr.mem ctx.c_attr vc_term_attrs &&
-      match ctx.c_loc with
-      | Some loc -> Loc.equal loc vc_term_loc
-      | None -> has_vc_term_loc t
-
-let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
+let check_model_rs ?timelimit ?steplimit ~abstract reduce env pm model rs =
+  Debug.dprintf debug_check_ce "%s-step RAC@."
+    (if abstract then "Giant" else "Small");
+  let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
+  let get_value = get_value model mod_known th_known in
+  let rac = rac_config ~do_rac:true ~abstract ?timelimit ?steplimit
+      ~skip_cannot_compute:false ~reduce ~get_value () in
   let print_oloc =
     Pp.print_option_or_default "unknown location" Pretty.print_loc' in
   try
@@ -391,13 +403,9 @@ let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
     let reason = "no contradiction during execution" in
     {state= Rnormal; reason; exec_log= Log.close_log env.rac.log_uc}
   with
-  | Contr (ctx, t) when is_vc_term ?vc_term_loc ?vc_term_attrs ctx t ->
-      let reason = "counter-example confirmed" in
-      {state= Rfailure; reason; exec_log= Log.close_log ctx.c_log_uc}
   | Contr (ctx, t) ->
-      let reason = asprintf "contradiction for %s at %a, which \
-        doesn't match the VC goal" (describe_cntr_ctx ctx) print_oloc t.t_loc in
-      {state= Rstuck; reason; exec_log= Log.close_log ctx.c_log_uc}
+      let reason = "contradiction encountered" in
+      {state= Rfailure (ctx, t); reason; exec_log= Log.close_log ctx.c_log_uc}
   | RACStuck (env,l,reason) ->
       let reason = asprintf "%s at %a" reason print_oloc l in
       {state= Rstuck; reason; exec_log= Log.close_log env.rac.log_uc}
@@ -408,17 +416,6 @@ let check_model_rs ?vc_term_loc ?vc_term_attrs rac env pm rs =
   | CannotCompute r ->
       let reason = sprintf "terminated because %s" r.reason in
       {state= Runknown; reason; exec_log= Log.empty_log}
-
-let check_model_rs ?timelimit ?steplimit ~abstract reduce env pm model rs =
-  Debug.dprintf debug_check_ce "%s-step RAC@."
-    (if abstract then "Giant" else "Small");
-  let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
-  let vc_term_loc = Opt.get (get_model_term_loc model) in
-  let vc_term_attrs = get_model_term_attrs model in
-  let get_value = get_value model mod_known th_known in
-  let rac = rac_config ~do_rac:true ~abstract ?timelimit ?steplimit
-      ~skip_cannot_compute:false ~reduce ~get_value () in
-  check_model_rs ~vc_term_loc ~vc_term_attrs rac env pm rs
 
 let find_rs pm model =
   match get_model_term_loc model with
@@ -473,13 +470,13 @@ let prioritize_first_good_model: sort_models = fun models ->
   let good_models, other_models =
     let is_good (_,_,_,_,s) = match s with
       | NC _ | SW _ | NCSW _ -> true
-      | BAD | UNKNOWN _ -> false in
+      | BAD _ | UNKNOWN _ -> false in
     List.partition is_good models in
   if good_models = [] then
     (* No good models. Prioritize the last, non-empty model as it was done
        before 2020, but penalize bad models. *)
     let ce_summary_index = function
-      | UNKNOWN _ -> 0 | BAD -> 1
+      | UNKNOWN _ -> 0 | BAD _ -> 1
       | NC _ | SW _ | NCSW _ -> assert false in
     let compare = cmp [
         cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
@@ -490,7 +487,7 @@ let prioritize_first_good_model: sort_models = fun models ->
   else
     let ce_summary_index = function
       | NC _ -> 0 | SW _ -> 1 | NCSW _ -> 2
-      | UNKNOWN _ | BAD -> assert false in
+      | UNKNOWN _ | BAD _ -> assert false in
     let compare = cmp [
         (* prefer NC > SW > NCSW > UNKNOWN > BAD *)
         cmptr (fun (_,_,_,_,s) -> ce_summary_index s) (-);
@@ -533,7 +530,9 @@ let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
       (* Debug.dprintf debug_check_ce "@[<hv2>Model from prover:@\n@[%a@]@]@."
        *   (print_model ?me_name_trans:None ~print_attrs:false) m; *)
       let mr = check_model m in
-      let s = ce_summary mr in
+      let vc_term_loc = get_model_term_loc m in
+      let vc_term_attrs = get_model_term_attrs m in
+      let s = ce_summary ~vc_term_loc ~vc_term_attrs mr in
       Debug.dprintf debug_check_ce "@[<v2>Result of checking model %d: %a@]@." i
         (print_check_model_result ?verb_lvl) (mr, s);
       i,r,m,mr,s in
