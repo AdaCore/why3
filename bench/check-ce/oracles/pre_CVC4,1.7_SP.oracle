@@ -6,7 +6,7 @@
             Line 9:
               y = {"type": "Integer", "val": "42"}
             Line 11:
-              y_vc_constant = {"type": "Integer", "val": "0"}
+              y = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -16,7 +16,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/pre.mlw", line 9, characters 9-10: 42
 <check-ce>Result of checking model 0: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -37,7 +37,7 @@
                     x = 42
                   Property failure at precondition of `f` with:
                     x = 42
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -66,7 +66,7 @@
             Line 9:
               y = {"type": "Integer", "val": "42"}
             Line 11:
-              y_vc_constant = {"type": "Integer", "val": "42"}
+              y = {"type": "Integer", "val": "42"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -76,7 +76,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/pre.mlw", line 9, characters 9-10: 42
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -97,7 +97,7 @@
                     x = 42
                   Property failure at precondition of `f` with:
                     x = 42
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -126,7 +126,7 @@
             Line 9:
               y = {"type": "Integer", "val": "42"}
             Line 11:
-              y_vc_constant = {"type": "Integer", "val": "42"}
+              y = {"type": "Integer", "val": "42"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -136,7 +136,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/pre.mlw", line 9, characters 9-10: 42
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -157,7 +157,7 @@
                     x = 42
                   Property failure at precondition of `f` with:
                     x = 42
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -180,14 +180,14 @@
                     x = 42
 <check-ce-summary>Results:
 - Selected model 0: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
 - Checked model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/pre.mlw", line 11, characters 4-7)
 File "bench/check-ce/pre.mlw", line 11, characters 4-7:
 Sub-goal Precondition of goal g'vc.
 Prover result is: Unknown (sat) (0.06s, 4706 steps).
@@ -220,7 +220,7 @@ File pre.mlw:
             Line 9:
               y = {"type": "Integer", "val": "99"}
             Line 10:
-              y_vc_constant = {"type": "Integer", "val": "0"}
+              y = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -231,7 +231,7 @@ File pre.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/pre.mlw", line 9, characters 9-10: 99
 <check-ce>Result of checking model 0: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -257,7 +257,7 @@ File pre.mlw:
                 Line 10:
                   Property failure at postcondition of `g` with:
                     result = 100
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -286,7 +286,7 @@ File pre.mlw:
             Line 9:
               y = {"type": "Integer", "val": "99"}
             Line 10:
-              y_vc_constant = {"type": "Integer", "val": "99"}
+              y = {"type": "Integer", "val": "99"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -297,7 +297,7 @@ File pre.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/pre.mlw", line 9, characters 9-10: 99
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -323,7 +323,7 @@ File pre.mlw:
                 Line 10:
                   Property failure at postcondition of `g` with:
                     result = 100
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -352,7 +352,7 @@ File pre.mlw:
             Line 9:
               y = {"type": "Integer", "val": "99"}
             Line 10:
-              y_vc_constant = {"type": "Integer", "val": "99"}
+              y = {"type": "Integer", "val": "99"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -363,7 +363,7 @@ File pre.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/pre.mlw", line 9, characters 9-10: 99
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -389,7 +389,7 @@ File pre.mlw:
                 Line 10:
                   Property failure at postcondition of `g` with:
                     result = 100
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -414,17 +414,17 @@ File pre.mlw:
                     result = 100
 <check-ce-summary>Results:
 - Selected model 0: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
 - Checked model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/pre.mlw", line 10, characters 14-27)
 File "bench/check-ce/pre.mlw", line 10, characters 14-27:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (sat) (0.04s, 4715 steps).
+Prover result is: Unknown (sat) (0.03s, 4715 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

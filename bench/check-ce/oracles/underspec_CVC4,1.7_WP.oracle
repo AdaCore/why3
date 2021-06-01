@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.04s, 1016 steps).
+Prover result is: Valid (0.03s, 1016 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Checking model:
@@ -14,7 +14,7 @@ Prover result is: Valid (0.04s, 1016 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 17:
-              x1_vc_constant =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -42,7 +42,7 @@ Prover result is: Valid (0.04s, 1016 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -95,7 +95,7 @@ Prover result is: Valid (0.04s, 1016 steps).
                     _ = 1
                 Line 13:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
               
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Checking model:
@@ -109,7 +109,7 @@ Prover result is: Valid (0.04s, 1016 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 17:
-              x1_vc_constant =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -137,7 +137,7 @@ Prover result is: Valid (0.04s, 1016 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -190,7 +190,7 @@ Prover result is: Valid (0.04s, 1016 steps).
                     _ = 1
                 Line 13:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
               
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Checking model:
@@ -204,7 +204,7 @@ Prover result is: Valid (0.04s, 1016 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 17:
-              x1_vc_constant =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -232,7 +232,7 @@ Prover result is: Valid (0.04s, 1016 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -285,18 +285,18 @@ Prover result is: Valid (0.04s, 1016 steps).
                     _ = 1
                 Line 13:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
               
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
 - Checked model 1: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
 - Selected model 2: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (0.03s, 6176 steps).
@@ -313,11 +313,11 @@ File underspec.mlw:
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.02s, 1208 steps).
+Prover result is: Valid (0.01s, 1208 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.01s, 1134 steps).
+Prover result is: Valid (0.02s, 1134 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Checking model:
@@ -350,7 +350,7 @@ Prover result is: Valid (0.01s, 1134 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 47:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -373,7 +373,7 @@ Prover result is: Valid (0.01s, 1134 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -413,7 +413,7 @@ Prover result is: Valid (0.01s, 1134 steps).
                     _ = 1
                 Line 44:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
               
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Checking model:
@@ -446,7 +446,7 @@ Prover result is: Valid (0.01s, 1134 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 47:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -470,7 +470,7 @@ Prover result is: Valid (0.01s, 1134 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -510,7 +510,7 @@ Prover result is: Valid (0.01s, 1134 steps).
                     _ = 1
                 Line 44:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -578,7 +578,7 @@ Prover result is: Valid (0.01s, 1134 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 47:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -602,7 +602,7 @@ Prover result is: Valid (0.01s, 1134 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -642,7 +642,7 @@ Prover result is: Valid (0.01s, 1134 steps).
                     _ = 1
                 Line 44:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -681,14 +681,14 @@ Prover result is: Valid (0.01s, 1134 steps).
                     z = {contents= 2}
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
 - Selected model 1: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
 - Checked model 2: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Sub-goal Assertion of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (0.03s, 6083 steps).

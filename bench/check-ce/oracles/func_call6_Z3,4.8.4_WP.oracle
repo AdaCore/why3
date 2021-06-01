@@ -34,9 +34,9 @@
 <rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6)
+            - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `z` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `z` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8)
               
 <check-ce>Check model 1 ("bench/check-ce/func_call6.mlw", line 16, characters 11-17)
 <check-ce>Checking model:
@@ -69,7 +69,7 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 16:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -99,7 +99,7 @@
                                                                     2}
 <rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: ()
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -140,7 +140,7 @@
                 Line 16:
                   Property failure at assertion with:
                     z = {contents= 2}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -185,14 +185,14 @@
                     z = {contents= 2}
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `z` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8
+  - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `z` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8)
 - Selected model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
 File "bench/check-ce/func_call6.mlw", line 16, characters 11-17:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.80s).
+Prover result is: Step limit exceeded (0.78s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

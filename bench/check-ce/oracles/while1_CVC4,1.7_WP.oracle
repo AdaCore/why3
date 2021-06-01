@@ -1,6 +1,6 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.03s, 859 steps).
+Prover result is: Valid (0.05s, 859 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Sub-goal Loop variant decrease of goal f'vc.
@@ -14,7 +14,7 @@ Prover result is: Valid (0.02s, 1193 steps).
 <check-ce>Checking model:
           File while1.mlw:
             Line 5:
-              x_vc_constant =
+              x =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -56,7 +56,7 @@ Prover result is: Valid (0.02s, 1193 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -132,7 +132,7 @@ Prover result is: Valid (0.02s, 1193 steps).
                     arg = {contents= 2}
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC STUCK (when reaching the end of a loop iteration at "bench/check-ce/while1.mlw", line 8, characters 4-113)
+            - Abstract RAC: STUCK (when reaching the end of a loop iteration at "bench/check-ce/while1.mlw", line 8, characters 4-113)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -185,7 +185,7 @@ Prover result is: Valid (0.02s, 1193 steps).
 <check-ce>Checking model:
           File while1.mlw:
             Line 5:
-              x_vc_constant =
+              x =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -227,7 +227,7 @@ Prover result is: Valid (0.02s, 1193 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -303,7 +303,7 @@ Prover result is: Valid (0.02s, 1193 steps).
                     arg = {contents= 2}
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/while1.mlw", line 5, characters 12-22)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -347,7 +347,7 @@ Prover result is: Valid (0.02s, 1193 steps).
 <check-ce>Checking model:
           File while1.mlw:
             Line 5:
-              x_vc_constant =
+              x =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -389,7 +389,7 @@ Prover result is: Valid (0.02s, 1193 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -465,7 +465,7 @@ Prover result is: Valid (0.02s, 1193 steps).
                     arg = {contents= 2}
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/while1.mlw", line 5, characters 12-22)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -507,14 +507,14 @@ Prover result is: Valid (0.02s, 1193 steps).
                     result = 0
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC STUCK, when reaching the end of a loop iteration at "bench/check-ce/while1.mlw", line 8, characters 4-113
+  - Concrete RAC: NORMAL
+  - Abstract RAC: STUCK (when reaching the end of a loop iteration at "bench/check-ce/while1.mlw", line 8, characters 4-113)
 - Selected model 1: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/while1.mlw", line 5, characters 12-22)
 - Checked model 2: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/while1.mlw", line 5, characters 12-22)
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (0.03s, 6037 steps).

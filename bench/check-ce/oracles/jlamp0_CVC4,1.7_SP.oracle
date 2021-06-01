@@ -23,7 +23,7 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 12:
-              a_vc_constant =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -44,7 +44,7 @@
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
+            - Concrete RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -66,7 +66,7 @@
                   Execution got stuck at precondition of `p1` with:
                     a = {contents= 0}
                     b = {contents= 0}
-            - Abstract RAC STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
+            - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -113,7 +113,7 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
             Line 12:
-              a_vc_constant =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -139,7 +139,7 @@
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -184,7 +184,7 @@
                 Line 12:
                   Property failure at assertion with:
                     a = {contents= 3}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -246,7 +246,7 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
             Line 12:
-              a_vc_constant =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -272,7 +272,7 @@
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -317,7 +317,7 @@
                 Line 12:
                   Property failure at assertion with:
                     a = {contents= 3}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -356,17 +356,17 @@
                     a = {contents= 3}
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC STUCK, failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8
-  - Abstract RAC STUCK, failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8
+  - Concrete RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
+  - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
 - Selected model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Sub-goal Assertion of goal p1'vc.
-Prover result is: Unknown (unknown + incomplete) (0.05s, 6269 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 6269 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -438,7 +438,7 @@ File jlamp0.mlw:
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              a_vc_constant =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -473,7 +473,7 @@ File jlamp0.mlw:
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
+            - Concrete RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -495,7 +495,7 @@ File jlamp0.mlw:
                   Execution got stuck at precondition of `p1` with:
                     a = {contents= 0}
                     b = {contents= 0}
-            - Abstract RAC STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
+            - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -541,7 +541,7 @@ File jlamp0.mlw:
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "9"}}]}}
-              a_vc_constant =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -587,7 +587,7 @@ File jlamp0.mlw:
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -667,7 +667,7 @@ File jlamp0.mlw:
                 Line 10:
                   Property failure at postcondition of `p1` with:
                     a = {contents= 9}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -747,7 +747,7 @@ File jlamp0.mlw:
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "9"}}]}}
-              a_vc_constant =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -793,7 +793,7 @@ File jlamp0.mlw:
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -873,7 +873,7 @@ File jlamp0.mlw:
                 Line 10:
                   Property failure at postcondition of `p1` with:
                     a = {contents= 9}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -931,14 +931,14 @@ File jlamp0.mlw:
                     a = {contents= 9}
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC STUCK, failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8
-  - Abstract RAC STUCK, failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8
+  - Concrete RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
+  - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
 - Selected model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
 Prover result is: Unknown (unknown + incomplete) (0.04s, 6467 steps).
@@ -1048,7 +1048,7 @@ File jlamp0.mlw:
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-              a_vc_constant =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1076,7 +1076,7 @@ File jlamp0.mlw:
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
+            - Concrete RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1098,7 +1098,7 @@ File jlamp0.mlw:
                   Execution got stuck at precondition of `p1` with:
                     a = {contents= 0}
                     b = {contents= 0}
-            - Abstract RAC STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
+            - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1144,7 +1144,7 @@ File jlamp0.mlw:
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "5"}}]}}
-              a_vc_constant =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1178,7 +1178,7 @@ File jlamp0.mlw:
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1236,7 +1236,7 @@ File jlamp0.mlw:
                 Line 10:
                   Property failure at postcondition of `p1` with:
                     a = {contents= 5}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1305,7 +1305,7 @@ File jlamp0.mlw:
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "5"}}]}}
-              a_vc_constant =
+              a =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1339,7 +1339,7 @@ File jlamp0.mlw:
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
                                                                     3}
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1397,7 +1397,7 @@ File jlamp0.mlw:
                 Line 10:
                   Property failure at postcondition of `p1` with:
                     a = {contents= 5}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1444,17 +1444,17 @@ File jlamp0.mlw:
                     a = {contents= 5}
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC STUCK, failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8
-  - Abstract RAC STUCK, failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8
+  - Concrete RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
+  - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0.mlw", line 8, characters 6-8)
 - Selected model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6405 steps).
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6405 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1533,7 +1533,7 @@ File jlamp0.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 22:
-              c_vc_constant =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1562,7 +1562,7 @@ File jlamp0.mlw:
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1596,7 +1596,7 @@ File jlamp0.mlw:
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Checking model:
@@ -1616,7 +1616,7 @@ File jlamp0.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
             Line 22:
-              c_vc_constant =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1646,7 +1646,7 @@ File jlamp0.mlw:
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1680,7 +1680,7 @@ File jlamp0.mlw:
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1734,7 +1734,7 @@ File jlamp0.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
             Line 22:
-              c_vc_constant =
+              c =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -1764,7 +1764,7 @@ File jlamp0.mlw:
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1798,7 +1798,7 @@ File jlamp0.mlw:
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -1836,17 +1836,17 @@ File jlamp0.mlw:
                     c = {contents= 1}
 <check-ce-summary>Results:
 - Selected model 0: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 - Checked model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6106 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6106 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1885,7 +1885,7 @@ File jlamp0.mlw:
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Valid (0.02s, 1180 steps).
+Prover result is: Valid (0.01s, 1180 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>Checking model:
@@ -1932,7 +1932,7 @@ Prover result is: Valid (0.02s, 1180 steps).
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "0"}}]}}
-                c_vc_constant =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -1975,7 +1975,7 @@ Prover result is: Valid (0.02s, 1180 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2009,7 +2009,7 @@ Prover result is: Valid (0.02s, 1180 steps).
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>Checking model:
@@ -2056,7 +2056,7 @@ Prover result is: Valid (0.02s, 1180 steps).
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "4"}}]}}
-                c_vc_constant =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -2100,7 +2100,7 @@ Prover result is: Valid (0.02s, 1180 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2134,7 +2134,7 @@ Prover result is: Valid (0.02s, 1180 steps).
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2215,7 +2215,7 @@ Prover result is: Valid (0.02s, 1180 steps).
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "4"}}]}}
-                c_vc_constant =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -2259,7 +2259,7 @@ Prover result is: Valid (0.02s, 1180 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2293,7 +2293,7 @@ Prover result is: Valid (0.02s, 1180 steps).
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2331,17 +2331,17 @@ Prover result is: Valid (0.02s, 1180 steps).
                     c = {contents= 1}
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 - Checked model 1: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 - Selected model 2: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Sub-goal Loop variant decrease of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6471 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6471 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -2384,7 +2384,7 @@ Sorry, we don't have a good counterexample for you :(
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "0"}}]}}
               Line 22:
-                c_vc_constant =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -2427,7 +2427,7 @@ Sorry, we don't have a good counterexample for you :(
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2461,7 +2461,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 <check-ce>Checking model:
@@ -2502,7 +2502,7 @@ Sorry, we don't have a good counterexample for you :(
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "10"}}]}}
               Line 22:
-                c_vc_constant =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -2546,7 +2546,7 @@ Sorry, we don't have a good counterexample for you :(
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2580,7 +2580,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2655,7 +2655,7 @@ Sorry, we don't have a good counterexample for you :(
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "10"}}]}}
               Line 22:
-                c_vc_constant =
+                c =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -2699,7 +2699,7 @@ Sorry, we don't have a good counterexample for you :(
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2733,7 +2733,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2771,17 +2771,17 @@ Sorry, we don't have a good counterexample for you :(
                     c = {contents= 1}
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 - Checked model 1: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 - Selected model 2: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6442 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6442 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -2824,7 +2824,7 @@ Sorry, we don't have a good counterexample for you :(
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "0"}}]}}
               Line 23:
-                a_vc_constant =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -2867,7 +2867,7 @@ Sorry, we don't have a good counterexample for you :(
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -2901,7 +2901,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 23, characters 18-31)
 <check-ce>Checking model:
@@ -2942,7 +2942,7 @@ Sorry, we don't have a good counterexample for you :(
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "8"}}]}}
               Line 23:
-                a_vc_constant =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -2986,7 +2986,7 @@ Sorry, we don't have a good counterexample for you :(
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -3020,7 +3020,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -3095,7 +3095,7 @@ Sorry, we don't have a good counterexample for you :(
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "8"}}]}}
               Line 23:
-                a_vc_constant =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -3139,7 +3139,7 @@ Sorry, we don't have a good counterexample for you :(
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -3173,7 +3173,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -3211,17 +3211,17 @@ Sorry, we don't have a good counterexample for you :(
                     c = {contents= 1}
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 - Checked model 1: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 - Selected model 2: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6515 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6515 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -3250,7 +3250,7 @@ Sorry, we don't have a good counterexample for you :(
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "0"}}]}}
-                a_vc_constant =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -3299,7 +3299,7 @@ Sorry, we don't have a good counterexample for you :(
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -3333,7 +3333,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
               
 <check-ce>Check model 1 ("bench/check-ce/jlamp0.mlw", line 19, characters 15-28)
 <check-ce>Checking model:
@@ -3360,7 +3360,7 @@ Sorry, we don't have a good counterexample for you :(
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "3"}}]}}
-                a_vc_constant =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -3410,7 +3410,7 @@ Sorry, we don't have a good counterexample for you :(
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -3444,7 +3444,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -3505,7 +3505,7 @@ Sorry, we don't have a good counterexample for you :(
                     {"Field":
                       [{"field": "contents",
                         "value": {"type": "Integer", "val": "3"}}]}}
-                a_vc_constant =
+                a =
                   {"type": "Record",
                    "val":
                     {"Field":
@@ -3555,7 +3555,7 @@ Sorry, we don't have a good counterexample for you :(
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: BAD
-            - Concrete RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -3589,7 +3589,7 @@ Sorry, we don't have a good counterexample for you :(
                 Line 22:
                   Property failure at loop invariant init with:
                     c = {contents= 1}
-            - Abstract RAC STUCK (contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal)
+            - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -3627,17 +3627,17 @@ Sorry, we don't have a good counterexample for you :(
                     c = {contents= 1}
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/jlamp0.mlw", line 20, characters 4-10)
 - Checked model 1: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 - Selected model 2: BAD
-  - Concrete RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
-  - Abstract RAC STUCK, contradiction for loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31, which doesn't match the VC goal
+  - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
+  - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Sub-goal Postcondition of goal p2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6316 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6316 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

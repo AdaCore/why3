@@ -38,7 +38,7 @@ Prover result is: Valid (0.03s, 1545 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -78,7 +78,7 @@ Prover result is: Valid (0.03s, 1545 steps).
                     _ = 1
                 Line 10:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6)
               
 <check-ce>Check model 1 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Checking model:
@@ -111,7 +111,7 @@ Prover result is: Valid (0.03s, 1545 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 13:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -135,7 +135,7 @@ Prover result is: Valid (0.03s, 1545 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -175,7 +175,7 @@ Prover result is: Valid (0.03s, 1545 steps).
                     _ = 1
                 Line 10:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call.mlw", line 13, characters 11-16)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -214,14 +214,14 @@ Prover result is: Valid (0.03s, 1545 steps).
                     z = {contents= 2}
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6)
 - Selected model 1: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call.mlw", line 13, characters 11-16)
 File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.81s).
+Prover result is: Step limit exceeded (0.74s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:

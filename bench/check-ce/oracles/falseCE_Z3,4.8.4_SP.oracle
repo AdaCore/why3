@@ -17,7 +17,7 @@
 <rac-values>Value from model for parameter `a` at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 1
 <rac-values>Value from model for parameter `b` at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 12166397
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
+            - Concrete RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -39,7 +39,7 @@
                   Execution got stuck at precondition of `rsa` with:
                     a = 1
                     b = 12166397
-            - Abstract RAC STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
+            - Abstract RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -63,11 +63,11 @@
                     b = 12166397
 <check-ce-summary>Results:
 - Selected model 0: BAD
-  - Concrete RAC STUCK, failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7
-  - Abstract RAC STUCK, failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7
+  - Concrete RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
+  - Abstract RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
 File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
 Sub-goal Assertion of goal rsa'vc.
-Prover result is: Step limit exceeded (0.08s).
+Prover result is: Step limit exceeded (0.06s).
 Sorry, we don't have a good counterexample for you :(
 
 

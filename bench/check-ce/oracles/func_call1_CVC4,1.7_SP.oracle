@@ -39,7 +39,7 @@ Prover result is: Valid (0.02s, 901 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 15:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -63,7 +63,7 @@ Prover result is: Valid (0.02s, 901 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -110,7 +110,7 @@ Prover result is: Valid (0.02s, 901 steps).
                     _ = 3
                 Line 12:
                   Execution of main function terminated normally
-            - Abstract RAC STUCK (failure in postcondition of `g` at "bench/check-ce/func_call1.mlw", line 7, characters 12-21)
+            - Abstract RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call1.mlw", line 7, characters 12-21)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -178,7 +178,7 @@ Prover result is: Valid (0.02s, 901 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 15:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -202,7 +202,7 @@ Prover result is: Valid (0.02s, 901 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -249,7 +249,7 @@ Prover result is: Valid (0.02s, 901 steps).
                     _ = 3
                 Line 12:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call1.mlw", line 15, characters 11-16)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -319,7 +319,7 @@ Prover result is: Valid (0.02s, 901 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 15:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -343,7 +343,7 @@ Prover result is: Valid (0.02s, 901 steps).
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -390,7 +390,7 @@ Prover result is: Valid (0.02s, 901 steps).
                     _ = 3
                 Line 12:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call1.mlw", line 15, characters 11-16)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -431,17 +431,17 @@ Prover result is: Valid (0.02s, 901 steps).
                     z = {contents= 2}
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC STUCK, failure in postcondition of `g` at "bench/check-ce/func_call1.mlw", line 7, characters 12-21
+  - Concrete RAC: NORMAL
+  - Abstract RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call1.mlw", line 7, characters 12-21)
 - Selected model 1: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call1.mlw", line 15, characters 11-16)
 - Checked model 2: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call1.mlw", line 15, characters 11-16)
 File "bench/check-ce/func_call1.mlw", line 15, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6083 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6083 steps).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:

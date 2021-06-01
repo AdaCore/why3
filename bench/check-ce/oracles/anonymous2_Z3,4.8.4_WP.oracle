@@ -23,9 +23,9 @@
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/anonymous2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for parameter `x`)
+            - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
 <check-ce>Checking model:
@@ -40,7 +40,7 @@
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 9:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -64,7 +64,7 @@
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
 <check-ce>Result of checking model 1: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -100,7 +100,7 @@
                     _ = 1
                 Line 5:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -136,14 +136,14 @@
                     z = {contents= 0}
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for parameter `x`
-  - Abstract RAC UNKNOWN, terminated because missing value for parameter `x`
+  - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
+  - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
 - Selected model 1: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
 File "bench/check-ce/anonymous2.mlw", line 9, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.82s).
+Prover result is: Step limit exceeded (0.76s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:

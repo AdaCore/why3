@@ -1,14 +1,14 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.01s, 24 steps).
+Prover result is: Valid (0.03s, 24 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.01s, 1775 steps).
+Prover result is: Valid (0.02s, 1775 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.00s, 1646 steps).
+Prover result is: Valid (0.01s, 1646 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce>Checking model:
@@ -37,7 +37,7 @@ Prover result is: Valid (0.00s, 1646 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -113,13 +113,13 @@ Prover result is: Valid (0.00s, 1646 steps).
                     arg = {contents= 2}
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `i` at "bench/check-ce/while1.mlw", line 8, characters 4-113)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `i` at "bench/check-ce/while1.mlw", line 8, characters 4-113)
               
 <check-ce>Check model 1 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce>Checking model:
           File while1.mlw:
             Line 5:
-              x_vc_constant =
+              x =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -161,7 +161,7 @@ Prover result is: Valid (0.00s, 1646 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -237,7 +237,7 @@ Prover result is: Valid (0.00s, 1646 steps).
                     arg = {contents= 2}
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/while1.mlw", line 5, characters 12-22)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -279,14 +279,14 @@ Prover result is: Valid (0.00s, 1646 steps).
                     result = 0
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `i` at "bench/check-ce/while1.mlw", line 8, characters 4-113
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `i` at "bench/check-ce/while1.mlw", line 8, characters 4-113)
 - Selected model 1: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/while1.mlw", line 5, characters 12-22)
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Step limit exceeded (1.00s).
+Prover result is: Step limit exceeded (1.09s).
 The contracts of some function or loop are underspecified, for example during
   the following execution:
 File int.mlw:
