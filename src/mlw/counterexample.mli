@@ -63,7 +63,11 @@ val check_model : ?timelimit:float -> ?steplimit:int -> rac_reduce_config ->
     (the program corresponding to the model is obtained from the location in the
     model) *)
 
-val print_full_verdict : ?verb_lvl:int -> result Pp.pp
+val print_result : result Pp.pp
+(** Print the result state, and the reason for stuck and unknown *)
+
+val print_full_result : ?verb_lvl:int -> result Pp.pp
+(** Like [print_result] but print also the execution log *)
 
 (** {2 Summary of checking models} *)
 

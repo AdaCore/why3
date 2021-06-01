@@ -115,9 +115,20 @@ let print_result_state fmt = function
   | Rstuck -> fprintf fmt "STUCK"
   | Runknown -> fprintf fmt "UNKNOWN"
 
-let print_full_verdict ?verb_lvl fmt v =
-  fprintf fmt "%a (%s)@,%a"
-    print_result_state v.state v.reason (Log.print_log ?verb_lvl ~json:false) v.exec_log
+let print_result fmt r =
+  match r.state with
+  | Rnormal -> fprintf fmt "NORMAL"
+  | Rfailure (ctx, t) ->
+      fprintf fmt "FAILURE (%a at %a)"
+        Vc.print_expl ctx.Pinterp.c_attr
+        (Pp.print_option_or_default "unknown location" Pretty.print_loc')
+        (match ctx.Pinterp.c_loc with Some _ as loc -> loc | _ -> t.Term.t_loc)
+  | Rstuck -> fprintf fmt "STUCK (%s)" r.reason
+  | Runknown -> fprintf fmt "UNKNOWN (%s)" r.reason
+
+let print_full_result ?verb_lvl fmt v =
+  fprintf fmt "%a@,%a"
+    print_result v (Log.print_log ?verb_lvl ~json:false) v.exec_log
 
 type check_model_result =
   | Cannot_check_model of {reason: string}
@@ -128,11 +139,11 @@ let print_result_summary print_result fmt (mr, s) =
   | Cannot_check_model {reason} ->
       fprintf fmt "CANNOT CHECK: %s" reason
   | Check_model_result r ->
-      fprintf fmt "%a@\n@[<v2>- Concrete RAC %a@]@\n@[<v2>- Abstract RAC %a@]"
+      fprintf fmt "%a@\n@[<v2>- Concrete RAC: %a@]@\n@[<v2>- Abstract RAC: %a@]"
         print_ce_summary_kind s print_result r.concrete print_result r.abstract
 
 let print_check_model_result ?verb_lvl =
-  print_result_summary (print_full_verdict ?verb_lvl)
+  print_result_summary (print_full_result ?verb_lvl)
 
 let is_vc_term ~vc_term_loc ~vc_term_attrs ctx t =
   match vc_term_loc with
@@ -499,9 +510,8 @@ let prioritize_first_good_model: sort_models = fun models ->
 let print_dbg_model selected_ix fmt (i,_,_,mr,s) =
   let mark_selected fmt =
     Pp.string fmt (if selected_ix = Some i then "Selected" else "Checked") in
-  let pp_res fmt r = fprintf fmt "%a, %s" print_result_state r.state r.reason in
   fprintf fmt "- @[<v>%t model %d: %a@]" mark_selected i
-    (print_result_summary pp_res) (mr, s)
+    (print_result_summary print_result) (mr, s)
 
 let select_model ?verb_lvl ?(check=false) ?(reduce_config=rac_reduce_config ())
     ?timelimit ?steplimit ?sort_models env pmodule models =
