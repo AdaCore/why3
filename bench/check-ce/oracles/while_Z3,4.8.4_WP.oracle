@@ -1,17 +1,17 @@
-File "bench/check-ce/while.mlw", line 10, characters 25-32:
+File "bench/check-ce/while.mlw", line 11, characters 25-32:
 Sub-goal Loop invariant init of goal f'vc.
 Prover result is: Valid (0.02s, 96 steps).
 
-File "bench/check-ce/while.mlw", line 9, characters 14-19:
+File "bench/check-ce/while.mlw", line 10, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
 Prover result is: Valid (0.01s, 1788 steps).
 
-<check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
+<check-ce>Check model 0 ("bench/check-ce/while.mlw", line 11, characters 25-32)
 <check-ce>Checking model:
           File while.mlw:
-            Line 10:
+            Line 11:
               the check fails with all inputs
-            Line 12:
+            Line 13:
               x1 =
                 {"type": "Record",
                  "val":
@@ -29,10 +29,10 @@ Prover result is: Valid (0.01s, 1788 steps).
               
             - Abstract RAC UNKNOWN (terminated because missing value for parameter `z`)
               
-<check-ce>Check model 1 ("bench/check-ce/while.mlw", line 10, characters 25-32)
+<check-ce>Check model 1 ("bench/check-ce/while.mlw", line 11, characters 25-32)
 <check-ce>Checking model:
           File while.mlw:
-            Line 8:
+            Line 9:
               i =
                 {"type": "Record",
                  "val":
@@ -51,21 +51,21 @@ Prover result is: Valid (0.01s, 1788 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-2"}}]}}
-            Line 10:
+            Line 11:
               x1_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
-            Line 12:
+            Line 13:
               x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
-            Line 15:
+            Line 16:
               i =
                 {"type": "Record",
                  "val":
@@ -90,28 +90,28 @@ Prover result is: Valid (0.01s, 1788 steps).
 - Selected model 1: UNKNOWN
   - Concrete RAC UNKNOWN, terminated because missing value for parameter `z`
   - Abstract RAC UNKNOWN, terminated because missing value for parameter `z`
-File "bench/check-ce/while.mlw", line 10, characters 25-32:
+File "bench/check-ce/while.mlw", line 11, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Step limit exceeded (1.03s).
+Prover result is: Step limit exceeded (1.06s).
 The following counterexample model could not be verified
   (concrete RAC terminated because missing value for parameter `z`):
 File while.mlw:
-  Line 8:
+  Line 9:
     [before iteration] i = 0
     [current iteration] i = 0
     [before iteration] x1 = -2
-  Line 10:
+  Line 11:
     [current iteration] x1 = -1
-  Line 12:
+  Line 13:
     [current iteration] x1 = -1
-  Line 15:
+  Line 16:
     [current iteration] i = 1
 
-File "bench/check-ce/while.mlw", line 9, characters 14-19:
+File "bench/check-ce/while.mlw", line 10, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
 Prover result is: Valid (0.01s, 1785 steps).
 
-File "bench/check-ce/while.mlw", line 10, characters 25-32:
+File "bench/check-ce/while.mlw", line 11, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Valid (0.01s, 1720 steps).
 

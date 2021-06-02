@@ -1,0 +1,101 @@
+<check-ce>Check model 0 ("bench/check-ce/test_result_ce_value0.mlw", line 9, characters 11-18)
+<check-ce>Checking model:
+          File test_result_ce_value0.mlw:
+            Line 4:
+              a = {"type": "Integer", "val": "42"}
+              x = {"type": "Integer", "val": "0"}
+            Line 6:
+              x = {"type": "Integer", "val": "0"}
+            Line 8:
+              a = {"type": "Integer", "val": "42"}
+            Line 9:
+              a_vc_constant = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value0.mlw", line 6, characters 11-12: 0
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value0.mlw", line 6, characters 11-12: 0
+<check-ce>Result of checking model 0: UNKNOWN
+            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14)
+              
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14)
+              
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value0.mlw", line 9, characters 11-18)
+<check-ce>Checking model:
+          File test_result_ce_value0.mlw:
+            Line 4:
+              a = {"type": "Integer", "val": "42"}
+              x = {"type": "Integer", "val": "0"}
+            Line 6:
+              x = {"type": "Integer", "val": "0"}
+            Line 8:
+              a = {"type": "Integer", "val": "42"}
+            Line 9:
+              a_vc_constant = {"type": "Integer", "val": "42"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value0.mlw", line 6, characters 11-12: 0
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value0.mlw", line 6, characters 11-12: 0
+<check-ce>Result of checking model 1: UNKNOWN
+            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14)
+              
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14)
+              
+<check-ce>Check model 2 ("bench/check-ce/test_result_ce_value0.mlw", line 9, characters 11-18)
+<check-ce>Checking model:
+          File test_result_ce_value0.mlw:
+            Line 4:
+              a = {"type": "Integer", "val": "42"}
+              x = {"type": "Integer", "val": "0"}
+            Line 6:
+              x = {"type": "Integer", "val": "0"}
+            Line 8:
+              a = {"type": "Integer", "val": "42"}
+            Line 9:
+              a_vc_constant = {"type": "Integer", "val": "42"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value0.mlw", line 6, characters 11-12: 0
+<check-ce>Small-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value0.mlw", line 6, characters 11-12: 0
+<check-ce>Result of checking model 2: UNKNOWN
+            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14)
+              
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14)
+              
+<check-ce-summary>Results:
+- Checked model 0: UNKNOWN
+  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14
+- Checked model 1: UNKNOWN
+  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14
+- Selected model 2: UNKNOWN
+  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14
+File "bench/check-ce/test_result_ce_value0.mlw", line 9, characters 11-18:
+Sub-goal Assertion of goal test2'vc.
+Prover result is: Unknown (sat) (0.06s, 4749 steps).
+The following counterexample model could not be verified
+  (concrete RAC terminated because missing value for variable `result` at "bench/check-ce/test_result_ce_value0.mlw", line 8, characters 10-14):
+File test_result_ce_value0.mlw:
+  Line 4:
+    a = 42 (0X2A)
+    x = 0
+  Line 6:
+    x = 0
+  Line 8:
+    a = 42 (0X2A)
+  Line 9:
+    a = 42 (0X2A)
+

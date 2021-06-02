@@ -13,6 +13,9 @@ File records.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 15:
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+  Line 17:
     result [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records.mlw", line 15, characters 14-24:
@@ -375,6 +378,9 @@ File records.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 65:
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
+  Line 67:
     result [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records.mlw", line 65, characters 14-24:

@@ -1,16 +1,16 @@
-<check-ce>Check model 0 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
+<check-ce>Check model 0 ("bench/check-ce/anonymous2.mlw", line 12, characters 11-16)
 <check-ce>Checking model:
           File anonymous2.mlw:
             Line 5:
               x = {"type": "Integer", "val": "0"}
-            Line 8:
+            Line 11:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 9:
+            Line 12:
               z_vc_constant =
                 {"type": "Record",
                  "val":
@@ -88,19 +88,19 @@
                     one = 1
                   Execution got stuck at precondition of `f` with:
                     x = 0
-<check-ce>Check model 1 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
+<check-ce>Check model 1 ("bench/check-ce/anonymous2.mlw", line 12, characters 11-16)
 <check-ce>Checking model:
           File anonymous2.mlw:
             Line 5:
               x = {"type": "Integer", "val": "1"}
-            Line 8:
+            Line 11:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 9:
+            Line 12:
               z_vc_constant =
                 {"type": "Record",
                  "val":
@@ -114,9 +114,9 @@
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/anonymous2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
-<rac-values>Value from model for variable `z` at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/anonymous2.mlw", line 11, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 11, characters 2-25: {contents=
                                                                     0}
-<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: ()
+<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous2.mlw", line 11, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 11, characters 2-25: ()
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -151,7 +151,7 @@
                     x = 1
                     zero = 0
                     one = 1
-                Line 8:
+                Line 11:
                   Concrete execution of function `h` with args:
                     y = 1
                   Concrete execution of function `contents` with args:
@@ -187,27 +187,27 @@
                     x = 1
                     zero = 0
                     one = 1
-                Line 8:
+                Line 11:
                   Abstract execution of function `h` with args:
                     y = 1
                   z = {contents= 0}
                   result = ()
-                Line 9:
+                Line 12:
                   Property failure at assertion with:
                     z = {contents= 0}
-<check-ce>Check model 2 ("bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
+<check-ce>Check model 2 ("bench/check-ce/anonymous2.mlw", line 12, characters 11-16)
 <check-ce>Checking model:
           File anonymous2.mlw:
             Line 5:
               x = {"type": "Integer", "val": "1"}
-            Line 8:
+            Line 11:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 9:
+            Line 12:
               z_vc_constant =
                 {"type": "Record",
                  "val":
@@ -221,9 +221,9 @@
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/anonymous2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous2.mlw", line 5, characters 7-8: 1
-<rac-values>Value from model for variable `z` at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/anonymous2.mlw", line 11, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 11, characters 2-25: {contents=
                                                                     0}
-<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25: ()
+<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous2.mlw", line 11, characters 2-25 at "bench/check-ce/anonymous2.mlw", line 11, characters 2-25: ()
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -258,7 +258,7 @@
                     x = 1
                     zero = 0
                     one = 1
-                Line 8:
+                Line 11:
                   Concrete execution of function `h` with args:
                     y = 1
                   Concrete execution of function `contents` with args:
@@ -294,12 +294,12 @@
                     x = 1
                     zero = 0
                     one = 1
-                Line 8:
+                Line 11:
                   Abstract execution of function `h` with args:
                     y = 1
                   z = {contents= 0}
                   result = ()
-                Line 9:
+                Line 12:
                   Property failure at assertion with:
                     z = {contents= 0}
 <check-ce-summary>Results:
@@ -312,11 +312,11 @@
 - Checked model 2: SW
   - Concrete RAC NORMAL, no contradiction during execution
   - Abstract RAC FAILURE, counter-example confirmed
-File "bench/check-ce/anonymous2.mlw", line 9, characters 11-16:
+File "bench/check-ce/anonymous2.mlw", line 12, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.06s, 6026 steps).
-The contracts of some function or loop are underspecified, for example during
-  the following execution:
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6026 steps).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
@@ -342,12 +342,12 @@ File anonymous2.mlw:
       x = 1
       zero = 0
       one = 1
-  Line 8:
+  Line 11:
     Abstract execution of function `h` with args:
       y = 1
     z = {contents= 0}
     result = ()
-  Line 9:
+  Line 12:
     Property failure at assertion with:
       z = {contents= 0}
 

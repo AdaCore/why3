@@ -1,11 +1,11 @@
-<check-ce>Check model 0 ("bench/check-ce/var_clones.mlw", line 9, characters 13-39)
+<check-ce>Check model 0 ("bench/check-ce/var_clones.mlw", line 10, characters 13-39)
 <check-ce>Checking model:
           File var_clones.mlw:
             Line 6:
               n = {"type": "Integer", "val": "111"}
             Line 7:
               n = {"type": "Integer", "val": "222"}
-            Line 9:
+            Line 10:
               the check fails with all inputs
 <check-ce>Giant-step RAC
 <rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 6, characters 2-16: 111
@@ -31,7 +31,7 @@
                     _ = ()
                     n = 111
                     n = 222
-                Line 9:
+                Line 10:
                   Property failure at assertion with:
                     n = 111
                     n = 222
@@ -50,18 +50,18 @@
                     _ = ()
                     n = 111
                     n = 222
-                Line 9:
+                Line 10:
                   Property failure at assertion with:
                     n = 111
                     n = 222
-<check-ce>Check model 1 ("bench/check-ce/var_clones.mlw", line 9, characters 13-39)
+<check-ce>Check model 1 ("bench/check-ce/var_clones.mlw", line 10, characters 13-39)
 <check-ce>Checking model:
           File var_clones.mlw:
             Line 6:
               n = {"type": "Integer", "val": "111"}
             Line 7:
               n = {"type": "Integer", "val": "222"}
-            Line 9:
+            Line 10:
               n_vc_constant = {"type": "Integer", "val": "222"}
 <check-ce>Giant-step RAC
 <rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 6, characters 2-16: 111
@@ -87,7 +87,7 @@
                     _ = ()
                     n = 111
                     n = 222
-                Line 9:
+                Line 10:
                   Property failure at assertion with:
                     n = 111
                     n = 222
@@ -106,18 +106,18 @@
                     _ = ()
                     n = 111
                     n = 222
-                Line 9:
+                Line 10:
                   Property failure at assertion with:
                     n = 111
                     n = 222
-<check-ce>Check model 2 ("bench/check-ce/var_clones.mlw", line 9, characters 13-39)
+<check-ce>Check model 2 ("bench/check-ce/var_clones.mlw", line 10, characters 13-39)
 <check-ce>Checking model:
           File var_clones.mlw:
             Line 6:
               n = {"type": "Integer", "val": "111"}
             Line 7:
               n = {"type": "Integer", "val": "222"}
-            Line 9:
+            Line 10:
               n_vc_constant = {"type": "Integer", "val": "222"}
 <check-ce>Giant-step RAC
 <rac-values>Value from model for global `n` at "bench/check-ce/var_clones.mlw", line 6, characters 2-16: 111
@@ -143,7 +143,7 @@
                     _ = ()
                     n = 111
                     n = 222
-                Line 9:
+                Line 10:
                   Property failure at assertion with:
                     n = 111
                     n = 222
@@ -162,7 +162,7 @@
                     _ = ()
                     n = 111
                     n = 222
-                Line 9:
+                Line 10:
                   Property failure at assertion with:
                     n = 111
                     n = 222
@@ -176,7 +176,7 @@
 - Checked model 2: NC
   - Concrete RAC FAILURE, counter-example confirmed
   - Abstract RAC FAILURE, counter-example confirmed
-File "bench/check-ce/var_clones.mlw", line 9, characters 13-39:
+File "bench/check-ce/var_clones.mlw", line 10, characters 13-39:
 Sub-goal Assertion of goal f'vc.
 Prover result is: Unknown (sat) (0.02s, 163 steps).
 The program does not comply to the verification goal, for example during the
@@ -195,7 +195,7 @@ File var_clones.mlw:
       _ = ()
       n = 111
       n = 222
-  Line 9:
+  Line 10:
     Property failure at assertion with:
       n = 111
       n = 222

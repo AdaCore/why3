@@ -30,9 +30,10 @@
                     y = 0
                     zero = 0
                     one = 1
-                Line 9:
+                Line 11:
                   Concrete execution of function `f` with args:
                     x = 0
+                Line 10:
                   Concrete execution of function `(@)` with args:
                     u = (fun y -> assume { y > 0 };
                            y + x) with x = 0
@@ -40,7 +41,7 @@
                 Line 4:
                   Execution got stuck at assumption with:
                     y = 0
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5)
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 11, characters 2-5)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
 <check-ce>Checking model:
@@ -74,9 +75,10 @@
                     y = 0
                     zero = 0
                     one = 1
-                Line 9:
+                Line 11:
                   Concrete execution of function `f` with args:
                     x = 0
+                Line 10:
                   Concrete execution of function `(@)` with args:
                     u = (fun y -> assume { y > 0 };
                            y + x) with x = 0
@@ -84,7 +86,7 @@
                 Line 4:
                   Execution got stuck at assumption with:
                     y = 0
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5)
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 11, characters 2-5)
               
 <check-ce>Check model 2 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
 <check-ce>Checking model:
@@ -118,9 +120,10 @@
                     y = 0
                     zero = 0
                     one = 1
-                Line 9:
+                Line 11:
                   Concrete execution of function `f` with args:
                     x = 0
+                Line 10:
                   Concrete execution of function `(@)` with args:
                     u = (fun y -> assume { y > 0 };
                            y + x) with x = 0
@@ -128,21 +131,21 @@
                 Line 4:
                   Execution got stuck at assumption with:
                     y = 0
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5)
+            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 11, characters 2-5)
               
 <check-ce-summary>Results:
 - Checked model 0: BAD
   - Concrete RAC STUCK, failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 11, characters 2-5
 - Checked model 1: BAD
   - Concrete RAC STUCK, failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 11, characters 2-5
 - Selected model 2: BAD
   - Concrete RAC STUCK, failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5
+  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 11, characters 2-5
 File "bench/check-ce/anonymous4.mlw", line 8, characters 13-23:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (unknown + incomplete) (0.06s, 5041 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 5106 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

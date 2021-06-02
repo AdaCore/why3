@@ -56,7 +56,7 @@ File threshold.mlw:
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "3"}}
-    result [@introduced] =
+    result [@introduced] [@model_trace:result] =
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "2"}}
@@ -65,6 +65,10 @@ File threshold.mlw:
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "5"}}
+    result [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "2"}}
 
 File "bench/ce/threshold.mlw", line 25, characters 11-29:
 Sub-goal Arithmetic overflow of goal f'vc.
@@ -95,7 +99,9 @@ File threshold.mlw:
   Line 22:
     max [@introduced] [@model_trace:max] = {"type": "Integer", "val": "0"}
     min [@introduced] [@model_trace:min] = {"type": "Integer", "val": "1"}
-    result [@introduced] = {"type": "Integer", "val": "0"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
   Line 25:
     _x [@introduced] = {"type": "Integer", "val": "1"}
+    result [@introduced] = {"type": "Integer", "val": "0"}
 
