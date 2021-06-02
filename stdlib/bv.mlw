@@ -217,11 +217,15 @@ module BV_Gen
   use Pow2int
 
   constant two_power_size : int
+(* not needed yet, since sdiv and srem are not yet realized
   constant two_power_size_minus_one : int
+*)
   constant max_int : int
 
   axiom two_power_size_val : two_power_size = pow2 size
+(* not needed yet, since sdiv and srem are not yet realized
   axiom two_power_size_minus_one_val : two_power_size_minus_one = pow2 (size-1)
+*)
   axiom max_int_val : max_int = two_power_size - 1
 
   predicate is_signed_positive t
@@ -253,11 +257,13 @@ module BV_Gen
   axiom to_uint_of_int :
     forall i. 0 <= i < two_power_size -> to_uint (of_int i) = i
 
+(* not yet realized
   axiom to_int_bounds :
     forall v:t. - two_power_size_minus_one <= to_int v < two_power_size_minus_one
 
   axiom to_int_of_int :
     forall i. - two_power_size_minus_one <= i < two_power_size_minus_one -> to_int (of_int i) = i
+*)
 
   constant size_bv : t
 
