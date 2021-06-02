@@ -11,6 +11,9 @@ val g (): unit
   ensures { !z > !(old z) }
 
 let f () =
+  [@vc:ce_trace]
+  begin
   z := 0;
   g ();
   assert { !z = 1 }
+  end

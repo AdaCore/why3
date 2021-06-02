@@ -11,6 +11,7 @@ module LoopInvariant
   (*   done *)
 
   let f () =
+    [@vc:ce_trace]
     let ref x1 = 0 in
     let ref x2 = 0 in
     for i = 0 to 1 do
@@ -42,7 +43,10 @@ module PostCondition
   = z <- z + 1
 
   let f () =
+    [@vc:ce_trace]
+    begin
     z <- 0;
     g ();
     assert { z = 1 }
+    end
 end

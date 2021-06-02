@@ -1,5 +1,6 @@
 
 use int.Int
+
 val ref z: int
 
 let g ()
@@ -8,6 +9,9 @@ let g ()
 = z <- z + 1
 
 let f () =
+  [@vc:ce_trace]
+  begin
   z <- 0;
   g ();
   assert { z = 1 }
+  end

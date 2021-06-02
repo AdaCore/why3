@@ -10,11 +10,14 @@ let g1 (y: int)
 
 let f1 (x : int)
   requires { x > 0 }
-= let z = g1 x in
+=
+  [@vc:ce_trace]
+  let z = g1 x in
   assert { !z = x }
 
 let g2 (y: int) = ref (y + 1)
 
 let f2 (x: int) =
+  [@vc:ce_trace]
   let z = g2 x in
   assert { !z = x }

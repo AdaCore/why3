@@ -6,5 +6,6 @@ module N
   clone M0 as M1
   clone M0 as M2
   let f () =
+    [@vc:ce_trace]
     assert { M1.n <> 111 \/ M2.n <> 222 }
 end
