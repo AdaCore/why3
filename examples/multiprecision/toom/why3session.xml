@@ -2715,12 +2715,12 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.386" expl="assertion" proved="true">
-  <transf name="replace" proved="true" arg1="(m * m)" arg2="(power radix result)">
+  <transf name="replace" proved="true" arg1="(m * m)" arg2="(power radix o)">
    <goal name="wmpn_toom22_mul&#39;vc.386.0" expl="assertion" proved="true">
-   <proof prover="7" memlimit="1000"><result status="valid" time="0.11"/></proof>
+   <proof prover="7" memlimit="1000"><result status="valid" time="0.10"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.386.1" expl="equality hypothesis" proved="true">
-   <proof prover="9"><result status="valid" time="0.61" steps="62828"/></proof>
+   <proof prover="9"><result status="valid" time="0.47" steps="62828"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2816,12 +2816,12 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.397" expl="assertion" proved="true">
-  <transf name="replace" proved="true" arg1="(m * m)" arg2="(power radix result)">
+  <transf name="replace" proved="true" arg1="(m * m)" arg2="(power radix o)">
    <goal name="wmpn_toom22_mul&#39;vc.397.0" expl="assertion" proved="true">
-   <proof prover="7" memlimit="1000"><result status="valid" time="0.27"/></proof>
+   <proof prover="7" memlimit="1000"><result status="valid" time="0.25"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.397.1" expl="equality hypothesis" proved="true">
-   <proof prover="9"><result status="valid" time="0.68" steps="65595"/></proof>
+   <proof prover="9"><result status="valid" time="0.58" steps="65595"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6382,13 +6382,13 @@
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.462" expl="assertion" proved="true">
-  <transf name="replace" proved="true" arg1="vx3" arg2="(value r3n1 result)">
+  <transf name="replace" proved="true" arg1="vx3" arg2="(value r3n1 o)">
    <goal name="wmpn_toom32_mul&#39;vc.462.0" expl="assertion" proved="true">
    <transf name="rewrite" proved="true" arg1="Ensures">
     <goal name="wmpn_toom32_mul&#39;vc.462.0.0" expl="assertion" proved="true">
     <transf name="replace" proved="true" arg1="lvx3" arg2="(value r3n1 n)">
      <goal name="wmpn_toom32_mul&#39;vc.462.0.0.0" expl="assertion" proved="true">
-     <proof prover="7"><result status="valid" time="0.08"/></proof>
+     <proof prover="7"><result status="valid" time="0.07"/></proof>
      </goal>
      <goal name="wmpn_toom32_mul&#39;vc.462.0.0.1" expl="equality hypothesis" proved="true">
      <proof prover="7"><result status="valid" time="0.02"/></proof>
@@ -6398,7 +6398,7 @@
    </transf>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.462.1" expl="equality hypothesis" proved="true">
-   <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
+   <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
    </goal>
   </transf>
   </goal>
