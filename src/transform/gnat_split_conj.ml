@@ -205,10 +205,28 @@ let is_all_vars tl =
     | _ -> false
     ) tl
 
+let rec has_pretty_labels t =
+  let is_pretty_label s = Strings.has_prefix "GP_Pretty_Ada" s in
+  if Ident.Sattr.exists (fun a -> is_pretty_label a.Ident.attr_string) t.t_attrs then true
+  else match t.t_node with
+  | Tvar _ | Tconst _ | Tapp _ | Ttrue | Tfalse -> false
+  | Tif (f1,f2,f3) -> has_pretty_labels f1 || has_pretty_labels f2 || has_pretty_labels f3
+  | Tbinop (_, f1, f2) -> has_pretty_labels f1 || has_pretty_labels f2
+  | Tnot f1 -> has_pretty_labels f1
+  | Tlet (f1, tb) -> has_pretty_labels f1 || let _, f = t_open_bound tb in has_pretty_labels f
+  | Teps tb -> let _,f = t_open_bound tb in has_pretty_labels f
+  | Tquant (_, tb) -> let _,_,f = t_open_quant tb in has_pretty_labels f
+  | Tcase (f, pl) -> has_pretty_labels f || List.exists branch_has_pretty_labels pl
+
+and branch_has_pretty_labels b =
+  let _, f = t_open_branch b in
+  has_pretty_labels f
+
 let extract_def env vs lhs rhs =
   match lhs.t_node with
   | Tapp (ls, tl) when is_all_vars tl && should_unfold ls ->
-      Mls.add ls (vs, rhs) env
+      let r = has_pretty_labels rhs in
+      if r then Mls.add ls (vs, rhs) env else env
   | _ -> env
 
 (* function to extract a definition from an axiom. It supports the two cases
@@ -258,7 +276,7 @@ let fold env d =
       | Dlogic [ls,ld]
         when should_unfold ls ->
           let vl,e = open_ls_defn ld in
-          Mls.add ls (vl,e) env
+          if has_pretty_labels e then Mls.add ls (vl,e) env else env
       | Dprop (Paxiom, _, t) ->
           let env = extract_def_from_axiom env t in
           env
