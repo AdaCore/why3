@@ -217,15 +217,11 @@ module BV_Gen
   use Pow2int
 
   constant two_power_size : int
-(* not needed yet, since sdiv and srem are not yet realized
   constant two_power_size_minus_one : int
-*)
   constant max_int : int
 
   axiom two_power_size_val : two_power_size = pow2 size
-(* not needed yet, since sdiv and srem are not yet realized
   axiom two_power_size_minus_one_val : two_power_size_minus_one = pow2 (size-1)
-*)
   axiom max_int_val : max_int = two_power_size - 1
 
   predicate is_signed_positive t
