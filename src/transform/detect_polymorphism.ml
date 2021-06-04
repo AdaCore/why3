@@ -118,7 +118,9 @@ let detect_polymorphism task =
       Task.add_meta task meta_monomorphic_types_only []
 
 let detect_polymorphism =
-  Trans.compose Eliminate_unused.eliminate_unused (Trans.store detect_polymorphism)
+  Trans.compose
+    Eliminate_unused.eliminate_unused_types
+    (Trans.store detect_polymorphism)
 
 let () = Trans.register_transform "detect_polymorphism"
   detect_polymorphism

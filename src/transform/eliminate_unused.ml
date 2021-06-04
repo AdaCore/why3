@@ -20,11 +20,15 @@ let debug = Debug.register_info_flag "eliminate_unused"
 
 
 type used_symbols = {
+    keep_logic_symbols : bool;
     used_ts : Sts.t;
     used_ls : Sls.t;
   }
 
-let empty = { used_ts = Sts.empty; used_ls = Sls.empty }
+let initial b =
+  { keep_logic_symbols = b;
+    used_ts = Sts.add ts_int Sts.empty;
+    used_ls = Sls.add ps_equ Sls.empty }
 
 let used_symbols_in_type =
   ty_s_fold
@@ -51,10 +55,9 @@ let rec eliminate_unused_decl acc task : Task.task =
         Task.add_tdecl ta td
      | Theory.Decl d ->
         match d.d_node with
-        | Dprop (_,pr,t) ->
+        | Dprop (_,_,t) ->
            let acc = used_symbols_in_term acc t in
            let ta = eliminate_unused_decl acc ta in
-           Debug.dprintf debug "[eliminate_unused] keeping prop `%s`@." pr.pr_name.id_string;
            Task.add_decl ta d
         | Ddata ddl ->
            if List.exists
@@ -82,11 +85,15 @@ let rec eliminate_unused_decl acc task : Task.task =
              Task.add_decl ta d
            else
              begin
-               Debug.dprintf debug "[eliminate_unused] removing datatypes@.";
+               let l =
+                 List.fold_left (fun acc (ts,_) -> ts::acc) [] ddl
+               in
+               Debug.dprintf debug "[eliminate_unused] removing datatypes %a@."
+                 (Pp.print_list Pp.comma Pretty.print_ts) l;
                eliminate_unused_decl acc ta
              end
      | Dlogic dl ->
-        if List.exists (fun (ls,_) -> Sls.mem ls acc.used_ls) dl
+        if acc.keep_logic_symbols || List.exists (fun (ls,_) -> Sls.mem ls acc.used_ls) dl
         then
           let acc =
             List.fold_left
@@ -100,7 +107,11 @@ let rec eliminate_unused_decl acc task : Task.task =
           Task.add_decl ta d
         else
           begin
-            Debug.dprintf debug "[eliminate_unused] removing logic decls@.";
+            let l =
+              List.fold_left (fun acc (ls,_) -> ls::acc) [] dl
+            in
+            Debug.dprintf debug "[eliminate_unused] removing logic decls %a@."
+              (Pp.print_list Pp.comma Pretty.print_ls) l;
             eliminate_unused_decl acc ta
           end
      | Dtype tys ->
@@ -109,21 +120,21 @@ let rec eliminate_unused_decl acc task : Task.task =
           Task.add_decl ta d
         else
           begin
-            Debug.dprintf debug "[eliminate_unused] removing type decl '%s'@." tys.ts_name.id_string;
+            Debug.dprintf debug "[eliminate_unused] removing type decl '%a'@." Pretty.print_ts tys;
             eliminate_unused_decl acc ta
           end
      | Dparam ls ->
-        if Sls.mem ls acc.used_ls then
+        if acc.keep_logic_symbols || Sls.mem ls acc.used_ls then
           let acc = used_type_symbols_in_lsymbol acc ls in
           let ta = eliminate_unused_decl acc ta in
           Task.add_decl ta d
         else
           begin
-            Debug.dprintf debug "[eliminate_unused] removing param decl '%s'@." ls.ls_name.id_string;
+            Debug.dprintf debug "[eliminate_unused] removing param decl '%a'@." Pretty.print_ls ls;
             eliminate_unused_decl acc ta
           end
      | Dind (_,il) ->
-        if List.exists (fun (ls,_) -> Sls.mem ls acc.used_ls) il
+        if acc.keep_logic_symbols || List.exists (fun (ls,_) -> Sls.mem ls acc.used_ls) il
         then
           let acc =
             List.fold_left
@@ -138,13 +149,18 @@ let rec eliminate_unused_decl acc task : Task.task =
           Task.add_decl ta d
         else
           begin
-            Debug.dprintf debug "[eliminate_unused] removing inductive decl@.";
+            let l =
+              List.fold_left (fun acc (ls,_) -> ls::acc) [] il
+            in
+            Debug.dprintf debug "[eliminate_unused] removing inductive decls %a@."
+              (Pp.print_list Pp.comma Pretty.print_ls) l;
             eliminate_unused_decl acc ta
           end
 
 
-let eliminate_unused = Trans.store (eliminate_unused_decl empty)
+let eliminate_unused_types = Trans.store (eliminate_unused_decl (initial true))
 
+let eliminate_unused = Trans.store (eliminate_unused_decl (initial false))
 
 let () =
   Trans.register_transform "eliminate_unused" eliminate_unused
