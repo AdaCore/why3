@@ -117,6 +117,9 @@ let detect_polymorphism task =
     with Task.GoalNotFound ->
       Task.add_meta task meta_monomorphic_types_only []
 
+let detect_polymorphism =
+  Trans.compose Eliminate_unused.eliminate_unused (Trans.store detect_polymorphism)
+
 let () = Trans.register_transform "detect_polymorphism"
-  (Trans.store detect_polymorphism)
+  detect_polymorphism
   ~desc:"Detect if task has polymorphic types somewhere."
