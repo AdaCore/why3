@@ -1324,7 +1324,7 @@ let read_channel env path filename c =
   (* Defer printing of mlw file until after the typing, to set the marker of located
      exceptions *)
   let print_mlw_file ?mark () =
-    let pp = Mlw_printer.pp_mlw_file ~attr:false in
+    let pp = Mlw_printer.pp_mlw_file ~attr:true in
     let pp = match mark with
       | None -> pp
       | Some (msg, pos) -> Mlw_printer.with_marker ~msg pos pp in
