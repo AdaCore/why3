@@ -119,7 +119,7 @@ let detect_polymorphism task =
 
 let detect_polymorphism =
   Trans.compose
-    Eliminate_unused.eliminate_unused_types
+    Eliminate_unused.eliminate_unused_keep_constants
     (Trans.store detect_polymorphism)
 
 let () = Trans.register_transform "detect_polymorphism"

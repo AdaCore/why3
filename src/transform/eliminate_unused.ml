@@ -20,13 +20,15 @@ let debug = Debug.register_info_flag "eliminate_unused"
 
 
 type used_symbols = {
-    keep_logic_symbols : bool;
+    keep_constants : bool;
+    keep_other_logic_symbols : bool;
     used_ts : Sts.t;
     used_ls : Sls.t;
   }
 
-let initial b =
-  { keep_logic_symbols = b;
+let initial bc bls  =
+  { keep_constants = bc;
+    keep_other_logic_symbols = bls;
     used_ts = Sts.add ts_int Sts.empty;
     used_ls = Sls.add ps_equ Sls.empty }
 
@@ -44,6 +46,12 @@ let used_symbols_in_term =
     used_symbols_in_type
     (fun acc ls ->
       { acc with used_ls = Sls.add ls acc.used_ls})
+
+let keep_ls acc ls =
+  (match ls.ls_args with
+   | [] -> acc.keep_constants
+   | _ -> acc.keep_other_logic_symbols)
+  || Sls.mem ls acc.used_ls
 
 let rec eliminate_unused_decl acc task : Task.task =
   match task with
@@ -93,7 +101,7 @@ let rec eliminate_unused_decl acc task : Task.task =
                eliminate_unused_decl acc ta
              end
      | Dlogic dl ->
-        if acc.keep_logic_symbols || List.exists (fun (ls,_) -> Sls.mem ls acc.used_ls) dl
+        if List.exists (fun (ls,_) -> Sls.mem ls acc.used_ls) dl
         then
           let acc =
             List.fold_left
@@ -124,7 +132,7 @@ let rec eliminate_unused_decl acc task : Task.task =
             eliminate_unused_decl acc ta
           end
      | Dparam ls ->
-        if acc.keep_logic_symbols || Sls.mem ls acc.used_ls then
+        if keep_ls acc ls then
           let acc = used_type_symbols_in_lsymbol acc ls in
           let ta = eliminate_unused_decl acc ta in
           Task.add_decl ta d
@@ -134,7 +142,7 @@ let rec eliminate_unused_decl acc task : Task.task =
             eliminate_unused_decl acc ta
           end
      | Dind (_,il) ->
-        if acc.keep_logic_symbols || List.exists (fun (ls,_) -> Sls.mem ls acc.used_ls) il
+        if List.exists (fun (ls,_) -> keep_ls acc ls) il
         then
           let acc =
             List.fold_left
@@ -158,10 +166,20 @@ let rec eliminate_unused_decl acc task : Task.task =
           end
 
 
-let eliminate_unused_types = Trans.store (eliminate_unused_decl (initial true))
+let eliminate_unused_types = Trans.store (eliminate_unused_decl (initial true true))
 
-let eliminate_unused = Trans.store (eliminate_unused_decl (initial false))
+let eliminate_unused_keep_constants = Trans.store (eliminate_unused_decl (initial true false))
+
+let eliminate_unused = Trans.store (eliminate_unused_decl (initial false false))
+
+let () =
+  Trans.register_transform "eliminate_unused_types" eliminate_unused_types
+    ~desc:"Eliminate@ unused@ type@ symbols"
+
+let () =
+  Trans.register_transform "eliminate_unused_keep_constants" eliminate_unused_keep_constants
+    ~desc:"Eliminate@ unused@ type@ symbols@ and@ unused@ non-constant@ logic@ symbols"
 
 let () =
   Trans.register_transform "eliminate_unused" eliminate_unused
-    ~desc:"Eliminate@ unused@ type@ symbols@ and@ logic@ symbols"
+    ~desc:"Eliminate@ unused@ type@ symbols@ and@ unused@ logic@ symbols"
