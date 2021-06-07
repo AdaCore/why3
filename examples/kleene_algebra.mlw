@@ -19,8 +19,8 @@ module SemiRing
   clone algebra.Monoid with type t = t, constant unit = one,
   function op = (*), axiom .
 
-  axiom Mul_zero_l : forall x. x * zero = zero
-  axiom Mul_zero_r : forall x. zero * x = zero
+  axiom Mul_zero_l : forall x. zero * x = zero
+  axiom Mul_zero_r : forall x. x * zero = zero
 
   axiom Mul_distr_l : forall x y z : t. x * (y + z) = x * y + x * z
   axiom Mul_distr_r : forall x y z : t. (y + z) * x = y * x + z * x
@@ -127,9 +127,10 @@ module KleeneAlgebra
   so one + (!(!x * y) * !x) * (x + y) <= !(!x * y) * !x
   so !(x + y) <= !(!x * y) * !x
 
+  (** Conway's equality: a way to cut x^* in slices of size x^n *)
+
   let rec ghost function sum_mon (x : t) (a b: int) : t
-    requires { Int.(<=) 0 a }
-    requires { Int.(<=) a b }
+    requires { b >= a >= 0 }
     variant { b - a }
   = if b = a then pure{zero} else
     let m1 = sum_mon x a (b - 1) in
@@ -137,19 +138,19 @@ module KleeneAlgebra
     pure {m1 + m2}
 
   lemma sum_mon_left: forall x a b.
-    Int.(<=) 0 a -> Int.(<) a  b ->
+    b > a >= 0 ->
     sum_mon x a b = x^a + sum_mon x (Int.(+) a 1) b
 
   lemma mul_sum_mon: forall x a b.
-    Int.(<=) 0 a -> Int.(<=) a b ->
+    b >= a >= 0 ->
     sum_mon x a b * x = sum_mon x (Int.(+) a 1) (Int.(+) b 1)
 
   lemma sum_mon_le_star: forall x a b.
-    Int.(<=) 0 a -> Int.(<=) a b ->
+    b >= a >= 0 ->
     sum_mon x a b <= !x
 
   lemma Conway_equality: forall x n.
-    Int.(<=) 1 n ->
+    n >= 1 ->
     !x = !(x^n) * sum_mon x 0 n
   by !(x^n) * sum_mon x 0 n <= !x
   so !(x^n) * sum_mon x 0 n * x = !(x^n) * sum_mon x 1 n + !(x^n) * x ^ n
@@ -162,9 +163,10 @@ module RelAlgebra
 
   use int.Int
 
+  (** Potentially infinite sets with set comprehension and cartesian product *)
+
   use set.Set
 
-  (* We also need set comprehension and cartesian product *)
   function filter (s: set 'a) (p: 'a -> bool) : set 'a
   axiom filter_def:
     forall s : set 'a, p x. mem x (filter s p) <-> mem x s /\ p x
@@ -174,16 +176,18 @@ module RelAlgebra
     forall s1 : set 'a, s2 : set 'b, x : 'a, y : 'b.
       mem (x, y) (cartesian_product s1 s2) <-> mem x s1 /\ mem y s2
 
+  (* Relational Algebra: sets of pairs of the same type *)
+
   type a
 
   type t = set (a, a)
 
-  constant zero : t = empty
+  (** Specify zero, one, +, * and ! in terms of membership *)
 
+  constant zero : t = empty
   lemma zero_def : forall x. not mem x zero
 
   constant one : t = map (fun a -> (a, a)) all
-
   lemma one_def : forall x : a. mem (x, x) one
 
   let ghost function post (s : t) (x : a)
@@ -226,7 +230,7 @@ module RelAlgebra
 
   lemma le_mem : forall x y. x <= y <-> forall u. mem u x -> mem u y
 
-  (* Can't do a infinite union, so we axiomatize 'star' *)
+  (* Can't do an infinite union so we axiomatize the star *)
   val function (!_) (s : t) : t
     ensures { forall p. mem p result <->
                         exists i. i >= 0 /\ mem p (s ^ i) }
@@ -269,7 +273,8 @@ module RelAlgebra
         exists v. mem (u1, v) z /\ mem (v, u2) (!x)
                   so exists i. i >= 0 /\ mem u (z * x^i)
 
-  (* The result: this forms a Kleene Algebra *)
+  (** Prove that this forms a Kleene Algebra *)
+
   clone KleeneAlgebra with type t = t, constant zero = zero,
   constant one = one, function (+) = (+), function (*) = (*),
   function (!_) = (!_), lemma .
