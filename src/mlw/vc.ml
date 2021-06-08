@@ -116,7 +116,18 @@ type vc_env = {
   trace_for_ce : bool;
 }
 
-let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs = {
+let mk_env ?(attrs=Sattr.empty)
+      {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs =
+  (* generate traceability info for counterexamples if asked *)
+  let trace_for_ce =
+    if Sattr.mem trace_for_ce_attr attrs then
+      begin
+        Debug.dprintf debug_vc "trace_for_ce is set@.";
+        true
+      end
+    else false
+  in
+  {
   known_map = kn;
   ts_ranges = tuc.Theory.uc_ranges;
   ps_int_le = Theory.ns_find_ls ns_int [Ident.op_infix "<="];
@@ -129,7 +140,7 @@ let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs =
   exn_count = ref 0;
   divergent = false;
   inferinvs = invs;
-  trace_for_ce = false;
+  trace_for_ce;
 }
 
 let acc env r t =
@@ -148,10 +159,10 @@ let new_exn env = incr env.exn_count; !(env.exn_count)
 (* FIXME: cannot verify int.why because of a cyclic dependency.
    int.Int is used for the "for" loops and for integer variants.
    We should be able to extract the necessary lsymbols from kn. *)
-let mk_env env kn tuc invs =
+let mk_env ?attrs env kn tuc invs =
   let th_int = Env.read_theory env ["int"] "Int" in
   let th_wf  = Env.read_theory env ["relations"] "WellFounded" in
-  mk_env th_int th_wf kn tuc invs
+  mk_env ?attrs th_int th_wf kn tuc invs
 
 let int_of_range env ty =
   let td = Mts.find ty env.ts_ranges in
@@ -974,9 +985,6 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
   (* do not check termination if asked nicely *)
   let env = if Sattr.mem nt_attr e.e_attrs then
     { env with divergent = true } else env in
-  (* generate traceability info for counterexamples if asked *)
-  let env = if Sattr.mem trace_for_ce_attr e.e_attrs then
-    { env with trace_for_ce = true } else env in
   let k = k_expr env lps e res xmap in
   let k = Kseq (k, 0, add_qinv res q) in
   let k = Mxs.fold (fun _ ((i,r), xq) k ->
@@ -1619,7 +1627,11 @@ let mk_vc_decl ({known_map = kn; trace_for_ce } as env) id f =
   let f = wp_forall (Mvs.keys (t_freevars Mvs.empty f)) f in
   let f = Typeinv.inject kn f in
   let f = if Debug.test_flag debug_no_eval then f else
-          Eval_match.eval_match ~trace_for_ce kn f in
+            begin
+              Debug.dprintf debug_vc "Calling eval_match with trace_for_ce = %b@." trace_for_ce;
+              Eval_match.eval_match ~trace_for_ce kn f
+            end
+  in
   let f = simp_cast_projections env f in
   create_pure_decl (create_prop_decl Pgoal pr f)
 
@@ -1636,9 +1648,9 @@ let rec is_trivial_vc f =
   | _ -> false
 
 
-let add_vc_decl kn id f vcl =
+let add_vc_decl env id f vcl =
   if not (Sattr.mem annot_attr f.t_attrs) && is_trivial_vc f
-  then vcl else mk_vc_decl kn id f :: vcl
+  then vcl else mk_vc_decl env id f :: vcl
 
 let infer_invs = ref (fun _ _ _ _ _ _ -> [])
 let set_infer_invs f = infer_invs := f
@@ -1647,20 +1659,21 @@ let vc env kn tuc d = match d.pd_node with
   | PDlet (LDvar (_, {e_node = Eexec ({c_node = Cany},_)})) ->
       []
   | PDlet (LDvar (v, e)) ->
-      let env = mk_env env kn tuc [] in
       let c, e = match e.e_node with
         | Eexec ({c_node = Cfun e} as c, _) -> c, e
         | _ -> c_fun [] [] [] Mxs.empty Mpv.empty e, e in
+      let env = mk_env ~attrs:e.e_attrs env kn tuc [] in
       let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
       add_vc_decl env v.pv_vs.vs_name f []
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let open Theory in
       let attrs = s.rs_name.id_attrs in
       let invs = !infer_invs attrs env tuc.uc_known kn e cty in
-      let env = mk_env env kn tuc invs in
+      let env = mk_env ~attrs:e.e_attrs env kn tuc invs in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
       add_vc_decl env s.rs_name f []
   | PDlet (LDrec rdl) ->
+     (** FIXME : pass ~attrs:e.e_attrs *)
       let env = mk_env env kn tuc [] in
       let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
       let add rd f vcl = add_vc_decl env rd.rec_sym.rs_name f vcl in
