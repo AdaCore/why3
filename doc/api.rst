@@ -910,3 +910,11 @@ pmodule ``pm``:
    :language: ocaml
    :start-after: BEGIN{check_ce}
    :end-before: END{check_ce}
+
+The API also permits running only one of the two RAC executions (giant-step, in
+this case):
+
+.. literalinclude:: ../examples/use_api/counterexample.ml
+   :language: ocaml
+   :start-after: BEGIN{check_ce_giant_step}
+   :end-before: END{check_ce_giant_step}

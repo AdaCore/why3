@@ -182,3 +182,19 @@ let () =
   | None ->
       printf "No model@."
 (* END{check_ce} *)
+
+(* BEGIN{check_ce_giant_step} *)
+let () =
+  match Counterexample.select_model_last_non_empty pr.Call_provers.pr_models with
+  | None -> printf "No non-empty model@."
+  | Some model ->
+      let reduce_config =
+        let trans = "compute_in_goal" and prover = "cvc4" and try_negate = true in
+        Pinterp.rac_reduce_config_lit ~trans ~prover ~try_negate config env () in
+      match Counterexample.find_rs pm model with
+      | exception Failure str -> Warning.emit "%s@." str
+      | rs ->
+          let res = Counterexample.check_model_rs ~abstract:true
+              reduce_config env pm model rs in
+          Counterexample.print_full_result std_formatter res
+(* END{check_ce_giant_step} *)
