@@ -5,7 +5,7 @@ open Term
 open Theory
 open Ty
 
-let inlined_attr = create_attribute "GP_Inline"
+let inlined_attr = create_attribute "GP_Inlined"
 
 let apply_append fn acc l =
   List.fold_left (fun l e -> fn e :: l) acc (List.rev l)
@@ -130,7 +130,7 @@ let split_conj_axioms = Trans.decl split_axioms None
 
 let split_conj_axioms_name = "split_conj_axioms"
 
-let inline_attr = Ident.create_attribute "inline_marker"
+let inline_attr = Ident.create_attribute "GP_Inline"
 
 let should_unfold ls =
   Sattr.mem inline_attr (ls.ls_name.id_attrs)

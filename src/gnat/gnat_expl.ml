@@ -355,7 +355,7 @@ type gp_label =
   | Gp_Pretty_Ada of int
   | Gp_Shape of string
   | Gp_Already_Proved
-  | Gp_Inline
+  | Gp_Inlined
 
 let parse_check_string s l =
   match l with
@@ -403,9 +403,9 @@ let read_label s =
           begin
             Some (Gp_Already_Proved)
           end
-       | ["GP_Inline"] ->
+       | ["GP_Inlined"] ->
           begin
-            Some (Gp_Inline)
+            Some (Gp_Inlined)
           end
        | _ ->
           let msg = "found malformed GNATprove label, " in
@@ -457,7 +457,7 @@ let read_vc_labels acc s =
            b.shape <- Some shape
         | Some Gp_Already_Proved ->
            b.already_proved <- true
-        | Some Gp_Inline ->
+        | Some Gp_Inlined ->
            b.inline <- true
         | None ->
             ()
