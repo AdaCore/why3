@@ -663,20 +663,20 @@ let rec k_expr env lps e res xmap =
         let pinv = if trusted then [] else inv_of_pvs env e.e_loc rds in
         let qinv = if trusted then [] else inv_of_pvs env e.e_loc aff in
         let k_of_post expl v ql =
-          let sp = sp_of_post loc attrs expl v ql in
-          let sp = t_subst sbs sp (* rename oldies *) in
-          let rinv = if trusted then [] else
-            inv_of_pvs env e.e_loc (Spv.singleton v) in
-          let k =
+          let k v =
+            let sp = sp_of_post loc attrs expl v ql in
+            let sp = t_subst sbs sp (* rename oldies *) in
+            let rinv = if trusted then [] else
+                         inv_of_pvs env e.e_loc (Spv.singleton v) in
             match term_of_post ~prop:false v.pv_vs sp with
             | Some (t, sp) ->
                Klet (v, t_tag t, List.fold_right sp_and rinv sp)
             | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
           if env.trace_for_ce then
             let vv = explicit_result loc ce v.pv_ity in
-            Kseq(k,0,Klet(vv, t_var v.pv_vs, t_true))
+            Kseq(k vv,0,Klet(v, t_var vv.pv_vs, t_true))
           else
-            k
+            k v
           in
         let k = k_of_post expl_post res cty.cty_post in
         (* in abstract blocks, exceptions without postconditions
