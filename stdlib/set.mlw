@@ -127,6 +127,12 @@ module Set
   lemma disjoint_diff_s2:
     forall s1 s2: set 'a. disjoint (diff s1 s2) s2
 
+  (** `{ (x, y) | x in s1 /\ y in s2 }` *)
+  function product (s1: set 'a) (s2: set 'b) : set ('a, 'b)
+  axiom product_def:
+    forall s1: set 'a, s2: set 'b, x : 'a, y : 'b.
+    mem (x, y) (product s1 s2) <-> mem x s1 /\ mem y s2
+
   (** `{ x | x in s /\ p x }` *)
   function filter (s: set 'a) (p: 'a -> bool) : set 'a
   axiom filter_def:

@@ -16,6 +16,9 @@ definition mapi :: "('a \<Rightarrow> 'b) \<Rightarrow> ('a \<Rightarrow> bool) 
 definition filteri :: " ('a \<Rightarrow> bool) \<Rightarrow> ('a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow> bool" where
   "filteri f s x = conj (s x) (f x)"
 
+definition product :: "('a \<Rightarrow> bool) \<Rightarrow> ('b \<Rightarrow> bool) \<Rightarrow> ('a \<times> 'b \<Rightarrow> bool)" where
+  "product s1 s2 p = conj (s1 (fst p)) (s2 (snd p))"
+
 why3_open "set/Set.xml"
   constants
     empty = bot
@@ -29,6 +32,7 @@ why3_open "set/Set.xml"
     all = top
     map = mapi
     filter = filteri
+    product = product
 
 why3_vc diffqtdef by (simp add: mem_def)
 
@@ -107,6 +111,9 @@ why3_vc filter_def
 
 why3_vc subset_filter
   by (simp add: filter_def subset_def)
+
+why3_vc product_def
+  by (simp add: product_def mem_def)
 
 why3_end
 
