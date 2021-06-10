@@ -191,8 +191,6 @@ destruct a2 as (Hx1dup, Hx1eq).
   + eapply Cardinal.NoDup_app; eauto.
     - intros. rewrite Hx1eq in H0. rewrite Hdieq. rewrite set.Set.diff'def.
       intuition.
-    - intros. rewrite Hx1eq. rewrite Hdieq in H0. rewrite set.Set.diff'def in H0.
-      intuition.
 }
 lia.
 Qed.
@@ -222,8 +220,6 @@ destruct a2 as (Hx1dup, Hx1eq).
     rewrite set.Set.union'def. clear - e. intuition.
   + eapply Cardinal.NoDup_app; eauto.
     * intros. intro. apply Hx0eq in H0. apply Hx1eq in H.
-      specialize (Hdisj e). intuition.
-    * intros. intro. apply Hx1eq in H0. apply Hx0eq in H.
       specialize (Hdisj e). intuition.
 Qed.
 

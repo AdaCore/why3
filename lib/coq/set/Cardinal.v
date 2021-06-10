@@ -280,6 +280,63 @@ split.
   constructor. 
 Qed.
 
+Lemma NoDup_app: forall {A} l l'
+  (Hnotin: forall e: A, List.In e l -> ~ List.In e l'),
+  List.NoDup l -> List.NoDup l' -> List.NoDup (List.app l l').
+Proof.
+induction l; intros.
++ simpl. assumption.
++ simpl. apply List.NoDup_cons.
+  - rewrite List.in_app_iff. intuition.
+    rewrite List.NoDup_cons_iff in H. intuition.
+    apply (Hnotin a). apply List.in_eq. assumption.
+  - apply IHl. intros e He. apply (Hnotin e). apply List.in_cons. assumption.
+    rewrite List.NoDup_cons_iff in H. intuition.
+    assumption.
+Qed.
+
+Lemma nodup_prod {T1 T2} (l1 : list T1) (l2 : list T2):
+  List.NoDup l1 -> List.NoDup l2 ->
+  List.NoDup (List.list_prod l1 l2).
+Proof.
+  induction l1.
+  intros _ _. apply List.NoDup_nil.
+  intros h1 h2. simpl.
+  apply NoDup_app.
+  intros e He. destruct e as [x1 x2].
+  rewrite List.in_prod_iff.
+  rewrite List.in_map_iff in He.
+  destruct He as [x [Ha _]].
+  assert (a = x1).
+  change a with (fst (a, x)). change x1 with (fst (x1, x2)).
+  rewrite Ha. reflexivity.
+  rewrite <- H.
+  rewrite List.NoDup_cons_iff in h1.
+  intuition.
+  apply List.NoDup_map_inv with T2 (fun (p : T1 * T2) => let (a, y) := p in y).
+  rewrite List.map_map. rewrite List.map_id. assumption.
+  apply IHl1. rewrite List.NoDup_cons_iff in h1. intuition.
+  assumption.
+Qed.
+
+(* Why3 goal *)
+Lemma is_finite_product {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  forall (s1:a -> Init.Datatypes.bool) (s2:b -> Init.Datatypes.bool),
+  is_finite s1 -> is_finite s2 -> is_finite (set.Set.product s1 s2).
+Proof.
+  intros s1 s2 h1 h2.
+  destruct h1 as [l1 [ndl1 h1]].
+  destruct h2 as [l2 [ndl2 h2]].
+  exists (List.list_prod l1 l2).
+  split. apply nodup_prod. assumption. assumption.
+  intro e.
+  destruct e as [x y].
+  fold (set.Set.mem (x, y) (set.Set.product s1 s2)).
+  rewrite set.Set.product_def.
+  rewrite List.in_prod_iff, h1, h2.
+  intuition.
+Qed.
+
 (* Why3 goal *)
 Definition cardinal {a:Type} {a_WT:WhyType a} :
   (a -> Init.Datatypes.bool) -> Numbers.BinNums.Z.
@@ -298,6 +355,26 @@ destruct (ClassicalEpsilon.excluded_middle_informative (is_finite f)).
 + (* Case when set is infinite: default value = 0 *)
   apply Z.zero.
 Defined.
+
+Lemma cardinal_list {a} {a_WT:WhyType a} (l : list a) s :
+  List.NoDup l -> (forall e, List.In e l <-> s e = true) ->
+  (cardinal s = Z_of_nat (length l))%Z.
+Proof.
+  intros H1 H2.
+  unfold cardinal.
+  assert (is_finite s).
+  exists l. intuition.
+  destruct ClassicalEpsilon.excluded_middle_informative; [| intuition].
+  destruct ClassicalEpsilon.classical_indefinite_description.
+  specialize (a0 i). clear H i. destruct a0 as [G1 G2].
+  assert (length x <= length l).
+  apply List.NoDup_incl_length. assumption.
+  intros e H. rewrite H2. rewrite G2 in H. assumption.
+  assert (length l <= length x).
+  apply List.NoDup_incl_length. assumption.
+  intros e h. rewrite G2. rewrite H2 in h. assumption.
+  omega.
+Qed.
 
 (* Why3 goal *)
 Lemma cardinal_nonneg {a:Type} {a_WT:WhyType a} :
@@ -550,22 +627,6 @@ induction lu; intros.
   lia.
 Qed.
 
-Lemma NoDup_app: forall {A} l l' 
-  (Hnotin1: forall e: A, List.In e l -> ~ List.In e l')
-  (Hnotin2: forall e, List.In e l' -> ~ List.In e l),
-  List.NoDup l -> List.NoDup l' -> List.NoDup (List.app l l').
-Proof.
-induction l; intros.
-+ simpl. assumption.
-+ simpl. constructor; eauto.
-  - intro. rewrite List.in_app_iff in H1. destruct H1. inversion H; intuition.
-    eapply Hnotin1; eauto. left. reflexivity.
-  - eapply IHl; eauto.
-    * intros. eapply Hnotin1. right. assumption.
-    * intros. eapply Hnotin2 in H1. intro Habs. destruct H1. right. assumption.
-    * inversion H; eauto.
-Qed.
-
 (* Why3 goal *)
 Lemma cardinal_union {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool),
@@ -643,10 +704,6 @@ assert (List.NoDup (List.app l1_lint l2_lint) /\
     + intros. rewrite Heql2_lint. eapply Heql1_lint in H4.
       rewrite Heqs2 in H4. rewrite Heq_int in H4. rewrite Heq_int.
       rewrite Heqs1. rewrite set.Set.inter'def in H4. rewrite set.Set.inter'def.
-      unfold set.Set.mem in *. intuition.
-    + intros. rewrite Heql2_lint in H4. rewrite Heql1_lint.
-      rewrite Heqs2. rewrite Heq_int. rewrite Heq_int in H4.
-      rewrite Heqs1 in H4. rewrite set.Set.inter'def in H4. rewrite set.Set.inter'def.
       unfold set.Set.mem in *. intuition.
   - intros. rewrite List.in_app_iff. rewrite Heqlun_lint.
   rewrite Heql1_lint. rewrite Heql2_lint. rewrite Heq_un, Heqs2, Heqs1, Heq_int.
@@ -761,5 +818,29 @@ assert (List.length x <= List.length x0).
   - rewrite List.map_length; eauto.
 }
 lia.
+Qed.
+
+(* Why3 goal *)
+Lemma cardinal_product {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  forall (s1:a -> Init.Datatypes.bool) (s2:b -> Init.Datatypes.bool),
+  is_finite s1 -> is_finite s2 ->
+  ((cardinal (set.Set.product s1 s2)) = ((cardinal s1) * (cardinal s2))%Z).
+Proof.
+  intros s1 s2 h1 h2.
+  destruct h1 as [l1 [ndl1 h1]].
+  destruct h2 as [l2 [ndl2 h2]].
+  remember (List.list_prod l1 l2) as l.
+  assert (List.NoDup l).
+  rewrite Heql. apply nodup_prod; assumption.
+  assert (forall e, List.In e l <-> set.Set.product s1 s2 e = true).
+  intro e. fold (set.Set.mem e (set.Set.product s1 s2)).
+  destruct e as [x1 x2]. rewrite set.Set.product_def.
+  rewrite Heql. rewrite List.in_prod_iff, h1, h2.
+  intuition.
+  rewrite cardinal_list with l (set.Set.product s1 s2); [|assumption|assumption].
+  rewrite cardinal_list with l1 s1; [|assumption|assumption].
+  rewrite cardinal_list with l2 s2; [|assumption|assumption].
+  rewrite Heql. rewrite List.prod_length.
+  rewrite Nat2Z.inj_mul. reflexivity.
 Qed.
 

@@ -194,6 +194,10 @@ module Cardinal
   lemma is_finite_map:
     forall f: 'a -> 'b, s: set 'a. is_finite s -> is_finite (map f s)
 
+  lemma is_finite_product:
+    forall s1: set 'a, s2 : set 'b. is_finite s1 -> is_finite s2 ->
+           is_finite (product s1 s2)
+
   (** `cardinal` function *)
 
   use int.Int
@@ -243,6 +247,9 @@ module Cardinal
     forall f: 'a -> 'b, s: set 'a. is_finite s ->
     cardinal (map f s) <= cardinal s
 
+  lemma cardinal_product:
+    forall s1: set 'a, s2 : set 'b. is_finite s1 -> is_finite s2 ->
+    cardinal (product s1 s2) = cardinal s1 * cardinal s2
 end
 
 (** {2 Finite sets} *)
