@@ -26,18 +26,23 @@ val debug_check_ce_summary : Debug.flag
 (** Print only a summary of checking the counterexample. *)
 
 type result_state =
-  | Rnormal (** the execution terminated normally *)
-  | Rfailure of cntr_ctx * Term.term (** the execution leads to a failure *)
-  | Rstuck (** the model doesn't lead to a counterexample or is incosistent *)
-  | Runknown (** cannot decide if the model leads to a counterexample *)
+  | Rnormal
+    (** the execution terminated normally *)
+  | Rfailure of cntr_ctx * Term.term
+    (** the execution leads to a failure *)
+  | Rstuck of string
+    (** the model doesn't lead to a counterexample or is incosistent *)
+  | Runknown of string
+    (** cannot decide if the model leads to a counterexample *)
 
 val print_result_state : result_state Pp.pp
 
-type result = {
+type rac_result = {
     state    : result_state;
-    reason   : string;
     exec_log : Log.exec_log;
   }
+(** Result of a RAC execution comprised of a final state and the execution log.
+   *)
 
 val find_rs : pmodule -> model -> Expr.rsymbol
 (** Returns the rsymbol of the procedure to which the VC term of the model
@@ -46,63 +51,64 @@ val find_rs : pmodule -> model -> Expr.rsymbol
     @raise Failure when there is no such procedure, or the VC term location is
     empty or dummy. *)
 
-val check_model_rs : ?timelimit:float -> ?steplimit:int -> abstract:bool ->
-  rac_reduce_config -> Env.env -> pmodule -> model -> Expr.rsymbol -> result
+val check_model_rs : ?timelimit:float -> ?steplimit:int -> giant_steps:bool ->
+  rac_reduce_config -> Env.env -> pmodule -> model -> Expr.rsymbol -> rac_result
 (** [check_model_rs ~abstract cfg env pm m rs] executes a call to the procedure
-    [rs] abstractly or concretely. *)
+    [rs] with normal and giant-steps RAC. *)
 
-type check_model_result = private
-  | Cannot_check_model of {reason: string}
-    (** The model could not be checked *)
-  | Check_model_result of {abstract: result; concrete: result}
-    (** The model has been checked *)
+type two_rac_results = private
+  | Cannot_execute_model of {reason: string}
+    (** Neither RAC could be executed  *)
+  | Check_model_result of {normal: result; giant_steps: result}
+    (**  *)
+(** The results of the two RAC executions *)
 
 val check_model : ?timelimit:float -> ?steplimit:int -> rac_reduce_config ->
-  Env.env -> pmodule -> model -> check_model_result
-(** interpret concrecly and abstractly the program corresponding to the model
+  Env.env -> pmodule -> model -> two_rac_results
+(** Run the normal and giant-step RAC on the function corresponding to the model
     (the program corresponding to the model is obtained from the location in the
-    model) *)
+    model). *)
 
-val print_result : result Pp.pp
-(** Print the result state, and the reason for stuck and unknown *)
+val print_result : rac_result Pp.pp
+(** Print the result of a RAC execution. *)
 
-val print_full_result : ?verb_lvl:int -> result Pp.pp
+val print_result_with_trace : ?verb_lvl:int -> rac_result Pp.pp
 (** Like [print_result] but print also the execution log *)
 
 (** {2 Summary of checking models} *)
 
-type ce_summary =
-  | NC of Log.exec_log
-  (** Non-conformity between program and annotations: the CE shows that the
-      program doesn't comply to the verification goal. *)
-  | SW of Log.exec_log
-  (** Sub-contract weakness: The contracts of some function or loop are
-      underspecified. *)
-  | NCSW of Log.exec_log
-  (** Non-conformity or sub-contract weakness. *)
-  | BAD of Log.exec_log
-  (** Bad counterexample. *)
-  | UNKNOWN of string
-  (** The counterexample has not been verified. *)
+type verdict =
+  | NC (** Non-conformity between program and annotations: the CE shows that the
+           program doesn't comply to the verification goal. *)
+  | SW (** Sub-contract weakness: The contracts of some function or loop are
+           underspecified. *)
+  | NCSW (** Non-conformity or sub-contract weakness. *)
+  | BAD of string (** Bad counterexample with reason *)
+  | UNKNOWN of string (** Incompleteness with reason *)
+
+type classification = verdict * Log.exec_log
+(** The result of a classification based on normal and giant-step RAC execution
+    is comprised of a verdict and the execution trace of the relevant execution *)
+
+val classify :
+  vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
+  normal:rac_result -> giant_steps:rac_result -> classification
+(** Classify a counterexample based on the resultso of the two RAC executions *)
 
 val is_vc_term :
   vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
   cntr_ctx -> Term.term -> bool
 
-val ce_summary :
-  vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
-  check_model_result -> ce_summary
+val print_classification_title : ?check_ce:bool -> classification Pp.pp
 
-val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
+val print_classification_kind : classification Pp.pp
 
-val print_ce_summary_kind : ce_summary Pp.pp
-
-val print_counterexample :
-  ?verb_lvl:int -> ?check_ce:bool -> ?json:[< `All | `Values ] -> (model * ce_summary) Pp.pp
+val print_model_classification :
+  ?verb_lvl:int -> ?check_ce:bool -> ?json:[< `All | `Values ] -> (model * classification) Pp.pp
 (** Print a counterexample. (When the prover model is printed and [~json:`Values] is
    given, only the values are printedas JSON.) *)
 
-val print_result_summary : result Pp.pp -> (check_model_result * ce_summary) Pp.pp
+val print_result_summary : result Pp.pp -> (two_rac_results * classification) Pp.pp
 
 (** {2 Model selection} *)
 
@@ -113,7 +119,7 @@ val select_model :
   ?verb_lvl:int -> ?check:bool -> ?reduce_config:rac_reduce_config ->
   ?timelimit:float -> ?steplimit:int -> ?sort_models:sort_models ->
   Env.env -> pmodule -> (Call_provers.prover_answer * model) list ->
-  (model * ce_summary) option
+  (model * classification) option
 (** [select ~check ~conservative ~reduce_config env pm ml] chooses a model from
     [ml]. [check] is set to false by default and indicates if interpretation
     should be used to select the model. [reduce_config] is set to
