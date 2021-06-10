@@ -127,6 +127,14 @@ module Set
   lemma disjoint_diff_s2:
     forall s1 s2: set 'a. disjoint (diff s1 s2) s2
 
+  (** `{ x | x in s /\ p x }` *)
+  function filter (s: set 'a) (p: 'a -> bool) : set 'a
+  axiom filter_def:
+    forall s: set 'a, p: 'a -> bool, x: 'a. mem x (filter s p) <-> mem x s /\ p x
+
+  lemma subset_filter:
+    forall s: set 'a, p: 'a -> bool. subset (filter s p) s
+
   (** `{ f x | x in U }` *)
   function map (f: 'a -> 'b) (u: set 'a) : set 'b =
     fun (y: 'b) -> exists x: 'a. mem x u /\ y = f x

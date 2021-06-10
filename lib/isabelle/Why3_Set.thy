@@ -13,6 +13,9 @@ definition complement :: "('a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow>
 definition mapi :: "('a \<Rightarrow> 'b) \<Rightarrow> ('a \<Rightarrow> bool) \<Rightarrow> ('b \<Rightarrow> bool)" where
   "mapi f s x = Set.member x (image f (Collect s))"
 
+definition filteri :: " ('a \<Rightarrow> bool) \<Rightarrow> ('a \<Rightarrow> bool) \<Rightarrow> 'a \<Rightarrow> bool" where
+  "filteri f s x = conj (s x) (f x)"
+
 why3_open "set/Set.xml"
   constants
     empty = bot
@@ -25,6 +28,7 @@ why3_open "set/Set.xml"
     pick = Eps
     all = top
     map = mapi
+    filter = filteri
 
 why3_vc diffqtdef by (simp add: mem_def)
 
@@ -97,6 +101,12 @@ why3_vc disjoint_diff_s2
 
 why3_vc disjoint_inter_empty
   by (simp add: disjoint_def mem_def set.Set.is_empty_def)
+
+why3_vc filter_def
+  by (metis filteri_def mem_def)
+
+why3_vc subset_filter
+  by (simp add: filter_def subset_def)
 
 why3_end
 
