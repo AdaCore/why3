@@ -127,34 +127,34 @@ let do_input f =
   let pmod = Pmodule.close_module muc in
 
   (* execute expression *)
-  let open Pinterp in
-  Opt.iter init_real !prec;
+  Opt.iter Pinterp.init_real !prec;
   try
-    let rac =
-      let reduce =
+    let interp_config =
+      let rac =
         let trans = "compute_in_goal" and prover = !opt_rac_prover
         and try_negate = !opt_rac_try_negate and metas = !opt_metas in
-        rac_reduce_config_lit config env ~metas ~trans ?prover ~try_negate () in
+        Pinterp.rac_config_lit config env ~metas ~trans ?prover ~try_negate ()
+      in
       let skip_cannot_compute = not !opt_rac_fail_cannot_check in
       let timelimit = Opt.map float_of_int !opt_rac_timelimit in
-      rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute
-        ?timelimit ?steplimit:!opt_rac_steplimit ~reduce () in
-    let res = eval_global_fundef rac env pmod [] None expr in
-    printf "%a@." (report_eval_result expr) res;
+      Pinterp.config ~do_rac:!opt_enable_rac ~giant_steps:false ~skip_cannot_compute
+        ?timelimit ?steplimit:!opt_rac_steplimit ~rac () in
+    let res = Pinterp.eval_global_fundef interp_config env pmod [] None expr in
+    printf "%a@." (Pinterp.report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
   with
-  | Contr (ctx, term) ->
+  | Pinterp.RAC_Failure (ctx, term) ->
       Pretty.forget_all ();
-      eprintf "%a@." report_cntr (ctx, term);
+      eprintf "%a@." Pinterp.report_cntr (ctx, term);
       exit 1
-  | CannotCompute reason ->
-      eprintf "Execution terminated because %s@." reason.reason;
-      exit 2
-  | RACStuck (_, l, reason) ->
+  | Pinterp.RAC_Stuck (_, l, reason) ->
       (* TODO Remove this case when value origins (default vs model) can be distinguished
          in RAC *)
       eprintf "RAC got stuck %s after %a@." reason
         (Pp.print_option_or_default "unknown location" Pretty.print_loc') l;
+      exit 2
+  | Pinterp.Exec_incomplete reason ->
+      eprintf "Execution terminated because %s@." reason;
       exit 2
 
 let () =

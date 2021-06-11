@@ -77,17 +77,17 @@ val print_value : Format.formatter -> value -> unit
 (** {2 Interpreter log} *)
 
 module type Log = sig
-  type exec_kind = ExecAbstract | ExecConcrete
+  type exec_mode = Exec_giant_steps | Exec_normal
 
   type value_or_invalid = Value of value | Invalid
 
   type log_entry_desc = private
     | Val_assumed of (ident * value)
     | Const_init of ident
-    | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
-    | Exec_pure of (lsymbol * exec_kind)
+    | Exec_call of (rsymbol option * value Mvs.t  * exec_mode)
+    | Exec_pure of (lsymbol * exec_mode)
     | Exec_any of (rsymbol option * value Mvs.t)
-    | Iter_loop of exec_kind
+    | Iter_loop of exec_mode
     | Exec_main of (rsymbol * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -104,12 +104,12 @@ module type Log = sig
   val log_val : log_uc -> ident -> value -> Loc.position option -> unit
   val log_const : log_uc -> ident -> Loc.position option -> unit
   val log_call : log_uc -> rsymbol option -> value Mvs.t ->
-                 exec_kind -> Loc.position option -> unit
-  val log_pure_call : log_uc -> lsymbol -> exec_kind ->
+                 exec_mode -> Loc.position option -> unit
+  val log_pure_call : log_uc -> lsymbol -> exec_mode ->
                       Loc.position option -> unit
   val log_any_call : log_uc -> rsymbol option -> value Mvs.t
                      -> Loc.position option -> unit
-  val log_iter_loop : log_uc -> exec_kind -> Loc.position option -> unit
+  val log_iter_loop : log_uc -> exec_mode -> Loc.position option -> unit
   val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Lazy.t Mrs.t ->
                       Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
@@ -136,19 +136,19 @@ type rac_prover
 
 val rac_prover : command:string -> Driver.driver -> Call_provers.resource_limit -> rac_prover
 
-type rac_reduce_config
+type rac_config
 (** The configuration for RAC, including (optionally) a transformation for reducing terms
    (usually: compute_in_goal), and a prover to be used if the transformation does not
    yield a truth value. When neither transformation nor prover are defined, then RAC does
    not progress. *)
 
-val rac_reduce_config :
+val rac_config :
   ?metas:(Theory.meta * Theory.meta_arg list) list ->
   ?trans:Task.task Trans.tlist ->
   ?prover:rac_prover -> ?try_negate:bool ->
-  unit -> rac_reduce_config
+  unit -> rac_config
 
-(** [rac_reduce_config_lit cnf env ?metas ?trans ?prover ?try_negate ()] configures the
+(** [rac_config_lit cnf env ?metas ?trans ?prover ?try_negate ()] configures the
    term reduction of RAC. [trans] is the name of a transformation (usually
    "compute_in_goal"). [prover] is a prover string with optional, space-sparated
    time limit and memory limit. And with [~try_negate:true] the negated term is
@@ -159,11 +159,11 @@ val rac_reduce_config :
    directory to print all SMT tasks sent to the RAC prover, if
    [--debug=rac-check-term-sat] is set.
  *)
-val rac_reduce_config_lit :
+val rac_config_lit :
   Whyconf.config -> Env.env ->
   ?metas:(string * string option) list -> ?trans:string ->
   ?prover:string -> ?try_negate:bool ->
-  unit -> rac_reduce_config
+  unit -> rac_config
 
 type get_value =
   ?loc:Loc.position -> (ity -> value -> unit) -> ident -> ity -> value option
@@ -173,15 +173,15 @@ type get_value =
     @raise CannotCompute if the value or any component is invalid (e.g., a range
     value outside its bounds). *)
 
-type rac_config = private {
+type config = private {
   do_rac : bool;
   (** check assertions *)
-  rac_abstract : bool;
-  (** interpret abstractly *)
+  giant_steps : bool;
+  (** execute with giant steps *)
   skip_cannot_compute : bool;
   (** continue when term cannot be checked *)
-  rac_reduce : rac_reduce_config;
-  (** configuration for reducing terms *)
+  rac : rac_config;
+  (** configuration for the RAC *)
   get_value : get_value;
   (** import values when they are needed *)
   log_uc : Log.log_uc;
@@ -190,15 +190,15 @@ type rac_config = private {
   (** Timeout in seconds and step limit for RAC execution *)
 }
 
-val rac_config :
+val config :
   do_rac:bool ->
-  abstract:bool ->
+  giant_steps:bool ->
   ?skip_cannot_compute:bool ->
-  ?reduce:rac_reduce_config ->
+  ?rac:rac_config ->
   ?get_value:get_value ->
   ?timelimit:float ->
   ?steplimit:int ->
-  unit -> rac_config
+  unit -> config
 
 (** {2 Interpreter environment and results} *)
 
@@ -219,7 +219,7 @@ type env = private {
   (** The (stateful) set of checked terms in the execution context *)
   env     : Env.env;
   (** The Why3 environment *)
-  rac     : rac_config;
+  config  : config;
   (** The configuration of the RAC *)
   old_varl : ((term * lsymbol option) list * value Mvs.t) option;
   (** To check function variants *)
@@ -232,7 +232,7 @@ type result = private
   | Irred of expr
 
 (** Context of a contradiction during RAC *)
-type cntr_ctx = private {
+type cntr_ctx = {
   c_attr: Ident.attribute; (** Related VC attribute *)
   c_desc: string option; (** Additional context *)
   c_loc: Loc.position option; (** Position if different than term *)
@@ -243,18 +243,18 @@ type cntr_ctx = private {
 
 val describe_cntr_ctx : cntr_ctx -> string
 
-exception CannotCompute of {reason: string}
+exception Exec_incomplete of string
 (** raised when interpretation cannot continue due to unsupported
    feature *)
-exception Contr of cntr_ctx * term
+exception RAC_Failure of cntr_ctx * term
 (** raised when a contradiction is detected during RAC. *)
-exception RACStuck of env * Loc.position option * string
+exception RAC_Stuck of env * Loc.position option * string
 (** raised when an assumed property is not satisfied *)
 
 (** {2 Interpreter} *)
 
 val eval_global_fundef :
-  rac_config ->
+  config ->
   Env.env ->
   Pmodule.pmodule ->
   (rsymbol * cexp) list ->
@@ -290,7 +290,7 @@ val report_eval_result :
   expr -> Format.formatter -> result * value Mvs.t * value Lazy.t Mrs.t -> unit
 (** Report an evaluation result *)
 
-val eval_rs : rac_config -> Env.env -> Pmodule.pmodule -> rsymbol -> result * env
+val eval_rs : config -> Env.env -> Pmodule.pmodule -> rsymbol -> result * env
 (** [eval_rs ~rac env pm rs] evaluates the definition of [rs] and
    returns an evaluation result and a final environment.
 

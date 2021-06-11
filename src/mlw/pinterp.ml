@@ -99,12 +99,12 @@ let is_range_ty ty =
 
 exception NoMatch
 exception Undetermined
-exception CannotCompute of {reason: string}
+exception Exec_incomplete of string
 exception NotNum
 exception CannotFind of (Env.pathname * string * string)
 
-let cannot_compute f =
-  kasprintf (fun reason -> raise (CannotCompute {reason})) f
+let incomplete f =
+  kasprintf (fun reason -> raise (Exec_incomplete reason)) f
 
 (******************************************************************************)
 (*                                VALUES                                      *)
@@ -164,9 +164,9 @@ end = struct
 
   let rec compare_values v1 v2 =
     if v1.v_desc = Vundefined then
-      cannot_compute "undefined value of type %a cannot be compared" print_ty v1.v_ty;
+      incomplete "undefined value of type %a cannot be compared" print_ty v1.v_ty;
     if v2.v_desc = Vundefined then
-      cannot_compute "undefined value of type %a cannot be compared" print_ty v2.v_ty;
+      incomplete "undefined value of type %a cannot be compared" print_ty v2.v_ty;
     let v_ty v = v.v_ty and v_desc v = v.v_desc in
     cmp [cmptr v_ty ty_compare; cmptr v_desc compare_desc] v1 v2
   and compare_desc d1 d2 =
@@ -241,7 +241,7 @@ let range_value ity n =
         try
           Number.(check_range { il_kind = ILitUnk; il_int = n } r);
         with Number.OutOfRange _ ->
-          cannot_compute "%s is out of range" (BigInt.to_string n)
+          incomplete "%s is out of range" (BigInt.to_string n)
       end
   | _ -> ()
   end;
@@ -258,7 +258,7 @@ let proj_value ity ls v =
         try
           Number.(check_range { il_kind = ILitUnk; il_int = n } r);
         with Number.OutOfRange _ ->
-          cannot_compute "projection value %s is out of range of %a"
+          incomplete "projection value %s is out of range of %a"
             (BigInt.to_string n) print_ity ity
       end
   | _ -> ()
@@ -390,18 +390,18 @@ type rac_prover = Rac_prover of {
 let rac_prover ~command driver limit =
   Rac_prover {command; driver; limit}
 
-type rac_reduce_config = {
+type rac_config = {
   rac_metas : (Theory.meta * Theory.meta_arg list) list;
   rac_trans: Task.task Trans.tlist option;
   rac_prover: rac_prover option;
   rac_try_negate: bool;
 }
 
-let rac_reduce_config ?metas:(rac_metas=[]) ?trans:rac_trans
+let rac_config ?metas:(rac_metas=[]) ?trans:rac_trans
     ?prover:rac_prover ?try_negate:(rac_try_negate=false) () =
   {rac_metas; rac_trans; rac_prover; rac_try_negate}
 
-let rac_reduce_config_lit config env ?(metas=[]) ?trans ?prover ?try_negate () =
+let rac_config_lit config env ?(metas=[]) ?trans ?prover ?try_negate () =
   let metas =
     let aux (meta, s) =
       let open Theory in
@@ -432,24 +432,25 @@ let rac_reduce_config_lit config env ?(metas=[]) ?trans ?prover ?try_negate () =
       let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
       rac_prover ~command driver limit in
     Opt.map aux prover in
-  rac_reduce_config ~metas ?trans ?prover ?try_negate ()
+  rac_config ~metas ?trans ?prover ?try_negate ()
 
 (******************************************************************************)
 (*                             Execution log                                  *)
 (******************************************************************************)
 
 module type Log = sig
-  type exec_kind = ExecAbstract | ExecConcrete
+
+  type exec_mode = Exec_giant_steps | Exec_normal
 
   type value_or_invalid = Value of value | Invalid
 
   type log_entry_desc = private
     | Val_assumed of (ident * value)
     | Const_init of ident
-    | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
-    | Exec_pure of (lsymbol * exec_kind)
+    | Exec_call of (rsymbol option * value Mvs.t  * exec_mode)
+    | Exec_pure of (lsymbol * exec_mode)
     | Exec_any of (rsymbol option * value Mvs.t)
-    | Iter_loop of exec_kind
+    | Iter_loop of exec_mode
     | Exec_main of (rsymbol * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -466,12 +467,12 @@ module type Log = sig
   val log_val : log_uc -> ident -> value -> Loc.position option -> unit
   val log_const : log_uc -> ident -> Loc.position option -> unit
   val log_call : log_uc -> rsymbol option -> value Mvs.t ->
-                 exec_kind -> Loc.position option -> unit
-  val log_pure_call : log_uc -> lsymbol -> exec_kind ->
+                 exec_mode -> Loc.position option -> unit
+  val log_pure_call : log_uc -> lsymbol -> exec_mode ->
                       Loc.position option -> unit
   val log_any_call : log_uc -> rsymbol option -> value Mvs.t ->
                      Loc.position option -> unit
-  val log_iter_loop : log_uc -> exec_kind -> Loc.position option -> unit
+  val log_iter_loop : log_uc -> exec_mode -> Loc.position option -> unit
   val log_exec_main : log_uc -> rsymbol -> value Mvs.t -> value Lazy.t Mrs.t ->
                       Loc.position option -> unit
   val log_failed : log_uc -> string -> value Mid.t ->
@@ -487,17 +488,18 @@ module type Log = sig
 end
 
 module Log : Log = struct
-  type exec_kind = ExecAbstract | ExecConcrete
+
+  type exec_mode = Exec_giant_steps | Exec_normal
 
   type value_or_invalid = Value of value | Invalid
 
   type log_entry_desc =
     | Val_assumed of (ident * value)
     | Const_init of ident
-    | Exec_call of (rsymbol option * value Mvs.t  * exec_kind)
-    | Exec_pure of (lsymbol * exec_kind)
+    | Exec_call of (rsymbol option * value Mvs.t  * exec_mode)
+    | Exec_pure of (lsymbol * exec_mode)
     | Exec_any of (rsymbol option * value Mvs.t)
-    | Iter_loop of exec_kind
+    | Iter_loop of exec_mode
     | Exec_main of (rsymbol * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
     | Exec_failed of (string * value Mid.t)
@@ -555,8 +557,8 @@ module Log : Log = struct
   let close_log log_uc = List.rev !log_uc
 
   let exec_kind_to_string ?(cap=true) = function
-    | ExecAbstract -> if cap then "Abstract" else "abstract"
-    | ExecConcrete -> if cap then "Concrete" else "concrete"
+    | Exec_giant_steps -> if cap then "Giant-step" else "giant-step"
+    | Exec_normal -> if cap then "Normal" else "normal"
 
   (** Partition a list of elements into lists of pairs, of consecutive
       elements with the same value for f *)
@@ -607,7 +609,7 @@ module Log : Log = struct
           print_decoded ls.ls_name.id_string
     | Exec_any (rs,mvs) ->
          fprintf fmt
-           "@[<h2>(abstract) execution of unimplemented function%t%t%a@]"
+           "@[<h2>(giant-step) execution of unimplemented function%t%t%a@]"
            (fun fmt -> Opt.iter (fprintf fmt " `%a`" print_rs) rs)
            (fun fmt -> if Mvs.is_empty mvs then fprintf fmt " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
@@ -642,8 +644,8 @@ module Log : Log = struct
       let id2string id = id.id_string in
       let rs2string rs = rs.rs_name.id_string in
       let print_json_kind fmt = function
-        | ExecAbstract -> print_json fmt (string "ABSTRACT")
-        | ExecConcrete -> print_json fmt (string "CONCRETE") in
+        | Exec_giant_steps -> print_json fmt (string "GIANT-STEPS")
+        | Exec_normal -> print_json fmt (string "NORMAL") in
       let print_value_or_undefined fmt = function
         | Value v -> print_value fmt v
         | Invalid -> print_json fmt Null in
@@ -782,11 +784,11 @@ end
 type get_value =
   ?loc:Loc.position -> (ity -> value -> unit) -> ident -> ity -> value option
 
-type rac_config = {
+type config = {
   do_rac              : bool;
-  rac_abstract        : bool;
+  giant_steps         : bool;
   skip_cannot_compute : bool; (* skip if it cannot compute, when possible *)
-  rac_reduce          : rac_reduce_config;
+  rac                 : rac_config;
   get_value           : get_value;
   log_uc              : Log.log_uc;
   limits              : float option * int option; (* (seconds, steps) *)
@@ -794,14 +796,10 @@ type rac_config = {
 
 let default_get_value ?loc:_ _ _ _ = None
 
-let rac_config ~do_rac ~abstract:rac_abstract
-      ?(skip_cannot_compute=true)
-      ?reduce:rac_reduce
+let config ~do_rac ~giant_steps ?(skip_cannot_compute=true) ?rac
       ?(get_value=default_get_value) ?timelimit ?steplimit () =
-  let rac_reduce = match rac_reduce with
-    | Some r -> r
-    | None -> rac_reduce_config () in
-  {do_rac; rac_abstract; rac_reduce; log_uc= Log.empty_log_uc ();
+  let rac = match rac with | Some r -> r | None -> rac_config () in
+  {do_rac; giant_steps; rac; log_uc= Log.empty_log_uc ();
    get_value; skip_cannot_compute; limits=(timelimit, steplimit) }
 
 type bunch = term list list ref
@@ -829,44 +827,44 @@ type env = {
   rsenv    : value Lazy.t Mrs.t; (* global constants *)
   premises : premises;
   env      : Env.env;
-  rac      : rac_config;
+  config   : config;
   old_varl : ((term * lsymbol option) list * value Mvs.t) option;
 }
 
-let default_env env rac pmodule =
-  { pmodule; rac; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty;
+let default_env env config pmodule =
+  { pmodule; config; env; funenv= Mrs.empty; vsenv= Mvs.empty; rsenv= Mrs.empty;
     premises= ref [ref []]; old_varl= None }
 
 let register_used_value env loc id value =
-  Log.log_val env.rac.log_uc id (snapshot value) loc
+  Log.log_val env.config.log_uc id (snapshot value) loc
 
 let register_const_init env loc id =
-  Log.log_const env.rac.log_uc id loc
+  Log.log_const env.config.log_uc id loc
 
 let register_call env loc rs mvs kind =
-  Log.log_call env.rac.log_uc rs (Mvs.map snapshot mvs) kind loc
+  Log.log_call env.config.log_uc rs (Mvs.map snapshot mvs) kind loc
 
 let register_pure_call env loc ls kind =
-  Log.log_pure_call env.rac.log_uc ls kind loc
+  Log.log_pure_call env.config.log_uc ls kind loc
 
 let register_any_call env loc rs mvs =
-  Log.log_any_call env.rac.log_uc rs (Mvs.map snapshot mvs) loc
+  Log.log_any_call env.config.log_uc rs (Mvs.map snapshot mvs) loc
 
 let register_iter_loop env loc kind =
-  Log.log_iter_loop env.rac.log_uc kind loc
+  Log.log_iter_loop env.config.log_uc kind loc
 
 let register_exec_main env rs =
-  Log.log_exec_main env.rac.log_uc rs (Mvs.map snapshot env.vsenv)
+  Log.log_exec_main env.config.log_uc rs (Mvs.map snapshot env.vsenv)
     env.rsenv rs.rs_name.id_loc
 
 let register_failure env loc reason mvs =
-  Log.log_failed env.rac.log_uc reason (Mid.map snapshot mvs) loc
+  Log.log_failed env.config.log_uc reason (Mid.map snapshot mvs) loc
 
 let register_stucked env loc reason mvs =
-  Log.log_stucked env.rac.log_uc reason (Mid.map snapshot mvs) loc
+  Log.log_stucked env.config.log_uc reason (Mid.map snapshot mvs) loc
 
 let register_ended env loc =
-  Log.log_exec_ended env.rac.log_uc loc
+  Log.log_exec_ended env.config.log_uc loc
 
 let snapshot_vsenv = Mvs.map snapshot
 
@@ -934,7 +932,7 @@ let use_float_format (float_format : int) =
   match float_format with
   | 32 -> initialize_float32 ()
   | 64 -> initialize_float64 ()
-  | _ -> cannot_compute "float format is unknown: %d" float_format
+  | _ -> incomplete "float format is unknown: %d" float_format
 
 let eval_float :
   type a. tysymbol -> int -> a float_arity -> a -> rsymbol -> value list -> value option =
@@ -955,10 +953,10 @@ let eval_float :
           Vfloat (subnormalize ~rnd:mode (op mode f1 f2 f3))
       | Mode_rel, [Vfloat f1; Vfloat f2] -> Vbool (op f1 f2)
       | Mode_rel1, [Vfloat f] -> Vbool (op f)
-      | _ -> cannot_compute "arity error in float operation" in
+      | _ -> incomplete "arity error in float operation" in
     Some {v_desc; v_ty= ty_result}
   with Mlmpfr_wrapper.Not_Implemented ->
-    cannot_compute "mlmpfr wrapper is not implemented"
+    incomplete "mlmpfr wrapper is not implemented"
 
 type 'a real_arity =
   | Modeconst : Big_real.real real_arity
@@ -974,14 +972,14 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
       | Mode2r, [Vreal r1; Vreal r2] -> Vreal (op r1 r2)
       | Mode_relr, [Vreal r1; Vreal r2] -> Vbool (op r1 r2)
       | Modeconst, [] -> Vreal op
-      | _ -> cannot_compute "arity error in real operation" in
+      | _ -> incomplete "arity error in real operation" in
     Some {v_desc; v_ty= ty_real}
   with
   | Big_real.Undetermined ->
       (* Cannot decide interval comparison *)
-      cannot_compute "computation on reals is undetermined"
+      incomplete "computation on reals is undetermined"
   | Mlmpfr_wrapper.Not_Implemented ->
-      cannot_compute "mlmpfr wrapper is not implemented"
+      incomplete "mlmpfr wrapper is not implemented"
 
 let builtin_progs = Hrs.create 17
 
@@ -1102,7 +1100,7 @@ let built_in_modules () =
                 let n = BigInt.to_int n in
                 let ty = ty_app ts [def.v_ty] in
                 Some (value ty (Varray (Array.make n def)))
-              with e -> cannot_compute "array could not be made: %a" Exn_printer.exn_printer e )
+              with e -> incomplete "array could not be made: %a" Exn_printer.exn_printer e )
           | _ -> assert false);
       "empty", (fun _ args -> match args with
           | [{v_desc= Vconstr(_, _, [])}] ->
@@ -1118,7 +1116,7 @@ let built_in_modules () =
       op_get "", (fun _ args -> match args with
           | [{v_desc= Varray a}; {v_desc= Vnum i}] -> (
               try Some a.(BigInt.to_int i) with e ->
-                cannot_compute "array element could not be retrieved: %a" Exn_printer.exn_printer e )
+                incomplete "array element could not be retrieved: %a" Exn_printer.exn_printer e )
           | _ -> assert false);
       op_set "", (fun _ args -> match args with
           | [{v_desc= Varray a}; {v_desc= Vnum i}; v] -> (
@@ -1126,7 +1124,7 @@ let built_in_modules () =
                 a.(BigInt.to_int i) <- v;
                 Some unit_value
               with e ->
-                cannot_compute "array element could not be set: %a" Exn_printer.exn_printer e )
+                incomplete "array element could not be set: %a" Exn_printer.exn_printer e )
           | _ -> assert false) ;
         ]);
     float_module 32 ~prec:24 "Float32";
@@ -1391,7 +1389,7 @@ let add_premises ?post_res ?(vsenv=[]) ts env =
         let t = t_ty_subst mt mv t in
         let vs_args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
         t_let_close vs (t_lambda vs_args [] t) sofar
-    | _ -> cannot_compute "anonymous function not cfun"
+    | _ -> incomplete "anonymous function not cfun"
     | exception Not_found ->
         kasprintf failwith "add_premises: function %a not found" print_vs vs in
   let close_term t =
@@ -1445,7 +1443,7 @@ type cntr_ctx = {
 
 type pre_cntr_ctx = env -> cntr_ctx
 
-exception Contr of cntr_ctx * term
+exception RAC_Failure of cntr_ctx * term
 
 let describe_cntr_ctx ctx =
   asprintf "%s%a"
@@ -1493,7 +1491,7 @@ let cntr_ctx ?loc ?(attrs=Sattr.empty) ?desc attr () : pre_cntr_ctx =
       c_loc= loc;
       c_attrs= attrs;
       c_vsenv= snapshot_vsenv env.vsenv;
-      c_log_uc= env.rac.log_uc;
+      c_log_uc= env.config.log_uc;
     }
 
 (******************************************************************************)
@@ -1657,7 +1655,7 @@ let task_of_term ?(vsenv=[]) metas env t =
 let bind_univ_quant_vars = false
 let bind_univ_quant_vars_default = false
 
-(* Get the value of a vsymbol with env.rac.get_value or a default value *)
+(* Get the value of a vsymbol with env.config.get_value or a default value *)
 let get_value_for_quant_var env vs =
   match vs.vs_name.id_loc with
   | None -> None
@@ -1666,7 +1664,7 @@ let get_value_for_quant_var env vs =
         if bind_univ_quant_vars then
           let check _ _ =
             Warning.emit "Model value for all-quantified variable not checked" in
-          let v = env.rac.get_value ~loc check vs.vs_name (ity_of_ty vs.vs_ty) in
+          let v = env.config.get_value ~loc check vs.vs_name (ity_of_ty vs.vs_ty) in
           (Opt.iter (fun v ->
                Debug.dprintf debug_rac_values
                  "Bind all-quantified variable %a to %a@."
@@ -1687,7 +1685,7 @@ let get_value_for_quant_var env vs =
 
 (** When the task goal is [forall vs* . t], add declarations to the
    task that bind the variables [vs*] to concrete values (with
-   env.rac.get_value or default values), and make [t] the new goal. *)
+   env.config.get_value or default values), and make [t] the new goal. *)
 let bind_univ_quant_vars env task =
   try match (Task.task_goal_fmla task).t_node with
     | Tquant (Tforall, tq) ->
@@ -1709,8 +1707,9 @@ let task_hd_equal t1 t2 = let open Task in let open Theory in let open Decl in
       pr_equal p1 p2 && t_equal_strict g1 g2
   | _ -> t1 == t2
 
-(** Apply the (reduction) transformation and fill universally quantified variables
-    in the head of the task by values obtained with env.rac.get_value, recursively. *)
+(** Apply the (reduction) transformation and fill universally quantified
+    variables in the head of the task by values obtained with
+    env.config.get_value, recursively. *)
 let rec trans_and_bind_quants env trans task =
   let task = bind_univ_quant_vars env task in
   let tasks = Trans.apply trans task in
@@ -1724,10 +1723,10 @@ let rec trans_and_bind_quants env trans task =
 
 (** Compute the value of a term by using the (reduction) transformation *)
 let compute_term ?vsenv env t =
-  match env.rac.rac_reduce.rac_trans with
+  match env.config.rac.rac_trans with
   | None -> t
   | Some trans ->
-      let task, ls_mv = task_of_term ?vsenv env.rac.rac_reduce.rac_metas env t in
+      let task, ls_mv = task_of_term ?vsenv env.config.rac.rac_metas env t in
       if t.t_ty = None then (* [t] is a formula *)
         let tasks = trans_and_bind_quants env trans task in
         match List.map Task.task_goal_fmla tasks with
@@ -1796,20 +1795,20 @@ let check_term_dispatch ~try_negate rp task =
 (* The callee must ensure that RAC is enabled. *)
 let check_term ?vsenv env (ctx: pre_cntr_ctx) t =
   let ctx = ctx env in
-  if not env.rac.do_rac then failwith "check_term with RAC disabled";
+  if not env.config.do_rac then failwith "check_term with RAC disabled";
   Debug.dprintf debug_rac_check_sat "@[<hv2>Check term: %a %a@]@." print_term t
     Pp.(print_list space (fun fmt vs -> fprintf fmt "@[%a=%a@]" print_vs vs print_value (get_vs env vs)))
     (Mvs.keys (t_freevars Mvs.empty t)) ;
-  let task, _ = task_of_term ?vsenv env.rac.rac_reduce.rac_metas env t in
+  let task, _ = task_of_term ?vsenv env.config.rac.rac_metas env t in
   let res = (* Try checking the term using computation first ... *)
     Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Computed %b.@." b; b)
-      (Opt.bind env.rac.rac_reduce.rac_trans
+      (Opt.bind env.config.rac.rac_trans
          (fun trans -> check_term_compute env trans task)) in
   let res =
     if res = None then (* ... then try solving using a prover *)
-      let try_negate = env.rac.rac_reduce.rac_try_negate in
+      let try_negate = env.config.rac.rac_try_negate in
       Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Dispatched: %b.@." b; b)
-        (Opt.bind env.rac.rac_reduce.rac_prover
+        (Opt.bind env.config.rac.rac_prover
            (fun rp -> check_term_dispatch ~try_negate rp task))
     else res in
   let task_filename = match Sys.getenv_opt "WHY3RACTASKDIR" with
@@ -1829,15 +1828,15 @@ let check_term ?vsenv env (ctx: pre_cntr_ctx) t =
   | Some false ->
       Debug.dprintf debug_rac_check_term_result "%a%t@."
         report_cntr (ctx, "failed", t) pp_task_filename;
-      raise (Contr (ctx, t))
+      raise (RAC_Failure (ctx, t))
   | None ->
       let msg = "cannot be evaluated" in
       Debug.dprintf debug_rac_check_term_result "%a%t@."
         report_cntr_head (ctx, msg, t) pp_task_filename;
-      if env.rac.skip_cannot_compute then
+      if env.config.skip_cannot_compute then
         Warning.emit "%a@." report_cntr_head (ctx, msg, t)
       else
-        cannot_compute "%a" report_cntr_title (ctx, msg)
+        incomplete "%a" report_cntr_title (ctx, msg)
 
 let check_terms env ctx = List.iter (check_term env ctx)
 
@@ -1870,13 +1869,13 @@ let check_type_invs ?loc env ity v =
     let ctx = cntr_ctx Vc.expl_type_inv ?loc:loc () in
     check_terms env ctx def.Pdecl.itd_invariant
 
-exception RACStuck of env * Loc.position option * string
-(* The execution goes into RACStuck when a property that should be
+exception RAC_Stuck of env * Loc.position option * string
+(* The execution goes into RAC_Stuck when a property that should be
    assumed is not satisfied. E.g. when executing a function, if the
    environment does not satisfy the precondition, the execution ends
-   with RACStuck. *)
+   with RAC_Stuck. *)
 
-let stuck ?loc env f = kasprintf (fun reason -> RACStuck (env, loc, reason)) f
+let stuck ?loc env f = kasprintf (fun reason -> RAC_Stuck (env, loc, reason)) f
 
 let opt_or o1 o2 = if o1 <> None then o1 else o2
 
@@ -1900,14 +1899,14 @@ let value_of_free_vars env ctx t =
     ) mid t
 
 let check_assume_term env ctx t =
-  try check_term env ctx t with Contr (ctx,t) ->
+  try check_term env ctx t with RAC_Failure (ctx,t) ->
     let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
     register_stucked env loc (describe_cntr_ctx ctx) mid;
     raise (stuck ?loc env "failure in %s" (describe_cntr_ctx ctx))
 
 let check_assume_terms env ctx tl =
-  try check_terms env ctx tl with Contr (ctx,t) ->
+  try check_terms env ctx tl with RAC_Failure (ctx,t) ->
     let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
     register_stucked env loc (describe_cntr_ctx ctx) mid;
@@ -1916,32 +1915,32 @@ let check_assume_terms env ctx tl =
 let check_assume_posts env ctx v posts =
   let ctx = ctx env in
   try check_posts env ctx.c_attr ?desc:ctx.c_desc ctx.c_loc v posts
-  with Contr (ctx,t) ->
+  with RAC_Failure (ctx,t) ->
     let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
     register_stucked env loc (describe_cntr_ctx ctx) mid;
     raise (stuck ?loc env "failure in %s" (describe_cntr_ctx ctx))
 
 let check_term ?vsenv env ctx t =
-  try check_term ?vsenv env ctx t with (Contr (ctx,t)) as e ->
+  try check_term ?vsenv env ctx t with (RAC_Failure (ctx,t)) as e ->
     let mid = value_of_free_vars env ctx t in
     register_failure env (opt_or ctx.c_loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_terms env ctx tl =
-  try check_terms env ctx tl with (Contr (ctx,t)) as e ->
+  try check_terms env ctx tl with (RAC_Failure (ctx,t)) as e ->
     let mid = value_of_free_vars env ctx t in
     register_failure env (opt_or ctx.c_loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_posts env attr ?desc ?attrs loc v posts =
-  try check_posts env attr ?desc ?attrs loc v posts with (Contr (ctx,t)) as e ->
+  try check_posts env attr ?desc ?attrs loc v posts with (RAC_Failure (ctx,t)) as e ->
     let mid = value_of_free_vars env ctx t in
     register_failure env (opt_or ctx.c_loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_assume_type_invs ?loc env ity v =
-  try check_type_invs ?loc env ity v with Contr (ctx, t) ->
+  try check_type_invs ?loc env ity v with RAC_Failure (ctx, t) ->
     let loc = opt_or ctx.c_loc t.t_loc in
     let mid = value_of_free_vars env ctx t in
     register_stucked env loc (describe_cntr_ctx ctx) mid;
@@ -1950,7 +1949,7 @@ let check_assume_type_invs ?loc env ity v =
 (* Currently, type invariants are only check when creating values or getting
    values from the model. TODO Check type invariants also during execution *)
 let check_type_invs ?loc env ity v =
-  try check_type_invs ?loc env ity v with Contr (ctx, t) as e ->
+  try check_type_invs ?loc env ity v with RAC_Failure (ctx, t) as e ->
     let mid = value_of_free_vars env ctx t in
     register_failure env (opt_or ctx.c_loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
@@ -2080,7 +2079,7 @@ let fix_boolean_term t =
   if t_equal t t_false then t_bool_false else t
 
 let exec_pure ~loc env ls pvs =
-  register_pure_call env loc ls Log.ExecConcrete;
+  register_pure_call env loc ls Log.Exec_normal;
   if ls_equal ls ps_equ then
     (* TODO (?) Add more builtin logical symbols *)
     let pv1, pv2 = match pvs with [pv1; pv2] -> pv1, pv2 | _ -> assert false in
@@ -2140,7 +2139,7 @@ let value_of_term env t =
           | _ -> raise Exit in
         let vs = List.map aux ts in
         let res = value ty (Vconstr (rs, fs, List.map field vs)) in
-        if env.rac.do_rac then check_type_invs env (ity_of_ty ty) res;
+        if env.config.do_rac then check_type_invs env (ity_of_ty ty) res;
         res
     | _ -> raise Exit in
   try Some (aux t) with Exit -> None
@@ -2181,8 +2180,8 @@ let get_value : value_gen list -> string * value =
 let gen_model_variable ?check env ?loc id ity : value_gen =
   "value from model", fun () ->
     Opt.apply () check id;
-    try env.rac.get_value ?loc (check_assume_type_invs ?loc env) id ity with
-    | CannotCompute {reason} ->
+    try env.config.get_value ?loc (check_assume_type_invs ?loc env) id ity with
+    | Exec_incomplete reason ->
         Debug.dprintf debug_rac_values "Cannot compute getting value: %s@."
           reason;
         if is_ignore_id id then None else
@@ -2208,7 +2207,7 @@ let gen_type_default ~really ?posts env ity : value_gen =
     try
       Opt.iter (check_posts env Vc.expl_post ~desc:"type default value" None v) posts;
       Some v
-    with Contr _ | CannotCompute _ -> None
+    with RAC_Failure _ | Exec_incomplete _ -> None
 
 (** Generate a value by evaluating an optional expression, if that is not [None]
    *)
@@ -2217,12 +2216,12 @@ let gen_eval_expr env eval_expr id oexp =
     match oexp with
     | None -> None
     | Some e ->
-        let env' = {env with rac= {env.rac with rac_abstract= false}} in
+        let env' = {env with config= {env.config with giant_steps= false}} in
         register_const_init env id.id_loc id;
         match eval_expr env' e with
         | Normal v -> Some v
         | Excep _ ->
-            cannot_compute "initialization of global variable `%a` raised an \
+            incomplete "initialization of global variable `%a` raised an \
                             exception" print_decoded id.id_string
         | Irred _ -> None
 
@@ -2230,7 +2229,7 @@ let gen_eval_expr env eval_expr id oexp =
     if no value is generated. *)
 let get_value' ctx_desc oloc gens =
   let desc, value = try get_value gens with Not_found ->
-    cannot_compute "missing value for %s" ctx_desc
+    incomplete "missing value for %s" ctx_desc
       (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc in
   Debug.dprintf debug_rac_values "@[<h>%s for %s at %a: %a@]@."
     (String.capitalize_ascii desc) ctx_desc
@@ -2263,7 +2262,7 @@ let get_and_register_param env id ity =
   register_used_value env id.id_loc id value;
   value
 
-(* For globals, RACStuck exeptions that indicate invalid model values are
+(* For globals, RAC_Stuck exeptions that indicate invalid model values are
    referred lazily until their value is required in RAC or in the task. *)
 let get_and_register_global check_model_variable env eval_expr id oexp post ity =
   let ctx_desc = asprintf "global `%a`" print_decoded id.id_string in
@@ -2274,12 +2273,12 @@ let get_and_register_global check_model_variable env eval_expr id oexp post ity 
   try
     let value = get_value' ctx_desc id.id_loc gens in
     register_used_value env id.id_loc id value;
-    if env.rac.do_rac then (
+    if env.config.do_rac then (
       let desc = asprintf "of global variable `%a`" print_decoded id.id_string in
       let ctx = cntr_ctx Vc.expl_post ~desc () in
       check_assume_posts env ctx value post );
     lazy value
-  with RACStuck _ as e ->
+  with RAC_Stuck _ as e ->
     lazy Printexc.(raise_with_backtrace e (get_raw_backtrace ()))
 
 (******************************************************************************)
@@ -2320,13 +2319,13 @@ let check_timelimit time0 = function
   | None -> ()
   | Some timelimit ->
       if Sys.time () -. time0 >= timelimit then
-        cannot_compute "RAC timelimit reached"
+        incomplete "RAC timelimit reached"
 
 let check_steplimit (steps: int) = function
   | None -> ()
   | Some steplimit ->
       if steps >= steplimit then
-        cannot_compute "RAC steplimit reached"
+        incomplete "RAC steplimit reached"
 
 (* State for checking limits (start time and current step count) *)
 let limits_state = ref None
@@ -2371,10 +2370,10 @@ let find_rec_defn rs env =
       | _ -> None
 
 let rec eval_expr env e =
-  check_limits env.rac.limits;
+  check_limits env.config.limits;
   let _,l,bc,ec = Loc.get (Opt.get_def Loc.dummy_position e.e_loc) in
   Debug.dprintf debug_trace_exec "@[<h>%t%sEVAL EXPR %d %d-%d: %a@]@." pp_indent
-    (if env.rac.rac_abstract then "Abs. " else "") l bc ec
+    (if env.config.giant_steps then "G-s. " else "") l bc ec
     (pp_limited print_expr) e;
   let res = eval_expr' env e in
   Debug.dprintf debug_trace_exec "@[<h>%t -> %a@]@." pp_indent (print_result) res;
@@ -2399,7 +2398,7 @@ and eval_expr' env e =
         let sp, sq = BigInt.to_string p, BigInt.to_string q in
         try Normal (value ty_real (Vreal (Big_real.real_from_fraction sp sq)))
         with Mlmpfr_wrapper.Not_Implemented ->
-          cannot_compute "mlmpfr wrapper is not implemented"
+          incomplete "mlmpfr wrapper is not implemented"
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
@@ -2412,7 +2411,7 @@ and eval_expr' env e =
           Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: EXEC PURE %a %a@]@." pp_indent print_ls ls
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs env) pvs);
           let desc = asprintf "of `%a`" print_ls ls in
-          if env.rac.do_rac then
+          if env.config.do_rac then
             check_terms env (cntr_ctx ?loc:e.e_loc Vc.expl_pre ~desc ()) cty.cty_pre;
           with_push_premises env.premises @@ fun () -> (
           add_premises cty.cty_pre env;
@@ -2424,14 +2423,14 @@ and eval_expr' env e =
         let mvs = snapshot_vsenv cl in
         ( match ce.c_cty.cty_args with
           | [] ->
-             if env.rac.rac_abstract then begin
-                 register_call env e.e_loc None mvs Log.ExecAbstract;
+             if env.config.giant_steps then begin
+                 register_call env e.e_loc None mvs Log.Exec_giant_steps;
                  exec_call_abstract ?loc:e.e_loc ~attrs:e.e_attrs
                    ~snapshot:cty.cty_oldies env ce.c_cty [] e.e_ity
                end
              else begin
-                 register_call env e.e_loc None mvs Log.ExecConcrete;
-                 if env.rac.do_rac then
+                 register_call env e.e_loc None mvs Log.Exec_normal;
+                 if env.config.do_rac then
                    check_terms env (cntr_ctx ?loc:e.e_loc Vc.expl_pre ()) cty.cty_pre;
                  with_push_premises env.premises @@ fun () -> (
                  add_premises cty.cty_pre env;
@@ -2444,32 +2443,32 @@ and eval_expr' env e =
               let mt = Spv.fold match_free cty.cty_effect.eff_reads Mtv.empty in
               let ty = ty_inst mt (ty_of_ity e.e_ity) in
               if cty.cty_pre <> [] then
-                cannot_compute "anonymous function with precondition not supported (%a)"
+                incomplete "anonymous function with precondition not supported (%a)"
                   Pp.(print_option_or_default "unknown location" Pretty.print_loc') e.e_loc;
               Normal (value ty (Vfun (cl, arg.pv_vs, e')))
-          | _ -> cannot_compute "many args for exec fun" (* TODO *) )
+          | _ -> incomplete "many args for exec fun" (* TODO *) )
       | Cany ->
          register_any_call env e.e_loc None Mvs.empty;
-         if env.rac.do_rac then
+         if env.config.do_rac then
            exec_call_abstract ?loc:e.e_loc ~attrs:e.e_attrs
              ~snapshot:cty.cty_oldies env cty [] e.e_ity
          else (* We must check postconditions for abstract exec *)
-           cannot_compute "cannot evaluate any-value with RAC disabled"
+           incomplete "cannot evaluate any-value with RAC disabled"
       | Capp (rs, pvsl) when
           Opt.map is_prog_constant (Mid.find_opt rs.rs_name env.pmodule.Pmodule.mod_known)
           = Some true ->
-          if env.rac.do_rac then (
+          if env.config.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
             let ctx = cntr_ctx ?loc:e.e_loc Vc.expl_pre ~desc () in
             check_terms env ctx cty.cty_pre );
           assert (cty.cty_args = [] && pvsl = []);
           let v = Lazy.force (Mrs.find rs env.rsenv) in
-          if env.rac.do_rac then
+          if env.config.do_rac then
             check_posts env Vc.expl_post None v rs.rs_cty.cty_post;
           Normal v
       | Capp (rs, pvsl) ->
           if ce.c_cty.cty_args <> [] then
-            cannot_compute "no support for partial function applications (%a)"
+            incomplete "no support for partial function applications (%a)"
               (Pp.print_option_or_default "unknown location" Pretty.print_loc')
               e.e_loc;
           exec_call ?loc:e.e_loc ~attrs:e.e_attrs env rs pvsl e.e_ity
@@ -2520,7 +2519,7 @@ and eval_expr' env e =
         Debug.dprintf debug_trace_exec "Cannot eval if condition@.";
         Irred e )
     | r -> r )
-  | Ewhile (cond, inv, varl, e1) when env.rac.rac_abstract -> begin
+  | Ewhile (cond, inv, varl, e1) when env.config.giant_steps -> begin
       (* arbitrary execution of an iteration taken from the counterexample
 
         while e1 do invariant {I} e2 done
@@ -2536,31 +2535,31 @@ and eval_expr' env e =
             (invariant does not hold at beginning of execution)
         3 - if assert3 fails, then we have a real counterexample
             (invariant does not hold after iteration)
-        * stop the interpretation here - raise RACStuck *)
+        * stop the interpretation here - raise RAC_Stuck *)
       (* assert1 *)
       let res = with_push_premises env.premises @@ fun () -> (
-      if env.rac.do_rac then
+      if env.config.do_rac then
         check_terms env (cntr_ctx Vc.expl_loop_init ()) inv;
       add_premises inv env;
-      register_iter_loop env e.e_loc Log.ExecAbstract;
+      register_iter_loop env e.e_loc Log.Exec_giant_steps;
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
         (Mvs.keys env.vsenv);
       (* assert2 *)
       let opt_old_varl =
-        if env.rac.do_rac && e.e_effect.eff_oneway = Total then
+        if env.config.do_rac && e.e_effect.eff_oneway = Total then
           Some (oldify_varl env varl) else None in
       check_assume_terms env (cntr_ctx Vc.expl_loop_keep ()) inv;
       add_premises inv env;
       match eval_expr env cond with
       | Normal v ->
          if is_true v then begin
-             register_iter_loop env e.e_loc Log.ExecConcrete;
+             register_iter_loop env e.e_loc Log.Exec_normal;
              match eval_expr env e1 with
              | Normal _ ->
-                 if env.rac.do_rac then
+                 if env.config.do_rac then
                    check_terms env (cntr_ctx Vc.expl_loop_keep ()) inv;
                  add_premises inv env;
-                 if env.rac.do_rac && e.e_effect.eff_oneway = Total then (
+                 if env.config.do_rac && e.e_effect.eff_oneway = Total then (
                    let oldified_varl = Opt.get opt_old_varl in
                    check_variant Vc.expl_loop_vari e.e_loc env oldified_varl varl );
                  (* the execution cannot continue from here *)
@@ -2581,23 +2580,23 @@ and eval_expr' env e =
     end
   | Ewhile (e1, inv, varl, e2) ->
       let res = with_push_premises env.premises @@ fun () -> (
-      if env.rac.do_rac then
+      if env.config.do_rac then
         check_terms env (cntr_ctx Vc.expl_loop_init ()) inv ;
       add_premises inv env;
       let rec iter () =
         let opt_old_varl =
-          if env.rac.do_rac && e.e_effect.eff_oneway = Total then
+          if env.config.do_rac && e.e_effect.eff_oneway = Total then
             Some (oldify_varl env varl) else None in
         match eval_expr env e1 with
         | Normal v ->
             if is_true v then ( (* condition true *)
-              register_iter_loop env e.e_loc Log.ExecConcrete;
+              register_iter_loop env e.e_loc Log.Exec_normal;
               match eval_expr env e2 with
               | Normal _ -> (* body executed normally *)
-                  if env.rac.do_rac then
+                  if env.config.do_rac then
                     check_terms env (cntr_ctx Vc.expl_loop_keep ()) inv;
                   add_premises inv env;
-                  if env.rac.do_rac && e.e_effect.eff_oneway = Total then (
+                  if env.config.do_rac && e.e_effect.eff_oneway = Total then (
                     let old_varl = Opt.get opt_old_varl in
                     check_variant Vc.expl_loop_vari e.e_loc env old_varl varl );
                   iter ()
@@ -2612,7 +2611,7 @@ and eval_expr' env e =
       ) in
       add_premises inv env;
       res
-  | Efor (i, (pvs1, dir, pvs2), _ii, inv, e1) when env.rac.rac_abstract -> begin
+  | Efor (i, (pvs1, dir, pvs2), _ii, inv, e1) when env.config.giant_steps -> begin
       (* TODO what to do with _ii? *)
       (* arbitrary execution of an iteartion taken from the counterexample
         for i = e1 to e2 do invariant {I} e done
@@ -2652,11 +2651,11 @@ and eval_expr' env e =
         let le, suc = match dir with
           | To -> BigInt.le, BigInt.succ
           | DownTo -> BigInt.ge, BigInt.pred in
-        register_iter_loop env e.e_loc Log.ExecAbstract;
+        register_iter_loop env e.e_loc Log.Exec_giant_steps;
         (* assert1 *)
         if le a (suc b) then begin
           let env = bind_vs i.pv_vs (int_value a) env in
-          if env.rac.do_rac then begin
+          if env.config.do_rac then begin
             check_terms env (cntr_ctx Vc.expl_loop_init ()) inv end;
           add_premises inv env;
           List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy env)
@@ -2671,7 +2670,7 @@ and eval_expr' env e =
             register_stucked env e.e_loc msg mid;
             raise (stuck ?loc:e.e_loc env "because %s" msg) end;
           if le a i_bi && le i_bi b then begin
-            register_iter_loop env e.e_loc Log.ExecAbstract;
+            register_iter_loop env e.e_loc Log.Exec_giant_steps;
             (* assert2 *)
             check_assume_terms env (cntr_ctx Vc.expl_loop_keep ()) inv;
             add_premises inv env;
@@ -2679,7 +2678,7 @@ and eval_expr' env e =
             | Normal _ ->
                 let env = bind_vs i.pv_vs (int_value (suc i_bi)) env in
                 (* assert3 *)
-                if env.rac.do_rac then
+                if env.config.do_rac then
                   check_terms env (cntr_ctx Vc.expl_loop_keep ()) inv;
                 add_premises inv env;
                 let env = bind_vs i.pv_vs (int_value (suc b)) env in
@@ -2714,18 +2713,18 @@ and eval_expr' env e =
       let a = big_int_of_value (get_pvs env pvs1) in
       let b = big_int_of_value (get_pvs env pvs2) in
       let env = bind_vs pvs.pv_vs (value ty_int (Vnum a)) env in
-      ( if env.rac.do_rac then
+      ( if env.config.do_rac then
           check_terms env (cntr_ctx Vc.expl_loop_init ()) inv ) ;
       add_premises inv env;
       let rec iter i =
         Debug.dprintf debug_trace_exec "[interp] for loop with index = %s@."
           (BigInt.to_string i) ;
         if le i b then (
-          register_iter_loop env e.e_loc Log.ExecConcrete;
+          register_iter_loop env e.e_loc Log.Exec_normal;
           let env = bind_vs pvs.pv_vs (int_value i) env in
           match eval_expr env e1 with
           | Normal _ ->
-              if env.rac.do_rac then
+              if env.config.do_rac then
                 check_terms env (cntr_ctx Vc.expl_loop_keep ()) inv ;
               iter (suc i)
           | r -> r, None
@@ -2763,7 +2762,7 @@ and eval_expr' env e =
       match r with Normal t -> Excep (xs, t) | _ -> r )
   | Eexn (_, e1) -> eval_expr env e1
   | Eassert (kind, t) ->
-      if env.rac.do_rac then begin
+      if env.config.do_rac then begin
           match kind with
             | Assert ->
                 check_term env (cntr_ctx Vc.expl_assert ()) t;
@@ -2785,7 +2784,7 @@ and eval_expr' env e =
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
       let ctx = cntr_ctx Vc.expl_absurd ?loc:e.e_loc () in
-      raise (Contr (ctx env, t_false))
+      raise (RAC_Failure (ctx env, t_false))
 
 and exec_match env t ebl =
   let rec iter ebl =
@@ -2807,18 +2806,18 @@ and exec_call ?(main_function=false) ?loc ?attrs env rs arg_pvs ity_result =
   let env = multibind_pvs rs.rs_cty.cty_args arg_vs env in
   let env = {env with vsenv= snapshot_oldies rs.rs_cty.cty_oldies env.vsenv} in
   let res = with_push_premises env.premises @@ fun () -> (
-  let exec_kind =
-    let can_interpret_abstractly =
+  let mode =
+    let giant_steps_possible () =
       if rs_equal rs rs_func_app then false else
         match find_definition env rs with
         | LocalFunction _ -> true | _ -> false in
-    if env.rac.rac_abstract && can_interpret_abstractly && not main_function
-    then Log.ExecAbstract
-    else Log.ExecConcrete in
+    if env.config.giant_steps && not main_function && giant_steps_possible ()
+    then Log.Exec_giant_steps
+    else Log.Exec_normal in
   let mvs = let aux pv v = pv.pv_vs, snapshot v in
     Mvs.of_list (List.map2 aux rs.rs_cty.cty_args arg_vs) in
   let env =
-    if env.rac.do_rac then ( (* Check variant decrease, maybe *)
+    if env.config.do_rac then ( (* Check variant decrease, maybe *)
       match find_rec_defn rs env with
       | None -> (* Call to non-recursive function *)
           {env with old_varl= None}
@@ -2833,31 +2832,31 @@ and exec_call ?(main_function=false) ?loc ?attrs env rs arg_pvs ity_result =
                   check_variant Vc.expl_variant loc env old_varl rd.rec_varl;
                   {env with old_varl= Some (oldify_varl env rd.rec_varl)} )
     else env in
-  let check_pre_and_register_call ?(any_function=false) exec_kind =
+  let check_pre_and_register_call ?(any_function=false) mode =
     if not main_function then
       if any_function then
         register_any_call env loc (Some rs) mvs
       else
-        register_call env loc (Some rs) mvs exec_kind;
+        register_call env loc (Some rs) mvs mode;
     (* Module [Expr] adds a precondition "DECR f" to each recursive function
        "f", which is not defined in the context of Pinterp. TODO? *)
     let not_DECR = function
       | {t_node= Tapp (f, _)} -> not (Strings.has_prefix "DECR " f.ls_name.id_string)
       | _ -> true in
-    if env.rac.do_rac then (
+    if env.config.do_rac then (
       let desc = asprintf "of `%a`" print_rs rs in
       let ctx = cntr_ctx ?loc:loc ?attrs Vc.expl_pre ~desc () in
       let pre = List.filter not_DECR rs.rs_cty.cty_pre in
       (if main_function then check_assume_terms else check_terms) env ctx pre );
     add_premises (List.filter not_DECR rs.rs_cty.cty_pre) env in
-  match exec_kind with
-  | Log.ExecAbstract ->
-      check_pre_and_register_call Log.ExecAbstract;
+  match mode with
+  | Log.Exec_giant_steps ->
+      check_pre_and_register_call Log.Exec_giant_steps;
       exec_call_abstract ?loc ?attrs ~rs env rs.rs_cty arg_pvs ity_result
-  | Log.ExecConcrete ->
+  | Log.Exec_normal ->
       let res =
         if rs_equal rs rs_func_app then begin
-          check_pre_and_register_call Log.ExecConcrete;
+          check_pre_and_register_call Log.Exec_normal;
           match arg_vs with
           | [{v_desc= Vfun (cl, arg, e)}; value] ->
               let env =
@@ -2874,7 +2873,7 @@ and exec_call ?(main_function=false) ?loc ?attrs env rs arg_pvs ity_result =
           match rs, arg_vs with
           | {rs_logic= RLls ls}, [{v_desc= Vproj (ls', v)}]
             when ls_equal ls ls' -> (* Projection of a projection value *)
-              check_pre_and_register_call Log.ExecConcrete;
+              check_pre_and_register_call Log.Exec_normal;
               Normal v
           | _ -> match find_definition env rs with
             | LocalFunction (locals, (ce, rdl)) -> (
@@ -2883,32 +2882,32 @@ and exec_call ?(main_function=false) ?loc ?attrs env rs arg_pvs ity_result =
                 | Capp (rs', pvl) ->
                     Debug.dprintf debug_trace_exec "@[<h>%tEXEC CALL %a: Capp %a]@."
                       pp_indent print_rs rs print_rs rs';
-                    check_pre_and_register_call Log.ExecConcrete;
+                    check_pre_and_register_call Log.Exec_normal;
                     exec_call ?loc ?attrs env rs' (pvl @ arg_pvs) ity_result
                 | Cfun body ->
                     Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: FUN/%d %a@]@."
                       pp_indent print_rs rs (List.length ce.c_cty.cty_args) (pp_limited print_expr) body;
                     let env = multibind_pvs ce.c_cty.cty_args arg_vs env in
-                    check_pre_and_register_call Log.ExecConcrete;
+                    check_pre_and_register_call Log.Exec_normal;
                     eval_expr env body
                 | Cany ->
-                    if env.rac.do_rac then (
-                      check_pre_and_register_call ~any_function:true Log.ExecAbstract;
+                    if env.config.do_rac then (
+                      check_pre_and_register_call ~any_function:true Log.Exec_giant_steps;
                       exec_call_abstract ?loc ?attrs ~rs env rs.rs_cty arg_pvs ity_result )
                     else (* We can't check the postcondition *)
-                      cannot_compute "cannot apply an any-function %a with RAC disabled"
+                      incomplete "cannot apply an any-function %a with RAC disabled"
                         print_rs rs
                 | Cpur _ -> assert false (* TODO ? *) )
             | Builtin f ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
-                check_pre_and_register_call Log.ExecConcrete;
+                check_pre_and_register_call Log.Exec_normal;
                 ( match f rs arg_vs with
                   | Some v -> Normal v
-                  | None -> cannot_compute "cannot compute result of builtin `%a`"
+                  | None -> incomplete "cannot compute result of builtin `%a`"
                               Ident.print_decoded rs.rs_name.id_string )
             | Constructor its_def ->
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: CONSTRUCTOR@]@." pp_indent print_rs rs;
-                check_pre_and_register_call Log.ExecConcrete;
+                check_pre_and_register_call Log.Exec_normal;
                 let aux mt pv v =
                   ty_match mt pv.pv_vs.vs_ty (ty_inst mt (v_ty v)) in
                 let mt =
@@ -2916,11 +2915,11 @@ and exec_call ?(main_function=false) ?loc ?attrs env rs arg_pvs ity_result =
                 let ty = ty_inst mt (ty_of_ity ity_result) in
                 let vs = List.map field arg_vs in
                 let v = value ty (Vconstr (rs, its_def.Pdecl.itd_fields, vs)) in
-                if env.rac.do_rac then check_type_invs ?loc env ity_result v;
+                if env.config.do_rac then check_type_invs ?loc env ity_result v;
                 Normal v
             | Projection _d -> (
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
-                check_pre_and_register_call Log.ExecConcrete;
+                check_pre_and_register_call Log.Exec_normal;
                 match rs.rs_field, arg_vs with
                 | Some pv, [{v_desc= Vconstr (cstr, _, args)} as v] ->
                     let rec search constr_args args =
@@ -2937,9 +2936,9 @@ and exec_call ?(main_function=false) ?loc ?attrs env rs arg_pvs ity_result =
                          Pp.(print_list comma print_value) arg_vs
                          print_rs rs )
             | exception Not_found ->
-                cannot_compute "definition of routine %s could not be found"
+                incomplete "definition of routine %s could not be found"
                   rs.rs_name.id_string in
-      if env.rac.do_rac then (
+      if env.config.do_rac then (
         let desc = asprintf "of `%a`" print_rs rs in
         let loc = if main_function then None else loc in
         match res with
@@ -2968,7 +2967,7 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs env cty arg_pvs ity_result =
      from the counterexample)
    *)
   let res = with_push_premises env.premises @@ fun () -> (
-  let exn = CannotCompute {reason= "Abstract call without location"} in
+  let exn = Exec_incomplete "Giant-step call without location" in
   let loc = Opt.get_exn exn loc in
   let env = match snapshot with
     | Some oldies -> {env with vsenv= snapshot_oldies oldies env.vsenv}
@@ -3018,7 +3017,7 @@ module Sidpos = struct
      variable, we cannot decide here if the values is intended for that
      variable, because they the different variables share the same location.
      Because the wrong value can make the RAC stuck and the model to be
-     considered (wrongly) BAD, we have to abort.
+     considered (wrongly) BAD_CE, we have to abort.
 
      As of 84f534324, identifiers from cloned modules have the location of
      the clone, but we leave the check here to identify possible other sources

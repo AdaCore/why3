@@ -342,8 +342,9 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
       (Call_provers.print_prover_result ~json:false) res;
     (match ce with
      | Some ce ->
-        Counterexample.print_counterexample ?verb_lvl:!opt_ce_check_verbosity
-          ~check_ce:!opt_check_ce_model ?json fmt ce
+         Counterexample.print_model_classification
+           ?verb_lvl:!opt_ce_check_verbosity ~check_ce:!opt_check_ce_model
+           ?json fmt ce
      | None -> ());
     fprintf fmt "@\n"
 
@@ -353,29 +354,29 @@ let select_ce env th models =
   if models <> [] then
     match Pmodule.restore_module th with
     | pm ->
-        let reduce_config =
-          Pinterp.rac_reduce_config_lit config env
+        let rac =
+          Pinterp.rac_config_lit config env
             ~trans:"compute_in_goal" ?prover:!opt_rac_prover
             ~try_negate:!opt_rac_try_negate () in
         let timelimit = Opt.map float_of_int !opt_rac_timelimit in
-        Counterexample.select_model ~reduce_config ?timelimit
-          ?steplimit:!opt_rac_steplimit ~check:!opt_check_ce_model
+        Counterexample.select_model ~check_ce:!opt_check_ce_model ~rac
+          ?timelimit ?steplimit:!opt_rac_steplimit
           ?verb_lvl:!opt_ce_check_verbosity env pm models
     | exception Not_found -> None
   else None
 
-let print_other_models (m, ce_summary) =
+let print_other_models (m, (c, log)) =
   let print_model fmt m =
     let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
     if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
     else Model_parser.print_model (* json values *) fmt m ~print_attrs in
-  ( match ce_summary with
-    | Counterexample.(NC _ | SW _ | NCSW _ | BAD _) ->
+  ( match c with
+    | Counterexample.(NC | SW | NC_SW | BAD_CE _) ->
         if Debug.test_flag debug_print_original_model then
           printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
     | _ -> () );
-  ( match ce_summary with
-    | Counterexample.(NC log | SW log | NCSW log) ->
+  ( match c with
+    | Counterexample.(NC | SW | NC_SW) ->
         if Debug.test_flag debug_print_derived_model then
           printf "@[<v>Derived model:@\n%a@]@\n@." print_model
             (Counterexample.model_of_exec_log ~original_model:m log)

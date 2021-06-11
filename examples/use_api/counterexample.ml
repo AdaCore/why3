@@ -162,39 +162,36 @@ let task =
   | [task] -> task
   | _ -> failwith "Not exactly one task"
 
-let pr =
+let {Call_provers.pr_models= models} =
   Call_provers.wait_on_call
     (Driver.prove_task ~limit:Call_provers.empty_limit
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
-    cvc4_driver task)
+       cvc4_driver task)
 
 (* BEGIN{check_ce} *)
 let () =
-  let reduce_config =
+  let rac =
     let trans = "compute_in_goal" and prover = "cvc4" and try_negate = true in
-    Pinterp.rac_reduce_config_lit ~trans ~prover ~try_negate config env () in
-  let check = true in
-  match Counterexample.select_model ~check ~reduce_config
-          env pm pr.Call_provers.pr_models with
-  | Some model_summary ->
-      printf "%a@." (Counterexample.print_counterexample
-                       ~check_ce:check ?verb_lvl:None ?json:None) model_summary
-  | None ->
-      printf "No model@."
+    Pinterp.rac_config_lit ~trans ~prover ~try_negate config env () in
+  let ms = Opt.get_exn (Failure "No good model found")
+      (Counterexample.select_model ~check_ce:true ~rac env pm models) in
+  printf "%a@." (Counterexample.print_model_classification
+                   ~check_ce:true ?verb_lvl:None ?json:None) ms
 (* END{check_ce} *)
 
 (* BEGIN{check_ce_giant_step} *)
 let () =
-  match Counterexample.select_model_last_non_empty pr.Call_provers.pr_models with
-  | None -> printf "No non-empty model@."
-  | Some model ->
-      let reduce_config =
-        let trans = "compute_in_goal" and prover = "cvc4" and try_negate = true in
-        Pinterp.rac_reduce_config_lit ~trans ~prover ~try_negate config env () in
-      match Counterexample.find_rs pm model with
-      | exception Failure str -> Warning.emit "%s@." str
-      | rs ->
-          let res = Counterexample.check_model_rs ~abstract:true
-              reduce_config env pm model rs in
-          Counterexample.print_full_result std_formatter res
+  let model = Opt.get_exn (Failure "No non-empty model")
+      (Counterexample.select_model_last_non_empty models) in
+  let loc = Opt.get_exn (Failure "No model term location")
+      (Model_parser.get_model_term_loc model) in
+  let rs =
+    Opt.get_exn (Failure "No procedure symbol found")
+      (Counterexample.find_rs pm loc) in
+  let rac =
+    let trans = "compute_in_goal" and prover = "cvc4" and try_negate = true in
+    Pinterp.rac_config_lit ~trans ~prover ~try_negate config env () in
+  let res =
+    Counterexample.rac_execute ~rac ~giant_steps:true env pm model rs in
+  Counterexample.print_rac_result std_formatter res
 (* END{check_ce_giant_step} *)

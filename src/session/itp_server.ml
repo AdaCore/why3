@@ -1010,12 +1010,11 @@ match pa.proof_state with
        let th = Session_itp.find_th cont.controller_session parid in
        let pm = Pmodule.restore_module (Theory.restore_theory (theory_name th)) in
        let env = cont.controller_env in
-       let reduce_config =
+       let rac =
          let trans = "compute_in_goal" and prover = None in
-         Pinterp.rac_reduce_config_lit cont.controller_config env ~trans ?prover () in
+         Pinterp.rac_config_lit cont.controller_config env ~trans ?prover () in
        let sel =
-         Counterexample.select_model ~check:true
-           ~reduce_config env pm res.pr_models in
+         Counterexample.select_model ~check_ce:true ~rac env pm res.pr_models in
        match sel with None -> Model_parser.empty_model | Some (m,_) -> m in
      let ce_result =
        Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs ?me_name_trans:None)
