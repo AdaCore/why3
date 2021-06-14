@@ -1,7 +1,7 @@
 Weakest Precondition
 File "bench/ce/records.mlw", line 15, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test1'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
@@ -21,7 +21,7 @@ Prover result is: Valid.
 
 File "bench/ce/records.mlw", line 23, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test2'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File records.mlw:
@@ -42,7 +42,7 @@ File records.mlw:
 
 File "bench/ce/records.mlw", line 28, characters 14-18:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -57,7 +57,7 @@ File ref.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
@@ -84,7 +84,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 28:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -115,7 +115,7 @@ File records.mlw:
 
 File "bench/ce/records.mlw", line 33, characters 14-22:
 Sub-goal Postcondition of goal record_match_eval_test4'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -130,7 +130,7 @@ File ref.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
@@ -157,7 +157,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 33:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -188,7 +188,7 @@ File records.mlw:
 
 File "bench/ce/records.mlw", line 42, characters 13-22:
 Sub-goal Assertion of goal record_match_eval_test44'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -203,7 +203,7 @@ File ref.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
@@ -230,7 +230,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 40:
     x [@field:0:contents] [@introduced] =
@@ -265,7 +265,7 @@ Prover result is: Valid.
 
 File "bench/ce/records.mlw", line 48, characters 14-26:
 Sub-goal Postcondition of goal test_record_match_eval_test5'vc.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -280,7 +280,7 @@ File ref.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
@@ -307,8 +307,8 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
-                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": true}}]}}}]}}
   Line 47:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -320,7 +320,7 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
+                   "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 48:
     re [@field:0:contents] [@introduced] [@model_trace:re] =
@@ -333,8 +333,8 @@ File records.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
-                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": true}}]}}}]}}
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
