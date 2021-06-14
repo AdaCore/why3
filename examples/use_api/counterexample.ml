@@ -122,7 +122,7 @@ let () = printf "@[On task 1, CVC4,1.7 answers %a@."
 
 let () = printf "Model is %t@."
     (fun fmt ->
-       match Counterexample.select_model_last_non_empty
+       match Check_ce.select_model_last_non_empty
                 result1.Call_provers.pr_models with
        | Some m ->
            Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None fmt m
@@ -168,30 +168,34 @@ let {Call_provers.pr_models= models} =
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
        cvc4_driver task)
 
+let () = print_endline "\n== Check CE"
+
 (* BEGIN{check_ce} *)
 let () =
-  let rac =
-    let trans = "compute_in_goal" and prover = "cvc4" and try_negate = true in
-    Pinterp.rac_config_lit ~trans ~prover ~try_negate config env () in
-  let ms = Opt.get_exn (Failure "No good model found")
-      (Counterexample.select_model ~check_ce:true ~rac env pm models) in
-  printf "%a@." (Counterexample.print_model_classification
-                   ~check_ce:true ?verb_lvl:None ?json:None) ms
+  let rac = Pinterp.mk_rac ~ignore_incomplete:false
+      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+  let model, clsf = Opt.get_exn (Failure "No good model found")
+      (Check_ce.select_model ~check_ce:true rac env pm models) in
+  printf "%a@." (Check_ce.print_model_classification
+                   ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
 (* END{check_ce} *)
+
+let () = print_endline "\n== RAC execute giant steps\n"
 
 (* BEGIN{check_ce_giant_step} *)
 let () =
   let model = Opt.get_exn (Failure "No non-empty model")
-      (Counterexample.select_model_last_non_empty models) in
+      (Check_ce.select_model_last_non_empty models) in
   let loc = Opt.get_exn (Failure "No model term location")
       (Model_parser.get_model_term_loc model) in
   let rs =
     Opt.get_exn (Failure "No procedure symbol found")
-      (Counterexample.find_rs pm loc) in
-  let rac =
-    let trans = "compute_in_goal" and prover = "cvc4" and try_negate = true in
-    Pinterp.rac_config_lit ~trans ~prover ~try_negate config env () in
-  let res =
-    Counterexample.rac_execute ~rac ~giant_steps:true env pm model rs in
-  Counterexample.print_rac_result std_formatter res
+      (Check_ce.find_rs pm loc) in
+  let oracle = Check_ce.oracle_of_model pm model in
+  let rac = Pinterp.mk_rac ~ignore_incomplete:false
+      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+  let env = Pinterp.mk_empty_env env pm in
+  let ctx = Pinterp.mk_ctx env ~do_rac:true ~rac ~giant_steps:true ~oracle () in
+  let res = Check_ce.rac_execute ctx rs in
+  printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
 (* END{check_ce_giant_step} *)

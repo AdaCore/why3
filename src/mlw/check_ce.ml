@@ -9,14 +9,15 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Format
 open Wstdlib
 open Ident
 open Term
 open Ity
 open Expr
-open Format
-open Pinterp
 open Model_parser
+open Pinterp_core
+open Pinterp
 
 let debug_check_ce = Debug.register_info_flag "check-ce"
     ~desc:"Debug@ info@ for@ --check-ce"
@@ -26,16 +27,16 @@ let debug_check_ce_summary = Debug.register_info_flag "check-ce-summary"
 
 (** Result of checking solvers' counterexample models *)
 
-type classification = NC | SW | NC_SW | BAD_CE of string | INCOMPLETE of string
+type verdict = NC | SW | NC_SW | BAD_CE of string | INCOMPLETE of string
 
-let string_of_classification = function
+let string_of_verdict = function
   | NC -> "NC"
   | SW -> "SW"
   | NC_SW -> "NC_SW"
   | INCOMPLETE _ -> "INCOMPLETE"
   | BAD_CE _ -> "BAD_CE"
 
-let print_classification_description ?check_ce fmt = function
+let report_verdict ?check_ce fmt = function
   | NC ->
      Format.fprintf fmt
        "The@ program@ does@ not@ comply@ to@ the@ verification@ goal"
@@ -65,7 +66,7 @@ let print_classification_description ?check_ce fmt = function
         fprintf fmt "The@ following@ counterexample@ model@ has@ not@ \
                      been@ verified@ (%s)" reason
 
-type classification_result = classification * Log.exec_log
+type classification = verdict * Log.exec_log
 
 let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
     fmt (model, (c, log)) =
@@ -98,22 +99,22 @@ let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
     )
 
 type rac_result_state =
-  | Normal
-  | Fail of cntr_ctx * term
-  | Stuck of string
-  | Incomplete of string
+  | Res_normal
+  | Res_fail of cntr_ctx * term
+  | Res_stuck of string
+  | Res_incomplete of string
 
 type rac_result = rac_result_state * Log.exec_log
 
 let print_rac_result_state fmt = function
-  | Normal -> fprintf fmt "NORMAL"
-  | Fail (ctx, t) ->
+  | Res_normal -> fprintf fmt "NORMAL"
+  | Res_fail (ctx, t) ->
       fprintf fmt "FAILURE (%a at %a)"
-        Vc.print_expl ctx.Pinterp.c_attr
+        Vc.print_expl ctx.attr
         (Pp.print_option_or_default "unknown location" Pretty.print_loc')
-        (match ctx.Pinterp.c_loc with Some _ as loc -> loc | _ -> t.Term.t_loc)
-  | Stuck reason -> fprintf fmt "STUCK (%s)" reason
-  | Incomplete reason -> fprintf fmt "INCOMPLETE (%s)" reason
+        (match ctx.loc with Some _ as loc -> loc | _ -> t.Term.t_loc)
+  | Res_stuck reason -> fprintf fmt "STUCK (%s)" reason
+  | Res_incomplete reason -> fprintf fmt "INCOMPLETE (%s)" reason
 
 let print_rac_result ?verb_lvl fmt (st, log) =
   fprintf fmt "%a@,%a" print_rac_result_state st
@@ -132,8 +133,8 @@ let is_vc_term ~vc_term_loc ~vc_term_attrs ctx t =
         | Tquant (_, tq) -> let _,_,t = t_open_quant tq in has_vc_term_loc t
         | Tlet (_, tb) -> let _,t = t_open_bound tb in has_vc_term_loc t
         | _ -> false in
-      Sattr.mem ctx.c_attr vc_term_attrs &&
-      match ctx.c_loc with
+      Sattr.mem ctx.attr vc_term_attrs &&
+      match ctx.loc with
       | Some loc -> Loc.equal loc vc_term_loc
       | None -> has_vc_term_loc t
 
@@ -146,42 +147,42 @@ let classify ~vc_term_loc ~vc_term_attrs ~normal_result ~giant_step_result =
   let normal_state, normal_log = normal_result in
   let giant_step_state, giant_step_log = giant_step_result in
   match normal_state with
-  | Fail (ctx, t) ->
+  | Res_fail (ctx, t) ->
       if is_vc_term ~vc_term_loc ~vc_term_attrs ctx t then
         NC, normal_log
       else
         let reason = "..." in
         BAD_CE reason, normal_log
-  | Stuck reason ->
+  | Res_stuck reason ->
       BAD_CE reason, normal_log
-  | Normal -> begin
+  | Res_normal -> begin
       match giant_step_state with
-      | Fail _ ->
+      | Res_fail _ ->
           SW, giant_step_log
-      | Stuck reason -> BAD_CE reason, giant_step_log
-      | Normal -> BAD_CE "no failure", giant_step_log
-      | Incomplete reason ->
-          INCOMPLETE (sprintf "giant-step RAC %s" reason), giant_step_log
+      | Res_stuck reason -> BAD_CE reason, giant_step_log
+      | Res_normal -> BAD_CE "no failure", giant_step_log
+      | Res_incomplete reason ->
+          INCOMPLETE (sprintf "abstract RAC %s" reason), giant_step_log
     end
-  | Incomplete normal_reason -> begin
+  | Res_incomplete normal_reason -> begin
       match giant_step_state with
-      | Fail _ ->
+      | Res_fail _ ->
           NC_SW, giant_step_log
-      | Normal ->
+      | Res_normal ->
           INCOMPLETE normal_reason, normal_log
-      | Incomplete giant_step_reason ->
+      | Res_incomplete giant_step_reason ->
           if normal_reason = giant_step_reason then
             INCOMPLETE (sprintf "both RAC %s" normal_reason), normal_log
           else
-            INCOMPLETE (sprintf "normal RAC %s, giant-step RAC %s"
+            INCOMPLETE (sprintf "concrete RAC %s, abstract RAC %s"
                           normal_reason giant_step_reason), normal_log
-      | Stuck giant_step_reason ->
+      | Res_stuck giant_step_reason ->
           BAD_CE giant_step_reason, giant_step_log
     end
 
 let print_model_classification ?verb_lvl ?json ?check_ce fmt (m, c) =
   fprintf fmt "@ @[<hov2>%a%t@]"
-    (print_classification_description ?check_ce) (fst c)
+    (report_verdict ?check_ce) (fst c)
     (fun fmt ->
        match fst c with
        | NC | SW | NC_SW ->
@@ -191,26 +192,33 @@ let print_model_classification ?verb_lvl ?json ?check_ce fmt (m, c) =
        | _ -> ());
   let print_attrs = Debug.test_flag Call_provers.debug_attrs in
   fprintf fmt "@ %a"
-    (print_classification_log_or_model ?verb_lvl ~print_attrs ?json ) (m, c)
+    (print_classification_log_or_model ?verb_lvl ~print_attrs ?json) (m, c)
 
 (* Import values from solver counterexample model *)
 
 let cannot_import f =
   kasprintf (fun reason ->
       let reason = "cannot import value from model: "^reason in
-      raise (Exec_incomplete reason)) f
+      raise (Incomplete reason)) f
 
 let trace_or_name id =
   match get_model_element_name ~attrs:id.id_attrs with
   | name -> if name = "" then id.id_string else name
   | exception Not_found -> id.id_string
 
-let import_model_const ity = function
+let get_or_stuck loc env ity desc = function
+  | Some v -> v
+  | None ->
+      let desc = asprintf "for %s %a" desc print_ity ity in
+      let cntr_ctx = mk_cntr_ctx env ~desc Vc.expl_pre in
+      stuck ?loc cntr_ctx "%s" desc
+
+let import_model_const loc env ity = function
   | Integer s ->
       if ity_equal ity ity_int then
         int_value s.int_value
       else if is_range_ty (ty_of_ity ity) then
-        range_value ity s.int_value
+        get_or_stuck loc env ity "range" (range_value ity s.int_value)
       else
         cannot_import "type %a instead of int or range type" print_ity ity
   | String s ->
@@ -229,12 +237,12 @@ let import_model_const ity = function
     type is cloned with different types as instantiations of the abstract type.
 
     @raise CannotImportModelValue when the value cannot be imported *)
-let rec import_model_value check known th_known ity v =
+let rec import_model_value loc env check known th_known ity v =
   let ts, l1, l2 = ity_components ity in
   let subst = its_match_regs ts l1 l2 in
   let def = Pdecl.find_its_defn known ts in
   let res = match v with
-      | Const c -> import_model_const ity c
+      | Const c -> import_model_const loc env ity c
       | Var _ -> undefined_value ity
       | Record r ->
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
@@ -243,7 +251,7 @@ let rec import_model_value check known th_known ity v =
             let field_name = trace_or_name field_rs.rs_name in
             let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
             match List.assoc field_name r with
-            | v -> import_model_value check known th_known field_ity v
+            | v -> import_model_value loc env check known th_known field_ity v
             | exception Not_found ->
                 (* TODO Better create a default value? Requires an [Env.env]. *)
                 undefined_value field_ity in
@@ -254,7 +262,9 @@ let rec import_model_value check known th_known ity v =
           let rs = List.find matching_name def.Pdecl.itd_constructors in
           let itys = List.map (fun pv -> ity_full_inst subst pv.pv_ity)
               rs.rs_cty.cty_args in
-          let vs = List.map2 (import_model_value check known th_known) itys vs in
+          let vs =
+            List.map2 (import_model_value loc env check known th_known) itys vs
+          in
           constr_value ity rs [] vs
       | Proj (p, x) ->
           (* {p : ity -> ty_res => x: ty_res} : ITY *)
@@ -274,8 +284,10 @@ let rec import_model_value check known th_known ity v =
             cannot_import "Cannot import projection %a, argument type %a is not \
                            value type %a"
               Pretty.print_ls ls Pretty.print_ty ty_arg print_ity ity;
-          let x = import_model_value check known th_known (ity_of_ty ty_res) x in
-          proj_value ity ls x
+          let x =
+            import_model_value loc env check known th_known (ity_of_ty ty_res) x
+          in
+          get_or_stuck loc env ity "range projection" (proj_value ity ls x)
       | Array a ->
           let open Ty in
           if not (its_equal def.Pdecl.itd_its its_func) then
@@ -285,20 +297,28 @@ let rec import_model_value check known th_known ity v =
             | _ -> assert false in
           let key_value ix = ix.arr_index_key, ix.arr_index_value in
           let keys, values = List.split (List.map key_value a.arr_indices) in
-          let keys = List.map (import_model_value check known th_known key_ity) keys in
-          let values = List.map (import_model_value check known th_known value_ity) values in
+          let keys =
+            List.map (import_model_value loc env check known th_known key_ity)
+              keys in
+          let values =
+            List.map (import_model_value loc env check known th_known value_ity)
+              values in
           let mv = Mv.of_list (List.combine keys values) in
-          let v0 = import_model_value check known th_known value_ity a.arr_others in
+          let v0 = import_model_value loc env check known th_known value_ity
+              a.arr_others in
           purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
       | Unparsed s -> cannot_import "unparsed value %s" s
       | Undefined -> undefined_value ity in
   check ity res;
   res
 
-let get_value m known th_known =
-  fun ?loc check id ity ->
-  match search_model_element_for_id m ?loc id with
-  | me -> Some (import_model_value check known th_known ity me.me_value)
+let oracle_of_model pm model : oracle =
+  fun ?loc env check id ity ->
+  match search_model_element_for_id model ?loc id with
+  | me ->
+      let loc = if loc <> None then loc else id.id_loc in
+      Some (import_model_value loc env check pm.Pmodule.mod_known
+              pm.Pmodule.mod_theory.Theory.th_known ity me.me_value)
   | exception Not_found -> None
 
 (** Check and select solver counterexample models *)
@@ -402,27 +422,28 @@ let find_rs pm loc =
     | Udecl pd -> find_pdecl pd in
   find_in_list find_mod_unit pm.mod_units
 
-let rac_execute ?timelimit ?steplimit ?rac ~giant_steps env pm model rs =
+let rac_execute ctx rs =
+  if not (get_do_rac ctx) then
+    failwith "rac_execute with RAC disabled";
+  if (get_rac ctx).ignore_incomplete then
+    failwith "incomplete checks ignored in RAC execute";
   Debug.dprintf debug_check_ce "%s RAC@."
-    (if giant_steps then "Giant-step" else "Small-step");
-  let {Pmodule.mod_known; mod_theory= {Theory.th_known}} = pm in
-  let get_value = get_value model mod_known th_known in
-  let rac = Pinterp.config ~do_rac:true ~giant_steps ?rac
-      ~skip_cannot_compute:false ?timelimit ?steplimit ~get_value () in
-  let print_oloc =
-    Pp.print_option_or_default "unknown location" Pretty.print_loc' in
+    (if get_giant_steps ctx then "Giant-step" else "Normal");
+  ignore (Log.flush_log (get_env ctx).log_uc);
   try
-    let _, env = eval_rs rac env pm rs in
-    Normal, Log.close_log env.config.log_uc
+    let _, ctx = Pinterp.exec_rs ctx rs in
+    Res_normal, Log.flush_log (get_env ctx).log_uc
   with
-  | RAC_Failure (ctx, t) ->
-      Fail (ctx, t), Log.close_log ctx.c_log_uc
-  | RAC_Stuck (env,l,reason) ->
+  | Fail (ctx, t) ->
+      Res_fail (ctx, t), Log.flush_log ctx.cntr_env.log_uc
+  | Stuck (ctx,l,reason) ->
+      let print_oloc =
+        Pp.print_option_or_default "unknown location" Pretty.print_loc' in
       let reason = asprintf "%s at %a" reason print_oloc l in
-      Stuck reason, Log.close_log env.config.log_uc
-  | Exec_incomplete reason ->
-      let reason = sprintf "aborted because %s" reason in
-      Incomplete reason, Log.empty_log
+      Res_stuck reason, Log.flush_log ctx.cntr_env.log_uc
+  | Incomplete reason ->
+      let reason = sprintf "terminated because %s" reason in
+      Res_incomplete reason, Log.empty_log
 
 (* let check_goal reduce env pm model ls =
  *   failwith "check_goal not implemented!" *)
@@ -453,13 +474,13 @@ type results =
  *   | Some true -> "VALID"
  *   | Some false -> "INVALID" *)
 
-let print_result_summary pp fmt (mr, c) =
+let print_result_summary pp fmt (mr, v) =
   match mr with
   | Cannot_check reason ->
       fprintf fmt "CANNOT CHECK: %s" reason
   | Checked_rs {normal_result; giant_step_result} ->
-      fprintf fmt "%s@\n@[<v2>- Normal RAC: %a@]@\n@[<v2>- Giant-step RAC: %a@]"
-        (string_of_classification c) pp normal_result pp giant_step_result
+      fprintf fmt "%s@\n@[<v2>- Concrete RAC: %a@]@\n@[<v2>- Abstract RAC: %a@]"
+        (string_of_verdict v) pp normal_result pp giant_step_result
   (* | Checked_ls res ->
    *     fprintf fmt "%s@\n@[<v2>- %s@]" (string_of_classification c)
    *       (string_of_goal_result res) *)
@@ -467,12 +488,12 @@ let print_result_summary pp fmt (mr, c) =
 let print_check_model_result ?verb_lvl =
   print_result_summary (print_rac_result ?verb_lvl)
 
-let check_model ?timelimit ?steplimit ?rac env pm model =
+let check_model ?timelimit ?steplimit rac compute_term env model =
   let exn = Failure "model term has no location" in
   let loc = Opt.get_exn exn (get_model_term_loc model) in
   if Loc.equal loc Loc.dummy_position then
     failwith "the term of the CE model has a dummy location";
-  match find_rs pm loc with
+  match find_rs env.pmodule loc with
   | Some rs ->
       let me_name_trans men = men.Model_parser.men_name in
       let print_attrs = Debug.test_flag Call_provers.debug_attrs in
@@ -480,7 +501,10 @@ let check_model ?timelimit ?steplimit ?rac env pm model =
         "@[Checking model:@\n@[<hv2>%a@]@]@\n"
         (print_model ~filter_similar:false ~me_name_trans ~print_attrs) model;
       let check_model_rs ~giant_steps =
-        rac_execute ~giant_steps ?timelimit ?steplimit ?rac env pm model rs in
+        let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
+            ~oracle:(oracle_of_model env.pmodule model) ~compute_term
+            ?timelimit ?steplimit () in
+        rac_execute ctx rs in
       let giant_step_result = check_model_rs ~giant_steps:true in
       let normal_result = check_model_rs ~giant_steps:false in
       Checked_rs {normal_result; giant_step_result}
@@ -501,10 +525,10 @@ let select_model_last_non_empty models =
   | [] -> None
 
 type strategy =
-  (int * Call_provers.prover_answer * model * results * classification_result) list ->
-  (int * Call_provers.prover_answer * model * results * classification_result) list
+  (int * Call_provers.prover_answer * model * results * classification) list ->
+  (int * Call_provers.prover_answer * model * results * classification) list
 
-let prioritize_last_non_empty_model: strategy = fun models ->
+let last_non_empty_model: strategy = fun models ->
   let open Util in
   let compare = cmp [
       cmptr (fun (i,_,_,_,_) -> -i) (-);
@@ -512,7 +536,7 @@ let prioritize_last_non_empty_model: strategy = fun models ->
   List.filter (fun (_,_,m,_,_) -> not (is_model_empty m))
     (List.sort compare models)
 
-let prioritize_first_good_model: strategy = fun models ->
+let first_good_model: strategy = fun models ->
   let open Util in
   let good_models, other_models =
     let is_good (_,_,_,_,(s,_)) = match s with
@@ -550,13 +574,19 @@ let print_dbg_model selected_ix fmt (i,_,_,mr,(s,_)) =
     (print_result_summary (fun fmt (s,_) -> print_rac_result_state fmt s))
     (mr, s)
 
-let select_model ?(check_ce=false) ?rac ?timelimit ?steplimit ?verb_lvl
-    ?strategy env pmodule models =
-  let strategy = Opt.get_def
-      (if check_ce then prioritize_first_good_model
-       else prioritize_last_non_empty_model) strategy in
+let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ?strategy
+    ~check_ce rac env pm models =
+  if rac.ignore_incomplete then
+    failwith "ignore incomplete must not be true for selecting models";
+  let compute_term = match compute_term with
+    | Some f -> f
+    | None -> Rac.Why.mk_compute_term_lit env () in
+  let strategy =
+    Opt.get_def (if check_ce then first_good_model else last_non_empty_model)
+      strategy in
+  let env = mk_empty_env env pm in
   let check_model =
-    if check_ce then check_model ?timelimit ?steplimit ?rac env pmodule
+    if check_ce then check_model ?timelimit ?steplimit rac compute_term env
     else fun _ -> Cannot_check "not checking CE model" in
   let models = (* Keep at most one empty model *)
     let found_empty = ref false in

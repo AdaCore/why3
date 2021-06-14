@@ -323,25 +323,18 @@ let why3_parse_theories steps theories =
 
 let why3_execute_one m rs =
   let open Expr in
-  let open Pinterp in
   let e_unit = e_exec (c_app (rs_tuple 0) [] [] (Ity.ity_tuple [])) in
   let (let_defn,pv) = let_var (Ident.id_fresh "o") e_unit in
   let e_rs_unit = e_exec (c_app rs [pv] [] rs.rs_cty.Ity.cty_result) in
   let expr = e_let let_defn e_rs_unit in
   let result =
     try
-      let reduce = rac_reduce_config_lit config env ~trans:"compute_in_goal" () in
-      let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
-      let res = eval_global_fundef rac_config env m [] None expr in
-      asprintf "returns %a" (report_eval_result expr) res
-    with
-    | Contr (ctx, term) ->
-        asprintf "has failed: %a" report_cntr_body (ctx, term)
-    | CannotCompute r ->
-        asprintf "cannot compute (%s)" r.reason
-    | RACStuck (_, l, _) ->
-        asprintf "got stuck at %a"
-          (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
+      let ctx = Pinterp.mk_ctx (Pinterp.mk_empty_env env m)
+          ~do_rac:false ~giant_steps:false () in
+      let res = Pinterp.exec_global_fundef ctx [] None expr in
+      asprintf "returns %a" (Pinterp.report_eval_result expr) res
+    with Pinterp_core.Incomplete r ->
+      asprintf "cannot compute (%s)" r in
   let {Theory.th_name = th} = m.Pmodule.mod_theory in
   let mod_name = th.Ident.id_string in
   let mod_loc = Opt.get_def Loc.dummy_position th.Ident.id_loc in

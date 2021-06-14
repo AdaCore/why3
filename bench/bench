@@ -389,9 +389,9 @@ rac () {
         # Add () as argument if there is none
         [[ $expr != *" "* ]] && expr="$expr ()"
         echo "** $mod.$expr"
-        bin/why3"$suffix" execute --rac --rac-prover=cvc4 --rac-try-negate \
-                --debug=rac-check-term-result \
-                "${RACARGS[@]}" "$file" --use="$mod" "$expr" 2>&1 |\
+        bin/why3"$suffix" execute --rac --rac-prover="cvc4" \
+                "${RACARGS[@]}" "$file" --use="$mod" "$expr" \
+                --debug="rac-check-term-result" 2>&1 |\
             sed "s|$(bin/why3$suffix --print-datadir)|WHY3DATA|g" |\
             sed "s|$(bin/why3$suffix --print-libdir)|WHY3LIB|g"
     done
