@@ -2,8 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="2.0" timelimit="30" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -66,7 +65,7 @@
   <proof prover="2" timelimit="5"><result status="valid" time="4.26" steps="21067"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.86" steps="101995"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.86" steps="123588"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.16" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.63" steps="3375"/></proof>
@@ -150,7 +149,7 @@
   <proof prover="2"><result status="valid" time="0.03" steps="126"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="104919"/></proof>
+  <proof prover="1"><result status="valid" time="2.74" steps="457039"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.16" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="30"/></proof>

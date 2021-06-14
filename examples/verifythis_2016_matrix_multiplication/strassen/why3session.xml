@@ -9,6 +9,7 @@
 <prover id="4" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="strassen.mlw"/>
 <theory name="MatrixMultiplication" proved="true">
@@ -215,7 +216,29 @@
   <proof prover="1" timelimit="10"><result status="valid" time="8.70" steps="3080"/></proof>
   </goal>
   <goal name="padding&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="0" timelimit="20"><result status="valid" time="0.96" steps="906785"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="padding&#39;vc.6.0" expl="assertion" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="padding&#39;vc.6.0.0" expl="assertion" proved="true">
+    <transf name="split_all_full" proved="true" >
+     <goal name="padding&#39;vc.6.0.0.0" expl="VC for padding" proved="true">
+     <proof prover="7"><result status="valid" time="0.11" steps="25311"/></proof>
+     </goal>
+     <goal name="padding&#39;vc.6.0.0.1" expl="VC for padding" proved="true">
+     <proof prover="7"><result status="valid" time="0.10" steps="25191"/></proof>
+     </goal>
+     <goal name="padding&#39;vc.6.0.0.2" expl="VC for padding" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="padding&#39;vc.6.0.0.2.0" expl="VC for padding" proved="true">
+      <proof prover="7" timelimit="30" memlimit="4000"><result status="valid" time="6.07" steps="898062"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="padding&#39;vc.7" expl="assertion" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="1.01" steps="919"/></proof>

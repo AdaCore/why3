@@ -5,6 +5,7 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="3" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="5" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="6" steplimit="0" memlimit="4000"/>
@@ -650,7 +651,7 @@
  <goal name="separation&#39;vc" expl="VC for separation" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="separation&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.24"/></proof>
+  <proof prover="3"><result status="valid" time="0.46" steps="4236"/></proof>
   </goal>
   <goal name="separation&#39;vc.1" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
