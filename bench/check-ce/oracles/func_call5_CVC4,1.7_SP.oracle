@@ -1,10 +1,10 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Sub-goal Postcondition of goal g1'vc.
-Prover result is: Valid (0.04s, 899 steps).
+Prover result is: Valid (0.05s, 899 steps).
 
 File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
 Sub-goal Precondition of goal f1'vc.
-Prover result is: Valid (0.01s, 1094 steps).
+Prover result is: Valid (0.02s, 1094 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Checking model:
@@ -27,8 +27,8 @@ Prover result is: Valid (0.01s, 1094 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 14:
-              x_vc_constant = {"type": "Integer", "val": "0"}
-              z_vc_constant =
+              x = {"type": "Integer", "val": "0"}
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -43,7 +43,7 @@ Prover result is: Valid (0.01s, 1094 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: (-1)
 <check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
+            - Concrete RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -61,7 +61,7 @@ Prover result is: Valid (0.01s, 1094 steps).
                     one = 1
                   Execution got stuck at precondition of `f1` with:
                     x = (-1)
-            - Abstract RAC STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
+            - Abstract RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -100,8 +100,8 @@ Prover result is: Valid (0.01s, 1094 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 14:
-              x_vc_constant = {"type": "Integer", "val": "1"}
-              z_vc_constant =
+              x = {"type": "Integer", "val": "1"}
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -116,7 +116,7 @@ Prover result is: Valid (0.01s, 1094 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <check-ce>Result of checking model 1: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -142,7 +142,7 @@ Prover result is: Valid (0.01s, 1094 steps).
                     contents = 1
                 Line 11:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
               
 <check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
 <check-ce>Checking model:
@@ -165,8 +165,8 @@ Prover result is: Valid (0.01s, 1094 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 14:
-              x_vc_constant = {"type": "Integer", "val": "1"}
-              z_vc_constant =
+              x = {"type": "Integer", "val": "1"}
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -181,7 +181,7 @@ Prover result is: Valid (0.01s, 1094 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
 <check-ce>Result of checking model 2: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -207,18 +207,18 @@ Prover result is: Valid (0.01s, 1094 steps).
                     contents = 1
                 Line 11:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
               
 <check-ce-summary>Results:
 - Checked model 0: BAD
-  - Concrete RAC STUCK, failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6
-  - Abstract RAC STUCK, failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6
+  - Concrete RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
+  - Abstract RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
 - Checked model 1: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 13, characters 10-14
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
 - Selected model 2: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 13, characters 10-14
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 13, characters 10-14)
 File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
 Sub-goal Assertion of goal f1'vc.
 Prover result is: Unknown (unknown + incomplete) (0.03s, 6212 steps).
@@ -242,7 +242,7 @@ File func_call5.mlw:
             Line 18:
               x = {"type": "Integer", "val": "0"}
             Line 20:
-              x_vc_constant = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -254,7 +254,7 @@ File func_call5.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <check-ce>Result of checking model 0: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -285,7 +285,7 @@ File func_call5.mlw:
                   Property failure at assertion with:
                     x = 0
                     z = {contents= 1}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -315,7 +315,7 @@ File func_call5.mlw:
             Line 18:
               x = {"type": "Integer", "val": "0"}
             Line 20:
-              x_vc_constant = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -327,7 +327,7 @@ File func_call5.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -358,7 +358,7 @@ File func_call5.mlw:
                   Property failure at assertion with:
                     x = 0
                     z = {contents= 1}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -388,7 +388,7 @@ File func_call5.mlw:
             Line 18:
               x = {"type": "Integer", "val": "0"}
             Line 20:
-              x_vc_constant = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -400,7 +400,7 @@ File func_call5.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 18, characters 8-9: 0
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -431,7 +431,7 @@ File func_call5.mlw:
                   Property failure at assertion with:
                     x = 0
                     z = {contents= 1}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -457,14 +457,14 @@ File func_call5.mlw:
                     z = {contents= 1}
 <check-ce-summary>Results:
 - Selected model 0: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
 - Checked model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 20, characters 11-17)
 File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
 Sub-goal Assertion of goal f2'vc.
 Prover result is: Unknown (unknown + incomplete) (0.04s, 5935 steps).

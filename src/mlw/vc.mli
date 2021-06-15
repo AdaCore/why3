@@ -42,3 +42,5 @@ val expl_loop_vari : Ident.attribute
 val expl_variant : Ident.attribute
 val expl_type_inv : Ident.attribute
 val expl_divergent : Ident.attribute
+
+val print_expl : Ident.attribute Pp.pp

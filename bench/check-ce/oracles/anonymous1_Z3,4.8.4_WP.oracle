@@ -8,9 +8,9 @@
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for parameter `x`)
+            - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
 <check-ce>Checking model:
@@ -18,7 +18,7 @@
             Line 4:
               x = {"type": "Integer", "val": "0"}
             Line 6:
-              x_vc_constant = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -29,7 +29,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -55,7 +55,7 @@
                   Property failure at assertion with:
                     x = 0
                     w = 2
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -85,7 +85,7 @@
             Line 4:
               x = {"type": "Integer", "val": "0"}
             Line 6:
-              x_vc_constant = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -96,7 +96,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -122,7 +122,7 @@
                   Property failure at assertion with:
                     x = 0
                     w = 2
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -148,14 +148,14 @@
                     w = 2
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for parameter `x`
-  - Abstract RAC UNKNOWN, terminated because missing value for parameter `x`
+  - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
+  - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
 - Selected model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
 File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
 Sub-goal Assertion of goal f'vc.
 Prover result is: Unknown (sat) (0.02s, 655 steps).

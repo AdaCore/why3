@@ -14,7 +14,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -56,7 +56,7 @@
               File multifile2.mlw:
                 Line 7:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
               
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 <check-ce>Checking model:
@@ -65,7 +65,7 @@
               x = {"type": "Integer", "val": "0"}
             Line 8:
               result = {"type": "Integer", "val": "2"}
-              x_vc_constant = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -75,7 +75,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <check-ce>Result of checking model 1: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -117,7 +117,7 @@
               File multifile2.mlw:
                 Line 7:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
               
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 <check-ce>Checking model:
@@ -126,7 +126,7 @@
               x = {"type": "Integer", "val": "0"}
             Line 8:
               result = {"type": "Integer", "val": "2"}
-              x_vc_constant = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -136,7 +136,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <check-ce>Result of checking model 2: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -178,18 +178,18 @@
               File multifile2.mlw:
                 Line 7:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
               
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
 - Checked model 1: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
 - Selected model 2: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
 File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
 Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (sat) (0.03s, 866 steps).
@@ -222,7 +222,7 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <check-ce>Result of checking model 0: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -266,7 +266,7 @@ File multifile2.mlw:
                   Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
               
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 <check-ce>Checking model:
@@ -279,7 +279,7 @@ File multifile2.mlw:
                 x = {"type": "Integer", "val": "0"}
               Line 13:
                 result = {"type": "Integer", "val": "1"}
-                x_vc_constant = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -289,7 +289,7 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -333,7 +333,7 @@ File multifile2.mlw:
                   Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
               
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 <check-ce>Checking model:
@@ -346,7 +346,7 @@ File multifile2.mlw:
                 x = {"type": "Integer", "val": "0"}
               Line 13:
                 result = {"type": "Integer", "val": "1"}
-                x_vc_constant = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -356,7 +356,7 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -400,18 +400,18 @@ File multifile2.mlw:
                   Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
               
 <check-ce-summary>Results:
 - Selected model 0: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
 - Checked model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
 File "bench/check-ce/multifile2.mlw", line 13, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown (sat) (0.00s, 878 steps).
@@ -481,9 +481,9 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
               
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>Checking model:
@@ -496,7 +496,7 @@ File multifile2.mlw:
                 x = {"type": "Integer", "val": "0"}
               Line 19:
                 result = {"type": "Integer", "val": "1"}
-                x_vc_constant = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -506,9 +506,9 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <check-ce>Result of checking model 1: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
               
 <check-ce>Check model 2 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>Checking model:
@@ -521,7 +521,7 @@ File multifile2.mlw:
                 x = {"type": "Integer", "val": "0"}
               Line 19:
                 result = {"type": "Integer", "val": "1"}
-                x_vc_constant = {"type": "Integer", "val": "0"}
+                x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -531,20 +531,20 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <check-ce>Result of checking model 2: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
               
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12
+  - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
 - Checked model 1: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12
+  - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
 - Selected model 2: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12
+  - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
 File "bench/check-ce/multifile2.mlw", line 19, characters 12-26:
 Sub-goal Postcondition of goal h'vc.
 Prover result is: Unknown (sat) (0.00s, 878 steps).

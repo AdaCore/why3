@@ -100,15 +100,15 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File loop_ce.mlw:
   Line 20:
-    old a [@at:'Old:loc:bench/ce/loop_ce.mlw:20]
-      [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents] [@introduced]
-      [@mlw:reference_var] =
+    a [@field:0:contents] [@introduced] [@mlw:reference_var]
+      [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
-    a [@field:0:contents] [@introduced] [@mlw:reference_var]
-      [@model_trace:a] =
+    old a [@at:'Old:loc:bench/ce/loop_ce.mlw:20]
+      [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents] [@introduced]
+      [@mlw:reference_var] =
       {"type": "Record",
        "val":
         {"Field":

@@ -370,7 +370,7 @@ let print_other_models (m, ce_summary) =
     if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
     else Model_parser.print_model (* json values *) fmt m ~print_attrs in
   ( match ce_summary with
-    | Counterexample.(NC _ | SW _ | NCSW _ | BAD) ->
+    | Counterexample.(NC _ | SW _ | NCSW _ | BAD _) ->
         if Debug.test_flag debug_print_original_model then
           printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
     | _ -> () );

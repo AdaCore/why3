@@ -16,7 +16,7 @@
 <rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -40,7 +40,7 @@
                 Line 8:
                   Property failure at postcondition of `f1` with:
                     result = 1
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -70,7 +70,7 @@
             Line 5:
               v1 = {"type": "Integer", "val": "1"}
             Line 8:
-              v1_vc_constant = {"type": "Integer", "val": "1"}
+              v1 = {"type": "Integer", "val": "1"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -82,7 +82,7 @@
 <rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -106,7 +106,7 @@
                 Line 8:
                   Property failure at postcondition of `f1` with:
                     result = 1
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -136,7 +136,7 @@
             Line 5:
               v1 = {"type": "Integer", "val": "1"}
             Line 8:
-              v1_vc_constant = {"type": "Integer", "val": "1"}
+              v1 = {"type": "Integer", "val": "1"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -148,7 +148,7 @@
 <rac-values>Value from model for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 5, characters 15-17: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -172,7 +172,7 @@
                 Line 8:
                   Property failure at postcondition of `f1` with:
                     result = 1
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -198,14 +198,14 @@
                     result = 1
 <check-ce-summary>Results:
 - Selected model 0: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
 - Checked model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24)
 File "bench/check-ce/global_logic_constant.mlw", line 8, characters 14-24:
 Sub-goal Postcondition of goal f1'vc.
 Prover result is: Unknown (sat) (0.02s, 696 steps).
@@ -264,7 +264,7 @@ File global_logic_constant.mlw:
                                                                     1}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -297,7 +297,7 @@ File global_logic_constant.mlw:
                 Line 14:
                   Property failure at postcondition of `f2` with:
                     result = 1
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -341,7 +341,7 @@ File global_logic_constant.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 14:
-              v2_vc_constant =
+              v2 =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -364,7 +364,7 @@ File global_logic_constant.mlw:
                                                                     2}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -397,7 +397,7 @@ File global_logic_constant.mlw:
                 Line 14:
                   Property failure at postcondition of `f2` with:
                     result = 2
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -432,14 +432,14 @@ File global_logic_constant.mlw:
                     result = 2
 <check-ce-summary>Results:
 - Selected model 0: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
 - Checked model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24)
 File "bench/check-ce/global_logic_constant.mlw", line 14, characters 14-24:
 Sub-goal Postcondition of goal f2'vc.
-Prover result is: Step limit exceeded (0.79s).
+Prover result is: Step limit exceeded (0.73s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

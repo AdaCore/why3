@@ -236,6 +236,7 @@ type cntr_ctx = private {
   c_attr: Ident.attribute; (** Related VC attribute *)
   c_desc: string option; (** Additional context *)
   c_loc: Loc.position option; (** Position if different than term *)
+  c_attrs: Ident.Sattr.t; (** Additional attributes *)
   c_vsenv: value Mvs.t;
   c_log_uc: Log.log_uc;
 }
