@@ -1624,9 +1624,9 @@ let t_let_simp_keep_var ~keep e ((v,b,t) as bt) =
   if n = 0 then
     let t = t_subst_unsafe b.bv_subst t in
     if keep then
-      match t.t_node with
+      (*match t.t_node with
       | Ttrue -> t
-      | _ -> t_let_close v e t
+      | _ -> *)t_let_close v e t
     else
       (*if relevant_for_counterexample v.vs_name
       then failwith "t_let_simp_keep_var"
@@ -1647,9 +1647,9 @@ let t_let_simp = t_let_simp_keep_var ~keep:false
 let t_let_close_simp_keep_var ~keep v e t =
   let n = t_v_occurs v t in
   if n = 0 then
-    if keep then match t.t_node with
+    if keep then (* match t.t_node with
       | Ttrue -> t
-      | _ -> t_let_close v e t
+      | _ -> *) t_let_close v e t
     else
       (* if relevant_for_counterexample v.vs_name
       then failwith "t_let_close_simp_keep_var"

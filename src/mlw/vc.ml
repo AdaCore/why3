@@ -672,9 +672,16 @@ let rec k_expr env lps e res xmap =
             | Some (t, sp) ->
                Klet (v, t_tag t, List.fold_right sp_and rinv sp)
             | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
-          if env.trace_for_ce then
+          let need_trace = match ce.c_node with
+            | (Capp ({rs_logic = RLls _ls}, _) (* `let function` or `val function` *)
+               | Cpur (_ls, _)) (* direct application of a logic symbol *)
+              ->
+               ce.c_cty.cty_args <> [] (* unless not fully applied *)
+          | _ -> true
+            in
+          if env.trace_for_ce && need_trace then
             let vv = explicit_result loc ce v.pv_ity in
-            Kseq(k vv,0,Klet(v, t_var vv.pv_vs, t_true))
+            Kseq(k v,0,Klet(vv, t_var v.pv_vs, t_true))
           else
             k v
           in
