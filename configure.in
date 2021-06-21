@@ -871,13 +871,10 @@ fi
 if test "$enable_coq_support" = yes; then
    COQLIB=`$COQC -where | sed -e 's|\\\|/|g' -e 's| |\\ |g'`
    AC_MSG_CHECKING(Coq version)
-   COQVERSION=[`$COQC -v | sed -n -e 's|.*version *\([^ ]*\) .*$|\1|p'`]
+   COQVERSION=[`$COQC -v | sed -n -e 's|.*version  *\([^ ]*\).*|\1|p'`]
    AC_MSG_RESULT($COQVERSION)
 
    case $COQVERSION in
-      8.6*)
-         coq_compat_version="COQ86"
-         ;;
       8.7*)
          coq_compat_version="COQ87"
          ;;
@@ -899,10 +896,13 @@ if test "$enable_coq_support" = yes; then
       8.13*)
          coq_compat_version="COQ813"
          ;;
+      8.14*)
+         coq_compat_version="COQ814"
+         ;;
       *)
          enable_coq_support=no
-         AC_MSG_WARN(You need Coq 8.6 or later; Coq discarded)
-         reason_coq_support=" (need version >= 8.6)"
+         AC_MSG_WARN(You need Coq 8.7 or later; Coq discarded)
+         reason_coq_support=" (need version >= 8.7)"
          ;;
    esac
 fi
