@@ -16,7 +16,9 @@ Require BuiltIn.
 Require HighOrd.
 Require int.Int.
 
-Require Import ClassicalEpsilon.
+Require Import ClassicalEpsilon Lia.
+Require Logic.ProofIrrelevance.
+Require set.Set set.Cardinal.
 
 (* Why3 goal *)
 Definition fset : forall (a:Type), Type.
@@ -40,8 +42,6 @@ Qed.
 Definition mem {a:Type} {a_WT:WhyType a} : a -> fset a -> Prop.
 Proof.
 intros. destruct X0 as (f, P).
-(* TODO remove this *)
-Require set.Set.
 apply (set.Set.mem X f).
 Defined.
 
@@ -62,7 +62,6 @@ eapply set.Set.extensionality. intro. eauto.
 subst.
 assert (e = e0).
 (* TODO maybe provable on such property ? *)
-Require Logic.ProofIrrelevance.
 apply Logic.ProofIrrelevance.proof_irrelevance.
 subst. reflexivity.
 Qed.
@@ -96,8 +95,6 @@ Definition is_empty {a:Type} {a_WT:WhyType a} (s:fset a) : Prop :=
 Definition empty {a:Type} {a_WT:WhyType a} : fset a.
 Proof.
 exists (fun x => false). 
-(* TODO remove this *)
-Require Cardinal.
 apply Cardinal.is_finite_empty. unfold set.Set.is_empty.
 unfold set.Set.mem. intuition.
 Defined.
@@ -591,10 +588,10 @@ destruct ClassicalEpsilon.excluded_middle_informative; [| intuition].
    intro. intros. rewrite H2. rewrite H0 in H3. rewrite Bool.andb_true_iff in H3.
    apply H3.
   }
-  omega.
+  lia.
 - destruct ClassicalEpsilon.classical_indefinite_description.
   destruct ClassicalEpsilon.excluded_middle_informative; [| intuition].
-  unfold Z.zero. omega.
+  unfold Z.zero. lia.
 Qed.
 
 (* Why3 goal *)

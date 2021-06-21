@@ -20,7 +20,7 @@ Require int.ComputerDivision.
 Require number.Parity.
 Require number.Divisibility.
 
-Import Znumtheory.
+Require Import Lia Znumtheory.
 
 (* Why3 assumption *)
 Definition prime (p:Numbers.BinNums.Z) : Prop :=
@@ -39,6 +39,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma not_prime_1 : ~ prime 1%Z.
+Proof.
 intros (H1,_).
 now elim H1.
 Qed.
@@ -84,26 +85,26 @@ elimtype False.
 (* *)
 assert (exists d, (2 <= d)%Z /\ (d * d <= p)%Z /\ prime d /\ Z.divide d p).
 clear H.
-assert (Hp' : (0 <= p)%Z) by omega.
+assert (Hp' : (0 <= p)%Z) by lia.
 revert p Hp' Hp Pp.
 apply (Zlt_0_ind (fun p => 2 <= p -> ~ Znumtheory.prime p -> (exists d : Z, 2 <= d /\ d * d <= p /\ prime d /\ (d | p)))%Z).
 intros p IH _ Hp Pp.
 destruct (not_prime_divide p) as (x,(Hx1,Hx2)).
-clear -Hp ; omega.
+clear -Hp ; lia.
 exact Pp.
 destruct (Zle_or_lt (x * x) p) as [Hx|Hx].
 destruct (prime_dec x) as [Px|Px].
 exists x.
 split.
-clear -Hx1 ; omega.
+clear -Hx1 ; lia.
 split.
 exact Hx.
 split.
 now apply <- prime_is_Zprime.
 exact Hx2.
 destruct (IH x) as (y&Hy1&Hy2&Hy3&Hy4).
-clear -Hx1 ; omega.
-clear -Hx1 ; omega.
+clear -Hx1 ; lia.
+clear -Hx1 ; lia.
 exact Px.
 exists y.
 refine (conj Hy1 (conj _ (conj Hy3 _))).
@@ -112,14 +113,14 @@ apply Z.le_trans with (2 := Hx).
 rewrite <- (Zmult_1_r x) at 1.
 apply Zmult_le_compat_l.
 now apply Zlt_le_weak.
-clear -Hx1 ; omega.
+clear -Hx1 ; lia.
 now apply Z.divide_trans with x.
 case Hx2.
 intros q Hq1.
 assert (Hq2 : (2 <= q)%Z).
 apply (Zlt_le_succ 1).
 apply Zmult_lt_reg_r with x.
-clear -Hx1 ; omega.
+clear -Hx1 ; lia.
 now rewrite Zmult_1_l, <- Hq1.
 destruct (prime_dec q) as [Pq|Pq].
 exists q.
@@ -130,20 +131,20 @@ rewrite Hq1.
 apply Zmult_le_compat_l.
 apply Zlt_le_weak.
 apply Zmult_lt_reg_r with x.
-clear -Hx1 ; omega.
+clear -Hx1 ; lia.
 now rewrite <- Hq1.
-clear -Hq2 ; omega.
+clear -Hq2 ; lia.
 split.
 now apply <- prime_is_Zprime.
 exists x.
 now rewrite Zmult_comm.
 destruct (IH q) as (y&Hy1&Hy2&Hy3&Hy4).
 split.
-clear -Hq2 ; omega.
+clear -Hq2 ; lia.
 rewrite <- (Zmult_1_r q), Hq1.
 apply Zmult_lt_compat_l.
-clear -Hq2 ; omega.
-clear -Hx1 ; omega.
+clear -Hq2 ; lia.
+clear -Hx1 ; lia.
 exact Hq2.
 exact Pq.
 exists y.
@@ -151,8 +152,8 @@ refine (conj Hy1 (conj _ (conj Hy3 _))).
 apply Z.le_trans with (1 := Hy2).
 rewrite <- (Zmult_1_r q), Hq1.
 apply Zmult_le_compat_l.
-clear -Hx1 ; omega.
-clear -Hq2 ; omega.
+clear -Hx1 ; lia.
+clear -Hq2 ; lia.
 apply Z.divide_trans with (1 := Hy4).
 exists x.
 now rewrite Zmult_comm.
@@ -175,13 +176,7 @@ assert (Z.divide q p).
 now exists 2%Z.
 intros.
 refine (_ (fun H1 => H0 H1 H) (proj1 Pp)).
-(* ??? omega fails to solve this goal ??? *)
-clear -Hq.
-intros H Hp.
-destruct (Zle_lt_or_eq 2 p Hp) as [Hp'|Hp'].
-elim H.
-omega.
-easy.
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -193,6 +188,6 @@ intros p Pp Hp.
 apply <- Divisibility.odd_divides.
 apply proj2 in Pp.
 apply Pp.
-omega.
+lia.
 Qed.
 

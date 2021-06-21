@@ -31,8 +31,7 @@ Definition surjection (n:nat) (f:nat -> nat) :=
   forall i:nat, i < n ->
     exists j:nat, j < n /\ f j = i.
 
-Require Omega.
-Require Import Peano_dec.
+Require Import Lia Peano_dec.
 
 Theorem injective_implies_surjective:
   forall n:nat,
@@ -44,11 +43,11 @@ Proof.
 induction n.
 (* case n = 0 *)
 unfold surjection; intros.
-elimtype False; omega.
+elimtype False; lia.
 (* case n > 0 *)
 intros f Hinto Hinj.
 pose (k := f n).
-assert (Hbound_k: k < S n) by (apply Hinto; omega).
+assert (Hbound_k: k < S n) by (apply Hinto; lia).
 (* transposition n <-> k *)
 pose (trans i :=
   if eq_nat_dec i n then k else
@@ -61,21 +60,21 @@ assert (Ginto: into n g).
   unfold into, g, trans; intros.
   destruct (eq_nat_dec (f i) n).
   (* f i = n *)
-  assert (h : k < n \/ k = n) by omega.
+  assert (h : k < n \/ k = n) by lia.
   destruct h; auto.
   elimtype False.
   clear g trans; subst.
   assert (f i = i) by (apply Hinj; auto with * ).
-  omega.
+  lia.
   (* f i <> n *)
   destruct (eq_nat_dec (f i) k).
   (* f i = k *)
   elimtype False.
   assert (i = n) by (apply Hinj; auto with * ).
-  omega.
+  lia.
   (* f i <> k *)
-  assert (f i < S n) by (apply Hinto; omega).
-  omega.
+  assert (f i < S n) by (apply Hinto; lia).
+  lia.
 
 (* second step: trans is injective *)
 
@@ -85,14 +84,14 @@ assert (trans_inj: injection (S n) trans).
   (* i = n *)
   destruct (eq_nat_dec j n); auto with *.
   (* i = n and j <> n *)
-  destruct (eq_nat_dec j k); omega.
+  destruct (eq_nat_dec j k); lia.
   (* i <> n *)
   destruct (eq_nat_dec i k); auto with *.
   destruct (eq_nat_dec j n); auto with *.
-  destruct (eq_nat_dec j k); omega.
+  destruct (eq_nat_dec j k); lia.
   (* i <> n and i <> k *)
   destruct (eq_nat_dec j n); auto with *.
-  destruct (eq_nat_dec j k); omega.
+  destruct (eq_nat_dec j k); lia.
 
 (* third step: g is injective on [0;n[  *)
 assert (Ginj: injection n g).
@@ -118,12 +117,12 @@ assert (f_is_trans_o_g: forall i, f i = trans (g i)).
 
 (* conclusion *)
 red; intros.
-assert (h: i = k \/ i <> k) by omega.
+assert (h: i = k \/ i <> k) by lia.
 destruct h.
 (* case i = k: the preimage is n *)
 exists n; auto.
 (* case i <> k *)
-assert (h: i = n \/ i <> n) by omega.
+assert (h: i = n \/ i <> n) by lia.
 destruct h.
 (* case i = n: the preimage is the preimage of k by g *)
 elim Gsurj with (i:=k).
@@ -135,7 +134,7 @@ rewrite h2.
 unfold trans.
 destruct (eq_nat_dec k n); auto with *.
 destruct (eq_nat_dec k k); auto with *.
-omega.
+lia.
 (* case i <> n and i <> k:
    the preimage is the preimage of i by g
  *)
@@ -148,7 +147,7 @@ rewrite h2.
 unfold trans.
 destruct (eq_nat_dec i n); auto with *.
 destruct (eq_nat_dec i k); auto with *.
-omega.
+lia.
 Qed.
 
 
@@ -183,7 +182,7 @@ Proof.
 intros n f Hinto.
 elim (lifting n f Hinto).
 intros g Heq_g_f Hinj i Hi_inf_n.
-assert (n_pos: 0 <= n) by omega.
+assert (n_pos: 0 <= n) by lia.
 elim (Z_of_nat_complete_inf n n_pos).
 intros m Heq_n_m.
 
@@ -191,7 +190,7 @@ intros m Heq_n_m.
 
 assert (Hinto_g: into m g).
   red; intros i0 Hinter.
-  assert (0 <= f (Z_of_nat i0) < n) by (apply Hinto; omega).
+  assert (0 <= f (Z_of_nat i0) < n) by (apply Hinto; lia).
   apply inj_lt_rev; auto with *.
   rewrite Heq_g_f; auto with *.
 
@@ -206,14 +205,14 @@ assert (Hinj_g: injection m g).
 (* conclusion *)
 generalize (injective_implies_surjective m g Hinto_g Hinj_g).
 intro Hsurj_g.
-assert (i_pos: 0 <= i) by omega.
+assert (i_pos: 0 <= i) by lia.
 elim (Z_of_nat_complete_inf i i_pos).
 intros j Heq_j_i.
 elim (Hsurj_g j); auto with *.
 intros x (inter_x, eq_x).
 exists (Z_of_nat x).
 split; auto with *.
-rewrite <- Heq_g_f; omega.
+rewrite <- Heq_g_f; lia.
 Qed.
 
 
@@ -248,7 +247,7 @@ intros a n h1 h2.
 intros.
 apply Zinjective_implies_surjective; auto.
 intros.
-assert (h: (i0 = j \/ i0 <> j)%Z) by omega.
+assert (h: (i0 = j \/ i0 <> j)%Z) by lia.
 destruct h; auto.
 red in h1.
 elimtype False; apply h1 with i0 j; clear h1; auto.
@@ -265,78 +264,78 @@ Proof.
 intros m n; split.
 (* -> *)
 intros inj v.
-assert (case: (occ v m 0 n <= 1 \/ occ v m 0 n >= 2)%Z) by omega. destruct case.
+assert (case: (occ v m 0 n <= 1 \/ occ v m 0 n >= 2)%Z) by lia. destruct case.
 trivial.
-destruct (occ_exists v m 0 n) as (i,(hi1,hi2)). omega.
+destruct (occ_exists v m 0 n) as (i,(hi1,hi2)). lia.
 assert (0 <= occ v m 0 i)%Z.
-  generalize (occ_bounds v m 0 i). omega.
-assert (case: (occ v m 0 i = 0 \/ occ v m 0 i > 0)%Z) by omega. destruct case.
+  generalize (occ_bounds v m 0 i). lia.
+assert (case: (occ v m 0 i = 0 \/ occ v m 0 i > 0)%Z) by lia. destruct case.
 assert (0 < occ v m (i+1) n)%Z.
 assert (occ v m 0 n = occ v m 0 i + occ v m i n)%Z.
-  apply occ_append; omega.
+  apply occ_append; lia.
   assert (occ v m i n = occ v m i (i+1) + occ v m (i+1) n)%Z.
-  apply occ_append; omega.
+  apply occ_append; lia.
   assert (occ v m i (i+1) = 1)%Z.
   rewrite occ_right_add.
-  replace (i+1-1)%Z with i by omega.
-  rewrite occ_empty; omega.
-  omega.
-  replace (i+1-1)%Z with i by omega. auto.
-  omega.
-destruct (occ_exists v m (i+1) n) as (j,(hj1,hj2)). omega.
-elim (inj i j); omega.
-destruct (occ_exists v m 0 i) as (j,(hj1,hj2)). omega.
-elim (inj i j); omega.
+  replace (i+1-1)%Z with i by lia.
+  rewrite occ_empty; lia.
+  lia.
+  replace (i+1-1)%Z with i by lia. auto.
+  lia.
+destruct (occ_exists v m (i+1) n) as (j,(hj1,hj2)). lia.
+elim (inj i j); lia.
+destruct (occ_exists v m 0 i) as (j,(hj1,hj2)). lia.
+elim (inj i j); lia.
 
 (* <- *)
 intros Hocc i j hi hj neq eq.
 pose (v := m i).
 assert (occ v m 0 n >= 2)%Z.
 assert (occ v m 0 n = occ v m 0 i + occ v m i n)%Z.
-  apply occ_append; omega.
+  apply occ_append; lia.
   assert (occ v m i n = occ v m i (i+1) + occ v m (i+1) n)%Z.
-  apply occ_append; omega.
+  apply occ_append; lia.
   assert (occ v m i (i+1) = 1)%Z.
   rewrite occ_right_add.
-  replace (i+1-1)%Z with i by omega.
-  rewrite occ_empty; omega.
-  omega.
-  replace (i+1-1)%Z with i by omega. auto.
-assert (case: (j < i \/ i+1 <= j)%Z) by omega. destruct case.
+  replace (i+1-1)%Z with i by lia.
+  rewrite occ_empty; lia.
+  lia.
+  replace (i+1-1)%Z with i by lia. auto.
+assert (case: (j < i \/ i+1 <= j)%Z) by lia. destruct case.
 assert (occ v m 0 i >= 1)%Z.
   assert (occ v m 0 i = occ v m 0 j + occ v m j i)%Z.
-  apply occ_append; omega.
+  apply occ_append; lia.
   assert (occ v m j i = occ v m j (j+1) + occ v m (j+1) i)%Z.
-  apply occ_append; omega.
+  apply occ_append; lia.
   assert (occ v m j (j+1) = 1)%Z.
   rewrite occ_right_add.
-  replace (j+1-1)%Z with j by omega.
-  rewrite occ_empty; omega.
-  omega.
-  replace (j+1-1)%Z with j by omega. auto.
+  replace (j+1-1)%Z with j by lia.
+  rewrite occ_empty; lia.
+  lia.
+  replace (j+1-1)%Z with j by lia. auto.
   generalize (occ_bounds v m (i+1) n).
   generalize (occ_bounds v m 0 j).
   generalize (occ_bounds v m (j+1) i).
-  omega.
+  lia.
   generalize (occ_bounds v m (i+1) n).
-omega.
+lia.
 assert (occ v m (i+1) n >= 1)%Z.
   assert (occ v m (i+1) n = occ v m (i+1) j + occ v m j n)%Z.
-  apply occ_append; omega.
+  apply occ_append; lia.
   assert (occ v m j n = occ v m j (j+1) + occ v m (j+1) n)%Z.
-  apply occ_append; omega.
+  apply occ_append; lia.
   assert (occ v m j (j+1) = 1)%Z.
   rewrite occ_right_add.
-  replace (j+1-1)%Z with j by omega.
-  rewrite occ_empty; omega.
-  omega.
-  replace (j+1-1)%Z with j by omega. auto.
+  replace (j+1-1)%Z with j by lia.
+  rewrite occ_empty; lia.
+  lia.
+  replace (j+1-1)%Z with j by lia. auto.
   generalize (occ_bounds v m (j+1) n).
   generalize (occ_bounds v m 0 i).
   generalize (occ_bounds v m (i+1) j).
-  omega.
+  lia.
   generalize (occ_bounds v m 0 i).
-  omega.
-generalize (Hocc v); omega.
+  lia.
+generalize (Hocc v); lia.
 Qed.
 

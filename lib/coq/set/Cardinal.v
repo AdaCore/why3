@@ -19,6 +19,8 @@ Require set.Set.
 Require map.Map.
 Require map.Const.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Definition is_finite {a:Type} {a_WT:WhyType a} :
   (a -> Init.Datatypes.bool) -> Prop.
@@ -304,7 +306,7 @@ Proof.
 intros s.
 unfold cardinal. destruct ClassicalEpsilon.excluded_middle_informative.
 destruct ClassicalEpsilon.classical_indefinite_description.
-omega.
+lia.
 reflexivity.
 Qed.
 
@@ -430,7 +432,7 @@ assert (List.length x <= List.length x0).
   intros e H1.
   eapply Heqx0. eapply Heqx in H1. unfold set.Set.subset, set.Set.mem in h2. eapply h2 in H1. assumption.
 }
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -465,10 +467,10 @@ unfold set.Set.subset in h2.
 rewrite <- Heq2, <- Heq1.
 assert (List.length l1 = List.length l2).
 {
-  omega.
+  lia.
 }
 split. eauto.
-eapply List.NoDup_length_incl; eauto. omega.
+eapply List.NoDup_length_incl; eauto. lia.
 Qed.
 
 (* Why3 goal *)
@@ -487,7 +489,7 @@ destruct ClassicalEpsilon.excluded_middle_informative.
   + inversion h1.
   + destruct x0.
     - simpl in a0. eapply a0 in h2. eapply a0 in H0. intuition. subst. reflexivity.
-    - simpl in h1; contradict h1; zify; omega.
+    - simpl in h1; contradict h1; lia.
 * inversion h1.
 Qed.
 
@@ -520,7 +522,7 @@ induction lu; intros.
        subst. inversion H. intuition.
    }
    rewrite Hlieq. rewrite List.app_length. simpl length.
-   rewrite H4. rewrite List.app_length. omega.
+   rewrite H4. rewrite List.app_length. lia.
   * assert (List.In a lui). { eapply H3. split. left. reflexivity. assumption. }
     destruct (List.in_split a lui H4) as [lui' [lui'' Hlui]].
     assert (length (List.app lui' lui'') = length lu - length li).
@@ -545,7 +547,7 @@ induction lu; intros.
       intros e Hincl. specialize (H2 e Hincl). simpl in H2. intuition. subst.
       intuition.
     }
-  omega.
+  lia.
 Qed.
 
 Lemma NoDup_app: forall {A} l l' 
@@ -657,7 +659,7 @@ assert (List.length (List.app l1_lint l2_lint) = List.length lun_lint).
   eapply List.NoDup_incl_length; intuition. intro. apply H6.
   assert (List.length (List.app l1_lint l2_lint) >= List.length lun_lint).
   eapply List.NoDup_incl_length; intuition. intro. apply H7.
-  omega.
+  lia.
 }
 
 assert (length l1 >= length lint).
@@ -675,7 +677,7 @@ assert (length lun >= length lint).
   eapply List.NoDup_incl_length; intuition. intros e Hincl. eapply Heq_int in Hincl.
   eapply Heq_un. eapply set.Set.inter'def in Hincl. eapply set.Set.union'def. intuition.
 }
-rewrite List.app_length in H5. omega.
+rewrite List.app_length in H5. lia.
 Qed.
 
 (* Why3 goal *)
@@ -729,7 +731,7 @@ eapply List.NoDup_incl_length; intuition.
   intros e Hincl. eapply H4. eapply H6 in Hincl. rewrite set.Set.inter'def in Hincl.
   intuition.
 }
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -758,6 +760,6 @@ assert (List.length x <= List.length x0).
     eapply List.NoDup_incl_length; eauto.
   - rewrite List.map_length; eauto.
 }
-omega.
+lia.
 Qed.
 

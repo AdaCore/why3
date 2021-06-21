@@ -3,6 +3,10 @@
 Input Formats
   * Witness expression for type invariant is generalized (#286,!428)
 
+Provers
+  * support for Coq 8.14.0 (released ..., 2021)
+  * dropped support for Coq 8.6
+
 Version 1.4.0, March 13, 2021
 -----------------------------
 

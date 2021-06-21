@@ -17,6 +17,8 @@ Require HighOrd.
 Require int.Int.
 Require set.Fset.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Definition sum {a:Type} {a_WT:WhyType a} :
   set.Fset.fset a -> (a -> Numbers.BinNums.Z) -> Numbers.BinNums.Z.
@@ -192,7 +194,7 @@ destruct a2 as (Hx1dup, Hx1eq).
     - intros. rewrite Hx1eq. rewrite Hdieq in H0. rewrite set.Set.diff'def in H0.
       intuition.
 }
-omega.
+lia.
 Qed.
 
 Lemma sum_union_disj {a:Type} {a_WT:WhyType a} :
@@ -255,7 +257,7 @@ assert (sum (Fset.union s1 s2) f - sum (Fset.inter s1 s2) f =
   + eapply Fset.subset_trans with s1. eapply Fset.subset_inter_1.
     eapply Fset.subset_union_1.
 }
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)
