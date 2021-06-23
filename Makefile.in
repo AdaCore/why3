@@ -1637,7 +1637,7 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.con
 	  `find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
 	+dynlink.js +toplevel.js $<
 
-src/trywhy3/why3_worker.byte: $(WHY3CMA) lib/plugins/python.cma lib/plugins/microc.cma \
+src/trywhy3/why3_worker.byte: $(WHY3CMA) $(PYTHONCMO) $(MICROCCMO) \
 		$(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo why3_worker.cmo)
 	$(OCAMLFIND) ocamlc $(filter-out -thread,$(BFLAGS)) -package js_of_ocaml -o $@ -linkpkg $^
 

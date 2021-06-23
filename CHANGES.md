@@ -1,5 +1,14 @@
 :x: marks a potential source of incompatibility
 
+TryWhy3
+  * graphical modifications
+  * the contextual menu steps are now configurable
+  * the prove button now splits the VCs if they are not proven with "first-attempt steps limit"
+  * added a split and a prove button next to each task
+  * added examples for python and micro-c
+  * added `index_{language}.txt` in `examples` directory in order to list all examples path for each languages
+  * added `config.json` in `examples` directory in order to configure the number of steps for each settings
+
 Input Formats
   * Witness expression for type invariant is generalized (#286,!428)
 
