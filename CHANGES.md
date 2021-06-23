@@ -1,5 +1,20 @@
 :x: marks a potential source of incompatibility
 
+Python
+  * added break and continue
+  * added range with one, two or three argument(s)
+  * added slice (`list[i1:i2]`)
+  * added negative index (`list[n], with -len(list) ≤ n < len(list)`)
+  * added lists methods:
+    * `list.append(n)`
+    * `list.pop()`
+    * `list.clear()`
+    * `list.sort()`
+    * `list.reverse()`
+  * added `is_permutation(list1, list2)` predicate
+  * added assignment operators `+=`, `-=`, `*=`, `//=`, `%=`
+  * functions can now return `bool` and `list`
+
 TryWhy3
   * graphical modifications
   * the contextual menu steps are now configurable

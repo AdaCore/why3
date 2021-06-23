@@ -36,6 +36,7 @@ and expr_desc =
   | Ebinop of binop * expr * expr
   | Eunop of unop * expr
   | Ecall of ident * expr list
+  | Edot of expr * ident * expr list
   | Elist of expr list   (* [e1, e2, ..., en] *)
   | Emake of expr * expr (* [e1] * e2 *)
   | Eget of expr * expr  (* e1[e2] *)
@@ -46,6 +47,7 @@ and stmt = {
 }
 
 and stmt_desc =
+  | Sblock of block
   | Sif of expr * block * block
   | Sreturn of expr
   | Sassign of ident * expr
@@ -55,6 +57,7 @@ and stmt_desc =
   | Sset of expr * expr * expr (* e1[e2] = e3 *)
   | Sassert of Expr.assertion_kind * Ptree.term
   | Sbreak
+  | Scontinue
   | Slabel of ident
 
 and block = decl list
@@ -66,5 +69,3 @@ and decl =
   | Dlogic of bool (*is_func*) * ident * ident list
 
 type file = block
-
-
