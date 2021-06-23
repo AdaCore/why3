@@ -11,8 +11,8 @@ while s <= n:
     #@ invariant r * r <= n
     #@ invariant s == (r+1) * (r+1)
     #@ variant   n - s
-    r = r + 1
-    s = s + 2 * r + 1
+    r += 1
+    s += 2 * r + 1
 
 print(r)
 #@ assert r*r <= n < (r+1)*(r+1)

@@ -46,4 +46,4 @@ while n >= 1:
     lemma(n)
     lemma(n-k)
     #@ assert win(n) -> lose(n - k)
-    n = n - k
+    n -= k

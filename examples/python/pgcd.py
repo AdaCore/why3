@@ -5,8 +5,8 @@ def pgcd(a, b):
         #@ invariant a > 0 and b > 0
         #@ variant a + b
         if a < b:
-            b = b - a
+            b -= a
         else:
-            a = a - b
+            a -= b
     return a
 

@@ -20,9 +20,9 @@ while q > 0:
     #@ variant   q
     print(p, q, r)
     if q % 2 == 1:
-        r = r + p
-    p = p + p
-    q = q // 2
+        r += p
+    p += p
+    q //= 2
 print(p, q, r)
 print("a * b =", r)
 #@ assert r == a * b
