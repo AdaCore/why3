@@ -125,7 +125,7 @@ let mk_env ?(attrs=Sattr.empty)
         Debug.dprintf debug_vc "trace_for_ce is set@.";
         true
       end
-    else false
+    else true
   in
   {
   known_map = kn;

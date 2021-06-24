@@ -1619,21 +1619,21 @@ let small t = match t.t_node with
 *)
   | _ -> false
 
+let v_copy_unused v =
+  let id = v.vs_name in
+  let id' = id_fresh ~attrs:id.id_attrs ?loc:id.id_loc (id.id_string ^ "'unused") in
+  create_vsymbol id' v.vs_ty
+
 let t_let_simp_keep_var ~keep e ((v,b,t) as bt) =
   let n = t_v_occurs v t in
   if n = 0 then
     let t = t_subst_unsafe b.bv_subst t in
-    if keep then
-      let id = v.vs_name in
-      let id' = id_fresh ~attrs:id.id_attrs ?loc:id.id_loc (id.id_string ^ "'unused") in
-      let v' = create_vsymbol id' v.vs_ty in
-      t_let_close v' e t
-    else t
+    if keep then t_let_close (v_copy_unused v) e t else t
   else
   if n = 1 || small e then begin
     vs_check v e;
     let t = t_subst_unsafe (Mvs.add v e b.bv_subst) t in
-    if keep then t_let_close v e t else t
+    if keep then t_let_close (v_copy_unused v) e t else t
   end else
     t_let e bt
 
@@ -1642,16 +1642,11 @@ let t_let_simp = t_let_simp_keep_var ~keep:false
 let t_let_close_simp_keep_var ~keep v e t =
   let n = t_v_occurs v t in
   if n = 0 then
-    if keep then
-      let id = v.vs_name in
-      let id' = id_fresh ~attrs:id.id_attrs ?loc:id.id_loc (id.id_string ^ "'unused") in
-      let v' = create_vsymbol id' v.vs_ty in
-      t_let_close v' e t
-    else t
+    if keep then t_let_close (v_copy_unused v) e t else t
   else
   if n = 1 || small e then
     let t = t_subst_single v e t in
-    if keep then t_let_close v e t else t
+    if keep then t_let_close (v_copy_unused v) e t else t
   else
     t_let_close v e t
 
