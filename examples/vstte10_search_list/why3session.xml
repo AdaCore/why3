@@ -10,7 +10,7 @@
 <path name=".."/><path name="vstte10_search_list.mlw"/>
 <theory name="SearchingALinkedList" proved="true">
  <goal name="search&#39;vc" expl="VC for search" proved="true">
- <proof prover="2"><result status="valid" time="0.07" steps="283"/></proof>
+ <proof prover="2"><result status="valid" time="0.07" steps="285"/></proof>
  </goal>
  <goal name="search_list&#39;vc" expl="VC for search_list" proved="true">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
@@ -41,23 +41,23 @@
   </goal>
   <goal name="search_loop&#39;vc.2" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.3" expl="loop variant decrease" proved="true">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01" steps="38"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.4" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="search_loop&#39;vc.4.0" expl="VC for search_loop" proved="true">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="search_loop&#39;vc.4.1" expl="VC for search_loop" proved="true">
    <proof prover="1"><result status="timeout" time="5.00"/></proof>
-   <proof prover="2"><result status="valid" time="0.02" steps="33"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="34"/></proof>
    <proof prover="6"><result status="timeout" time="5.00"/></proof>
    </goal>
    <goal name="search_loop&#39;vc.4.2" expl="VC for search_loop" proved="true">
