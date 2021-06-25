@@ -18,17 +18,7 @@ module MatrixMultiplication
     ensures  { forall i j. tar_r <= i < tar_r + dr -> tar_c <= j < tar_c + dc ->
       tar.elts[i][j] = src.elts[i + (src_r - tar_r)][j + (src_c - tar_c)] }
     ensures  { forall i j. 0 <= i < tar.rows -> 0 <= j < tar.columns ->
-                 not (tar_r <= i < tar_r + dr /\ tar_c <= j < tar_c + dc) ->
-                 tar.elts[i][j] = (old tar).elts[i][j] }
-  =
-   label I in
-   for i = tar_r to tar_r + dr - 1 do
-     invariant { forall i j. 0 <= i < tar.rows -> 0 <= j < tar.columns ->
-                 not (tar_r <= i < tar_r + dr /\ tar_c <= j < tar_c + dc) ->
-                 tar.elts[i][j] = (tar at I).elts[i][j] }
-     invariant { forall i' j'. tar_r <= i' < i -> tar_c <= j' < tar_c + dc ->
-                 tar.elts[i'][j'] =
-                 src.elts[i' + (src_r - tar_r)][j' + (src_c - tar_c)] }
+                 not (tar_r <= i < tar_r
      label L in
      for j = tar_c to tar_c + dc - 1 do
        invariant { forall i' j'. 0 <= i' < tar.rows -> 0 <= j' < tar.columns ->
