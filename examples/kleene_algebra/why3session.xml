@@ -5,6 +5,7 @@
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="kleene_algebra.mlw"/>
 <theory name="SemiRing" proved="true">
@@ -69,14 +70,14 @@
  <goal name="var_mul_le_star" proved="true">
  <proof prover="0"><result status="valid" time="0.04" steps="4851"/></proof>
  </goal>
- <goal name="iter_le_star" proved="true">
+ <goal name="power_le_star" proved="true">
  <transf name="introduce_premises" proved="true" >
-  <goal name="iter_le_star.0" proved="true">
+  <goal name="power_le_star.0" proved="true">
   <transf name="induction" proved="true" arg1="i">
-   <goal name="iter_le_star.0.0" expl="base case" proved="true">
+   <goal name="power_le_star.0.0" expl="base case" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="3398"/></proof>
    </goal>
-   <goal name="iter_le_star.0.1" expl="recursive case" proved="true">
+   <goal name="power_le_star.0.1" expl="recursive case" proved="true">
    <proof prover="0"><result status="valid" time="0.04" steps="8253"/></proof>
    </goal>
   </transf>
@@ -202,45 +203,45 @@
   </goal>
  </transf>
  </goal>
- <goal name="sum_mon&#39;vc" expl="VC for sum_mon" proved="true">
+ <goal name="sum_pow&#39;vc" expl="VC for sum_pow" proved="true">
  <proof prover="0"><result status="valid" time="0.02" steps="4311"/></proof>
  </goal>
- <goal name="sum_mon_left" proved="true">
+ <goal name="sum_pow_left" proved="true">
  <transf name="introduce_premises" proved="true" >
-  <goal name="sum_mon_left.0" proved="true">
+  <goal name="sum_pow_left.0" proved="true">
   <transf name="induction" proved="true" arg1="b" arg2="from" arg3="a">
-   <goal name="sum_mon_left.0.0" expl="base case" proved="true">
+   <goal name="sum_pow_left.0.0" expl="base case" proved="true">
    <proof prover="0"><result status="valid" time="0.01" steps="3868"/></proof>
    </goal>
-   <goal name="sum_mon_left.0.1" expl="recursive case" proved="true">
+   <goal name="sum_pow_left.0.1" expl="recursive case" proved="true">
    <proof prover="0"><result status="valid" time="0.03" steps="8236"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="mul_sum_mon" proved="true">
+ <goal name="mul_sum_pow" proved="true">
  <transf name="introduce_premises" proved="true" >
-  <goal name="mul_sum_mon.0" proved="true">
+  <goal name="mul_sum_pow.0" proved="true">
   <transf name="induction" proved="true" arg1="b" arg2="from" arg3="a">
-   <goal name="mul_sum_mon.0.0" expl="base case" proved="true">
+   <goal name="mul_sum_pow.0.0" expl="base case" proved="true">
    <proof prover="0"><result status="valid" time="0.03" steps="4969"/></proof>
    </goal>
-   <goal name="mul_sum_mon.0.1" expl="recursive case" proved="true">
+   <goal name="mul_sum_pow.0.1" expl="recursive case" proved="true">
    <proof prover="0"><result status="valid" time="0.03" steps="18178"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="sum_mon_le_star" proved="true">
+ <goal name="sum_pow_le_star" proved="true">
  <transf name="introduce_premises" proved="true" >
-  <goal name="sum_mon_le_star.0" proved="true">
+  <goal name="sum_pow_le_star.0" proved="true">
   <transf name="induction" proved="true" arg1="b" arg2="from" arg3="a">
-   <goal name="sum_mon_le_star.0.0" expl="base case" proved="true">
+   <goal name="sum_pow_le_star.0.0" expl="base case" proved="true">
    <proof prover="0"><result status="valid" time="0.02" steps="5125"/></proof>
    </goal>
-   <goal name="sum_mon_le_star.0.1" expl="recursive case" proved="true">
+   <goal name="sum_pow_le_star.0.1" expl="recursive case" proved="true">
    <proof prover="0"><result status="valid" time="0.04" steps="8856"/></proof>
    </goal>
   </transf>
@@ -269,19 +270,19 @@
 </theory>
 <theory name="RelAlgebra" proved="true">
  <goal name="zero_def" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="9705"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="10170"/></proof>
  </goal>
  <goal name="one_def" proved="true">
- <proof prover="0"><result status="valid" time="0.08" steps="13170"/></proof>
+ <proof prover="3"><result status="valid" time="0.08" steps="13911"/></proof>
  </goal>
  <goal name="post&#39;vc" expl="VC for post" proved="true">
- <proof prover="0"><result status="valid" time="0.16" steps="35665"/></proof>
+ <proof prover="3"><result status="valid" time="0.16" steps="36426"/></proof>
  </goal>
  <goal name="pre&#39;vc" expl="VC for pre" proved="true">
- <proof prover="0"><result status="valid" time="0.27" steps="46723"/></proof>
+ <proof prover="3"><result status="valid" time="0.27" steps="45825"/></proof>
  </goal>
  <goal name="infix +&#39;vc" expl="VC for infix +" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="12502"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="13045"/></proof>
  </goal>
  <goal name="infix *&#39;vc" expl="VC for infix *" proved="true">
  <transf name="split_vc" proved="true" >
@@ -296,17 +297,17 @@
   <proof prover="1"><result status="valid" time="0.68" steps="5234"/></proof>
   </goal>
   <goal name="unit_l.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="10735"/></proof>
+  <proof prover="3"><result status="valid" time="0.05" steps="11449"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="unit_r" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="unit_r.0" proved="true">
-  <proof prover="1"><result status="valid" time="1.03" steps="5241"/></proof>
+  <proof prover="1"><result status="valid" time="0.57" steps="5241"/></proof>
   </goal>
   <goal name="unit_r.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="10778"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="11501"/></proof>
   </goal>
  </transf>
  </goal>
@@ -324,25 +325,25 @@
  </transf>
  </goal>
  <goal name="Dioid.Assoc" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="11307"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="12026"/></proof>
  </goal>
  <goal name="Dioid.Unit_def_l" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="11701"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="12425"/></proof>
  </goal>
  <goal name="Dioid.Unit_def_r" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="11651"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="12369"/></proof>
  </goal>
  <goal name="Dioid.Comm" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="11287"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="12023"/></proof>
  </goal>
  <goal name="Dioid.Monoid.Assoc" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="10897"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="11622"/></proof>
  </goal>
  <goal name="Dioid.Monoid.Unit_def_l" proved="true">
- <proof prover="0"><result status="valid" time="0.07" steps="10947"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="11683"/></proof>
  </goal>
  <goal name="Dioid.Monoid.Unit_def_r" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="10995"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="11740"/></proof>
  </goal>
  <goal name="Dioid.Mul_zero_l" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="87"/></proof>
@@ -354,51 +355,103 @@
  <proof prover="1"><result status="valid" time="0.71" steps="8168"/></proof>
  </goal>
  <goal name="Dioid.Mul_distr_r" proved="true">
- <proof prover="1"><result status="valid" time="1.10" steps="8170"/></proof>
+ <proof prover="1"><result status="valid" time="0.58" steps="8170"/></proof>
  </goal>
  <goal name="Dioid.Idem" proved="true">
- <proof prover="0"><result status="valid" time="0.09" steps="13231"/></proof>
+ <proof prover="3"><result status="valid" time="0.09" steps="13995"/></proof>
  </goal>
  <goal name="le_mem" proved="true">
- <proof prover="0"><result status="valid" time="0.07" steps="17981"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="19247"/></proof>
+ </goal>
+ <goal name="power_in_star" proved="true">
+ <transf name="introduce_premises" proved="true" >
+  <goal name="power_in_star.0" proved="true">
+  <transf name="induction" proved="true" arg1="i">
+   <goal name="power_in_star.0.0" expl="base case" proved="true">
+   <proof prover="1"><result status="valid" time="0.84" steps="18805"/></proof>
+   </goal>
+   <goal name="power_in_star.0.1" expl="recursive case" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="power_in_star.0.1.0" proved="true">
+    <proof prover="2"><result status="valid" time="0.43" steps="709053"/></proof>
+    </goal>
+    <goal name="power_in_star.0.1.1" proved="true">
+    <proof prover="2"><result status="valid" time="0.06" steps="192059"/></proof>
+    </goal>
+    <goal name="power_in_star.0.1.2" proved="true">
+    <proof prover="2"><result status="valid" time="0.01" steps="7163"/></proof>
+    </goal>
+    <goal name="power_in_star.0.1.3" proved="true">
+    <proof prover="1"><result status="valid" time="0.88" steps="8851"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="star_in_power" proved="true">
+ <transf name="introduce_premises" proved="true" >
+  <goal name="star_in_power.0" proved="true">
+  <transf name="induction_arg_pr" proved="true" arg1="H" arg2="with_gen" arg3="x,y">
+   <goal name="star_in_power.0.0" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="star_in_power.0.0.0" proved="true">
+    <transf name="exists" proved="true" arg1="0">
+     <goal name="star_in_power.0.0.0.0" proved="true">
+     <proof prover="2"><result status="valid" time="0.02" steps="93353"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="star_in_power.0.1" proved="true">
+   <proof prover="3"><result status="valid" time="0.31" steps="75750"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="star_spec" proved="true">
+ <proof prover="1"><result status="valid" time="0.10" steps="969"/></proof>
  </goal>
  <goal name="star_unfold_l" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="star_unfold_l.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="16389"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="18053"/></proof>
   </goal>
   <goal name="star_unfold_l.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.22" steps="55665"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="116105"/></proof>
   </goal>
   <goal name="star_unfold_l.2" proved="true">
   <transf name="exists" proved="true" arg1="i">
    <goal name="star_unfold_l.2.0" proved="true">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.04" steps="232"/></proof>
+   <proof prover="1" timelimit="10"><result status="valid" time="0.03" steps="239"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="star_unfold_l.3" proved="true">
-  <proof prover="1"><result status="valid" time="0.29" steps="2870"/></proof>
+  <proof prover="1"><result status="valid" time="0.29" steps="2480"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="star_unfold_r" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="star_unfold_r.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="16477"/></proof>
+  <proof prover="3"><result status="valid" time="0.10" steps="18141"/></proof>
   </goal>
   <goal name="star_unfold_r.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.21" steps="55757"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="117072"/></proof>
   </goal>
   <goal name="star_unfold_r.2" proved="true">
   <transf name="exists" proved="true" arg1="i">
    <goal name="star_unfold_r.2.0" proved="true">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.04" steps="232"/></proof>
+   <proof prover="1" timelimit="10"><result status="valid" time="0.03" steps="240"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="star_unfold_r.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="34070"/></proof>
+  <proof prover="3"><result status="valid" time="0.11" steps="39025"/></proof>
   </goal>
  </transf>
  </goal>
@@ -407,10 +460,10 @@
   <goal name="star_induct_left_ind.0" proved="true">
   <transf name="induction" proved="true" arg1="i">
    <goal name="star_induct_left_ind.0.0" expl="base case" proved="true">
-   <proof prover="2"><result status="valid" time="0.04" steps="76833"/></proof>
+   <proof prover="2"><result status="valid" time="0.04" steps="83826"/></proof>
    </goal>
    <goal name="star_induct_left_ind.0.1" expl="recursive case" proved="true">
-   <proof prover="0"><result status="valid" time="0.52" steps="54297"/></proof>
+   <proof prover="3"><result status="valid" time="0.29" steps="60114"/></proof>
    </goal>
   </transf>
   </goal>
@@ -419,27 +472,27 @@
  <goal name="star_induct_left_lem" proved="true">
  <transf name="rewrite" proved="true" arg1="&lt;-" arg2="le_mem">
   <goal name="star_induct_left_lem.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="13749"/></proof>
+  <proof prover="3"><result status="valid" time="0.05" steps="15508"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="star_induct_left" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="star_induct_left.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="16466"/></proof>
+  <proof prover="3"><result status="valid" time="0.09" steps="18124"/></proof>
   </goal>
   <goal name="star_induct_left.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.19" steps="50610"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="131217"/></proof>
   </goal>
   <goal name="star_induct_left.2" proved="true">
   <transf name="exists" proved="true" arg1="i">
    <goal name="star_induct_left.2.0" proved="true">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.04" steps="213"/></proof>
+   <proof prover="1" timelimit="10"><result status="valid" time="0.03" steps="221"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="star_induct_left.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.16" steps="37636"/></proof>
+  <proof prover="3"><result status="valid" time="0.16" steps="40463"/></proof>
   </goal>
  </transf>
  </goal>
@@ -448,10 +501,10 @@
   <goal name="star_induct_right_ind.0" proved="true">
   <transf name="induction" proved="true" arg1="i">
    <goal name="star_induct_right_ind.0.0" expl="base case" proved="true">
-   <proof prover="2"><result status="valid" time="0.03" steps="79077"/></proof>
+   <proof prover="2"><result status="valid" time="0.03" steps="86064"/></proof>
    </goal>
    <goal name="star_induct_right_ind.0.1" expl="recursive case" proved="true">
-   <proof prover="2" timelimit="10"><result status="valid" time="0.38" steps="315263"/></proof>
+   <proof prover="2" timelimit="10"><result status="valid" time="0.38" steps="327189"/></proof>
    </goal>
   </transf>
   </goal>
@@ -460,50 +513,50 @@
  <goal name="star_induct_right_lem" proved="true">
  <transf name="rewrite" proved="true" arg1="&lt;-" arg2="le_mem">
   <goal name="star_induct_right_lem.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="14143"/></proof>
+  <proof prover="3"><result status="valid" time="0.05" steps="15902"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="star_induct_right" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="star_induct_right.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="16874"/></proof>
+  <proof prover="3"><result status="valid" time="0.09" steps="18549"/></proof>
   </goal>
   <goal name="star_induct_right.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.41" steps="65235"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="133710"/></proof>
   </goal>
   <goal name="star_induct_right.2" proved="true">
   <transf name="exists" proved="true" arg1="i">
    <goal name="star_induct_right.2.0" proved="true">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.04" steps="215"/></proof>
+   <proof prover="1" timelimit="10"><result status="valid" time="0.05" steps="222"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="star_induct_right.3" proved="true">
-  <proof prover="0"><result status="valid" time="0.17" steps="40129"/></proof>
+  <proof prover="3"><result status="valid" time="0.17" steps="43687"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="KleeneAlgebra.Assoc" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="14375"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="16134"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Unit_def_l" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="14422"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="16180"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Unit_def_r" proved="true">
- <proof prover="0"><result status="valid" time="0.12" steps="14466"/></proof>
+ <proof prover="3"><result status="valid" time="0.12" steps="16224"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Comm" proved="true">
- <proof prover="0"><result status="valid" time="0.07" steps="14508"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="16267"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Monoid.Assoc" proved="true">
- <proof prover="0"><result status="valid" time="0.08" steps="14892"/></proof>
+ <proof prover="3"><result status="valid" time="0.08" steps="16651"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Monoid.Unit_def_l" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="14942"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="16712"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Monoid.Unit_def_r" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="14990"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="16769"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Mul_zero_l" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
@@ -512,25 +565,25 @@
  <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Mul_distr_l" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Mul_distr_r" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Idem" proved="true">
- <proof prover="0"><result status="valid" time="0.08" steps="16125"/></proof>
+ <proof prover="3"><result status="valid" time="0.08" steps="17928"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Star_unfold_left" proved="true">
- <proof prover="0"><result status="valid" time="0.09" steps="19856"/></proof>
+ <proof prover="3"><result status="valid" time="0.09" steps="22204"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Star_unfold_right" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="20626"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="23012"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Star_induct_left" proved="true">
- <proof prover="0"><result status="valid" time="0.12" steps="17811"/></proof>
+ <proof prover="3"><result status="valid" time="0.12" steps="19711"/></proof>
  </goal>
  <goal name="KleeneAlgebra.Star_induct_right" proved="true">
- <proof prover="0"><result status="valid" time="0.08" steps="18043"/></proof>
+ <proof prover="3"><result status="valid" time="0.08" steps="19960"/></proof>
  </goal>
 </theory>
 </file>

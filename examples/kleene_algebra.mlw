@@ -89,7 +89,7 @@ module KleeneAlgebra
 
   lemma var_mul_le_star : forall x. !x * x <= !x
 
-  lemma iter_le_star : forall i x. i >= 0 -> x ^ i <= !x
+  lemma power_le_star : forall i x. i >= 0 -> x ^ i <= !x
 
   lemma star_mul_star : forall x. !x * !x = !x
   by !x + x * !x <= ! x
@@ -129,33 +129,33 @@ module KleeneAlgebra
 
   (** Conway's equality: a way to cut x^* in slices of size x^n *)
 
-  let rec ghost function sum_mon (x : t) (a b: int) : t
+  let rec ghost function sum_pow (x : t) (a b: int) : t
     requires { b >= a >= 0 }
     variant { b - a }
   = if b = a then pure{zero} else
-    let m1 = sum_mon x a (b - 1) in
+    let m1 = sum_pow x a (b - 1) in
     let m2 = x ^ (b - 1) in
     pure {m1 + m2}
 
-  lemma sum_mon_left: forall x a b.
+  lemma sum_pow_left: forall x a b.
     b > a >= 0 ->
-    sum_mon x a b = x^a + sum_mon x (Int.(+) a 1) b
+    sum_pow x a b = x^a + sum_pow x (Int.(+) a 1) b
 
-  lemma mul_sum_mon: forall x a b.
+  lemma mul_sum_pow: forall x a b.
     b >= a >= 0 ->
-    sum_mon x a b * x = sum_mon x (Int.(+) a 1) (Int.(+) b 1)
+    sum_pow x a b * x = sum_pow x (Int.(+) a 1) (Int.(+) b 1)
 
-  lemma sum_mon_le_star: forall x a b.
+  lemma sum_pow_le_star: forall x a b.
     b >= a >= 0 ->
-    sum_mon x a b <= !x
+    sum_pow x a b <= !x
 
   lemma Conway_equality: forall x n.
     n >= 1 ->
-    !x = !(x^n) * sum_mon x 0 n
-  by !(x^n) * sum_mon x 0 n <= !x
-  so !(x^n) * sum_mon x 0 n * x = !(x^n) * sum_mon x 1 n + !(x^n) * x ^ n
-                                <= !(x^n) * sum_mon x 0 n
-  so one + !(x^n) * sum_mon x 0 n * x <= !(x^n) * sum_mon x 0 n
+    !x = !(x^n) * sum_pow x 0 n
+  by !(x^n) * sum_pow x 0 n <= !x
+  so !(x^n) * sum_pow x 0 n * x = !(x^n) * sum_pow x 1 n + !(x^n) * x ^ n
+                                <= !(x^n) * sum_pow x 0 n
+  so one + !(x^n) * sum_pow x 0 n * x <= !(x^n) * sum_pow x 0 n
 end
 
 
@@ -230,21 +230,34 @@ module RelAlgebra
 
   lemma le_mem : forall x y. x <= y <-> forall u. mem u x -> mem u y
 
-  (* Can't do an infinite union so we axiomatize the star *)
-  val function (!_) (s : t) : t
-    ensures { forall p. mem p result <->
-                        exists i. i >= 0 /\ mem p (s ^ i) }
+  inductive in_star t (a, a) =
+   | Star_0 : forall x s. in_star s (x, x)
+   | Star_s : forall x y z s. in_star s (x, y) -> mem (y, z) s -> in_star s (x, z)
 
-  lemma star_unfold_l : forall x u. mem u (one + x * !x) -> mem u (!x)
+  let ghost function (!_) (s : t) =
+      filter all (in_star s)
+
+  lemma power_in_star : forall s : t, i, p : (a, a).
+        i >= 0 -> mem p (s ^ i) -> mem p !s
+        by i > 0 -> let (x, z) = p in
+           exists y. (in_star s (x, y) by mem (x, y) (s ^ (i-1)))  /\ mem (y, z) s
+
+  lemma star_in_power : forall s x y.
+        in_star s (x, y) -> (exists i. i >= 0 /\ mem (x, y) (s ^ i))
+
+  lemma star_spec : forall s : t, p : (a, a).
+        mem p !s <-> exists i. i >= 0 /\ mem p (s ^ i)
+
+  lemma star_unfold_l : forall x u. mem u (one + x * !x) -> mem u !x
   by mem u (x * !x) -> (exists i. i >= 0 /\ mem u (x * x ^ i))
      by let (u1, u2) = u in
-        exists v. mem (u1, v) x /\ mem (v, u2) (!x)
+        exists v. mem (u1, v) x /\ mem (v, u2) !x
                   so exists i. i >= 0 /\ mem u (x * x ^ i)
 
-  lemma star_unfold_r : forall x u. mem u (one + !x * x) -> mem u (!x)
+  lemma star_unfold_r : forall x u. mem u (one + !x * x) -> mem u !x
   by mem u (!x * x) -> (exists i. i >= 0 /\ mem u (x ^ i * x))
      by let (u1, u2) = u in
-     exists v. mem (u1, v) (!x) /\ mem (v, u2) x
+     exists v. mem (u1, v) !x /\ mem (v, u2) x
             so exists i. i >= 0 /\ mem u (x ^ i * x)
 
   lemma star_induct_left_ind : forall x y z i. i >= 0 ->
@@ -257,7 +270,7 @@ module RelAlgebra
     z + x * y <= y -> !x * z <= y
   by forall u. mem u (!x * z) -> (exists i. i >= 0 /\ mem u (x^i * z))
      by let (u1, u2) = u in
-        exists v. mem (u1, v) (!x) /\ mem (v, u2) z
+        exists v. mem (u1, v) !x /\ mem (v, u2) z
                   so exists i. i >= 0 /\ mem u (x^i * z)
 
   lemma star_induct_right_ind : forall x y z i. i >= 0 ->
@@ -270,7 +283,7 @@ module RelAlgebra
     z + y * x <= y -> z * !x <= y
   by forall u. mem u (z * !x) -> (exists i. i >= 0 /\ mem u (z * x^i))
      by let (u1, u2) = u in
-        exists v. mem (u1, v) z /\ mem (v, u2) (!x)
+        exists v. mem (u1, v) z /\ mem (v, u2) !x
                   so exists i. i >= 0 /\ mem u (z * x^i)
 
   (** Prove that this forms a Kleene Algebra *)
