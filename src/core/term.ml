@@ -1621,7 +1621,7 @@ let small t = match t.t_node with
 
 let v_copy_unused v =
   let id = v.vs_name in
-  let id' = id_fresh ~attrs:id.id_attrs ?loc:id.id_loc (id.id_string ^ "'unused") in
+  let id' = id_derive (id.id_string ^ "'unused") in
   create_vsymbol id' v.vs_ty
 
 let t_let_simp_keep_var ~keep e ((v,b,t) as bt) =
