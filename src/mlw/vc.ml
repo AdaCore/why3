@@ -92,7 +92,7 @@ let wp_attr = Ident.create_attribute "vc:wp"
 let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
 let nt_attr = Ident.create_attribute "vc:divergent"
-let trace_for_ce_attr = Ident.create_attribute "vc:ce_trace"
+let do_not_keep_trace_attr = Ident.create_attribute "vc:do_not_keep_trace"
 
 let vc_attrs =
   Sattr.add nt_attr (Sattr.add kp_attr (Sattr.add wb_attr
@@ -113,17 +113,17 @@ type vc_env = {
   exn_count : int ref;
   divergent : bool;
   inferinvs : (expr * term) list;   (* inferred invariants *)
-  trace_for_ce : bool;
+  keep_trace : bool;
 }
 
 let mk_env ?(attrs=Sattr.empty)
       {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs =
   (* generate traceability info for counterexamples if asked *)
-  let trace_for_ce =
-    if Sattr.mem trace_for_ce_attr attrs then
+  let keep_trace =
+    if Sattr.mem do_not_keep_trace_attr attrs then
       begin
-        Debug.dprintf debug_vc "trace_for_ce is set@.";
-        true
+        Debug.dprintf debug_vc "keep_trace is unset@.";
+        false
       end
     else true
   in
@@ -140,7 +140,7 @@ let mk_env ?(attrs=Sattr.empty)
   exn_count = ref 0;
   divergent = false;
   inferinvs = invs;
-  trace_for_ce;
+  keep_trace;
 }
 
 let acc env r t =
@@ -262,7 +262,7 @@ let wp_forall vl wp = t_forall_close_simp vl [] wp
 let sp_exists vl sp = t_exists_close_simp vl [] sp
 
 let t_let_close_simp env v t f =
-  let keep = env.trace_for_ce && relevant_for_counterexample v.vs_name in
+  let keep = env.keep_trace && relevant_for_counterexample v.vs_name in
   t_let_close_simp_keep_var ~keep v t f
 
 let wp_let env v t wp =
@@ -679,7 +679,7 @@ let rec k_expr env lps e res xmap =
                ce.c_cty.cty_args <> [] (* unless not fully applied *)
           | _ -> true
             in
-          if env.trace_for_ce && need_trace then
+          if env.keep_trace && need_trace then
             let vv = explicit_result loc ce v.pv_ity in
             Kseq(k v,0,Klet(vv, t_var v.pv_vs, t_true))
           else
@@ -1626,7 +1626,7 @@ let vc_fun env vc_wp cty e =
 let vc_rec env vc_wp rdl =
   List.map (vc_kode env vc_wp) (k_rec env Mls.empty rdl)
 
-let mk_vc_decl ({known_map = kn; trace_for_ce } as env) id f =
+let mk_vc_decl ({known_map = kn; keep_trace } as env) id f =
   let {id_string = nm; id_attrs = attrs; id_loc = loc} = id in
   let attrs = if attrs_has_expl attrs then attrs else
     Sattr.add (Ident.create_attribute ("expl:VC for " ^ nm)) attrs in
@@ -1635,8 +1635,8 @@ let mk_vc_decl ({known_map = kn; trace_for_ce } as env) id f =
   let f = Typeinv.inject kn f in
   let f = if Debug.test_flag debug_no_eval then f else
             begin
-              Debug.dprintf debug_vc "Calling eval_match with trace_for_ce = %b@." trace_for_ce;
-              Eval_match.eval_match ~trace_for_ce kn f
+              Debug.dprintf debug_vc "Calling eval_match with keep_trace = %b@." keep_trace;
+              Eval_match.eval_match ~keep_trace kn f
             end
   in
   let f = simp_cast_projections env f in
