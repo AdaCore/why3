@@ -98,7 +98,7 @@ module TortoiseAndHareAlgorithm
     ensures { 0 <= mu < m /\ 1 <= lambda <= m /\ mu + lambda <= m /\
               x (mu + lambda) = x mu }
     ensures { forall i j. 0 <= i < j < mu + lambda -> x i <> x j }
-  = [@vc:do_not_keep_trace] (* traceability info breaks the proof with Vampire on sub goal 13.2 *)
+  = [@vc:do_not_keep_trace] (* traceability info breaks the proofs *)
     let mu, lambda = periodicity () in
     equality mu lambda;
     (* the first loop implements the tortoise and hare,
