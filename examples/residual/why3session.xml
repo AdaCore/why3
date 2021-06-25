@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="residual.mlw"/>
 <theory name="Residuals" proved="true">
@@ -15,21 +15,21 @@
   <proof prover="1"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
   <goal name="accepts_epsilon&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="53"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="63"/></proof>
   </goal>
   <goal name="accepts_epsilon&#39;vc.2" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
   <goal name="accepts_epsilon&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="53"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="63"/></proof>
   </goal>
   <goal name="accepts_epsilon&#39;vc.4" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="accepts_epsilon&#39;vc.4.0" expl="VC for accepts_epsilon" proved="true">
-   <proof prover="2"><result status="valid" time="0.02" steps="23927"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="24282"/></proof>
    </goal>
    <goal name="accepts_epsilon&#39;vc.4.1" expl="VC for accepts_epsilon" proved="true">
-   <proof prover="1"><result status="valid" time="0.05" steps="428"/></proof>
+   <proof prover="1"><result status="valid" time="0.05" steps="461"/></proof>
    </goal>
   </transf>
   </goal>
@@ -72,13 +72,13 @@
   <proof prover="1"><result status="valid" time="0.01" steps="52"/></proof>
   </goal>
   <goal name="residual&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="53"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="63"/></proof>
   </goal>
   <goal name="residual&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="53"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="63"/></proof>
   </goal>
   <goal name="residual&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="53"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="63"/></proof>
   </goal>
   <goal name="residual&#39;vc.5" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="52"/></proof>
@@ -100,13 +100,10 @@
     <proof prover="1" timelimit="1"><result status="valid" time="0.05" steps="84"/></proof>
     </goal>
     <goal name="residual&#39;vc.6.0.4" expl="postcondition" proved="true">
-    <proof prover="4"><path name="residual_Residuals_VC_residual_1.v"/><result status="valid" time="0.30"/></proof>
+    <proof prover="0"><result status="valid" time="2.12" steps="434865"/></proof>
     </goal>
     <goal name="residual&#39;vc.6.0.5" expl="postcondition" proved="true">
-    <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="154"/></proof>
-    </goal>
-    <goal name="residual&#39;vc.6.0.6" expl="postcondition" proved="true">
-    <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="0.04" steps="163"/></proof>
+    <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="163"/></proof>
     </goal>
    </transf>
    </goal>
@@ -125,13 +122,17 @@
     <proof prover="1" timelimit="1"><result status="valid" time="0.02" steps="65"/></proof>
     </goal>
     <goal name="residual&#39;vc.6.1.4" expl="postcondition" proved="true">
-    <proof prover="4"><path name="residual_Residuals_VC_residual_2.v"/><result status="valid" time="0.31"/></proof>
+    <transf name="split_vc" proved="true" >
+     <goal name="residual&#39;vc.6.1.4.0" expl="postcondition" proved="true">
+     <proof prover="0" timelimit="1"><result status="valid" time="0.54" steps="138359"/></proof>
+     </goal>
+     <goal name="residual&#39;vc.6.1.4.1" expl="postcondition" proved="true">
+     <proof prover="0" timelimit="1"><result status="valid" time="0.41" steps="104455"/></proof>
+     </goal>
+    </transf>
     </goal>
     <goal name="residual&#39;vc.6.1.5" expl="postcondition" proved="true">
-    <proof prover="4"><path name="residual_Residuals_VC_residual_3.v"/><result status="valid" time="0.31"/></proof>
-    </goal>
-    <goal name="residual&#39;vc.6.1.6" expl="postcondition" proved="true">
-    <proof prover="2"><result status="valid" time="0.02" steps="32311"/></proof>
+    <proof prover="0"><result status="valid" time="0.06" steps="10903"/></proof>
     </goal>
    </transf>
    </goal>
