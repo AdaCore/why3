@@ -1282,7 +1282,7 @@ ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy Why3_Map.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 
-ISABELLEREALIZEDRV=drivers/isabelle@ISABELLEVERSION@-realize.drv
+ISABELLEREALIZEDRV=drivers/isabelle-realize.drv
 
 $(ISABELLEVERSIONSPECIFICTARGETS): %: %.@ISABELLEVERSION@
 	$(CMP_CP)
@@ -1346,10 +1346,10 @@ else
   ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
 endif
 
-$(GENERATED_PREFIX_ISABELLE)/realizations.@ISABELLEVERSION@: $(ISABELLELIBS)
+$(GENERATED_PREFIX_ISABELLE)/realizations: $(ISABELLELIBS)
 	$(HIDE)sha1sum $^ | sed -e "s,$(GENERATED_PREFIX_ISABELLE)/,," > $@
 
-update-isabelle: $(GENERATED_PREFIX_ISABELLE)/realizations.@ISABELLEVERSION@
+update-isabelle: $(GENERATED_PREFIX_ISABELLE)/realizations
 
 $(ISABELLELIBS_INT): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/int.mlw
