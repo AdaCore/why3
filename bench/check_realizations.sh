@@ -9,7 +9,7 @@ echo "Testing Isabelle realizations"
 # We want to use the makefile to be sure to check exhaustively the
 # realizations that are built
 make GENERATED_PREFIX_ISABELLE="$TMPREAL/lib/isabelle" update-isabelle > /dev/null 2> /dev/null
-LANG=C diff lib/isabelle $TMPREAL/lib/isabelle/realizations.* > $TMPREAL/diff-isabelle
+LANG=C diff -u lib/isabelle/realizations $TMPREAL/lib/isabelle/realizations > $TMPREAL/diff-isabelle
 if test -s "$TMPREAL/diff-isabelle"; then
     echo "Isabelle realizations FAILED, please regenerate and prove them"
     cat $TMPREAL/diff-isabelle
