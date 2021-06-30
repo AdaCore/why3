@@ -105,7 +105,8 @@ mlw_module_parsing_only:
 
 module_head:
 | THEORY attrs(uident_nq)  { Typing.open_module $2 }
-| MODULE attrs(uident_nq)  { Typing.open_module $2 }
+| MODULE attrs(uident_nq) intf = option(preceded(COLON, tqualid))
+    { Typing.open_module ?intf $2 }
 
 scope_head:
 | SCOPE boption(IMPORT) attrs(uident_nq)
