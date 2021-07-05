@@ -229,6 +229,17 @@ let extract_def env vs lhs rhs =
       if r then Mls.add ls (vs, rhs) env else env
   | _ -> env
 
+(* function to open all universal quantifiers on top of a term. *)
+let rec match_forall f =
+  match f.t_node with
+  | Tquant (Tforall, tq) ->
+      let vs, _, t = t_open_quant tq in
+      begin match match_forall t with
+      | None -> Some (vs, t)
+      | Some (vs2, t) -> Some (vs @ vs2, t)
+      end
+  | _ -> None
+
 (* function to extract a definition from an axiom. It supports the two cases
      f(x1 ... xn) = rhs
   and
@@ -240,10 +251,9 @@ let extract_def env vs lhs rhs =
 *)
 
 let extract_def_from_axiom env t =
-  match t.t_node with
-  | Tquant (Tforall, tq) ->
+  match match_forall t with
+  | Some (vs, t) ->
     begin
-      let vs, _, t = t_open_quant tq in
       match t.t_node with
       | Tbinop (Tiff, lhs, rhs) ->
         let rhs = t_attr_add inlined_attr rhs in
