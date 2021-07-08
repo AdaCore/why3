@@ -1,4 +1,3 @@
-### Exemple pour break ###
 
 s = 0
 
@@ -10,11 +9,6 @@ for i in range(100):
     s += 1
 
 #@ assert s == 10
-
-
-
-
-### Exemple pour continue ###
 
 s = 0
 
