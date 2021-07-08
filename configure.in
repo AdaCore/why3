@@ -319,8 +319,8 @@ if test "$MENHIR" = no ; then
 fi
 
 MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
-AX_VERSION_GE([$MENHIRVERSION], 20151112, [],
-  [AC_MSG_ERROR(You need Menhir 20151112 or higher.)])
+AX_VERSION_GE([$MENHIRVERSION], 20170418, [],
+  [AC_MSG_ERROR(You need Menhir 20170418 or higher.)])
 
 if test "$enable_ocamlfind" != yes; then
    OCAMLFIND=no
