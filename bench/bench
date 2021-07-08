@@ -58,7 +58,12 @@ goods () {
     ERROR=
     test -d $1 || exit 1
     rm -f bench_errors
-    for f in $1/*.{why,mlw,mlcfg} ; do
+    ext=
+    case $1 in
+        *python) ext=py;;
+        *micro-c) ext=c;;
+    esac
+    for f in $1/*.{why,mlw,mlcfg} $1/*.$ext ; do
         printf "  $f... "
         opts="$2"
         if test $f = stdlib/int.mlw; then opts="$2 --type-only"; fi
@@ -426,7 +431,9 @@ goods bench/typing/x-good --parse-only
 bads bench/typing/x-good --type-only
 goods bench/programs/good
 goods bench/ce
-goods src/trywhy3/examples "--debug=ignore_missing_diverges"
+goods src/trywhy3/examples/whyml "--debug=ignore_missing_diverges"
+goods src/trywhy3/examples/python "--debug=ignore_missing_diverges"
+goods src/trywhy3/examples/micro-c "--debug=ignore_missing_diverges"
 goods examples/bts
 goods examples/tests
 goods examples/tests-provers
@@ -443,6 +450,8 @@ goods examples/double_wp "-L examples/double_wp"
 goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
 goods examples/prover "-L examples/prover --debug=ignore_unused_vars"
+goods examples/python
+goods examples/micro-c
 goods examples/in_progress
 goods bench/plugins/mlcfg
 echo ""
@@ -612,7 +621,7 @@ replay examples/logic --merging-only
 replay examples --merging-only
 replay examples/foveoos11-cm --merging-only
 replay examples/WP_revisited --merging-only
-replay examples/microc --merging-only
+replay examples/micro-c --merging-only
 replay examples/python --merging-only
 replay examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps --merging-only"
 replay examples/bitvectors "-L examples/bitvectors --merging-only"

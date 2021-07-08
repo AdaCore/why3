@@ -28,7 +28,7 @@
        "for", FOR; "in", IN;
        "and", AND; "or", OR; "not", NOT;
        "True", TRUE; "False", FALSE; "None", NONE;
-       "from", FROM; "import", IMPORT; "break", BREAK;
+       "from", FROM; "import", IMPORT; "break", BREAK; "continue", CONTINUE;
        (* annotations *)
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET;
        "old", OLD; "at", AT;
@@ -67,7 +67,7 @@
 
 let letter = ['a'-'z' 'A'-'Z']
 let digit = ['0'-'9']
-let ident = letter (letter | digit | '_')*
+let ident = (letter | '_')+ (letter | digit | '_')*
 let integer = ['0'-'9']+
 let space = ' ' | '\t'
 let comment = "#" [^'@''\n'] [^'\n']*
@@ -83,7 +83,14 @@ rule next_tokens = parse
   | "#@"    { raise (Lexing_error "expecting an annotation") }
   | ident as id
             { [id_or_kwd id] }
+  | (ident ("'" ident)+) as id
+            { [QIDENT id] }
   | '+'     { [PLUS] }
+  | "+="    { [PLUSEQUAL] }
+  | "-="    { [MINUSEQUAL] }
+  | "*="    { [TIMESEQUAL] }
+  | "//="   { [DIVEQUAL] }
+  | "%="    { [MODEQUAL] }
   | '-'     { [MINUS] }
   | '*'     { [TIMES] }
   | "//"    { [DIV] }
