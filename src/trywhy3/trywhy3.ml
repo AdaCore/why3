@@ -891,7 +891,6 @@ module ToolBar = struct
         FormatList.resolve_format name;
         Editor.name := name;
         Editor.set_value content;
-        Printf.printf "salut";
         ExampleList.update_example ();
         Js._true
 
@@ -1428,7 +1427,7 @@ let () =
   let search = url ##. searchParams in
   let () =
     match Js.Opt.to_option (search ## get !!"name") with
-    | Some name -> Printf.printf "%s\n" (Js.to_string name); Editor.name := name
+    | Some name -> Editor.name := name
     | None -> ()
   in
   let lang, buffer =
