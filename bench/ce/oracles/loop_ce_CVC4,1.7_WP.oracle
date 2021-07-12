@@ -67,15 +67,15 @@ File loop_ce.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 22:
-    result [@introduced]
-      [@model_result_call_loc:22:7:14:bench/ce/loop_ce.mlw]
-      [@model_trace:result] =
-      {"type": "Boolean", "val": false}
     a [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    result [@introduced]
+      [@model_result_call_loc:22:7:14:bench/ce/loop_ce.mlw]
+      [@model_trace:result] =
+      {"type": "Boolean", "val": false}
   Line 23:
     a at X [@at:X] [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents]
       [@introduced] [@mlw:reference_var] [@model_trace:a] =

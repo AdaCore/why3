@@ -41,11 +41,6 @@ File int32.mlw:
               "type": "Proj",
               "value": {"type": "Integer", "val": "42"}}}]}}
   Line 9:
-    result [@introduced] [@model_result_call_loc:9:9:14:bench/ce/int32.mlw]
-      [@model_trace:result] =
-      {"proj_name": "int32'int",
-       "type": "Proj",
-       "value": {"type": "Integer", "val": "84"}}
     r [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
        "val":
@@ -55,4 +50,9 @@ File int32.mlw:
              {"proj_name": "int32'int",
               "type": "Proj",
               "value": {"type": "Integer", "val": "84"}}}]}}
+    result [@introduced] [@model_result_call_loc:9:9:14:bench/ce/int32.mlw]
+      [@model_trace:result] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "84"}}
 

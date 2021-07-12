@@ -15,8 +15,7 @@ File if_decision_branch.mlw:
   Line 18:
     a [@introduced] = {"type": "Integer", "val": "0"}
   Line 19:
-    result [@introduced] [@model_trace:result] =
-      {"type": "Integer", "val": "22"}
+    result [@introduced] = {"type": "Integer", "val": "22"}
   Line 22:
     TEMP_NAME [@introduced] [@model_trace:TEMP_NAME] =
       {"type": "Record",
@@ -25,13 +24,13 @@ File if_decision_branch.mlw:
           [{"field": "sel_path", "value": {"type": "Boolean", "val": false}}]}}
     result [@introduced] = {"type": "Integer", "val": "22"}
   Line 27:
-    result [@introduced]
-      [@model_result_call_loc:27:36:43:bench/ce/if_decision_branch.mlw]
-      [@model_trace:result] =
-      {"type": "Boolean", "val": false}
     TEMP_NAME [@introduced] [@model_trace:TEMP_NAME] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "sel_path", "value": {"type": "Boolean", "val": false}}]}}
+    result [@introduced]
+      [@model_result_call_loc:27:36:43:bench/ce/if_decision_branch.mlw]
+      [@model_trace:result] =
+      {"type": "Boolean", "val": false}
 
