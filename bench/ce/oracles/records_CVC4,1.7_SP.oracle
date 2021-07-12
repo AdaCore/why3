@@ -42,6 +42,8 @@ File records.mlw:
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 25:
+    result'unused'unused [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records.mlw", line 28, characters 14-18:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
@@ -103,6 +105,12 @@ File records.mlw:
                    "value": {"type": "Integer", "val": "6"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 30:
+    q 'unused'unused [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
@@ -176,6 +184,18 @@ File records.mlw:
                    "value": {"type": "Integer", "val": "6"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 35:
+    q 'unused'unused [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result'unused'unused [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
@@ -248,6 +268,13 @@ File records.mlw:
                  [{"field": ".my_field_f",
                    "value": {"type": "Integer", "val": "6"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
+  Line 41:
+    q 'unused'unused [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 42:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
@@ -351,6 +378,18 @@ File records.mlw:
                    "value": {"type": "Integer", "val": "6"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 50:
+    q 'unused'unused [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "3"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+    result'unused'unused [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":

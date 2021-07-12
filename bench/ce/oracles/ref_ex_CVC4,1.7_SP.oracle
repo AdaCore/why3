@@ -200,6 +200,13 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_ex.mlw:37:2:96]
+      [@vc:written:37:2:96:bench/ce/ref_ex.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -214,8 +221,20 @@ File ref_ex.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-2"}}]}}
+  Line 24:
+    old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:24]
+      [@at:L:loc:bench/ce/ref_ex.mlw:38] [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    x [@at:M:loc:bench/ce/ref_ex.mlw:38] [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 31:
-    x [@at:'Old:loc:bench/ce/ref_ex.mlw:24]
+    x [@at:'Old] [@at:'Old:loc:bench/ce/ref_ex.mlw:24]
       [@at:L:loc:bench/ce/ref_ex.mlw:38] [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":

@@ -67,6 +67,10 @@ File loop_ce.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 22:
+    result [@introduced]
+      [@model_result_call_loc:22:7:14:bench/ce/loop_ce.mlw]
+      [@model_trace:result] =
+      {"type": "Boolean", "val": false}
     a [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
        "val":
@@ -107,4 +111,9 @@ File loop_ce.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 22:
+    result [@introduced]
+      [@model_result_call_loc:22:7:14:bench/ce/loop_ce.mlw]
+      [@model_trace:result] =
+      {"type": "Boolean", "val": true}
 

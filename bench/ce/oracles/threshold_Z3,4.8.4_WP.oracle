@@ -65,6 +65,11 @@ File threshold.mlw:
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
+  Line 11:
+    result [@introduced]
+      [@model_result_call_loc:11:5:12:bench/ce/threshold.mlw]
+      [@model_trace:result] =
+      {"type": "Boolean", "val": true}
 
 File "bench/ce/threshold.mlw", line 25, characters 11-29:
 Sub-goal Arithmetic overflow of goal f'vc.
@@ -88,17 +93,25 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 21:
-    max [@introduced] = {"type": "Integer", "val": "407257092"}
-    min [@introduced] = {"type": "Integer", "val": "541605897"}
-    n [@introduced] = {"type": "Integer", "val": "809926657"}
+    max [@introduced] = {"type": "Integer", "val": "5324832"}
+    min [@introduced] = {"type": "Integer", "val": "1068490825"}
+    n [@introduced] = {"type": "Integer", "val": "5328897"}
   Line 22:
     max [@introduced] [@model_trace:max] =
-      {"type": "Integer", "val": "407257092"}
+      {"type": "Integer", "val": "5324832"}
     min [@introduced] [@model_trace:min] =
-      {"type": "Integer", "val": "541605897"}
+      {"type": "Integer", "val": "1068490825"}
     result [@introduced] [@model_trace:result] =
-      {"type": "Integer", "val": "407257092"}
+      {"type": "Integer", "val": "1068490825"}
   Line 25:
-    _x [@introduced] = {"type": "Integer", "val": "948862989"}
-    result [@introduced] = {"type": "Integer", "val": "407257092"}
+    _x [@introduced] = {"type": "Integer", "val": "1073815657"}
+    result [@introduced]
+      [@model_result_call_loc:25:11:29:bench/ce/threshold.mlw]
+      [@model_trace:result] =
+      {"type": "Integer", "val": "1073815657"}
+  Line 26:
+    result [@introduced]
+      [@model_result_call_loc:26:5:20:bench/ce/threshold.mlw]
+      [@model_trace:result] =
+      {"type": "Boolean", "val": true}
 
