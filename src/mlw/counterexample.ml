@@ -48,7 +48,7 @@ let print_ce_summary_title ?check_ce fmt = function
        "The@ program@ does@ not@ comply@ to@ the@ verification@ goal"
   | SW _ ->
      Format.fprintf fmt
-       "The@ contracts@ of@ some@ function@ or@ loop@ are@ underspecified"
+       "The@ contracts@ of@ some@ function@ or@ loop@ are@ too weak"
   | NCSW _ ->
      Format.fprintf fmt
        ("The@ program@ does@ not@ comply@ to@ the@ verification@ \

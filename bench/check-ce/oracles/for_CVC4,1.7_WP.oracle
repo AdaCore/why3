@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.04s, 1016 steps).
+Prover result is: Valid (0.02s, 1530 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Checking model:
@@ -20,6 +20,8 @@ Prover result is: Valid (0.04s, 1016 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 9:
+              result = {"type": "Boolean", "val": false}
             Line 10:
               x1 =
                 {"type": "Record",
@@ -115,6 +117,8 @@ Prover result is: Valid (0.04s, 1016 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 9:
+              result = {"type": "Boolean", "val": true}
             Line 10:
               x1 =
                 {"type": "Record",
@@ -210,6 +214,8 @@ Prover result is: Valid (0.04s, 1016 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 9:
+              result = {"type": "Boolean", "val": true}
             Line 10:
               x1 =
                 {"type": "Record",
@@ -299,7 +305,7 @@ Prover result is: Valid (0.04s, 1016 steps).
   - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6176 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6886 steps).
 The following counterexample model could not be verified
   (concrete RAC no contradiction during execution, abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125):
 File for.mlw:
@@ -308,10 +314,12 @@ File for.mlw:
     [before iteration] x1 = -1
   Line 8:
     [current iteration] x1 = 0
+  Line 9:
+    [current iteration] result = true
   Line 10:
     [current iteration] x1 = 0
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.01s, 1208 steps).
+Prover result is: Valid (0.02s, 1784 steps).
 

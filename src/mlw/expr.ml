@@ -796,19 +796,43 @@ let c_pur s vl ityl ity =
   let cty = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
   mk_cexp (Cpur (s,vl)) cty
 
-let mk_proxy_decl ~ghost e =
-  let id =
-    match e.e_node with
-    | Eexec ({ c_node = Capp (_rs,_)},cty) ->
-       result_id ?loc:e.e_loc ~attrs:proxy_attrs ~ql:cty.cty_post ()
-    | Eexec ({ c_node = Cpur _},_) ->
-       result_id ?loc:e.e_loc ~attrs:proxy_attrs ()
-    | _ ->
-       id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o"
-  in
-  let_var ~ghost id e
+let print_expr_hook = ref (fun fmt _e -> Format.fprintf fmt "Expr.print_expr_hook not set!")
+let print_rs_hook = ref (fun fmt _rs -> Format.fprintf fmt "Expr.print_rs_hook not set!")
 
-let mk_proxy ghost e hd = match e.e_node with
+let mk_proxy_decl ~ghost e =
+(*  Format.eprintf "[Expr.mk_proxy_decl] e = %a@." !print_expr_hook e; *)
+(*
+  let mk_attrs id =
+    let s = Format.asprintf "%a'result" Ident.print_decoded id.id_string in
+    let a = create_model_trace_attr s in
+    (*    let b = create_model_loc_attr id.id_loc in *)
+    let at = Sattr.add a proxy_attrs in
+    match id.id_loc with
+    | None -> at
+    | Some l ->
+       let s = Format.asprintf "model_loc:%a" Loc.gen_report_position l in
+       let b = create_attribute s in
+       Sattr.add b at
+  in
+ *)
+  let (* rec *) find_id e =
+     match e.e_node with
+(*
+     | Eexec ({ c_node = Capp (rs,_)},cty) ->
+        let attrs = mk_attrs rs.rs_name in
+        result_id ?loc:e.e_loc ~attrs ~ql:cty.cty_post ()
+     | Eexec ({ c_node = Cpur (ls,_)},_) ->
+        let attrs = mk_attrs ls.ls_name in
+        result_id ?loc:e.e_loc ~attrs ()
+     | Elet(_,e) -> find_id e
+ *)
+     | _ ->
+        id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o"
+  in
+  let_var ~ghost (find_id e) e
+
+let mk_proxy ghost e hd =
+  match e.e_node with
   | Evar v when Sattr.is_empty e.e_attrs -> hd, v
   | _ ->
       let ld, v = mk_proxy_decl ~ghost e in ld::hd, v
@@ -1515,6 +1539,10 @@ and print_rec_fun fst fmt fd =
     print_variant fd.rec_varl
     (print_lexpr 0 (*4*)) e;
   forget_cty fd.rec_fun.c_cty
+
+let () =
+  print_expr_hook := print_expr;
+  print_rs_hook := print_rs
 
 (* exception handling *)
 

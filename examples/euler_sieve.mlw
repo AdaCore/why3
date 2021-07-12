@@ -851,7 +851,8 @@ module EulerSieveImpl
     ensures  { forall i. 0 <= i < result.length -> prime result[i] }
     ensures  { forall i. 2 <= i <= max -> prime i ->
                          exists j. 0 <= j < result.length /\ result[j] = i }
-  = let t = create max in
+  = [@vc:do_not_keep_trace] (* traceability info breaks the proof with Vampire on sub goal 13.2 *)
+    let t = create max in
     let rec loop (n: int63) =
       requires { 3 <= n <= max }
       requires { n * n <= max }

@@ -1,6 +1,6 @@
 
 use int.Int
-use ref.Ref
+
 let f (z: int) =
   let ref x1 = z in
   let ref x2 = 0 in
@@ -16,14 +16,13 @@ let f (z: int) =
   done
 
 (*
-counterexamle: `x1 = -2`, `i = 0` at the beggining of the loop.
+counterexample: `x1 = -2`, `i = 0` at the beginning of the loop.
 
 The execution of `f` with the counterexample:
-- terminates normally if executed concretly;
+- terminates normally if executed concretely;
 - terminates in error if executed abstractly (invariant preservation
   fails)
 
 It is a real counterexample due to underspecification (weak loop
 invariant).
 *)
-

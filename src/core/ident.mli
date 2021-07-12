@@ -198,6 +198,12 @@ val extract_written_loc: attribute -> Loc.position option
     ill-formed.
 *)
 
+val create_model_result_call_loc_attr : Loc.position -> attribute
+
+val extract_model_result_call_loc : attribute -> Loc.position option
+
+val get_model_result_call_loc : Sattr.t -> Loc.position option
+
 val remove_model_attrs : attrs:Sattr.t -> Sattr.t
 (** Remove the counter-example attributes from an attribute set *)
 

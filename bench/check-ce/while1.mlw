@@ -1,6 +1,6 @@
 
 use int.Int
-use ref.Ref
+
 let f ()
   ensures { result = 2 }
   = let ref x = 0 in
@@ -14,13 +14,12 @@ let f ()
     x
 
 (*
-counterexamle: `x = 0`, `i = 2` at beggining of loop.
+counterexample: `x = 0`, `i = 2` at beginning of the loop.
 
 The execution of `f` with the counterexample:
-- terminates normally if executed concretly;
+- terminates normally if executed concretely;
 - terminates in error if executed abstractly (postcondition fails)
 
 It is a real counterexample due to underspecification (weak loop
 invariant).
 *)
-

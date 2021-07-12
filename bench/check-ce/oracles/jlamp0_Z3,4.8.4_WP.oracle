@@ -45,32 +45,32 @@
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "3"}}]}}
+                      "value": {"type": "Integer", "val": "4"}}]}}
             Line 11:
               a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "3"}}]}}
+                      "value": {"type": "Integer", "val": "4"}}]}}
             Line 12:
               a =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "3"}}]}}
+                      "value": {"type": "Integer", "val": "4"}}]}}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 3
+                                                                    4}
+<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 14-16: 4
 <rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11 at "bench/check-ce/jlamp0.mlw", line 11, characters 9-11: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: {contents=
-                                                                    3}
+                                                                    4}
 <rac-values>Type default value for variable `result` at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16 at "bench/check-ce/jlamp0.mlw", line 11, characters 4-16: ()
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
@@ -78,7 +78,7 @@
 <rac-values>Value from model for global `a` at "bench/check-ce/jlamp0.mlw", line 6, characters 6-7: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `b` at "bench/check-ce/jlamp0.mlw", line 8, characters 10-11: {contents=
-                                                                    3}
+                                                                    4}
 <check-ce>Result of checking model 1: NC
             - Concrete RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
               File int.mlw:
@@ -92,20 +92,20 @@
                 Line 6:
                   a = {contents= 0}
                 Line 8:
-                  b = {contents= 3}
-                  b = {contents= 3}
+                  b = {contents= 4}
+                  b = {contents= 4}
                   Execution of main function `p1` with env:
                     a = {contents= 0}
-                    b = {contents= 3}
+                    b = {contents= 4}
                     zero = 0
                     one = 1
                 Line 11:
                   Concrete execution of function `(!)` with args:
-                    r = {contents= 3}
+                    r = {contents= 4}
               File ref.mlw:
                 Line 18:
                   Concrete execution of function `contents` with args:
-                    arg = {contents= 3}
+                    arg = {contents= 4}
               File jlamp0.mlw:
                 Line 11:
                   Concrete execution of function `(!)` with args:
@@ -118,13 +118,13 @@
                 Line 11:
                   Concrete execution of function `(+)` with args:
                     _ = 0
-                    _ = 3
+                    _ = 4
                   Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
-                    v = 3
+                    v = 4
                 Line 12:
                   Property failure at assertion with:
-                    a = {contents= 3}
+                    a = {contents= 4}
             - Abstract RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
               File int.mlw:
                 Line 13:
@@ -137,31 +137,31 @@
                 Line 6:
                   a = {contents= 0}
                 Line 8:
-                  b = {contents= 3}
-                  b = {contents= 3}
+                  b = {contents= 4}
+                  b = {contents= 4}
                   Execution of main function `p1` with env:
                     a = {contents= 0}
-                    b = {contents= 3}
+                    b = {contents= 4}
                     zero = 0
                     one = 1
                 Line 11:
                   Abstract execution of function `(!)` with args:
-                    r = {contents= 3}
-                  result = 3
+                    r = {contents= 4}
+                  result = 4
                   Abstract execution of function `(!)` with args:
                     r = {contents= 0}
                   result = 0
                   Concrete execution of function `(+)` with args:
                     _ = 0
-                    _ = 3
+                    _ = 4
                   Abstract execution of function `(:=)` with args:
                     r = {contents= 0}
-                    v = 3
-                  a = {contents= 3}
+                    v = 4
+                  a = {contents= 4}
                   result = ()
                 Line 12:
                   Property failure at assertion with:
-                    a = {contents= 3}
+                    a = {contents= 4}
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
   - Concrete RAC: UNKNOWN (terminated because missing value for parameter `b`)
@@ -171,7 +171,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/jlamp0.mlw", line 12, characters 13-26)
 File "bench/check-ce/jlamp0.mlw", line 12, characters 13-26:
 Sub-goal Assertion of goal p1'vc.
-Prover result is: Step limit exceeded (0.96s).
+Prover result is: Step limit exceeded (0.78s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -185,20 +185,20 @@ File jlamp0.mlw:
   Line 6:
     a = {contents= 0}
   Line 8:
-    b = {contents= 3}
-    b = {contents= 3}
+    b = {contents= 4}
+    b = {contents= 4}
     Execution of main function `p1` with env:
       a = {contents= 0}
-      b = {contents= 3}
+      b = {contents= 4}
       zero = 0
       one = 1
   Line 11:
     Concrete execution of function `(!)` with args:
-      r = {contents= 3}
+      r = {contents= 4}
 File ref.mlw:
   Line 18:
     Concrete execution of function `contents` with args:
-      arg = {contents= 3}
+      arg = {contents= 4}
 File jlamp0.mlw:
   Line 11:
     Concrete execution of function `(!)` with args:
@@ -211,13 +211,13 @@ File jlamp0.mlw:
   Line 11:
     Concrete execution of function `(+)` with args:
       _ = 0
-      _ = 3
+      _ = 4
     Concrete execution of function `(:=)` with args:
       r = {contents= 0}
-      v = 3
+      v = 4
   Line 12:
     Property failure at assertion with:
-      a = {contents= 3}
+      a = {contents= 4}
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 <check-ce>Checking model:
@@ -470,7 +470,7 @@ File jlamp0.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
-Prover result is: Step limit exceeded (0.76s).
+Prover result is: Step limit exceeded (0.70s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -759,7 +759,7 @@ File jlamp0.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/jlamp0.mlw", line 10, characters 15-29)
 File "bench/check-ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
-Prover result is: Step limit exceeded (1.22s).
+Prover result is: Step limit exceeded (0.60s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1025,7 +1025,7 @@ File jlamp0.mlw:
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Step limit exceeded (0.90s).
+Prover result is: Step limit exceeded (0.85s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1067,7 +1067,7 @@ File jlamp0.mlw:
 
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Valid (0.00s, 221 steps).
+Prover result is: Valid (0.00s, 265 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/jlamp0.mlw", line 24, characters 16-18)
 <check-ce>Checking model:
@@ -1321,7 +1321,7 @@ Prover result is: Valid (0.00s, 221 steps).
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 24, characters 16-18:
 Sub-goal Loop variant decrease of goal p2'vc.
-Prover result is: Step limit exceeded (0.89s).
+Prover result is: Step limit exceeded (1.11s).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -1563,7 +1563,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Step limit exceeded (0.89s).
+Prover result is: Step limit exceeded (0.95s).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -1805,7 +1805,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Step limit exceeded (0.91s).
+Prover result is: Step limit exceeded (1.31s).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -2044,7 +2044,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0.mlw", line 22, characters 18-31)
 File "bench/check-ce/jlamp0.mlw", line 19, characters 15-28:
 Sub-goal Postcondition of goal p2'vc.
-Prover result is: Step limit exceeded (0.84s).
+Prover result is: Step limit exceeded (0.90s).
 Sorry, we don't have a good counterexample for you :(
 
 

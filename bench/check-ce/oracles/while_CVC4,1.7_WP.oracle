@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.05s, 1022 steps).
+Prover result is: Valid (0.05s, 1568 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.02s, 1332 steps).
+Prover result is: Valid (0.02s, 2041 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Checking model:
@@ -37,6 +37,8 @@ Prover result is: Valid (0.02s, 1332 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 11:
+              result = {"type": "Boolean", "val": false}
             Line 12:
               x1 =
                 {"type": "Record",
@@ -190,6 +192,8 @@ Prover result is: Valid (0.02s, 1332 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
+            Line 11:
+              result = {"type": "Boolean", "val": true}
             Line 12:
               x1 =
                 {"type": "Record",
@@ -343,6 +347,8 @@ Prover result is: Valid (0.02s, 1332 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
+            Line 11:
+              result = {"type": "Boolean", "val": true}
             Line 12:
               x1 =
                 {"type": "Record",
@@ -477,7 +483,7 @@ Prover result is: Valid (0.02s, 1332 steps).
   - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6190 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 7029 steps).
 The following counterexample model could not be verified
   (concrete RAC no contradiction during execution, abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161):
 File while.mlw:
@@ -489,6 +495,8 @@ File while.mlw:
     [before iteration] x1 = -2
   Line 10:
     [current iteration] x1 = -1
+  Line 11:
+    [current iteration] result = true
   Line 12:
     [current iteration] x1 = -1
   Line 15:
@@ -496,9 +504,9 @@ File while.mlw:
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.02s, 1327 steps).
+Prover result is: Valid (0.01s, 2007 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.01s, 1264 steps).
+Prover result is: Valid (0.02s, 1944 steps).
 

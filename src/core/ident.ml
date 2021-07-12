@@ -360,23 +360,29 @@ let is_model_trace_attr a =
 let is_written_attr a =
   Strings.has_prefix "vc:written:" a.attr_string
 
-let create_written_attr loc =
+let create_loc_attr prefix loc =
   let f,l,b,e = Loc.get loc in
-  let s = Format.sprintf "vc:written:%i:%i:%i:%s" l b e f in
+  (* The file comes last to permit filenames that contain colons *)
+  let s = Format.sprintf "%s:%i:%i:%i:%s" prefix l b e f in
   create_attribute s
 
-let extract_written_loc attr =
-  let spl = Strings.bounded_split ':' attr.attr_string 6 in
-  match spl with
-  | "vc" :: "written" :: line :: col_st :: col_end :: file :: [] ->
-      begin try
-          let line = int_of_string line in
-          let col_st = int_of_string col_st in
-          let col_end = int_of_string col_end in
-          Some (Loc.user_position file line col_st col_end)
-        with _ -> None
-      end
-  | _ -> None
+let extract_loc_attr prefix attr =
+  match Strings.remove_prefix (prefix^":") attr.attr_string with
+  | exception Not_found -> None
+  | str -> match Strings.bounded_split ':' str 4 with
+    | [line; col_st; col_end; file] ->
+        begin try
+            let line = int_of_string line in
+            let col_st = int_of_string col_st in
+            let col_end = int_of_string col_end in
+            Some (Loc.user_position file line col_st col_end)
+          with _ -> None
+        end
+    | _ -> None
+
+let create_written_attr = create_loc_attr "vc:written"
+
+let extract_written_loc = extract_loc_attr "vc:written"
 
 let is_counterexample_attr a =
   is_model_trace_attr a || attr_equal a model_projected_attr ||
@@ -391,6 +397,14 @@ let relevant_for_counterexample id =
 
 let remove_model_attrs ~attrs =
   Sattr.filter (fun l -> not (is_counterexample_attr l)) attrs
+
+let create_model_result_call_loc_attr = create_loc_attr "model_result_call_loc"
+
+let extract_model_result_call_loc = extract_loc_attr "model_result_call_loc"
+
+let get_model_result_call_loc attrs =
+  try Some (Lists.first extract_model_result_call_loc (Sattr.elements attrs))
+  with Not_found -> None
 
 let get_model_trace_attr ~attrs =
   Sattr.choose (Sattr.filter is_model_trace_attr attrs)

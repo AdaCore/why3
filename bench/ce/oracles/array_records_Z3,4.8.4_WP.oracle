@@ -20,6 +20,15 @@ File array_records.mlw:
     i [@introduced] = {"type": "Integer", "val": "-1"}
   Line 27:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "3"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": true}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "5"}}]}}
 
 File "bench/ce/array_records.mlw", line 27, characters 5-81:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
@@ -31,6 +40,15 @@ File array_records.mlw:
     i [@introduced] = {"type": "Integer", "val": "-1"}
   Line 27:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "3"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": true}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "5"}}]}}
 
 File "bench/ce/array_records.mlw", line 28, characters 64-68:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
@@ -40,6 +58,15 @@ The following counterexample model has not been verified
 File array_records.mlw:
   Line 23:
     i [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "2"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}}]}}
   Line 28:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
 
@@ -51,8 +78,25 @@ The following counterexample model has not been verified
 File array_records.mlw:
   Line 23:
     i [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "2"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}}]}}
   Line 28:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
+    result [@introduced]
+      [@model_result_call_loc:28:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "2"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/array_records.mlw", line 28, characters 5-82:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
@@ -62,8 +106,25 @@ The following counterexample model has not been verified
 File array_records.mlw:
   Line 23:
     i [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "2"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}}]}}
   Line 28:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
+    result [@introduced]
+      [@model_result_call_loc:28:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "2"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/array_records.mlw", line 29, characters 64-68:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
@@ -73,6 +134,26 @@ The following counterexample model has not been verified
 File array_records.mlw:
   Line 23:
     i [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 28:
+    result [@introduced]
+      [@model_result_call_loc:28:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
   Line 29:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
 
@@ -84,8 +165,37 @@ The following counterexample model has not been verified
 File array_records.mlw:
   Line 23:
     i [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 28:
+    result [@introduced]
+      [@model_result_call_loc:28:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
   Line 29:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
+    result [@introduced]
+      [@model_result_call_loc:29:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
 
 File "bench/ce/array_records.mlw", line 29, characters 5-82:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
@@ -95,8 +205,37 @@ The following counterexample model has not been verified
 File array_records.mlw:
   Line 23:
     i [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 28:
+    result [@introduced]
+      [@model_result_call_loc:28:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
   Line 29:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
+    result [@introduced]
+      [@model_result_call_loc:29:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
 
 File "bench/ce/array_records.mlw", line 30, characters 74-78:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
@@ -106,6 +245,36 @@ The following counterexample model has not been verified
 File array_records.mlw:
   Line 23:
     i [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 28:
+    result [@introduced]
+      [@model_result_call_loc:28:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "4"}}]}}
+  Line 29:
+    result [@introduced]
+      [@model_result_call_loc:29:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
   Line 30:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
 
@@ -117,8 +286,47 @@ The following counterexample model has not been verified
 File array_records.mlw:
   Line 23:
     i [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 28:
+    result [@introduced]
+      [@model_result_call_loc:28:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "4"}}]}}
+  Line 29:
+    result [@introduced]
+      [@model_result_call_loc:29:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
   Line 30:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
+    result [@introduced]
+      [@model_result_call_loc:30:74:78:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
 
 File "bench/ce/array_records.mlw", line 30, characters 5-92:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
@@ -128,8 +336,47 @@ The following counterexample model has not been verified
 File array_records.mlw:
   Line 23:
     i [@introduced] = {"type": "Integer", "val": "-1"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 28:
+    result [@introduced]
+      [@model_result_call_loc:28:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "4"}}]}}
+  Line 29:
+    result [@introduced]
+      [@model_result_call_loc:29:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
   Line 30:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "-1"}
+    result [@introduced]
+      [@model_result_call_loc:30:74:78:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "2"}}]}}
 
 File "bench/ce/array_records.mlw", line 31, characters 13-35:
 Sub-goal Assertion of goal var_overwrite'vc.
@@ -145,4 +392,44 @@ File array_records.mlw:
     i [@introduced] = {"type": "Integer", "val": "2"}
   Line 25:
     i [@introduced] [@model_trace:i] = {"type": "Integer", "val": "2"}
+  Line 27:
+    result [@introduced]
+      [@model_result_call_loc:27:45:49:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "11"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "69"}}]}}
+  Line 28:
+    result [@introduced]
+      [@model_result_call_loc:28:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 29:
+    result [@introduced]
+      [@model_result_call_loc:29:64:68:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "4"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "9"}}]}}
+  Line 30:
+    result [@introduced]
+      [@model_result_call_loc:30:74:78:bench/ce/array_records.mlw]
+      [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "first_val", "value": {"type": "Integer", "val": "6"}},
+           {"field": "flag", "value": {"type": "Boolean", "val": false}},
+           {"field": "sec_val", "value": {"type": "Integer", "val": "7"}}]}}
 
