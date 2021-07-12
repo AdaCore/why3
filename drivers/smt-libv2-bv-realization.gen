@@ -103,6 +103,31 @@ theory bv.BV_Gen
 
 end
 
+theory bv.BV256
+  syntax type t "(_ BitVec 256)"
+
+  syntax function zeros "#x0000000000000000000000000000000000000000000000000000000000000000"
+  syntax function ones "#xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+
+  syntax function nth_bv
+    "(not (= (bvand (bvlshr %1 %2) (_ bv1 256)) (_ bv0 256)))"
+
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv256 256))) (bvlshr %1 (bvsub (_ bv256 256) (bvurem %2 (_ bv256 256)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv256 256))) (bvshl %1 (bvsub (_ bv256 256) (bvurem %2 (_ bv256 256)))))"
+end
+
+theory bv.BV128
+  syntax type t "(_ BitVec 128)"
+
+  syntax function zeros "#x00000000000000000000000000000000"
+  syntax function ones "#xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+
+  syntax function nth_bv
+    "(not (= (bvand (bvlshr %1 %2) (_ bv1 128)) (_ bv0 128)))"
+
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv128 128))) (bvlshr %1 (bvsub (_ bv128 128) (bvurem %2 (_ bv128 128)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv128 128))) (bvshl %1 (bvsub (_ bv128 128) (bvurem %2 (_ bv128 128)))))"
+end
 
 theory bv.BV64
   syntax type t "(_ BitVec 64)"
@@ -161,6 +186,31 @@ end
 
 theory bv.BVConverter_Gen
   remove allprops
+end
+
+theory bv.BVConverter_128_256
+  syntax function toBig "((_ zero_extend 128) %1)"
+  syntax function toSmall "((_ extract 127 0) %1)"
+end
+
+theory bv.BVConverter_64_128
+  syntax function toBig "((_ zero_extend 64) %1)"
+  syntax function toSmall "((_ extract 63 0) %1)"
+end
+
+theory bv.BVConverter_32_128
+  syntax function toBig "((_ zero_extend 96) %1)"
+  syntax function toSmall "((_ extract 31 0) %1)"
+end
+
+theory bv.BVConverter_16_128
+  syntax function toBig "((_ zero_extend 112) %1)"
+  syntax function toSmall "((_ extract 15 0) %1)"
+end
+
+theory bv.BVConverter_8_128
+  syntax function toBig "((_ zero_extend 120) %1)"
+  syntax function toSmall "((_ extract 7 0) %1)"
 end
 
 theory bv.BVConverter_32_64

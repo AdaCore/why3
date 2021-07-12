@@ -5,12 +5,22 @@ theory bv.BV_Gen
   syntax function to_uint "(bv2nat %1)"
 end
 
-theory bv.BV64
+theory bv.BV256
   (* mapping of_int to int2bv is disabled because it breaks proofs
      in examples/bitcount, examples/esterel,
      examples/isqrt_von_neumann, examples/rightmostbittrick,
      examples/bitwalker *)
 
+  (* syntax function of_int "((_ int2bv 256) %1)" *)
+  syntax function t'int "(bv2nat %1)"
+end
+
+theory bv.BV128
+  (* syntax function of_int "((_ int2bv 128) %1)" *)
+  syntax function t'int "(bv2nat %1)"
+end
+
+theory bv.BV64
   (* syntax function of_int "((_ int2bv 64) %1)" *)
   syntax function t'int "(bv2nat %1)"
 end
