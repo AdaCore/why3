@@ -3,6 +3,5 @@ use int.Int
 
 let swap (x:(int,int))
   ensures { let (a,b) = x in result = (b,a)}
-= [@vc:ce_trace]
-  let (a,b) = x in
+= let (a,b) = x in
   (a + b - a, b + a - b + 1)

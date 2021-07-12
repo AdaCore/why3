@@ -4,13 +4,9 @@ val ref z: int
 
 let f (x: int)
   requires { x > 0 }
-=
-  [@vc:ce_trace]
-  begin
-  z <- 0;
+= z <- 0;
   (fun y -> z <- z + y) x;
   assert { z > 0 }
-  end
 
 (*
   Why3 intermediate form

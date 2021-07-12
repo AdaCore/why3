@@ -7,9 +7,5 @@ let g (x: int)
   writes { z }
   ensures { z > old z }
   returns { r -> r = x + 2 }
-=
-  [@vc:ce_trace]
-  begin
-  z <- z + 1;
+= z <- z + 1;
   x + 1
-  end

@@ -6,6 +6,4 @@ let f (x: int) = (fun y -> assume {y > 0}; y + x)
 let g (y: int)
   requires { y >= 0 }
   ensures  { result > y }
-=
-  [@vc:ce_trace]
-  f y y
+= f y y

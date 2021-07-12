@@ -3,8 +3,7 @@ use int.Int
 
 let f ()
   ensures { result = 2 }
-  = [@vc:ce_trace]
-    let ref x = 0 in
+  = let ref x = 0 in
     let ref i = 0 in
     while i < 2 do
       variant { 2 - i }

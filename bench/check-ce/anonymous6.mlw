@@ -2,7 +2,6 @@
 use int.Int
 
 let f ()  =
-  [@vc:ce_trace]
   let ref z = 0 in
   begin ensures { 1 < z < 4 } z <- 2 end;
   assert {z = 2}

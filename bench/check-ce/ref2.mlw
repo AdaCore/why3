@@ -2,7 +2,6 @@
 use ref.Ref
 
 let f () =
-  [@vc:ce_trace]
   let x = ref 1 in
   x := 2;
   assert { false }

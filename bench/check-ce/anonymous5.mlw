@@ -5,6 +5,4 @@ let f (x: int) = (fun y z -> z + y + x)
 
 let g (y: int)
   ensures { result > y }
-=
-  [@vc:ce_trace]
-  f y y y
+= f y y y

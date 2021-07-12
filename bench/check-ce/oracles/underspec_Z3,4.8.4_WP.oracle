@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.01s, 50 steps).
+Prover result is: Valid (0.02s, 62 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Checking model:
@@ -92,21 +92,23 @@ Prover result is: Valid (0.01s, 50 steps).
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-1"}}]}}
+                      "value": {"type": "Integer", "val": "-401"}}]}}
             Line 17:
               x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
+                      "value": {"type": "Integer", "val": "-400"}}]}}
+            Line 18:
+              result = {"type": "Boolean", "val": true}
             Line 19:
               x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
+                      "value": {"type": "Integer", "val": "-400"}}]}}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -116,7 +118,7 @@ Prover result is: Valid (0.01s, 50 steps).
 <rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/underspec.mlw", line 15, characters 17-18 at "bench/check-ce/underspec.mlw", line 15, characters 17-18: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
-                                                                    (-1)}
+                                                                    (-401)}
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -192,19 +194,21 @@ The following counterexample model could not be verified
 File underspec.mlw:
   Line 16:
     [current iteration] i = 0
-    [before iteration] x1 = -1
+    [before iteration] x1 = -401 (-0X191)
   Line 17:
-    [current iteration] x1 = 0
+    [current iteration] x1 = -400 (-0X190)
+  Line 18:
+    [current iteration] result = true
   Line 19:
-    [current iteration] x1 = 0
+    [current iteration] x1 = -400 (-0X190)
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.01s, 1611 steps).
+Prover result is: Valid (0.01s, 2651 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.00s, 1545 steps).
+Prover result is: Valid (0.01s, 2497 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Checking model:
@@ -425,9 +429,9 @@ Prover result is: Valid (0.00s, 1545 steps).
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.81s).
-The contracts of some function or loop are underspecified, for example during
-  the following execution:
+Prover result is: Step limit exceeded (0.75s).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization

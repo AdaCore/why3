@@ -2,7 +2,6 @@
 use int.Int
 
 let f (x: int) =
-  [@vc:ce_trace]
   let w = (fun y -> y + 2) x in
   assert {w = x + 1}
 

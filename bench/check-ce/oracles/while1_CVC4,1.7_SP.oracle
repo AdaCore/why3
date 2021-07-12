@@ -1,14 +1,14 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.05s, 859 steps).
+Prover result is: Valid (0.05s, 1288 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.01s, 1286 steps).
+Prover result is: Valid (0.02s, 1930 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.02s, 1193 steps).
+Prover result is: Valid (0.01s, 1837 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while1.mlw", line 5, characters 12-22)
 <check-ce>Checking model:
@@ -20,6 +20,8 @@ Prover result is: Valid (0.02s, 1193 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 6:
+              result'unused'unused = {"type": "Integer", "val": "0"}
             Line 8:
               i =
                 {"type": "Record",
@@ -191,6 +193,8 @@ Prover result is: Valid (0.02s, 1193 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 6:
+              result'unused'unused = {"type": "Integer", "val": "0"}
             Line 8:
               i =
                 {"type": "Record",
@@ -353,6 +357,8 @@ Prover result is: Valid (0.02s, 1193 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 6:
+              result'unused'unused = {"type": "Integer", "val": "0"}
             Line 8:
               i =
                 {"type": "Record",
@@ -517,9 +523,9 @@ Prover result is: Valid (0.02s, 1193 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/while1.mlw", line 5, characters 12-22)
 File "bench/check-ce/while1.mlw", line 5, characters 12-22:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6037 steps).
-The contracts of some function or loop are underspecified, for example during
-  the following execution:
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6743 steps).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization

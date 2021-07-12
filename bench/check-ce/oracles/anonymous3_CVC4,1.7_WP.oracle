@@ -5,10 +5,15 @@
               y = {"type": "Integer", "val": "0"}
             Line 7:
               y = {"type": "Integer", "val": "0"}
+            Line 8:
+              result =
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "0"}}]}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
+<rac-values>Value from model for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5 at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5: [|; _ -> 0|]
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -44,7 +49,7 @@
                   Property failure at postcondition of `g` with:
                     y = 0
                     result = 0
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5)
+            - Abstract RAC: UNKNOWN (terminated because Postcondition of `f` cannot be evaluated)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous3.mlw", line 7, characters 12-22)
 <check-ce>Checking model:
@@ -53,10 +58,15 @@
               y = {"type": "Integer", "val": "0"}
             Line 7:
               y = {"type": "Integer", "val": "0"}
+            Line 8:
+              result =
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "0"}}]}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
+<rac-values>Value from model for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5 at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5: [|; _ -> 0|]
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -92,7 +102,7 @@
                   Property failure at postcondition of `g` with:
                     y = 0
                     result = 0
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5)
+            - Abstract RAC: UNKNOWN (terminated because Postcondition of `f` cannot be evaluated)
               
 <check-ce>Check model 2 ("bench/check-ce/anonymous3.mlw", line 7, characters 12-22)
 <check-ce>Checking model:
@@ -101,10 +111,15 @@
               y = {"type": "Integer", "val": "0"}
             Line 7:
               y = {"type": "Integer", "val": "0"}
+            Line 8:
+              result =
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "0"}}]}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous3.mlw", line 6, characters 7-8: 0
+<rac-values>Value from model for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5 at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5: [|; _ -> 0|]
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -140,21 +155,21 @@
                   Property failure at postcondition of `g` with:
                     y = 0
                     result = 0
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5)
+            - Abstract RAC: UNKNOWN (terminated because Postcondition of `f` cannot be evaluated)
               
 <check-ce-summary>Results:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/anonymous3.mlw", line 7, characters 12-22)
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5)
+  - Abstract RAC: UNKNOWN (terminated because Postcondition of `f` cannot be evaluated)
 - Checked model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/anonymous3.mlw", line 7, characters 12-22)
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5)
+  - Abstract RAC: UNKNOWN (terminated because Postcondition of `f` cannot be evaluated)
 - Checked model 2: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/anonymous3.mlw", line 7, characters 12-22)
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous3.mlw", line 8, characters 2-5)
+  - Abstract RAC: UNKNOWN (terminated because Postcondition of `f` cannot be evaluated)
 File "bench/check-ce/anonymous3.mlw", line 7, characters 12-22:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (unknown + incomplete) (0.06s, 5023 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 5152 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

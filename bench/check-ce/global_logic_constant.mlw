@@ -7,16 +7,12 @@ module M1
 
   let f1 () : int
     ensures { result = 0 }
-  =
-    [@vc:ce_trace]
-    v1
+  = v1
 
   val ref v2: int (* CE f2'vc: 2 *)
 
   let f2 () : int
     ensures { result = 0 }
-  =
-    [@vc:ce_trace]
-    v2
+  = v2
 
 end

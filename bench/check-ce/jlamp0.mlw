@@ -8,22 +8,16 @@ module M
   let p1 (b : ref int)
     requires { 0 <= !a <= 10 /\ 3 <= !b <= 17 }
     ensures  { 17 <= !a <= 42 }
-  =
-    [@vc:ce_trace]
-    begin
-    a := !a + !b;
+  = a := !a + !b;
     assert { 5 <= !a <= 15 };
     if !a >= 10 then a := !a - 1
-    end
 
   val c : ref int
 
   let p2 ()
     requires { 0 <= !a <= 10 }
     ensures  { 7 <= !a <= 42 }
-  = [@vc:ce_trace]
-    begin
-    c := 1;
+  = c := 1;
     while !c <= 10 do
       invariant { 2 <= !c <= 11 }
       invariant { 3 <= !a <= 10 }
@@ -31,6 +25,5 @@ module M
       a := !a + !c;
       c := !c + 2
     done
-    end
 
 end

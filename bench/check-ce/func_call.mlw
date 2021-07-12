@@ -9,9 +9,6 @@ let g ()
 = z <- z + 1
 
 let f () =
-  [@vc:ce_trace]
-  begin
   z <- 0;
   g ();
   assert { z = 1 }
-  end

@@ -11,9 +11,6 @@ let g (x: int)
   x + 1
 
 let f () =
-  [@vc:ce_trace]
-  begin
   z <- 0;
   let w = g (2) + 3 in
   assert { z = 1 }
-  end

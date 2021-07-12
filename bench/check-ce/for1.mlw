@@ -2,9 +2,7 @@ use int.Int
 
 let f ()
   ensures { result = 2 }
-=
-  [@vc:ce_trace]
-  let ref x = 0 in
+= let ref x = 0 in
     for i = 0 to 1 do
       invariant { x >= 0 }
       x <- x + 1
