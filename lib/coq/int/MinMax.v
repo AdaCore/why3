@@ -15,6 +15,8 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 
+Require Import Lia.
+
 (* Why3 comment *)
 (* min is replaced with (ZArith.BinInt.Z.min x x1) by the coq driver *)
 
@@ -28,7 +30,7 @@ intros x y.
 split ; intros H.
 now apply Z.min_l.
 apply Z.min_r.
-omega.
+lia.
 Qed.
 
 (* Why3 comment *)
@@ -44,13 +46,14 @@ intros x y.
 split ; intros H.
 now apply Z.max_r.
 apply Z.max_l.
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)
 Lemma Min_r :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), (y <= x)%Z ->
   ((ZArith.BinInt.Z.min x y) = y).
+Proof.
 exact Z.min_r.
 Qed.
 
@@ -58,6 +61,7 @@ Qed.
 Lemma Max_l :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), (y <= x)%Z ->
   ((ZArith.BinInt.Z.max x y) = x).
+Proof.
 exact Z.max_l.
 Qed.
 
@@ -65,6 +69,7 @@ Qed.
 Lemma Min_comm :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((ZArith.BinInt.Z.min x y) = (ZArith.BinInt.Z.min y x)).
+Proof.
 exact Z.min_comm.
 Qed.
 
@@ -72,6 +77,7 @@ Qed.
 Lemma Max_comm :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((ZArith.BinInt.Z.max x y) = (ZArith.BinInt.Z.max y x)).
+Proof.
 exact Z.max_comm.
 Qed.
 

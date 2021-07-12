@@ -115,7 +115,8 @@ and print_array fmt = function
 and print_definition fmt =
   let open Format in function
     | Dfunction (vars, iret, t) ->
-        fprintf fmt "@[<hv2>(Function (%a)@ %a@ %a)@]" Pp.(print_list space string) (List.map fst vars)
+        fprintf fmt "@[<hv2>(Function (%a)@ %a@ %a)@]"
+          Pp.(print_list (constant_string " ") string) (List.map fst vars)
           Pp.(print_option string) iret
           print_term t
     | Dterm t -> fprintf fmt "@[<hv2>(Term %a)@]" print_term t

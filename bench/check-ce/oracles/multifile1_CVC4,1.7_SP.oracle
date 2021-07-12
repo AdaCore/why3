@@ -10,7 +10,7 @@ Prover result is: Valid (0.02s, 285 steps).
             Line 9:
               x = {"type": "Integer", "val": "2"}
             Line 10:
-              x_vc_constant = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -21,7 +21,7 @@ Prover result is: Valid (0.02s, 285 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
 <check-ce>Result of checking model 0: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -58,7 +58,7 @@ Prover result is: Valid (0.02s, 285 steps).
                     _ = 2
                 Line 9:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -93,7 +93,7 @@ Prover result is: Valid (0.02s, 285 steps).
             Line 9:
               x = {"type": "Integer", "val": "2"}
             Line 10:
-              x_vc_constant = {"type": "Integer", "val": "2"}
+              x = {"type": "Integer", "val": "2"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -104,7 +104,7 @@ Prover result is: Valid (0.02s, 285 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
 <check-ce>Result of checking model 1: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -141,7 +141,7 @@ Prover result is: Valid (0.02s, 285 steps).
                     _ = 2
                 Line 9:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -176,7 +176,7 @@ Prover result is: Valid (0.02s, 285 steps).
             Line 9:
               x = {"type": "Integer", "val": "2"}
             Line 10:
-              x_vc_constant = {"type": "Integer", "val": "2"}
+              x = {"type": "Integer", "val": "2"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -187,7 +187,7 @@ Prover result is: Valid (0.02s, 285 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
 <check-ce>Result of checking model 2: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -224,7 +224,7 @@ Prover result is: Valid (0.02s, 285 steps).
                     _ = 2
                 Line 9:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -253,14 +253,14 @@ Prover result is: Valid (0.02s, 285 steps).
                     result = 2
 <check-ce-summary>Results:
 - Selected model 0: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 - Checked model 1: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 - Checked model 2: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
 Sub-goal Postcondition of goal incr'vc.
 Prover result is: Unknown (sat) (0.02s, 4860 steps).

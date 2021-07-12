@@ -189,6 +189,9 @@ let expl_variant   = Ident.create_attribute "expl:variant decrease"
 let expl_type_inv  = Ident.create_attribute "expl:type invariant"
 let expl_divergent = Ident.create_attribute "expl:termination"
 
+let print_expl fmt expl =
+  Format.pp_print_string fmt (Strings.remove_prefix "expl:" expl.attr_string)
+
 let attrs_has_expl attrs =
   Sattr.exists (fun a -> Strings.has_prefix "expl:" a.attr_string) attrs
 

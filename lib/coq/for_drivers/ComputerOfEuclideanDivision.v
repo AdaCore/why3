@@ -18,8 +18,11 @@ Require int.Abs.
 Require int.EuclideanDivision.
 Require int.ComputerDivision.
 
+Require Import Lia.
+
 Lemma on_pos_euclidean_is_div:
   forall n d, (int.EuclideanDivision.div n (Zpos d)) = Z.div n (Zpos d).
+Proof.
 intros n d.
 unfold EuclideanDivision.div.
 assert (0 < Z.pos d)%Z by reflexivity.
@@ -40,6 +43,7 @@ Lemma cdiv_cases :
    ((ZArith.BinInt.Z.quot n d) = (-(int.EuclideanDivision.div n (-d)%Z))%Z)) /\
   ((n <= 0%Z)%Z -> (d < 0%Z)%Z ->
    ((ZArith.BinInt.Z.quot n d) = (int.EuclideanDivision.div (-n)%Z (-d)%Z))).
+Proof.
   intros n d.
   destruct d as [|d|d]; destruct n as [|n|n]; intuition (try discriminate; try contradiction).
     + assert (NZ_d:((Zpos d) <> 0)%Z) by discriminate.
@@ -75,11 +79,12 @@ Lemma cmod_cases :
   ((n <= 0%Z)%Z -> (d < 0%Z)%Z ->
    ((ZArith.BinInt.Z.rem n d) =
     (-(int.EuclideanDivision.mod1 (-n)%Z (-d)%Z))%Z)).
+Proof.
   intros n d.
   unfold int.EuclideanDivision.mod1.
   assert (Z.rem n d = n - (d * (Z.quot n d)))%Z.
   assert (H:= Z.quot_rem' n d).
-  omega.
+  lia.
   rewrite H.
   assert (H2:=cdiv_cases n d).
   intuition idtac.
@@ -87,13 +92,13 @@ Lemma cmod_cases :
     reflexivity.
   + rewrite H4.
     rewrite Z.mul_opp_r.
-    omega.
+    ring.
   + rewrite H1.
     rewrite Z.mul_opp_r.
     rewrite Z.mul_opp_l.
     reflexivity.
   + rewrite H4.
     rewrite Z.mul_opp_l.
-    omega.
+    ring.
 Qed.
 

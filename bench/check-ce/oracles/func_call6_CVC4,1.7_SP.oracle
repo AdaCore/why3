@@ -1,4 +1,4 @@
-<check-ce>Check model 0 ("bench/check-ce/func_call6.mlw", line 18, characters 11-17)
+<check-ce>Check model 0 ("bench/check-ce/func_call6.mlw", line 16, characters 11-17)
 <check-ce>Checking model:
           File func_call6.mlw:
             Line 11:
@@ -14,22 +14,22 @@
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 14:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 15:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
             Line 16:
               z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-            Line 17:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-            Line 18:
-              z_vc_constant =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -42,10 +42,10 @@
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call6.mlw", line 7, characters 4-5: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 16, characters 2-8 at "bench/check-ce/func_call6.mlw", line 16, characters 2-8: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8 at "bench/check-ce/func_call6.mlw", line 14, characters 2-8: {contents=
                                                                     0}
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 16, characters 2-8 at "bench/check-ce/func_call6.mlw", line 16, characters 2-8: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: {contents=
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8 at "bench/check-ce/func_call6.mlw", line 14, characters 2-8: ()
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: {contents=
                                                                     0}
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
@@ -54,14 +54,14 @@
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call6.mlw", line 7, characters 4-5: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6)
+            - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6)
               
-<check-ce>Check model 1 ("bench/check-ce/func_call6.mlw", line 18, characters 11-17)
+<check-ce>Check model 1 ("bench/check-ce/func_call6.mlw", line 16, characters 11-17)
 <check-ce>Checking model:
           File func_call6.mlw:
             Line 11:
@@ -77,22 +77,22 @@
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-            Line 16:
+            Line 14:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 17:
+            Line 15:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-            Line 18:
-              z_vc_constant =
+            Line 16:
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -105,12 +105,12 @@
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call6.mlw", line 7, characters 4-5: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 16, characters 2-8 at "bench/check-ce/func_call6.mlw", line 16, characters 2-8: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8 at "bench/check-ce/func_call6.mlw", line 14, characters 2-8: {contents=
                                                                     0}
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 16, characters 2-8 at "bench/check-ce/func_call6.mlw", line 16, characters 2-8: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: {contents=
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8 at "bench/check-ce/func_call6.mlw", line 14, characters 2-8: ()
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: {contents=
                                                                     2}
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: ()
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: ()
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -118,11 +118,11 @@
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call6.mlw", line 7, characters 4-5: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: {contents=
                                                                     2}
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: ()
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: ()
 <check-ce>Result of checking model 1: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -150,20 +150,20 @@
                     _ = ()
                     zero = 0
                     one = 1
-                Line 16:
+                Line 14:
                   Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 0
-                Line 17:
+                Line 15:
                   Concrete execution of function `Tuple0` with args:
                   (abstract) execution of unimplemented function `g`
                     _ = ()
                   z = {contents= 2}
                   result = ()
-                Line 18:
+                Line 16:
                   Property failure at assertion with:
                     z = {contents= 2}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -191,22 +191,22 @@
                     _ = ()
                     zero = 0
                     one = 1
-                Line 16:
+                Line 14:
                   Abstract execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 0
                   z = {contents= 0}
                   result = ()
-                Line 17:
+                Line 15:
                   Concrete execution of function `Tuple0` with args:
                   Abstract execution of function `g` with args:
                     _ = ()
                   z = {contents= 2}
                   result = ()
-                Line 18:
+                Line 16:
                   Property failure at assertion with:
                     z = {contents= 2}
-<check-ce>Check model 2 ("bench/check-ce/func_call6.mlw", line 18, characters 11-17)
+<check-ce>Check model 2 ("bench/check-ce/func_call6.mlw", line 16, characters 11-17)
 <check-ce>Checking model:
           File func_call6.mlw:
             Line 11:
@@ -222,22 +222,22 @@
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-            Line 16:
+            Line 14:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 17:
+            Line 15:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-            Line 18:
-              z_vc_constant =
+            Line 16:
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -250,12 +250,12 @@
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call6.mlw", line 7, characters 4-5: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 16, characters 2-8 at "bench/check-ce/func_call6.mlw", line 16, characters 2-8: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8 at "bench/check-ce/func_call6.mlw", line 14, characters 2-8: {contents=
                                                                     0}
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 16, characters 2-8 at "bench/check-ce/func_call6.mlw", line 16, characters 2-8: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: {contents=
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 14, characters 2-8 at "bench/check-ce/func_call6.mlw", line 14, characters 2-8: ()
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: {contents=
                                                                     2}
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: ()
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: ()
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -263,11 +263,11 @@
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call6.mlw", line 7, characters 4-5: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: {contents=
                                                                     2}
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6 at "bench/check-ce/func_call6.mlw", line 17, characters 2-6: ()
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6 at "bench/check-ce/func_call6.mlw", line 15, characters 2-6: ()
 <check-ce>Result of checking model 2: NC
-            - Concrete RAC FAILURE (counter-example confirmed)
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -295,20 +295,20 @@
                     _ = ()
                     zero = 0
                     one = 1
-                Line 16:
+                Line 14:
                   Concrete execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 0
-                Line 17:
+                Line 15:
                   Concrete execution of function `Tuple0` with args:
                   (abstract) execution of unimplemented function `g`
                     _ = ()
                   z = {contents= 2}
                   result = ()
-                Line 18:
+                Line 16:
                   Property failure at assertion with:
                     z = {contents= 2}
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -336,34 +336,34 @@
                     _ = ()
                     zero = 0
                     one = 1
-                Line 16:
+                Line 14:
                   Abstract execution of function `(:=)` with args:
                     r = {contents= 0}
                     v = 0
                   z = {contents= 0}
                   result = ()
-                Line 17:
+                Line 15:
                   Concrete execution of function `Tuple0` with args:
                   Abstract execution of function `g` with args:
                     _ = ()
                   z = {contents= 2}
                   result = ()
-                Line 18:
+                Line 16:
                   Property failure at assertion with:
                     z = {contents= 2}
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 17, characters 2-6
+  - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call6.mlw", line 15, characters 2-6)
 - Selected model 1: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
 - Checked model 2: NC
-  - Concrete RAC FAILURE, counter-example confirmed
-  - Abstract RAC FAILURE, counter-example confirmed
-File "bench/check-ce/func_call6.mlw", line 18, characters 11-17:
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call6.mlw", line 16, characters 11-17)
+File "bench/check-ce/func_call6.mlw", line 16, characters 11-17:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.06s, 6083 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6083 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -393,17 +393,17 @@ File func_call6.mlw:
       _ = ()
       zero = 0
       one = 1
-  Line 16:
+  Line 14:
     Concrete execution of function `(:=)` with args:
       r = {contents= 0}
       v = 0
-  Line 17:
+  Line 15:
     Concrete execution of function `Tuple0` with args:
     (abstract) execution of unimplemented function `g`
       _ = ()
     z = {contents= 2}
     result = ()
-  Line 18:
+  Line 16:
     Property failure at assertion with:
       z = {contents= 2}
 

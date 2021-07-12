@@ -552,12 +552,12 @@ PLUG_TRANSFORM += hypothesis_selection
 PLUGINS += hypothesis_selection
 
 lib/plugins/hypothesis_selection.cmxs: EXTINCLUDES += -I @OCAMLGRAPHLIB@
-lib/plugins/hypothesis_selection.cmo:  EXTINCLUDES += -I @OCAMLGRAPHLIB@
+lib/plugins/hypothesis_selection.cma:  EXTINCLUDES += -I @OCAMLGRAPHLIB@
 lib/plugins/hypothesis_selection.cmxs: EXTLIBS += graph.cmxa
-lib/plugins/hypothesis_selection.cmo:  EXTOBJS += graph.cmo
+lib/plugins/hypothesis_selection.cma:  EXTOBJS += graph.cma
 ifeq (@enable_ocamlfind@,yes)
 lib/plugins/hypothesis_selection.cmxs: FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
-lib/plugins/hypothesis_selection.cmo:  FLAGS += -package ocamlgraph graph.cmo
+lib/plugins/hypothesis_selection.cma:  FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
 endif
 endif
 
@@ -578,10 +578,10 @@ $(PLUGDEP) $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
 
 $(PLUGDEP): $(PLUGGENERATED)
 
-LIBPLUGCMO =  $(PLUGINS:%=lib/plugins/%.cmo)
+LIBPLUGCMA =  $(PLUGINS:%=lib/plugins/%.cma)
 LIBPLUGCMXS = $(PLUGINS:%=lib/plugins/%.cmxs)
 
-plugins.byte: $(LIBPLUGCMO)
+plugins.byte: $(LIBPLUGCMA)
 plugins.opt : $(LIBPLUGCMXS)
 
 lib/plugins:
@@ -591,24 +591,24 @@ lib/plugins/%.cmxs: | lib/plugins
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
-lib/plugins/%.cmo: | lib/plugins
+lib/plugins/%.cma: | lib/plugins
 	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
+	$(HIDE)$(OCAMLC) $(BFLAGS) -a -o $@ $^
 
 $(PLUG_PARSER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/parser/%.cmx
-$(PLUG_PARSER:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/parser/%.cmo
+$(PLUG_PARSER:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/parser/%.cmo
 $(PLUG_PRINTER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/printer/%.cmx
-$(PLUG_PRINTER:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/printer/%.cmo
+$(PLUG_PRINTER:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/printer/%.cmo
 $(PLUG_TRANSFORM:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/transform/%.cmx
-$(PLUG_TRANSFORM:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/transform/%.cmo
+$(PLUG_TRANSFORM:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/transform/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
-lib/plugins/tptp.cmo: $(TPTPCMO)
+lib/plugins/tptp.cma: $(TPTPCMO)
 lib/plugins/python.cmxs: $(PYTHONCMX)
-lib/plugins/python.cmo: $(PYTHONCMO)
+lib/plugins/python.cma: $(PYTHONCMO)
 lib/plugins/microc.cmxs: $(MICROCCMX)
-lib/plugins/microc.cmo: $(MICROCCMO)
+lib/plugins/microc.cma: $(MICROCCMO)
 lib/plugins/cfg.cmxs: $(addsuffix .cmx, $(CFGMODULES))
-lib/plugins/cfg.cmo: $(addsuffix .cmo, $(CFGMODULES))
+lib/plugins/cfg.cma: $(addsuffix .cmo, $(CFGMODULES))
 
 # depend and clean targets
 
@@ -618,12 +618,12 @@ CLEANDIRS += plugins $(addprefix plugins/, $(PLUGDIRS)) lib/plugins
 GENERATED += $(PLUGGENERATED)
 
 uninstall-bin::
-	rm -f $(PLUGINS:%=$(LIBDIR)/why3/plugins/%.cmo)
+	rm -f $(PLUGINS:%=$(LIBDIR)/why3/plugins/%.cma)
 	rm -f $(PLUGINS:%=$(LIBDIR)/why3/plugins/%.cmxs)
 
 install-bin::
 	$(MKDIR_P) $(LIBDIR)/why3/plugins
-	$(INSTALL_DATA) $(wildcard $(LIBPLUGCMO) $(LIBPLUGCMXS)) $(LIBDIR)/why3/plugins
+	$(INSTALL_DATA) $(wildcard $(LIBPLUGCMA) $(LIBPLUGCMXS)) $(LIBDIR)/why3/plugins
 
 ###############
 # Why3 commands
@@ -1282,7 +1282,7 @@ ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy Why3_Map.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 
-ISABELLEREALIZEDRV=drivers/isabelle@ISABELLEVERSION@-realize.drv
+ISABELLEREALIZEDRV=drivers/isabelle-realize.drv
 
 $(ISABELLEVERSIONSPECIFICTARGETS): %: %.@ISABELLEVERSION@
 	$(CMP_CP)
@@ -1346,10 +1346,10 @@ else
   ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
 endif
 
-$(GENERATED_PREFIX_ISABELLE)/realizations.@ISABELLEVERSION@: $(ISABELLELIBS)
+$(GENERATED_PREFIX_ISABELLE)/realizations: $(ISABELLELIBS)
 	$(HIDE)sha1sum $^ | sed -e "s,$(GENERATED_PREFIX_ISABELLE)/,," > $@
 
-update-isabelle: $(GENERATED_PREFIX_ISABELLE)/realizations.@ISABELLEVERSION@
+update-isabelle: $(GENERATED_PREFIX_ISABELLE)/realizations
 
 $(ISABELLELIBS_INT): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/int.mlw
@@ -1637,7 +1637,7 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.con
 	  `find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
 	+dynlink.js +toplevel.js $<
 
-src/trywhy3/why3_worker.byte: $(WHY3CMA) lib/plugins/python.cmo lib/plugins/microc.cmo \
+src/trywhy3/why3_worker.byte: $(WHY3CMA) $(PYTHONCMO) $(MICROCCMO) \
 		$(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo why3_worker.cmo)
 	$(OCAMLFIND) ocamlc $(filter-out -thread,$(BFLAGS)) -package js_of_ocaml -o $@ -linkpkg $^
 

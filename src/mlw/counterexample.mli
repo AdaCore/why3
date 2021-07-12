@@ -27,7 +27,7 @@ val debug_check_ce_summary : Debug.flag
 
 type result_state =
   | Rnormal (** the execution terminated normally *)
-  | Rfailure (** the execution leads to a failure for the VC *)
+  | Rfailure of cntr_ctx * Term.term (** the execution leads to a failure *)
   | Rstuck (** the model doesn't lead to a counterexample or is incosistent *)
   | Runknown (** cannot decide if the model leads to a counterexample *)
 
@@ -63,7 +63,11 @@ val check_model : ?timelimit:float -> ?steplimit:int -> rac_reduce_config ->
     (the program corresponding to the model is obtained from the location in the
     model) *)
 
-val print_full_verdict : ?verb_lvl:int -> result Pp.pp
+val print_result : result Pp.pp
+(** Print the result state, and the reason for stuck and unknown *)
+
+val print_full_result : ?verb_lvl:int -> result Pp.pp
+(** Like [print_result] but print also the execution log *)
 
 (** {2 Summary of checking models} *)
 
@@ -76,12 +80,18 @@ type ce_summary =
       underspecified. *)
   | NCSW of Log.exec_log
   (** Non-conformity or sub-contract weakness. *)
-  | BAD
+  | BAD of Log.exec_log
   (** Bad counterexample. *)
   | UNKNOWN of string
   (** The counterexample has not been verified. *)
 
-val ce_summary : check_model_result -> ce_summary
+val is_vc_term :
+  vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
+  cntr_ctx -> Term.term -> bool
+
+val ce_summary :
+  vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
+  check_model_result -> ce_summary
 
 val print_ce_summary_title : ?check_ce:bool -> ce_summary Pp.pp
 

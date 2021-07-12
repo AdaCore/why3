@@ -259,7 +259,7 @@ let pluginsdir m = Filename.concat m.libdir "plugins"
 
 let plugins_auto_detection main =
   let dir = pluginsdir main in
-  let ext = if Dynlink.is_native then ".cmxs" else ".cmo" in
+  let ext = if Dynlink.is_native then ".cmxs" else ".cma" in
   let files = try Sys.readdir dir with Sys_error _ -> [||] in
   let fold acc p =
     let open Filename in

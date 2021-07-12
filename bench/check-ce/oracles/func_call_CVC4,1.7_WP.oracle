@@ -1,11 +1,11 @@
-File "bench/check-ce/func_call.mlw", line 8, characters 12-21:
+File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.02s, 1134 steps).
+Prover result is: Valid (0.05s, 1134 steps).
 
-<check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 16, characters 11-16)
+<check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Checking model:
           File func_call.mlw:
-            Line 8:
+            Line 7:
               z =
                 {"type": "Record",
                  "val":
@@ -18,22 +18,22 @@ Prover result is: Valid (0.02s, 1134 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 14:
+            Line 11:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 15:
+            Line 12:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 16:
-              z_vc_constant =
+            Line 13:
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -42,21 +42,21 @@ Prover result is: Valid (0.02s, 1134 steps).
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 4, characters 9-14 at "bench/check-ce/func_call.mlw", line 4, characters 9-14: 0
-<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 4, characters 8-9: {contents=
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 15, characters 2-6 at "bench/check-ce/func_call.mlw", line 15, characters 2-6: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: {contents=
                                                                     0}
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 4, characters 9-14 at "bench/check-ce/func_call.mlw", line 4, characters 9-14: 0
-<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 4, characters 8-9: {contents=
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -65,7 +65,7 @@ Prover result is: Valid (0.02s, 1134 steps).
                   Constant one initialization
                   one = 1
               File func_call.mlw:
-                Line 4:
+                Line 3:
                   Constant z initialization
                   (abstract) execution of unimplemented function with args:
                   result = 0
@@ -77,31 +77,31 @@ Prover result is: Valid (0.02s, 1134 steps).
               Unknown location:
                   _ = ()
               File func_call.mlw:
-                Line 11:
+                Line 10:
                   _ = ()
                   Execution of main function `f` with env:
                     z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
-                Line 15:
+                Line 12:
                   Concrete execution of function `Tuple0` with args:
                   Concrete execution of function `g` with args:
                     _ = ()
-                Line 9:
+                Line 8:
                   Concrete execution of function `contents` with args:
                     arg = {contents= 0}
                   Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                Line 11:
+                Line 10:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 15, characters 2-6)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6)
               
-<check-ce>Check model 1 ("bench/check-ce/func_call.mlw", line 16, characters 11-16)
+<check-ce>Check model 1 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Checking model:
           File func_call.mlw:
-            Line 8:
+            Line 7:
               z =
                 {"type": "Record",
                  "val":
@@ -114,22 +114,22 @@ Prover result is: Valid (0.02s, 1134 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-            Line 14:
+            Line 11:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 15:
+            Line 12:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-            Line 16:
-              z_vc_constant =
+            Line 13:
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -138,22 +138,22 @@ Prover result is: Valid (0.02s, 1134 steps).
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 4, characters 9-14 at "bench/check-ce/func_call.mlw", line 4, characters 9-14: 0
-<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 4, characters 8-9: {contents=
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 15, characters 2-6 at "bench/check-ce/func_call.mlw", line 15, characters 2-6: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: {contents=
                                                                     2}
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 15, characters 2-6 at "bench/check-ce/func_call.mlw", line 15, characters 2-6: ()
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: ()
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 4, characters 9-14 at "bench/check-ce/func_call.mlw", line 4, characters 9-14: 0
-<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 4, characters 8-9: {contents=
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -162,7 +162,7 @@ Prover result is: Valid (0.02s, 1134 steps).
                   Constant one initialization
                   one = 1
               File func_call.mlw:
-                Line 4:
+                Line 3:
                   Constant z initialization
                   (abstract) execution of unimplemented function with args:
                   result = 0
@@ -174,26 +174,26 @@ Prover result is: Valid (0.02s, 1134 steps).
               Unknown location:
                   _ = ()
               File func_call.mlw:
-                Line 11:
+                Line 10:
                   _ = ()
                   Execution of main function `f` with env:
                     z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
-                Line 15:
+                Line 12:
                   Concrete execution of function `Tuple0` with args:
                   Concrete execution of function `g` with args:
                     _ = ()
-                Line 9:
+                Line 8:
                   Concrete execution of function `contents` with args:
                     arg = {contents= 0}
                   Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                Line 11:
+                Line 10:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call.mlw", line 13, characters 11-16)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -202,7 +202,7 @@ Prover result is: Valid (0.02s, 1134 steps).
                   Constant one initialization
                   one = 1
               File func_call.mlw:
-                Line 4:
+                Line 3:
                   Constant z initialization
                   (abstract) execution of unimplemented function with args:
                   result = 0
@@ -214,26 +214,26 @@ Prover result is: Valid (0.02s, 1134 steps).
               Unknown location:
                   _ = ()
               File func_call.mlw:
-                Line 11:
+                Line 10:
                   _ = ()
                   Execution of main function `f` with env:
                     z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
-                Line 15:
+                Line 12:
                   Concrete execution of function `Tuple0` with args:
                   Abstract execution of function `g` with args:
                     _ = ()
                   z = {contents= 2}
                   result = ()
-                Line 16:
+                Line 13:
                   Property failure at assertion with:
                     z = {contents= 2}
-<check-ce>Check model 2 ("bench/check-ce/func_call.mlw", line 16, characters 11-16)
+<check-ce>Check model 2 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
 <check-ce>Checking model:
           File func_call.mlw:
-            Line 8:
+            Line 7:
               z =
                 {"type": "Record",
                  "val":
@@ -246,22 +246,22 @@ Prover result is: Valid (0.02s, 1134 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-            Line 14:
+            Line 11:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
-            Line 15:
+            Line 12:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-            Line 16:
-              z_vc_constant =
+            Line 13:
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -270,22 +270,22 @@ Prover result is: Valid (0.02s, 1134 steps).
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 4, characters 9-14 at "bench/check-ce/func_call.mlw", line 4, characters 9-14: 0
-<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 4, characters 8-9: {contents=
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 15, characters 2-6 at "bench/check-ce/func_call.mlw", line 15, characters 2-6: {contents=
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: {contents=
                                                                     2}
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 15, characters 2-6 at "bench/check-ce/func_call.mlw", line 15, characters 2-6: ()
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6 at "bench/check-ce/func_call.mlw", line 12, characters 2-6: ()
 <check-ce>Small-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 4, characters 9-14 at "bench/check-ce/func_call.mlw", line 4, characters 9-14: 0
-<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 4, characters 8-9: {contents=
+<rac-values>Type default value for variable `result` at "bench/check-ce/func_call.mlw", line 3, characters 9-14 at "bench/check-ce/func_call.mlw", line 3, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -294,7 +294,7 @@ Prover result is: Valid (0.02s, 1134 steps).
                   Constant one initialization
                   one = 1
               File func_call.mlw:
-                Line 4:
+                Line 3:
                   Constant z initialization
                   (abstract) execution of unimplemented function with args:
                   result = 0
@@ -306,26 +306,26 @@ Prover result is: Valid (0.02s, 1134 steps).
               Unknown location:
                   _ = ()
               File func_call.mlw:
-                Line 11:
+                Line 10:
                   _ = ()
                   Execution of main function `f` with env:
                     z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
-                Line 15:
+                Line 12:
                   Concrete execution of function `Tuple0` with args:
                   Concrete execution of function `g` with args:
                     _ = ()
-                Line 9:
+                Line 8:
                   Concrete execution of function `contents` with args:
                     arg = {contents= 0}
                   Concrete execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                Line 11:
+                Line 10:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call.mlw", line 13, characters 11-16)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -334,7 +334,7 @@ Prover result is: Valid (0.02s, 1134 steps).
                   Constant one initialization
                   one = 1
               File func_call.mlw:
-                Line 4:
+                Line 3:
                   Constant z initialization
                   (abstract) execution of unimplemented function with args:
                   result = 0
@@ -346,37 +346,37 @@ Prover result is: Valid (0.02s, 1134 steps).
               Unknown location:
                   _ = ()
               File func_call.mlw:
-                Line 11:
+                Line 10:
                   _ = ()
                   Execution of main function `f` with env:
                     z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
-                Line 15:
+                Line 12:
                   Concrete execution of function `Tuple0` with args:
                   Abstract execution of function `g` with args:
                     _ = ()
                   z = {contents= 2}
                   result = ()
-                Line 16:
+                Line 13:
                   Property failure at assertion with:
                     z = {contents= 2}
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 15, characters 2-6
+  - Concrete RAC: NORMAL
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call.mlw", line 12, characters 2-6)
 - Selected model 1: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call.mlw", line 13, characters 11-16)
 - Checked model 2: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
-File "bench/check-ce/func_call.mlw", line 16, characters 11-16:
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call.mlw", line 13, characters 11-16)
+File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.05s, 6083 steps).
-The contracts of some function or loop are too weak, for example during the
-  following execution:
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6083 steps).
+The contracts of some function or loop are underspecified, for example during
+  the following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
@@ -385,7 +385,7 @@ File int.mlw:
     Constant one initialization
     one = 1
 File func_call.mlw:
-  Line 4:
+  Line 3:
     Constant z initialization
     (abstract) execution of unimplemented function with args:
     result = 0
@@ -397,20 +397,20 @@ File func_call.mlw:
 Unknown location:
     _ = ()
 File func_call.mlw:
-  Line 11:
+  Line 10:
     _ = ()
     Execution of main function `f` with env:
       z = {contents= 0}
       _ = ()
       zero = 0
       one = 1
-  Line 15:
+  Line 12:
     Concrete execution of function `Tuple0` with args:
     Abstract execution of function `g` with args:
       _ = ()
     z = {contents= 2}
     result = ()
-  Line 16:
+  Line 13:
     Property failure at assertion with:
       z = {contents= 2}
 

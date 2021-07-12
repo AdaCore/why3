@@ -1,7 +1,7 @@
-<check-ce>Check model 0 ("bench/check-ce/tuple1.mlw", line 8, characters 14-19)
+<check-ce>Check model 0 ("bench/check-ce/tuple1.mlw", line 7, characters 14-19)
 <check-ce>Checking model:
           File tuple1.mlw:
-            Line 7:
+            Line 6:
               a =
                 {"proj_name": "int63'int",
                  "type": "Proj",
@@ -10,7 +10,7 @@
                 {"proj_name": "int63'int",
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "0"}}
-            Line 8:
+            Line 7:
               the check fails with all inputs
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
@@ -27,11 +27,11 @@
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/mach/int.mlw", line 430, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/mach/int.mlw", line 431, characters 15-18: 1
 <check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
+            - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
               
-<check-ce>Check model 1 ("bench/check-ce/tuple1.mlw", line 8, characters 14-19)
+<check-ce>Check model 1 ("bench/check-ce/tuple1.mlw", line 7, characters 14-19)
 <check-ce>Checking model:
           File int.mlw:
             Line 432:
@@ -45,7 +45,7 @@
                  "type": "Proj",
                  "value": {"type": "Integer", "val": "-4611686018427387904"}}
             File tuple1.mlw:
-              Line 7:
+              Line 6:
                 a =
                   {"proj_name": "int63'int",
                    "type": "Proj",
@@ -54,12 +54,12 @@
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
-              Line 8:
-                a_vc_constant =
+              Line 7:
+                a =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
-                b_vc_constant =
+                b =
                   {"proj_name": "int63'int",
                    "type": "Proj",
                    "value": {"type": "Integer", "val": "0"}}
@@ -80,20 +80,20 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/mach/int.mlw", line 431, characters 15-18: 1
 <rac-values>Value from model for global `max_int` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 15-22: {int63'int => 4611686018427387903}
 <check-ce>Result of checking model 1: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
+            - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
+            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
               
 <check-ce-summary>Results:
 - Checked model 0: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74
+  - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
 - Selected model 1: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74
-File "bench/check-ce/tuple1.mlw", line 8, characters 14-19:
+  - Concrete RAC: UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
+  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
+File "bench/check-ce/tuple1.mlw", line 7, characters 14-19:
 Sub-goal Integer overflow of goal swap'vc.
-Prover result is: Step limit exceeded (0.30s).
+Prover result is: Step limit exceeded (0.11s).
 The following counterexample model could not be verified
   (concrete RAC terminated because missing value for variable `result` at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74):
 File int.mlw:
@@ -102,26 +102,26 @@ File int.mlw:
   Line 434:
     min_int = {int63'int => -4611686018427387904 (-0X4000000000000000)}
 File tuple1.mlw:
+  Line 6:
+    a = {int63'int => 0}
+    b = {int63'int => 0}
   Line 7:
     a = {int63'int => 0}
     b = {int63'int => 0}
-  Line 8:
-    a = {int63'int => 0}
-    b = {int63'int => 0}
 
-File "bench/check-ce/tuple1.mlw", line 8, characters 14-23:
+File "bench/check-ce/tuple1.mlw", line 7, characters 14-23:
 Sub-goal Integer overflow of goal swap'vc.
-Prover result is: Valid (0.01s, 7608 steps).
+Prover result is: Valid (0.01s, 5525 steps).
 
-File "bench/check-ce/tuple1.mlw", line 8, characters 3-8:
+File "bench/check-ce/tuple1.mlw", line 7, characters 3-8:
 Sub-goal Integer overflow of goal swap'vc.
-Prover result is: Valid (0.01s, 7739 steps).
+Prover result is: Valid (0.01s, 5656 steps).
 
-File "bench/check-ce/tuple1.mlw", line 8, characters 3-12:
+File "bench/check-ce/tuple1.mlw", line 7, characters 3-12:
 Sub-goal Integer overflow of goal swap'vc.
-Prover result is: Valid (0.01s, 8364 steps).
+Prover result is: Valid (0.01s, 6188 steps).
 
 File "bench/check-ce/tuple1.mlw", line 5, characters 38-43:
 Sub-goal Postcondition of goal swap'vc.
-Prover result is: Valid (0.01s, 8799 steps).
+Prover result is: Valid (0.01s, 6422 steps).
 

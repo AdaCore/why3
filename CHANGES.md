@@ -1,7 +1,35 @@
 :x: marks a potential source of incompatibility
 
+Python
+  * added break and continue
+  * added range with one, two or three argument(s)
+  * added slice (`list[i1:i2]`)
+  * added negative index (`list[n], with -len(list) ≤ n < len(list)`)
+  * added lists methods:
+    * `list.append(n)`
+    * `list.pop()`
+    * `list.clear()`
+    * `list.sort()`
+    * `list.reverse()`
+  * added `is_permutation(list1, list2)` predicate
+  * added assignment operators `+=`, `-=`, `*=`, `//=`, `%=`
+  * functions can now return `bool` and `list`
+
+TryWhy3
+  * graphical modifications
+  * the contextual menu steps are now configurable
+  * the prove button now splits the VCs if they are not proven with "first-attempt steps limit"
+  * added a split and a prove button next to each task
+  * added examples for python and micro-c
+  * added `index_{language}.txt` in `examples` directory in order to list all examples path for each languages
+  * added `config.json` in `examples` directory in order to configure the number of steps for each settings
+
 Input Formats
   * Witness expression for type invariant is generalized (#286,!428)
+
+Provers
+  * support for Coq 8.14.0 (released ..., 2021)
+  * dropped support for Coq 8.6
 
 Version 1.4.0, March 13, 2021
 -----------------------------

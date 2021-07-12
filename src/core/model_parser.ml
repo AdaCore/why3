@@ -1038,9 +1038,14 @@ class clean = object (self)
   method model m =
     {m with model_files= map_filter_model_files self#element m.model_files}
   method element me =
+    let me =
+      let name = me.me_name.men_name in
+      let attrs = me.me_name.men_attrs in
+      let name = get_model_trace_string ~name ~attrs in
+      let name = List.hd (Strings.bounded_split '@' name 2) in
+      {me with me_name = {me.me_name with men_name = name}} in
     if me.me_name.men_kind = Error_message then
-      (* Keep unparsed values for error messages *)
-      Some me
+      Some me (* Keep unparsed values for error messages *)
     else
       Opt.bind (self#value me.me_value) @@ fun me_value ->
       Some {me with me_value}
@@ -1051,10 +1056,10 @@ class clean = object (self)
     | Array a       -> self#array a    | Record fs     -> self#record fs
     | Undefined     -> self#undefined  | Var v         -> self#var v
   method const c = match c with
-      String v      -> self#string v  | Integer v     -> self#integer v  |
-      Decimal v     -> self#decimal v | Fraction v    -> self#fraction v |
-      Float v       -> self#float v   | Boolean v     -> self#boolean v  |
-      Bitvector v   -> self#bitvector v
+    | String v      -> self#string v  | Integer v     -> self#integer v
+    | Decimal v     -> self#decimal v | Fraction v    -> self#fraction v
+    | Float v       -> self#float v   | Boolean v     -> self#boolean v
+    | Bitvector v   -> self#bitvector v
   method string v = Some (Const (String v))
   method integer v = Some (Const (Integer v))
   method decimal v = Some (Const (Decimal v))
