@@ -4,7 +4,7 @@ Prover result is: Valid (0.04s, 1312 steps).
 
 File "bench/check-ce/func_call5.mlw", line 14, characters 10-14:
 Sub-goal Precondition of goal f1'vc.
-Prover result is: Valid (0.01s, 1094 steps).
+Prover result is: Valid (0.02s, 1094 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 15, characters 11-17)
 <check-ce>Checking model:
@@ -38,11 +38,11 @@ Prover result is: Valid (0.01s, 1094 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: (-1)
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: (-1)
-<check-ce>Result of checking model 0: BAD
+<check-ce>Result of checking model 0: BAD_CE
             - Concrete RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
               File int.mlw:
                 Line 13:
@@ -111,11 +111,11 @@ Prover result is: Valid (0.01s, 1094 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
-<check-ce>Result of checking model 1: UNKNOWN
+<check-ce>Result of checking model 1: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -133,16 +133,16 @@ Prover result is: Valid (0.01s, 1094 steps).
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of function `g1` with args:
+                  Normal execution of function `g1` with args:
                     y = 1
                 Line 9:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 1
                 Line 11:
                   Execution of main function terminated normally
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
               
 <check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 15, characters 11-17)
 <check-ce>Checking model:
@@ -176,11 +176,11 @@ Prover result is: Valid (0.01s, 1094 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
-<check-ce>Result of checking model 2: UNKNOWN
+<check-ce>Result of checking model 2: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -198,32 +198,32 @@ Prover result is: Valid (0.01s, 1094 steps).
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of function `g1` with args:
+                  Normal execution of function `g1` with args:
                     y = 1
                 Line 9:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 1
                 Line 11:
                   Execution of main function terminated normally
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
               
 <check-ce-summary>Results:
-- Checked model 0: BAD
+- Checked model 0: BAD_CE
   - Concrete RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
   - Abstract RAC: STUCK (failure in precondition of `f1` at "bench/check-ce/func_call5.mlw", line 11, characters 4-6)
-- Checked model 1: UNKNOWN
+- Checked model 1: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
-- Selected model 2: UNKNOWN
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+- Selected model 2: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
 File "bench/check-ce/func_call5.mlw", line 15, characters 11-17:
 Sub-goal Assertion of goal f1'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6796 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6796 steps).
 The following counterexample model could not be verified
-  (concrete RAC no contradiction during execution, abstract RAC terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
+  (abstract RAC terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
 File func_call5.mlw:
   Line 8:
     x = 1
@@ -249,7 +249,7 @@ File func_call5.mlw:
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
 <rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/func_call5.mlw", line 20, characters 10-14 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14: {contents=
                                                                     1}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
@@ -271,15 +271,15 @@ File func_call5.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of function `g2` with args:
+                  Normal execution of function `g2` with args:
                     y = 0
                 Line 17:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 1
                 Line 21:
                   Property failure at assertion with:
@@ -302,7 +302,7 @@ File func_call5.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of function `g2` with args:
+                  Giant-step execution of function `g2` with args:
                     y = 0
                   result = {contents= 1}
                 Line 21:
@@ -322,7 +322,7 @@ File func_call5.mlw:
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
 <rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/func_call5.mlw", line 20, characters 10-14 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14: {contents=
                                                                     1}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
@@ -344,15 +344,15 @@ File func_call5.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of function `g2` with args:
+                  Normal execution of function `g2` with args:
                     y = 0
                 Line 17:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 1
                 Line 21:
                   Property failure at assertion with:
@@ -375,7 +375,7 @@ File func_call5.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of function `g2` with args:
+                  Giant-step execution of function `g2` with args:
                     y = 0
                   result = {contents= 1}
                 Line 21:
@@ -395,7 +395,7 @@ File func_call5.mlw:
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
 <rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/func_call5.mlw", line 20, characters 10-14 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14: {contents=
                                                                     1}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
@@ -417,15 +417,15 @@ File func_call5.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  Concrete execution of function `g2` with args:
+                  Normal execution of function `g2` with args:
                     y = 0
                 Line 17:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 1
                 Line 21:
                   Property failure at assertion with:
@@ -448,7 +448,7 @@ File func_call5.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of function `g2` with args:
+                  Giant-step execution of function `g2` with args:
                     y = 0
                   result = {contents= 1}
                 Line 21:
@@ -467,7 +467,7 @@ File func_call5.mlw:
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
 File "bench/check-ce/func_call5.mlw", line 21, characters 11-17:
 Sub-goal Assertion of goal f2'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6540 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6540 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -486,15 +486,15 @@ File func_call5.mlw:
       zero = 0
       one = 1
   Line 20:
-    Concrete execution of function `g2` with args:
+    Normal execution of function `g2` with args:
       y = 0
   Line 17:
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 0
       _ = 1
-    Concrete execution of function `ref` with args:
+    Normal execution of function `ref` with args:
       contents = 1
-    Concrete execution of function `ref'mk` with args:
+    Normal execution of function `ref'mk` with args:
       contents = 1
   Line 21:
     Property failure at assertion with:

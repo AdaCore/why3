@@ -14,11 +14,11 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8 at "bench/check-ce/multifile2.mlw", line 9, characters 2-8: 0
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
-<check-ce>Result of checking model 0: BAD
+<check-ce>Result of checking model 0: BAD_CE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -36,26 +36,26 @@
                     zero = 0
                     one = 1
                 Line 9:
-                  Concrete execution of function `incr` with args:
+                  Normal execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `decr` with args:
+                  Normal execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of function `(-)` with args:
+                  Normal execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of function `(-_)` with args:
+                  Normal execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
@@ -78,7 +78,7 @@
                     zero = 0
                     one = 1
                 Line 9:
-                  Abstract execution of function `incr` with args:
+                  Giant-step execution of function `incr` with args:
                     x = 0
                   result = 0
               File multifile1.mlw:
@@ -102,7 +102,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8 at "bench/check-ce/multifile2.mlw", line 9, characters 2-8: 2
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
@@ -124,26 +124,26 @@
                     zero = 0
                     one = 1
                 Line 9:
-                  Concrete execution of function `incr` with args:
+                  Normal execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `decr` with args:
+                  Normal execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of function `(-)` with args:
+                  Normal execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of function `(-_)` with args:
+                  Normal execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
@@ -166,7 +166,7 @@
                     zero = 0
                     one = 1
                 Line 9:
-                  Abstract execution of function `incr` with args:
+                  Giant-step execution of function `incr` with args:
                     x = 0
                   result = 2
                 Line 8:
@@ -189,7 +189,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8 at "bench/check-ce/multifile2.mlw", line 9, characters 2-8: 2
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
@@ -211,26 +211,26 @@
                     zero = 0
                     one = 1
                 Line 9:
-                  Concrete execution of function `incr` with args:
+                  Normal execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `decr` with args:
+                  Normal execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of function `(-)` with args:
+                  Normal execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of function `(-_)` with args:
+                  Normal execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
@@ -253,7 +253,7 @@
                     zero = 0
                     one = 1
                 Line 9:
-                  Abstract execution of function `incr` with args:
+                  Giant-step execution of function `incr` with args:
                     x = 0
                   result = 2
                 Line 8:
@@ -261,7 +261,7 @@
                     x = 0
                     result = 2
 <check-ce-summary>Results:
-- Checked model 0: BAD
+- Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: STUCK (failure in postcondition of `incr` at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 - Selected model 1: SW
@@ -272,7 +272,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 File "bench/check-ce/multifile2.mlw", line 8, characters 12-26:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (sat) (0.04s, 4994 steps).
+Prover result is: Unknown (sat) (0.06s, 4994 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -291,7 +291,7 @@ File multifile2.mlw:
       zero = 0
       one = 1
   Line 9:
-    Abstract execution of function `incr` with args:
+    Giant-step execution of function `incr` with args:
       x = 0
     result = 2
   Line 8:
@@ -318,7 +318,7 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8 at "bench/check-ce/multifile2.mlw", line 14, characters 2-8: 0
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
@@ -340,26 +340,26 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of function `incr` with args:
+                  Normal execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `decr` with args:
+                  Normal execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of function `(-)` with args:
+                  Normal execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of function `(-_)` with args:
+                  Normal execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
@@ -384,7 +384,7 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 14:
-                  Abstract execution of function `incr` with args:
+                  Giant-step execution of function `incr` with args:
                     x = 0
                   result = 0
               File multifile1.mlw:
@@ -411,7 +411,7 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8 at "bench/check-ce/multifile2.mlw", line 14, characters 2-8: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
@@ -433,26 +433,26 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of function `incr` with args:
+                  Normal execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `decr` with args:
+                  Normal execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of function `(-)` with args:
+                  Normal execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of function `(-_)` with args:
+                  Normal execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
@@ -477,7 +477,7 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 14:
-                  Abstract execution of function `incr` with args:
+                  Giant-step execution of function `incr` with args:
                     x = 0
                   result = 1
                 Line 13:
@@ -503,7 +503,7 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8 at "bench/check-ce/multifile2.mlw", line 14, characters 2-8: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
@@ -525,26 +525,26 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of function `incr` with args:
+                  Normal execution of function `incr` with args:
                     x = 0
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `decr` with args:
+                  Normal execution of function `decr` with args:
                     x = 0
                 Line 7:
-                  Concrete execution of function `(-)` with args:
+                  Normal execution of function `(-)` with args:
                     x = 0
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of function `(-_)` with args:
+                  Normal execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = (-1)
                     _ = 2
               File multifile2.mlw:
@@ -569,7 +569,7 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 14:
-                  Abstract execution of function `incr` with args:
+                  Giant-step execution of function `incr` with args:
                     x = 0
                   result = 1
                 Line 13:
@@ -588,7 +588,7 @@ File multifile2.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 File "bench/check-ce/multifile2.mlw", line 13, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (sat) (0.02s, 4919 steps).
+Prover result is: Unknown (sat) (0.03s, 4919 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -607,26 +607,26 @@ File multifile2.mlw:
       zero = 0
       one = 1
   Line 14:
-    Concrete execution of function `incr` with args:
+    Normal execution of function `incr` with args:
       x = 0
 File multifile1.mlw:
   Line 11:
-    Concrete execution of function `decr` with args:
+    Normal execution of function `decr` with args:
       x = 0
   Line 7:
-    Concrete execution of function `(-)` with args:
+    Normal execution of function `(-)` with args:
       x = 0
       y = 1
 File int.mlw:
   Line 23:
-    Concrete execution of function `(-_)` with args:
+    Normal execution of function `(-_)` with args:
       _ = 1
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 0
       _ = (-1)
 File multifile1.mlw:
   Line 11:
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = (-1)
       _ = 2
 File multifile2.mlw:
@@ -654,12 +654,12 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 0
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 0
-<check-ce>Result of checking model 0: BAD
+<check-ce>Result of checking model 0: BAD_CE
             - Concrete RAC: STUCK (failure in postcondition of `incr_val` at "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
               File int.mlw:
                 Line 13:
@@ -677,7 +677,7 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  (abstract) execution of unimplemented function `incr_val`
+                  (giant-step) execution of unimplemented function `incr_val`
                     x = 0
                   result = 0
               File multifile1.mlw:
@@ -702,7 +702,7 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of function `incr_val` with args:
+                  Giant-step execution of function `incr_val` with args:
                     x = 0
                   result = 0
               File multifile1.mlw:
@@ -729,7 +729,7 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
@@ -752,7 +752,7 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  (abstract) execution of unimplemented function `incr_val`
+                  (giant-step) execution of unimplemented function `incr_val`
                     x = 0
                   result = 1
                 Line 19:
@@ -776,7 +776,7 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of function `incr_val` with args:
+                  Giant-step execution of function `incr_val` with args:
                     x = 0
                   result = 1
                 Line 19:
@@ -802,7 +802,7 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
@@ -825,7 +825,7 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  (abstract) execution of unimplemented function `incr_val`
+                  (giant-step) execution of unimplemented function `incr_val`
                     x = 0
                   result = 1
                 Line 19:
@@ -849,7 +849,7 @@ File multifile2.mlw:
                     zero = 0
                     one = 1
                 Line 20:
-                  Abstract execution of function `incr_val` with args:
+                  Giant-step execution of function `incr_val` with args:
                     x = 0
                   result = 1
                 Line 19:
@@ -857,7 +857,7 @@ File multifile2.mlw:
                     x = 0
                     result = 1
 <check-ce-summary>Results:
-- Checked model 0: BAD
+- Checked model 0: BAD_CE
   - Concrete RAC: STUCK (failure in postcondition of `incr_val` at "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
   - Abstract RAC: STUCK (failure in postcondition of `incr_val` at "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
 - Selected model 1: NC
@@ -887,7 +887,7 @@ File multifile2.mlw:
       zero = 0
       one = 1
   Line 20:
-    (abstract) execution of unimplemented function `incr_val`
+    (giant-step) execution of unimplemented function `incr_val`
       x = 0
     result = 1
   Line 19:
