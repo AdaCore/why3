@@ -130,38 +130,21 @@ val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
 
 (** {2 Model selection based on counterexample checking}
 
-    Why3 requests three models from the prover, resulting in three candidate
-    counterexamples ({!recfield:Call_provers.prover_result.pr_models}). The following functions
-    help selecting one model using a selection strategy that may use the results
-    from the counterexample classifications. *)
-
-type strategy
-(** Strategies to select a model in {!select_model}. *)
-
-val first_good_model : strategy
-(** If there is any model that can be verified by counterexample checking,
-    prioritize non-conformity over subcontract-weakness over non-conformity or
-    subcontract weakness, and prioritize simpler (i.e., earlier) models from
-    the incrementally produced list of prover models.
-
-    Otherwise prioritize the last, non-empty model in the incremental list, but
-    penalize bad models. *)
-
-val last_non_empty_model : strategy
-(** Do not consider the result of checking the counterexample model, but just
-    priotize the last, non-empty model in the incremental list of models. *)
+    Why3 requests three models from the prover, resulting in three {e candidate}
+    counterexamples ({!recfield:Call_provers.prover_result.pr_models}). The
+    following functions help selecting one counterexample. *)
 
 val select_model :
   ?timelimit:float -> ?steplimit:int -> ?verb_lvl:int ->
-  ?compute_term:compute_term -> ?strategy:strategy ->
+  ?compute_term:compute_term ->
   check_ce:bool -> rac -> Env.env -> Pmodule.pmodule ->
   (Call_provers.prover_answer * model) list -> (model * classification) option
-(** Chose one of the given models based on the given strategy. By default,
-    counterexample classification ([check_ce]) is disabled. The RAC reduce
-    configuration [rac] is used only when counterexample checking is
-    enabled. The selection strategies is [first_good_model] by
-    default when counterexample checking is enabled, and
-    [last_non_empty_model] otherwise. *)
+(** Select one of the given models. By default, counterexample classification
+    ([check_ce]) is disabled. When counterexample checking is enabled, the first
+    good model is selected (with verdict {!variant:NC}, {!variant:SW}, or
+    {!variant:NC_SW}, if any), or the last non-empty model otherwise. The RAC
+    reduce configuration [rac] is used only when counterexample checking is
+    enabled. *)
 
 val select_model_last_non_empty :
   (Call_provers.prover_answer * model) list -> model option

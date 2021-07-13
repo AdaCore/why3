@@ -574,16 +574,15 @@ let print_dbg_model selected_ix fmt (i,_,_,mr,(s,_)) =
     (print_result_summary (fun fmt (s,_) -> print_rac_result_state fmt s))
     (mr, s)
 
-let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term ?strategy
+let select_model ?timelimit ?steplimit ?verb_lvl ?compute_term
     ~check_ce rac env pm models =
   if rac.ignore_incomplete then
     failwith "ignore incomplete must not be true for selecting models";
-  let compute_term = match compute_term with
-    | Some f -> f
-    | None -> Rac.Why.mk_compute_term_lit env () in
-  let strategy =
-    Opt.get_def (if check_ce then first_good_model else last_non_empty_model)
-      strategy in
+  let compute_term =
+    match compute_term with
+    | None -> Rac.Why.mk_compute_term_lit env ()
+    | Some f -> f in
+  let strategy = if check_ce then first_good_model else last_non_empty_model in
   let env = mk_empty_env env pm in
   let check_model =
     if check_ce then check_model ?timelimit ?steplimit rac compute_term env
