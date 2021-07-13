@@ -11,7 +11,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
@@ -33,9 +33,9 @@
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `h` with args:
+                  Normal execution of function `h` with args:
                     y = 0
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 2
                 Line 6:
@@ -59,7 +59,7 @@
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of function `h` with args:
+                  Giant-step execution of function `h` with args:
                     y = 0
                   result = 2
                 Line 6:
@@ -79,7 +79,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
@@ -101,9 +101,9 @@
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `h` with args:
+                  Normal execution of function `h` with args:
                     y = 0
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 2
                 Line 6:
@@ -127,7 +127,7 @@
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of function `h` with args:
+                  Giant-step execution of function `h` with args:
                     y = 0
                   result = 2
                 Line 6:
@@ -147,7 +147,7 @@
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
 <rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
@@ -169,9 +169,9 @@
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `h` with args:
+                  Normal execution of function `h` with args:
                     y = 0
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 2
                 Line 6:
@@ -195,7 +195,7 @@
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of function `h` with args:
+                  Giant-step execution of function `h` with args:
                     y = 0
                   result = 2
                 Line 6:
@@ -214,7 +214,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
 File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (sat) (0.05s, 4769 steps).
+Prover result is: Unknown (sat) (0.09s, 4769 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -233,9 +233,9 @@ File anonymous1.mlw:
       zero = 0
       one = 1
   Line 5:
-    Concrete execution of function `h` with args:
+    Normal execution of function `h` with args:
       y = 0
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 0
       _ = 2
   Line 6:

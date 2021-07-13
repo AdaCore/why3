@@ -23,16 +23,16 @@
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
-            - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
 <check-ce>Checking model:
@@ -73,7 +73,7 @@
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
                                                                     (-1)}
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 0
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
@@ -95,11 +95,11 @@
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 10:
@@ -111,11 +111,11 @@
                     zero = 0
                     one = 1
                 Line 12:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= (-1)}
                   result = 0
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 10
                 Line 13:
@@ -132,11 +132,11 @@
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 10:
@@ -148,26 +148,26 @@
                     zero = 0
                     one = 1
                 Line 12:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= (-1)}
                   result = 0
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 10
                 Line 13:
                   Property failure at assertion with:
                     a = {contents= (-1)}
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
-  - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
 File "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20:
 Sub-goal Assertion of goal test2'vc.
-Prover result is: Step limit exceeded (1.13s).
+Prover result is: Step limit exceeded (1.22s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -180,11 +180,11 @@ File int.mlw:
 File test_result_ce_value2.mlw:
   Line 3:
     Constant a initialization
-    (abstract) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args:
     result = 0
-    Concrete execution of function `ref` with args:
+    Normal execution of function `ref` with args:
       contents = 0
-    Concrete execution of function `ref'mk` with args:
+    Normal execution of function `ref'mk` with args:
       contents = 0
     a = {contents= 0}
   Line 10:
@@ -196,11 +196,11 @@ File test_result_ce_value2.mlw:
       zero = 0
       one = 1
   Line 12:
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= (-1)}
     result = 0
-    Concrete execution of function `(<)` with args:
+    Normal execution of function `(<)` with args:
       _ = 0
       _ = 10
   Line 13:
@@ -232,16 +232,16 @@ File test_result_ce_value2.mlw:
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
-            - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
 <check-ce>Checking model:
@@ -282,7 +282,7 @@ File test_result_ce_value2.mlw:
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
                                                                     42}
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 43
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
@@ -304,11 +304,11 @@ File test_result_ce_value2.mlw:
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 10:
@@ -320,11 +320,11 @@ File test_result_ce_value2.mlw:
                     zero = 0
                     one = 1
                 Line 12:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = 0
                   a = {contents= 42}
                   result = 43
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 43
                     _ = 10
                 Line 15:
@@ -341,11 +341,11 @@ File test_result_ce_value2.mlw:
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 10:
@@ -357,26 +357,26 @@ File test_result_ce_value2.mlw:
                     zero = 0
                     one = 1
                 Line 12:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = 0
                   a = {contents= 42}
                   result = 43
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 43
                     _ = 10
                 Line 15:
                   Property failure at assertion with:
                     a = {contents= 42}
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
-  - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
 File "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20:
 Sub-goal Assertion of goal test2'vc.
-Prover result is: Step limit exceeded (1.03s).
+Prover result is: Step limit exceeded (1.13s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -389,11 +389,11 @@ File int.mlw:
 File test_result_ce_value2.mlw:
   Line 3:
     Constant a initialization
-    (abstract) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args:
     result = 0
-    Concrete execution of function `ref` with args:
+    Normal execution of function `ref` with args:
       contents = 0
-    Concrete execution of function `ref'mk` with args:
+    Normal execution of function `ref'mk` with args:
       contents = 0
     a = {contents= 0}
   Line 10:
@@ -405,11 +405,11 @@ File test_result_ce_value2.mlw:
       zero = 0
       one = 1
   Line 12:
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = 0
     a = {contents= 42}
     result = 43
-    Concrete execution of function `(<)` with args:
+    Normal execution of function `(<)` with args:
       _ = 43
       _ = 10
   Line 15:
@@ -439,16 +439,16 @@ File test_result_ce_value2.mlw:
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
-            - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 <check-ce>Checking model:
@@ -512,7 +512,7 @@ File test_result_ce_value2.mlw:
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
                                                                     41}
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 51
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
@@ -537,11 +537,11 @@ File test_result_ce_value2.mlw:
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 17:
@@ -553,24 +553,24 @@ File test_result_ce_value2.mlw:
                     zero = 0
                     one = 1
                 Line 21:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= (-1)}
                   result = 0
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 100
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= 41}
                   result = 51
-                  Concrete execution of function `(>)` with args:
+                  Normal execution of function `(>)` with args:
                     x = 51
                     y = 50
                 Line 22:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 41}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 18:
@@ -587,11 +587,11 @@ File test_result_ce_value2.mlw:
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 17:
@@ -603,39 +603,39 @@ File test_result_ce_value2.mlw:
                     zero = 0
                     one = 1
                 Line 21:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= (-1)}
                   result = 0
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 100
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= 41}
                   result = 51
-                  Concrete execution of function `(>)` with args:
+                  Normal execution of function `(>)` with args:
                     x = 51
                     y = 50
                 Line 22:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 41}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 18:
                   Property failure at postcondition of `test3` with:
                     a = {contents= 42}
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
-  - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Step limit exceeded (0.75s).
+Prover result is: Step limit exceeded (0.79s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -648,11 +648,11 @@ File int.mlw:
 File test_result_ce_value2.mlw:
   Line 3:
     Constant a initialization
-    (abstract) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args:
     result = 0
-    Concrete execution of function `ref` with args:
+    Normal execution of function `ref` with args:
       contents = 0
-    Concrete execution of function `ref'mk` with args:
+    Normal execution of function `ref'mk` with args:
       contents = 0
     a = {contents= 0}
   Line 17:
@@ -664,24 +664,24 @@ File test_result_ce_value2.mlw:
       zero = 0
       one = 1
   Line 21:
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= (-1)}
     result = 0
-    Concrete execution of function `(<)` with args:
+    Normal execution of function `(<)` with args:
       _ = 0
       _ = 100
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= 41}
     result = 51
-    Concrete execution of function `(>)` with args:
+    Normal execution of function `(>)` with args:
       x = 51
       y = 50
   Line 22:
-    Concrete execution of function `contents` with args:
+    Normal execution of function `contents` with args:
       arg = {contents= 41}
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 41
       _ = 1
   Line 18:
@@ -711,16 +711,16 @@ File test_result_ce_value2.mlw:
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
-            - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 <check-ce>Checking model:
@@ -784,7 +784,7 @@ File test_result_ce_value2.mlw:
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
                                                                     40}
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 41
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
@@ -809,11 +809,11 @@ File test_result_ce_value2.mlw:
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 17:
@@ -825,24 +825,24 @@ File test_result_ce_value2.mlw:
                     zero = 0
                     one = 1
                 Line 21:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= (-1)}
                   result = 0
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 100
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= 40}
                   result = 41
-                  Concrete execution of function `(>)` with args:
+                  Normal execution of function `(>)` with args:
                     x = 41
                     y = 50
                 Line 24:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 40}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 40
                     _ = 2
                 Line 18:
@@ -859,11 +859,11 @@ File test_result_ce_value2.mlw:
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 17:
@@ -875,39 +875,39 @@ File test_result_ce_value2.mlw:
                     zero = 0
                     one = 1
                 Line 21:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= (-1)}
                   result = 0
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 100
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= 40}
                   result = 41
-                  Concrete execution of function `(>)` with args:
+                  Normal execution of function `(>)` with args:
                     x = 41
                     y = 50
                 Line 24:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 40}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 40
                     _ = 2
                 Line 18:
                   Property failure at postcondition of `test3` with:
                     a = {contents= 42}
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
-  - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Step limit exceeded (0.56s).
+Prover result is: Step limit exceeded (0.59s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -920,11 +920,11 @@ File int.mlw:
 File test_result_ce_value2.mlw:
   Line 3:
     Constant a initialization
-    (abstract) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args:
     result = 0
-    Concrete execution of function `ref` with args:
+    Normal execution of function `ref` with args:
       contents = 0
-    Concrete execution of function `ref'mk` with args:
+    Normal execution of function `ref'mk` with args:
       contents = 0
     a = {contents= 0}
   Line 17:
@@ -936,24 +936,24 @@ File test_result_ce_value2.mlw:
       zero = 0
       one = 1
   Line 21:
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= (-1)}
     result = 0
-    Concrete execution of function `(<)` with args:
+    Normal execution of function `(<)` with args:
       _ = 0
       _ = 100
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= 40}
     result = 41
-    Concrete execution of function `(>)` with args:
+    Normal execution of function `(>)` with args:
       x = 41
       y = 50
   Line 24:
-    Concrete execution of function `contents` with args:
+    Normal execution of function `contents` with args:
       arg = {contents= 40}
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 40
       _ = 2
   Line 18:
@@ -987,16 +987,16 @@ Prover result is: Valid (0.01s, 100 steps).
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
-            - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 <check-ce>Checking model:
@@ -1050,7 +1050,7 @@ Prover result is: Valid (0.01s, 100 steps).
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
                                                                     40}
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 100
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
@@ -1072,11 +1072,11 @@ Prover result is: Valid (0.01s, 100 steps).
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 17:
@@ -1088,20 +1088,20 @@ Prover result is: Valid (0.01s, 100 steps).
                     zero = 0
                     one = 1
                 Line 21:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = 0
                   a = {contents= 40}
                   result = 100
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 100
                     _ = 100
               Unknown location:
-                  Concrete execution of function `False` with args:
+                  Normal execution of function `False` with args:
               File test_result_ce_value2.mlw:
                 Line 24:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 40}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 40
                     _ = 2
                 Line 18:
@@ -1118,11 +1118,11 @@ Prover result is: Valid (0.01s, 100 steps).
               File test_result_ce_value2.mlw:
                 Line 3:
                   Constant a initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   a = {contents= 0}
                 Line 17:
@@ -1134,35 +1134,35 @@ Prover result is: Valid (0.01s, 100 steps).
                     zero = 0
                     one = 1
                 Line 21:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = 0
                   a = {contents= 40}
                   result = 100
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 100
                     _ = 100
               Unknown location:
-                  Concrete execution of function `False` with args:
+                  Normal execution of function `False` with args:
               File test_result_ce_value2.mlw:
                 Line 24:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 40}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 40
                     _ = 2
                 Line 18:
                   Property failure at postcondition of `test3` with:
                     a = {contents= 42}
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
-  - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Step limit exceeded (0.72s).
+Prover result is: Step limit exceeded (0.75s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1175,11 +1175,11 @@ File int.mlw:
 File test_result_ce_value2.mlw:
   Line 3:
     Constant a initialization
-    (abstract) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args:
     result = 0
-    Concrete execution of function `ref` with args:
+    Normal execution of function `ref` with args:
       contents = 0
-    Concrete execution of function `ref'mk` with args:
+    Normal execution of function `ref'mk` with args:
       contents = 0
     a = {contents= 0}
   Line 17:
@@ -1191,20 +1191,20 @@ File test_result_ce_value2.mlw:
       zero = 0
       one = 1
   Line 21:
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = 0
     a = {contents= 40}
     result = 100
-    Concrete execution of function `(<)` with args:
+    Normal execution of function `(<)` with args:
       _ = 100
       _ = 100
 Unknown location:
-    Concrete execution of function `False` with args:
+    Normal execution of function `False` with args:
 File test_result_ce_value2.mlw:
   Line 24:
-    Concrete execution of function `contents` with args:
+    Normal execution of function `contents` with args:
       arg = {contents= 40}
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 40
       _ = 2
   Line 18:

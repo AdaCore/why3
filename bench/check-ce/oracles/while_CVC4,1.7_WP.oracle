@@ -1,6 +1,6 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.05s, 1568 steps).
+Prover result is: Valid (0.03s, 1568 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
@@ -65,11 +65,11 @@ Prover result is: Valid (0.02s, 2041 steps).
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Result of checking model 0: UNKNOWN
+<check-ce>Result of checking model 0: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -87,79 +87,79 @@ Prover result is: Valid (0.02s, 2041 steps).
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 8:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 2
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 11:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 12:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 8:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 1
                     _ = 2
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 11:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 14:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 1
                     _ = 1
                 Line 8:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 2}
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 2
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
               
 <check-ce>Check model 1 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Checking model:
@@ -220,11 +220,11 @@ Prover result is: Valid (0.02s, 2041 steps).
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
                                                                     (-2)}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Result of checking model 1: UNKNOWN
+<check-ce>Result of checking model 1: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -242,79 +242,79 @@ Prover result is: Valid (0.02s, 2041 steps).
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 8:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 2
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 11:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 12:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 8:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 1
                     _ = 2
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 11:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 14:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 1
                     _ = 1
                 Line 8:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 2}
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 2
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
               
 <check-ce>Check model 2 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Checking model:
@@ -375,11 +375,11 @@ Prover result is: Valid (0.02s, 2041 steps).
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
                                                                     (-2)}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Result of checking model 2: UNKNOWN
+<check-ce>Result of checking model 2: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -397,95 +397,95 @@ Prover result is: Valid (0.02s, 2041 steps).
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 8:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 2
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 11:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 12:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 8:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 1
                     _ = 2
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 11:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 14:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 15:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 1}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 1
                     _ = 1
                 Line 8:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 2}
-                  Concrete execution of function `(<)` with args:
+                  Normal execution of function `(<)` with args:
                     _ = 2
                     _ = 2
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
               
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
+- Checked model 0: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
-- Checked model 1: UNKNOWN
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+- Checked model 1: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
-- Selected model 2: UNKNOWN
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+- Selected model 2: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 7029 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 7029 steps).
 The following counterexample model could not be verified
-  (concrete RAC no contradiction during execution, abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161):
+  (abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161):
 File while.mlw:
   Line 4:
     z = 0

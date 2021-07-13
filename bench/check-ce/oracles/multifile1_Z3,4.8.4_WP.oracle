@@ -1,6 +1,6 @@
 File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
 Sub-goal Postcondition of goal decr'vc.
-Prover result is: Valid (0.02s, 24 steps).
+Prover result is: Valid (0.01s, 24 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 <check-ce>Checking model:
@@ -18,7 +18,7 @@ Prover result is: Valid (0.02s, 24 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
@@ -40,22 +40,22 @@ Prover result is: Valid (0.02s, 24 steps).
                     zero = 0
                     one = 1
                 Line 11:
-                  Concrete execution of function `decr` with args:
+                  Normal execution of function `decr` with args:
                     x = 2
                 Line 7:
-                  Concrete execution of function `(-)` with args:
+                  Normal execution of function `(-)` with args:
                     x = 2
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of function `(-_)` with args:
+                  Normal execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 2
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 1
                     _ = 2
                 Line 9:
@@ -77,10 +77,10 @@ Prover result is: Valid (0.02s, 24 steps).
                     zero = 0
                     one = 1
                 Line 11:
-                  Abstract execution of function `decr` with args:
+                  Giant-step execution of function `decr` with args:
                     x = 2
                   result = 0
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 2
                 Line 10:
@@ -105,7 +105,7 @@ Prover result is: Valid (0.02s, 24 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
@@ -127,22 +127,22 @@ Prover result is: Valid (0.02s, 24 steps).
                     zero = 0
                     one = 1
                 Line 11:
-                  Concrete execution of function `decr` with args:
+                  Normal execution of function `decr` with args:
                     x = 2
                 Line 7:
-                  Concrete execution of function `(-)` with args:
+                  Normal execution of function `(-)` with args:
                     x = 2
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of function `(-_)` with args:
+                  Normal execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 2
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 1
                     _ = 2
                 Line 9:
@@ -164,10 +164,10 @@ Prover result is: Valid (0.02s, 24 steps).
                     zero = 0
                     one = 1
                 Line 11:
-                  Abstract execution of function `decr` with args:
+                  Giant-step execution of function `decr` with args:
                     x = 2
                   result = 0
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 2
                 Line 10:
@@ -192,7 +192,7 @@ Prover result is: Valid (0.02s, 24 steps).
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
 <rac-values>Value from model for variable `result` at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
@@ -214,22 +214,22 @@ Prover result is: Valid (0.02s, 24 steps).
                     zero = 0
                     one = 1
                 Line 11:
-                  Concrete execution of function `decr` with args:
+                  Normal execution of function `decr` with args:
                     x = 2
                 Line 7:
-                  Concrete execution of function `(-)` with args:
+                  Normal execution of function `(-)` with args:
                     x = 2
                     y = 1
               File int.mlw:
                 Line 23:
-                  Concrete execution of function `(-_)` with args:
+                  Normal execution of function `(-_)` with args:
                     _ = 1
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 2
                     _ = (-1)
               File multifile1.mlw:
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 1
                     _ = 2
                 Line 9:
@@ -251,10 +251,10 @@ Prover result is: Valid (0.02s, 24 steps).
                     zero = 0
                     one = 1
                 Line 11:
-                  Abstract execution of function `decr` with args:
+                  Giant-step execution of function `decr` with args:
                     x = 2
                   result = 0
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 2
                 Line 10:
@@ -292,10 +292,10 @@ File multifile1.mlw:
       zero = 0
       one = 1
   Line 11:
-    Abstract execution of function `decr` with args:
+    Giant-step execution of function `decr` with args:
       x = 2
     result = 0
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 0
       _ = 2
   Line 10:

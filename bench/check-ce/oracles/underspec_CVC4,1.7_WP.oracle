@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.04s, 1530 steps).
+Prover result is: Valid (0.05s, 1530 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Checking model:
@@ -39,11 +39,11 @@ Prover result is: Valid (0.04s, 1530 steps).
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 0: UNKNOWN
+<check-ce>Result of checking model 0: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -62,42 +62,42 @@ Prover result is: Valid (0.04s, 1530 steps).
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 15:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 16:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 18:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 19:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 16:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 18:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 21:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 13:
                   Execution of main function terminated normally
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
               
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Checking model:
@@ -136,11 +136,11 @@ Prover result is: Valid (0.04s, 1530 steps).
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
                                                                     (-1)}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 1: UNKNOWN
+<check-ce>Result of checking model 1: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -159,42 +159,42 @@ Prover result is: Valid (0.04s, 1530 steps).
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 15:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 16:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 18:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 19:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 16:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 18:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 21:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 13:
                   Execution of main function terminated normally
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
               
 <check-ce>Check model 2 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Checking model:
@@ -233,11 +233,11 @@ Prover result is: Valid (0.04s, 1530 steps).
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
                                                                     (-1)}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 2: UNKNOWN
+<check-ce>Result of checking model 2: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -256,58 +256,58 @@ Prover result is: Valid (0.04s, 1530 steps).
                     zero = 0
                     one = 1
                 Line 14:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 15:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 16:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 18:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 19:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 16:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 18:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 21:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 13:
                   Execution of main function terminated normally
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
               
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
+- Checked model 0: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
-- Checked model 1: UNKNOWN
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+- Checked model 1: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
-- Selected model 2: UNKNOWN
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+- Selected model 2: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6886 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6886 steps).
 The following counterexample model could not be verified
-  (concrete RAC no contradiction during execution, abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139):
+  (abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139):
 File underspec.mlw:
   Line 16:
     [current iteration] i = 0
@@ -321,11 +321,11 @@ File underspec.mlw:
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.01s, 1784 steps).
+Prover result is: Valid (0.02s, 1784 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.01s, 1663 steps).
+Prover result is: Valid (0.02s, 1663 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Checking model:
@@ -373,14 +373,14 @@ Prover result is: Valid (0.01s, 1663 steps).
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <rac-values>Value from model for variable `z` at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/underspec.mlw", line 37, characters 11-16 at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/underspec.mlw", line 37, characters 10-11: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 0: UNKNOWN
+<check-ce>Result of checking model 0: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -392,11 +392,11 @@ Prover result is: Valid (0.01s, 1663 steps).
               File underspec.mlw:
                 Line 37:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -410,18 +410,18 @@ Prover result is: Valid (0.01s, 1663 steps).
                     zero = 0
                     one = 1
                 Line 46:
-                  Concrete execution of function `Tuple0` with args:
-                  Concrete execution of function `g` with args:
+                  Normal execution of function `Tuple0` with args:
+                  Normal execution of function `g` with args:
                     _ = ()
                 Line 42:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 44:
                   Execution of main function terminated normally
-            - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
               
 <check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Checking model:
@@ -470,7 +470,7 @@ Prover result is: Valid (0.01s, 1663 steps).
 <rac-values>Value from model for variable `z` at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: {contents=
                                                                     2}
 <rac-values>Type default value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: ()
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/underspec.mlw", line 37, characters 11-16 at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
@@ -489,11 +489,11 @@ Prover result is: Valid (0.01s, 1663 steps).
               File underspec.mlw:
                 Line 37:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -507,13 +507,13 @@ Prover result is: Valid (0.01s, 1663 steps).
                     zero = 0
                     one = 1
                 Line 46:
-                  Concrete execution of function `Tuple0` with args:
-                  Concrete execution of function `g` with args:
+                  Normal execution of function `Tuple0` with args:
+                  Normal execution of function `g` with args:
                     _ = ()
                 Line 42:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 44:
@@ -529,11 +529,11 @@ Prover result is: Valid (0.01s, 1663 steps).
               File underspec.mlw:
                 Line 37:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -547,8 +547,8 @@ Prover result is: Valid (0.01s, 1663 steps).
                     zero = 0
                     one = 1
                 Line 46:
-                  Concrete execution of function `Tuple0` with args:
-                  Abstract execution of function `g` with args:
+                  Normal execution of function `Tuple0` with args:
+                  Giant-step execution of function `g` with args:
                     _ = ()
                   z = {contents= 2}
                   result = ()
@@ -602,7 +602,7 @@ Prover result is: Valid (0.01s, 1663 steps).
 <rac-values>Value from model for variable `z` at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: {contents=
                                                                     2}
 <rac-values>Type default value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: ()
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/underspec.mlw", line 37, characters 11-16 at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
@@ -621,11 +621,11 @@ Prover result is: Valid (0.01s, 1663 steps).
               File underspec.mlw:
                 Line 37:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -639,13 +639,13 @@ Prover result is: Valid (0.01s, 1663 steps).
                     zero = 0
                     one = 1
                 Line 46:
-                  Concrete execution of function `Tuple0` with args:
-                  Concrete execution of function `g` with args:
+                  Normal execution of function `Tuple0` with args:
+                  Normal execution of function `g` with args:
                     _ = ()
                 Line 42:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 44:
@@ -661,11 +661,11 @@ Prover result is: Valid (0.01s, 1663 steps).
               File underspec.mlw:
                 Line 37:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -679,8 +679,8 @@ Prover result is: Valid (0.01s, 1663 steps).
                     zero = 0
                     one = 1
                 Line 46:
-                  Concrete execution of function `Tuple0` with args:
-                  Abstract execution of function `g` with args:
+                  Normal execution of function `Tuple0` with args:
+                  Giant-step execution of function `g` with args:
                     _ = ()
                   z = {contents= 2}
                   result = ()
@@ -688,9 +688,9 @@ Prover result is: Valid (0.01s, 1663 steps).
                   Property failure at assertion with:
                     z = {contents= 2}
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
+- Checked model 0: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
 - Selected model 1: SW
   - Concrete RAC: NORMAL
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
@@ -699,7 +699,7 @@ Prover result is: Valid (0.01s, 1663 steps).
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6697 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6697 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -712,11 +712,11 @@ File int.mlw:
 File underspec.mlw:
   Line 37:
     Constant z initialization
-    (abstract) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args:
     result = 0
-    Concrete execution of function `ref` with args:
+    Normal execution of function `ref` with args:
       contents = 0
-    Concrete execution of function `ref'mk` with args:
+    Normal execution of function `ref'mk` with args:
       contents = 0
     z = {contents= 0}
 Unknown location:
@@ -730,8 +730,8 @@ File underspec.mlw:
       zero = 0
       one = 1
   Line 46:
-    Concrete execution of function `Tuple0` with args:
-    Abstract execution of function `g` with args:
+    Normal execution of function `Tuple0` with args:
+    Giant-step execution of function `g` with args:
       _ = ()
     z = {contents= 2}
     result = ()

@@ -8,13 +8,13 @@
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
-            - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/test_result_ce_value1.mlw", line 12, characters 11-18)
 <check-ce>Checking model:
@@ -36,7 +36,7 @@
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value1.mlw", line 8, characters 11-12: (-1)
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value1.mlw", line 10, characters 6-12 at "bench/check-ce/test_result_ce_value1.mlw", line 10, characters 6-12: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value1.mlw", line 9, characters 10-25 at "bench/check-ce/test_result_ce_value1.mlw", line 9, characters 10-25: 41
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value1.mlw", line 8, characters 11-12: (-1)
@@ -60,14 +60,14 @@
                     zero = 0
                     one = 1
                 Line 10:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   result = 0
                 Line 9:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = 0
                   result = 41
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 12:
@@ -90,14 +90,14 @@
                     zero = 0
                     one = 1
                 Line 10:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = (-1)
                   result = 0
                 Line 9:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = 0
                   result = 41
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 12:
@@ -123,7 +123,7 @@
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value1.mlw", line 8, characters 11-12: (-1)
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value1.mlw", line 10, characters 6-12 at "bench/check-ce/test_result_ce_value1.mlw", line 10, characters 6-12: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value1.mlw", line 9, characters 10-25 at "bench/check-ce/test_result_ce_value1.mlw", line 9, characters 10-25: 41
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value1.mlw", line 8, characters 11-12: (-1)
@@ -147,14 +147,14 @@
                     zero = 0
                     one = 1
                 Line 10:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   result = 0
                 Line 9:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = 0
                   result = 41
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 12:
@@ -177,23 +177,23 @@
                     zero = 0
                     one = 1
                 Line 10:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = (-1)
                   result = 0
                 Line 9:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = 0
                   result = 41
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 12:
                   Property failure at assertion with:
                     a = 42
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
-  - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value1.mlw", line 12, characters 11-18)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value1.mlw", line 12, characters 11-18)
@@ -202,7 +202,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value1.mlw", line 12, characters 11-18)
 File "bench/check-ce/test_result_ce_value1.mlw", line 12, characters 11-18:
 Sub-goal Assertion of goal test1'vc.
-Prover result is: Unknown (sat) (0.01s, 889 steps).
+Prover result is: Unknown (sat) (0.03s, 889 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -221,14 +221,14 @@ File test_result_ce_value1.mlw:
       zero = 0
       one = 1
   Line 10:
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = (-1)
     result = 0
   Line 9:
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = 0
     result = 41
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 41
       _ = 1
   Line 12:
@@ -245,13 +245,13 @@ File test_result_ce_value1.mlw:
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
-            - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/test_result_ce_value1.mlw", line 16, characters 11-18)
 <check-ce>Checking model:
@@ -272,7 +272,7 @@ File test_result_ce_value1.mlw:
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value1.mlw", line 14, characters 14-15: (-1)
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value1.mlw", line 15, characters 13-19 at "bench/check-ce/test_result_ce_value1.mlw", line 15, characters 13-19: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value1.mlw", line 15, characters 10-19 at "bench/check-ce/test_result_ce_value1.mlw", line 15, characters 10-19: 41
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value1.mlw", line 14, characters 14-15: (-1)
@@ -296,13 +296,13 @@ File test_result_ce_value1.mlw:
                     zero = 0
                     one = 1
                 Line 15:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   result = 0
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = 0
                   result = 41
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 16:
@@ -325,13 +325,13 @@ File test_result_ce_value1.mlw:
                     zero = 0
                     one = 1
                 Line 15:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = (-1)
                   result = 0
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = 0
                   result = 41
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 16:
@@ -356,7 +356,7 @@ File test_result_ce_value1.mlw:
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value1.mlw", line 14, characters 14-15: (-1)
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value1.mlw", line 15, characters 13-19 at "bench/check-ce/test_result_ce_value1.mlw", line 15, characters 13-19: 0
 <rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value1.mlw", line 15, characters 10-19 at "bench/check-ce/test_result_ce_value1.mlw", line 15, characters 10-19: 41
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value1.mlw", line 14, characters 14-15: (-1)
@@ -380,13 +380,13 @@ File test_result_ce_value1.mlw:
                     zero = 0
                     one = 1
                 Line 15:
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   result = 0
-                  (abstract) execution of unimplemented function `id`
+                  (giant-step) execution of unimplemented function `id`
                     x = 0
                   result = 41
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 16:
@@ -409,22 +409,22 @@ File test_result_ce_value1.mlw:
                     zero = 0
                     one = 1
                 Line 15:
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = (-1)
                   result = 0
-                  Abstract execution of function `id` with args:
+                  Giant-step execution of function `id` with args:
                     x = 0
                   result = 41
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 41
                     _ = 1
                 Line 16:
                   Property failure at assertion with:
                     a = 42
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC: UNKNOWN (terminated because missing value for parameter `x`)
-  - Abstract RAC: UNKNOWN (terminated because missing value for parameter `x`)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value1.mlw", line 16, characters 11-18)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value1.mlw", line 16, characters 11-18)
@@ -452,13 +452,13 @@ File test_result_ce_value1.mlw:
       zero = 0
       one = 1
   Line 15:
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = (-1)
     result = 0
-    (abstract) execution of unimplemented function `id`
+    (giant-step) execution of unimplemented function `id`
       x = 0
     result = 41
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 41
       _ = 1
   Line 16:

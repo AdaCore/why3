@@ -2,11 +2,11 @@ File "bench/check-ce/func_call1.mlw", line 15, characters 6-7:
 warning: unused variable w
 File "bench/check-ce/func_call1.mlw", line 8, characters 12-21:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.04s, 1689 steps).
+Prover result is: Valid (0.02s, 1689 steps).
 
 File "bench/check-ce/func_call1.mlw", line 9, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.01s, 1358 steps).
+Prover result is: Valid (0.02s, 1358 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call1.mlw", line 16, characters 11-16)
 <check-ce>Checking model:
@@ -57,14 +57,14 @@ Prover result is: Valid (0.01s, 1358 steps).
 <rac-values>Value from model for variable `z` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: {contents=
                                                                     0}
 <rac-values>Value from model for variable `result` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 0
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call1.mlw", line 4, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 0: BAD
+<check-ce>Result of checking model 0: BAD_CE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -76,11 +76,11 @@ Prover result is: Valid (0.01s, 1358 steps).
               File func_call1.mlw:
                 Line 4:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -94,20 +94,20 @@ Prover result is: Valid (0.01s, 1358 steps).
                     zero = 0
                     one = 1
                 Line 15:
-                  Concrete execution of function `g` with args:
+                  Normal execution of function `g` with args:
                     x = 2
                 Line 10:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 2
                     _ = 1
                 Line 15:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 3
                     _ = 3
                 Line 13:
@@ -123,11 +123,11 @@ Prover result is: Valid (0.01s, 1358 steps).
               File func_call1.mlw:
                 Line 4:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -141,7 +141,7 @@ Prover result is: Valid (0.01s, 1358 steps).
                     zero = 0
                     one = 1
                 Line 15:
-                  Abstract execution of function `g` with args:
+                  Giant-step execution of function `g` with args:
                     x = 2
                   z = {contents= 0}
                   result = 0
@@ -198,7 +198,7 @@ Prover result is: Valid (0.01s, 1358 steps).
 <rac-values>Value from model for variable `z` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: {contents=
                                                                     2}
 <rac-values>Value from model for variable `result` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
@@ -217,11 +217,11 @@ Prover result is: Valid (0.01s, 1358 steps).
               File func_call1.mlw:
                 Line 4:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -235,20 +235,20 @@ Prover result is: Valid (0.01s, 1358 steps).
                     zero = 0
                     one = 1
                 Line 15:
-                  Concrete execution of function `g` with args:
+                  Normal execution of function `g` with args:
                     x = 2
                 Line 10:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 2
                     _ = 1
                 Line 15:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 3
                     _ = 3
                 Line 13:
@@ -264,11 +264,11 @@ Prover result is: Valid (0.01s, 1358 steps).
               File func_call1.mlw:
                 Line 4:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -282,11 +282,11 @@ Prover result is: Valid (0.01s, 1358 steps).
                     zero = 0
                     one = 1
                 Line 15:
-                  Abstract execution of function `g` with args:
+                  Giant-step execution of function `g` with args:
                     x = 2
                   z = {contents= 2}
                   result = 3
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 3
                     _ = 3
                 Line 16:
@@ -341,7 +341,7 @@ Prover result is: Valid (0.01s, 1358 steps).
 <rac-values>Value from model for variable `z` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: {contents=
                                                                     2}
 <rac-values>Value from model for variable `result` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for variable `result` at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
@@ -360,11 +360,11 @@ Prover result is: Valid (0.01s, 1358 steps).
               File func_call1.mlw:
                 Line 4:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -378,20 +378,20 @@ Prover result is: Valid (0.01s, 1358 steps).
                     zero = 0
                     one = 1
                 Line 15:
-                  Concrete execution of function `g` with args:
+                  Normal execution of function `g` with args:
                     x = 2
                 Line 10:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 11:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 2
                     _ = 1
                 Line 15:
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 3
                     _ = 3
                 Line 13:
@@ -407,11 +407,11 @@ Prover result is: Valid (0.01s, 1358 steps).
               File func_call1.mlw:
                 Line 4:
                   Constant z initialization
-                  (abstract) execution of unimplemented function with args:
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                   z = {contents= 0}
               Unknown location:
@@ -425,18 +425,18 @@ Prover result is: Valid (0.01s, 1358 steps).
                     zero = 0
                     one = 1
                 Line 15:
-                  Abstract execution of function `g` with args:
+                  Giant-step execution of function `g` with args:
                     x = 2
                   z = {contents= 2}
                   result = 3
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 3
                     _ = 3
                 Line 16:
                   Property failure at assertion with:
                     z = {contents= 2}
 <check-ce-summary>Results:
-- Checked model 0: BAD
+- Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call1.mlw", line 8, characters 12-21)
 - Selected model 1: SW
@@ -447,7 +447,7 @@ Prover result is: Valid (0.01s, 1358 steps).
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call1.mlw", line 16, characters 11-16)
 File "bench/check-ce/func_call1.mlw", line 16, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6751 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6751 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -460,11 +460,11 @@ File int.mlw:
 File func_call1.mlw:
   Line 4:
     Constant z initialization
-    (abstract) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args:
     result = 0
-    Concrete execution of function `ref` with args:
+    Normal execution of function `ref` with args:
       contents = 0
-    Concrete execution of function `ref'mk` with args:
+    Normal execution of function `ref'mk` with args:
       contents = 0
     z = {contents= 0}
 Unknown location:
@@ -478,11 +478,11 @@ File func_call1.mlw:
       zero = 0
       one = 1
   Line 15:
-    Abstract execution of function `g` with args:
+    Giant-step execution of function `g` with args:
       x = 2
     z = {contents= 2}
     result = 3
-    Concrete execution of function `(+)` with args:
+    Normal execution of function `(+)` with args:
       _ = 3
       _ = 3
   Line 16:
