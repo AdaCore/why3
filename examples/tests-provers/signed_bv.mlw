@@ -1,0 +1,38 @@
+
+
+use mach.bv.BVCheck8
+
+
+let f1 (x y : t) : t
+  requires { sle (0:t) x }
+  requires { sle x (42:t) }
+  requires { sle (0:t) y }
+  requires { sle y (67:t) }
+=
+  sadd_check x y
+
+
+
+let f2 (x y : t) : t
+  requires { sle (0:t) x }
+  requires { sle x (92:t) }
+  requires { sle (0:t) y }
+  requires { sle y (67:t) }
+=
+  sadd_check x y
+
+
+
+let f3 (x y : t) : t
+  requires { ule x (142:t) }
+  requires { ule y (67:t) }
+=
+  uadd_check x y
+
+
+
+let f4 (x y : t) : t
+  requires { ule x (92:t) }
+  requires { ule y (167:t) }
+=
+  uadd_check x y

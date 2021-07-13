@@ -29,7 +29,6 @@ module BVCheck_Gen
   constant two_power_size_minus_one : int
   constant zeros           : t
   constant minus_one : t
-  constant min_sint : t
 
   function to_uint t   : int
   function to_int t   : int
@@ -60,26 +59,32 @@ module BVCheck_Gen
   predicate sge t t
   predicate sgt t t
 
-  (** addition for overflow check *)
-(***     Notes for the future pre-conditions in pure BV formulas :
+  use bv.BV128 as BV128
 
-     in signed addition, overflow occurs iff
-     msb (((a+b) xor a) & (a+b) xor b)) = 1
+  function sto_bv128 t : BV128.t
+  function uto_bv128 t : BV128.t
 
-     in unsigned addition, overflow occurs iff
-     msb ((a&b) | ((a|b) & not (a+b))) = 1
+  constant min_sint : t
+  constant max_sint : t
+  constant max_uint : t
+  constant min_sint128 : BV128.t = sto_bv128 min_sint
+  constant max_sint128 : BV128.t = sto_bv128 max_sint
+  constant max_uint128 : BV128.t = uto_bv128 max_uint
 
-     alternatives : (a+b) < a    or    not a < b
-
-  *)
+  (** unsigned addition forbidding overflows *)
   val uadd_check (a b:t) : t
-    requires { [@expl:arithmetic overflow] 0 <= to_uint a + to_uint b < two_power_size }
+    requires { [@expl:arithmetic overflow]
+                  to_uint a + to_uint b < two_power_size
+               \/ BV128.ule (BV128.add (uto_bv128 a) (uto_bv128 b)) max_uint128 }
     ensures  { to_uint result = to_uint a + to_uint b }
     ensures  { result = add a b }
 
+  (** signed addition forbidding overflows *)
   val sadd_check (a b:t) : t
     requires { [@expl:arithmetic overflow]
-      - two_power_size_minus_one <= to_int a + to_int b < two_power_size_minus_one }
+      - two_power_size_minus_one <= to_int a + to_int b < two_power_size_minus_one
+      \/ let r = BV128.add (sto_bv128 a) (sto_bv128 b) in
+         (BV128.sle min_sint128 r /\ BV128.sle r max_sint128) }
     ensures  { to_int result = to_int a + to_int b }
     ensures  { result = add a b }
 
@@ -204,6 +209,10 @@ module BVCheck8
   constant two_power_size_minus_one : int = 0x80
   constant minus_one : t = 0xFF
   constant min_sint : t = 0x80
+  constant max_sint : t = 0x7F
+  constant max_uint : t = 0xFF
+
+  use bv.BVConverter_8_128
 
   clone export BVCheck_Gen with
     type t = t,
@@ -213,6 +222,8 @@ module BVCheck8
     function zeros = zeros,
     function minus_one = minus_one,
     function min_sint = min_sint,
+    function max_sint = max_sint,
+    function max_uint = max_uint,
     function to_uint = t'int,
     function to_int = to_int,
     function of_int = of_int,
@@ -236,7 +247,9 @@ module BVCheck8
     predicate sle = sle,
     predicate slt = slt,
     predicate sge = sge,
-    predicate sgt = sgt
+    predicate sgt = sgt,
+    function sto_bv128 = stoBig,
+    function uto_bv128 = toBig
 end
 
 

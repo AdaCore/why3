@@ -228,56 +228,67 @@ end
 
 theory bv.BVConverter_128_256
   syntax function toBig "((_ zero_extend 128) %1)"
+  syntax function stoBig "((_ sign_extend 128) %1)"
   syntax function toSmall "((_ extract 127 0) %1)"
 end
 
 theory bv.BVConverter_64_128
   syntax function toBig "((_ zero_extend 64) %1)"
+  syntax function stoBig "((_ sign_extend 64) %1)"
   syntax function toSmall "((_ extract 63 0) %1)"
 end
 
 theory bv.BVConverter_32_128
   syntax function toBig "((_ zero_extend 96) %1)"
+  syntax function stoBig "((_ sign_extend 96) %1)"
   syntax function toSmall "((_ extract 31 0) %1)"
 end
 
 theory bv.BVConverter_16_128
   syntax function toBig "((_ zero_extend 112) %1)"
+  syntax function stoBig "((_ sign_extend 112) %1)"
   syntax function toSmall "((_ extract 15 0) %1)"
 end
 
 theory bv.BVConverter_8_128
   syntax function toBig "((_ zero_extend 120) %1)"
+  syntax function stoBig "((_ sign_extend 120) %1)"
   syntax function toSmall "((_ extract 7 0) %1)"
 end
 
 theory bv.BVConverter_32_64
   syntax function toBig "((_ zero_extend 32) %1)"
+  syntax function stoBig "((_ sign_extend 32) %1)"
   syntax function toSmall "((_ extract 31 0) %1)"
 end
 
 theory bv.BVConverter_16_64
   syntax function toBig "((_ zero_extend 48) %1)"
+  syntax function stoBig "((_ sign_extend 48) %1)"
   syntax function toSmall "((_ extract 15 0) %1)"
 end
 
 theory bv.BVConverter_8_64
   syntax function toBig "((_ zero_extend 56) %1)"
+  syntax function stoBig "((_ sign_extend 56) %1)"
   syntax function toSmall "((_ extract 7 0) %1)"
 end
 
 theory bv.BVConverter_16_32
   syntax function toBig "((_ zero_extend 16) %1)"
+  syntax function stoBig "((_ sign_extend 16) %1)"
   syntax function toSmall "((_ extract 15 0) %1)"
 end
 
 theory bv.BVConverter_8_32
   syntax function toBig "((_ zero_extend 24) %1)"
+  syntax function stoBig "((_ sign_extend 24) %1)"
   syntax function toSmall "((_ extract 7 0) %1)"
 end
 
 theory bv.BVConverter_8_16
   syntax function toBig "((_ zero_extend 8) %1)"
+  syntax function stoBig "((_ sign_extend 8) %1)"
   syntax function toSmall "((_ extract 7 0) %1)"
 end
 
