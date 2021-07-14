@@ -255,3 +255,6 @@ val get_model_trace_attr : attrs:Sattr.t -> attribute
 val get_hyp_name: attrs:Sattr.t -> string option
 (** If attrs contains an attribute of the form ["hyp_name:<s>"] returns
     [Some <s>] or [None] if no attribute have this form *)
+
+val unused_suffix : string
+(** Suffix for unused variables kept for counterexample generation *)

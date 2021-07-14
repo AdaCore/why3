@@ -523,3 +523,5 @@ let id_unique_attr printer ?(sanitizer = same) id =
     let name = find_unique printer.indices name in
     Hid.replace printer.values id name;
     name
+
+let unused_suffix = "'unused"

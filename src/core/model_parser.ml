@@ -545,7 +545,9 @@ let print_model_element ?(print_locs=false) ~print_attrs ~print_model_value ~me_
 let similar_model_element_names n1 n2 =
   Ident.get_model_trace_string ~name:n1.men_name ~attrs:n1.men_attrs
   = Ident.get_model_trace_string ~name:n2.men_name ~attrs:n2.men_attrs &&
-  n1.men_kind = n2.men_kind
+  n1.men_kind = n2.men_kind &&
+  Strings.has_suffix unused_suffix n1.men_name =
+  Strings.has_suffix unused_suffix n2.men_name
 
 (* TODO optimize *)
 let rec filter_duplicated l =
