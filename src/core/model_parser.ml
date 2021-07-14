@@ -411,6 +411,7 @@ and print_model_value_human fmt (v : model_value) =
 
 type model_element_kind =
   | Result
+  | Call_result of Loc.position
   | Old
   | At of string
   | Loop_before
@@ -421,6 +422,7 @@ type model_element_kind =
 
 let print_model_kind fmt = function
   | Result -> fprintf fmt "Result"
+  | Call_result loc -> fprintf fmt "Call_result (%a)" Pretty.print_loc' loc
   | Old -> fprintf fmt "Old"
   | At l -> fprintf fmt "At %s" l
   | Error_message -> fprintf fmt "Error_message"
@@ -584,6 +586,9 @@ let why_name_trans men =
   let name = List.hd (Strings.bounded_split '@' name 2) in
   match men.men_kind with
   | Result -> "result"
+  | Call_result loc ->
+      let _,l,bc,ec = Loc.get loc in
+      asprintf "result of call at line %d, characters %d-%d" l bc ec
   | Old -> "old "^name
   | At l -> name^" at "^l
   | Loop_previous_iteration -> "[before iteration] "^name
@@ -596,6 +601,7 @@ let json_name_trans men =
   match men.men_kind with
   | Result -> "result"
   | Old -> "old "^name
+  | Call_result _ -> "call-result"
   | _ -> name
 
 let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
@@ -725,6 +731,7 @@ let print_model_element_json me_name_to_str fmt me =
     (* We compute kinds using the attributes and locations *)
     match me.me_name.men_kind with
     | Result -> fprintf fmt "%a" Json_base.string "result"
+    | Call_result _ -> fprintf fmt "%a" Json_base.string "result"
     | At l -> fprintf fmt "@%s" l
     | Old -> fprintf fmt "%a" Json_base.string "old"
     | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
@@ -823,6 +830,10 @@ let get_loc_kind oloc attrs () =
       try Some (Lists.first search (Sattr.elements attrs)) with
         Not_found -> None
 
+let get_call_result_kind attrs () =
+  Opt.map (fun l -> Call_result l)
+    (search_attribute_value get_call_result_loc attrs)
+
 let get_result_kind attrs () =
   match Ident.get_model_trace_attr ~attrs with
   | exception Not_found -> None
@@ -835,6 +846,7 @@ let compute_kind vc_attrs oloc attrs =
   try
     Lists.first (fun f -> f ()) [
       get_loc_kind oloc attrs;
+      get_call_result_kind attrs;
       get_result_kind attrs;
       get_loop_kind vc_attrs oloc;
     ]

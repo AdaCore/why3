@@ -120,6 +120,7 @@ module Log : sig
 
   type log_entry_desc = private
     | Val_assumed of (Ident.ident * value)
+    | Res_assumed of (Expr.rsymbol option * value)
     | Const_init of Ident.ident
     | Exec_call of (Expr.rsymbol option * value Term.Mvs.t  * exec_mode)
     | Exec_pure of (Term.lsymbol * exec_mode)
@@ -264,6 +265,8 @@ val oracle_dummy : oracle
 (** {3 Log functions} *)
 
 val register_used_value : env -> Loc.position option -> Ident.ident -> value -> unit
+
+val register_res_value : env -> Loc.position -> Expr.rsymbol option -> value -> unit
 
 val register_const_init : env -> Loc.position option -> Ident.ident -> unit
 

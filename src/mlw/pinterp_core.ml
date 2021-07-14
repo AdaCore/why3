@@ -311,6 +311,7 @@ module Log = struct
 
   type log_entry_desc =
     | Val_assumed of (ident * value)
+    | Res_assumed of (rsymbol option * value)
     | Const_init of ident
     | Exec_call of (rsymbol option * value Mvs.t  * exec_mode)
     | Exec_pure of (lsymbol * exec_mode)
@@ -341,6 +342,9 @@ module Log = struct
 
   let log_val log_uc id v loc =
     log_entry log_uc (Val_assumed (id,v)) loc
+
+  let log_res log_uc ors v loc =
+    log_entry log_uc (Res_assumed (ors,v)) (Some loc)
 
   let log_const log_uc id loc =
     log_entry log_uc (Const_init id) loc
@@ -415,6 +419,10 @@ module Log = struct
     match e.log_desc with
     | Val_assumed (id, v) ->
         fprintf fmt "@[<h2>%a = %a@]" print_decoded id.id_string print_value v;
+    | Res_assumed (None,v) ->
+        fprintf fmt "@[<h2>result = %a@]" print_value v
+    | Res_assumed (Some rs,v) ->
+        fprintf fmt "@[<h2>result of `%a` = %a@]" print_rs rs print_value v
     | Const_init id ->
         fprintf fmt "@[<h2>Constant %a initialization@]" print_decoded id.id_string;
     | Exec_call (None, mvs, k) ->
@@ -486,6 +494,16 @@ module Log = struct
               (print_json_field "vs" print_json)
               (string "%a" print_decoded id.id_string)
               (print_json_field "value" print_value) v
+        | Res_assumed (None, v) ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
+              (print_json_field "kind" print_json) (string "RES_ASSUMED")
+              (print_json_field "value" print_value) v
+        | Res_assumed (Some rs, v) ->
+            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
+              (print_json_field "kind" print_json) (string "RES_ASSUMED")
+              (print_json_field "rs" print_json)
+              (string "%a" print_rs rs)
+              (print_json_field "value" print_value) v
         | Const_init id ->
             fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
               (print_json_field "kind" print_json) (string "CONST_INIT")
@@ -551,7 +569,7 @@ module Log = struct
     else
       let entry_log = List.filter (fun le ->
             match le.log_desc with
-            | Val_assumed _ | Const_init _ | Exec_main _ -> true
+            | Val_assumed _ | Res_assumed _ | Const_init _ | Exec_main _ -> true
             | Exec_call _ | Exec_pure _ | Exec_any _
                  when verb_lvl > 1 -> true
             | Iter_loop _ when verb_lvl > 2 -> true
@@ -672,6 +690,9 @@ let oracle_dummy ?loc:_ _ _ _ _ = None
 
 let register_used_value env loc id value =
   Log.log_val env.log_uc id (snapshot value) loc
+
+let register_res_value env loc ors value =
+  Log.log_res env.log_uc ors (snapshot value) loc
 
 let register_const_init env loc id =
   Log.log_const env.log_uc id loc

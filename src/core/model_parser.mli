@@ -93,6 +93,8 @@ val debug_force_binary_floats : Debug.flag
 type model_element_kind =
   | Result
   (** Result of a function call (if the counter-example is for postcondition) *)
+  | Call_result of Loc.position
+  (** Result of the function call at the given location *)
   | Old
   (** Old value of function argument (if the counter-example is for
       postcondition) *)
