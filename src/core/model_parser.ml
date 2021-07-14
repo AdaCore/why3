@@ -503,7 +503,7 @@ let search_model_element ?file ?line m p =
   let iter_file f file' lines = if file = None || file = Some file' then
       Mint.iter (iter_line f) lines in
   let iter_files f = Mstr.iter (iter_file f) m.model_files in
-  Util.iter_first iter_files p
+  try Some (Util.iter_first iter_files p) with Not_found -> None
 
 let trace_by_id id =
   Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
@@ -519,6 +519,16 @@ let search_model_element_for_id m ?loc id =
        Opt.equal Loc.equal me.me_location oloc
     then Some me else None in
   search_model_element m p
+
+let search_model_element_call_result model loc =
+  let p me = (* [@model_trace:result] [@call_result_loc:<loc>] *)
+    let has_model_trace_result attrs =
+      get_model_trace_string ~name:"" ~attrs = "result" in
+    if has_model_trace_result me.me_name.men_attrs &&
+       let oloc = search_attribute_value get_call_result_loc me.me_name.men_attrs in
+       Opt.equal Loc.equal oloc (Some loc)
+    then Some me else None in
+  search_model_element model p
 
 (*
 ***************************************************************

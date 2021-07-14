@@ -248,11 +248,20 @@ val default_value_of_type : env -> Ity.ity -> value
 
 (** {3 Oracles} *)
 
-type oracle =
-  ?loc:Loc.position -> env -> (Ity.ity -> Value.value -> unit) ->
-    Ident.ident -> Ity.ity -> Value.value option
+type check_value = Ity.ity -> value -> unit
+
+type oracle = {
+  for_variable:
+    ?check:check_value -> ?loc:Loc.position -> env -> Ident.ident -> Ity.ity -> value option;
+  for_result:
+    ?check:check_value -> env -> Loc.position -> Ity.ity -> value option;
+}
 (** An oracle provides values during execution in {!Pinterp} for program
-    parameters and during giant steps.
+    parameters and during giant steps. The [check] is called on the value and
+    every component.
+
+    @raise CannotCompute if the value or any component is invalid (e.g., a
+       range value outside its bounds).
 
     See {!Check_ce.oracle_of_model} for an implementation.
 

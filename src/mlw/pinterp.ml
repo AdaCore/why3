@@ -604,8 +604,16 @@ let gen_model_variable ?check ctx ?loc id ity : value_gen =
   "value from model", fun () ->
     Opt.apply () check id;
     try
-      ctx.oracle ?loc ctx.env (check_assume_type_invs ctx.rac ?loc ctx.env) id ity
+      let check = check_assume_type_invs ctx.rac ?loc ctx.env in
+      ctx.oracle.for_variable ?loc ~check ctx.env id ity
     with Stuck _ when is_ignore_id id -> None
+
+(** Generate a value by querying the model for a result *)
+let gen_model_result ctx loc ity : value_gen =
+  "value from model", fun () ->
+    let res = ctx.oracle.for_result ctx.env loc ity in
+    Opt.iter (check_assume_type_invs ctx.rac ~loc ctx.env ity) res;
+    res
 
 (** Generator for a default value *)
 let gen_default def : value_gen =
@@ -614,7 +622,7 @@ let gen_default def : value_gen =
 (** Generate a value by computing the postcondition *)
 let gen_from_post env posts : value_gen =
   "value computed from postcondition", fun () ->
-    Opt.bind posts (try_eval_ensures env)
+    try_eval_ensures env posts
 
 (** Generator for the type default value, when [posts] are not none or [really]
     is true. *)
@@ -656,7 +664,7 @@ let get_value' ctx_desc oloc gens =
     (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc print_value value;
   value
 
-let get_and_register_value ctx ?def ?loc ?posts id ity =
+let get_and_register_variable ctx ?def ?loc id ity =
   let ctx_desc = asprintf "variable `%a`%t" print_decoded id.id_string
       (fun fmt -> match loc with
          | Some loc -> fprintf fmt " at %a" Pretty.print_loc' loc
@@ -664,12 +672,23 @@ let get_and_register_value ctx ?def ?loc ?posts id ity =
   let oloc = if loc <> None then loc else id.id_loc in
   let gens = [
     gen_model_variable ctx ?loc id ity;
-    gen_from_post ctx posts;
     gen_default def;
-    gen_type_default ~really:(is_ignore_id id) ?posts ctx ity;
+    gen_type_default ~really:(is_ignore_id id) ctx ity;
   ] in
   let value = get_value' ctx_desc oloc gens in
   register_used_value ctx.env oloc id value;
+  value
+
+let get_and_register_result ?def ?rs ctx posts loc ity =
+  let ctx_desc = asprintf "return value of call at %a" Pretty.print_loc' loc in
+  let gens = [
+    gen_model_result ctx loc ity;
+    gen_default def;
+    gen_from_post ctx posts;
+    gen_type_default ~really:true ~posts ctx ity;
+  ] in
+  let value = get_value' ctx_desc (Some loc) gens in
+  register_res_value ctx.env loc rs value;
   value
 
 let get_and_register_param ctx id ity =
@@ -728,7 +747,7 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc ctx vs =
       pp_indent print_pv pv
       (Pp.print_option print_loc') pv.pv_vs.vs_name.id_loc;
     let pv = Mpv.find_def pv pv vars_map in
-    let value = get_and_register_value ctx ~loc pv.pv_vs.vs_name pv.pv_ity in
+    let value = get_and_register_variable ctx ~loc pv.pv_vs.vs_name pv.pv_ity in
     set_constr (get_vs ctx.env vs) value )
 
 (******************************************************************************)
@@ -1110,7 +1129,7 @@ and exec_expr' ctx e =
           bind_vs i a;
           assert1 {I};
           assign_written_vars_with_ce;
-          let i = get_and_register_value ~def:(b+1) i in
+          let i = get_and_register_variable ~def:(b+1) i in
           if not (a <= i <= b + 1) then abort1;
           if a <= i <= b then begin
             assert2* { I };
@@ -1150,7 +1169,7 @@ and exec_expr' ctx e =
           List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy ctx)
             (Mvs.keys ctx.env.vsenv);
           let def = int_value (suc b) in
-          let i_val = get_and_register_value ctx ~def i.pv_vs.vs_name i.pv_ity in
+          let i_val = get_and_register_variable ctx ~def i.pv_vs.vs_name i.pv_ity in
           let ctx = {ctx with env= bind_vs i.pv_vs i_val ctx.env} in
           let i_bi = big_int_of_value i_val in
           if not (le a i_bi && le i_bi (suc b)) then begin
@@ -1471,15 +1490,11 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs ctx cty arg_pvs ity_result =
         {ctx with env= {ctx.env with vsenv}}
     | None -> ctx in
   (* assert1 is already done above *)
-  let res = match cty.cty_post with
-    | p :: _ -> let (vs,_) = open_post p in vs.vs_name
-    | _ -> id_register (id_fresh "result") in
   let vars_map = Mpv.of_list (List.combine cty.cty_args arg_pvs) in
   let asgn_wrt =
     assign_written_vars ~vars_map cty.cty_effect.eff_writes loc ctx in
   List.iter asgn_wrt (Mvs.keys ctx.env.vsenv);
-  let res_v =
-    get_and_register_value ctx ~loc ~posts:cty.cty_post res ity_result in
+  let res_v = get_and_register_result ?rs ctx cty.cty_post loc ity_result in
   (* assert2 *)
   let desc = match rs with
     | None -> "of anonymous function"

@@ -170,10 +170,14 @@ val get_model_term_attrs : model -> Ident.Sattr.t
 (** {2 Search model elements} *)
 
 val search_model_element_for_id :
-  model -> ?loc:Loc.position -> Ident.ident -> model_element
+  model -> ?loc:Loc.position -> Ident.ident -> model_element option
 (** [search_model_element_for_id m ?loc id] searches for a model element for
-    identifier [id], at the location [id.id_loc], or at [loc], when given.
-    @raise Not_found when there is no such model element. *)
+    identifier [id], at the location [id.id_loc], or at [loc], when given. *)
+
+val search_model_element_call_result :
+  model -> Loc.position -> model_element option
+(** [search_model_element_call_result m loc] searches for a model element that
+    holds the return value for a call at location [loc]. *)
 
 (** {2 Printing the model} *)
 

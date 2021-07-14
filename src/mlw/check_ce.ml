@@ -312,14 +312,19 @@ let rec import_model_value loc env check known th_known ity v =
   check ity res;
   res
 
-let oracle_of_model pm model : oracle =
-  fun ?loc env check id ity ->
-  match search_model_element_for_id model ?loc id with
-  | me ->
-      let loc = if loc <> None then loc else id.id_loc in
-      Some (import_model_value loc env check pm.Pmodule.mod_known
-              pm.Pmodule.mod_theory.Theory.th_known ity me.me_value)
-  | exception Not_found -> None
+let oracle_of_model pm model =
+  let import check oid loc env ity me =
+    let loc = if loc <> None then loc else
+        match oid with Some id -> id.id_loc | None -> None in
+    import_model_value loc env check pm.Pmodule.mod_known
+      pm.Pmodule.mod_theory.Theory.th_known ity me.me_value in
+  let for_variable ?(check=fun _ _ -> ()) ?loc env id ity =
+    Opt.map (import check (Some id) loc env ity)
+      (search_model_element_for_id model ?loc id) in
+  let for_result ?(check=fun _ _ -> ()) env loc ity =
+    Opt.map (import check None (Some loc) env ity)
+      (search_model_element_call_result model loc) in
+  { for_variable; for_result }
 
 (** Check and select solver counterexample models *)
 
@@ -670,8 +675,8 @@ let model_of_exec_log ~original_model log =
     let name = asprintf "%a" print_decoded id.id_string in
     let men_name = get_model_trace_string ~name ~attrs:id.id_attrs in
     let men_kind = match search_model_element_for_id original_model id with
-      | me -> me.me_name.men_kind
-      | exception Not_found -> Other in
+      | Some me -> me.me_name.men_kind
+      | None -> Other in
     let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
     let me_value = model_value value in
     {me_name; me_value; me_location= Some loc; me_term= None} in

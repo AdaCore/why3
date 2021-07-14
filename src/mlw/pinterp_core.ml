@@ -679,10 +679,19 @@ let bind_pvs ?register pv v_t ctx =
 let multibind_pvs ?register l tl ctx =
   List.fold_left2 (fun ctx pv v -> bind_pvs ?register pv v ctx) ctx l tl
 
-type oracle =
-  ?loc:Loc.position -> env -> (ity -> value -> unit) -> ident -> ity -> value option
+type check_value = ity -> value -> unit
 
-let oracle_dummy ?loc:_ _ _ _ _ = None
+type oracle = {
+  for_variable:
+    ?check:check_value -> ?loc:Loc.position -> env -> ident -> ity -> value option;
+  for_result:
+    ?check:check_value -> env -> Loc.position -> ity -> value option;
+}
+
+let oracle_dummy = {
+  for_variable= (fun ?check:_ ?loc:_ _ _ _ -> None);
+  for_result= (fun ?check:_ _ _ _ -> None);
+}
 
 (******************************************************************************)
 (*                              Log registration                              *)

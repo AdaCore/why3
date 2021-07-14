@@ -34,7 +34,7 @@ let oracle_quant_var
         if bind_univ_quant_vars then
           let check _ _ =
             Warning.emit "Model value for all-quantified variable not checked" in
-          oracle ~loc env check vs.vs_name (ity_of_ty vs.vs_ty)
+          oracle.for_variable ~check ~loc env vs.vs_name (ity_of_ty vs.vs_ty)
         else None in
       let value =
         if value <> None then value else
