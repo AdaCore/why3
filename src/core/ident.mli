@@ -193,16 +193,20 @@ val create_written_attr: Loc.position -> attribute
     file_name is at the end for easier parsing (file_name can contain ":")
 *)
 
-val extract_written_loc: attribute -> Loc.position option
-(** Extract the location inside vc_written attribute. [None] if the attribute is
-    ill-formed.
-*)
+val get_written_loc: attribute -> Loc.position option
+(** Get the location inside vc_written attribute. [None] if the attribute is
+    ill-formed. *)
 
-val create_model_result_call_loc_attr : Loc.position -> attribute
+val create_call_result_attr : Loc.position -> attribute
+(** A call result attribute on a counterexample model element marks the result
+    of a call at the given location *)
 
-val extract_model_result_call_loc : attribute -> Loc.position option
+val get_call_result_loc : attribute -> Loc.position option
+(** Get the call result location from an attribute. *)
 
-val get_model_result_call_loc : Sattr.t -> Loc.position option
+val search_attribute_value : (attribute -> 'a option) -> Sattr.t -> 'a option
+(** [search_attribute_value f attrs] applies f to the attributes in [attr] and
+    returns the first inhabitad result, if any, or [None] otherwise. *)
 
 val remove_model_attrs : attrs:Sattr.t -> Sattr.t
 (** Remove the counter-example attributes from an attribute set *)

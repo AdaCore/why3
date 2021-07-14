@@ -989,8 +989,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     let oloc = internal_loc (Opt.get me.me_term) in
     let model = add_with_loc_set_kind me oloc model in
     let add_written_loc a =
-      let oloc = Ident.extract_written_loc a in
-      add_with_loc_set_kind me oloc in
+      add_with_loc_set_kind me (get_written_loc a) in
     Sattr.fold add_written_loc me.me_name.men_attrs model in
   List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
 

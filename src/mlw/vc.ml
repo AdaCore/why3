@@ -68,13 +68,10 @@ let explicit_result loc ce ity =
     | Cfun _ -> "anonymous'result"
     | Cany -> "any'result"
   in
-  let attrs =
-    match loc with
-    | Some l ->
-       let a = create_model_result_call_loc_attr l in
-       Sattr.add a model_trace_result_attributes
-    | None -> model_trace_result_attributes
-  in
+  let attrs = model_trace_result_attributes in
+  let attrs = match loc with
+    | Some l -> Sattr.add (create_call_result_attr l) attrs
+    | None -> attrs in
   create_pvsymbol (id_fresh ?loc ~attrs name) ity
 
 
