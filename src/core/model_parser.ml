@@ -963,39 +963,37 @@ let register_remove_field f = remove_field := f
    elements, and adding the element at all relevant locations *)
 let build_model_rec pm (elts: model_element list) : model_files =
   let fields_projs = fields_projs pm and vc_attrs = pm.Printer.vc_term_attrs in
+  let process_me me =
+    match Mstr.find me.me_name.men_name pm.queried_terms with
+    | exception Not_found ->
+        Debug.dprintf debug "No term for %s@." me.me_name.men_name;
+        None
+    | t ->
+        assert (me.me_location = None && me.me_term = None);
+        let attrs = Sattr.union me.me_name.men_attrs t.t_attrs in
+        let name, attrs = match t.t_node with
+          | Tapp (ls, []) ->
+              (* Ident [ls] is recorded as [t_app ls] in [Printer.queried_terms] *)
+              ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
+          | _ -> "", attrs in
+        Debug.dprintf debug "@[<h>Term attrs for %s at %a@]@."
+          (why_name_trans me.me_name)
+          (Pp.print_option_or_default "NO LOC" Pretty.print_loc') t.t_loc;
+        (* Replace projections with their real name *)
+        let me_value = replace_projection
+            (fun s -> recover_name pm fields_projs s)
+            me.me_value in
+        (* Remove some specific record field related to the front-end language.
+           This function is registered. *)
+        let attrs, me_value = !remove_field (attrs, me_value) in
+        (* Transform value flattened by eval_match (one field record) back to records *)
+        let attrs, me_value = read_one_fields ~attrs me_value in
+        let me_name = create_model_element_name name attrs Other in
+        Some {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
   let add_with_loc_set_kind me loc model =
     if loc = None then model else
       let kind = compute_kind vc_attrs loc me.me_name.men_attrs in
       add_to_model_if_loc ~kind {me with me_location= loc} model in
-  let process_me me =
-    assert (me.me_location = None && me.me_term = None);
-    let aux t =
-      let attrs = Sattr.union me.me_name.men_attrs t.t_attrs in
-      let name, attrs = match t.t_node with
-        | Tapp (ls, []) ->
-            (* Ident [ls] is recorded as [t_app ls] in [Printer.queried_terms] *)
-            ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
-        | _ -> "", attrs in
-      (* Replace projections with their real name *)
-      let me_value = replace_projection
-          (fun s -> recover_name pm fields_projs s)
-          me.me_value in
-      (* Remove some specific record field related to the front-end language.
-         This function is registered. *)
-      let attrs, me_value = !remove_field (attrs, me_value) in
-      (* Transform value flattened by eval_match (one field record) back to records *)
-      let attrs, me_value = read_one_fields ~attrs me_value in
-      let me_name = create_model_element_name name attrs Other in
-      {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
-    match Mstr.find_opt me.me_name.men_name pm.queried_terms with
-    | None ->
-        Debug.dprintf debug "No term for %s@." (why_name_trans me.me_name);
-        None
-    | Some t ->
-        Debug.dprintf debug "@[<h>Term attrs for %s at %a@]@."
-          (why_name_trans me.me_name)
-          (Pp.print_option_or_default "NO LOC" Pretty.print_loc') t.t_loc;
-        Some (aux t) in
   (** Add a model element at the relevant locations *)
   let add_model_elt model me =
     let kind = compute_kind vc_attrs me.me_location me.me_name.men_attrs in
