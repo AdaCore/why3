@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call3.mlw", line 8, characters 12-21:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.02s, 1689 steps).
+Prover result is: Valid (0.03s, 1689 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call3.mlw", line 9, characters 17-26)
 <check-ce>Checking model:
@@ -24,7 +24,7 @@ Prover result is: Valid (0.02s, 1689 steps).
             Line 9:
               x = {"type": "Integer", "val": "0"}
             Line 10:
-              result'unused'unused = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "0"}
               z =
                 {"type": "Record",
                  "val":
@@ -132,7 +132,7 @@ Prover result is: Valid (0.02s, 1689 steps).
             Line 9:
               x = {"type": "Integer", "val": "0"}
             Line 10:
-              result'unused'unused = {"type": "Integer", "val": "1"}
+              result = {"type": "Integer", "val": "1"}
               z =
                 {"type": "Record",
                  "val":
@@ -240,7 +240,7 @@ Prover result is: Valid (0.02s, 1689 steps).
             Line 9:
               x = {"type": "Integer", "val": "0"}
             Line 10:
-              result'unused'unused = {"type": "Integer", "val": "1"}
+              result = {"type": "Integer", "val": "1"}
               z =
                 {"type": "Record",
                  "val":
@@ -338,7 +338,7 @@ Prover result is: Valid (0.02s, 1689 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/func_call3.mlw", line 9, characters 17-26)
 File "bench/check-ce/func_call3.mlw", line 9, characters 17-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6674 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 6674 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

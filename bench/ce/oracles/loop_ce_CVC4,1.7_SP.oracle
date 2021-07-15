@@ -66,13 +66,6 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File loop_ce.mlw:
-  Line 20:
-    a [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents] [@introduced]
-      [@mlw:reference_var] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 22:
     a [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
@@ -80,18 +73,18 @@ File loop_ce.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 23:
-    a at X [@at:X] [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents]
-      [@introduced] [@mlw:reference_var] [@model_trace:a] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
     a [@field:0:contents] [@introduced] [@mlw:reference_var]
       [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    a at X [@at:X] [@at:X:loc:bench/ce/loop_ce.mlw:23] [@field:0:contents]
+      [@introduced] [@mlw:reference_var] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
 File "bench/ce/loop_ce.mlw", line 20, characters 31-44:
 Sub-goal Postcondition of goal g'vc.

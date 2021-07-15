@@ -5,7 +5,7 @@ warning: unused variable x
           
 <check-ce>Giant-step RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/ref1.mlw", line 5, characters 10-15 at "bench/check-ce/ref1.mlw", line 5, characters 10-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/ref1.mlw", line 5, characters 10-15 at "bench/check-ce/ref1.mlw", line 5, characters 10-15: {contents=
                                                                     1}
 <check-ce>Normal RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
@@ -36,7 +36,7 @@ warning: unused variable x
                 Line 5:
                   Giant-step execution of function `ref` with args:
                     contents = 1
-                  result = {contents= 1}
+                  result of `ref` = {contents= 1}
                 Line 6:
                   Property failure at assertion with:
 <check-ce-summary>Results:
@@ -45,7 +45,7 @@ warning: unused variable x
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/ref1.mlw", line 6, characters 11-16)
 File "bench/check-ce/ref1.mlw", line 6, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.01s, 1019 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 1600 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 Unknown location:

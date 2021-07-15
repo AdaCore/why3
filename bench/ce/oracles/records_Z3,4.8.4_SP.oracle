@@ -40,7 +40,8 @@ File records.mlw:
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "2"}}]}}
   Line 25:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "2"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "2"}
 
 File "bench/ce/records.mlw", line 28, characters 14-18:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
@@ -94,7 +95,7 @@ File records.mlw:
                {"Field":
                  [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 30:
-    q 'unused'unused [@introduced] =
+    q  [@introduced] [@model_trace:q ] =
       {"type": "Record",
        "val":
         {"Field":
@@ -162,12 +163,12 @@ File records.mlw:
                {"Field":
                  [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 35:
-    q 'unused'unused [@introduced] =
+    q  [@introduced] [@model_trace:q ] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}
-    result'unused'unused [@introduced] =
+    result [@introduced] [@model_trace:result] =
       {"type": "Record",
        "val":
         {"Field":
@@ -243,7 +244,7 @@ File records.mlw:
                    "value": {"type": "Integer", "val": "2"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 41:
-    q 'unused'unused [@introduced] =
+    q  [@introduced] [@model_trace:q ] =
       {"type": "Record",
        "val":
         {"Field":
@@ -340,12 +341,12 @@ File records.mlw:
                {"Field":
                  [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 50:
-    q 'unused'unused [@introduced] =
+    q  [@introduced] [@model_trace:q ] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "g", "value": {"type": "Boolean", "val": false}}]}}
-    result'unused'unused [@introduced] =
+    result [@introduced] [@model_trace:result] =
       {"type": "Record",
        "val":
         {"Field":
@@ -404,7 +405,8 @@ File records.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 75:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "0"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
 
 File "bench/ce/records.mlw", line 78, characters 14-17:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
@@ -455,7 +457,7 @@ File records.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 85:
-    result'unused'unused [@introduced] =
+    result [@introduced] [@model_trace:result] =
       {"type": "Record",
        "val":
         {"Field":

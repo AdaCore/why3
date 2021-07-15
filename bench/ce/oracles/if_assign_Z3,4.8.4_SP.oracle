@@ -12,7 +12,8 @@ File if_assign.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 12:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "42"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "42"}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
@@ -32,7 +33,8 @@ File if_assign.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 18:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "42"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "42"}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
@@ -56,7 +58,8 @@ File if_assign.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 24:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "42"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "42"}
   Line 25:
     x [@field:0:contents] [@introduced] [@model_trace:x]
       [@vc:written:25:4:20:bench/ce/if_assign.mlw]
@@ -91,7 +94,8 @@ File if_assign.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "18"}}]}}
   Line 24:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "18"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "18"}
   Line 25:
     x [@field:0:contents] [@introduced] [@model_trace:x]
       [@vc:written:25:4:20:bench/ce/if_assign.mlw]
@@ -152,7 +156,8 @@ File if_assign.mlw:
   Line 31:
     the check fails with all inputs
   Line 33:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "17"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "17"}
   Line 34:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",

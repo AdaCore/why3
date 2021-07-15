@@ -22,7 +22,7 @@ Prover result is: Valid (0.01s, 2602 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for1.mlw", line 5, characters 14-15 at "bench/check-ce/for1.mlw", line 5, characters 14-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for1.mlw", line 5, characters 14-15 at "bench/check-ce/for1.mlw", line 5, characters 14-15: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x` at "bench/check-ce/for1.mlw", line 6, characters 4-74 at "bench/check-ce/for1.mlw", line 6, characters 4-74: {contents=
                                                                     0}
@@ -95,7 +95,7 @@ Prover result is: Valid (0.01s, 2602 steps).
                 Line 5:
                   Giant-step execution of function `ref` with args:
                     contents = 0
-                  result = {contents= 0}
+                  result of `ref` = {contents= 0}
                 Line 6:
                   Giant-step iteration of loop
                   x = {contents= 0}
@@ -117,7 +117,7 @@ Prover result is: Valid (0.01s, 2602 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "1"}}]}}
             Line 5:
-              result'unused'unused = {"type": "Integer", "val": "1"}
+              result = {"type": "Integer", "val": "1"}
             Line 6:
               x =
                 {"type": "Record",
@@ -129,7 +129,7 @@ Prover result is: Valid (0.01s, 2602 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for1.mlw", line 5, characters 14-15 at "bench/check-ce/for1.mlw", line 5, characters 14-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for1.mlw", line 5, characters 14-15 at "bench/check-ce/for1.mlw", line 5, characters 14-15: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x` at "bench/check-ce/for1.mlw", line 6, characters 4-74 at "bench/check-ce/for1.mlw", line 6, characters 4-74: {contents=
                                                                     1}
@@ -202,7 +202,7 @@ Prover result is: Valid (0.01s, 2602 steps).
                 Line 5:
                   Giant-step execution of function `ref` with args:
                     contents = 0
-                  result = {contents= 0}
+                  result of `ref` = {contents= 0}
                 Line 6:
                   Giant-step iteration of loop
                   x = {contents= 1}
@@ -222,7 +222,7 @@ Prover result is: Valid (0.01s, 2602 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/for1.mlw", line 4, characters 12-22)
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Step limit exceeded (0.83s).
+Prover result is: Step limit exceeded (1.37s).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -244,7 +244,7 @@ File for1.mlw:
   Line 5:
     Giant-step execution of function `ref` with args:
       contents = 0
-    result = {contents= 0}
+    result of `ref` = {contents= 0}
   Line 6:
     Giant-step iteration of loop
     x = {contents= 0}

@@ -20,13 +20,13 @@
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: INCOMPLETE
@@ -66,23 +66,23 @@
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: (-1)
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 0
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: (-1)
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 0
 <check-ce>Result of checking model 1: NC
             - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
               File int.mlw:
@@ -114,7 +114,7 @@
                   (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= (-1)}
-                  result = 0
+                  result of `id` = 0
                   Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 10
@@ -151,7 +151,7 @@
                   Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= (-1)}
-                  result = 0
+                  result of `id` = 0
                   Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 10
@@ -167,7 +167,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
 File "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20:
 Sub-goal Assertion of goal test2'vc.
-Prover result is: Step limit exceeded (1.25s).
+Prover result is: Step limit exceeded (1.96s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -199,7 +199,7 @@ File test_result_ce_value2.mlw:
     (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= (-1)}
-    result = 0
+    result of `id` = 0
     Normal execution of function `(<)` with args:
       _ = 0
       _ = 10
@@ -229,13 +229,13 @@ File test_result_ce_value2.mlw:
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: INCOMPLETE
@@ -275,23 +275,23 @@ File test_result_ce_value2.mlw:
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
                                                                     42}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 43
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 43
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
                                                                     42}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 43
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 43
 <check-ce>Result of checking model 1: NC
             - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
               File int.mlw:
@@ -323,7 +323,7 @@ File test_result_ce_value2.mlw:
                   (giant-step) execution of unimplemented function `id`
                     x = 0
                   a = {contents= 42}
-                  result = 43
+                  result of `id` = 43
                   Normal execution of function `(<)` with args:
                     _ = 43
                     _ = 10
@@ -360,7 +360,7 @@ File test_result_ce_value2.mlw:
                   Giant-step execution of function `id` with args:
                     x = 0
                   a = {contents= 42}
-                  result = 43
+                  result of `id` = 43
                   Normal execution of function `(<)` with args:
                     _ = 43
                     _ = 10
@@ -376,7 +376,7 @@ File test_result_ce_value2.mlw:
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
 File "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20:
 Sub-goal Assertion of goal test2'vc.
-Prover result is: Step limit exceeded (1.06s).
+Prover result is: Step limit exceeded (1.81s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -408,7 +408,7 @@ File test_result_ce_value2.mlw:
     (giant-step) execution of unimplemented function `id`
       x = 0
     a = {contents= 42}
-    result = 43
+    result of `id` = 43
     Normal execution of function `(<)` with args:
       _ = 43
       _ = 10
@@ -436,13 +436,13 @@ File test_result_ce_value2.mlw:
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: INCOMPLETE
@@ -502,29 +502,29 @@ File test_result_ce_value2.mlw:
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
                                                                     41}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 51
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 51
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
                                                                     41}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 51
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 51
 <check-ce>Result of checking model 1: NC
             - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
               File int.mlw:
@@ -556,14 +556,14 @@ File test_result_ce_value2.mlw:
                   (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= (-1)}
-                  result = 0
+                  result of `id` = 0
                   Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 100
                   (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= 41}
-                  result = 51
+                  result of `id` = 51
                   Normal execution of function `(>)` with args:
                     x = 51
                     y = 50
@@ -606,14 +606,14 @@ File test_result_ce_value2.mlw:
                   Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= (-1)}
-                  result = 0
+                  result of `id` = 0
                   Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 100
                   Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= 41}
-                  result = 51
+                  result of `id` = 51
                   Normal execution of function `(>)` with args:
                     x = 51
                     y = 50
@@ -635,7 +635,7 @@ File test_result_ce_value2.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Step limit exceeded (0.79s).
+Prover result is: Step limit exceeded (1.28s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -667,14 +667,14 @@ File test_result_ce_value2.mlw:
     (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= (-1)}
-    result = 0
+    result of `id` = 0
     Normal execution of function `(<)` with args:
       _ = 0
       _ = 100
     (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= 41}
-    result = 51
+    result of `id` = 51
     Normal execution of function `(>)` with args:
       x = 51
       y = 50
@@ -708,13 +708,13 @@ File test_result_ce_value2.mlw:
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: INCOMPLETE
@@ -774,29 +774,29 @@ File test_result_ce_value2.mlw:
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
                                                                     40}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 41
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 41
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
                                                                     (-1)}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
                                                                     40}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 41
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 41
 <check-ce>Result of checking model 1: NC
             - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
               File int.mlw:
@@ -828,14 +828,14 @@ File test_result_ce_value2.mlw:
                   (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= (-1)}
-                  result = 0
+                  result of `id` = 0
                   Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 100
                   (giant-step) execution of unimplemented function `id`
                     x = (-1)
                   a = {contents= 40}
-                  result = 41
+                  result of `id` = 41
                   Normal execution of function `(>)` with args:
                     x = 41
                     y = 50
@@ -878,14 +878,14 @@ File test_result_ce_value2.mlw:
                   Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= (-1)}
-                  result = 0
+                  result of `id` = 0
                   Normal execution of function `(<)` with args:
                     _ = 0
                     _ = 100
                   Giant-step execution of function `id` with args:
                     x = (-1)
                   a = {contents= 40}
-                  result = 41
+                  result of `id` = 41
                   Normal execution of function `(>)` with args:
                     x = 41
                     y = 50
@@ -907,7 +907,7 @@ File test_result_ce_value2.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Step limit exceeded (0.64s).
+Prover result is: Step limit exceeded (1.03s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -939,14 +939,14 @@ File test_result_ce_value2.mlw:
     (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= (-1)}
-    result = 0
+    result of `id` = 0
     Normal execution of function `(<)` with args:
       _ = 0
       _ = 100
     (giant-step) execution of unimplemented function `id`
       x = (-1)
     a = {contents= 40}
-    result = 41
+    result of `id` = 41
     Normal execution of function `(>)` with args:
       x = 41
       y = 50
@@ -984,13 +984,13 @@ Prover result is: Valid (0.01s, 100 steps).
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: INCOMPLETE
@@ -1043,23 +1043,23 @@ Prover result is: Valid (0.01s, 100 steps).
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
                                                                     40}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 100
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 100
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
 <rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
                                                                     0}
 <rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
 <rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
                                                                     40}
-<rac-values>Value from model for variable `result` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 100
+<rac-values>Value from model for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 100
 <check-ce>Result of checking model 1: NC
             - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
               File int.mlw:
@@ -1091,7 +1091,7 @@ Prover result is: Valid (0.01s, 100 steps).
                   (giant-step) execution of unimplemented function `id`
                     x = 0
                   a = {contents= 40}
-                  result = 100
+                  result of `id` = 100
                   Normal execution of function `(<)` with args:
                     _ = 100
                     _ = 100
@@ -1137,7 +1137,7 @@ Prover result is: Valid (0.01s, 100 steps).
                   Giant-step execution of function `id` with args:
                     x = 0
                   a = {contents= 40}
-                  result = 100
+                  result of `id` = 100
                   Normal execution of function `(<)` with args:
                     _ = 100
                     _ = 100
@@ -1162,7 +1162,7 @@ Prover result is: Valid (0.01s, 100 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Step limit exceeded (0.82s).
+Prover result is: Step limit exceeded (1.23s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -1194,7 +1194,7 @@ File test_result_ce_value2.mlw:
     (giant-step) execution of unimplemented function `id`
       x = 0
     a = {contents= 40}
-    result = 100
+    result of `id` = 100
     Normal execution of function `(<)` with args:
       _ = 100
       _ = 100

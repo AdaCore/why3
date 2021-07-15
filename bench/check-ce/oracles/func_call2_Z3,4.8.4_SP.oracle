@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call2.mlw", line 8, characters 12-21:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.00s, 2564 steps).
+Prover result is: Valid (0.01s, 2564 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call2.mlw", line 9, characters 12-26)
 <check-ce>Checking model:
@@ -8,13 +8,13 @@ Prover result is: Valid (0.00s, 2564 steps).
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call2.mlw", line 4, characters 9-14 at "bench/check-ce/func_call2.mlw", line 4, characters 9-14: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/func_call2.mlw", line 4, characters 9-14 at "bench/check-ce/func_call2.mlw", line 4, characters 9-14: 0
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call2.mlw", line 4, characters 8-9: {contents=
                                                                     0}
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call2.mlw", line 4, characters 9-14 at "bench/check-ce/func_call2.mlw", line 4, characters 9-14: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/func_call2.mlw", line 4, characters 9-14 at "bench/check-ce/func_call2.mlw", line 4, characters 9-14: 0
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call2.mlw", line 4, characters 8-9: {contents=
                                                                     0}
 <check-ce>Result of checking model 0: INCOMPLETE
@@ -44,7 +44,7 @@ Prover result is: Valid (0.00s, 2564 steps).
             Line 9:
               x = {"type": "Integer", "val": "-1"}
             Line 10:
-              result'unused'unused = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "0"}
               z =
                 {"type": "Record",
                  "val":
@@ -139,7 +139,7 @@ Prover result is: Valid (0.00s, 2564 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/func_call2.mlw", line 9, characters 12-26)
 File "bench/check-ce/func_call2.mlw", line 9, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Step limit exceeded (0.79s).
+Prover result is: Step limit exceeded (1.42s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

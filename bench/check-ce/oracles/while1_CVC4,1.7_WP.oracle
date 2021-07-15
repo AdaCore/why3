@@ -1,10 +1,10 @@
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.04s, 1288 steps).
+Prover result is: Valid (0.02s, 1288 steps).
 
 File "bench/check-ce/while1.mlw", line 9, characters 16-21:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.02s, 1930 steps).
+Prover result is: Valid (0.03s, 1930 steps).
 
 File "bench/check-ce/while1.mlw", line 10, characters 18-24:
 Sub-goal Loop invariant preservation of goal f'vc.
@@ -21,7 +21,7 @@ Prover result is: Valid (0.02s, 1837 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 6:
-              result'unused'unused = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "0"}
             Line 8:
               i =
                 {"type": "Record",
@@ -45,9 +45,9 @@ Prover result is: Valid (0.02s, 1837 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while1.mlw", line 6, characters 16-17 at "bench/check-ce/while1.mlw", line 6, characters 16-17: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/while1.mlw", line 6, characters 16-17 at "bench/check-ce/while1.mlw", line 6, characters 16-17: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while1.mlw", line 7, characters 16-17 at "bench/check-ce/while1.mlw", line 7, characters 16-17: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/while1.mlw", line 7, characters 16-17 at "bench/check-ce/while1.mlw", line 7, characters 16-17: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x` at "bench/check-ce/while1.mlw", line 8, characters 4-113 at "bench/check-ce/while1.mlw", line 8, characters 4-113: {contents=
                                                                     0}
@@ -154,11 +154,11 @@ Prover result is: Valid (0.02s, 1837 steps).
                 Line 6:
                   Giant-step execution of function `ref` with args:
                     contents = 0
-                  result = {contents= 0}
+                  result of `ref` = {contents= 0}
                 Line 7:
                   Giant-step execution of function `ref` with args:
                     contents = 0
-                  result = {contents= 0}
+                  result of `ref` = {contents= 0}
                 Line 8:
                   Giant-step iteration of loop
                   x = {contents= 0}
@@ -194,7 +194,7 @@ Prover result is: Valid (0.02s, 1837 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 6:
-              result'unused'unused = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "0"}
             Line 8:
               i =
                 {"type": "Record",
@@ -218,9 +218,9 @@ Prover result is: Valid (0.02s, 1837 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while1.mlw", line 6, characters 16-17 at "bench/check-ce/while1.mlw", line 6, characters 16-17: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/while1.mlw", line 6, characters 16-17 at "bench/check-ce/while1.mlw", line 6, characters 16-17: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while1.mlw", line 7, characters 16-17 at "bench/check-ce/while1.mlw", line 7, characters 16-17: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/while1.mlw", line 7, characters 16-17 at "bench/check-ce/while1.mlw", line 7, characters 16-17: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x` at "bench/check-ce/while1.mlw", line 8, characters 4-113 at "bench/check-ce/while1.mlw", line 8, characters 4-113: {contents=
                                                                     0}
@@ -327,11 +327,11 @@ Prover result is: Valid (0.02s, 1837 steps).
                 Line 6:
                   Giant-step execution of function `ref` with args:
                     contents = 0
-                  result = {contents= 0}
+                  result of `ref` = {contents= 0}
                 Line 7:
                   Giant-step execution of function `ref` with args:
                     contents = 0
-                  result = {contents= 0}
+                  result of `ref` = {contents= 0}
                 Line 8:
                   Giant-step iteration of loop
                   x = {contents= 0}
@@ -358,7 +358,7 @@ Prover result is: Valid (0.02s, 1837 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 6:
-              result'unused'unused = {"type": "Integer", "val": "0"}
+              result = {"type": "Integer", "val": "0"}
             Line 8:
               i =
                 {"type": "Record",
@@ -382,9 +382,9 @@ Prover result is: Valid (0.02s, 1837 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while1.mlw", line 6, characters 16-17 at "bench/check-ce/while1.mlw", line 6, characters 16-17: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/while1.mlw", line 6, characters 16-17 at "bench/check-ce/while1.mlw", line 6, characters 16-17: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while1.mlw", line 7, characters 16-17 at "bench/check-ce/while1.mlw", line 7, characters 16-17: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/while1.mlw", line 7, characters 16-17 at "bench/check-ce/while1.mlw", line 7, characters 16-17: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x` at "bench/check-ce/while1.mlw", line 8, characters 4-113 at "bench/check-ce/while1.mlw", line 8, characters 4-113: {contents=
                                                                     0}
@@ -491,11 +491,11 @@ Prover result is: Valid (0.02s, 1837 steps).
                 Line 6:
                   Giant-step execution of function `ref` with args:
                     contents = 0
-                  result = {contents= 0}
+                  result of `ref` = {contents= 0}
                 Line 7:
                   Giant-step execution of function `ref` with args:
                     contents = 0
-                  result = {contents= 0}
+                  result of `ref` = {contents= 0}
                 Line 8:
                   Giant-step iteration of loop
                   x = {contents= 0}
@@ -545,11 +545,11 @@ File while1.mlw:
   Line 6:
     Giant-step execution of function `ref` with args:
       contents = 0
-    result = {contents= 0}
+    result of `ref` = {contents= 0}
   Line 7:
     Giant-step execution of function `ref` with args:
       contents = 0
-    result = {contents= 0}
+    result of `ref` = {contents= 0}
   Line 8:
     Giant-step iteration of loop
     x = {contents= 0}

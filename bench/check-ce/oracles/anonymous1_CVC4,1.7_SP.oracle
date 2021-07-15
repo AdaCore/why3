@@ -13,7 +13,7 @@
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 0
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -64,7 +64,7 @@
                 Line 5:
                   Giant-step execution of function `h` with args:
                     y = 0
-                  result = 0
+                  result of `h` = 0
                   Execution got stuck at postcondition of `h` with:
                     y = 0
                     result = 0
@@ -83,7 +83,7 @@
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
+<rac-values>Value from model for return value of call at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -134,7 +134,7 @@
                 Line 5:
                   Giant-step execution of function `h` with args:
                     y = 0
-                  result = 2
+                  result of `h` = 2
                 Line 6:
                   Property failure at assertion with:
                     x = 0
@@ -154,7 +154,7 @@
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/anonymous1.mlw", line 4, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
+<rac-values>Value from model for return value of call at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28 at "bench/check-ce/anonymous1.mlw", line 5, characters 10-28: 2
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -205,7 +205,7 @@
                 Line 5:
                   Giant-step execution of function `h` with args:
                     y = 0
-                  result = 2
+                  result of `h` = 2
                 Line 6:
                   Property failure at assertion with:
                     x = 0
@@ -222,7 +222,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
 File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (sat) (0.06s, 4925 steps).
+Prover result is: Unknown (sat) (0.04s, 4925 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

@@ -12,7 +12,7 @@
               the check fails with all inputs
 <check-ce>Giant-step RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
                                                                     1}
 <rac-values>Value from model for variable `x` at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
                                                                     0}
@@ -38,7 +38,7 @@
                     v = 2
                 Line 7:
                   Property failure at assertion with:
-            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/ref2.mlw", line 6, characters 2-8)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/ref2.mlw", line 6, characters 2-8)
               
 <check-ce>Check model 1 ("bench/check-ce/ref2.mlw", line 7, characters 11-16)
 <check-ce>Checking model:
@@ -54,11 +54,11 @@
               the check fails with all inputs
 <check-ce>Giant-step RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
                                                                     1}
 <rac-values>Value from model for variable `x` at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
                                                                     2}
-<rac-values>Type default value for variable `result` at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
+<rac-values>Type default value for return value of call at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
 <check-ce>Normal RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: NC
@@ -92,13 +92,13 @@
                 Line 5:
                   Giant-step execution of function `ref` with args:
                     contents = 1
-                  result = {contents= 1}
+                  result of `ref` = {contents= 1}
                 Line 6:
                   Giant-step execution of function `(:=)` with args:
                     r = {contents= 1}
                     v = 2
                   x = {contents= 2}
-                  result = ()
+                  result of `(:=)` = ()
                 Line 7:
                   Property failure at assertion with:
 <check-ce>Check model 2 ("bench/check-ce/ref2.mlw", line 7, characters 11-16)
@@ -115,11 +115,11 @@
               the check fails with all inputs
 <check-ce>Giant-step RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
                                                                     1}
 <rac-values>Value from model for variable `x` at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
                                                                     2}
-<rac-values>Type default value for variable `result` at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
+<rac-values>Type default value for return value of call at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
 <check-ce>Normal RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 2: NC
@@ -153,19 +153,19 @@
                 Line 5:
                   Giant-step execution of function `ref` with args:
                     contents = 1
-                  result = {contents= 1}
+                  result of `ref` = {contents= 1}
                 Line 6:
                   Giant-step execution of function `(:=)` with args:
                     r = {contents= 1}
                     v = 2
                   x = {contents= 2}
-                  result = ()
+                  result of `(:=)` = ()
                 Line 7:
                   Property failure at assertion with:
 <check-ce-summary>Results:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
-  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/ref2.mlw", line 6, characters 2-8)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/ref2.mlw", line 6, characters 2-8)
 - Checked model 1: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
@@ -174,7 +174,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
 File "bench/check-ce/ref2.mlw", line 7, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.05s, 1038 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 1619 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 Unknown location:

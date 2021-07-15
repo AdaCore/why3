@@ -38,6 +38,13 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File result.mlw:
+  Line 16:
+    A [@at:'Old:loc:bench/ce/result.mlw:18] [@field:0:contents] [@introduced]
+      [@model] [@model_trace:A] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 17:
     A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
       {"type": "Record",
@@ -62,5 +69,12 @@ File result.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "2"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "2"}
+  Line 20:
+    A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
 

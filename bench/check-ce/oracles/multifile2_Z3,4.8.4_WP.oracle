@@ -11,12 +11,11 @@
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8 at "bench/check-ce/multifile2.mlw", line 9, characters 2-8: 0
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
-<check-ce>Result of checking model 0: BAD_CE
+<check-ce>Result of checking model 0: INCOMPLETE
             - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
@@ -59,31 +58,8 @@
               File multifile2.mlw:
                 Line 7:
                   Execution of main function terminated normally
-            - Abstract RAC: STUCK (failure in postcondition of `incr` at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                  zero = 0
-                Line 14:
-                  Constant one initialization
-                  one = 1
-              File multifile2.mlw:
-                Line 7:
-                  x = 0
-                  x = 0
-                  Execution of main function `f` with env:
-                    x = 0
-                    zero = 0
-                    one = 1
-                Line 9:
-                  Giant-step execution of function `incr` with args:
-                    x = 0
-                  result = 0
-              File multifile1.mlw:
-                Line 10:
-                  Execution got stuck at postcondition of `incr` with:
-                    x = 0
-                    result = 0
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
+              
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 8, characters 12-26)
 <check-ce>Checking model:
           File multifile2.mlw:
@@ -95,11 +71,12 @@
               x = {"type": "Integer", "val": "0"}
             Line 9:
               result = {"type": "Integer", "val": "2"}
+              result = {"type": "Integer", "val": "2"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8 at "bench/check-ce/multifile2.mlw", line 9, characters 2-8: 2
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile2.mlw", line 9, characters 2-8 at "bench/check-ce/multifile2.mlw", line 9, characters 2-8: 2
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -166,7 +143,7 @@
                 Line 9:
                   Giant-step execution of function `incr` with args:
                     x = 0
-                  result = 2
+                  result of `incr` = 2
                 Line 8:
                   Property failure at postcondition of `f` with:
                     x = 0
@@ -182,11 +159,12 @@
               x = {"type": "Integer", "val": "0"}
             Line 9:
               result = {"type": "Integer", "val": "2"}
+              result = {"type": "Integer", "val": "2"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 7, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 9, characters 2-8 at "bench/check-ce/multifile2.mlw", line 9, characters 2-8: 2
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile2.mlw", line 9, characters 2-8 at "bench/check-ce/multifile2.mlw", line 9, characters 2-8: 2
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -253,15 +231,15 @@
                 Line 9:
                   Giant-step execution of function `incr` with args:
                     x = 0
-                  result = 2
+                  result of `incr` = 2
                 Line 8:
                   Property failure at postcondition of `f` with:
                     x = 0
                     result = 2
 <check-ce-summary>Results:
-- Checked model 0: BAD_CE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: STUCK (failure in postcondition of `incr` at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/multifile2.mlw", line 9, characters 2-8)
 - Selected model 1: SW
   - Concrete RAC: NORMAL
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 8, characters 12-26)
@@ -291,7 +269,7 @@ File multifile2.mlw:
   Line 9:
     Giant-step execution of function `incr` with args:
       x = 0
-    result = 2
+    result of `incr` = 2
   Line 8:
     Property failure at postcondition of `f` with:
       x = 0
@@ -314,7 +292,6 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8 at "bench/check-ce/multifile2.mlw", line 14, characters 2-8: 0
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -364,31 +341,8 @@ File multifile2.mlw:
                   Property failure at postcondition of `g` with:
                     x = 0
                     result = 1
-            - Abstract RAC: STUCK (failure in postcondition of `incr` at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                  zero = 0
-                Line 14:
-                  Constant one initialization
-                  one = 1
-              File multifile2.mlw:
-                Line 12:
-                  x = 0
-                  x = 0
-                  Execution of main function `g` with env:
-                    x = 0
-                    zero = 0
-                    one = 1
-                Line 14:
-                  Giant-step execution of function `incr` with args:
-                    x = 0
-                  result = 0
-              File multifile1.mlw:
-                Line 10:
-                  Execution got stuck at postcondition of `incr` with:
-                    x = 0
-                    result = 0
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
+              
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 <check-ce>Checking model:
           File multifile1.mlw:
@@ -403,11 +357,12 @@ File multifile2.mlw:
                 x = {"type": "Integer", "val": "0"}
               Line 14:
                 result = {"type": "Integer", "val": "1"}
+                result = {"type": "Integer", "val": "1"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8 at "bench/check-ce/multifile2.mlw", line 14, characters 2-8: 1
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile2.mlw", line 14, characters 2-8 at "bench/check-ce/multifile2.mlw", line 14, characters 2-8: 1
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -476,7 +431,7 @@ File multifile2.mlw:
                 Line 14:
                   Giant-step execution of function `incr` with args:
                     x = 0
-                  result = 1
+                  result of `incr` = 1
                 Line 13:
                   Property failure at postcondition of `g` with:
                     x = 0
@@ -495,11 +450,12 @@ File multifile2.mlw:
                 x = {"type": "Integer", "val": "0"}
               Line 14:
                 result = {"type": "Integer", "val": "1"}
+                result = {"type": "Integer", "val": "1"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 12, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 14, characters 2-8 at "bench/check-ce/multifile2.mlw", line 14, characters 2-8: 1
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile2.mlw", line 14, characters 2-8 at "bench/check-ce/multifile2.mlw", line 14, characters 2-8: 1
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -568,7 +524,7 @@ File multifile2.mlw:
                 Line 14:
                   Giant-step execution of function `incr` with args:
                     x = 0
-                  result = 1
+                  result of `incr` = 1
                 Line 13:
                   Property failure at postcondition of `g` with:
                     x = 0
@@ -576,7 +532,7 @@ File multifile2.mlw:
 <check-ce-summary>Results:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
-  - Abstract RAC: STUCK (failure in postcondition of `incr` at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/multifile2.mlw", line 14, characters 2-8)
 - Checked model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
@@ -585,7 +541,7 @@ File multifile2.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 13, characters 12-26)
 File "bench/check-ce/multifile2.mlw", line 13, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (sat) (0.00s, 934 steps).
+Prover result is: Unknown (sat) (0.01s, 934 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -649,63 +605,15 @@ File multifile2.mlw:
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 0
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 0
-<check-ce>Result of checking model 0: BAD_CE
-            - Concrete RAC: STUCK (failure in postcondition of `incr_val` at "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                  zero = 0
-                Line 14:
-                  Constant one initialization
-                  one = 1
-              File multifile2.mlw:
-                Line 18:
-                  x = 0
-                  x = 0
-                  Execution of main function `h` with env:
-                    x = 0
-                    zero = 0
-                    one = 1
-                Line 20:
-                  (giant-step) execution of unimplemented function `incr_val`
-                    x = 0
-                  result = 0
-              File multifile1.mlw:
-                Line 14:
-                  Execution got stuck at postcondition of `incr_val` with:
-                    x = 0
-                    result = 0
-            - Abstract RAC: STUCK (failure in postcondition of `incr_val` at "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                  zero = 0
-                Line 14:
-                  Constant one initialization
-                  one = 1
-              File multifile2.mlw:
-                Line 18:
-                  x = 0
-                  x = 0
-                  Execution of main function `h` with env:
-                    x = 0
-                    zero = 0
-                    one = 1
-                Line 20:
-                  Giant-step execution of function `incr_val` with args:
-                    x = 0
-                  result = 0
-              File multifile1.mlw:
-                Line 14:
-                  Execution got stuck at postcondition of `incr_val` with:
-                    x = 0
-                    result = 0
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+              
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+              
 <check-ce>Check model 1 ("bench/check-ce/multifile2.mlw", line 19, characters 12-26)
 <check-ce>Checking model:
           File multifile1.mlw:
@@ -720,16 +628,17 @@ File multifile2.mlw:
                 x = {"type": "Integer", "val": "0"}
               Line 20:
                 result = {"type": "Integer", "val": "1"}
+                result = {"type": "Integer", "val": "1"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
 <check-ce>Result of checking model 1: NC
             - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 19, characters 12-26)
               File int.mlw:
@@ -750,7 +659,7 @@ File multifile2.mlw:
                 Line 20:
                   (giant-step) execution of unimplemented function `incr_val`
                     x = 0
-                  result = 1
+                  result of `incr_val` = 1
                 Line 19:
                   Property failure at postcondition of `h` with:
                     x = 0
@@ -774,7 +683,7 @@ File multifile2.mlw:
                 Line 20:
                   Giant-step execution of function `incr_val` with args:
                     x = 0
-                  result = 1
+                  result of `incr_val` = 1
                 Line 19:
                   Property failure at postcondition of `h` with:
                     x = 0
@@ -793,16 +702,17 @@ File multifile2.mlw:
                 x = {"type": "Integer", "val": "0"}
               Line 20:
                 result = {"type": "Integer", "val": "1"}
+                result = {"type": "Integer", "val": "1"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile2.mlw", line 18, characters 7-8: 0
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile2.mlw", line 20, characters 2-12 at "bench/check-ce/multifile2.mlw", line 20, characters 2-12: 1
 <check-ce>Result of checking model 2: NC
             - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 19, characters 12-26)
               File int.mlw:
@@ -823,7 +733,7 @@ File multifile2.mlw:
                 Line 20:
                   (giant-step) execution of unimplemented function `incr_val`
                     x = 0
-                  result = 1
+                  result of `incr_val` = 1
                 Line 19:
                   Property failure at postcondition of `h` with:
                     x = 0
@@ -847,15 +757,15 @@ File multifile2.mlw:
                 Line 20:
                   Giant-step execution of function `incr_val` with args:
                     x = 0
-                  result = 1
+                  result of `incr_val` = 1
                 Line 19:
                   Property failure at postcondition of `h` with:
                     x = 0
                     result = 1
 <check-ce-summary>Results:
-- Checked model 0: BAD_CE
-  - Concrete RAC: STUCK (failure in postcondition of `incr_val` at "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
-  - Abstract RAC: STUCK (failure in postcondition of `incr_val` at "bench/check-ce/multifile1.mlw", line 14, characters 14-24)
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/multifile2.mlw", line 20, characters 2-12)
 - Selected model 1: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 19, characters 12-26)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile2.mlw", line 19, characters 12-26)
@@ -885,7 +795,7 @@ File multifile2.mlw:
   Line 20:
     (giant-step) execution of unimplemented function `incr_val`
       x = 0
-    result = 1
+    result of `incr_val` = 1
   Line 19:
     Property failure at postcondition of `h` with:
       x = 0

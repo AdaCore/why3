@@ -65,14 +65,18 @@ File threshold.mlw:
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "5"}}
+    result of call at line 10, characters 11-20 [@call_result:10:11:20:bench/ce/threshold.mlw]
+      [@introduced] [@model_trace:result] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "5"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "2"}}
   Line 11:
-    result [@introduced]
-      [@model_result_call_loc:11:5:12:bench/ce/threshold.mlw]
-      [@model_trace:result] =
+    result of call at line 11, characters 5-12 [@call_result:11:5:12:bench/ce/threshold.mlw]
+      [@introduced] [@model_trace:result] =
       {"type": "Boolean", "val": false}
 
 File "bench/ce/threshold.mlw", line 25, characters 11-29:
@@ -107,10 +111,12 @@ File threshold.mlw:
     result [@introduced] = {"type": "Integer", "val": "0"}
   Line 25:
     _x [@introduced] = {"type": "Integer", "val": "1"}
+    result of call at line 25, characters 11-29 [@call_result:25:11:29:bench/ce/threshold.mlw]
+      [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "1"}
     result [@introduced] = {"type": "Integer", "val": "0"}
   Line 26:
-    result [@introduced]
-      [@model_result_call_loc:26:5:20:bench/ce/threshold.mlw]
-      [@model_trace:result] =
+    result of call at line 26, characters 5-20 [@call_result:26:5:20:bench/ce/threshold.mlw]
+      [@introduced] [@model_trace:result] =
       {"type": "Boolean", "val": false}
 
