@@ -1,7 +1,7 @@
 Weakest Precondition
 File "bench/ce/record_map.mlw", line 42, characters 12-22:
 Sub-goal Postcondition of goal map_record_proj_test1'vc.
-Prover result is: Unknown (sat)
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File record_map.mlw:
@@ -43,10 +43,12 @@ File record_map.mlw:
                [{"field": ".field_f",
                  "value": {"type": "Integer", "val": "0"}},
                 {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
+  Line 44:
+    result'unused'unused [@introduced] = {"type": "Integer", "val": "-1"}
 
 File "bench/ce/record_map.mlw", line 47, characters 12-22:
 Sub-goal Postcondition of goal record_map_proj_test2'vc.
-Prover result is: Unknown (sat)
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File record_map.mlw:
@@ -76,10 +78,12 @@ File record_map.mlw:
                  "value": {"type": "Integer", "val": "-1"}},
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
+  Line 49:
+    result'unused'unused [@introduced] = {"type": "Integer", "val": "-1"}
 
 File "bench/ce/record_map.mlw", line 54, characters 12-31:
 Sub-goal Postcondition of goal record_map_proj_test3'vc.
-Prover result is: Unknown (sat)
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File record_map.mlw:
@@ -114,6 +118,16 @@ File record_map.mlw:
               "val": [{"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": true}}]}}
     rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f_map",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
+  Line 56:
+    result'unused'unused [@introduced] =
       {"type": "Record",
        "val":
         {"Field":

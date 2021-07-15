@@ -24,6 +24,12 @@ File jlamp_projections.mlw:
       {"proj_name": "to_int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "127"}}
+    result [@introduced]
+      [@model_result_call_loc:29:8:18:bench/ce/jlamp_projections.mlw]
+      [@model_trace:result] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "1"}}
 
 File "bench/ce/jlamp_projections.mlw", line 42, characters 14-24:
 Sub-goal Precondition of goal p3'vc.
@@ -105,4 +111,10 @@ File jlamp_projections.mlw:
               "type": "Proj",
               "value": {"type": "Integer", "val": "127"}}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
+    result [@introduced]
+      [@model_result_call_loc:54:29:39:bench/ce/jlamp_projections.mlw]
+      [@model_trace:result] =
+      {"proj_name": "to_int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "1"}}
 

@@ -287,6 +287,8 @@ File records_inv.mlw:
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 76:
+    result'unused'unused [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records_inv.mlw", line 79, characters 14-17:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
@@ -337,6 +339,12 @@ File records_inv.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 86:
+    result'unused'unused [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@introduced] =
       {"type": "Record",
        "val":
