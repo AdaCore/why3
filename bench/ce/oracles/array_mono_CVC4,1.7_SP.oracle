@@ -50,6 +50,19 @@ Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File array_mono.mlw:
+  Line 23:
+    a'unused'unused [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Integer", "val": "42"}},
+                {"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 25:
     a [@introduced] =
       {"type": "Record",
@@ -60,8 +73,6 @@ File array_mono.mlw:
              {"type": "Array",
               "val":
                [{"indice": {"type": "Integer", "val": "0"},
-                 "value": {"type": "Integer", "val": "42"}},
-                {"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "42"}},
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
@@ -75,8 +86,6 @@ File array_mono.mlw:
              {"type": "Array",
               "val":
                [{"indice": {"type": "Integer", "val": "0"},
-                 "value": {"type": "Integer", "val": "42"}},
-                {"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "42"}},
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
@@ -92,8 +101,6 @@ File array_mono.mlw:
               "val":
                [{"indice": {"type": "Integer", "val": "0"},
                  "value": {"type": "Integer", "val": "42"}},
-                {"indice": {"type": "Integer", "val": "1"},
-                 "value": {"type": "Integer", "val": "42"}},
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 40:
@@ -107,8 +114,6 @@ File array_mono.mlw:
               "val":
                [{"indice": {"type": "Integer", "val": "0"},
                  "value": {"type": "Integer", "val": "42"}},
-                {"indice": {"type": "Integer", "val": "1"},
-                 "value": {"type": "Integer", "val": "42"}},
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
   Line 41:
@@ -121,8 +126,6 @@ File array_mono.mlw:
              {"type": "Array",
               "val":
                [{"indice": {"type": "Integer", "val": "0"},
-                 "value": {"type": "Integer", "val": "42"}},
-                {"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "42"}},
                 {"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "length", "value": {"type": "Integer", "val": "2"}}]}}
