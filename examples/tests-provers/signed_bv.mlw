@@ -1,9 +1,7 @@
 
-
 use mach.bv.BVCheck8
 
-
-let f1 (x y : t) : t
+let add (x y : t) : t
   requires { sle (0:t) x }
   requires { sle x (42:t) }
   requires { sle (0:t) y }
@@ -11,28 +9,26 @@ let f1 (x y : t) : t
 =
   sadd_check x y
 
-
-
-let f2 (x y : t) : t
+let sub (x y : t) : t
   requires { sle (0:t) x }
-  requires { sle x (92:t) }
+  requires { sle x (42:t) }
   requires { sle (0:t) y }
   requires { sle y (67:t) }
 =
-  sadd_check x y
+  ssub_check x y
 
-
-
-let f3 (x y : t) : t
-  requires { ule x (142:t) }
-  requires { ule y (67:t) }
+let mul (x y : t) : t
+  requires { sle (neg (10:t)) x }
+  requires { sle x (10:t) }
+  requires { sle (neg (7:t)) y }
+  requires { sle y (7:t) }
 =
-  uadd_check x y
+  smul_check x y
 
-
-
-let f4 (x y : t) : t
-  requires { ule x (92:t) }
-  requires { ule y (167:t) }
+let div (x y : t) : t
+  requires { sle (0:t) x }
+  requires { sle x (42:t) }
+  requires { slt (0:t) y }
+  requires { sle y (67:t) }
 =
-  uadd_check x y
+  sdiv_check x y
