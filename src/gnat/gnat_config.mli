@@ -68,6 +68,9 @@ val debug : bool
 val debug_save_vcs : bool
 (* true if option --debug-save-vcs was present *)
 
+val debug_prover_errors : bool
+(* true if option --debug-prover-errors was present *)
+
 val stand_alone : bool
 (* true if option --standalone was present *)
 

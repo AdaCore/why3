@@ -27,6 +27,7 @@ let opt_warn_timeout : int ref = ref 1
 let opt_steps : int option ref = ref None
 let opt_debug = ref false
 let opt_debug_save_vcs = ref false
+let opt_debug_prover_errors = ref false
 let opt_force = ref false
 let opt_proof_mode = ref Progressive
 let opt_lazy = ref true
@@ -181,6 +182,8 @@ let options = Arg.align [
            by \"file:first_line:last_line\"";
    "--list-transforms", Arg.Unit output_list_transforms,
           " Output the list of available transformations and exit";
+   "--debug-prover-errors", Arg.Set opt_debug_prover_errors,
+          " Output error/crash messages from provers";
    "--prover", Arg.String set_prover,
           " Use prover given in argument instead of Alt-Ergo";
    "--replay", Arg.Set opt_replay,
@@ -603,6 +606,7 @@ let proof_mode = !opt_proof_mode
 let lazy_ = !opt_lazy
 let debug = !opt_debug
 let debug_save_vcs = !opt_debug_save_vcs
+let debug_prover_errors = !opt_debug_prover_errors
 
 let debug_keep_vcs = Debug.register_info_flag "keep_vcs" ~desc:"Keep@ intermediate@ prover@ files."
 
