@@ -3,7 +3,7 @@
           
 <check-ce>Giant-step RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
                                                                     1}
 <check-ce>Normal RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
@@ -43,11 +43,11 @@
               the check fails with all inputs
 <check-ce>Giant-step RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/ref2.mlw", line 5, characters 10-15 at "bench/check-ce/ref2.mlw", line 5, characters 10-15: {contents=
                                                                     1}
 <rac-values>Value from model for variable `x` at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: {contents=
                                                                     2}
-<rac-values>Type default value for variable `result` at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
+<rac-values>Type default value for return value of call at "bench/check-ce/ref2.mlw", line 6, characters 2-8 at "bench/check-ce/ref2.mlw", line 6, characters 2-8: ()
 <check-ce>Normal RAC
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: NC
@@ -81,13 +81,13 @@
                 Line 5:
                   Giant-step execution of function `ref` with args:
                     contents = 1
-                  result = {contents= 1}
+                  result of `ref` = {contents= 1}
                 Line 6:
                   Giant-step execution of function `(:=)` with args:
                     r = {contents= 1}
                     v = 2
                   x = {contents= 2}
-                  result = ()
+                  result of `(:=)` = ()
                 Line 7:
                   Property failure at assertion with:
 <check-ce-summary>Results:
@@ -99,7 +99,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
 File "bench/check-ce/ref2.mlw", line 7, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.79s).
+Prover result is: Step limit exceeded (1.53s).
 The program does not comply to the verification goal, for example during the
   following execution:
 Unknown location:

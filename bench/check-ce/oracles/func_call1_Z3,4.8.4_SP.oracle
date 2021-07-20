@@ -2,11 +2,11 @@ File "bench/check-ce/func_call1.mlw", line 15, characters 6-7:
 warning: unused variable w
 File "bench/check-ce/func_call1.mlw", line 8, characters 12-21:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.02s, 2564 steps).
+Prover result is: Valid (0.00s, 2564 steps).
 
 File "bench/check-ce/func_call1.mlw", line 9, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.02s, 36 steps).
+Prover result is: Valid (0.01s, 36 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call1.mlw", line 16, characters 11-16)
 <check-ce>Checking model:
@@ -30,17 +30,17 @@ Prover result is: Valid (0.02s, 36 steps).
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call1.mlw", line 4, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <rac-values>Value from model for variable `z` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call1.mlw", line 4, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
@@ -124,7 +124,7 @@ Prover result is: Valid (0.02s, 36 steps).
                   Giant-step execution of function `g` with args:
                     x = 2
                   z = {contents= 0}
-                  result = 3
+                  result of `g` = 3
                 Line 8:
                   Execution got stuck at postcondition of `g` with:
                     z = {contents= 0}
@@ -154,7 +154,7 @@ Prover result is: Valid (0.02s, 36 steps).
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 15:
               result = {"type": "Integer", "val": "3"}
-              w'unused'unused = {"type": "Integer", "val": "6"}
+              w = {"type": "Integer", "val": "6"}
               z =
                 {"type": "Record",
                  "val":
@@ -171,17 +171,17 @@ Prover result is: Valid (0.02s, 36 steps).
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call1.mlw", line 4, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <rac-values>Value from model for variable `z` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: {contents=
                                                                     2}
-<rac-values>Value from model for variable `result` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
+<rac-values>Value from model for return value of call at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/func_call1.mlw", line 4, characters 9-14 at "bench/check-ce/func_call1.mlw", line 4, characters 9-14: 0
 <rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call1.mlw", line 4, characters 8-9: {contents=
                                                                     0}
 <rac-values>Type default value for parameter `_` at NO LOC: ()
@@ -265,7 +265,7 @@ Prover result is: Valid (0.02s, 36 steps).
                   Giant-step execution of function `g` with args:
                     x = 2
                   z = {contents= 2}
-                  result = 3
+                  result of `g` = 3
                   Normal execution of function `(+)` with args:
                     _ = 3
                     _ = 3
@@ -281,7 +281,7 @@ Prover result is: Valid (0.02s, 36 steps).
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call1.mlw", line 16, characters 11-16)
 File "bench/check-ce/func_call1.mlw", line 16, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.71s).
+Prover result is: Step limit exceeded (1.05s).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -315,7 +315,7 @@ File func_call1.mlw:
     Giant-step execution of function `g` with args:
       x = 2
     z = {contents= 2}
-    result = 3
+    result of `g` = 3
     Normal execution of function `(+)` with args:
       _ = 3
       _ = 3

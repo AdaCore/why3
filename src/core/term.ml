@@ -1621,7 +1621,11 @@ let small t = match t.t_node with
 
 let v_copy_unused v =
   let id = v.vs_name in
-  let id' = id_derive (id.id_string ^ "'unused") id in
+  let attrs =
+    try ignore (get_model_trace_attr ~attrs:id.id_attrs); None
+    with Not_found ->
+      Some (Sattr.singleton (create_model_trace_attr id.id_string)) in
+  let id' = id_derive ?attrs (id.id_string ^ unused_suffix) id in
   create_vsymbol id' v.vs_ty
 
 let t_let_simp_keep_var ~keep e ((v,b,t) as bt) =

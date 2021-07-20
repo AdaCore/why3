@@ -120,6 +120,7 @@ module Log : sig
 
   type log_entry_desc = private
     | Val_assumed of (Ident.ident * value)
+    | Res_assumed of (Expr.rsymbol option * value)
     | Const_init of Ident.ident
     | Exec_call of (Expr.rsymbol option * value Term.Mvs.t  * exec_mode)
     | Exec_pure of (Term.lsymbol * exec_mode)
@@ -247,11 +248,20 @@ val default_value_of_type : env -> Ity.ity -> value
 
 (** {3 Oracles} *)
 
-type oracle =
-  ?loc:Loc.position -> env -> (Ity.ity -> Value.value -> unit) ->
-    Ident.ident -> Ity.ity -> Value.value option
+type check_value = Ity.ity -> value -> unit
+
+type oracle = {
+  for_variable:
+    ?check:check_value -> ?loc:Loc.position -> env -> Ident.ident -> Ity.ity -> value option;
+  for_result:
+    ?check:check_value -> env -> Loc.position -> Ity.ity -> value option;
+}
 (** An oracle provides values during execution in {!Pinterp} for program
-    parameters and during giant steps.
+    parameters and during giant steps. The [check] is called on the value and
+    every component.
+
+    @raise CannotCompute if the value or any component is invalid (e.g., a
+       range value outside its bounds).
 
     See {!Check_ce.oracle_of_model} for an implementation.
 
@@ -264,6 +274,8 @@ val oracle_dummy : oracle
 (** {3 Log functions} *)
 
 val register_used_value : env -> Loc.position option -> Ident.ident -> value -> unit
+
+val register_res_value : env -> Loc.position -> Expr.rsymbol option -> value -> unit
 
 val register_const_init : env -> Loc.position option -> Ident.ident -> unit
 

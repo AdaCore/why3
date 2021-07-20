@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.02s, 1530 steps).
+Prover result is: Valid (0.04s, 1530 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Checking model:
@@ -33,9 +33,9 @@ Prover result is: Valid (0.02s, 1530 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     0}
@@ -130,9 +130,9 @@ Prover result is: Valid (0.02s, 1530 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     (-1)}
@@ -227,9 +227,9 @@ Prover result is: Valid (0.02s, 1530 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     (-1)}
@@ -305,7 +305,7 @@ Prover result is: Valid (0.02s, 1530 steps).
   - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6886 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 6886 steps).
 The following counterexample model could not be verified
   (abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125):
 File for.mlw:
@@ -315,11 +315,11 @@ File for.mlw:
   Line 8:
     [current iteration] x1 = 0
   Line 9:
-    [current iteration] result = true
+    result of call at line 9, characters 7-12 = true
   Line 10:
     [current iteration] x1 = 0
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.03s, 1784 steps).
+Prover result is: Valid (0.02s, 1784 steps).
 

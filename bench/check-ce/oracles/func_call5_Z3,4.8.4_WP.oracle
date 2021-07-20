@@ -4,7 +4,7 @@ Prover result is: Valid (0.01s, 36 steps).
 
 File "bench/check-ce/func_call5.mlw", line 14, characters 10-14:
 Sub-goal Precondition of goal f1'vc.
-Prover result is: Valid (0.01s, 83 steps).
+Prover result is: Valid (0.00s, 83 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 15, characters 11-17)
 <check-ce>Checking model:
@@ -63,7 +63,7 @@ Prover result is: Valid (0.01s, 83 steps).
                     contents = 1
                 Line 11:
                   Execution of main function terminated normally
-            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
               
 <check-ce>Check model 1 ("bench/check-ce/func_call5.mlw", line 15, characters 11-17)
 <check-ce>Checking model:
@@ -128,20 +128,20 @@ Prover result is: Valid (0.01s, 83 steps).
                     contents = 1
                 Line 11:
                   Execution of main function terminated normally
-            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
               
 <check-ce-summary>Results:
 - Checked model 0: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
 - Selected model 1: INCOMPLETE
   - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
 File "bench/check-ce/func_call5.mlw", line 15, characters 11-17:
 Sub-goal Assertion of goal f1'vc.
-Prover result is: Step limit exceeded (0.67s).
+Prover result is: Step limit exceeded (1.26s).
 The following counterexample model could not be verified
-  (abstract RAC terminated because missing value for variable `result` at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
+  (abstract RAC terminated because missing value for return value of call at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
 File func_call5.mlw:
   Line 8:
     x = 1
@@ -179,7 +179,7 @@ File func_call5.mlw:
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/func_call5.mlw", line 20, characters 10-14 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/func_call5.mlw", line 20, characters 10-14 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14: {contents=
                                                                     1}
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
@@ -236,7 +236,7 @@ File func_call5.mlw:
                 Line 20:
                   Giant-step execution of function `g2` with args:
                     y = 0
-                  result = {contents= 1}
+                  result of `g2` = {contents= 1}
                 Line 21:
                   Property failure at assertion with:
                     x = 0
@@ -250,7 +250,7 @@ File func_call5.mlw:
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
 File "bench/check-ce/func_call5.mlw", line 21, characters 11-17:
 Sub-goal Assertion of goal f2'vc.
-Prover result is: Step limit exceeded (0.81s).
+Prover result is: Step limit exceeded (1.33s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

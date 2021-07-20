@@ -176,8 +176,8 @@ let option_list =
      (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     "<prover> use <prover> to check assertions in RAC when term\n\
-     reduction is insufficient, with optional, comma-\n\
-     separated time and memory limit (e.g. 'cvc4,2,1000')";
+     reduction is insufficient, with optional, space-\n\
+     separated time and memory limit (e.g. 'cvc4 2 1000')";
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
     "<seconds> Time limit in seconds for RAC (with --check-ce)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),

@@ -17,7 +17,7 @@ Prover result is: Valid (0.01s, 24 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -79,7 +79,7 @@ Prover result is: Valid (0.01s, 24 steps).
                 Line 11:
                   Giant-step execution of function `decr` with args:
                     x = 2
-                  result = 0
+                  result of `decr` = 0
                   Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 2
@@ -98,13 +98,13 @@ Prover result is: Valid (0.01s, 24 steps).
               result = {"type": "Integer", "val": "0"}
               x = {"type": "Integer", "val": "2"}
             Line 11:
+              result = {"type": "Integer", "val": "2"}
               result = {"type": "Integer", "val": "0"}
-              result'unused'unused = {"type": "Integer", "val": "2"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -166,7 +166,7 @@ Prover result is: Valid (0.01s, 24 steps).
                 Line 11:
                   Giant-step execution of function `decr` with args:
                     x = 2
-                  result = 0
+                  result of `decr` = 0
                   Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 2
@@ -185,13 +185,13 @@ Prover result is: Valid (0.01s, 24 steps).
               result = {"type": "Integer", "val": "0"}
               x = {"type": "Integer", "val": "2"}
             Line 11:
+              result = {"type": "Integer", "val": "2"}
               result = {"type": "Integer", "val": "0"}
-              result'unused'unused = {"type": "Integer", "val": "2"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
-<rac-values>Value from model for variable `result` at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
+<rac-values>Value from model for return value of call at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -253,7 +253,7 @@ Prover result is: Valid (0.01s, 24 steps).
                 Line 11:
                   Giant-step execution of function `decr` with args:
                     x = 2
-                  result = 0
+                  result of `decr` = 0
                   Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 2
@@ -273,7 +273,7 @@ Prover result is: Valid (0.01s, 24 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
 File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
 Sub-goal Postcondition of goal incr'vc.
-Prover result is: Unknown (sat) (0.02s, 970 steps).
+Prover result is: Unknown (sat) (0.01s, 970 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
@@ -294,7 +294,7 @@ File multifile1.mlw:
   Line 11:
     Giant-step execution of function `decr` with args:
       x = 2
-    result = 0
+    result of `decr` = 0
     Normal execution of function `(+)` with args:
       _ = 0
       _ = 2

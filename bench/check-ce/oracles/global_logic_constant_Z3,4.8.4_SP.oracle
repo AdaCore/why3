@@ -72,7 +72,7 @@
             Line 9:
               v1 = {"type": "Integer", "val": "1"}
             Line 10:
-              result'unused'unused = {"type": "Integer", "val": "1"}
+              result = {"type": "Integer", "val": "1"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -140,7 +140,7 @@
             Line 9:
               v1 = {"type": "Integer", "val": "1"}
             Line 10:
-              result'unused'unused = {"type": "Integer", "val": "1"}
+              result = {"type": "Integer", "val": "1"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -212,7 +212,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 9, characters 14-24)
 File "bench/check-ce/global_logic_constant.mlw", line 9, characters 14-24:
 Sub-goal Postcondition of goal f1'vc.
-Prover result is: Unknown (sat) (0.02s, 724 steps).
+Prover result is: Unknown (sat) (0.01s, 724 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -254,7 +254,7 @@ File global_logic_constant.mlw:
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22 at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22 at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22: 0
 <rac-values>RHS evaluated for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 6, characters 15-17: 0
 <rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 12, characters 10-12: {contents=
                                                                     1}
@@ -262,7 +262,7 @@ File global_logic_constant.mlw:
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22 at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22 at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22: 0
 <rac-values>RHS evaluated for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 6, characters 15-17: 0
 <rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 12, characters 10-12: {contents=
                                                                     1}
@@ -352,11 +352,11 @@ File global_logic_constant.mlw:
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 16:
-              result'unused'unused = {"type": "Integer", "val": "2"}
+              result = {"type": "Integer", "val": "2"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22 at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22 at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22: 0
 <rac-values>RHS evaluated for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 6, characters 15-17: 0
 <rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 12, characters 10-12: {contents=
                                                                     2}
@@ -364,7 +364,7 @@ File global_logic_constant.mlw:
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Type default value for variable `result` at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22 at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22: 0
+<rac-values>Type default value for return value of call at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22 at "bench/check-ce/global_logic_constant.mlw", line 6, characters 17-22: 0
 <rac-values>RHS evaluated for global `v1` at "bench/check-ce/global_logic_constant.mlw", line 6, characters 15-17: 0
 <rac-values>Value from model for global `v2` at "bench/check-ce/global_logic_constant.mlw", line 12, characters 10-12: {contents=
                                                                     2}
@@ -445,7 +445,7 @@ File global_logic_constant.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 15, characters 14-24)
 File "bench/check-ce/global_logic_constant.mlw", line 15, characters 14-24:
 Sub-goal Postcondition of goal f2'vc.
-Prover result is: Step limit exceeded (1.03s).
+Prover result is: Step limit exceeded (1.81s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

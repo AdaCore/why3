@@ -44,7 +44,8 @@ File records_inv.mlw:
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "2"}}]}}
   Line 26:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "2"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "2"}
 
 File "bench/ce/records_inv.mlw", line 31, characters 9-25:
 Sub-goal Precondition of goal record_match_eval_test3'vc.
@@ -125,7 +126,8 @@ File records_inv.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 76:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "0"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
 
 File "bench/ce/records_inv.mlw", line 79, characters 14-17:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
@@ -176,7 +178,7 @@ File records_inv.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 86:
-    result'unused'unused [@introduced] =
+    result [@introduced] [@model_trace:result] =
       {"type": "Record",
        "val":
         {"Field":
