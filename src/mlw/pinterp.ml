@@ -582,7 +582,8 @@ let try_eval_ensures ctx posts =
   let is_ensures_result = function
     | {t_node= Teps tb} -> let vs, t = t_open_bound tb in loop vs t
     | _ -> None in
-  try Some (Lists.first is_ensures_result posts) with Not_found -> None
+  try Some (Lists.first is_ensures_result posts)
+  with Not_found | Incomplete _ -> None
 
 (******************************************************************************)
 (*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
