@@ -26,7 +26,9 @@ let pp_env pp_key pp_value fmt =
 exception Incomplete of string
 
 let incomplete f =
-  kasprintf (fun reason -> raise (Incomplete reason)) f
+  kasprintf (fun reason ->
+      Debug.dprintf (Debug.lookup_flag "trace_exec") "Incomplete: %s@." reason;
+      raise (Incomplete reason)) f
 
 let ity_components ity = match ity.ity_node with
   | Ityapp (ts, l1, l2)
@@ -787,7 +789,9 @@ exception Fail of cntr_ctx * Term.term
 exception Stuck of cntr_ctx * Loc.position option * string
 
 let stuck ?loc ctx f =
-  kasprintf (fun reason -> raise (Stuck (ctx, loc, reason))) f
+  kasprintf (fun reason ->
+      Debug.dprintf (Debug.lookup_flag "trace_exec") "Stuck: %s@." reason;
+      raise (Stuck (ctx, loc, reason))) f
 
 type check_term =
   ?vsenv:(Term.vsymbol * Term.term) list -> cntr_ctx -> Term.term -> unit
