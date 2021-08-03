@@ -1654,12 +1654,10 @@ let rec is_trivial_vc f =
   | Tif(_,t1,t2) -> is_trivial_vc t1 && is_trivial_vc t2
   | _ -> false
 
-let rec has_attr a f =
-  Sattr.mem annot_attr f.t_attrs || t_any (has_attr a) f
 
-let add_vc_decl kn id f vcl =
-  if is_trivial_vc f && not (has_attr annot_attr f)
-  then vcl else mk_vc_decl kn id f :: vcl
+let add_vc_decl env id f vcl =
+  if not (Sattr.mem annot_attr f.t_attrs) && is_trivial_vc f
+  then vcl else mk_vc_decl env id f :: vcl
 
 let infer_invs = ref (fun _ _ _ _ _ _ -> [])
 let set_infer_invs f = infer_invs := f
