@@ -174,7 +174,7 @@ let report_messages c obj =
       let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
       let extra_info =
         match unproved_goal with
-        | None -> { Gnat_expl.pretty_node = None; inlined = false }
+        | None -> { Gnat_expl.pretty_node = None; inlined = None }
         | Some g -> Gnat_objectives.get_extra_info g
       in
       Gnat_report.Not_Proved (extra_info, model, manual_info) in

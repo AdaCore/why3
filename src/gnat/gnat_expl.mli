@@ -81,7 +81,7 @@ type check =
 
 type extra_info = 
   { pretty_node : int option;
-    inlined     : bool;
+    inlined     : int option;
   }
 
 type vc_info =

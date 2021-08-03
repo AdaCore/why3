@@ -45,14 +45,21 @@ open Why3
    The field "id" contains the id of the VC. The field "reason" identifies the
    kind of the VC, such as "overflow_check" etc. The field "result" tells if
    the VC has been proved or not. The field "extra_info" specifies more
-   precisely the part of the VC, it may be "0" if no extra information is
-   available. The fields "vc_file" and "editor_cmd" are both optional and
-   should be present at the same time. If present, "vc_file" contains the name
-   of a VC file to be used for manual proof, and "editor_cmd" the command to
-   spawn for an external editor for this VC.
+   precisely the part of the VC (see below). The fields "vc_file" and
+   "editor_cmd" are both optional and should be present at the same time. If
+   present, "vc_file" contains the name of a VC file to be used for manual
+   proof, and "editor_cmd" the command to spawn for an external editor for this
+   VC.
 
      extra_info = { "node" : int,
-                    "inline" : bool }
+                    "inline" : int }
+
+  The "node" information of the extra_info type contains the node of the Ada
+  expression which represents the unproved part of the VC (0 indicates no such
+  node could be obtained). If this node was obtained by inlining symbols inside
+  why3, the "inline" field is set to a non-zero value, otherwise it is set to
+  0. If the "inline" node is positive, it contains the Ada node that
+  corresponds to the expression prior to inlining.
 
   The counter example information is stored in the cntexmp field. At the top
   level, this is a mapping from file names to linesentry record.

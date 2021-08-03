@@ -133,7 +133,7 @@ type check =
 
 type extra_info =
   { pretty_node : int option;
-    inlined     : bool;
+    inlined     : int option;
   }
 
 type vc_info =
@@ -421,7 +421,7 @@ type my_expl =
      mutable check_sloc     : Gnat_loc.loc option;
      mutable shape          : string option;
      mutable already_proved : bool;
-     mutable inline         : bool
+     mutable inline         : int option
    }
 (* The type that is used to extract information from a VC, is filled up field
    by field *)
@@ -433,7 +433,7 @@ let default_expl =
      extra_node     = None;
      shape          = None;
      already_proved = false;
-     inline         = false;
+     inline         = None;
    }
 let read_vc_labels acc s =
    (* This function takes a set of labels and extracts a "node_info" from that
@@ -458,7 +458,8 @@ let read_vc_labels acc s =
         | Some Gp_Already_Proved ->
            b.already_proved <- true
         | Some Gp_Inlined ->
-           b.inline <- true
+          if b.extra_node = None then b.inline <- Some (-1)
+          else b.inline <- b.extra_node
         | None ->
             ()
      ) s;

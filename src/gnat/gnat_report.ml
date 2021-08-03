@@ -60,7 +60,7 @@ let register check check_tree result =
     match result with
     | Proved (stats, stats_checker, stat_trivial) ->
         true,
-        {Gnat_expl.pretty_node = None; inlined = false},
+        {Gnat_expl.pretty_node = None; inlined = None},
         Some (stats, stats_checker, stat_trivial),
         None,
         None
@@ -149,7 +149,7 @@ let print_extra_info fmt i =
  let print_info fmt (i, inline) =
   Format.fprintf fmt "{%a, %a}"
     (print_json_field "node" opt_int) i
-    (print_json_field "inline" bool) inline
+    (print_json_field "inline" opt_int) inline
   in
   match i with
   | { Gnat_expl.pretty_node = i; inlined = inline } ->
