@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="register_allocation.mlw"/>
@@ -143,6 +144,9 @@
  </goal>
 </theory>
 <theory name="FiniteNumberOfRegisters" proved="true">
+ <goal name="k&#39;vc" expl="VC for k" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="0"/></proof>
+ </goal>
  <goal name="compile&#39;vc" expl="VC for compile" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="compile&#39;vc.0" expl="precondition" proved="true">
@@ -316,6 +320,9 @@
  </goal>
 </theory>
 <theory name="OptimalNumberOfRegisters" proved="true">
+ <goal name="k&#39;vc" expl="VC for k" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
  <goal name="n&#39;vc" expl="VC for n" proved="true">
  <proof prover="1"><result status="valid" time="0.03" steps="60"/></proof>
  </goal>

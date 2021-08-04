@@ -10,9 +10,13 @@
 <prover id="5" name="Z3" version="4.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Eprover" version="1.8-001" timelimit="16" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="tortoise_and_hare.mlw"/>
 <theory name="TortoiseAndHareAlgorithm" proved="true">
+ <goal name="x0&#39;vc" expl="VC for x0" proved="true">
+ <proof prover="8"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
  <goal name="x_in_range&#39;vc" expl="VC for x_in_range" proved="true">
  <proof prover="2"><result status="valid" time="0.22" steps="311"/></proof>
  </goal>

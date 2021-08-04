@@ -7,11 +7,21 @@
 <prover id="2" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2018_array_based_queuing_lock_1.mlw"/>
 <theory name="Top" proved="true">
+ <goal name="k&#39;vc" expl="VC for k" proved="true">
+ <proof prover="5"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
+ <goal name="n&#39;vc" expl="VC for n" proved="true">
+ <proof prover="5"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
  <goal name="bounded_int&#39;vc" expl="VC for bounded_int" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+ </goal>
+ <goal name="bzero&#39;vc" expl="VC for bzero" proved="true">
+ <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="bounded_int2&#39;vc" expl="VC for bounded_int2" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
