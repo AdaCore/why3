@@ -1703,6 +1703,8 @@ endif
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.$(SHAREDBEST) plugins $(TOOLS) \
   share/Makefile.config bin/why3extract.$(SHAREDBEST)
+	bin/why3.@OCAMLBEST@ config list-provers | grep -q Alt-Ergo || \
+		bin/why3.@OCAMLBEST@ config detect
 	@echo "=== Check API examples ==="
 	$(MAKE) bench-api
 	@echo "=== Check examples ==="
