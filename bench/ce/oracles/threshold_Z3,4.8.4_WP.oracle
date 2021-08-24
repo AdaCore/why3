@@ -78,13 +78,13 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 21:
-    max [@introduced] = {"type": "Integer", "val": "4026531703"}
-    min [@introduced] = {"type": "Integer", "val": "4116707090"}
+    max [@introduced] = {"type": "Integer", "val": "2147483776"}
+    min [@introduced] = {"type": "Integer", "val": "2147483651"}
   Line 25:
     max [@introduced] [@model_trace:max] =
-      {"type": "Integer", "val": "4026531703"}
+      {"type": "Integer", "val": "2147483776"}
     min [@introduced] [@model_trace:min] =
-      {"type": "Integer", "val": "4116707090"}
+      {"type": "Integer", "val": "2147483651"}
 
 File "bench/ce/threshold.mlw", line 22, characters 13-45:
 Sub-goal Postcondition of goal f'vc.
