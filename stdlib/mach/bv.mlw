@@ -95,9 +95,7 @@ module BVCheck_Gen
 
   (** unsigned subtraction with overflow check *)
   val usub_check (a b:t) : t
-    requires { [@expl:arithmetic overflow]
-                  to_uint a - to_uint b < two_power_size
-               \/ BV128.ule (BV128.sub (uto_bv128 a) (uto_bv128 b)) max_uint128 }
+    requires { [@expl:arithmetic overflow] to_uint a >= to_uint b \/ sge a b }
     ensures  { result = sub a b }
     ensures  { to_uint result = to_uint a - to_uint b }
 
@@ -132,17 +130,17 @@ module BVCheck_Gen
   (** unsigned logical shift left requires the second argument to be smaller than bitvector size *)
   val ulsl_check (a b:t) : t
     requires { [@expl:out-of-bounds shifting]
-                slt b bv_size \/ to_uint b < size }
+                ult b bv_size \/ to_uint b < size }
     ensures  { result = lsl_bv a b }
     ensures  { result = lsl a (to_uint b) }
 
   val slsl_check (a b:t) : t
     requires { [@expl:out-of-bounds shifting]
-                slt b bv_size \/ to_uint b < size }
+                ult b bv_size \/ to_uint b < size }
     requires { [@expl:out-of-bounds shifting]
-                (sle zeros a /\ slt a bv_size) \/ (to_uint a) < size }
+                sle zeros a \/ to_int a >= 0 }
     requires { [@expl:arithmetic overflow]
-      (to_int a) * (pow2 (to_int b)) < two_power_size
+      (to_int a) * (pow2 (to_int b)) < two_power_size_minus_one
       \/ let r = BV128.lsl_bv (sto_bv128 a) (sto_bv128 b) in
          (BV128.sle min_sint128 r /\ BV128.sle r max_sint128) }
     ensures  { result = lsl_bv a b }
@@ -151,14 +149,14 @@ module BVCheck_Gen
   (** logical shift right requires the second argument to be smaller than bitvector size *)
   val lsr_check (a b:t) : t
     requires { [@expl:out-of-bounds shifting]
-                slt b bv_size \/ to_uint b < size }
+                ult b bv_size \/ to_uint b < size }
     ensures  { result = lsr_bv a b }
     ensures  { result = lsr a (to_uint b) }
 
   (** arithmetic shift right requires the second argument to be smaller than bitvector size *)
   val asr_check (a b:t) : t
     requires { [@expl:out-of-bounds shifting]
-                slt b bv_size \/ to_uint b < size }
+                ult b bv_size \/ to_uint b < size }
     ensures  { result = asr_bv a b }
     ensures  { result = asr a (to_uint b) }
 
