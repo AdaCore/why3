@@ -104,6 +104,12 @@ type rac_result_state =
   | Res_stuck of string
   | Res_incomplete of string
 
+let string_of_rac_result_state = function
+  | Res_normal -> "NORMAL"
+  | Res_fail _ -> "FAILURE"
+  | Res_stuck _ -> "STUCK"
+  | Res_incomplete _ -> "INCOMPLETE"
+
 type rac_result = rac_result_state * Log.exec_log
 
 let print_rac_result_state fmt = function
