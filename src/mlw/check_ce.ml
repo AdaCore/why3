@@ -214,11 +214,11 @@ let get_or_stuck loc env ity desc = function
       stuck ?loc cntr_ctx "%s" desc
 
 let import_model_const loc env ity = function
-  | Integer s ->
+  | Integer {int_value= v} | Bitvector {bv_value= v} ->
       if ity_equal ity ity_int then
-        int_value s.int_value
+        int_value v
       else if is_range_ty (ty_of_ity ity) then
-        get_or_stuck loc env ity "range" (range_value ity s.int_value)
+        get_or_stuck loc env ity "range" (range_value ity v)
       else
         cannot_import "type %a instead of int or range type" print_ity ity
   | String s ->
@@ -227,7 +227,7 @@ let import_model_const loc env ity = function
   | Boolean b ->
       ity_equal_check ity ity_bool;
       bool_value b
-  | Decimal _ | Fraction _ | Float _ | Bitvector _ as v ->
+  | Decimal _ | Fraction _ | Float _ as v ->
       cannot_import "not implemented for value %a" print_model_const_human v
 
 (** Import a value from the prover model to an interpreter value.
