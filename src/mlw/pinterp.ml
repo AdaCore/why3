@@ -658,6 +658,8 @@ let gen_eval_expr cnf exec_expr id oexp =
     if no value is generated. *)
 let get_value' ctx_desc oloc gens =
   let desc, value = try get_value gens with Not_found ->
+    Debug.dprintf debug_rac_values "@[<h>No value for %s at %a@]@." ctx_desc
+      (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc;
     incomplete "missing value for %s" ctx_desc
       (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc in
   Debug.dprintf debug_rac_values "@[<h>%s for %s at %a: %a@]@."
@@ -681,7 +683,9 @@ let get_and_register_variable ctx ?def ?loc id ity =
   value
 
 let get_and_register_result ?def ?rs ctx posts loc ity =
-  let ctx_desc = asprintf "return value of call at %a" Pretty.print_loc' loc in
+  let ctx_desc = asprintf "return value of call%t at %a"
+      (fun fmt -> Opt.iter (fprintf fmt " to %a" print_rs) rs)
+      Pretty.print_loc' loc in
   let gens = [
     gen_model_result ctx loc ity;
     gen_default def;
