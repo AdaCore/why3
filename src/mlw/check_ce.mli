@@ -53,6 +53,9 @@ type rac_result = rac_result_state * Log.exec_log
 (** The result of a RAC execution is comprised of the final state and the
    execution log. *)
 
+val string_of_rac_result_state : rac_result_state -> string
+(** String of the RAC result state variant *)
+
 val print_rac_result : ?verb_lvl:int -> rac_result Pp.pp
 (** Print the result state of a RAC execution with the execution log *)
 
