@@ -174,7 +174,8 @@ type info = {
   info_set_incremental: bool;
   info_supports_reason_unknown : bool;
   mutable info_labels: Sattr.t Mstr.t;
-  mutable incr_list: (prsymbol * term) list;
+  mutable incr_list_axioms: (prsymbol * term) list;
+  mutable incr_list_ldecls: (lsymbol * vsymbol list * term) list;
 }
 
 let debug_print_term message t =
@@ -242,6 +243,9 @@ let print_typed_var info fmt vs =
     (print_type info) vs.vs_ty
 
 let print_var_list info fmt vsl =
+  print_list space (print_var info) fmt vsl
+
+let print_typed_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
 let collect_model_ls info ls =
@@ -408,12 +412,12 @@ and print_fmla info fmt f =
       if tl = [] then
         fprintf fmt "@[(%s@ (%a)@ %a)@]"
           q
-          (print_var_list info) vl
+          (print_typed_var_list info) vl
           (print_fmla info) f
       else
         fprintf fmt "@[(%s@ (%a)@ (! %a %a))@]"
           q
-          (print_var_list info) vl
+          (print_typed_var_list info) vl
           (print_fmla info) f
           (print_triggers info) tl;
       List.iter (forget_var info) vl
@@ -547,19 +551,31 @@ let print_param_decl info fmt ls =
                  (print_list space (print_type info)) ls.ls_args
                  (print_type_value info) ls.ls_value)) tvs
 
+let rec has_quantification f =
+  match f.t_node with
+  | Tquant _ | Teps _ -> true
+  | _ -> Term.t_any has_quantification f
+
 let print_logic_decl info fmt (ls,def) =
-  if Mid.mem ls.ls_name info.info_syn then () else begin
+  if not (Mid.mem ls.ls_name info.info_syn) then begin
     collect_model_ls info ls;
     let vsl,expr = Decl.open_ls_defn def in
-    let tvs = Term.ls_ty_freevars ls in
-    fprintf fmt "@[<hov 2>(define-fun %a %a)@]@\n@\n"
-      (print_ident info) ls.ls_name
-      (print_par info
-         (fun fmt -> Format.fprintf fmt "(%a) %a %a"
-             (print_var_list info) vsl
-             (print_type_value info) ls.ls_value
-             (print_expr info) expr)) tvs;
-    List.iter (forget_var info) vsl
+    if info.info_incremental && has_quantification expr then begin
+      fprintf fmt "@[<hov2>(declare-fun %a (%a) %a)@]@\n@\n"
+        (print_ident info) ls.ls_name
+        (print_list space (print_type info)) (List.map (fun vs -> vs.vs_ty) vsl)
+        (print_type_value info) ls.ls_value;
+      info.incr_list_ldecls <- (ls, vsl, expr) :: info.incr_list_ldecls
+    end else
+      let tvs = Term.ls_ty_freevars ls in
+      fprintf fmt "@[<v2>(define-fun %a %a)@]@\n@\n"
+        (print_ident info) ls.ls_name
+        (print_par info
+           (fun fmt -> Format.fprintf fmt "@[<h>(%a) %a@]@ %a"
+               (print_typed_var_list info) vsl
+               (print_type_value info) ls.ls_value
+               (print_expr info) expr)) tvs;
+      List.iter (forget_var info) vsl
   end
 
 let print_info_model info =
@@ -595,7 +611,7 @@ let print_info_model info =
 
 
 (* TODO factor out print_prop ? *)
-let print_prop info fmt pr f =
+let print_prop info fmt (pr, f) =
   let tvs = Term.t_ty_freevars Ty.Stv.empty f in
   fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
     pr.pr_name.id_string (* FIXME? collisions *)
@@ -610,27 +626,27 @@ let add_check_sat info fmt =
   if info.info_cntexample then
     fprintf fmt "@[(get-model)@]@\n"
 
-let rec property_on_incremental2 _ f =
-  match f.t_node with
-  | Tquant _ -> true
-  | Teps _ -> true
-  | _ -> Term.t_fold property_on_incremental2 false f
-
-let property_on_incremental2 f =
-  property_on_incremental2 false f
+let print_ldecl_axiom info fmt (ls, vls, t) =
+  fprintf fmt
+    "@[<hv2>(assert@ @[<hv2>(forall @[(%a)@]@ @[<hv2>(= (%a %a) %a)@])@])@]@\n@\n"
+    (print_typed_var_list info) vls
+    (print_ident info) ls.ls_name
+    (print_var_list info) vls
+    (print_expr info) t
 
 (* TODO if the property doesnt begin with quantifier, then we print it first.
    Else, we print it afterwards. *)
 let print_incremental_axiom info fmt =
-  List.iter (fun (pr, f) -> print_prop info fmt pr f) info.incr_list;
+  List.iter (print_prop info fmt) info.incr_list_axioms;
+  List.iter (print_ldecl_axiom info fmt) info.incr_list_ldecls;
   add_check_sat info fmt
 
 let print_prop_decl vc_loc vc_attrs args info fmt k pr f = match k with
   | Paxiom ->
-      if info.info_incremental && property_on_incremental2 f then
-        info.incr_list <- (pr, f) :: info.incr_list
+      if info.info_incremental && has_quantification f then
+        info.incr_list_axioms <- (pr, f) :: info.incr_list_axioms
       else
-        print_prop info fmt pr f
+        print_prop info fmt (pr, f)
   | Pgoal ->
       let tvs = Term.t_ty_freevars Ty.Stv.empty f in
       if not (Ty.Stv.is_empty tvs) then unsupported "smt: monomorphise goal must be applied";
@@ -815,7 +831,8 @@ let print_task version args ?old:_ fmt task =
     *)
     info_set_incremental = not need_push && incremental;
     info_supports_reason_unknown = supports_reason_unknown;
-    incr_list = [];
+    incr_list_axioms = [];
+    incr_list_ldecls = [];
     }
   in
   print_prelude fmt args.prelude;
