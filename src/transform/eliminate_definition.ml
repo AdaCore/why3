@@ -191,15 +191,16 @@ let () =
           (true when the meta get_counexeamp is there)
 *)
 
+let eliminate_const_definition =
+  eliminate_definition_gen (fun ls -> ls.ls_args = [])
+
 let eliminate_definition_conditionally =
   Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
     (function
-    | [] -> eliminate_definition
-    | _ ->
-       Trans.on_meta Inlining.meta_get_counterexmp
-         (function
+      | [] -> eliminate_definition
+      | _ -> Trans.on_meta Inlining.meta_get_counterexmp (function
           | [] -> eliminate_recursion
-          | _ -> eliminate_definition))
+          | _ -> Trans.compose eliminate_recursion eliminate_const_definition))
 
 let () =
   Trans.register_transform "eliminate_definition_conditionally"
