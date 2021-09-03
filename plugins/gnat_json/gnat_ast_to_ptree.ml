@@ -1031,7 +1031,7 @@ let mk_function_decl (node: function_decl_id) =
                    T.(let left = mk_var (Qident result_ident) in
                       let op = mk_ident [] (Ident.op_infix "=") in
                       let right =
-                        let p = mk_var (Qident ident) in
+                        let p = mk_var (Qident {ident with id_ats= []}) in
                         let args = List.map arg_for_param params in
                         List.fold_left (mk_apply ?loc:None) p args in
                       mk_infix left op right)] in
@@ -1102,7 +1102,7 @@ let mk_function_decl (node: function_decl_id) =
                     ensures
                       T.(let left = mk_term (Tident (Qident result_ident)) in
                          let right =
-                           let p = mk_var (Qident ident) in
+                           let p = mk_var (Qident {ident with id_ats= []}) in
                            let args = List.map2 mk_arg_of_param r.binders params in
                            List.fold_left (mk_apply ?loc:None) p args in
                          mk_binop left `Iff right)
