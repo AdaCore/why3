@@ -328,3 +328,14 @@ let () =
   in
   Trans.register_transform_l "split_goal_wp_conj" trans
     ~desc:"split goal followed by conjunction split"
+
+let () =
+  let trans =
+    Trans.compose_l
+      Introduction.split_vc
+      (Trans.compose_l
+        (Trans.singleton unfold_trans)
+          split_conj)
+  in
+  Trans.register_transform_l "split_vc_conj" trans
+    ~desc:"split vc followed by conjunction split"

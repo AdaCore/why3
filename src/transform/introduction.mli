@@ -36,6 +36,8 @@ val introduce_premises : Task.task Trans.trans
 
 val simplify_intros: Task.task Trans.trans
 
+val split_vc: Task.task Trans.tlist
+
 val push_attributes_with_prefix : string -> unit
 (** [intros] preserves attributes with given prefixes (initially ["expl:"] and
     ["hyp_name:"]) by pushing them through variables bindings. Custom attributes
