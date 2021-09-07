@@ -6,13 +6,13 @@
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for parameter `x`)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
 <check-ce>Check model 1 ("bench/check-ce/tuple.mlw", line 5, characters 38-43)
 <check-ce>Checking model:
@@ -21,32 +21,36 @@
               a = {"type": "Integer", "val": "0"}
               b = {"type": "Integer", "val": "2"}
               result = {"type": "Integer", "val": "1"}
+            Line 6:
+              result = {"type": "Integer", "val": "1"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<check-ce>Result of checking model 1: UNKNOWN
-            - Concrete RAC UNKNOWN (terminated because missing value for parameter `x`)
+<check-ce>Result of checking model 1: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
-            - Abstract RAC UNKNOWN (terminated because missing value for parameter `x`)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
               
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for parameter `x`
-  - Abstract RAC UNKNOWN, terminated because missing value for parameter `x`
-- Selected model 1: UNKNOWN
-  - Concrete RAC UNKNOWN, terminated because missing value for parameter `x`
-  - Abstract RAC UNKNOWN, terminated because missing value for parameter `x`
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for parameter `x`)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for parameter `x`)
 File "bench/check-ce/tuple.mlw", line 5, characters 38-43:
 Sub-goal Postcondition of goal swap'vc.
-Prover result is: Step limit exceeded (0.30s).
+Prover result is: Step limit exceeded (2.38s).
 The following counterexample model could not be verified
-  (concrete RAC terminated because missing value for parameter `x`):
+  (both RAC terminated because missing value for parameter `x`):
 File tuple.mlw:
   Line 5:
     a = 0
     b = 2
+    result = 1
+  Line 6:
     result = 1
 

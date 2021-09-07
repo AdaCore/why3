@@ -74,7 +74,7 @@ let same_line_locs loc1 ls =
   in
   is_same ||
   Sattr.exists (fun x ->
-      let loc = extract_written_loc x in
+      let loc = get_written_loc x in
       same_line_loc loc loc1) ls.id_attrs
 
 let add_model_trace_attr name attrs =

@@ -19,7 +19,7 @@ Instructions to build TryWhy3
             git clone git://github.com/OCamlPro/alt-ergo.git
             cd alt-ergo
             opam exec make js-worker
-            mv alt-ergo-worker.js ..
+            cp alt-ergo-worker.js ..
 
       - alternatively, recover `alt-ergo-worker.js` from a GitHub workflow
         at https://github.com/OCamlPro/alt-ergo/actions/workflows/build_js.yml

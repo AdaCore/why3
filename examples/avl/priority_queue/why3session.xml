@@ -2,12 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="priority_queue.mlw"/>
 <theory name="PQueue" proved="true">
+ <goal name="balancing&#39;vc" expl="VC for balancing" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
  <goal name="M.assoc_m&#39;vc" expl="VC for assoc_m" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="assoc_m&#39;vc.0" expl="assertion" proved="true">
@@ -98,13 +102,13 @@
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="monoid_sum_is_min&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="19"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="monoid_sum_is_min&#39;vc.2" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="monoid_sum_is_min&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="41"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="43"/></proof>
   </goal>
   <goal name="monoid_sum_is_min&#39;vc.4" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -112,7 +116,7 @@
    <proof prover="1"><result status="valid" time="0.09" steps="27405"/></proof>
    </goal>
    <goal name="monoid_sum_is_min&#39;vc.4.1" expl="VC for monoid_sum_is_min" proved="true">
-   <proof prover="1"><result status="valid" time="1.69" steps="173173"/></proof>
+   <proof prover="1"><result status="valid" time="2.08" steps="173173"/></proof>
    </goal>
    <goal name="monoid_sum_is_min&#39;vc.4.2" expl="VC for monoid_sum_is_min" proved="true">
    <proof prover="1"><result status="valid" time="0.10" steps="29055"/></proof>
@@ -132,10 +136,10 @@
    <proof prover="4"><result status="valid" time="0.64" steps="1705"/></proof>
    </goal>
    <goal name="selected_is_min&#39;vc.1.1" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="1.74" steps="174552"/></proof>
+   <proof prover="1"><result status="valid" time="0.84" steps="132427"/></proof>
    </goal>
    <goal name="selected_is_min&#39;vc.1.2" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.27" steps="58618"/></proof>
+   <proof prover="1"><result status="valid" time="0.27" steps="58807"/></proof>
    </goal>
    <goal name="selected_is_min&#39;vc.1.3" expl="assertion" proved="true">
    <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
@@ -344,11 +348,11 @@
  <goal name="Sel.M.neutral" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
- <goal name="Sel.M.zero&#39;vc" expl="VC for zero" proved="true">
+ <goal name="Sel.M.zero&#39;refn&#39;vc" expl="VC for zero&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="Sel.M.op&#39;vc" expl="VC for op" proved="true">
- <proof prover="4"><result status="valid" time="0.02" steps="4"/></proof>
+ <goal name="Sel.M.op&#39;refn&#39;vc" expl="VC for op&#39;refn" proved="true">
+ <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="Sel.M.agg_empty" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
@@ -359,14 +363,17 @@
  <goal name="Sel.M.agg_cat" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="5"/></proof>
  </goal>
- <goal name="Sel.balancing&#39;vc" expl="VC for balancing" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
+ <goal name="Sel.balancing&#39;refn&#39;vc" expl="VC for balancing&#39;refn" proved="true">
+ <proof prover="4"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
  <goal name="Sel.selection_empty" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
- <goal name="Sel.selected_part&#39;vc" expl="VC for selected_part" proved="true">
+ <goal name="Sel.selected_part&#39;refn&#39;vc" expl="VC for selected_part&#39;refn" proved="true">
  <proof prover="4"><result status="valid" time="0.04" steps="257"/></proof>
+ </goal>
+ <goal name="to_bag&#39;vc" expl="VC for to_bag" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
  <goal name="to_bag_mem&#39;vc" expl="VC for to_bag_mem" proved="true">
  <transf name="split_goal_right" proved="true" >

@@ -15,6 +15,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 
+Require Import Lia.
 Require Import int.EuclideanDivision.
 
 (* Why3 goal *)
@@ -28,6 +29,6 @@ exists (div x 2).
 refine (_ (Mod_bound x 2 _) (Div_mod x 2 _)) ; try easy.
 intros H1 H2.
 simpl in H1.
-omega.
+lia.
 Qed.
 

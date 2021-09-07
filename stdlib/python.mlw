@@ -2,49 +2,59 @@ module Python
 
   use int.Int
   use ref.Ref
-  use array.Array
+  use seq.Seq
+  use int.EuclideanDivision as E
 
-  (* Python's lists are actually resizable arrays, but we simplify here *)
-  type list 'a = Array.array 'a
+  type list 'a = private {
+    mutable elts: seq 'a;
+    mutable len: int;
+  } invariant { len = length elts }
 
-  function ([]) (l: list 'a) (i: int) : 'a =
-    Array.([]) l i
+  meta coercion function elts
 
-  function ([<-]) (l: list 'a) (i: int) (v: 'a) : list 'a =
-    Array.([<-]) l i v
+  function ([]) (l: list 'a) (i: int) : 'a
+  = [@inline:trivial]
+    if i >= 0 then Seq.(l[i]) else Seq.(l[l.len + i])
 
-  let function len (l: list 'a) : int
-  = Array.length l
+  val ghost function create (s: seq 'a) : list 'a
+    ensures { result = s }
+    ensures { len result = length s }
+
+  function ([<-]) (l: list 'a) (i: int) (v: 'a) : list 'a
+  = [@inline:trivial]
+    create (if i >= 0 then Seq.(l.elts[i <- v]) else Seq.(l.elts[l.len + i <- v]))
 
   let ([]) (l: list 'a) (i: int) : 'a
-    requires { [@expl:index in array bounds] 0 <= i < Array.length l }
+    requires { [@expl:index in array bounds] -len l <= i < len l }
     ensures  { result = l[i] }
-  = Array.([]) l i
+  = if i >= 0 then Seq.(l.elts[i]) else Seq.(l.elts[len l + i])
 
-  let ([]<-) (l: list 'a) (i: int) (v: 'a) : unit
-    requires { [@expl:index in array bounds] 0 <= i < Array.length l }
-    writes   { l }
-    ensures  { l = Array.([<-]) (old l) i v }
-  = Array.([]<-) l i v
+  val ([]<-) (l: list 'a) (i: int) (v: 'a) : unit
+    requires { [@expl:index in array bounds] -len l <= i < len l }
+    writes   { l.elts }
+    ensures  { l.elts = (old l)[i <- v].elts }
 
-  val range (l u: int) : list int
-    requires { [@expl:valid range] l <= u }
-    ensures  { Array.length result = u - l }
-    ensures  { forall i. l <= i < u -> result[i] = i }
+  val empty () : list 'a
+    ensures { result = Seq.empty }
+
+  val make (n: int) (v: 'a) : list 'a
+    requires { n >= 0 }
+    ensures  { len result = n }
+    ensures  { forall i. -n <= i < n -> result[i] = v }
+
 
   (* ad-hoc facts about exchange *)
 
-  use map.Occ
+  use seq.Occ
 
-  function occurrence (v: 'a) (l: list 'a) : int =
-    Occ.occ v l.Array.elts 0 l.Array.length
-
-  (* Python's division and modulus according are neither Euclidean division,
-     nor computer division, but something else defined in
-     https://docs.python.org/3/reference/expressions.html *)
+  function occurrence (v: 'a) (l: list 'a) (lo hi: int): int =
+    Occ.occ v l lo hi
 
   use int.Abs
-  use int.EuclideanDivision as E
+
+  (* Python's division and modulus according are neither Euclidean division,
+   nor computer division, but something else defined in
+   https://docs.python.org/3/reference/expressions.html *)
 
   function (//) (x y: int) : int =
     let q = E.div x y in
@@ -78,8 +88,77 @@ module Python
   val int (n: int) : int
     ensures { result = n }
 
-  exception Break
+  (* ajouts réalisés *)
 
-  exception Return int
+  val range (lo hi: int) : list int
+    requires { [@expl:valid range] lo <= hi }
+    ensures  { len result = hi - lo }
+    ensures  { forall i. 0 <= i < hi - lo -> result[i] = i + lo }
+
+  let range3 (le ri step: int) : list int
+    requires { [@expl:valid range] (le <= ri /\ step > 0) \/ (ri <= le /\ step < 0) }
+    ensures  { len result = E.div (ri - le) step + if E.mod (ri - le) step <> 0 then 1 else 0 }
+    ensures  { forall i. 0 <= i < len result -> result[i] = le + i * step }
+  = let n = E.div (ri - le) step + if E.mod (ri - le) step <> 0 then 1 else 0 in
+    let a = make n 0 in
+    for i=0 to n-1 do
+      invariant { forall j. 0 <= j < i -> a[j] = le + j * step }
+      a[i] <- le + i * step;
+    done;
+    assert { step > 0 -> le +  n    * step >= ri
+          /\ step > 0 -> le + (n-1) * step <  ri
+          /\ step < 0 -> le +  n    * step <= ri
+          /\ step < 0 -> le + (n-1) * step >  ri };
+    return a
+
+  val pop (l: list 'a) : 'a
+    requires { len l > 0 }
+    writes   { l }
+    ensures  { len l = len (old l) - 1 }
+    ensures  { result = (old l)[len l] }
+    ensures  { forall i. 0 <= i < len l -> l[i] = (old l)[i] }
+
+  val append (l: list 'a) (v: 'a) : unit
+    writes   { l }
+    ensures  { len l = len (old l) + 1 }
+    ensures  { l[len (old l)] = v }
+    ensures  { forall i. 0 <= i < len (old l) -> l[i] = (old l)[i] }
+
+  function transform_idx (l: list 'a) (i: int): int
+  = [@inline:trivial]
+    if i < 0 then len l + i else i
+
+  val slice (l: list 'a) (lo hi: int) : list 'a
+    requires { transform_idx l lo >= 0 }
+    requires { transform_idx l hi <= len l }
+    requires { transform_idx l lo <= transform_idx l hi }
+    ensures  { len result = transform_idx l hi - transform_idx l lo }
+    ensures  { forall i. 0 <= i < len result -> result[i] = l[transform_idx l lo + i] }
+
+  val clear (l : list 'a) : unit
+    writes  { l }
+    ensures { len l = 0 }
+
+  val copy (l: list 'a): list 'a
+    ensures { len result = len l }
+    ensures { result.elts = l.elts }
+
+  use seq.Permut
+
+  predicate is_permutation (l1 l2: list 'a)
+  = ([@expl:equality of length] length l1 = length l2)
+      /\ ([@expl:equality of elements] permut l1 l2 0 (length l2))
+
+  val sort (l : list int) : unit
+    writes  { l.elts }
+    ensures { is_permutation l (old l) }
+    ensures { forall i, j. 0 <= i <= j < len(l) -> l[i] <= l[j] }
+
+  val reverse (l: list 'a) : unit
+    writes  { l.elts }
+    ensures { len l = len (old l) }
+    ensures { forall i. 0 <= i < len l -> l[i] = (old l)[-(i+1)] }
+    ensures { forall i. 0 <= i < len l -> (old l)[i] = l[-(i+1)] }
+    ensures { is_permutation l (old l) }
 
 end

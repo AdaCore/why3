@@ -193,10 +193,20 @@ val create_written_attr: Loc.position -> attribute
     file_name is at the end for easier parsing (file_name can contain ":")
 *)
 
-val extract_written_loc: attribute -> Loc.position option
-(** Extract the location inside vc_written attribute. [None] if the attribute is
-    ill-formed.
-*)
+val get_written_loc: attribute -> Loc.position option
+(** Get the location inside vc_written attribute. [None] if the attribute is
+    ill-formed. *)
+
+val create_call_result_attr : Loc.position -> attribute
+(** A call result attribute on a counterexample model element marks the result
+    of a call at the given location *)
+
+val get_call_result_loc : attribute -> Loc.position option
+(** Get the call result location from an attribute. *)
+
+val search_attribute_value : (attribute -> 'a option) -> Sattr.t -> 'a option
+(** [search_attribute_value f attrs] applies f to the attributes in [attr] and
+    returns the first inhabitad result, if any, or [None] otherwise. *)
 
 val remove_model_attrs : attrs:Sattr.t -> Sattr.t
 (** Remove the counter-example attributes from an attribute set *)
@@ -245,3 +255,6 @@ val get_model_trace_attr : attrs:Sattr.t -> attribute
 val get_hyp_name: attrs:Sattr.t -> string option
 (** If attrs contains an attribute of the form ["hyp_name:<s>"] returns
     [Some <s>] or [None] if no attribute have this form *)
+
+val unused_suffix : string
+(** Suffix for unused variables kept for counterexample generation *)

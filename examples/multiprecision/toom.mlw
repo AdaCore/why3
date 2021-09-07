@@ -1903,7 +1903,8 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
                       = value x (!ou + su) * value y sy };
           value_concat r !or (!ou + sr);
           assert { value r (!ou + sr)
-                      = value r !or + power radix !or * value rpn su };
+                      = value r !or + power radix !or * value rpn su 
+                   by value rpn su = value_sub (pelts r) (offset r + !or) (offset r + !ou + sr) };
           assert { value rpn su + cy < power radix su
                    by value x (!ou + su) < power radix (!ou + su)
                    so value y sy < power radix sy

@@ -30,7 +30,6 @@ let opt_metas = ref []
 let opt_json : [< `All | `Values ] option ref = ref None
 let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
-let opt_rac_try_negate = ref false
 let opt_rac_timelimit = ref None
 let opt_rac_steplimit = ref None
 let opt_ce_check_verbosity = ref None
@@ -177,11 +176,8 @@ let option_list =
      (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     "<prover> use <prover> to check assertions in RAC when term\n\
-     reduction is insufficient, with optional, comma-\n\
-     separated time and memory limit (e.g. 'cvc4,2,1000')";
-    KLong "rac-try-negate", Hnd0 (fun () -> opt_rac_try_negate := true),
-    " try checking the negated term using the RAC prover when\n\
-     the prover is defined and didn't give a result";
+     reduction is insufficient, with optional, space-\n\
+     separated time and memory limit (e.g. 'cvc4 2 1000')";
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
     "<seconds> Time limit in seconds for RAC (with --check-ce)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
@@ -340,11 +336,10 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
           expls goal_name );
     fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
       (Call_provers.print_prover_result ~json:false) res;
-    (match ce with
-     | Some ce ->
-        Counterexample.print_counterexample ?verb_lvl:!opt_ce_check_verbosity
-          ~check_ce:!opt_check_ce_model ?json fmt ce
-     | None -> ());
+    Opt.iter
+      (Check_ce.print_model_classification ?json
+         ?verb_lvl:!opt_ce_check_verbosity ~check_ce:!opt_check_ce_model fmt)
+      ce;
     fprintf fmt "@\n"
 
 let unproved = ref false
@@ -353,32 +348,30 @@ let select_ce env th models =
   if models <> [] then
     match Pmodule.restore_module th with
     | pm ->
-        let reduce_config =
-          Pinterp.rac_reduce_config_lit config env
-            ~trans:"compute_in_goal" ?prover:!opt_rac_prover
-            ~try_negate:!opt_rac_try_negate () in
+        let rac = Pinterp.mk_rac ~ignore_incomplete:false
+            (Rac.Why.mk_check_term_lit config env ?why_prover:!opt_rac_prover ()) in
         let timelimit = Opt.map float_of_int !opt_rac_timelimit in
-        Counterexample.select_model ~reduce_config ?timelimit
-          ?steplimit:!opt_rac_steplimit ~check:!opt_check_ce_model
-          ?verb_lvl:!opt_ce_check_verbosity env pm models
+        Check_ce.select_model
+          ?timelimit ?steplimit:!opt_rac_steplimit ?verb_lvl:!opt_ce_check_verbosity
+          ~check_ce:!opt_check_ce_model rac env pm models
     | exception Not_found -> None
   else None
 
-let print_other_models (m, ce_summary) =
+let print_other_models (m, (c, log)) =
   let print_model fmt m =
     let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
     if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
     else Model_parser.print_model (* json values *) fmt m ~print_attrs in
-  ( match ce_summary with
-    | Counterexample.(NC _ | SW _ | NCSW _ | BAD) ->
+  ( match c with
+    | Check_ce.(NC | SW | NC_SW | BAD_CE _) ->
         if Debug.test_flag debug_print_original_model then
           printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
     | _ -> () );
-  ( match ce_summary with
-    | Counterexample.(NC log | SW log | NCSW log) ->
+  ( match c with
+    | Check_ce.(NC | SW | NC_SW) ->
         if Debug.test_flag debug_print_derived_model then
           printf "@[<v>Derived model:@\n%a@]@\n@." print_model
-            (Counterexample.model_of_exec_log ~original_model:m log)
+            (Check_ce.model_of_exec_log ~original_model:m log)
     | _ -> () )
 
 let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =

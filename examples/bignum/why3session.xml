@@ -4,11 +4,15 @@
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bignum.mlw"/>
 <theory name="BigNum" proved="true">
+ <goal name="base&#39;vc" expl="VC for base" proved="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
  <goal name="nonneg&#39;vc" expl="VC for nonneg" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="nonneg&#39;vc.0" expl="variant decrease" proved="true">
@@ -50,7 +54,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="add_digit&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="82"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="83"/></proof>
   </goal>
  </transf>
  </goal>

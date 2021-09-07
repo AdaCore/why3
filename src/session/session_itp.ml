@@ -1285,7 +1285,22 @@ let get_version (xml: Xml.t) =
 
 module ReadShapes (C:Compress.S) = struct
 
-let shape = Buffer.create 97
+let input_line =
+  let shape = Buffer.create 97 in
+  fun ch ->
+  Buffer.clear shape;
+  try
+    while true do
+      let c = C.input_char ch in
+      if c = '\n' then raise Exit;
+      Buffer.add_char shape c
+    done;
+    assert false
+  with
+  | End_of_file ->
+     raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
+  | Exit -> Buffer.contents shape
+
 
 let read_sum_and_shape ch =
   let sum = Bytes.create 32 in
@@ -1304,38 +1319,19 @@ let read_sum_and_shape ch =
   end;
   if try C.input_char ch <> ' ' with End_of_file -> true then
     raise (ShapesFileError "shapes files corrupted (space missing), ignored");
-  Buffer.clear shape;
-  try
-    while true do
-      let c = C.input_char ch in
-      if c = '\n' then raise Exit;
-      Buffer.add_char shape c
-    done;
-    assert false
-  with
-  | End_of_file ->
-     raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
-  | Exit -> Bytes.unsafe_to_string sum, Buffer.contents shape
+  let shape = input_line ch in
+  Bytes.unsafe_to_string sum, shape
 
 (* Read the first part of the shapes: a list of shapes which are then referred
    as H1 ... Hn in the shape corresponding to tasks *)
 let rec read_global_buffer gs ch =
-  Buffer.clear shape;
-  try
-    while true do
-      let c = C.input_char ch in
-      if c = '\n' then raise Exit;
-      Buffer.add_char shape c
-    done;
-    assert false
-  with
-  | End_of_file ->
-      raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
-  | Exit ->
-      let g_shape = Buffer.contents shape in
-      Buffer.clear shape;
-      if g_shape <> "" then
-        (Termcode.Gshape.add_shape_g gs g_shape; read_global_buffer gs ch)
+  let g_shape = input_line ch in
+  if g_shape <> "" then
+    begin
+      if not (Strings.has_prefix "(*" g_shape) then
+        Termcode.Gshape.add_shape_g gs g_shape;
+      read_global_buffer gs ch
+    end
 
   let sum_shape_version = ref None
 
@@ -2175,6 +2171,11 @@ let save fname shfname session =
     begin
       (* In version SV6 or higher, first save the list of variables that are
          referenced in shapes. *)
+      let s =
+        Format.asprintf
+          "(* shapes version: %a *)\n"
+          Termcode.pp_sum_shape_version session.shapes.shape_version in
+      Compress.Compress_z.output_string chsh s;
       Termcode.Gshape.write_shape_to_file session.shapes.session_global_shapes chsh;
       Compress.Compress_z.output_string chsh "\n";
     end;

@@ -36,10 +36,9 @@ let opt_parser = ref None
 let opt_metas = ref []
 let opt_enable_rac = ref false
 let opt_rac_prover = ref None
-let opt_rac_try_negate = ref false
 let opt_rac_timelimit = ref None
 let opt_rac_steplimit = ref None
-let opt_rac_fail_cannot_check = ref false
+let opt_rac_ignore_incomplete = ref true
 
 let use_modules = ref []
 
@@ -68,17 +67,14 @@ let option_list =
     " enable runtime assertion checking (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     "<prover> use <prover> to check assertions in RAC when term\n\
-     reduction is insufficient, with optional, comma-\n\
-     separated time and memory limit (e.g. 'cvc4,2,1000')";
-    KLong "rac-try-negate", Hnd0 (fun () -> opt_rac_try_negate := true),
-    " try checking the negated term using the RAC prover when\n\
-     the prover is defined and didn't give a result";
+     reduction is insufficient, with optional, space-\n\
+     separated time and memory limit (e.g. 'cvc4 2 1000')";
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
     "<seconds> Time limit in seconds for RAC (with --rac)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
     "<seconds> Step limit for RAC (with --rac)";
-    KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_fail_cannot_check := true),
-    " Fail when a assertion cannot be checked";
+    KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_ignore_incomplete := false),
+    " Fail RAC as incomplete when a assertion cannot be checked";
     KLong "use", Hnd1 (AString, fun m -> use_modules := m :: !use_modules),
     "<qualified_module> use module in the execution";
   ]
@@ -127,34 +123,32 @@ let do_input f =
   let pmod = Pmodule.close_module muc in
 
   (* execute expression *)
-  let open Pinterp in
-  Opt.iter init_real !prec;
+  Opt.iter Pinterp.init_real !prec;
   try
-    let rac =
-      let reduce =
-        let trans = "compute_in_goal" and prover = !opt_rac_prover
-        and try_negate = !opt_rac_try_negate and metas = !opt_metas in
-        rac_reduce_config_lit config env ~metas ~trans ?prover ~try_negate () in
-      let skip_cannot_compute = not !opt_rac_fail_cannot_check in
-      let timelimit = Opt.map float_of_int !opt_rac_timelimit in
-      rac_config ~do_rac:!opt_enable_rac ~abstract:false ~skip_cannot_compute
-        ?timelimit ?steplimit:!opt_rac_steplimit ~reduce () in
-    let res = eval_global_fundef rac env pmod [] None expr in
-    printf "%a@." (report_eval_result expr) res;
+    let compute_term = Rac.Why.mk_compute_term_lit env () in
+    let why_prover = !opt_rac_prover and metas = !opt_metas in
+    let rac = Pinterp.mk_rac ~ignore_incomplete:!opt_rac_ignore_incomplete
+        (Rac.Why.mk_check_term_lit config env ~metas ?why_prover ()) in
+    let env = Pinterp.mk_empty_env env pmod in
+    let ctx = Pinterp.mk_ctx env ~do_rac:!opt_enable_rac ~rac ~giant_steps:false
+        ~compute_term ?steplimit:!opt_rac_steplimit
+        ?timelimit:(Opt.map float_of_int !opt_rac_timelimit) () in
+    let res = Pinterp.exec_global_fundef ctx [] None expr in
+    printf "%a@." (Pinterp.report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
   with
-  | Contr (ctx, term) ->
+  | Pinterp_core.Fail (ctx, term) ->
       Pretty.forget_all ();
-      eprintf "%a@." report_cntr (ctx, term);
+      eprintf "%a@." Pinterp.report_cntr (ctx, term);
       exit 1
-  | CannotCompute reason ->
-      eprintf "Execution terminated because %s@." reason.reason;
-      exit 2
-  | RACStuck (_, l, reason) ->
+  | Pinterp_core.Stuck (_, l, reason) ->
       (* TODO Remove this case when value origins (default vs model) can be distinguished
          in RAC *)
       eprintf "RAC got stuck %s after %a@." reason
         (Pp.print_option_or_default "unknown location" Pretty.print_loc') l;
+      exit 2
+  | Pinterp_core.Incomplete reason ->
+      eprintf "Execution terminated because %s@." reason;
       exit 2
 
 let () =

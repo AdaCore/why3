@@ -18,6 +18,8 @@ File records_inv.mlw:
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 16:
     result [@introduced] = {"type": "Integer", "val": "0"}
+  Line 18:
+    result [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records_inv.mlw", line 16, characters 14-24:
 Sub-goal Postcondition of goal record_match_eval_test1'vc.
@@ -43,12 +45,29 @@ File records_inv.mlw:
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 26:
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
 
 File "bench/ce/records_inv.mlw", line 31, characters 9-25:
 Sub-goal Precondition of goal record_match_eval_test3'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 File records_inv.mlw:
   Line 28:
     x [@field:0:contents] [@introduced] =
@@ -64,7 +83,12 @@ File records_inv.mlw:
                    "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 31:
-    the check fails with all inputs
+    q  [@introduced] [@model_trace:q ] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/records_inv.mlw", line 29, characters 14-18:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
@@ -75,6 +99,20 @@ Sub-goal Precondition of goal record_match_eval_test4'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 File records_inv.mlw:
   Line 33:
     x [@field:0:contents] [@introduced] =
@@ -90,7 +128,12 @@ File records_inv.mlw:
                    "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 36:
-    the check fails with all inputs
+    q  [@introduced] [@model_trace:q ] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/records_inv.mlw", line 34, characters 14-22:
 Sub-goal Postcondition of goal record_match_eval_test4'vc.
@@ -101,6 +144,20 @@ Sub-goal Precondition of goal record_match_eval_test44'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 File records_inv.mlw:
   Line 39:
     x [@field:0:contents] [@introduced] =
@@ -116,7 +173,12 @@ File records_inv.mlw:
                    "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 42:
-    the check fails with all inputs
+    q  [@introduced] [@model_trace:q ] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/records_inv.mlw", line 43, characters 13-22:
 Sub-goal Assertion of goal record_match_eval_test44'vc.
@@ -131,6 +193,20 @@ Sub-goal Precondition of goal test_record_match_eval_test5'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    x [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents",
+            "value":
+             {"type": "Record",
+              "val":
+               {"Field":
+                 [{"field": ".my_field_f",
+                   "value": {"type": "Integer", "val": "0"}},
+                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 File records_inv.mlw:
   Line 46:
     re [@field:0:contents] [@introduced] =
@@ -159,7 +235,12 @@ File records_inv.mlw:
                    "value": {"type": "Integer", "val": "0"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
   Line 51:
-    the check fails with all inputs
+    q  [@introduced] [@model_trace:q ] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/records_inv.mlw", line 49, characters 14-26:
 Sub-goal Postcondition of goal test_record_match_eval_test5'vc.
@@ -179,6 +260,8 @@ File records_inv.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": true}}]}}
   Line 66:
+    result [@introduced] = {"type": "Integer", "val": "0"}
+  Line 68:
     result [@introduced] = {"type": "Integer", "val": "0"}
 
 File "bench/ce/records_inv.mlw", line 66, characters 14-24:
@@ -205,6 +288,9 @@ File records_inv.mlw:
         {"Field":
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
+  Line 76:
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
 
 File "bench/ce/records_inv.mlw", line 79, characters 14-17:
 Sub-goal Postcondition of goal record_match_eval_test3'vc.
@@ -255,6 +341,12 @@ File records_inv.mlw:
           [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 86:
+    result [@introduced] [@model_trace:result] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": ".my_field_f", "value": {"type": "Integer", "val": "6"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@introduced] =
       {"type": "Record",
        "val":

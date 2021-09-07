@@ -175,6 +175,16 @@ File map.mlw:
                 {"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
+  Line 21:
+    x0 [@introduced] =
+      {"type": "Array", "val": [{"others": {"type": "Integer", "val": "1"}}]}
+  Line 22:
+    x0 [@introduced] [@model_trace:x0] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Integer", "val": "0"},
+          "value": {"type": "Integer", "val": "3"}},
+         {"others": {"type": "Integer", "val": "1"}}]}
   Line 23:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",

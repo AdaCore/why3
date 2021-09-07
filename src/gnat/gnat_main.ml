@@ -166,11 +166,12 @@ let report_messages c obj =
       let model =
         match Opt.map (Session_itp.get_proof_attempt_node s) unproved_pa with
         | Some ({ Session_itp.proof_state = Some pr }) ->
-            Counterexample.select_model_last_non_empty
+            Check_ce.select_model_last_non_empty
               (List.filter (fun (pa,_) -> pa <> Call_provers.StepLimitExceeded)
                  pr.Call_provers.pr_models)
         | _ -> None
       in
+      let model = Opt.map Gnat_counterexamples.post_clean#model model in
       let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
       let extra_info =
         match unproved_goal with
@@ -235,7 +236,7 @@ let save_session_and_exit c signum =
 let _ =
   if Gnat_config.debug then Debug.(set_flag (lookup_flag "gnat_ast"));
   Debug.set_flag Model_parser.debug_force_binary_floats;
-  Model_parser.customize_clean (new Gnat_counterexamples.clean);
+  Model_parser.customize_clean Gnat_counterexamples.clean;
   ( try
       let log = Sys.getenv "GNATWHY3LOG" in
       let out = open_out_gen [Open_text; Open_creat; Open_append] 0o666 log in

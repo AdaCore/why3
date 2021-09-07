@@ -20,11 +20,13 @@ theory Test
   
   (* meta model_projection function a'int *)
   
-  goal f2'vc : false
+  goal f2'vc : let result'unused'unused = True in false
   
-  goal f3'vc : forall b:a. a'int b = 42
+  goal f3'vc : forall b:a. let _result'unused'unused = b in a'int b = 42
   
-  goal f1'vc : forall b:a. a'int b = 42 -> 42 = a'int b
+  goal f1'vc :
+    forall b:a.
+     a'int b = 42 -> (let result'unused'unused = (42:a) in 42 = a'int b)
 end
 
 theory Test1
@@ -284,7 +286,7 @@ Task 1: theory Task
           
           (* meta model_projection function a'int1 *)
           
-          goal f2'vc : false
+          goal f2'vc : let result'unused'unused = True in false
 end
 
 Task 2: theory Task
@@ -518,7 +520,8 @@ Task 2: theory Task
           
           (* meta model_projection function a'int1 *)
           
-          goal f3'vc : forall b:a1. a'int1 b = 42
+          goal f3'vc :
+            forall b:a1. let _result'unused'unused = b in a'int1 b = 42
 end
 
 Task 3: theory Task
@@ -752,6 +755,9 @@ Task 3: theory Task
           
           (* meta model_projection function a'int1 *)
           
-          goal f1'vc : forall b:a1. a'int1 b = 42 -> 42 = a'int1 b
+          goal f1'vc :
+            forall b:a1.
+             a'int1 b = 42 ->
+             (let result'unused'unused = (42:a1) in 42 = a'int1 b)
 end
 

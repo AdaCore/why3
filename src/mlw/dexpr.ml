@@ -1332,8 +1332,6 @@ let get_xs env = function
   | DElexn (n,_) -> Mstr.find_exn (UnboundExn n) n env.xsm
   | DEgexn xs -> xs
 
-let proxy_attrs = Sattr.singleton proxy_attr
-
 type header =
   | LS of let_defn
   | LX of xsymbol
@@ -1399,6 +1397,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       when Sattr.is_empty e.e_attrs ->
         proxy_args ghost ldl (v::vl) plp
     | EA (gh, e) :: plp ->
+        (* Format.eprintf "[Dexpr.mk_proxy_args] e = %a@." print_expr e; *)
         let ld, v  = mk_proxy_decl ~ghost:(ghost || gh) e in
         proxy_args ghost (LS ld :: ldl) (v::vl) plp
     | HD hd :: plp ->
@@ -1410,13 +1409,20 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     let argl = List.map ity_of_dity (drop vl argl) in
     env.cgh, ldl, app s vl argl (ity_of_dity res) in
   let c_app s lpl =
+    (* Format.eprintf "[Dexpr.c_app] s = %a@." print_rs s; *)
     let al = List.map (fun v -> v.pv_ghost) s.rs_cty.cty_args in
     let rec full_app al lpl = match al, lpl with
       | _::al, DA _::lpl -> full_app al lpl
       | al, LD _::lpl -> full_app al lpl
       | [], [] -> true | _ -> false in
     let tpl = is_rs_tuple s && full_app al lpl in
-    apply c_app tpl (env.ghs || env.lgh || rs_ghost s) s al lpl in
+    (*let (ghost,ldl,e) = *)
+    apply c_app tpl (env.ghs || env.lgh || rs_ghost s) s al lpl
+      (* in *)
+    (* Format.eprintf "[Dexpr.c_app] e = %a@." (print_cexp true 0) e; *)
+    (*let ld, v = mk_proxy_decl ~ghost e in
+    (ghost,(LS ld)::ldl,v) *)
+  in
   let c_pur ugh s lpl =
     let loc = Opt.get_def de0.de_loc uloc in
     if not (ugh || env.ghs || env.lgh || env.ugh) then Loc.errorm ?loc
@@ -1692,6 +1698,7 @@ and var_defn uloc env (id,gh,kind,de) =
     | RKfunc | RKpred | RKnone ->
         let e = expr uloc {env with ugh = gh} de in
         e_ghostify env.cgh e in
+  (* Format.eprintf "[Dexpr.var_defn] e = %a@." print_expr e; *)
   let ld, v = let_var id ~ghost:(gh || env.ghs) e in
   ld, add_pvsymbol env v
 

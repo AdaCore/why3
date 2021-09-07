@@ -2,15 +2,33 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="avl.mlw"/>
+<theory name="SelectionTypes" proved="true">
+ <goal name="rebuild&#39;vc" expl="VC for rebuild" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
+ <goal name="left_extend&#39;vc" expl="VC for left_extend" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
+ <goal name="right_extend&#39;vc" expl="VC for right_extend" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
+</theory>
 <theory name="AVL" proved="true">
  <goal name="M.M.assoc" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="M.M.neutral" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+ <goal name="balancing&#39;vc" expl="VC for balancing" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+ </goal>
+ <goal name="node_model&#39;vc" expl="VC for node_model" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
  <goal name="real_height_nonnegative&#39;vc" expl="VC for real_height_nonnegative" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="56"/></proof>
@@ -55,60 +73,60 @@
   <proof prover="1"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="balance&#39;vc.1" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="34"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="41"/></proof>
   </goal>
   <goal name="balance&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="133"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="145"/></proof>
   </goal>
   <goal name="balance&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.13" steps="187"/></proof>
-  </goal>
-  <goal name="balance&#39;vc.4" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.07" steps="164"/></proof>
-  </goal>
-  <goal name="balance&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.10" steps="485"/></proof>
-  </goal>
-  <goal name="balance&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.17" steps="484"/></proof>
-  </goal>
-  <goal name="balance&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.38" steps="1442"/></proof>
-  </goal>
-  <goal name="balance&#39;vc.8" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.04" steps="36"/></proof>
-  </goal>
-  <goal name="balance&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.10" steps="166"/></proof>
-  </goal>
-  <goal name="balance&#39;vc.10" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.13" steps="203"/></proof>
   </goal>
+  <goal name="balance&#39;vc.4" expl="unreachable point" proved="true">
+  <proof prover="1"><result status="valid" time="0.07" steps="182"/></proof>
+  </goal>
+  <goal name="balance&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.10" steps="525"/></proof>
+  </goal>
+  <goal name="balance&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.17" steps="512"/></proof>
+  </goal>
+  <goal name="balance&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.38" steps="1522"/></proof>
+  </goal>
+  <goal name="balance&#39;vc.8" expl="unreachable point" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="44"/></proof>
+  </goal>
+  <goal name="balance&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.10" steps="186"/></proof>
+  </goal>
+  <goal name="balance&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.13" steps="223"/></proof>
+  </goal>
   <goal name="balance&#39;vc.11" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.09" steps="155"/></proof>
+  <proof prover="1"><result status="valid" time="0.09" steps="176"/></proof>
   </goal>
   <goal name="balance&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.16" steps="314"/></proof>
+  <proof prover="1"><result status="valid" time="0.16" steps="339"/></proof>
   </goal>
   <goal name="balance&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.18" steps="677"/></proof>
+  <proof prover="1"><result status="valid" time="0.18" steps="733"/></proof>
   </goal>
   <goal name="balance&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.26" steps="901"/></proof>
+  <proof prover="1"><result status="valid" time="0.26" steps="961"/></proof>
   </goal>
   <goal name="balance&#39;vc.15" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="13"/></proof>
   </goal>
   <goal name="balance&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.67" steps="3086"/></proof>
+  <proof prover="1"><result status="valid" time="0.67" steps="3291"/></proof>
   </goal>
   <goal name="balance&#39;vc.17" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="balance&#39;vc.17.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.59" steps="2455"/></proof>
+   <proof prover="1"><result status="valid" time="0.59" steps="2616"/></proof>
    </goal>
    <goal name="balance&#39;vc.17.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.76" steps="3116"/></proof>
+   <proof prover="1"><result status="valid" time="0.76" steps="3310"/></proof>
    </goal>
    <goal name="balance&#39;vc.17.2" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.05" steps="24"/></proof>
@@ -176,25 +194,25 @@
   <proof prover="1"><result status="valid" time="0.07" steps="497"/></proof>
   </goal>
   <goal name="join&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.15" steps="483"/></proof>
+  <proof prover="1"><result status="valid" time="0.15" steps="556"/></proof>
   </goal>
   <goal name="join&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.20" steps="806"/></proof>
+  <proof prover="1"><result status="valid" time="0.20" steps="848"/></proof>
   </goal>
   <goal name="join&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.15" steps="528"/></proof>
+  <proof prover="1"><result status="valid" time="0.15" steps="589"/></proof>
   </goal>
   <goal name="join&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.23" steps="652"/></proof>
+  <proof prover="1"><result status="valid" time="0.23" steps="702"/></proof>
   </goal>
   <goal name="join&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="183"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="201"/></proof>
   </goal>
   <goal name="join&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.08" steps="454"/></proof>
+  <proof prover="1"><result status="valid" time="0.08" steps="478"/></proof>
   </goal>
   <goal name="join&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="1.59" steps="6581"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="2.00" steps="6830"/></proof>
   </goal>
  </transf>
  </goal>

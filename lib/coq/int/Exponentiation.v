@@ -69,7 +69,8 @@ Lemma Power_s_alt :
 Proof.
 intros x n h1.
 rewrite <- Power_s; auto with zarith.
-f_equal; omega.
+apply f_equal.
+ring.
 Qed.
 
 (* Why3 goal *)

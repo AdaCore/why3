@@ -15,6 +15,8 @@ val intro_attr : Ident.attribute
 
 val meta : Theory.meta
 
+val meta_get_counterexmp : Theory.meta
+
 val get_counterexmp : Task.task -> bool
 (**
    Returns true if counterexample should be get for the task.

@@ -1,6 +1,6 @@
 File "bench/check-ce/anonymous6.mlw", line 6, characters 18-27:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Valid (0.02s, 1520 steps).
+Prover result is: Valid (0.01s, 2466 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 <check-ce>Checking model:
@@ -18,16 +18,16 @@ Prover result is: Valid (0.02s, 1520 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15: {contents=
                                                                     0}
 <rac-values>Value from model for variable `z` at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -45,16 +45,16 @@ Prover result is: Valid (0.02s, 1520 steps).
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of anonymous function with args:
+                  Normal execution of anonymous function with args:
                     z = {contents= 0}
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 <check-ce>Checking model:
@@ -67,7 +67,7 @@ Prover result is: Valid (0.02s, 1520 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "3"}}]}}
             Line 7:
-              z_vc_constant =
+              z =
                 {"type": "Record",
                  "val":
                   {"Field":
@@ -77,17 +77,17 @@ Prover result is: Valid (0.02s, 1520 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15 at "bench/check-ce/anonymous6.mlw", line 5, characters 14-15: {contents=
                                                                     0}
 <rac-values>Value from model for variable `z` at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: {contents=
                                                                     3}
-<rac-values>Type default value for variable `result` at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: ()
-<check-ce>Small-step RAC
+<rac-values>Type default value for return value of call at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40 at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40: ()
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <check-ce>Result of checking model 1: SW
-            - Concrete RAC NORMAL (no contradiction during execution)
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -105,16 +105,16 @@ Prover result is: Valid (0.02s, 1520 steps).
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of anonymous function with args:
+                  Normal execution of anonymous function with args:
                     z = {contents= 0}
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC FAILURE (counter-example confirmed)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -132,11 +132,11 @@ Prover result is: Valid (0.02s, 1520 steps).
                     zero = 0
                     one = 1
                 Line 5:
-                  Abstract execution of function `ref` with args:
+                  Giant-step execution of function `ref` with args:
                     contents = 0
-                  result = {contents= 0}
+                  result of `ref` = {contents= 0}
                 Line 6:
-                  Abstract execution of anonymous function with args:
+                  Giant-step execution of anonymous function with args:
                     z = {contents= 0}
                   z = {contents= 3}
                   result = ()
@@ -144,17 +144,17 @@ Prover result is: Valid (0.02s, 1520 steps).
                   Property failure at assertion with:
                     z = {contents= 3}
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40)
 - Selected model 1: SW
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC FAILURE, counter-example confirmed
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous6.mlw", line 7, characters 10-15)
 File "bench/check-ce/anonymous6.mlw", line 7, characters 10-15:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.79s).
-The contracts of some function or loop are underspecified, for example during
-  the following execution:
+Prover result is: Step limit exceeded (1.14s).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
@@ -172,11 +172,11 @@ File anonymous6.mlw:
       zero = 0
       one = 1
   Line 5:
-    Abstract execution of function `ref` with args:
+    Giant-step execution of function `ref` with args:
       contents = 0
-    result = {contents= 0}
+    result of `ref` = {contents= 0}
   Line 6:
-    Abstract execution of anonymous function with args:
+    Giant-step execution of anonymous function with args:
       z = {contents= 0}
     z = {contents= 3}
     result = ()

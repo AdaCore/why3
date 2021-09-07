@@ -1,24 +1,26 @@
-<check-ce>Check model 0 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<check-ce>Check model 0 ("bench/check-ce/falseCE.mlw", line 15, characters 11-21)
 <check-ce>Checking model:
           File falseCE.mlw:
             Line 12:
               a = {"type": "Integer", "val": "-2"}
               b = {"type": "Integer", "val": "-2"}
+            Line 14:
+              c = {"type": "Integer", "val": "0"}
             Line 15:
-              a_vc_constant = {"type": "Integer", "val": "0"}
-              b_vc_constant = {"type": "Integer", "val": "0"}
+              a = {"type": "Integer", "val": "0"}
+              b = {"type": "Integer", "val": "0"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `a` at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: (-2)
 <rac-values>Value from model for parameter `b` at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: (-2)
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `a` at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: (-2)
 <rac-values>Value from model for parameter `b` at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: (-2)
-<check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
+<check-ce>Result of checking model 0: BAD_CE
+            - Concrete RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -40,7 +42,7 @@
                   Execution got stuck at precondition of `rsa` with:
                     a = (-2)
                     b = (-2)
-            - Abstract RAC STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
+            - Abstract RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -62,27 +64,29 @@
                   Execution got stuck at precondition of `rsa` with:
                     a = (-2)
                     b = (-2)
-<check-ce>Check model 1 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<check-ce>Check model 1 ("bench/check-ce/falseCE.mlw", line 15, characters 11-21)
 <check-ce>Checking model:
           File falseCE.mlw:
             Line 12:
               a = {"type": "Integer", "val": "2"}
               b = {"type": "Integer", "val": "2"}
+            Line 14:
+              c = {"type": "Integer", "val": "12166397"}
             Line 15:
-              a_vc_constant = {"type": "Integer", "val": "2"}
-              b_vc_constant = {"type": "Integer", "val": "2"}
+              a = {"type": "Integer", "val": "2"}
+              b = {"type": "Integer", "val": "2"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `a` at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
 <rac-values>Value from model for parameter `b` at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `a` at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
 <rac-values>Value from model for parameter `b` at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
-<check-ce>Result of checking model 1: BAD
-            - Concrete RAC NORMAL (no contradiction during execution)
+<check-ce>Result of checking model 1: BAD_CE
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -102,7 +106,7 @@
                     zero = 0
                     one = 1
                   Execution of main function terminated normally
-            - Abstract RAC NORMAL (no contradiction during execution)
+            - Abstract RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -122,27 +126,29 @@
                     zero = 0
                     one = 1
                   Execution of main function terminated normally
-<check-ce>Check model 2 ("bench/check-ce/falseCE.mlw", line 15, characters 13-23)
+<check-ce>Check model 2 ("bench/check-ce/falseCE.mlw", line 15, characters 11-21)
 <check-ce>Checking model:
           File falseCE.mlw:
             Line 12:
               a = {"type": "Integer", "val": "2"}
               b = {"type": "Integer", "val": "2"}
+            Line 14:
+              c = {"type": "Integer", "val": "12166397"}
             Line 15:
-              a_vc_constant = {"type": "Integer", "val": "2"}
-              b_vc_constant = {"type": "Integer", "val": "2"}
+              a = {"type": "Integer", "val": "2"}
+              b = {"type": "Integer", "val": "2"}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `a` at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
 <rac-values>Value from model for parameter `b` at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `a` at "bench/check-ce/falseCE.mlw", line 12, characters 9-10: 2
 <rac-values>Value from model for parameter `b` at "bench/check-ce/falseCE.mlw", line 12, characters 11-12: 2
-<check-ce>Result of checking model 2: BAD
-            - Concrete RAC NORMAL (no contradiction during execution)
+<check-ce>Result of checking model 2: BAD_CE
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -162,7 +168,7 @@
                     zero = 0
                     one = 1
                   Execution of main function terminated normally
-            - Abstract RAC NORMAL (no contradiction during execution)
+            - Abstract RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -183,18 +189,18 @@
                     one = 1
                   Execution of main function terminated normally
 <check-ce-summary>Results:
-- Checked model 0: BAD
-  - Concrete RAC STUCK, failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7
-  - Abstract RAC STUCK, failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7
-- Checked model 1: BAD
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC NORMAL, no contradiction during execution
-- Selected model 2: BAD
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC NORMAL, no contradiction during execution
-File "bench/check-ce/falseCE.mlw", line 15, characters 13-23:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
+  - Abstract RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 2: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/falseCE.mlw", line 15, characters 11-21:
 Sub-goal Assertion of goal rsa'vc.
-Prover result is: Unknown (unknown + incomplete) (0.06s, 15056 steps).
+Prover result is: Unknown (unknown + incomplete) (0.08s, 15075 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

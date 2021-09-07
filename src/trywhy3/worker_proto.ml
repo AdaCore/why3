@@ -15,10 +15,10 @@ type id = int
 type loc = int * int * int * int
 type why3_loc = string * (int * int * int) (* kind, line, column, length *)
 type status = StNew | StValid | StUnknown
-type transform = Prove of int | Split | Clean
+type transform = Prove of int | Split of int | Clean
 
 type why3_command =
-  | ParseBuffer of string * string
+  | ParseBuffer of string * string * int
   | ExecuteBuffer of string * string
   | ProveAll
   | Transform of transform * id

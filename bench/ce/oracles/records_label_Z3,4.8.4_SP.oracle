@@ -83,6 +83,12 @@ File records_label.mlw:
           [{"field": "f", "value": {"type": "Integer", "val": "12"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 22:
+    x [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f", "value": {"type": "Integer", "val": "12"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x at L [@at:L] [@at:L:loc:bench/ce/records_label.mlw:22] [@introduced]
       [@model_trace:x] =
       {"type": "Record",
@@ -96,12 +102,6 @@ File records_label.mlw:
        "val":
         {"Field":
           [{"field": "f", "value": {"type": "Integer", "val": "6"}},
-           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
-    x [@introduced] [@model_trace:x] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "12"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     y [@introduced] [@model_trace:y] =
       {"type": "Record",

@@ -1,0 +1,19 @@
+use int.Int, lib.IntRef
+
+let isqrt (n: int)
+  requires { 0 <= n } (* <= 10000 *)
+  ensures { result * result <= n < (result + 1) * (result + 1) }
+= let r = int_ref n in
+  let y = int_ref (n * n) in
+  let z = int_ref (-2 * n + 1) in
+  while !y > n do
+    invariant I1 { 0 <= !r <= n }
+    invariant I2 { !y = !r * !r }
+    invariant I3 { n < (!r+1) * (!r+1) }
+    invariant I4 { !z = -2 * !r + 1 }
+    variant { !r }
+    y := !y + !z;
+    z := !z + 2;
+    r := !r - 1
+  done;
+  !r

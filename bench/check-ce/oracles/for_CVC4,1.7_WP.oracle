@@ -1,6 +1,6 @@
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.05s, 1016 steps).
+Prover result is: Valid (0.04s, 1530 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Checking model:
@@ -14,12 +14,14 @@ Prover result is: Valid (0.05s, 1016 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 8:
-              x1_vc_constant =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 9:
+              result = {"type": "Boolean", "val": false}
             Line 10:
               x1 =
                 {"type": "Record",
@@ -31,18 +33,18 @@ Prover result is: Valid (0.05s, 1016 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     0}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 0: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -60,42 +62,42 @@ Prover result is: Valid (0.05s, 1016 steps).
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 9:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 10:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 7:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 9:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 12:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
               
 <check-ce>Check model 1 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Checking model:
@@ -109,12 +111,14 @@ Prover result is: Valid (0.05s, 1016 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 8:
-              x1_vc_constant =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 9:
+              result = {"type": "Boolean", "val": true}
             Line 10:
               x1 =
                 {"type": "Record",
@@ -126,18 +130,18 @@ Prover result is: Valid (0.05s, 1016 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     (-1)}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 1: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+<check-ce>Result of checking model 1: INCOMPLETE
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -155,42 +159,42 @@ Prover result is: Valid (0.05s, 1016 steps).
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 9:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 10:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 7:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 9:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 12:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
               
 <check-ce>Check model 2 ("bench/check-ce/for.mlw", line 8, characters 25-31)
 <check-ce>Checking model:
@@ -204,12 +208,14 @@ Prover result is: Valid (0.05s, 1016 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-1"}}]}}
             Line 8:
-              x1_vc_constant =
+              x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+            Line 9:
+              result = {"type": "Boolean", "val": true}
             Line 10:
               x1 =
                 {"type": "Record",
@@ -221,18 +227,18 @@ Prover result is: Valid (0.05s, 1016 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 5, characters 15-16 at "bench/check-ce/for.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/for.mlw", line 6, characters 15-16 at "bench/check-ce/for.mlw", line 6, characters 15-16: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/for.mlw", line 7, characters 2-125 at "bench/check-ce/for.mlw", line 7, characters 2-125: {contents=
                                                                     (-1)}
-<check-ce>Small-step RAC
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<check-ce>Result of checking model 2: UNKNOWN
-            - Concrete RAC NORMAL (no contradiction during execution)
+<check-ce>Result of checking model 2: INCOMPLETE
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -250,68 +256,70 @@ Prover result is: Valid (0.05s, 1016 steps).
                     zero = 0
                     one = 1
                 Line 5:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 6:
-                  Concrete execution of function `ref` with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of function `ref'mk` with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
                 Line 7:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 9:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 0
                     y = 0
                 Line 10:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 7:
-                  Concrete iteration of loop
+                  Normal iteration of loop
                 Line 9:
-                  Concrete execution of function `(=)` with args:
+                  Normal execution of function `(=)` with args:
                     x = 1
                     y = 0
                 Line 12:
-                  Concrete execution of function `contents` with args:
+                  Normal execution of function `contents` with args:
                     arg = {contents= 0}
-                  Concrete execution of function `(+)` with args:
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
                 Line 4:
                   Execution of main function terminated normally
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
+            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
               
 <check-ce-summary>Results:
-- Checked model 0: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125
-- Checked model 1: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125
-- Selected model 2: UNKNOWN
-  - Concrete RAC NORMAL, no contradiction during execution
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125)
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.03s, 6176 steps).
+Prover result is: Unknown (unknown + incomplete) (0.06s, 6886 steps).
 The following counterexample model could not be verified
-  (concrete RAC no contradiction during execution, abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125):
+  (abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/for.mlw", line 7, characters 2-125):
 File for.mlw:
   Line 7:
     [current iteration] i = 0
     [before iteration] x1 = -1
   Line 8:
     [current iteration] x1 = 0
+  Line 9:
+    result of call at line 9, characters 7-12 = true
   Line 10:
     [current iteration] x1 = 0
 
 File "bench/check-ce/for.mlw", line 8, characters 25-31:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.02s, 1208 steps).
+Prover result is: Valid (0.02s, 1784 steps).
 

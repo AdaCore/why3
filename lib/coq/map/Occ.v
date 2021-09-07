@@ -17,6 +17,8 @@ Require HighOrd.
 Require int.Int.
 Require map.Map.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Definition occ {a:Type} {a_WT:WhyType a} :
   a -> (Numbers.BinNums.Z -> a) -> Numbers.BinNums.Z -> Numbers.BinNums.Z ->
@@ -35,11 +37,11 @@ Lemma occ_equation :
   ((if why_decidable_eq (m (u - 1)%Z) v then 1 else 0) + occ v m l (u - 1))%Z.
 Proof.
 intros a a_WT v m l u Hlu.
-assert (0 < u - l)%Z as h1' by omega.
+assert (0 < u - l)%Z as h1' by lia.
 unfold occ.
 replace (u - 1 - l)%Z with (u - l - 1)%Z by ring.
 replace (u - 1)%Z with (l + (u - l - 1))%Z by ring.
-rewrite <- (Z2Nat.id (u - l - 1)) by omega.
+rewrite <- (Z2Nat.id (u - l - 1)) by lia.
 rewrite (Z2Nat.inj_sub _ 1) by easy.
 destruct (u - l)%Z ; try easy.
 simpl.
@@ -70,15 +72,15 @@ rewrite <- Zplus_assoc.
 apply f_equal.
 rewrite Zplus_comm.
 apply H.
-clear -Hlu' ; unfold Zwf ; omega.
-clear -Hlu' ; omega.
+clear -Hlu' ; unfold Zwf ; lia.
+clear -Hlu' ; lia.
 replace u with (l + 1)%Z.
 unfold occ.
 rewrite Z.add_simpl_l.
 rewrite <- Zminus_diag_reverse.
 simpl.
 now rewrite (Zplus_0_r l).
-clear -Hlu Hlu' ; omega.
+clear -Hlu Hlu' ; lia.
 Qed.
 
 (* Why3 goal *)
@@ -88,7 +90,7 @@ Lemma occ_empty {a:Type} {a_WT:WhyType a} :
   (u <= l)%Z -> ((occ v m l u) = 0%Z).
 Proof.
 intros v m l u h1.
-assert (u - l <= 0)%Z as h1' by omega.
+assert (u - l <= 0)%Z as h1' by lia.
 unfold occ.
 destruct (u - l)%Z ; try reflexivity.
 now elim h1'.
@@ -148,28 +150,28 @@ Lemma occ_bounds {a:Type} {a_WT:WhyType a} :
   (l <= u)%Z -> (0%Z <= (occ v m l u))%Z /\ ((occ v m l u) <= (u - l)%Z)%Z.
 Proof.
 intros v m l u h1.
-cut (0 <= u - l)%Z. 2: omega.
+cut (0 <= u - l)%Z. 2: lia.
 replace (occ v m l u) with (occ v m l (l + (u - l)))%Z.
-pattern (u - l)%Z; apply Z_lt_induction. 2: omega.
+pattern (u - l)%Z; apply Z_lt_induction. 2: lia.
 intros.
-assert (h: (x = 0 \/ x <> 0)%Z) by omega. destruct h.
-now rewrite occ_empty; omega.
+assert (h: (x = 0 \/ x <> 0)%Z) by lia. destruct h.
+now rewrite occ_empty; lia.
 destruct (why_decidable_eq (m (l + (x-1))%Z) v).
 rewrite occ_right_add.
 generalize (H (x-1)%Z); clear H; intros.
 assert (0 <= occ v m l (l + (x - 1)) <= x-1)%Z.
-apply H; omega.
+apply H; lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
-omega.
-omega.
+lia.
+lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
 trivial.
 rewrite occ_right_no_add.
 assert (0 <= occ v m l (l + (x - 1)) <= x-1)%Z.
-apply H; omega.
+apply H; lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
-omega.
-omega.
+lia.
+lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
 trivial.
 replace (l + (u-l))%Z with u by ring. trivial.
@@ -183,38 +185,38 @@ Lemma occ_append {a:Type} {a_WT:WhyType a} :
   ((occ v m l u) = ((occ v m l mid) + (occ v m mid u))%Z).
 Proof.
 intros v m l mid u (h1,h2).
-cut (0 <= u - mid)%Z. 2: omega.
+cut (0 <= u - mid)%Z. 2: lia.
 replace (occ v m l u) with (occ v m l (mid + (u - mid)))%Z.
 replace (occ v m mid u) with (occ v m mid (mid + (u - mid)))%Z.
-pattern (u - mid)%Z; apply Z_lt_induction. 2: omega.
+pattern (u - mid)%Z; apply Z_lt_induction. 2: lia.
 intros.
-assert (h: (x = 0 \/ x <> 0)%Z) by omega. destruct h.
+assert (h: (x = 0 \/ x <> 0)%Z) by lia. destruct h.
 rewrite (occ_empty _ _ mid (mid+x)%Z).
 subst x. ring_simplify ((mid+0)%Z). ring.
-omega.
+lia.
 destruct (why_decidable_eq (m (mid + (x-1))%Z) v).
 rewrite (occ_right_add _ _ l (mid+x))%Z.
 rewrite (occ_right_add _ _ mid (mid+x))%Z.
 generalize (H (x-1)%Z); clear H; intros.
 assert ((occ v m l (mid+(x-1)) = (occ v m l mid) + occ v m mid (mid + (x - 1)))%Z).
-apply H; omega.
+apply H; lia.
 replace (mid + x - 1)%Z with (mid+(x-1))%Z by ring.
-omega. omega.
+lia. lia.
 trivial.
 replace (mid + x - 1)%Z with (mid+(x-1))%Z by ring. trivial.
-omega.
+lia.
 replace (mid + x - 1)%Z with (mid+(x-1))%Z by ring. trivial.
 
 rewrite (occ_right_no_add _ _ l (mid+x))%Z.
 rewrite (occ_right_no_add _ _ mid (mid+x))%Z.
 generalize (H (x-1)%Z); clear H; intros.
 assert ((occ v m l (mid+(x-1)) = (occ v m l mid) + occ v m mid (mid + (x - 1)))%Z).
-apply H; omega.
+apply H; lia.
 replace (mid + x - 1)%Z with (mid+(x-1))%Z by ring.
-omega. omega.
+lia. lia.
 trivial.
 replace (mid + x - 1)%Z with (mid+(x-1))%Z by ring. trivial.
-omega.
+lia.
 replace (mid + x - 1)%Z with (mid+(x-1))%Z by ring. trivial.
 
 replace (mid + (u-mid))%Z with u by ring. trivial.
@@ -229,23 +231,23 @@ Lemma occ_neq {a:Type} {a_WT:WhyType a} :
   ((occ v m l u) = 0%Z).
 Proof.
 intros v m l u.
-assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
-rewrite occ_empty. trivial. omega.
+assert (h: (u < l \/ 0 <= u - l)%Z) by lia. destruct h.
+rewrite occ_empty. trivial. lia.
 replace u with (l + (u - l))%Z. 2:ring.
 generalize H.
-pattern (u - l)%Z; apply Z_lt_induction. 2: omega.
+pattern (u - l)%Z; apply Z_lt_induction. 2: lia.
 clear H; intros.
-assert (h: (x = 0 \/ x <> 0)%Z) by omega. destruct h.
-now rewrite occ_empty; omega.
+assert (h: (x = 0 \/ x <> 0)%Z) by lia. destruct h.
+now rewrite occ_empty; lia.
 destruct (why_decidable_eq (m (l + (x-1))%Z) v).
 assert (m (l + (x - 1)) <> v)%Z.
-  apply H1; omega.
+  apply H1; lia.
 intuition.
 rewrite occ_right_no_add.
 replace (l+x-1)%Z with (l+(x-1))%Z by ring.
 apply H; intuition.
-apply (H1 i). omega. assumption.
-omega.
+apply (H1 i). lia. assumption.
+lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
 trivial.
 Qed.
@@ -258,23 +260,23 @@ Lemma occ_exists {a:Type} {a_WT:WhyType a} :
   exists i:Numbers.BinNums.Z, ((l <= i)%Z /\ (i < u)%Z) /\ ((m i) = v).
 Proof.
 intros v m l u h1.
-assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
-rewrite occ_empty in h1. elimtype False; omega. omega.
+assert (h: (u < l \/ 0 <= u - l)%Z) by lia. destruct h.
+rewrite occ_empty in h1. elimtype False; lia. lia.
 generalize h1.
 replace u with (l + (u - l))%Z. 2:ring.
 generalize H.
-pattern (u - l)%Z; apply Z_lt_induction. 2: omega.
+pattern (u - l)%Z; apply Z_lt_induction. 2: lia.
 clear H; intros.
-assert (h: (x = 0 \/ x <> 0)%Z) by omega. destruct h.
-rewrite occ_empty in h0. elimtype False; omega. omega.
+assert (h: (x = 0 \/ x <> 0)%Z) by lia. destruct h.
+rewrite occ_empty in h0. elimtype False; lia. lia.
 destruct (why_decidable_eq (m (l + (x-1))%Z) v).
-exists (l+(x-1))%Z. split. omega. now trivial.
-destruct (H (x-1))%Z as (i,(hi1,hi2)). omega. omega.
+exists (l+(x-1))%Z. split. lia. now trivial.
+destruct (H (x-1))%Z as (i,(hi1,hi2)). lia. lia.
 rewrite occ_right_no_add in h0.
 replace (l + (x - 1))%Z with (l+x-1)%Z by ring. trivial.
-omega.
+lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring. trivial.
-exists i. split. omega. assumption.
+exists i. split. lia. assumption.
 Qed.
 
 (* Why3 goal *)
@@ -286,17 +288,17 @@ Proof.
 intros m l u i (h1,h2).
 pose (v := m i). fold v.
 assert (occ v m l u = occ v m l i + occ v m i u)%Z.
-  apply occ_append. omega.
+  apply occ_append. lia.
 assert (occ v m i u = occ v m i (i+1) + occ v m (i+1) u)%Z.
-  apply occ_append. omega.
+  apply occ_append. lia.
 assert (occ v m i (i + 1) = 1)%Z.
 rewrite occ_right_add.
-  ring_simplify (i+1-1)%Z. rewrite occ_empty. ring. omega. omega.
+  ring_simplify (i+1-1)%Z. rewrite occ_empty. ring. lia. lia.
 ring_simplify (i+1-1)%Z. auto.
-assert (0 <= occ v m l i <= i -l)%Z. apply occ_bounds. omega.
-assert (0 <= occ v m i (i+1) <= (i+1)-i)%Z. apply occ_bounds. omega.
-assert (0 <= occ v m (i+1) u <= u - (i+1))%Z. apply occ_bounds. omega.
-omega.
+assert (0 <= occ v m l i <= i -l)%Z. apply occ_bounds. lia.
+assert (0 <= occ v m i (i+1) <= (i+1)-i)%Z. apply occ_bounds. lia.
+assert (0 <= occ v m (i+1) u <= u - (i+1))%Z. apply occ_bounds. lia.
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -308,33 +310,33 @@ Lemma occ_eq {a:Type} {a_WT:WhyType a} :
   ((occ v m1 l u) = (occ v m2 l u)).
 Proof.
 intros v m1 m2 l u h1.
-assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
+assert (h: (u < l \/ 0 <= u - l)%Z) by lia. destruct h.
 rewrite occ_empty.
 rewrite occ_empty. trivial.
-omega. omega.
+lia. lia.
 generalize h1.
 replace u with (l + (u - l))%Z. 2:ring.
 generalize H.
-pattern (u - l)%Z; apply Z_lt_induction. 2: omega.
+pattern (u - l)%Z; apply Z_lt_induction. 2: lia.
 clear H; intros.
-assert (h: (x = 0 \/ x <> 0)%Z) by omega. destruct h.
-rewrite occ_empty. rewrite occ_empty. trivial. omega. omega.
+assert (h: (x = 0 \/ x <> 0)%Z) by lia. destruct h.
+rewrite occ_empty. rewrite occ_empty. trivial. lia. lia.
 destruct (why_decidable_eq (m1 (l + (x-1))%Z) v).
 rewrite occ_right_add.
 rewrite (occ_right_add v m2).
 apply f_equal.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
-apply H. omega. omega. intros. apply h0. omega. omega.
+apply H. lia. lia. intros. apply h0. lia. lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
-rewrite <- h0. trivial. omega. omega.
+rewrite <- h0. trivial. lia. lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring. assumption.
 
 rewrite occ_right_no_add.
 rewrite (occ_right_no_add v m2).
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
-apply H. omega. omega. intros. apply h0. omega. omega.
+apply H. lia. lia. intros. apply h0. lia. lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring.
-rewrite <- h0. trivial. omega. omega.
+rewrite <- h0. trivial. lia. lia.
 replace (l + x - 1)%Z with (l+(x-1))%Z by ring. assumption.
 Qed.
 
@@ -358,18 +360,18 @@ Lemma occ_set {a:Type} {a_WT:WhyType a} :
   if why_decidable_eq (m i) y then 1 else 0)%Z.
 Proof.
 intros m l u i x y H.
-rewrite 2!(occ_append _ _ l i u) by omega.
-rewrite 2!(occ_append _ _ i (i + 1) u) by omega.
+rewrite 2!(occ_append _ _ l i u) by lia.
+rewrite 2!(occ_append _ _ i (i + 1) u) by lia.
 rewrite 2!occ_single.
 rewrite (proj1 (Map.set'def _ _ _ _) eq_refl).
 rewrite 2!(occ_eq _ (Map.set m i x) m).
 ring.
 intros j H1.
 apply Map.set'def.
-omega.
+lia.
 intros j H1.
 apply Map.set'def.
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)

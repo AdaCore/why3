@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="python" proved="true">
+<path name=".."/><path name="is_sorted.py"/>
+<theory name="Is_sorted" proved="true">
+ <goal name="main&#39;vc" expl="VC for main" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="main&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="20391"/></proof>
+  </goal>
+  <goal name="main&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="20439"/></proof>
+  </goal>
+  <goal name="main&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.07" steps="21555"/></proof>
+  </goal>
+  <goal name="main&#39;vc.3" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.09" steps="21749"/></proof>
+  </goal>
+  <goal name="main&#39;vc.4" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.09" steps="21746"/></proof>
+  </goal>
+  <goal name="main&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.15" steps="31536"/></proof>
+  </goal>
+  <goal name="main&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.10" steps="26033"/></proof>
+  </goal>
+  <goal name="main&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="21214"/></proof>
+  </goal>
+  <goal name="main&#39;vc.8" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="619"/></proof>
+  </goal>
+  <goal name="main&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="687"/></proof>
+  </goal>
+  <goal name="main&#39;vc.10" expl="VC for main" proved="true">
+  <proof prover="1"><result status="valid" time="0.08" steps="21552"/></proof>
+  </goal>
+  <goal name="main&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="15315"/></proof>
+  </goal>
+  <goal name="main&#39;vc.12" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.08" steps="21349"/></proof>
+  </goal>
+  <goal name="main&#39;vc.13" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.08" steps="21581"/></proof>
+  </goal>
+  <goal name="main&#39;vc.14" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.07" steps="21691"/></proof>
+  </goal>
+  <goal name="main&#39;vc.15" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.13" steps="34764"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

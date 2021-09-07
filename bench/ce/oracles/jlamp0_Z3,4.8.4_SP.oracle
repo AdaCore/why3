@@ -16,19 +16,19 @@ File jlamp0.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
   Line 11:
     a [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
   Line 12:
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
 
 File "bench/ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
@@ -240,6 +240,14 @@ Sub-goal Loop invariant preservation of goal p2'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    c [@field:0:contents] [@introduced] [@loop:bench/ce/jlamp0.mlw:21:4:157]
+      [@vc:written:21:4:157:bench/ce/jlamp0.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -270,11 +278,12 @@ File jlamp0.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
   Line 23:
     [current iteration] a [@field:0:contents] [@introduced]
-      [@model_trace:a] =
+      [@loop:bench/ce/jlamp0.mlw:21:4:157]
+      [@vc:written:21:4:157:bench/ce/jlamp0.mlw] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
   Line 25:
     [current iteration] a [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -310,7 +319,7 @@ File jlamp0.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 19:
     a [@field:0:contents] [@introduced] [@loop:bench/ce/jlamp0.mlw:21:4:157]
-      [@model_trace:a] [@vc:written:21:4:157:bench/ce/jlamp0.mlw] =
+      [@vc:written:21:4:157:bench/ce/jlamp0.mlw] =
       {"type": "Record",
        "val":
         {"Field":

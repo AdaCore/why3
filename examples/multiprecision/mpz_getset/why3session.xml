@@ -103,22 +103,22 @@
  <goal name="abs_cast&#39;vc" expl="VC for abs_cast" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="abs_cast&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="abs_cast&#39;vc.1" expl="integer overflow" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="abs_cast&#39;vc.2" expl="integer overflow" proved="true">
+  <goal name="abs_cast&#39;vc.1" expl="integer overflow" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="abs_cast&#39;vc.2" expl="integer overflow" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="abs_cast&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="abs_cast&#39;vc.4" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="23"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
   <goal name="abs_cast&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="59"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="62"/></proof>
   </goal>
  </transf>
  </goal>
@@ -140,7 +140,7 @@
   <proof prover="4"><result status="valid" time="0.05" steps="163"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.5" expl="integer overflow" proved="true">
-  <proof prover="3" timelimit="1"><result status="valid" time="0.16" steps="22992"/></proof>
+  <proof prover="3" timelimit="1"><result status="valid" time="0.16" steps="23015"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.6" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="66"/></proof>
@@ -155,25 +155,25 @@
   <proof prover="4"><result status="valid" time="0.01" steps="68"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="76"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="77"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="383"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="386"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.12" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="73"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="3.71"/></proof>
+  <proof prover="1"><result status="valid" time="1.24"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.14" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="244"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="247"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.16" steps="403"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="406"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.16" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="178"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="181"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.17" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="80"/></proof>
@@ -185,33 +185,33 @@
   <proof prover="4"><result status="valid" time="0.01" steps="82"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="94"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="95"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.21" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.14" steps="16545"/></proof>
+  <proof prover="3"><result status="valid" time="0.14" steps="16574"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.22" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06" steps="103"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="104"/></proof>
   </goal>
   <goal name="wmpz_set_si&#39;vc.23" expl="postcondition" proved="true">
   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
    <goal name="wmpz_set_si&#39;vc.23.0" expl="apply premises" proved="true">
    <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
     <goal name="wmpz_set_si&#39;vc.23.0.0" expl="apply premises" proved="true">
-    <proof prover="4"><result status="valid" time="0.14" steps="271"/></proof>
+    <proof prover="4"><result status="valid" time="0.14" steps="272"/></proof>
     </goal>
     <goal name="wmpz_set_si&#39;vc.23.0.1" expl="apply premises" proved="true">
-    <proof prover="4"><result status="valid" time="0.03" steps="107"/></proof>
+    <proof prover="4"><result status="valid" time="0.03" steps="108"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpz_set_si&#39;vc.23.1" expl="apply premises" proved="true">
-   <proof prover="4"><result status="valid" time="0.05" steps="107"/></proof>
+   <proof prover="4"><result status="valid" time="0.05" steps="108"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpz_set_si&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.07" steps="15069"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="15092"/></proof>
   </goal>
  </transf>
  </goal>

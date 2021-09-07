@@ -28,22 +28,30 @@ let get_field_attr attr =
   | ["field"; _; s] -> Some s
   | _ -> None
 
+let is_split_field f =
+  List.exists (fun s -> Strings.has_prefix s f)
+    ["us_split_fields"; "us_split_discrs"; "__split_discrs"; "__split_fields"]
+
+let is_rec_ext_field f = Strings.has_prefix "rec__ext" f
+
 let for_field clean (f, v) =
-  if List.mem f ["__split_discrs"; "__split_fields"] then
+  if is_split_field f then
     match v with
     | Record fs ->
         let for_field (f, v) =
-          Opt.bind (clean#value v) @@ fun v ->
-          Some (f, v) in
+          match clean#value v with
+          | Some v -> Some (f, v)
+          | None -> None in
         Lists.map_filter for_field fs
-    | _ ->
-        Opt.get_def [] @@
-        Opt.bind (clean#value v) @@ fun v -> Some [f, v]
-  else if Strings.has_prefix "rec__ext" f then
+    | _ -> (
+        match clean#value v with
+        | None -> []
+        | Some v -> [f, v] )
+  else if is_rec_ext_field f then
     []
-  else
-    Opt.get_def [] @@
-    Opt.bind (clean#value v) @@ fun v -> Some [f, v]
+  else match clean#value v with
+    | None -> []
+    | Some v -> [f, v]
 
 (* The returned [fields] are the strings S in attributes [field:N:S], which have
    to be removed from the model element name *)
@@ -68,11 +76,55 @@ let in_spark (e: model_element) =
      gnat2why *)
   String.length name > 0 && (name.[0] = '.' || (name.[0] <= '9' && name.[0] >= '0'))
 
+(* Don't clean values that will be removed by [post_clean]. TODO Can we entierly
+   remove this and do all cleaning after retrieving the Model_parser.model? *)
+let clean = object (self)
+  inherit Model_parser.clean
+
+  method! element me =
+    (* Don't clean names here but in post *)
+    if me.me_name.men_kind = Error_message then
+      Some me (* Keep unparsed values for error messages *)
+    else
+      Opt.bind (self#value me.me_value) @@ fun me_value ->
+      Some {me with me_value}
+
+  method! record fs =
+    if only_first_field2 (List.map fst fs) then
+      (* Clean only the first field *)
+      match fs with
+      | (f, v) :: fs ->
+          Opt.bind (self#value v) @@ fun v ->
+          Some (Record ((f, v) :: fs))
+      | _ -> assert false
+    else
+      let for_field (f, v) =
+        if is_split_field f || is_rec_ext_field f then
+          Some (f, v)
+        else
+          Opt.bind (self#value v) @@ fun v ->
+          Some (f, v) in
+      match Lists.map_filter for_field fs with
+      | [] -> None
+      | fs -> Some (Record fs)
+end
+
 (** Clean values by a) replacing records according to [only_first_field2] and
    simplifying discriminant records b) removing unparsed values, in which the
    function returns [None]. *)
-class clean = object (self)
+let post_clean = object (self)
   inherit Model_parser.clean as super
+
+  method! element me =
+    match super#element me with
+    | Some me ->
+        let {Model_parser.men_name= name; men_attrs= attrs} = me.me_name in
+        let men_name = Ident.get_model_trace_string ~name ~attrs in
+        let men_name = List.hd (Strings.bounded_split '@' men_name 2) in
+        let me_name = clean_name {me.me_name with men_name} in
+        let me = {me with me_name} in
+        if in_spark me then Some me else None
+    | _ -> None
 
   method! record fs =
     let field_names, field_values = List.split fs in
@@ -81,10 +133,4 @@ class clean = object (self)
     else match List.concat (List.map (for_field self) fs) with
       | [] -> None
       | fs -> Some (Record fs)
-
-  method! element me =
-    let me_name = clean_name me.me_name in
-    match super#element {me with me_name} with
-    | Some me as res when in_spark me -> res
-    | _ -> None
 end

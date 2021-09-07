@@ -54,6 +54,19 @@ let eapply ?loc e1 e2 = expr ?loc (Eapply(e1,e2))
 
 let evar ?loc x = expr ?loc (Eident x)
 
+let empty_spec = {
+  sp_pre = [];
+  sp_post = [];
+  sp_xpost = [];
+  sp_reads = [];
+  sp_writes = [];
+  sp_alias = [];
+  sp_variant = [];
+  sp_checkrw = false;
+  sp_diverge = false;
+  sp_partial = false;
+}
+
 let use ?(loc=Loc.dummy_position) ~import l =
   let qid_id_opt = (qualid l, None) in
   Duseimport(loc,import,[qid_id_opt])

@@ -29,7 +29,6 @@ build: [
    "--disable-frama-c"
    "--disable-coq-libs"
    "--disable-js-of-ocaml"
-   "--disable-hypothesis-selection" {ocamlgraph:version >= "2.0"}
    "--disable-ide"]
   [make "-j%{jobs}%" "all" "opt" "byte"]
   [make "doc" "stdlibdoc" "apidoc"] {with-doc}
@@ -44,7 +43,7 @@ depends: [
   "conf-autoconf" {build & dev}
   "ocaml" {>= "4.05.0"}
   "ocamlfind" {build}
-  "menhir" {>= "20151112"}
+  "menhir" {>= "20170418"}
   "num"
 ]
 

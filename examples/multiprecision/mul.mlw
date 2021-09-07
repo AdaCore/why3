@@ -174,7 +174,7 @@ module Mul
                 + power radix (sz + sz) * result
               = value (old r) (sz + sz)
                 + value x sz * value y sz }
-  =
+  = [@vc:do_not_keep_trace] (* traceability info breaks the proof *)
     let ref rp = C.incr r 0 in
     let ref vp = C.incr y 0 in
     let ref lr = 0 in

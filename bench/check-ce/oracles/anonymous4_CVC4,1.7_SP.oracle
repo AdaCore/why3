@@ -4,17 +4,23 @@
             Line 6:
               y = {"type": "Integer", "val": "0"}
             Line 8:
-              y_vc_constant = {"type": "Integer", "val": "0"}
+              y = {"type": "Integer", "val": "0"}
+            Line 9:
+              result = {"type": "Integer", "val": "0"}
+              result =
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "0"}}]}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
-<check-ce>Small-step RAC
+<rac-values>Value from model for return value of call at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5: [|; _ -> 0|]
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
-<check-ce>Result of checking model 0: BAD
-            - Concrete RAC STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+<check-ce>Result of checking model 0: BAD_CE
+            - Concrete RAC: STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -31,16 +37,16 @@
                     zero = 0
                     one = 1
                 Line 9:
-                  Concrete execution of function `f` with args:
+                  Normal execution of function `f` with args:
                     x = 0
-                  Concrete execution of function `(@)` with args:
+                  Normal execution of function `(@)` with args:
                     u = (fun y -> assume { y > 0 };
                            y + x) with x = 0
                     u = 0
                 Line 4:
                   Execution got stuck at assumption with:
                     y = 0
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5)
+            - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
               
 <check-ce>Check model 1 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
 <check-ce>Checking model:
@@ -48,17 +54,23 @@
             Line 6:
               y = {"type": "Integer", "val": "0"}
             Line 8:
-              y_vc_constant = {"type": "Integer", "val": "0"}
+              y = {"type": "Integer", "val": "0"}
+            Line 9:
+              result = {"type": "Integer", "val": "0"}
+              result =
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "0"}}]}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
-<check-ce>Small-step RAC
+<rac-values>Value from model for return value of call at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5: [|; _ -> 0|]
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
-<check-ce>Result of checking model 1: BAD
-            - Concrete RAC STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+<check-ce>Result of checking model 1: BAD_CE
+            - Concrete RAC: STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -75,16 +87,16 @@
                     zero = 0
                     one = 1
                 Line 9:
-                  Concrete execution of function `f` with args:
+                  Normal execution of function `f` with args:
                     x = 0
-                  Concrete execution of function `(@)` with args:
+                  Normal execution of function `(@)` with args:
                     u = (fun y -> assume { y > 0 };
                            y + x) with x = 0
                     u = 0
                 Line 4:
                   Execution got stuck at assumption with:
                     y = 0
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5)
+            - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
               
 <check-ce>Check model 2 ("bench/check-ce/anonymous4.mlw", line 8, characters 13-23)
 <check-ce>Checking model:
@@ -92,17 +104,23 @@
             Line 6:
               y = {"type": "Integer", "val": "0"}
             Line 8:
-              y_vc_constant = {"type": "Integer", "val": "0"}
+              y = {"type": "Integer", "val": "0"}
+            Line 9:
+              result = {"type": "Integer", "val": "0"}
+              result =
+                {"type": "Array",
+                 "val": [{"others": {"type": "Integer", "val": "0"}}]}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
-<check-ce>Small-step RAC
+<rac-values>Value from model for return value of call at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5 at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5: [|; _ -> 0|]
+<check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `y` at "bench/check-ce/anonymous4.mlw", line 6, characters 7-8: 0
-<check-ce>Result of checking model 2: BAD
-            - Concrete RAC STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+<check-ce>Result of checking model 2: BAD_CE
+            - Concrete RAC: STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
@@ -119,30 +137,30 @@
                     zero = 0
                     one = 1
                 Line 9:
-                  Concrete execution of function `f` with args:
+                  Normal execution of function `f` with args:
                     x = 0
-                  Concrete execution of function `(@)` with args:
+                  Normal execution of function `(@)` with args:
                     u = (fun y -> assume { y > 0 };
                            y + x) with x = 0
                     u = 0
                 Line 4:
                   Execution got stuck at assumption with:
                     y = 0
-            - Abstract RAC UNKNOWN (terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5)
+            - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
               
 <check-ce-summary>Results:
-- Checked model 0: BAD
-  - Concrete RAC STUCK, failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5
-- Checked model 1: BAD
-  - Concrete RAC STUCK, failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5
-- Selected model 2: BAD
-  - Concrete RAC STUCK, failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40
-  - Abstract RAC UNKNOWN, terminated because missing value for variable `result` at "bench/check-ce/anonymous4.mlw", line 9, characters 2-5
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
+- Checked model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
+- Selected model 2: BAD_CE
+  - Concrete RAC: STUCK (failure in assumption at "bench/check-ce/anonymous4.mlw", line 4, characters 35-40)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
 File "bench/check-ce/anonymous4.mlw", line 8, characters 13-23:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (unknown + incomplete) (0.06s, 5041 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 5205 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

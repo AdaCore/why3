@@ -3,6 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Vampire" version="4.2.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="compiler.mlw"/>
@@ -632,6 +633,12 @@
  </goal>
  <goal name="compile_program&#39;vc" expl="VC for compile_program" proved="true">
  <proof prover="0" timelimit="15"><result status="valid" time="14.06"/></proof>
+ </goal>
+ <goal name="test&#39;vc" expl="VC for test" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="14"/></proof>
+ </goal>
+ <goal name="test2&#39;vc" expl="VC for test2" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="14"/></proof>
  </goal>
 </theory>
 </file>

@@ -1,0 +1,24 @@
+use int.Int
+
+val ref a : int
+
+val id (x: int) : int
+  writes { a }
+  ensures { result > x }
+  ensures { result > a }
+
+let test2 (x:int) =
+  a <- 17;
+  if id x < 10 then
+     assert { a > 42 }
+   else
+     assert { a < 42 }
+
+let test3 (x:int)
+  ensures { a <> 42 }
+ =
+  a <- 17;
+  if id x < 100 && id x > 50 then
+     a <- a + 1
+   else
+     a <- a + 2

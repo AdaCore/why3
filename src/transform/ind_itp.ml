@@ -29,7 +29,7 @@ let rec_case_expl = "recursive case"
 
    From task [delta, x: int, delta'(x) |- G(x)], variable x and term bound, builds the tasks:
    [delta, x: int, x <= bound, delta'(x) |- G(x)] and
-   [delta, x: int, x > bound, (forall n, n < x -> delta'(n) -> G(n)), delta'(x) |- G(x)]
+   [delta, x: int, bound < x, (forall n, n < x -> delta'(n) -> G(n)), delta'(x) |- G(x)]
 
    x cannot occur in delta as it can only appear after its declaration (by
    construction of the task). Also, G is not part of delta'.
@@ -273,14 +273,14 @@ let induction x bound env =
               (t_implies (Term.t_app_infer lt_int [t_var n; x]) (t_replace x (t_var n) t_delta'))
           in
 
-          (* x_gt_bound = bound < x *)
-          let x_gt_bound_t = t_app_infer lt_int [bound; x] in
-          let x_gt_bound =
-            create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "Init")) x_gt_bound_t in
+          (* bound_lt_x = bound < x *)
+          let bound_lt_x_t = t_app_infer lt_int [bound; x] in
+          let bound_lt_x =
+            create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "Init")) bound_lt_x_t in
           let rec_pr = create_prsymbol (gen_ident "Hrec") in
           let hrec = create_prop_decl Paxiom rec_pr t_delta' in
           let d = create_goal ~expl:rec_case_expl pr t in
-          [x_gt_bound; hrec; d]
+          [bound_lt_x; hrec; d]
     | Dprop (_p, _pr, _t) ->
         if !x_is_passed then
           begin

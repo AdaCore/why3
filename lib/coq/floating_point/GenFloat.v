@@ -21,6 +21,7 @@ Require real.Abs.
 Require real.FromInt.
 Require floating_point.Rounding.
 
+Require Import Lia.
 Require Import Flocq.Core.Core.
 Require Import Flocq.IEEE754.Binary.
 Require Import int.Abs.
@@ -226,7 +227,7 @@ unfold FLT_exp.
 rewrite Z.max_l.
 apply Z.le_refl.
 unfold emin.
-generalize Hprec' Hemax' ; clear ; omega.
+generalize Hprec' Hemax' ; clear ; lia.
 rewrite <- abs_IZR, Z.abs_eq, <- 2!IZR_Zpower.
 split.
 apply IZR_le.
@@ -240,12 +241,12 @@ apply bpow_lt.
 apply Zlt_pred.
 apply Zlt_le_weak.
 exact Hprec'.
-generalize Hprec' ; clear ; omega.
+generalize Hprec' ; clear ; lia.
 apply IZR_lt.
 apply Zlt_pred.
 apply Zlt_le_weak.
 exact Hprec'.
-generalize Hprec' ; clear ; omega.
+generalize Hprec' ; clear ; lia.
 apply Zlt_succ_le.
 change (2 ^ prec - 1)%Z with (Z.pred (2^prec))%Z.
 rewrite <- Zsucc_pred.
@@ -299,7 +300,7 @@ apply generic_format_abs.
 apply generic_format_B2R.
 apply generic_format_bpow.
 unfold FLT_exp, emin.
-zify ; generalize Hprec' Hemax' ; omega.
+zify ; generalize Hprec' Hemax' ; lia.
 apply abs_B2R_lt_emax.
 rewrite pred_eq_pos.
 unfold pred_pos.
@@ -316,7 +317,7 @@ rewrite minus_IZR, IZR_Zpower.
 simpl; ring.
 apply Zlt_le_weak.
 exact Hprec'.
-generalize Hprec' Hemax' ; omega.
+generalize Hprec' Hemax' ; lia.
 apply bpow_ge_0.
 Qed.
 
@@ -340,7 +341,7 @@ exists (Float radix2 z 0).
 unfold F2R ; simpl.
 now rewrite Rmult_1_r.
 easy.
-simpl; unfold emin; generalize Hprec' Hemax'; omega.
+simpl; unfold emin; generalize Hprec' Hemax'; lia.
 unfold max_representable_integer in Bz.
 change 2%Z with (radix_val radix2) in Bz.
 apply generic_format_abs_inv.
@@ -348,7 +349,7 @@ rewrite <- abs_IZR, Bz, IZR_Zpower.
 apply generic_format_bpow.
 unfold FLT_exp, emin.
 clear Bz; generalize Hprec' Hemax'; zify.
-omega.
+lia.
 apply Zlt_le_weak.
 apply Hprec'.
 Qed.

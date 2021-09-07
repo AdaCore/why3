@@ -308,8 +308,23 @@ val t_attr_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
 
+val t_let_close_simp : vsymbol -> term -> term -> term
+(** [t_let_close_simp v t1 t2] constructs the term [let v=t1
+   in t2] but if the term [t1] is simple enough, then it produces the
+   equivalent term [t2[v<-t2]] instead.  *)
+
+val t_let_close_simp_keep_var : keep:bool -> vsymbol -> term -> term -> term
+(** [t_let_close_simp_keep_var v t1 t2] does the same as
+   [t_let_close_simp] but when the second term is simple enough and
+   [keep] is true, it produces the term [let v=t1 in t2[v<-t2]],
+   keeping thus the variable [v] even if it is not used after the [in]
+   *)
+
 val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
+(** similar to [t_let_close_simp] but on a [term_bound] *)
+val t_let_simp_keep_var : keep:bool -> term -> term_bound -> term
+(** similar to [t_let_close_simp_keep_var] but on a [term_bound] *)
 val t_case_simp : term -> term_branch list -> term
 val t_quant_simp : quant -> term_quant -> term
 val t_forall_simp : term_quant -> term
@@ -328,7 +343,6 @@ val t_and_asym_simp_l : term list -> term
 val t_or_asym_simp : term -> term -> term
 val t_or_asym_simp_l : term list -> term
 
-val t_let_close_simp : vsymbol -> term -> term -> term
 val t_case_close_simp : term -> (pattern * term) list -> term
 val t_quant_close_simp : quant -> vsymbol list -> trigger -> term -> term
 val t_forall_close_simp : vsymbol list -> trigger -> term -> term

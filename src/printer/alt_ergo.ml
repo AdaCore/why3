@@ -223,8 +223,15 @@ let rec print_term info fmt t =
 		(print_tapp info) tl (print_type info) (t_type t)
 	    end
      end
-  | Tlet _ -> unsupportedTerm t
-      "alt-ergo: you must eliminate let in term"
+  | Tlet (t1, tb) ->
+      let v, t2 = t_open_bound tb in
+      fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
+        (print_ident info) v.vs_name
+        (print_term info) t1
+         (** some version of alt-ergo have an inefficient typing of let *)
+        (print_type info) v.vs_ty
+        (print_term info) t2;
+      forget_var info v
   | Tif(t1,t2,t3) ->
      fprintf fmt "(if %a then %a else %a)"
        (print_fmla info) t1 (print_term info) t2 (print_term info) t3

@@ -410,6 +410,7 @@ and print_model_value_human fmt (v : model_value) =
 
 type model_element_kind =
   | Result
+  | Call_result of Loc.position
   | Old
   | At of string
   | Loop_before
@@ -420,6 +421,7 @@ type model_element_kind =
 
 let print_model_kind fmt = function
   | Result -> fprintf fmt "Result"
+  | Call_result loc -> fprintf fmt "Call_result (%a)" Pretty.print_loc' loc
   | Old -> fprintf fmt "Old"
   | At l -> fprintf fmt "At %s" l
   | Error_message -> fprintf fmt "Error_message"
@@ -500,7 +502,7 @@ let search_model_element ?file ?line m p =
   let iter_file f file' lines = if file = None || file = Some file' then
       Mint.iter (iter_line f) lines in
   let iter_files f = Mstr.iter (iter_file f) m.model_files in
-  Util.iter_first iter_files p
+  try Some (Util.iter_first iter_files p) with Not_found -> None
 
 let trace_by_id id =
   Ident.get_model_trace_string ~name:id.id_string ~attrs:id.id_attrs
@@ -516,6 +518,16 @@ let search_model_element_for_id m ?loc id =
        Opt.equal Loc.equal me.me_location oloc
     then Some me else None in
   search_model_element m p
+
+let search_model_element_call_result model loc =
+  let p me = (* [@model_trace:result] [@call_result_loc:<loc>] *)
+    let has_model_trace_result attrs =
+      get_model_trace_string ~name:"" ~attrs = "result" in
+    if has_model_trace_result me.me_name.men_attrs &&
+       let oloc = search_attribute_value get_call_result_loc me.me_name.men_attrs in
+       Opt.equal Loc.equal oloc (Some loc)
+    then Some me else None in
+  search_model_element model p
 
 (*
 ***************************************************************
@@ -542,7 +554,9 @@ let print_model_element ?(print_locs=false) ~print_attrs ~print_model_value ~me_
 let similar_model_element_names n1 n2 =
   Ident.get_model_trace_string ~name:n1.men_name ~attrs:n1.men_attrs
   = Ident.get_model_trace_string ~name:n2.men_name ~attrs:n2.men_attrs &&
-  n1.men_kind = n2.men_kind
+  n1.men_kind = n2.men_kind &&
+  Strings.has_suffix unused_suffix n1.men_name =
+  Strings.has_suffix unused_suffix n2.men_name
 
 (* TODO optimize *)
 let rec filter_duplicated l =
@@ -583,6 +597,9 @@ let why_name_trans men =
   let name = List.hd (Strings.bounded_split '@' name 2) in
   match men.men_kind with
   | Result -> "result"
+  | Call_result loc ->
+      let _,l,bc,ec = Loc.get loc in
+      asprintf "result of call at line %d, characters %d-%d" l bc ec
   | Old -> "old "^name
   | At l -> name^" at "^l
   | Loop_previous_iteration -> "[before iteration] "^name
@@ -595,6 +612,7 @@ let json_name_trans men =
   match men.men_kind with
   | Result -> "result"
   | Old -> "old "^name
+  | Call_result _ -> "call-result"
   | _ -> name
 
 let print_model ~filter_similar ~print_attrs ?(me_name_trans = why_name_trans)
@@ -724,6 +742,7 @@ let print_model_element_json me_name_to_str fmt me =
     (* We compute kinds using the attributes and locations *)
     match me.me_name.men_kind with
     | Result -> fprintf fmt "%a" Json_base.string "result"
+    | Call_result _ -> fprintf fmt "%a" Json_base.string "result"
     | At l -> fprintf fmt "@%s" l
     | Old -> fprintf fmt "%a" Json_base.string "old"
     | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
@@ -822,6 +841,10 @@ let get_loc_kind oloc attrs () =
       try Some (Lists.first search (Sattr.elements attrs)) with
         Not_found -> None
 
+let get_call_result_kind attrs () =
+  Opt.map (fun l -> Call_result l)
+    (search_attribute_value get_call_result_loc attrs)
+
 let get_result_kind attrs () =
   match Ident.get_model_trace_attr ~attrs with
   | exception Not_found -> None
@@ -834,6 +857,7 @@ let compute_kind vc_attrs oloc attrs =
   try
     Lists.first (fun f -> f ()) [
       get_loc_kind oloc attrs;
+      get_call_result_kind attrs;
       get_result_kind attrs;
       get_loop_kind vc_attrs oloc;
     ]
@@ -948,41 +972,37 @@ let register_remove_field f = remove_field := f
    elements, and adding the element at all relevant locations *)
 let build_model_rec pm (elts: model_element list) : model_files =
   let fields_projs = fields_projs pm and vc_attrs = pm.Printer.vc_term_attrs in
+  let process_me me =
+    match Mstr.find me.me_name.men_name pm.queried_terms with
+    | exception Not_found ->
+        Debug.dprintf debug "No term for %s@." me.me_name.men_name;
+        None
+    | t ->
+        assert (me.me_location = None && me.me_term = None);
+        let attrs = Sattr.union me.me_name.men_attrs t.t_attrs in
+        let name, attrs = match t.t_node with
+          | Tapp (ls, []) ->
+              (* Ident [ls] is recorded as [t_app ls] in [Printer.queried_terms] *)
+              ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
+          | _ -> "", attrs in
+        Debug.dprintf debug "@[<h>Term attrs for %s at %a@]@."
+          (why_name_trans me.me_name)
+          (Pp.print_option_or_default "NO LOC" Pretty.print_loc') t.t_loc;
+        (* Replace projections with their real name *)
+        let me_value = replace_projection
+            (fun s -> recover_name pm fields_projs s)
+            me.me_value in
+        (* Remove some specific record field related to the front-end language.
+           This function is registered. *)
+        let attrs, me_value = !remove_field (attrs, me_value) in
+        (* Transform value flattened by eval_match (one field record) back to records *)
+        let attrs, me_value = read_one_fields ~attrs me_value in
+        let me_name = create_model_element_name name attrs Other in
+        Some {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
   let add_with_loc_set_kind me loc model =
     if loc = None then model else
       let kind = compute_kind vc_attrs loc me.me_name.men_attrs in
       add_to_model_if_loc ~kind {me with me_location= loc} model in
-  let process_me me =
-    assert (me.me_location = None && me.me_term = None);
-    let aux t =
-      let attrs = Sattr.union me.me_name.men_attrs t.t_attrs in
-      let name, attrs = match t.t_node with
-        | Tapp (ls, []) ->
-            (* Ident [ls] is recorded as [t_app ls] in [Printer.queried_terms] *)
-            ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
-        | _ -> "", attrs in
-      (* Replace projections with their real name *)
-      let me_value = replace_projection
-          (fun s -> recover_name pm fields_projs s)
-          me.me_value in
-      (* Remove some specific record field related to the front-end language.
-         This function is registered. *)
-      let attrs, me_value = !remove_field (attrs, me_value) in
-      (* Transform value flattened by eval_match (one field record) back to records *)
-      let attrs, me_value = read_one_fields ~attrs me_value in
-      let name = get_model_trace_string ~name ~attrs in
-      let name = List.hd (Strings.bounded_split '@' name 2) in
-      let me_name = create_model_element_name name attrs Other in
-      {me_name; me_value; me_location= t.t_loc; me_term= Some t} in
-    match Mstr.find_opt me.me_name.men_name pm.queried_terms with
-    | None ->
-        Debug.dprintf debug "No term for %s@." (why_name_trans me.me_name);
-        None
-    | Some t ->
-        Debug.dprintf debug "@[<h>Term attrs for %s at %a@]@."
-          (why_name_trans me.me_name)
-          (Pp.print_option_or_default "NO LOC" Pretty.print_loc') t.t_loc;
-        Some (aux t) in
   (** Add a model element at the relevant locations *)
   let add_model_elt model me =
     let kind = compute_kind vc_attrs me.me_location me.me_name.men_attrs in
@@ -990,8 +1010,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
     let oloc = internal_loc (Opt.get me.me_term) in
     let model = add_with_loc_set_kind me oloc model in
     let add_written_loc a =
-      let oloc = Ident.extract_written_loc a in
-      add_with_loc_set_kind me oloc in
+      add_with_loc_set_kind me (get_written_loc a) in
     Sattr.fold add_written_loc me.me_name.men_attrs model in
   List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
 
@@ -1039,9 +1058,14 @@ class clean = object (self)
   method model m =
     {m with model_files= map_filter_model_files self#element m.model_files}
   method element me =
+    let me =
+      let name = me.me_name.men_name in
+      let attrs = me.me_name.men_attrs in
+      let name = get_model_trace_string ~name ~attrs in
+      let name = List.hd (Strings.bounded_split '@' name 2) in
+      {me with me_name = {me.me_name with men_name = name}} in
     if me.me_name.men_kind = Error_message then
-      (* Keep unparsed values for error messages *)
-      Some me
+      Some me (* Keep unparsed values for error messages *)
     else
       Opt.bind (self#value me.me_value) @@ fun me_value ->
       Some {me with me_value}
@@ -1052,10 +1076,10 @@ class clean = object (self)
     | Array a       -> self#array a    | Record fs     -> self#record fs
     | Undefined     -> self#undefined  | Var v         -> self#var v
   method const c = match c with
-      String v      -> self#string v  | Integer v     -> self#integer v  |
-      Decimal v     -> self#decimal v | Fraction v    -> self#fraction v |
-      Float v       -> self#float v   | Boolean v     -> self#boolean v  |
-      Bitvector v   -> self#bitvector v
+    | String v      -> self#string v  | Integer v     -> self#integer v
+    | Decimal v     -> self#decimal v | Fraction v    -> self#fraction v
+    | Float v       -> self#float v   | Boolean v     -> self#boolean v
+    | Bitvector v   -> self#bitvector v
   method string v = Some (Const (String v))
   method integer v = Some (Const (Integer v))
   method decimal v = Some (Const (Decimal v))
