@@ -210,7 +210,7 @@ let get_or_stuck loc env ity desc = function
   | Some v -> v
   | None ->
       let desc = asprintf "for %s %a" desc print_ity ity in
-      let cntr_ctx = mk_cntr_ctx env ~desc Vc.expl_pre in
+      let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
       stuck ?loc cntr_ctx "%s" desc
 
 let import_model_const loc env ity = function

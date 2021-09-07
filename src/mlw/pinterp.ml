@@ -96,6 +96,9 @@ let get_giant_steps ctx = ctx.giant_steps
 
 let mk_empty_env = Pinterp_core.mk_empty_env
 
+let mk_cntr_ctx ctx =
+  Pinterp_core.mk_cntr_ctx ctx.env ~giant_steps:(Some ctx.giant_steps)
+
 let mk_rac = Pinterp_core.mk_rac
 
 let mk_ctx env ?timelimit ?steplimit ?(giant_steps=false)
@@ -592,7 +595,9 @@ let value_of_term ctx t =
           | _ -> raise Exit in
         let vs = List.map aux ts in
         let res = value ty (Vconstr (rs, fs, List.map field vs)) in
-        if ctx.do_rac then check_type_invs ctx.rac ctx.env (ity_of_ty ty) res;
+        if ctx.do_rac then
+          check_type_invs ctx.rac ~giant_steps:ctx.giant_steps ctx.env
+            (ity_of_ty ty) res;
         res
     | _ -> raise Exit in
   try Some (aux t) with Exit -> None
@@ -631,19 +636,19 @@ let get_value : value_gen list -> string * value =
   Lists.first aux
 
 (** Generate a value by querying the model for a variable. *)
-let gen_model_variable ?check ctx ?loc id ity : value_gen =
+let gen_model_variable ?check ({giant_steps} as ctx) ?loc id ity : value_gen =
   "value from model", fun () ->
     Opt.apply () check id;
     try
-      let check = check_assume_type_invs ctx.rac ?loc ctx.env in
+      let check = check_assume_type_invs ctx.rac ?loc ~giant_steps ctx.env in
       ctx.oracle.for_variable ?loc ~check ctx.env id ity
     with Stuck _ when is_ignore_id id -> None
 
 (** Generate a value by querying the model for a result *)
-let gen_model_result ctx loc ity : value_gen =
+let gen_model_result ({giant_steps} as ctx) loc ity : value_gen =
   "value from model", fun () ->
     let res = ctx.oracle.for_result ctx.env loc ity in
-    Opt.iter (check_assume_type_invs ctx.rac ~loc ctx.env ity) res;
+    Opt.iter (check_assume_type_invs ctx.rac ~loc ~giant_steps ctx.env ity) res;
     res
 
 (** Generator for a default value *)
@@ -662,8 +667,7 @@ let gen_type_default ~really ?posts ctx ity : value_gen =
     if posts = None && not really then None else
     let v = default_value_of_type ctx.env ity in
     try
-      let cntr_ctx =
-        mk_cntr_ctx ctx.env ~desc:"type default value" Vc.expl_post in
+      let cntr_ctx = mk_cntr_ctx ctx ~desc:"type default value" Vc.expl_post in
       Opt.iter (check_posts ctx.rac cntr_ctx v) posts;
       Some v
     with Fail _ | Incomplete _ -> None
@@ -749,7 +753,7 @@ let get_and_register_global check_model_variable ctx exec_expr id oexp post ity 
     register_used_value ctx.env id.id_loc id value;
     if ctx.do_rac then (
       let desc = asprintf "of global variable `%a`" print_decoded id.id_string in
-      let cntr_ctx = mk_cntr_ctx ctx.env ~desc Vc.expl_post in
+      let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
       check_assume_posts ctx.rac cntr_ctx value post );
     lazy value
   with (* Incomplete _ | *) Stuck _ as e ->
@@ -945,7 +949,7 @@ and exec_expr' ctx e =
             (Pp.print_list Pp.comma print_value) (List.map (get_pvs ctx.env) pvs);
           let desc = asprintf "of `%a`" print_ls ls in
           if ctx.do_rac then (
-            let cntr_ctx = mk_cntr_ctx ctx.env ?loc:e.e_loc ~desc Vc.expl_pre in
+            let cntr_ctx = mk_cntr_ctx ctx ?loc:e.e_loc ~desc Vc.expl_pre in
             check_terms ctx.rac cntr_ctx cty.cty_pre );
           with_push_premises ctx.env.premises @@ fun () -> (
           add_premises cty.cty_pre ctx.env;
@@ -965,7 +969,7 @@ and exec_expr' ctx e =
              else begin
                  register_call ctx.env e.e_loc None mvs Log.Exec_normal;
                  if ctx.do_rac then (
-                   let cntr_ctx = mk_cntr_ctx ctx.env ?loc:e.e_loc Vc.expl_pre in
+                   let cntr_ctx = mk_cntr_ctx ctx ?loc:e.e_loc Vc.expl_pre in
                    check_terms ctx.rac cntr_ctx cty.cty_pre );
                  with_push_premises ctx.env.premises @@ fun () -> (
                  add_premises cty.cty_pre ctx.env;
@@ -994,13 +998,13 @@ and exec_expr' ctx e =
           = Some true ->
           if ctx.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
-            let cntr_ctx = mk_cntr_ctx ctx.env ?loc:e.e_loc ~desc Vc.expl_pre in
+            let cntr_ctx = mk_cntr_ctx ctx ?loc:e.e_loc ~desc Vc.expl_pre in
             check_terms ctx.rac cntr_ctx cty.cty_pre );
           assert (cty.cty_args = [] && pvsl = []);
           let v = Lazy.force (Mrs.find rs ctx.env.rsenv) in
           if ctx.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
-            let cntr_ctx = mk_cntr_ctx ctx.env ~desc Vc.expl_post in
+            let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
             check_posts ctx.rac cntr_ctx v rs.rs_cty.cty_post );
           Normal v
       | Capp (rs, pvsl) ->
@@ -1074,7 +1078,7 @@ and exec_expr' ctx e =
       (* assert1 *)
       let res = with_push_premises ctx.env.premises @@ fun () -> (
       if ctx.do_rac then
-        check_terms ctx.rac (mk_cntr_ctx ctx.env Vc.expl_loop_init) inv;
+        check_terms ctx.rac (mk_cntr_ctx ctx Vc.expl_loop_init) inv;
       add_premises inv ctx.env;
       register_iter_loop ctx.env e.e_loc Log.Exec_giant_steps;
       List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy ctx)
@@ -1083,7 +1087,7 @@ and exec_expr' ctx e =
       let opt_old_varl =
         if ctx.do_rac && e.e_effect.eff_oneway = Total then
           Some (oldify_varl ctx.env varl) else None in
-      let cntr_ctx = mk_cntr_ctx ctx.env Vc.expl_loop_keep in
+      let cntr_ctx = mk_cntr_ctx ctx Vc.expl_loop_keep in
       check_assume_terms ctx.rac cntr_ctx inv;
       add_premises inv ctx.env;
       match exec_expr ctx cond with
@@ -1093,18 +1097,18 @@ and exec_expr' ctx e =
              match exec_expr ctx e1 with
              | Normal _ ->
                  if ctx.do_rac then (
-                   let cntr_ctx = mk_cntr_ctx ctx.env Vc.expl_loop_keep in
+                   let cntr_ctx = mk_cntr_ctx ctx Vc.expl_loop_keep in
                    check_terms ctx.rac cntr_ctx inv );
                  add_premises inv ctx.env;
                  if ctx.do_rac && e.e_effect.eff_oneway = Total then (
                    let oldified_varl = Opt.get opt_old_varl in
-                   check_variant ctx.rac Vc.expl_loop_vari e.e_loc ctx.env
-                     oldified_varl varl );
+                   check_variant ctx.rac Vc.expl_loop_vari e.e_loc
+                     ~giant_steps:ctx.giant_steps ctx.env oldified_varl varl );
                  (* the execution cannot continue from here *)
                  register_stucked ctx.env e.e_loc
                    "Cannot continue after arbitrary iteration" Mid.empty;
                  let desc = "when reaching the end of a loop iteration" in
-                 let cntr_ctx = mk_cntr_ctx ctx.env ~desc Vc.expl_absurd in
+                 let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_absurd in
                  stuck ?loc:e.e_loc cntr_ctx "%s" desc
              | r -> r
            end
@@ -1121,7 +1125,7 @@ and exec_expr' ctx e =
   | Ewhile (e1, inv, varl, e2) ->
       let res = with_push_premises ctx.env.premises @@ fun () -> (
       if ctx.do_rac then
-        check_terms ctx.rac (mk_cntr_ctx ctx.env Vc.expl_loop_init) inv;
+        check_terms ctx.rac (mk_cntr_ctx ctx Vc.expl_loop_init) inv;
       add_premises inv ctx.env;
       let rec iter () =
         let opt_old_varl =
@@ -1134,13 +1138,13 @@ and exec_expr' ctx e =
               match exec_expr ctx e2 with
               | Normal _ -> (* body executed normally *)
                   if ctx.do_rac then (
-                    let cntr_ctx = mk_cntr_ctx ctx.env Vc.expl_loop_keep in
+                    let cntr_ctx = mk_cntr_ctx ctx Vc.expl_loop_keep in
                     check_terms ctx.rac cntr_ctx inv );
                   add_premises inv ctx.env;
                   if ctx.do_rac && e.e_effect.eff_oneway = Total then (
                     let old_varl = Opt.get opt_old_varl in
-                    check_variant ctx.rac Vc.expl_loop_vari e.e_loc ctx.env
-                      old_varl varl );
+                    check_variant ctx.rac Vc.expl_loop_vari e.e_loc
+                      ~giant_steps:ctx.giant_steps ctx.env old_varl varl );
                   iter ()
               | r -> r
             ) else if is_false v then (* condition false *)
@@ -1198,7 +1202,7 @@ and exec_expr' ctx e =
         if le a (suc b) then begin
           let ctx = {ctx with env= bind_vs i.pv_vs (int_value a) ctx.env} in
           if ctx.do_rac then (
-            let cntr_ctx = mk_cntr_ctx ctx.env Vc.expl_loop_init in
+            let cntr_ctx = mk_cntr_ctx ctx Vc.expl_loop_init in
             check_terms ctx.rac cntr_ctx inv );
           add_premises inv ctx.env;
           List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy ctx)
@@ -1211,12 +1215,12 @@ and exec_expr' ctx e =
             let desc = asprintf "Iterating variable not in bounds" in
             let mid = Mid.singleton i.pv_vs.vs_name i_val in
             register_stucked ctx.env e.e_loc desc mid;
-            let cntr_ctx = mk_cntr_ctx ctx.env ~desc Vc.expl_pre in
+            let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_pre in
             stuck ?loc:e.e_loc cntr_ctx "because %s" desc end;
           if le a i_bi && le i_bi b then begin
             register_iter_loop ctx.env e.e_loc Log.Exec_giant_steps;
             (* assert2 *)
-            let cntr_ctx = mk_cntr_ctx ctx.env Vc.expl_loop_keep in
+            let cntr_ctx = mk_cntr_ctx ctx Vc.expl_loop_keep in
             check_assume_terms ctx.rac cntr_ctx inv;
             add_premises inv ctx.env;
             match exec_expr ctx e1 with
@@ -1224,14 +1228,13 @@ and exec_expr' ctx e =
                 let ctx = {ctx with env= bind_vs i.pv_vs (int_value (suc i_bi)) ctx.env} in
                 (* assert3 *)
                 if ctx.do_rac then
-                  check_terms ctx.rac
-                    (mk_cntr_ctx ctx.env Vc.expl_loop_keep) inv;
+                  check_terms ctx.rac (mk_cntr_ctx ctx Vc.expl_loop_keep) inv;
                 add_premises inv ctx.env;
                 let ctx =
                   {ctx with env= bind_vs i.pv_vs (int_value (suc b)) ctx.env} in
                 (* assert4 *)
                 check_assume_terms ctx.rac
-                  (mk_cntr_ctx ctx.env ~desc:"with (b+1)" Vc.expl_loop_keep) inv;
+                  (mk_cntr_ctx ctx ~desc:"with (b+1)" Vc.expl_loop_keep) inv;
                 Normal unit_value, Some (suc b)
             | r -> r, None
           end
@@ -1240,7 +1243,7 @@ and exec_expr' ctx e =
             (* i is already equal to b + 1 *)
             let desc = "after last iteration" in
             check_assume_terms ctx.rac
-              (mk_cntr_ctx ctx.env ~desc Vc.expl_loop_keep) inv;
+              (mk_cntr_ctx ctx ~desc Vc.expl_loop_keep) inv;
             Normal unit_value, match i_val.v_desc with Vnum n -> Some n | _ -> None
           end
         end
@@ -1263,7 +1266,7 @@ and exec_expr' ctx e =
       let ctx =
         {ctx with env= bind_vs pvs.pv_vs (value ty_int (Vnum a)) ctx.env} in
       ( if ctx.do_rac then
-          check_terms ctx.rac (mk_cntr_ctx ctx.env Vc.expl_loop_init) inv ) ;
+          check_terms ctx.rac (mk_cntr_ctx ctx Vc.expl_loop_init) inv ) ;
       add_premises inv ctx.env;
       let rec iter i =
         Debug.dprintf debug_trace_exec "[interp] for loop with index = %s@."
@@ -1274,7 +1277,7 @@ and exec_expr' ctx e =
           match exec_expr ctx e1 with
           | Normal _ ->
               if ctx.do_rac then
-                check_terms ctx.rac (mk_cntr_ctx ctx.env Vc.expl_loop_keep) inv;
+                check_terms ctx.rac (mk_cntr_ctx ctx Vc.expl_loop_keep) inv;
               iter (suc i)
           | r -> r, None
         ) else
@@ -1314,13 +1317,13 @@ and exec_expr' ctx e =
       if ctx.do_rac then begin
           match kind with
             | Assert ->
-                check_term ctx.rac (mk_cntr_ctx ctx.env Vc.expl_assert) t;
+                check_term ctx.rac (mk_cntr_ctx ctx Vc.expl_assert) t;
                 add_premises [t] ctx.env
             | Assume ->
-                check_assume_term ctx.rac (mk_cntr_ctx ctx.env Vc.expl_assume) t;
+                check_assume_term ctx.rac (mk_cntr_ctx ctx Vc.expl_assume) t;
                 add_premises [t] ctx.env
             | Check ->
-                check_term ctx.rac (mk_cntr_ctx ctx.env Vc.expl_check) t
+                check_term ctx.rac (mk_cntr_ctx ctx Vc.expl_check) t
         end;
       Normal unit_value
   | Eghost e1 ->
@@ -1332,7 +1335,7 @@ and exec_expr' ctx e =
       let t = ctx.compute_term ctx.env t in
       Normal (value (Opt.get t.t_ty) (Vterm t))
   | Eabsurd ->
-      let cntr_ctx = mk_cntr_ctx ?loc:e.e_loc ctx.env Vc.expl_absurd in
+      let cntr_ctx = mk_cntr_ctx ctx ?loc:e.e_loc Vc.expl_absurd in
       raise (Fail (cntr_ctx, t_false))
 
 and exec_match ctx t ebl =
@@ -1380,7 +1383,8 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
               match List.find (fun rd -> rs_equal rs rd.rec_rsym) rds with
               | rd -> (* Recursive call to recursive function *)
                   let old_varl = Opt.get ctx.old_varl in
-                  check_variant ctx.rac Vc.expl_variant loc ctx.env old_varl rd.rec_varl;
+                  check_variant ctx.rac Vc.expl_variant loc
+                    ~giant_steps:ctx.giant_steps ctx.env old_varl rd.rec_varl;
                   {ctx with old_varl= Some (oldify_varl ctx.env rd.rec_varl)} )
     else ctx in
   let check_pre_and_register_call ?(any_function=false) mode =
@@ -1397,7 +1401,7 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
     if ctx.do_rac then (
       let desc = asprintf "of `%a`" print_rs rs in
       (if main_function then check_assume_terms else check_terms)
-        ctx.rac (mk_cntr_ctx ctx.env ?loc:loc ?attrs ~desc Vc.expl_pre)
+        ctx.rac (mk_cntr_ctx ctx ?loc:loc ?attrs ~desc Vc.expl_pre)
         (List.filter not_DECR rs.rs_cty.cty_pre));
     add_premises (List.filter not_DECR rs.rs_cty.cty_pre) ctx.env in
   match mode with
@@ -1464,7 +1468,9 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                 let ty = ty_inst mt (ty_of_ity ity_result) in
                 let vs = List.map field arg_vs in
                 let v = value ty (Vconstr (rs, its_def.Pdecl.itd_fields, vs)) in
-                if ctx.do_rac then check_type_invs ctx.rac ?loc ctx.env ity_result v;
+                if ctx.do_rac then
+                  check_type_invs ctx.rac ?loc ~giant_steps:ctx.giant_steps
+                    ctx.env ity_result v;
                 Normal v
             | Projection _d -> (
                 Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: PROJECTION@]@." pp_indent print_rs rs;
@@ -1494,10 +1500,10 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
         let loc = if main_function then None else loc in
         match res with
         | Normal v ->
-            let cntr_ctx = mk_cntr_ctx ctx.env ?attrs ?loc ~desc Vc.expl_post in
+            let cntr_ctx = mk_cntr_ctx ctx ?attrs ?loc ~desc Vc.expl_post in
             check_posts ctx.rac cntr_ctx v rs.rs_cty.cty_post
         | Excep (xs, v) ->
-            let cntr_ctx = mk_cntr_ctx ctx.env ?loc ~desc ?attrs Vc.expl_xpost in
+            let cntr_ctx = mk_cntr_ctx ctx ?loc ~desc ?attrs Vc.expl_xpost in
             check_posts ctx.rac cntr_ctx v (Mxs.find xs rs.rs_cty.cty_xpost)
         | Irred _ -> () );
       res
@@ -1537,7 +1543,7 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs ctx cty arg_pvs ity_result =
     | None -> "of anonymous function"
     | Some rs -> asprintf "of `%a`" print_rs rs in
   check_assume_posts ctx.rac
-    (mk_cntr_ctx ctx.env ~desc ?attrs Vc.expl_post) res_v cty.cty_post;
+    (mk_cntr_ctx ctx ~desc ?attrs Vc.expl_post) res_v cty.cty_post;
   Normal res_v
   ) in
   add_post_premises cty res ctx.env;

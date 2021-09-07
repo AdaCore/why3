@@ -204,6 +204,11 @@ val create_call_result_attr : Loc.position -> attribute
 val get_call_result_loc : attribute -> Loc.position option
 (** Get the call result location from an attribute. *)
 
+val has_rac_assume : Sattr.t -> bool
+(** Check if the attributes contain [[@RAC:assume]]. When a program annotation
+   is a conjunction, conjuncts marked by this annotation are added to the
+   preconditions when checking the programannotation during giant-step RAC. *)
+
 val search_attribute_value : (attribute -> 'a option) -> Sattr.t -> 'a option
 (** [search_attribute_value f attrs] applies f to the attributes in [attr] and
     returns the first inhabitad result, if any, or [None] otherwise. *)

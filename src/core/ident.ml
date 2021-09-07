@@ -410,6 +410,9 @@ let search_attribute_value f attrs =
 let get_model_trace_attr ~attrs =
   Sattr.choose (Sattr.filter is_model_trace_attr attrs)
 
+let has_rac_assume =
+  Sattr.exists (fun a -> a.attr_string = "RAC:assume")
+
 let transform_model_trace_attr attrs trans_fun =
   try
     let trace_attr = get_model_trace_attr ~attrs in

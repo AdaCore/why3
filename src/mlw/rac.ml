@@ -376,6 +376,17 @@ module Why = struct
         Opt.map (fun b -> not b) res
     | r -> r
 
+  (* Replace (sub-)terms marked by {!Ident.has_rac_assume} by [t_true]. *)
+  let assumed_conjuncts t =
+    let assumed = ref [] in
+    let rec loop t =
+      if Ident.has_rac_assume t.t_attrs then
+        assumed := t :: !assumed
+      else match t.t_node with
+        | Tbinop _ -> t_iter loop t
+        | _ -> () in
+    loop t; !assumed
+
   (* The callee must ensure that RAC is enabled. *)
   let check_term cnf : check_term =
     fun ?vsenv ctx t ->
@@ -383,6 +394,19 @@ module Why = struct
       Pp.(print_list space (fun fmt vs -> fprintf fmt "@[%a=%a@]" print_vs vs print_value (get_vs ctx.cntr_env vs)))
       (Mvs.keys (t_freevars Mvs.empty t)) ;
     let task, _ = task_of_term ?vsenv cnf.metas ctx.cntr_env t in
+    let task =
+      let g, task' = Task.task_separate_goal task in
+      let t = match g with
+        | Theory.{td_node= Decl Decl.{d_node= Dprop (Pgoal, _, t)}} -> t
+        | _ -> assert false in
+      let assumptions = assumed_conjuncts t in
+      if assumptions = [] then task
+      else
+        let for_assumption task t =
+          let pid = Ident.id_fresh "rac'assume" in
+          Task.add_prop_decl task Decl.Paxiom (Decl.create_prsymbol pid) t in
+        let task' = List.fold_left for_assumption task' assumptions in
+        Task.add_tdecl task' g in
     let res = (* Try checking the term using computation first ... *)
       Opt.map (fun b -> Debug.dprintf debug_rac_check_sat "Computed %b.@." b; b)
         (Opt.bind cnf.trans
