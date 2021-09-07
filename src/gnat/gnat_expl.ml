@@ -351,7 +351,6 @@ let reason_to_string reason =
 
 type gp_label =
   | Gp_Check of int * reason * Gnat_loc.loc
-  | Gp_Subp of Gnat_loc.loc
   | Gp_Pretty_Ada of int
   | Gp_Shape of string
   | Gp_Already_Proved
@@ -385,14 +384,6 @@ let read_label s =
            | Failure _ ->
              let s =
                Format.sprintf "GP_Pretty_Ada: cannot parse string: %s" s in
-              Gnat_util.abort_with_message ~internal:true s
-           end
-       | ["GP_Subp" ; file ; line ] ->
-           begin try
-             Some (Gp_Subp (Gnat_loc.mk_loc_line file (int_of_string line)))
-           with e when Debug.test_flag Debug.stack_trace -> raise e
-           | Failure _ ->
-             let s = Format.sprintf "GP_Subp: cannot parse string: %s" s in
               Gnat_util.abort_with_message ~internal:true s
            end
        | ["GP_Shape"; shape ] ->
@@ -450,9 +441,6 @@ let read_vc_labels acc s =
             b.check_sloc <- Some sloc;
         | Some Gp_Pretty_Ada node ->
             b.extra_node <- Some node
-        | Some Gp_Subp _ ->
-             Gnat_util.abort_with_message ~internal:true
-                 "read_vc_labels: GP_Subp unexpected here"
         | Some Gp_Shape shape ->
            b.shape <- Some shape
         | Some Gp_Already_Proved ->

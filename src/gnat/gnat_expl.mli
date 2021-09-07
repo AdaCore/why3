@@ -102,8 +102,6 @@ type subp_entity = Gnat_loc.loc
 type gp_label =
   | Gp_Check of int * reason * Gnat_loc.loc
   (* used to indicate the ID, VC Kind and sloc of a VC *)
-  | Gp_Subp of Gnat_loc.loc
-  (* label "GP_Subp" used to indicate the location of the subprogram *)
   | Gp_Pretty_Ada of int
   (* label "GP_Pretty_Ada" used to give an Ada source node for some
      predicate *)
