@@ -4,13 +4,10 @@ type goal_id = Session_itp.proofNodeID
 (* This is the type of identifier of goal. They can be queried from the session
    through Session_itp functions *)
 
-type subp =
-  { subp_goal : goal_id;
-    subp_entity : Gnat_expl.subp_entity
-  }
+type subp = { subp_goal : goal_id }
 (* This type stores the goal which corresponds to a subprogram (the whole
-   correctness formula for a subp), together with the entity information which
-   describes it *)
+   correctness formula for a subp). We use a different type to avoid confusion
+   with regular goals. *)
 
 type objective = Gnat_expl.check
 (* an objective is identified by its explanation, which contains the source
@@ -626,33 +623,13 @@ let apply_split_goal_if_needed c g =
     C.schedule_transformation c g first_transform []
       ~callback:(fun _ -> ()) ~notification:(fun _ -> ())
 
-exception Found_loc of Gnat_loc.loc
-
-let extract_sloc (s: Session_itp.session) (main_goal: goal_id) =
-   let task = Session_itp.get_task s main_goal in
-   let goal_ident = (Task.task_goal task).Decl.pr_name in
-   let attr_set = goal_ident.Ident.id_attrs in
-   try
-      Ident.Sattr.iter (fun attr ->
-        match Gnat_expl.read_label attr.Ident.attr_string with
-        | Some Gnat_expl.Gp_Subp loc -> raise (Found_loc loc)
-        | _ -> ()
-      ) attr_set;
-      Gnat_util.abort_with_message ~internal:true
-        (Pp.sprintf "could not find source location for subprogram %s"
-        goal_ident.Ident.id_string)
-   with Found_loc l -> l
-
 let init_subp_vcs c subp =
   apply_split_goal_if_needed c subp.subp_goal
 
 let save_session c =
    Session_itp.save_session c.Controller_itp.controller_session
 
-let mk_subp_goal s goal =
-  { subp_goal = goal;
-    subp_entity = extract_sloc s goal
-  }
+let mk_subp_goal goal = { subp_goal = goal }
 
 let iter_subps c f =
    let s = c.Controller_itp.controller_session in
@@ -661,7 +638,7 @@ let iter_subps c f =
      iter_main_goals s (fun g ->
        let task = Session_itp.get_task s g in
        if task = None then ()
-       else acc := mk_subp_goal s g :: !acc) in
+       else acc := mk_subp_goal g :: !acc) in
    List.iter f !acc
 
 module Save_VCs = struct
