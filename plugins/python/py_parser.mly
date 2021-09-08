@@ -435,12 +435,12 @@ comma_list1(X):
 (* parsing of a single term *)
 
 term_eof:
-| term EOF { $1 }
+| term NEWLINE EOF { $1 }
 
 ident_comma_list_eof:
-| comma_list1(ident) EOF { $1 }
+| comma_list1(ident) NEWLINE EOF { $1 }
 
 term_comma_list_eof:
-| comma_list1(term) EOF { $1 }
+| comma_list1(term) NEWLINE EOF { $1 }
 (* we use single_term to avoid conflict with tuples, that
    do not need parentheses *)
