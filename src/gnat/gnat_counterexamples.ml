@@ -82,7 +82,7 @@ let clean = object (self)
   inherit Model_parser.clean
 
   method! element me =
-    (* Don't clean names here but in post *)
+    (* Don't clean names here but in post_clean *)
     if me.me_name.men_kind = Error_message then
       Some me (* Keep unparsed values for error messages *)
     else
