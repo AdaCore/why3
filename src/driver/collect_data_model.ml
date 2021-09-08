@@ -204,6 +204,9 @@ and eval_to_array ctx = function
 (*            Import Smtv2_model_defs to model elements                 *)
 (************************************************************************)
 
+(** Create a mapping from the names of constants among the definitions to model
+    values, which are obtained by evaluating the SMTv2 expressions by which
+    the constants are defined. *)
 let create_list pm (defs: definition Mstr.t) =
 
   (* Convert list_records to take replace fields with model_trace when
@@ -223,12 +226,15 @@ let create_list pm (defs: definition Mstr.t) =
   Debug.dprintf debug_cntex "@[<hv2>Definitions:%a@]@."
     Pp.(print_list_pre newline print_def) (Mstr.bindings defs);
 
+  (* Collect the function definitions from the SMT definitions, for use
+     during the evaluation of SMT expressions. *)
   let function_defs =
     let only_functions = function
       | Dfunction (args, res_type, body) -> Some {args; res_type; body}
       | _ -> None in
     Mstr.map_filter only_functions defs in
 
+  (* The constant names, i.e. the keys of the resulting mapping *)
   let const_names =
     let is_const nm def =
       def.args = [] &&
@@ -239,11 +245,13 @@ let create_list pm (defs: definition Mstr.t) =
   Debug.dprintf debug_cntex "@[<hov2>Const defs:%a@]@."
     Pp.(print_list_pre comma string) const_names;
 
+  (* The evaluation context *)
   let ctx =
     { values= Mstr.empty; consts= Hstr.create 7; prover_values= Hstr.create 7;
       function_defs; fields_projs; pm; list_records;
       interprete_prover_vars= true } in
 
+  (* Evaluate the expressions by which the constants are defined *)
   let res =
     let for_const nm  =
       Debug.dprintf debug_cntex "@[<hv2>EVAL CONST %s@]@." nm;
