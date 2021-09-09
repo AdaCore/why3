@@ -932,54 +932,54 @@ let () = Exn_printer.register
   | BadInstance (BadI_ty_vars ts) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
           extra type variables in the type expression"
-        print_id ts.ts_name
+        print_ts ts
   | BadInstance (BadI_ty_ner ts) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
           record types cannot be instantiated with type expressions"
-        print_id ts.ts_name
+        print_ts ts
   | BadInstance (BadI_ty_impure ts) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
           both %a and the refining type expression must be pure"
-        print_id ts.ts_name print_id ts.ts_name
+        print_ts ts print_ts ts
   | BadInstance (BadI_ty_arity ts) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\narity mismatch"
-        print_id ts.ts_name
+        print_ts ts
   | BadInstance (BadI_ty_rec ts) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
         the refining type must be a non-recursive record"
-        print_id ts.ts_name
+        print_ts ts
   | BadInstance (BadI_ty_mut_lhs ts) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
         the refinining type must be mutable"
-        print_id ts.ts_name
+        print_ts ts
   | BadInstance (BadI_ty_mut_rhs ts) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
         the refinining type must be immutable"
-        print_id ts.ts_name
+        print_ts ts
   | BadInstance (BadI_ty_alias ts) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
         the added fields are aliased with the original fields"
-        print_id ts.ts_name
+        print_ts ts
   | BadInstance (BadI_field (ts,vs)) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
         field %a not found in the refinining type"
-        print_id ts.ts_name print_id vs.vs_name
+        print_ts ts print_vs vs
   | BadInstance (BadI_field_type (ts,vs)) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
         incompatible types for field %a"
-        print_id ts.ts_name print_id vs.vs_name
+        print_ts ts print_vs vs
   | BadInstance (BadI_field_ghost (ts,vs)) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
         incompatible ghost status for field %a"
-        print_id ts.ts_name print_id vs.vs_name
+        print_ts ts print_vs vs
   | BadInstance (BadI_field_mut (ts,vs)) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
         incompatible mutability status for field %a"
-        print_id ts.ts_name print_id vs.vs_name
+        print_ts ts print_vs vs
   | BadInstance (BadI_field_inv (ts,vs)) -> Format.fprintf fmt
       "Illegal instantiation for type %a:@\n\
         field %a must not appear in the refined invariant"
-        print_id ts.ts_name print_id vs.vs_name
+        print_ts ts print_vs vs
   | BadInstance (BadI_ls_type (ls,ty1,ty2)) -> Format.fprintf fmt
       "Illegal instantiation for %s %a:@\ntype mismatch between %a and %a"
         (if ls.ls_value = None then "predicate" else "function")
@@ -987,17 +987,17 @@ let () = Exn_printer.register
   | BadInstance (BadI_ls_kind ls) -> Format.fprintf fmt
       "Illegal instantiation for %s %a:@\n%s expected"
         (if ls.ls_value = None then "predicate" else "function")
-        print_id ls.ls_name
+        print_ls ls
         (if ls.ls_value = None then "predicate" else "function")
   | BadInstance (BadI_ls_arity ls) -> Format.fprintf fmt
       "Illegal instantiation for %s %a:@\narity mismatch"
         (if ls.ls_value = None then "predicate" else "function")
-        print_id ls.ls_name
+        print_ls ls
   | BadInstance (BadI_ls_rs ls) -> Format.fprintf fmt
       "Cannot instantiate %s %a:@\nprogram function %a \
         must be refined instead"
         (if ls.ls_value = None then "predicate" else "function")
-        print_id ls.ls_name print_id ls.ls_name
+        print_ls ls print_ls ls
   | BadInstance (BadI_rs_arity id) -> Format.fprintf fmt
       "Illegal instantiation for program function %a:@\n\
         arity mismatch"
@@ -1078,11 +1078,11 @@ let () = Exn_printer.register
         is applied to %a"
         m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
   | RangeConflict ts ->
-      Format.fprintf fmt "Conflicting definitions for range type %s"
-        ts.ts_name.id_string
+      Format.fprintf fmt "Conflicting definitions for range type %a"
+        print_ts ts
   | FloatConflict ts ->
-      Format.fprintf fmt "Conflicting definitions for float type %s"
-        ts.ts_name.id_string
+      Format.fprintf fmt "Conflicting definitions for float type %a"
+        print_ts ts
   | _ -> raise exn
   end
 
