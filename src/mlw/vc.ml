@@ -89,7 +89,10 @@ let wp_attr = Ident.create_attribute "vc:wp"
 let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
 let nt_attr = Ident.create_attribute "vc:divergent"
+
 let do_not_keep_trace_attr = Ident.create_attribute "vc:do_not_keep_trace"
+let do_not_keep_trace_flag = Debug.register_flag "vc:do_not_keep_trace"
+    ~desc:"Do@ not@ keep@ trace@ variables@ in@ model"
 
 let vc_attrs =
   Sattr.add nt_attr (Sattr.add kp_attr (Sattr.add wb_attr
@@ -117,7 +120,8 @@ let mk_env ?(attrs=Sattr.empty)
       {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs =
   (* generate traceability info for counterexamples if asked *)
   let keep_trace =
-    if Sattr.mem do_not_keep_trace_attr attrs then
+    if Debug.test_flag do_not_keep_trace_flag ||
+       Sattr.mem do_not_keep_trace_attr attrs then
       begin
         Debug.dprintf debug_vc "keep_trace is unset@.";
         false
