@@ -980,10 +980,10 @@ let () = Exn_printer.register
       "Illegal instantiation for type %a:@\n\
         field %a must not appear in the refined invariant"
         print_id ts.ts_name print_id vs.vs_name
-  | BadInstance (BadI_ls_type ls) -> Format.fprintf fmt
-      "Illegal instantiation for %s %a:@\ntype mismatch"
+  | BadInstance (BadI_ls_type (ls,ty1,ty2)) -> Format.fprintf fmt
+      "Illegal instantiation for %s %a:@\ntype mismatch between %a and %a"
         (if ls.ls_value = None then "predicate" else "function")
-        print_id ls.ls_name
+        print_ls ls print_ty_qualified ty1 print_ty_qualified ty2
   | BadInstance (BadI_ls_kind ls) -> Format.fprintf fmt
       "Illegal instantiation for %s %a:@\n%s expected"
         (if ls.ls_value = None then "predicate" else "function")
