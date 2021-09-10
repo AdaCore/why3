@@ -411,11 +411,16 @@ let set_obsolete s paid b =
   pa.proof_obsolete <- b
  *)
 
-let check_if_already_exists s pid t args =
-    let sub_transfs = get_transformations s pid in
-    List.exists (fun tr_id ->
+let get_transformation s pid t args =
+  let sub_transfs = get_transformations s pid in
+  List.find (fun tr_id ->
       get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
       not (is_detached s (ATn tr_id))) sub_transfs
+
+let check_if_already_exists s pid t args =
+  match get_transformation s pid t args with
+  | _ -> true
+  | exception Not_found -> false
 
 (* Iterations functions on the session tree *)
 
