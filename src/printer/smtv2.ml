@@ -280,6 +280,20 @@ let escape c = match c with
   | '\000' .. '\031'
   | '\127' .. '\255' -> Format.sprintf "\\x%02X" (Char.code c)
 
+(* can the type of a value be derived from the type of the arguments? *)
+let unambig_fs version fs =
+  let rec lookup v ty = match ty.ty_node with
+    | Tyvar u when tv_equal u v -> true
+    | _ -> ty_any (lookup v) ty
+  in
+  let lookup v = List.exists (lookup v) fs.ls_args in
+  let rec inspect ty = match ty.ty_node with
+    | Tyvar u when not (lookup u) -> false
+    | _ -> ty_all inspect ty
+  in
+  match version with
+  | V20 | V26 -> true
+  | V26Par ->  inspect (Opt.get fs.ls_value)
 
 (** expr *)
 let rec print_term info fmt t =
@@ -340,12 +354,22 @@ let rec print_term info fmt t =
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		()
 	    end;
-	    fprintf fmt "@[%a@]" (print_ident info) ls.ls_name
+            if unambig_fs info.info_version ls then
+	      fprintf fmt "@[%a@]" (print_ident info) ls.ls_name
+            else
+              fprintf fmt "@[(as %a %a)@]" (print_ident info) ls.ls_name
+                (print_type info) (t_type t)
           | _ ->
-	    fprintf fmt "@[<hv2>(%a@ %a)@]"
-	      (print_ident info) ls.ls_name
-              (print_list space (print_term info)) tl
-                end
+            if unambig_fs info.info_version ls then
+	      fprintf fmt "@[<hv2>(%a@ %a)@]"
+	        (print_ident info) ls.ls_name
+                (print_list space (print_term info)) tl
+            else
+              fprintf fmt "@[<hv2>((as %a@ %a)@ %a)@]"
+                (print_ident info) ls.ls_name
+                (print_type info) (t_type t)
+                (print_list space (print_term info)) tl
+        end
     end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
