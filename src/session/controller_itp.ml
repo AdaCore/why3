@@ -851,7 +851,11 @@ let run_strategy_on_goal
                  S.idle ~prio:0 run_next)
                 (get_sub_tasks c.controller_session tid)
          in
-         schedule_transformation c g trname [] ~callback ~notification
+         begin match Session_itp.get_transformation c.controller_session g trname [] with
+         | tid -> callback (TSdone tid)
+         | exception Not_found ->
+             schedule_transformation c g trname [] ~callback ~notification
+         end
       | Igoto pc ->
          callback (STSgoto (g,pc));
          exec_strategy pc strat g
