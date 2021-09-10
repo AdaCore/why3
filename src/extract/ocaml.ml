@@ -135,7 +135,7 @@ module Print = struct
   let print_global_ident ~sanitizer fmt id =
     let s = id_unique ~sanitizer tprinter id in
     Ident.forget_id tprinter id;
-    fprintf fmt "%s" s
+    pp_print_string fmt s
 
   let print_path ~sanitizer fmt (q, id) =
     assert (List.length q >= 1);
@@ -169,7 +169,7 @@ module Print = struct
     with
     | Not_found ->
         let s = id_unique ~sanitizer iprinter id in
-        fprintf fmt "%s" s
+        pp_print_string fmt s
     | Local ->
         let _, _, q =
           try Pmodule.restore_path id with Not_found ->
@@ -209,10 +209,10 @@ module Print = struct
   let print_record_proj info fmt rs =
     match query_syntax info.info_syn rs.rs_name with
     | None ->
-       fprintf fmt "%a" (print_lident info) rs.rs_name
+        print_lident info fmt rs.rs_name
     | Some s when complex_syntax s ->
        Loc.errorm ?loc:rs.rs_name.id_loc "Unsupported: complex record field"
-    | Some s -> fprintf fmt "%s" s
+    | Some s -> pp_print_string fmt s
 
   (** Types *)
 
@@ -290,7 +290,7 @@ module Print = struct
     let attrs = id.id_attrs in
     if is_optional ~attrs then print_vsty_opt_fun info fmt id ty
     else if is_named ~attrs then print_vsty_named_fun info fmt id ty
-    else fprintf fmt "%a" (print_ty ~use_quote:false ~paren:true info) ty
+    else print_ty ~use_quote:false ~paren:true info fmt ty
 
   let print_vs_fun info fmt id =
     let attrs = id.id_attrs in
@@ -349,7 +349,7 @@ module Print = struct
                   (print_pat info 6)) (pjl, pl)
 
   and print_papp info ls fmt = function
-    | []  -> fprintf fmt "%a"      (print_uident info) ls.ls_name
+    | []  -> print_uident info fmt ls.ls_name
     | [p] -> fprintf fmt "%a %a"   (print_uident info) ls.ls_name
                (print_pat info 3) p
     | pl  -> fprintf fmt "%a (%a)" (print_uident info) ls.ls_name
@@ -383,7 +383,7 @@ module Print = struct
         let v = c.Number.il_int in
         let s = BigInt.to_string v in
         if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" s
-        else fprintf fmt "%s" s
+        else pp_print_string fmt s
     | Econst (Constant.ConstStr s) ->
        Constant.print_string_def fmt s
     | _ -> assert false end
@@ -403,11 +403,11 @@ module Print = struct
         else if is_named ~attrs:(pv_name pv).id_attrs then
           fprintf fmt "~%s:%a" (pv_name pv).id_string
             (print_expr info 1) expr
-        else fprintf fmt "%a" (print_expr info 3) expr;
+        else print_expr info 3 fmt expr;
         if exprl <> [] then fprintf fmt "@ ";
         print_apply_args info fmt (exprl, pvl)
     | expr :: exprl, [] ->
-        fprintf fmt "%a" (print_expr info 3) expr;
+        print_expr info 3 fmt expr;
         print_apply_args info fmt (exprl, [])
     | [], _ -> ()
 
@@ -818,7 +818,7 @@ module Print = struct
     let print_pair fmt (s, dl) =
       let info = { info with info_current_ph = s :: info.info_current_ph } in
       fprintf fmt "(%s:@ %a)" s (print_sig info) dl in
-    fprintf fmt "%a" (print_list space print_pair) args
+    print_list space print_pair fmt args
 
   let print_decl info fmt decl =
     (* avoids printing the same decl for mutually recursive decls *)

@@ -49,27 +49,27 @@ let print_tv fmt tv =
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
   let sanitizer = Strings.uncapitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer vs.vs_name)
+  pp_print_string fmt (id_unique iprinter ~sanitizer vs.vs_name)
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
 (* theory names always start with an upper case letter *)
 let print_th fmt th =
   let sanitizer = Strings.capitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer th.th_name)
+  pp_print_string fmt (id_unique iprinter ~sanitizer th.th_name)
 
 let print_ts fmt ts =
-  fprintf fmt "%s" (id_unique tprinter ts.ts_name)
+  pp_print_string fmt (id_unique tprinter ts.ts_name)
 
 let print_ls fmt ls =
-  fprintf fmt "%s" (id_unique iprinter ls.ls_name)
+  pp_print_string fmt (id_unique iprinter ls.ls_name)
 
 let print_cs fmt ls =
   let sanitizer = Strings.capitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer ls.ls_name)
+  pp_print_string fmt (id_unique iprinter ~sanitizer ls.ls_name)
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique pprinter pr.pr_name)
+  pp_print_string fmt (id_unique pprinter pr.pr_name)
 
 (* info *)
 
@@ -369,8 +369,8 @@ let print_meta_arg fmt = function
   | MAls ls -> fprintf fmt "%s %a" (ls_kind ls) print_ls ls
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
   | MAstr s -> fprintf fmt "\"%s\"" s
-  | MAint i -> fprintf fmt "%d" i
-  | MAid id -> fprintf fmt "%s" (id_unique iprinter id)
+  | MAint i -> pp_print_int fmt i
+  | MAid id -> pp_print_string fmt (id_unique iprinter id)
 
 let print_qt fmt th =
   if th.th_path = [] then print_th fmt th else

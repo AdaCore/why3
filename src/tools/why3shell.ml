@@ -141,7 +141,7 @@ let get_result pa =
 let print_proof_attempt fmt pa_id =
   let pa = Hnode.find nodes pa_id in
   match pa.node_proof with
-  | None -> fprintf fmt "%s" pa.node_name
+  | None -> pp_print_string fmt pa.node_name
   | Some _pr ->
     fprintf fmt "@[<h>%s %a@]"
       pa.node_name

@@ -66,7 +66,7 @@ let empty_spec = {
 
 
 let pp_id fmt id =
-  Format.fprintf fmt "%s" id.id_str
+  Format.pp_print_string fmt id.id_str
 
 let rec pp_qid fmt qid =
   match qid with

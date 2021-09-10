@@ -27,7 +27,7 @@ let string fmt s =
   String.iter (char fmt) s;
   pp_print_char fmt '"'
 
-let int fmt d = fprintf fmt "%d" d
+let int = pp_print_int
 let bool fmt b = fprintf fmt "%b" b
 let standard_float fmt f = fprintf fmt "%f" f
 let float fmt f = fprintf fmt "%g" f

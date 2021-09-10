@@ -100,7 +100,7 @@ struct
 
 
   let color_of_status ?(dark=false) fmt b =
-    fprintf fmt "%s" (if b then
+    pp_print_string fmt (if b then
         if dark then "008000" else "C0FFC0"
       else "FF0000")
 
@@ -217,14 +217,11 @@ let rec num_lines s acc tr =
     (* fprintf fmt "<h1>File %s</h1>@\n" f.file_name; *)
     let fn = Sysutil.basename (file_path f) in
     let fn = Filename.chop_extension fn in
-    fprintf fmt "%a"
-      (Pp.print_list Pp.newline (print_theory s fn)) (file_theories f)
+    Pp.print_list Pp.newline (print_theory s fn) fmt (file_theories f)
 
   let print_session name fmt s =
     fprintf fmt "<h1>Why3 Proof Results for Project \"%s\"</h1>@\n" name;
-    fprintf fmt "%a"
-      (Pp.print_iter2 Hfile.iter Pp.newline Pp.nothing Pp.nothing
-         (print_file s)) (get_files s)
+    Pp.print_iter2 Hfile.iter Pp.newline Pp.nothing Pp.nothing (print_file s) fmt (get_files s)
 
 end
 

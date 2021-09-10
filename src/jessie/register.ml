@@ -40,7 +40,7 @@ let run_on_task fmt prover prover_driver t =
          ~limit
          prover_driver t)
   in
-  Format.fprintf fmt "%a" Call_provers.print_prover_answer result.Call_provers.pr_answer;
+  Call_provers.print_prover_answer fmt result.Call_provers.pr_answer;
   match result.Call_provers.pr_answer with
   | Call_provers.Failure _ | Call_provers.HighFailure ->
     Format.fprintf fmt "@\n=======@\n%s@\n======@\n" result.Call_provers.pr_output

@@ -1171,7 +1171,7 @@ and pp_decl ?(attr=true) fmt = function
           (pp_fundef ~attr) in
       fprintf fmt "@[<v>@[<v 2>let rec %a@]@]" pp_fundefs defs
   | Dexn (id, pty, mask) ->
-      fprintf fmt "%a" (pp_exn ~attr) (id, pty, mask)
+      pp_exn ~attr fmt (id, pty, mask)
   | Dmeta (ident, args) ->
       let pp_metarg fmt = function
         | Mty ty -> fprintf fmt "type %a" (pp_pty ~attr).marked ty
@@ -1182,7 +1182,7 @@ and pp_decl ?(attr=true) fmt = function
         | Mgl qid -> fprintf fmt "goal %a" (pp_qualid ~attr) qid
         | Mval qid -> fprintf fmt "val %a" (pp_qualid ~attr) qid
         | Mstr s -> fprintf fmt "%S" s
-        | Mint i -> fprintf fmt "%d" i in
+        | Mint i -> pp_print_int fmt i in
       let pp_args = pp_print_list ~pp_sep:(pp_sep ", ") pp_metarg in
       fprintf fmt "meta \"%a\" %a" (pp_id ~attr) ident pp_args args
   | Dcloneexport (_, qid, substs) ->

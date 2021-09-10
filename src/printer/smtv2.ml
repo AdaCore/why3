@@ -182,12 +182,12 @@ let debug_print_term message t =
   end
 
 let print_ident info fmt id =
-  fprintf fmt "%s" (id_unique info.info_printer id)
+  pp_print_string fmt (id_unique info.info_printer id)
 
 (** type *)
 
 let print_tv info fmt tv =
-  fprintf fmt "%s" (id_unique info.info_printer tv.tv_name)
+  pp_print_string fmt (id_unique info.info_printer tv.tv_name)
 
 (** print `(par ...)` around the given body to print *)
 let print_par info (* body *) =
@@ -213,7 +213,7 @@ let rec print_type info fmt ty = match ty.ty_node with
   | Tyapp (ts, l) ->
       begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
-      | None, [] -> fprintf fmt "%a" (print_ident info) ts.ts_name
+      | None, [] -> print_ident info fmt ts.ts_name
       | None, _ -> fprintf fmt "(%a %a)" (print_ident info) ts.ts_name
           (print_list space (print_type info)) l
      end
@@ -230,7 +230,7 @@ let forget_var info v = forget_id info.info_printer v.vs_name
 
 let print_var info fmt {vs_name = id} =
   let n = id_unique info.info_printer id in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 let print_typed_var info fmt vs =
   fprintf fmt "(%a %a)" (print_var info) vs
@@ -514,7 +514,8 @@ and print_branch info subject pr fmt (cs,vars,t) =
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
-and print_trigger info fmt e = fprintf fmt "%a" (print_expr info) e
+and print_trigger info fmt e =
+  print_expr info fmt e
 
 and print_triggers info fmt = function
   | [] -> ()
@@ -586,7 +587,7 @@ let print_prop info fmt pr f =
   let tvs = Term.t_ty_freevars Ty.Stv.empty f in
   fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
     pr.pr_name.id_string (* FIXME? collisions *)
-    (print_par info (fun fmt -> Format.fprintf fmt "%a" (print_fmla info) f)) tvs
+    (print_par info (fun fmt -> print_fmla info fmt f)) tvs
 
 let add_check_sat info fmt =
   if info.info_cntexample && info.info_cntexample_need_push then

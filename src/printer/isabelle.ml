@@ -67,13 +67,13 @@ let forget_tvs () = forget_all tvprinter
 
 let print_tv fmt tv =
   let n = id_unique tvprinter tv.tv_name in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 (* logic variables *)
 
 let print_vs fmt vs =
   let n = id_unique iprinter vs.vs_name in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 let forget_var vs = forget_id iprinter vs.vs_name
 

@@ -183,8 +183,8 @@ let print_msg fmt m =
   | Task_Monitor _                               -> fprintf fmt "task montor"
   | Parse_Or_Type_Error (_, _, s)                -> fprintf fmt "parse_or_type_error:\n %s" s
   | File_Saved s                                 -> fprintf fmt "file saved %s" s
-  | Error s                                      -> fprintf fmt "%s" s
-  | Open_File_Error s                            -> fprintf fmt "%s" s
+  | Error s                                      -> pp_print_string fmt s
+  | Open_File_Error s                            -> pp_print_string fmt s
 
 (* TODO ad hoc printing. Should reuse print_loc. *)
 let print_loc fmt (loc: Loc.position) =

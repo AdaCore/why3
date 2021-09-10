@@ -79,7 +79,7 @@ let rec print_value fmt = function
   | Vbool b -> fprintf fmt "%b" b
   | Vstring s -> Constant.(print_string_def fmt s)
   | Vbigint i -> Constant.print_def fmt (Constant.int_const i)
-  | Vint i -> fprintf fmt "%d" i
+  | Vint i -> pp_print_int fmt i
   | Vtuple l -> fprintf fmt "@[<hov 2>(%a)@]"
                         (Pp.print_list Pp.comma print_value) l
   | Vconstr (rs, lf) -> fprintf fmt "@[<hov 2>(%a@ %a)@]"
@@ -91,7 +91,7 @@ let rec print_value fmt = function
   | Vref r -> fprintf fmt "Vref %a" print_value !r
 
 and print_field fmt = function
-  | Fimmutable v -> fprintf fmt "%a" print_value v
+  | Fimmutable v -> print_value fmt v
   | Fmutable vr -> fprintf fmt "Fmutable %a" print_value !vr
 and print_matrix fmt m =
   Array.iter (fun a -> fprintf fmt "[|%a|]\n"

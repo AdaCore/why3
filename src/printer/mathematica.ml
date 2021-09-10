@@ -110,7 +110,7 @@ let ident_printer =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
+  pp_print_string fmt (id_unique ident_printer id)
 
 let number_format = {
     Number.long_int_support = `Default;
@@ -170,9 +170,9 @@ let rec print_term info fmt t =
       | None -> print_ident fmt id
     end
   | Tapp ( { ls_name = id } ,[t] )
-      when try String.sub id.id_string 0 6 = "index_" with Invalid_argument _
-        -> false ->
-            fprintf fmt "%a" term t
+      when (try String.sub id.id_string 0 6 = "index_" with Invalid_argument _ -> false)
+    ->
+      term fmt t
   | Tapp (ls, tl) ->
       begin match query_syntax info.info_syn ls.ls_name with
         | Some s -> syntax_arguments s term fmt tl
@@ -180,7 +180,7 @@ let rec print_term info fmt t =
             unsupportedTerm t
               ("math: function '" ^ ls.ls_name.id_string ^ "' is not supported")*)
         | None -> begin match tl with
-            | [] -> fprintf fmt "%a" print_ident ls.ls_name
+            | [] -> print_ident fmt ls.ls_name
             | _ -> fprintf fmt "%a[%a]"
                 print_ident ls.ls_name (print_list comma term) tl
           end
@@ -254,7 +254,7 @@ let rec print_term info fmt t =
             (*unsupportedTerm f
               ("math: predicate '" ^ ls.ls_name.id_string ^ "' is not supported")*)
             begin match tl with
-              | [] -> fprintf fmt "%a" print_ident ls.ls_name
+              | [] -> print_ident fmt ls.ls_name
               | _ -> fprintf fmt "%a[%a]"
                 print_ident ls.ls_name (print_list comma (print_term info)) tl
             end
@@ -492,7 +492,7 @@ let print_dom _info fmt lsymbol =
   | _ -> ()
 
 let print_param _info fmt lsymbol =
-  fprintf fmt "%a" print_ident lsymbol.ls_name
+  print_ident fmt lsymbol.ls_name
 
 let print_var info fmt vsymbol =
   (*fprintf fmt "%a" print_ident vsymbol.vs_name*)

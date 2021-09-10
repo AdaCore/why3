@@ -22,7 +22,7 @@ let print_option f fmt = function
   | Some x -> f fmt x
 
 let print_option_or_default default f fmt = function
-  | None -> fprintf fmt "%s" default
+  | None -> pp_print_string fmt default
   | Some x -> f fmt x
 
 let rec print_list_pre sep print fmt = function
@@ -39,7 +39,7 @@ let print_list sep print fmt = function
   | x :: r -> print fmt x; print_list_pre sep print fmt r
 
 let print_list_or_default default sep print fmt = function
-  | [] -> fprintf fmt "%s" default
+  | [] -> pp_print_string fmt default
   | l -> print_list sep print fmt l
 
 let print_list_par sep pr fmt l =

@@ -19,9 +19,9 @@ let pp_bindings ?(sep = Pp.semi) ?(pair_sep = Pp.arrow) ?(delims = Pp.(lbrace, r
     (Pp.print_list sep pp_binding)
     l (snd delims) ()
 
-let pp_env pp_key pp_value fmt =
+let pp_env pp_key pp_value fmt l =
   let delims = Pp.nothing, Pp.nothing in
-  fprintf fmt "%a" (pp_bindings ~delims ~sep:Pp.comma pp_key pp_value)
+  pp_bindings ~delims ~sep:Pp.comma pp_key pp_value fmt l
 
 exception Incomplete of string
 
@@ -234,7 +234,7 @@ and print_value' fmt v =
   match v.v_desc with
   | Vnum n ->
       if BigInt.ge n BigInt.zero then
-        fprintf fmt "%s" (BigInt.to_string n)
+        pp_print_string fmt (BigInt.to_string n)
       else
         fprintf fmt "(%s)" (BigInt.to_string n)
   | Vbool b -> fprintf fmt "%b" b
@@ -245,7 +245,7 @@ and print_value' fmt v =
       let hexadecimal = Mlmpfr_wrapper.get_formatted_str ~base:16 f in
       let decimal = Mlmpfr_wrapper.get_formatted_str ~base:10 f in
       fprintf fmt "%s (%s)" decimal hexadecimal
-  | Vfloat_mode m -> fprintf fmt "%s" (mode_to_string m)
+  | Vfloat_mode m -> pp_print_string fmt (mode_to_string m)
   | Vstring s -> Constant.print_string_def fmt s
   | Vfun (mvs, vs, e) ->
       fprintf fmt "@[<h>@[<v3>(fun %a -> %a)@]%a@]"

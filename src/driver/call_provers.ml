@@ -207,10 +207,10 @@ let rec grep out l = match l with
 let craft_efficient_re l =
   let s = Format.asprintf "%a"
     (Pp.print_list_delim
-       ~start:(fun fmt () -> Format.fprintf fmt "\\(")
-       ~stop:(fun fmt () -> Format.fprintf fmt "\\)")
-       ~sep:(fun fmt () -> Format.fprintf fmt "\\|")
-       (fun fmt (a, _b) -> Format.fprintf fmt "%s" a)) l
+       ~start:(fun fmt () -> Format.pp_print_string fmt "\\(")
+       ~stop:(fun fmt () -> Format.pp_print_string fmt "\\)")
+       ~sep:(fun fmt () -> Format.pp_print_string fmt "\\|")
+       (fun fmt (a, _b) -> Format.pp_print_string fmt a)) l
   in
   Re.Str.regexp s
 

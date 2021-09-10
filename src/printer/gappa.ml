@@ -153,7 +153,7 @@ let ident_printer =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
+  pp_print_string fmt (id_unique ident_printer id)
 
 let number_format = {
     Number.long_int_support = `Default;
@@ -195,9 +195,9 @@ let rec print_term info defs fmt t =
     | Tapp ( { ls_name = id }, [] ) ->
        begin match query_syntax info.info_syn id with
        | Some s -> syntax_arguments s term fmt []
-       | None -> fprintf fmt "%s" (constant_value defs t)
+       | None -> pp_print_string fmt (constant_value defs t)
        end
-    | _ -> fprintf fmt "%s" (constant_value defs t)
+    | _ -> pp_print_string fmt (constant_value defs t)
   with Not_found ->
   match t.t_node with
   | Tconst _ -> assert false

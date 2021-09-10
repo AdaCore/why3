@@ -72,7 +72,7 @@ type info = {
 
 let print_tv info ~whytypes fmt tv =
   let n = id_unique iprinter tv.tv_name in
-  fprintf fmt "%s" n;
+  pp_print_string fmt n;
   if whytypes && not info.ssreflect then fprintf fmt " %s_WT" n
 
 let print_tv_binder info ~whytypes ~implicit fmt tv =
@@ -110,18 +110,18 @@ let forget_tvs () =
 (* logic variables *)
 let print_vs fmt vs =
   let n = id_unique iprinter vs.vs_name in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
 let print_ts fmt ts =
-  fprintf fmt "%s" (id_unique iprinter ts.ts_name)
+  pp_print_string fmt (id_unique iprinter ts.ts_name)
 
 let print_ls fmt ls =
-  fprintf fmt "%s" (id_unique iprinter ls.ls_name)
+  pp_print_string fmt (id_unique iprinter ls.ls_name)
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique iprinter pr.pr_name)
+  pp_print_string fmt (id_unique iprinter pr.pr_name)
 
 let ls_ty_vars ls =
   let ty_vars_args = List.fold_left Ty.ty_freevars Stv.empty ls.ls_args in
@@ -153,7 +153,7 @@ let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
 
 let print_ts_tv info fmt ts =
   match ts.ts_args with
-  | [] -> fprintf fmt "%a" print_ts ts
+  | [] -> print_ts fmt ts
   | _ -> fprintf fmt "(%a %a)" print_ts ts
     (print_list space (print_tv info ~whytypes:false)) ts.ts_args
 
@@ -312,7 +312,7 @@ let rec print_term ?(boxed=false) ?(opr=true) info ~prec fmt t =
   | Tapp (fs,[]) when is_fs_tuple fs ->
       fprintf fmt "Init.Datatypes.tt"
   | Tapp (fs,pl) when is_fs_tuple fs ->
-      fprintf fmt "%a" (print_paren_r (print_term ~prec:250 info)) pl
+      print_paren_r (print_term ~prec:250 info) fmt pl
   | Tapp (fs,[l;r]) when ls_equal fs fs_func_app ->
       fprintf fmt (protect_on (prec < 10) "%a@ %a")
         (print_term info ~prec:10) l (print_term info ~prec:9) r
@@ -671,7 +671,7 @@ let print_previous_proof def info fmt previous =
         fprintf fmt "@[(* Why3 %a *)@]@\n" (fun fmt f -> intros fmt f) f
     | _ -> ()
     end;
-    fprintf fmt "%s" c
+    pp_print_string fmt c
   | Some (Query (_,Notation,_))
   | Some (Axiom _) | Some (Other _) | Some (Info _) ->
     assert false

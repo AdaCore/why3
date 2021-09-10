@@ -762,7 +762,7 @@ let filter_from_prover pr =
 
 let print_filter_prover fmt fp =
   match fp.filter_version, fp.filter_altern with
-  | None  , None -> fprintf fmt "%s" fp.filter_name.desc
+  | None  , None -> pp_print_string fmt fp.filter_name.desc
   | Some v, None -> fprintf fmt "%s,%s" fp.filter_name.desc v.desc
   | None  , Some a -> fprintf fmt "%s,,%s" fp.filter_name.desc a.desc
   | Some v, Some a -> fprintf fmt "%s,%s,%s" fp.filter_name.desc v.desc a.desc

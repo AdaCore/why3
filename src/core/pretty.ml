@@ -643,8 +643,8 @@ let print_meta_arg fmt = function
   | MAls ls -> fprintf fmt "%s %a" (ls_kind ls) print_ls ls
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
   | MAstr s -> fprintf fmt "\"%s\"" s
-  | MAint i -> fprintf fmt "%d" i
-  | MAid i -> fprintf fmt "%a" Ident.print_decoded (id_unique sprinter i)
+  | MAint i -> pp_print_int fmt i
+  | MAid i -> Ident.print_decoded fmt (id_unique sprinter i)
 
 let print_qt fmt th =
   if th.th_path = [] then print_th fmt th else

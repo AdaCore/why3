@@ -348,7 +348,7 @@ let print_bv fmt (bv : model_bv) =
      parser between Bv_int and Bv_sharp -> convert Bv_int to Bitvector not
      Integer. And print Bv_int exactly like Bv_sharp.
   *)
-  fprintf fmt "%s" bv.bv_verbatim
+  pp_print_string fmt bv.bv_verbatim
 
 let print_model_const_human fmt = function
   | String s -> Constant.print_string_def fmt s
@@ -376,7 +376,7 @@ and print_record_human fmt r =
   match r with
   | [(_, value)] ->
       (* Special pretty printing for record with only one element *)
-      fprintf fmt "%a" print_model_value_human value
+      print_model_value_human fmt value
   | _ ->
       fprintf fmt "@[<hv1>%a@]"
         (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
@@ -391,7 +391,7 @@ and print_proj_human fmt p =
 and print_model_value_human fmt (v : model_value) =
   match v with
   | Const c -> print_model_const_human fmt c
-  | Apply (s, []) -> fprintf fmt "%s" s
+  | Apply (s, []) -> pp_print_string fmt s
   | Apply (s, lt) ->
       fprintf fmt "@[(%s@ %a)@]" s
         (Pp.print_list Pp.space print_model_value_human)
@@ -399,9 +399,9 @@ and print_model_value_human fmt (v : model_value) =
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Proj p -> print_proj_human fmt p
-  | Var v -> fprintf fmt "%s" v
-  | Undefined -> fprintf fmt "UNDEFINED"
-  | Unparsed s -> fprintf fmt "%s" s
+  | Var v -> pp_print_string fmt v
+  | Undefined -> pp_print_string fmt "UNDEFINED"
+  | Unparsed s -> pp_print_string fmt s
 
 (*
 ***************************************************************
@@ -541,7 +541,7 @@ let cmp_attrs a1 a2 =
 
 let print_model_element ?(print_locs=false) ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
-  | Error_message -> fprintf fmt "%s" m_element.me_name.men_name
+  | Error_message -> pp_print_string fmt m_element.me_name.men_name
   | _ ->
       fprintf fmt "@[<hv2>@[<hov2>%s%t =@]@ %a@]" (me_name_trans m_element.me_name)
         (fun fmt ->
@@ -738,21 +738,21 @@ let print_attrs_json (me : model_element_name) fmt =
 **  Quering the model - json
 *)
 let print_model_element_json me_name_to_str fmt me =
-  let print_value fmt = fprintf fmt "%a" print_model_value_sanit me.me_value in
+  let print_value fmt = print_model_value_sanit fmt me.me_value in
   let print_kind fmt =
     (* We compute kinds using the attributes and locations *)
     match me.me_name.men_kind with
-    | Result -> fprintf fmt "%a" Json_base.string "result"
-    | Call_result _ -> fprintf fmt "%a" Json_base.string "result"
+    | Result -> Json_base.string fmt "result"
+    | Call_result _ -> Json_base.string fmt "result"
     | At l -> fprintf fmt "@%s" l
-    | Old -> fprintf fmt "%a" Json_base.string "old"
-    | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
-    | Other -> fprintf fmt "%a" Json_base.string "other"
-    | Loop_before -> fprintf fmt "%a" Json_base.string "before_loop"
+    | Old -> Json_base.string fmt "old"
+    | Error_message -> Json_base.string fmt "error_message"
+    | Other -> Json_base.string fmt "other"
+    | Loop_before -> Json_base.string fmt "before_loop"
     | Loop_previous_iteration ->
-        fprintf fmt "%a" Json_base.string "before_iteration"
+        Json_base.string fmt "before_iteration"
     | Loop_current_iteration ->
-        fprintf fmt "%a" Json_base.string "current_iteration" in
+        Json_base.string fmt "current_iteration" in
   let print_name fmt = Json_base.string fmt (me_name_to_str me.me_name) in
   let print_json_attrs fmt = print_attrs_json me.me_name fmt in
   let print_value_or_kind_or_name fmt printer = printer fmt in

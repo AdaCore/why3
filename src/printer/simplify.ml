@@ -24,7 +24,7 @@ let ident_printer =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
+  pp_print_string fmt (id_unique ident_printer id)
 
 let forget_var v = forget_id ident_printer v.vs_name
 

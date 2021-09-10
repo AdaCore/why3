@@ -79,7 +79,7 @@ let ident_printer () =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident info fmt id =
-  fprintf fmt "%s" (id_unique info.info_printer id)
+  pp_print_string fmt (id_unique info.info_printer id)
 
 let print_attr fmt l = fprintf fmt "\"%s\"" l.attr_string
 

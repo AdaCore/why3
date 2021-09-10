@@ -31,18 +31,18 @@ let pr_printer =
 
 let print_symbol fmt id =
   let san = Strings.uncapitalize in
-  fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
+  pp_print_string fmt (id_unique ~sanitizer:san ident_printer id)
 
 let print_tvar fmt {tv_name = id} =
   let san = Strings.capitalize in
-  fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
+  pp_print_string fmt (id_unique ~sanitizer:san ident_printer id)
 
 let print_var fmt {vs_name = id} =
   let san = Strings.capitalize in
-  fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
+  pp_print_string fmt (id_unique ~sanitizer:san ident_printer id)
 
 let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique pr_printer pr.pr_name)
+  pp_print_string fmt (id_unique pr_printer pr.pr_name)
 
 let forget_var v = forget_id ident_printer v.vs_name
 let forget_tvar v = forget_id ident_printer v.tv_name
@@ -177,7 +177,7 @@ and print_fmla info fmt f = match f.t_node with
       let q = match q with Tforall -> "!" | Texists -> "?" in
       let vl, _tl, f = t_open_quant fq in
       let print_vsty fmt vs =
-        if info.info_fmt = FOF then fprintf fmt "%a" print_var vs
+        if info.info_fmt = FOF then print_var fmt vs
         else fprintf fmt "%a:@,%a" print_var vs (print_type info) vs.vs_ty in
       fprintf fmt "%s[%a]:@ %a" q
         (print_list comma print_vsty) vl (print_fmla info) f;

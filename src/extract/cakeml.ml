@@ -41,7 +41,7 @@ module Print = struct
   end)
 
   let print_vsty info fmt (id, _, _) =
-    fprintf fmt "%a" (print_lident info) id
+    print_lident info fmt id
 
   let print_tv_arg = print_tv
   let print_tv_args fmt = function
@@ -85,7 +85,7 @@ module Print = struct
                 (pjl, pl)
 
   and print_papp info ls fmt = function
-    | []  -> fprintf fmt "%a"      (print_uident info) ls.ls_name
+    | []  -> print_uident info fmt ls.ls_name
     | [p] -> fprintf fmt "%a %a"   (print_uident info) ls.ls_name
                (print_pat info) p
     | pl  -> fprintf fmt "%a %a" (print_uident info) ls.ls_name
@@ -116,7 +116,7 @@ module Print = struct
         let v = c.Number.il_int in
         let s = BigInt.to_string v in
         if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" s
-        else fprintf fmt "%s" s
+        else pp_print_string fmt s
     | Econst (Constant.ConstStr s) ->
        Constant.print_string_constant escape fmt s
     | _ -> assert false end
@@ -127,11 +127,11 @@ module Print = struct
 
   let rec print_apply_args info fmt = function
     | expr :: exprl, _ :: pvl ->
-        fprintf fmt "%a" (print_expr ~paren:true info) expr;
+        print_expr ~paren:true info fmt expr;
         if exprl <> [] then fprintf fmt "@ ";
         print_apply_args info fmt (exprl, pvl)
     | expr :: exprl, [] ->
-        fprintf fmt "%a" (print_expr ~paren:true info) expr;
+        print_expr ~paren:true info fmt expr;
         print_apply_args info fmt (exprl, [])
     | [], _ -> ()
 
