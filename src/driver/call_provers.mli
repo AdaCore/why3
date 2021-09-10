@@ -56,6 +56,8 @@ val print_prover_result : ?json:bool -> Format.formatter -> prover_result -> uni
 (** Pretty-print a prover_result. The answer and the time are output. The output of the
    prover is printed if and only if the answer is a [HighFailure]. *)
 
+val json_prover_result : prover_result -> Json_base.json
+
 val debug : Debug.flag
 (** debug flag for the calling procedure (option "--debug call_prover")
     If set [call_on_buffer] prints on stderr the commandline called

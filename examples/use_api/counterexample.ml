@@ -124,8 +124,7 @@ let () = printf "Model is %t@."
     (fun fmt ->
        match Check_ce.select_model_last_non_empty
                 result1.Call_provers.pr_models with
-       | Some m ->
-           Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None fmt m
+       | Some m -> Model_parser.print_model_json fmt m
        | None -> fprintf fmt "unavailable")
 (* END{ce_callprover} *)
 

@@ -72,8 +72,7 @@ let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
     fmt (model, (c, log)) =
   let open Json_base in
   let print_model_field =
-    print_json_field "model"
-      (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
+    print_json_field "model" print_model_json in
   let print_log_field =
     print_json_field "log" (Log.print_log ?verb_lvl ~json:true) in
   match json with

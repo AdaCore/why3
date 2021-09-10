@@ -181,6 +181,8 @@ val search_model_element_call_result :
 
 (** {2 Printing the model} *)
 
+val json_model : model -> Json_base.json
+
 val print_model :
   ?filter_similar:bool ->
   ?me_name_trans:(model_element_name -> string) ->
@@ -207,25 +209,8 @@ val print_model_human :
   unit
 (** Same as print_model but is intended to be human readable.*)
 
-val print_model_json :
-  ?me_name_trans:(model_element_name -> string) ->
-  ?vc_line_trans:(int -> string) ->
-  Format.formatter ->
-  model ->
-  unit
+val print_model_json : Format.formatter -> model -> unit
 (** Prints counter-example model to json format.
-
-    @param me_name_trans see print_model
-    @param vc_line_trans the transformation from the line number corresponding
-      to the term that triggers VC before splitting VC to the name of JSON field
-      storing counterexample information related to this term. By default, this
-      information is stored in JSON field corresponding to this line, i.e.,
-      the transformation is [string_of_int].
-      Note that the exact line of the construct that triggers VC may not be
-      known. This can happen if the term that triggers VC spans multiple lines
-      and it is splitted.
-      This transformation can be used to store the counterexample information
-      related to this term in dedicated JSON field
 
     The format is the following:
     - counterexample is JSON object with fields indexed by names of files

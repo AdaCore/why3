@@ -728,68 +728,63 @@ let interleave_with_source ~print_attrs ?(start_comment = "(* ")
     (source_code, gen_loc)
   with Not_found -> (source_code, locations)
 
-let print_attrs_json (me : model_element_name) fmt =
-  Json_base.list
-    (fun fmt attr -> Json_base.string fmt attr.attr_string)
-    fmt
-    (List.sort cmp_attrs (Sattr.elements me.men_attrs))
+let json_attrs me =
+  Json_base.List
+    (List.map (fun attr -> Json_base.String attr.attr_string)
+       (List.sort cmp_attrs (Sattr.elements me.men_attrs)))
 
 (*
 **  Quering the model - json
 *)
-let print_model_element_json me_name_to_str fmt me =
-  let print_value fmt = print_model_value_sanit fmt me.me_value in
-  let print_kind fmt =
-    (* We compute kinds using the attributes and locations *)
+
+let json_model_element me =
+  let open Json_base in
+  let kind =
     match me.me_name.men_kind with
-    | Result -> Json_base.string fmt "result"
-    | Call_result _ -> Json_base.string fmt "result"
-    | At l -> fprintf fmt "@%s" l
-    | Old -> Json_base.string fmt "old"
-    | Error_message -> Json_base.string fmt "error_message"
-    | Other -> Json_base.string fmt "other"
-    | Loop_before -> Json_base.string fmt "before_loop"
-    | Loop_previous_iteration ->
-        Json_base.string fmt "before_iteration"
-    | Loop_current_iteration ->
-        Json_base.string fmt "current_iteration" in
-  let print_name fmt = Json_base.string fmt (me_name_to_str me.me_name) in
-  let print_json_attrs fmt = print_attrs_json me.me_name fmt in
-  let print_value_or_kind_or_name fmt printer = printer fmt in
-  Json_base.map_bindings (fun s -> s) print_value_or_kind_or_name fmt
-    [ ("name", print_name); ("attrs", print_json_attrs);
-      ("value", print_value) ; ("kind", print_kind) ]
+    | Result -> "result"
+    | Call_result _ -> "result"
+    | At l -> Printf.sprintf "@%s" l
+    | Old -> "old"
+    | Error_message -> "error_message"
+    | Other -> "other"
+    | Loop_before -> "before_loop"
+    | Loop_previous_iteration ->"before_iteration"
+    | Loop_current_iteration -> "current_iteration" in
+  Record [
+      "name", String (json_name_trans me.me_name);
+      "attrs", json_attrs me.me_name;
+      "value", convert_model_value me.me_value;
+      "kind", String kind
+    ]
 
-let print_model_elements_json me_name_to_str fmt model_elements =
+let json_model_elements model_elements =
   let model_elements = filter_duplicated model_elements in
-  Json_base.list (print_model_element_json me_name_to_str) fmt model_elements
+  Json_base.List (List.map json_model_element model_elements)
 
-let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
-    (file_name, model_file) =
-  Json_base.map_bindings
-    (fun i ->
-      match model.vc_term_loc with
-      | None -> string_of_int i
-      | Some pos ->
-          let vc_file_name, line, _, _ = Loc.get pos in
-          if file_name = vc_file_name && i = line then vc_line_trans i
-          else string_of_int i)
-    (print_model_elements_json me_name_to_str)
-    fmt
-    (Mint.bindings model_file)
+let json_model_elements_on_lines model (file_name, model_file) =
+  let l =
+    List.map (fun (i, e) ->
+        let f =
+          match model.vc_term_loc with
+          | None -> string_of_int i
+          | Some pos ->
+              let vc_file_name, line, _, _ = Loc.get pos in
+              if file_name = vc_file_name && i = line then string_of_int i
+              else string_of_int i in
+        f, json_model_elements e)
+      (Mint.bindings model_file) in
+  Json_base.Record l
 
-let print_model_json ?(me_name_trans = json_name_trans)
-    ?(vc_line_trans = fun i -> string_of_int i) fmt model =
-  let model_files_bindings =
-    List.fold_left
-      (fun bindings (file_name, model_file) ->
-        List.append bindings [(file_name, (file_name, model_file))])
-      []
+let json_model model =
+  let l =
+    List.map (fun (file_name, model_file) ->
+        file_name,
+        json_model_elements_on_lines model (file_name, model_file))
       (Mstr.bindings model.model_files) in
-  Json_base.map_bindings
-    (fun s -> s)
-    (print_model_elements_on_lines_json model me_name_trans vc_line_trans)
-    fmt model_files_bindings
+  Json_base.Record l
+
+let print_model_json fmt model =
+  Json_base.print_json fmt (json_model model)
 
 (*
 ***************************************************************
