@@ -141,7 +141,7 @@ let get_result pa =
 let print_proof_attempt fmt pa_id =
   let pa = Hnode.find nodes pa_id in
   match pa.node_proof with
-  | None -> fprintf fmt "%s" pa.node_name
+  | None -> pp_print_string fmt pa.node_name
   | Some _pr ->
     fprintf fmt "@[<h>%s %a@]"
       pa.node_name
@@ -156,9 +156,9 @@ let rec print_proof_node (fmt: formatter) goal_id =
     goal_id = !cur_id
   in
   if current_goal then
-    fprintf fmt "**";
+    pp_print_string fmt "**";
   if goal.node_proved then
-    fprintf fmt "P";
+    pp_print_string fmt "P";
   let proof_attempts, transformations =
     List.partition (fun n -> let node = Hnode.find nodes n in
       node.node_type = SProofAttempt) goal.children_nodes
@@ -172,7 +172,7 @@ let rec print_proof_node (fmt: formatter) goal_id =
     (Pp.print_list Pp.semi print_trans_node) transformations;
 
   if current_goal then
-    fprintf fmt " **"
+    pp_print_string fmt " **"
 
 and print_trans_node fmt id =
   let trans = Hnode.find nodes id in
@@ -182,7 +182,7 @@ and print_trans_node fmt id =
   let parent = Hnode.find nodes trans.node_parent in
   let parent_name = parent.node_name in
   if trans.node_proved then
-    fprintf fmt "P";
+    pp_print_string fmt "P";
   fprintf fmt "@[<hv 2>{ Trans=%s;@ args=%a;@ parent=%s;@ [%a] }@]" name
     (Pp.print_option (Pp.print_list Pp.semi pp_print_string)) args parent_name
     (Pp.print_list Pp.semi print_proof_node) l
@@ -190,7 +190,7 @@ and print_trans_node fmt id =
 let print_theory fmt th_id : unit =
   let th = Hnode.find nodes th_id in
   if th.node_proved then
-    fprintf fmt "P";
+    pp_print_string fmt "P";
   fprintf fmt "@[<hv 1> Theory %s, id: %d;@ [%a]@]" th.node_name th_id
     (Pp.print_list Pp.semi print_proof_node) th.children_nodes
 

@@ -466,16 +466,16 @@ let print_notification_to_json (n: notification): json =
 )
 
 let print_notification fmt (n: notification) =
-  Format.fprintf fmt "%a" print_json (print_notification_to_json n)
+  print_json fmt (print_notification_to_json n)
 
 let print_request fmt (r: ide_request) =
-  Format.fprintf fmt "%a" print_json (print_request_to_json r)
+  print_json fmt (print_request_to_json r)
 
 let print_list_notification fmt (nl: notification list) =
-  Format.fprintf fmt "%a" (Json_base.list print_notification) nl
+  Json_base.list print_notification fmt nl
 
 let print_list_request fmt (rl: ide_request list) =
-  Format.fprintf fmt "%a" (Json_base.list print_request) rl
+  Json_base.list print_request fmt rl
 
 exception NotProver
 

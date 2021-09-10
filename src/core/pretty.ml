@@ -270,7 +270,7 @@ let rec print_ty_node ?(ext_printer=true) q pri fmt ty =
       fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
         (print_ty_node q 1) t1 (print_ty_node q 0) t2
   | Tyapp (ts, []) when is_ts_tuple ts ->
-      fprintf fmt "unit"
+      pp_print_string fmt "unit"
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       fprintf fmt "(%a)" (print_list comma (print_ty_node q 0)) tl
   | Tyapp (ts, []) ->
@@ -309,7 +309,7 @@ let unambig_fs fs =
 
 let rec print_pat_node pri fmt p = match p.pat_node with
   | Pwild ->
-      fprintf fmt "_"
+      pp_print_string fmt "_"
   | Pvar v ->
       print_vs fmt v; print_id_attrs fmt v.vs_name
   | Pas (p, v) ->
@@ -330,16 +330,16 @@ let rec print_pat_node pri fmt p = match p.pat_node with
 let print_pat = print_pat_node 0
 
 let print_quant fmt = function
-  | Tforall -> fprintf fmt "forall"
-  | Texists -> fprintf fmt "exists"
+  | Tforall -> pp_print_string fmt "forall"
+  | Texists -> pp_print_string fmt "exists"
 
 let print_binop ~asym fmt = function
-  | Tand when asym -> fprintf fmt "&&"
-  | Tor when asym -> fprintf fmt "||"
-  | Tand -> fprintf fmt "/\\"
-  | Tor -> fprintf fmt "\\/"
-  | Timplies -> fprintf fmt "->"
-  | Tiff -> fprintf fmt "<->"
+  | Tand when asym -> pp_print_string fmt "&&"
+  | Tor when asym -> pp_print_string fmt "||"
+  | Tand -> pp_print_string fmt "/\\"
+  | Tor -> pp_print_string fmt "\\/"
+  | Timplies -> pp_print_string fmt "->"
+  | Tiff -> pp_print_string fmt "<->"
 
 let rec print_term fmt t =
   print_lterm 0 fmt t
@@ -458,9 +458,9 @@ and print_tnode ?(ext_printer=true) pri fmt t =
           (print_list comma print_vsty) vl print_tl tl print_term f;
         List.iter forget_var vl
     | Ttrue ->
-        fprintf fmt "true"
+        pp_print_string fmt "true"
     | Tfalse ->
-        fprintf fmt "false"
+        pp_print_string fmt "false"
     | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
       when Sattr.mem Term.asym_split f2.t_attrs ->
         fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a so@ %a@]")
@@ -629,13 +629,13 @@ let print_inst_pr fmt (pr1,pr2) =
   fprintf fmt "prop %a = %a" print_pr pr1 print_pr pr2
 
 let print_meta_arg_type fmt = function
-  | MTty       -> fprintf fmt "[type]"
-  | MTtysymbol -> fprintf fmt "[type symbol]"
-  | MTlsymbol  -> fprintf fmt "[function/predicate symbol]"
-  | MTprsymbol -> fprintf fmt "[proposition]"
-  | MTstring   -> fprintf fmt "[string]"
-  | MTint      -> fprintf fmt "[integer]"
-  | MTid    -> fprintf fmt "[identifier]"
+  | MTty       -> pp_print_string fmt "[type]"
+  | MTtysymbol -> pp_print_string fmt "[type symbol]"
+  | MTlsymbol  -> pp_print_string fmt "[function/predicate symbol]"
+  | MTprsymbol -> pp_print_string fmt "[proposition]"
+  | MTstring   -> pp_print_string fmt "[string]"
+  | MTint      -> pp_print_string fmt "[integer]"
+  | MTid       -> pp_print_string fmt "[identifier]"
 
 let print_meta_arg fmt = function
   | MAty ty -> fprintf fmt "type %a" print_ty ty; forget_tvs ()
@@ -643,8 +643,8 @@ let print_meta_arg fmt = function
   | MAls ls -> fprintf fmt "%s %a" (ls_kind ls) print_ls ls
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
   | MAstr s -> fprintf fmt "\"%s\"" s
-  | MAint i -> fprintf fmt "%d" i
-  | MAid i -> fprintf fmt "%a" Ident.print_decoded (id_unique sprinter i)
+  | MAint i -> pp_print_int fmt i
+  | MAid i -> Ident.print_decoded fmt (id_unique sprinter i)
 
 let print_qt fmt th =
   if th.th_path = [] then print_th fmt th else
@@ -811,13 +811,13 @@ let () = Exn_printer.register
   | Ty.UnboundTypeVar tv ->
       fprintf fmt "Unbound type variable: %a" print_tv tv
   | Ty.UnexpectedProp ->
-      fprintf fmt "Unexpected propositional type"
+      pp_print_string fmt "Unexpected propositional type"
   | Ty.EmptyRange ->
-      fprintf fmt "Empty integer range"
+      pp_print_string fmt "Empty integer range"
   | Ty.BadFloatSpec ->
-      fprintf fmt "Invalid floating point format"
+      pp_print_string fmt "Invalid floating point format"
   | Ty.IllegalTypeParameters ->
-      fprintf fmt "This type cannot have type parameters"
+      pp_print_string fmt "This type cannot have type parameters"
   | Term.BadArity ({ls_args = []} as ls, _) ->
       fprintf fmt "%s %a expects no arguments"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls
@@ -827,7 +827,7 @@ let () = Exn_printer.register
         (if ls.ls_value = None then "Predicate" else "Function")
         print_ls ls i (if i = 1 then "" else "s") app_arg
   | Term.EmptyCase ->
-      fprintf fmt "Empty match expression"
+      pp_print_string fmt "Empty match expression"
   | Term.DuplicateVar vs ->
       fprintf fmt "Variable %a is used twice" print_vsty vs
   | Term.UncoveredVar vs ->
@@ -847,7 +847,7 @@ let () = Exn_printer.register
   | Term.InvalidRealLiteralType ty
   | Term.InvalidStringLiteralType ty when
          (match ty.ty_node with Tyvar _ -> true | _ -> false) ->
-      fprintf fmt "literal has an ambiguous type"
+      pp_print_string fmt "literal has an ambiguous type"
   | Term.InvalidIntegerLiteralType ty ->
       fprintf fmt "Cannot cast an integer literal to type %a" print_ty ty
   | Term.InvalidRealLiteralType ty ->
@@ -909,7 +909,7 @@ let () = Exn_printer.register
   | Decl.ClashIdent id ->
       fprintf fmt "Ident %a is defined twice" Ident.print_decoded id.id_string
   | Decl.EmptyDecl ->
-      fprintf fmt "Empty declaration"
+      pp_print_string fmt "Empty declaration"
   | Decl.EmptyAlgDecl ts ->
       fprintf fmt "Algebraic type %a has no constructors" print_ts ts
   | Decl.EmptyIndDecl ls ->
@@ -1059,9 +1059,9 @@ let () = Exn_printer.register
         incompatible mask"
         print_id id
   | CloseTheory ->
-      Format.fprintf fmt "Cannot close theory: some namespaces are still open"
+      pp_print_string fmt "Cannot close theory: some namespaces are still open"
   | NoOpenedNamespace ->
-      Format.fprintf fmt "No opened namespaces"
+      pp_print_string fmt "No opened namespaces"
   | ClashSymbol s ->
       Format.fprintf fmt "Symbol %s is already defined in the current scope" s
   | UnknownMeta s ->

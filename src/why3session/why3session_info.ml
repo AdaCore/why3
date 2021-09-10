@@ -234,7 +234,7 @@ and stats2_of_transf ~nb_proofs ses tr : (proofNodeID * goal_stat) list =
     [] (get_sub_tasks ses tr)
 
 let print_res ~time fmt (p,t) =
-  fprintf fmt "%a" print_prover p;
+  print_prover fmt p;
   if time then fprintf fmt " (%.2f)" t
 
 let rec print_goal_stats ~time depth ses (g,l) =

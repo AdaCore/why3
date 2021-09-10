@@ -39,7 +39,7 @@ let init, set_exponents, get_prec, get_zero, get_one =
   (fun () -> !one)
 
 let print_float fmt x =
-  Format.fprintf fmt "%s" (get_formatted_str ~base:10 x)
+  Format.pp_print_string fmt (get_formatted_str ~base:10 x)
 
 let print_real fmt (x, y) =
   Format.fprintf fmt "[%a, %a]" print_float x print_float y

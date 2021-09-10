@@ -1587,7 +1587,7 @@ let () = Exn_printer.register
     (fun fmt e ->
       match e with
       | NoProgress ->
-          Format.fprintf fmt "The transformation made no progress.\n"
+          Format.pp_print_string fmt "The transformation made no progress.\n"
       | _ -> raise e)
 
 let apply_trans_to_goal ~allow_no_effect s env name args id =
@@ -2062,7 +2062,7 @@ let save_result fmt r =
 let save_status fmt s =
   match s with
   | Some result -> save_result fmt result
-  | None -> fprintf fmt "<undone/>"
+  | None -> pp_print_string fmt "<undone/>"
 
 let save_file_path fmt p =
   List.iter

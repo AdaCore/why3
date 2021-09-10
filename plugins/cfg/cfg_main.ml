@@ -66,7 +66,7 @@ let empty_spec = {
 
 
 let pp_id fmt id =
-  Format.fprintf fmt "%s" id.id_str
+  Format.pp_print_string fmt id.id_str
 
 let rec pp_qid fmt qid =
   match qid with
@@ -80,7 +80,7 @@ let rec pp_pty fmt t =
        pp_qid qid
        (Pp.print_list Pp.semi pp_pty) l
   | _ ->
-     Format.fprintf fmt "<unknown pp_pty>"
+     Format.pp_print_string fmt "<unknown pp_pty>"
 
 let divergent_attr = ATstr (Ident.create_attribute "vc:divergent")
 

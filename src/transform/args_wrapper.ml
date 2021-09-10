@@ -515,10 +515,10 @@ let rec string_of_trans_typ : type a b. (a, b) trans_typ -> string =
 let rec print_type : type a b. Format.formatter -> (a, b) trans_typ -> unit =
   fun fmt t ->
     match t with
-    | Ttrans         -> Format.fprintf fmt "task"
-    | Ttrans_l       -> Format.fprintf fmt "list task"
-    | Tenvtrans      -> Format.fprintf fmt "env -> task"
-    | Tenvtrans_l    -> Format.fprintf fmt "env -> list task"
+    | Ttrans         -> Format.pp_print_string fmt "task"
+    | Ttrans_l       -> Format.pp_print_string fmt "list task"
+    | Tenvtrans      -> Format.pp_print_string fmt "env -> task"
+    | Tenvtrans_l    -> Format.pp_print_string fmt "env -> list task"
     | Tint t         -> Format.fprintf fmt "integer -> %a" print_type t
     | Tstring t      -> Format.fprintf fmt "string -> %a" print_type t
     | Tty t          -> Format.fprintf fmt "type -> %a" print_type t

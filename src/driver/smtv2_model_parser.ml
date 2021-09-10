@@ -32,7 +32,7 @@ module FromSexp = struct
   let get_string s = String.sub s 1 (String.length s-2)
 
   let rec pp_sexp fmt = function
-    | Atom s -> Format.fprintf fmt "%s" s
+    | Atom s -> Format.pp_print_string fmt s
     | List l -> Format.fprintf fmt "@[@[<hv2>(%a@])@]" Pp.(print_list space pp_sexp) l
 
   let string_of_sexp = Format.asprintf "%a" pp_sexp

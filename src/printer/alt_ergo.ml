@@ -79,7 +79,7 @@ let ident_printer () =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident info fmt id =
-  fprintf fmt "%s" (id_unique info.info_printer id)
+  pp_print_string fmt (id_unique info.info_printer id)
 
 let print_attr fmt l = fprintf fmt "\"%s\"" l.attr_string
 
@@ -298,9 +298,9 @@ and print_fmla_node info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "(not %a)" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tif(t1,t2,t3) ->
      fprintf fmt "(if %a then %a else %a)"
        (print_fmla info) t1 (print_fmla info) t2 (print_fmla info) t3

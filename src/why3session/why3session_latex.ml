@@ -90,10 +90,9 @@ let print_head n depth provers fmt =
   fprintf fmt "\\\\ @."
 
 let print_tabular_head n depth provers fmt =
-  fprintf fmt "\\begin{tabular}";
-  fprintf fmt "{|l|";
-  for _i = 0 to depth do fprintf fmt "l|" done;
-  for _i = 1 to (List.length provers) do fprintf fmt "c|" done;
+  pp_print_string fmt "\\begin{tabular}{|l|";
+  for _i = 0 to depth do pp_print_string fmt "l|" done;
+  for _i = 1 to (List.length provers) do pp_print_string fmt "c|" done;
   fprintf fmt "}@.";
   print_head n depth provers fmt
 
@@ -121,17 +120,17 @@ let print_result_prov s proofs prov fmt=
                   fprintf fmt "& \\outofmemory{%dM} "
                     pr.limit.Call_provers.limit_mem
 		| Call_provers.StepLimitExceeded ->
-                  fprintf fmt "& \\steplimitexceeded "
+                  pp_print_string fmt "& \\steplimitexceeded "
 		| Call_provers.Unknown _ ->
                   fprintf fmt "& \\unknown{%.2f} " res.Call_provers.pr_time
 		| Call_provers.Failure _ ->
-                  fprintf fmt "& \\failure "
+                  pp_print_string fmt "& \\failure "
 		| Call_provers.HighFailure ->
-                  fprintf fmt "& \\highfailure "
+                  pp_print_string fmt "& \\highfailure "
 
 	    end
-	| None -> fprintf fmt "(no result)"
-  with Not_found -> fprintf fmt "& \\noresult") prov;
+	| None -> pp_print_string fmt "(no result)"
+  with Not_found -> pp_print_string fmt "& \\noresult") prov;
   fprintf fmt "\\\\ @."
 
 
@@ -150,24 +149,24 @@ let rec goal_latex_stat s fmt prov depth depth_max subgoal g =
 	  begin
 	    if(depth < depth_max)  then
 	      for _i = 1 to depth do
-                fprintf fmt " & "
+                pp_print_string fmt " & "
               done
 	    else
 	      for _i = 1 to depth - 1 do
-                fprintf fmt " & "
+                pp_print_string fmt " & "
               done
 	  end
 	else
 	  if(depth < depth_max) then
 	    if depth > 0 then
-              fprintf fmt " & "
+              pp_print_string fmt " & "
       end
     else
       begin
 	if subgoal > 0  then
-	  for _i = 1 to depth do fprintf fmt " & " done
+	  for _i = 1 to depth do pp_print_string fmt " & " done
 	else
-	  if depth > 0 then fprintf fmt " & "
+	  if depth > 0 then pp_print_string fmt " & "
       end;
     if (depth <= 1) then
       fprintf fmt "\\explanation{%s} "
@@ -213,7 +212,7 @@ let style_2_row fmt ?(transf=false) depth prov subgoal expl=
     fprintf fmt "\\cline{%d-%d}@." 2 column
   else
     fprintf fmt "\\hline@.";
-  for _i = 1 to depth do fprintf fmt "\\quad" done;
+  for _i = 1 to depth do pp_print_string fmt "\\quad" done;
   let macro = if transf then "transformation" else "explanation" in
   if depth = 0 || transf then
     fprintf fmt "\\%s{%s} " macro expl
@@ -284,9 +283,8 @@ let latex_tabular_file n s fmt depth provers f =
 
 
 let latex_longtable n s fmt depth name provers t=
-  fprintf fmt "\\begin{longtable}";
-  fprintf fmt "{| l |";
-  for _i = 0 to (List.length provers) + depth do fprintf fmt "c |" done;
+  pp_print_string fmt "\\begin{longtable}{| l |";
+  for _i = 0 to (List.length provers) + depth do pp_print_string fmt "c |" done;
   fprintf fmt "}@.";
   (* First head *)
   print_head n depth provers fmt;

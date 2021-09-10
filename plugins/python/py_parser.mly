@@ -15,7 +15,7 @@
   open Py_ast
 
   let () = Exn_printer.register (fun fmt exn -> match exn with
-    | Error -> Format.fprintf fmt "syntax error"
+    | Error -> Format.pp_print_string fmt "syntax error"
     | _ -> raise exn)
 
   let floc s e = Loc.extract (s,e)
