@@ -167,7 +167,7 @@ let rec print_type ?(opr=true) info ~prec fmt ty =
   | Tyvar v -> print_tv info ~whytypes:false fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin match tl with
-      | [] -> fprintf fmt "Init.Datatypes.unit"
+      | [] -> pp_print_string fmt "Init.Datatypes.unit"
       | [ty] -> print_type ~opr info ~prec fmt ty
       | _ -> fprintf fmt "(%a)%%type" (print_list star (print_type info ~prec:40)) tl
       end
@@ -360,9 +360,9 @@ let rec print_term ?(boxed=false) ?(opr=true) info ~prec fmt t =
       fprintf fmt (protect_on (opr && prec < 200) "%a") aux vl;
       List.iter forget_var vl
   | Ttrue ->
-      fprintf fmt "True"
+      pp_print_string fmt "True"
   | Tfalse ->
-      fprintf fmt "False"
+      pp_print_string fmt "False"
   | Tbinop (b,f1,f2) ->
       begin match b with
       | Tand ->
@@ -600,11 +600,11 @@ let output_remaining fmt script =
 let rec intros_hyp n fmt f =
   match f.t_node with
     | Tbinop(Tand,f1,f2) ->
-      fprintf fmt "(";
+      pp_print_string fmt "(";
       let (m,vsl1) = intros_hyp n fmt f1 in
-      fprintf fmt ",";
+      pp_print_string fmt ",";
       let (k,vsl2) = intros_hyp m fmt f2 in
-      fprintf fmt ")";
+      pp_print_string fmt ")";
       (k,vsl1@vsl2)
     | Tquant(Texists,fq) ->
       let vsl,_trl,f = t_open_quant fq in
@@ -614,7 +614,7 @@ let rec intros_hyp n fmt f =
           | v::l ->
             fprintf fmt "(%a," print_vs v;
             let m = aux n l in
-            fprintf fmt ")";
+            pp_print_string fmt ")";
             m
       in
       aux n vsl
@@ -762,7 +762,7 @@ let print_data_decls info fmt tl =
     end
 
 let print_ls_type info fmt = function
-  | None -> fprintf fmt "Prop"
+  | None -> pp_print_string fmt "Prop"
   | Some ty -> print_type ~opr:false info ~prec:100 fmt ty
 
 let print_param_decl ~prev info fmt ls =

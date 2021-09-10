@@ -286,9 +286,9 @@ let rec print_term info fmt t =
   | Tnot f ->
       fprintf fmt "Not[%a]" fmla f
   | Ttrue ->
-      fprintf fmt "True"
+      pp_print_string fmt "True"
   | Tfalse ->
-      fprintf fmt "False"
+      pp_print_string fmt "False"
   | Tif (f1, f2, f3) ->
       fprintf fmt "If[%a,@ %a,@ %a]" fmla f1 fmla f2 fmla f3
   | Tlet _ -> unsupportedTerm f
@@ -453,7 +453,7 @@ let print_type_def _info fmt (ts,csl) =
   let alen = List.length csl in
   let print_def fmt () =
     if alen >= 1 then begin
-      fprintf fmt "x = 1";
+      pp_print_string fmt "x = 1";
       for i = 2 to alen do
         fprintf fmt " || x = %d" i
       done end
@@ -469,7 +469,7 @@ let print_type_def _info fmt (ts,csl) =
     if n > 1 then
       fprintf fmt "If[x == %d, v%d, %a]" n n print_case (n-1)
     else
-      fprintf fmt "If[x == 1, v1, 0]"
+      pp_print_string fmt "If[x == 1, v1, 0]"
   in
     fprintf fmt "Match%a[x_%a] := %a;@\n" print_ident ts.ts_name
       print_args () print_case alen

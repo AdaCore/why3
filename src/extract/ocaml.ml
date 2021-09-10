@@ -220,7 +220,7 @@ module Print = struct
     | Tvar tv ->
         print_tv ~use_quote fmt tv
     | Ttuple [] ->
-        fprintf fmt "unit"
+        pp_print_string fmt "unit"
     | Ttuple [t] ->
         print_ty  ~use_quote ~paren info fmt t
     | Ttuple tl ->
@@ -319,7 +319,7 @@ module Print = struct
 
   let rec print_pat info prec fmt = function
     | Pwild ->
-        fprintf fmt "_"
+        pp_print_string fmt "_"
     | Pvar {vs_name=id} ->
         (print_lident info) fmt id
     | Pas (p, {vs_name=id}) ->
@@ -389,8 +389,8 @@ module Print = struct
     | _ -> assert false end
 
   let print_for_direction fmt = function
-    | To     -> fprintf fmt "to"
-    | DownTo -> fprintf fmt "downto"
+    | To     -> pp_print_string fmt "to"
+    | DownTo -> pp_print_string fmt "downto"
 
   let rec print_apply_args info fmt = function
     | expr :: exprl, pv :: pvl ->
@@ -544,8 +544,8 @@ module Print = struct
           | _ -> assert false in
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
-         | None when n = "0" -> fprintf fmt "Z.zero"
-         | None when n = "1" -> fprintf fmt "Z.one"
+         | None when n = "0" -> pp_print_string fmt "Z.zero"
+         | None when n = "1" -> pp_print_string fmt "Z.one"
          | None   -> fprintf fmt (protect_on (prec < 4) "Z.of_string \"%s\"") n)
     | Econst (Constant.ConstStr s) ->
         Constant.print_string_def fmt s
@@ -559,9 +559,9 @@ module Print = struct
     | Eabsurd ->
         fprintf fmt (protect_on (opr && prec < 4) "assert false (* absurd *)")
     | Eapp (rs, [], _) when rs_equal rs rs_true ->
-        fprintf fmt "true"
+        pp_print_string fmt "true"
     | Eapp (rs, [], _) when rs_equal rs rs_false ->
-        fprintf fmt "false"
+        pp_print_string fmt "false"
     | Eapp (rs, [e], _)
          when query_syntax info.info_syn rs.rs_name = Some "%1" ->
         print_expr ~boxed ~opr ~be info prec fmt e
@@ -624,7 +624,7 @@ module Print = struct
           (print_expr ~opr:false ~be:true info 15) e2
           (print_expr ~be:true info 15) e3
     | Eblock [] ->
-        fprintf fmt "()"
+        pp_print_string fmt "()"
     | Eblock [e] ->
         print_expr ~be info prec fmt e
     | Eblock el ->
@@ -716,7 +716,7 @@ module Print = struct
 
   and print_xbranch info case fmt (xs, pvl, e) =
     let print_exn fmt () =
-      if case then fprintf fmt "exception " else fprintf fmt "" in
+      if case then pp_print_string fmt "exception " in
     let print_var fmt pv = print_lident info fmt (pv_name pv) in
     match query_syntax info.info_syn xs.xs_name, pvl with
     | Some s, _ when complex_syntax s || pvl = [] ->

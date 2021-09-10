@@ -195,7 +195,7 @@ let rec print_ty info fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin match tl with
-        | []  -> fprintf fmt "[]"
+        | []  -> pp_print_string fmt "[]"
         | [ty] -> print_ty info fmt ty
         | _   -> fprintf fmt "[%a]" (print_list comma (print_ty info)) tl
       end
@@ -271,10 +271,10 @@ let is_tuple_ty = function
   | Some _ | None -> false
 
 let print_binop fmt = function
-  | Tand -> fprintf fmt "AND"
-  | Tor -> fprintf fmt "OR"
-  | Timplies -> fprintf fmt "=>"
-  | Tiff -> fprintf fmt "<=>"
+  | Tand -> pp_print_string fmt "AND"
+  | Tor -> pp_print_string fmt "OR"
+  | Timplies -> pp_print_string fmt "=>"
+  | Tiff -> pp_print_string fmt "<=>"
 
 (* TODO: labels are lost, but we could print them as "% label \n",
    it would result in an ugly output, though *)
@@ -342,7 +342,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
         (print_vsty_nopar info) v (print_opl_fmla info) f;
       forget_var v
   | Tapp (fs, []) when is_fs_tuple fs ->
-      fprintf fmt "()"
+      pp_print_string fmt "()"
   | Tapp (fs, pl) when is_fs_tuple fs ->
       print_paren_r (print_term info) fmt pl
   | Tapp (fs, tl) ->
@@ -389,9 +389,9 @@ and print_fnode opl opr info fmt f = match f.t_node with
       aux fmt vl;
       List.iter forget_var vl
   | Ttrue ->
-      fprintf fmt "TRUE"
+      pp_print_string fmt "TRUE"
   | Tfalse ->
-      fprintf fmt "FALSE"
+      pp_print_string fmt "FALSE"
   | Tbinop (b, f1, f2) ->
       fprintf fmt (protect_on (opl || opr) "%a %a@ %a")
         (print_opr_fmla info) f1 print_binop b (print_opl_fmla info) f2
@@ -662,7 +662,7 @@ let print_data_decl info fmt d =
   end
 
 let print_ls_type info fmt = function
-  | None -> fprintf fmt "bool"
+  | None -> pp_print_string fmt "bool"
   | Some ty -> print_ty info fmt ty
 
 let create_argument ty = create_vsymbol (id_fresh "x") ty
@@ -676,7 +676,7 @@ let has_macro s =
   try let _ = Re.Str.search_forward re_macro s 0 in true with Not_found -> false
 let is_macro info fmt = function
   | Some (Edition (_, c)) when info.realization && List.exists has_macro c ->
-      fprintf fmt "MACRO "
+      pp_print_string fmt "MACRO "
   | _ -> ()
 
 let print_param_decl ~prev info fmt ls =

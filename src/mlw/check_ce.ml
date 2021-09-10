@@ -107,7 +107,7 @@ type rac_result_state =
 type rac_result = rac_result_state * Log.exec_log
 
 let print_rac_result_state fmt = function
-  | Res_normal -> fprintf fmt "NORMAL"
+  | Res_normal -> pp_print_string fmt "NORMAL"
   | Res_fail (ctx, t) ->
       fprintf fmt "FAILURE (%a at %a)"
         Vc.print_expl ctx.attr
@@ -188,7 +188,7 @@ let print_model_classification ?verb_lvl ?json ?check_ce fmt (m, c) =
        | NC | SW | NC_SW ->
            fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
        | INCOMPLETE _ ->
-           fprintf fmt ":"
+           pp_print_string fmt ":"
        | _ -> ());
   let print_attrs = Debug.test_flag Call_provers.debug_attrs in
   fprintf fmt "@ %a"

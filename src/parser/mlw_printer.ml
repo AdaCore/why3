@@ -401,7 +401,7 @@ let rec pp_pty_mask ~attr fmt = function
 let rec pp_pty_pat_mask ~attr ~closed fmt =
   let pp_vis_ghost fmt = function
     | Ity.MaskVisible -> ()
-    | Ity.MaskGhost -> fprintf fmt "ghost "
+    | Ity.MaskGhost -> pp_print_string fmt "ghost "
     | Ity.MaskTuple _ -> fprintf fmt "TUPLE??" in
   let pp_aux fmt = function
     | PTtuple ptys, ({pat_desc = Ptuple ps; _}, Ity.MaskTuple ms) ->
@@ -430,7 +430,7 @@ let pp_opt_result ~attr fmt (opt_pty, p, m) = match opt_pty with
       fprintf fmt " : %a" (pp_pty_pat_mask ~attr ~closed:true) (pty, (p, m))
 
 let pp_exn ~attr fmt (id, pty, m) =
-  let pp_space fmt = if pty <> PTtuple [] then fprintf fmt " " in
+  let pp_space fmt = if pty <> PTtuple [] then pp_print_string fmt " " in
   fprintf fmt "@[<h>exception %a%t%a@]"
     (pp_id ~attr) id pp_space (pp_pty_mask ~attr) (pty, m)
 
@@ -484,11 +484,11 @@ let pp_clone_subst ~attr fmt = function
         fprintf fmt "exception %a = %a"
           (pp_qualid ~attr) qid (pp_qualid ~attr) qid'
   | CSprop Decl.Paxiom ->
-      fprintf fmt "axiom ."
+      pp_print_string fmt "axiom ."
   | CSprop Decl.Plemma ->
-      fprintf fmt "lemma ."
+      pp_print_string fmt "lemma ."
   | CSprop Decl.Pgoal ->
-      fprintf fmt "goal ."
+      pp_print_string fmt "goal ."
   | CSlemma qid ->
       fprintf fmt "lemma %a" (pp_qualid ~attr) qid
   | CSgoal qid ->

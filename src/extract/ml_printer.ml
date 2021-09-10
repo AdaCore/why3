@@ -205,7 +205,7 @@ module MLPrinter (K: sig val keywords: string list end) = struct
     | Tvar tv ->
         print_tv fmt tv
     | Ttuple [] ->
-        fprintf fmt "unit"
+        pp_print_string fmt "unit"
     | Ttuple [t] ->
         print_ty ~paren info fmt t
     | Ttuple tl ->

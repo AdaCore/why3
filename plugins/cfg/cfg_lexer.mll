@@ -282,7 +282,7 @@ rule token = parse
 {
 
   let () = Exn_printer.register (fun fmt exn -> match exn with
-  | Cfg_parser.Error -> Format.fprintf fmt "syntax error"
+  | Cfg_parser.Error -> Format.pp_print_string fmt "syntax error"
   | _ -> raise exn)
 
   let parse_channel file c =

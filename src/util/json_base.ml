@@ -73,7 +73,7 @@ let rec print_json fmt v =
   | Int i -> int fmt i
   | Float f -> float fmt f
   | Bool b -> bool fmt b
-  | Null -> fprintf fmt "null"
+  | Null -> pp_print_string fmt "null"
 
 
 (* Get json fields. Return Not_found if no fields or field missing *)

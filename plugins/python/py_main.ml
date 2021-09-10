@@ -449,12 +449,12 @@ open Pretty
 
 (* python print_binop *)
 let print_binop ~asym fmt = function
-  | Tand when asym -> fprintf fmt "&&"
-  | Tor when asym  -> fprintf fmt "||"
-  | Tand           -> fprintf fmt "and"
-  | Tor            -> fprintf fmt "or"
-  | Timplies       -> fprintf fmt "->"
-  | Tiff           -> fprintf fmt "<->"
+  | Tand when asym -> pp_print_string fmt "&&"
+  | Tor when asym  -> pp_print_string fmt "||"
+  | Tand           -> pp_print_string fmt "and"
+  | Tor            -> pp_print_string fmt "or"
+  | Timplies       -> pp_print_string fmt "->"
+  | Tiff           -> pp_print_string fmt "<->"
 
 (* Register the transformations functions *)
 let rec python_ext_printer print_any fmt a =

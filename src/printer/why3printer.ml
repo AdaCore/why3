@@ -114,7 +114,7 @@ let unambig_fs fs =
 
 let rec print_pat_node pri fmt p = match p.pat_node with
   | Pwild ->
-      fprintf fmt "_"
+      pp_print_string fmt "_"
   | Pvar v ->
       print_vs fmt v
   | Pas (p, v) ->
@@ -208,9 +208,9 @@ and print_tnode pri fmt t = match t.t_node with
         (print_list comma print_vsty) vl print_tl tl print_term f;
       List.iter forget_var vl
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tbinop (b,f1,f2) ->
       let asym = Sattr.mem Term.asym_split f1.t_attrs in
       let p = prio_binop b in

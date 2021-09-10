@@ -325,11 +325,11 @@ let print_model_value = print_model_value_sanit
 (********************************************)
 let print_float_human fmt f =
   match f with
-  | Plus_infinity -> fprintf fmt "+∞"
-  | Minus_infinity -> fprintf fmt "-∞"
-  | Plus_zero -> fprintf fmt "+0"
-  | Minus_zero -> fprintf fmt "-0"
-  | Not_a_number -> fprintf fmt "NaN"
+  | Plus_infinity -> pp_print_string fmt "+∞"
+  | Minus_infinity -> pp_print_string fmt "-∞"
+  | Plus_zero -> pp_print_string fmt "+0"
+  | Minus_zero -> pp_print_string fmt "-0"
+  | Not_a_number -> pp_print_string fmt "NaN"
   | Float_number {hex= Some hex} ->
       fprintf fmt "%s (%g)" hex (float_of_string hex)
   | Float_number {binary= {sign; exp; mant}} ->
@@ -421,15 +421,15 @@ type model_element_kind =
   | Other
 
 let print_model_kind fmt = function
-  | Result -> fprintf fmt "Result"
+  | Result -> pp_print_string fmt "Result"
   | Call_result loc -> fprintf fmt "Call_result (%a)" Pretty.print_loc' loc
-  | Old -> fprintf fmt "Old"
+  | Old -> pp_print_string fmt "Old"
   | At l -> fprintf fmt "At %s" l
-  | Error_message -> fprintf fmt "Error_message"
-  | Loop_before -> fprintf fmt "Loop_before"
-  | Loop_previous_iteration -> fprintf fmt "Loop_previous_iteration"
-  | Loop_current_iteration -> fprintf fmt "Loop_current_iteration"
-  | Other -> fprintf fmt "Other"
+  | Error_message -> pp_print_string fmt "Error_message"
+  | Loop_before -> pp_print_string fmt "Loop_before"
+  | Loop_previous_iteration -> pp_print_string fmt "Loop_previous_iteration"
+  | Loop_current_iteration -> pp_print_string fmt "Loop_current_iteration"
+  | Other -> pp_print_string fmt "Other"
 
 type model_element_name = {
   men_name: string;

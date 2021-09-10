@@ -75,7 +75,7 @@ let value_of_const c ty = match c with
 open Format
 
 let rec print_value fmt = function
-  | Vvoid -> fprintf fmt "()"
+  | Vvoid -> pp_print_string fmt "()"
   | Vbool b -> fprintf fmt "%b" b
   | Vstring s -> Constant.(print_string_def fmt s)
   | Vbigint i -> Constant.print_def fmt (Constant.int_const i)
@@ -544,7 +544,7 @@ let ts = ref 0. (* timestamp for current callstack *)
 
 let print_callstack cs time =
   Format.eprintf "%a %d@."
-    (Pp.print_list (fun fmt () -> Format.fprintf fmt ";") Expr.print_rs)
+    (Pp.print_list (fun fmt () -> Format.pp_print_string fmt ";") Expr.print_rs)
     (List.rev cs)
     (int_of_float (time *. 100000000.))
 

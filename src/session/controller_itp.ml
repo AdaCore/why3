@@ -34,13 +34,13 @@ type proof_attempt_status =
 
 let print_status fmt st =
   match st with
-  | Undone            -> fprintf fmt "Undone"
-  | Scheduled         -> fprintf fmt "Scheduled"
-  | Running           -> fprintf fmt "Running"
+  | Undone            -> pp_print_string fmt "Undone"
+  | Scheduled         -> pp_print_string fmt "Scheduled"
+  | Running           -> pp_print_string fmt "Running"
   | Done r            -> fprintf fmt "Done(@[<h>%a@])"
                            (Call_provers.print_prover_result ~json:false) r
-  | Interrupted       -> fprintf fmt "Interrupted"
-  | Detached          -> fprintf fmt "Detached"
+  | Interrupted       -> pp_print_string fmt "Interrupted"
+  | Detached          -> pp_print_string fmt "Detached"
   | InternalFailure e ->
       fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
   | Uninstalled pr    ->
@@ -56,10 +56,10 @@ type transformation_status =
 
 let print_trans_status fmt st =
   match st with
-  | TSscheduled -> fprintf fmt "TScheduled"
-  | TSdone _tid -> fprintf fmt "TSdone" (* TODO print tid *)
-  | TSfailed _e -> fprintf fmt "TSfailed"
-  | TSfatal _e -> fprintf fmt "TSfatal"
+  | TSscheduled -> pp_print_string fmt "TScheduled"
+  | TSdone _tid -> pp_print_string fmt "TSdone" (* TODO print tid *)
+  | TSfailed _e -> pp_print_string fmt "TSfailed"
+  | TSfatal _e -> pp_print_string fmt "TSfatal"
 
 type strategy_status = STSgoto of proofNodeID * int | STShalt
                      | STSfatal of string * proofNodeID * exn
@@ -68,8 +68,8 @@ let print_strategy_status fmt st =
   match st with
   | STSgoto(id,n) ->
       fprintf fmt "goto step %d in proofNode %a" n print_proofNodeID id
-  | STShalt -> fprintf fmt "halt"
-  | STSfatal _ -> fprintf fmt "fatal"
+  | STShalt -> pp_print_string fmt "halt"
+  | STSfatal _ -> pp_print_string fmt "fatal"
 
 
 type controller =
@@ -1092,11 +1092,11 @@ let print_report fmt (r: report) =
   | CallFailed e ->
     Format.fprintf fmt "Callfailed %a" Exn_printer.exn_printer e
   | Replay_interrupted ->
-    Format.fprintf fmt "Interrupted"
+    Format.pp_print_string fmt "Interrupted"
   | Prover_not_installed ->
-    Format.fprintf fmt "Prover not installed"
+    Format.pp_print_string fmt "Prover not installed"
   | Edited_file_absent _ ->
-    Format.fprintf fmt "No edited file"
+    Format.pp_print_string fmt "No edited file"
   | No_former_result new_r ->
     Format.fprintf fmt "new_result = %a, no former result"
       (Call_provers.print_prover_result ~json:false) new_r

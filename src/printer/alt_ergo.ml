@@ -298,9 +298,9 @@ and print_fmla_node info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "(not %a)" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tif(t1,t2,t3) ->
      fprintf fmt "(if %a then %a else %a)"
        (print_fmla info) t1 (print_fmla info) t2 (print_fmla info) t3

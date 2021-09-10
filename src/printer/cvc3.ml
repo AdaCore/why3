@@ -79,7 +79,7 @@ let print_type info fmt ty = try print_type info fmt ty
   with Unsupported s -> raise (UnsupportedType (ty,s))
 
 let print_type_value info fmt = function
-  | None -> fprintf fmt "BOOLEAN"
+  | None -> pp_print_string fmt "BOOLEAN"
   | Some ty -> print_type info fmt ty
 
 (** var *)
@@ -180,9 +180,9 @@ and print_fmla info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "@[(NOT@ %a)@]" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "TRUE"
+      pp_print_string fmt "TRUE"
   | Tfalse ->
-      fprintf fmt "FALSE"
+      pp_print_string fmt "FALSE"
   | Tif (f1, f2, f3) ->
       fprintf fmt "@[(IF %a@ THEN %a@ ELSE %a ENDIF)@]"
         (print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3

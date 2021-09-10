@@ -145,14 +145,14 @@ type prover_result_parser = {
 }
 
 let print_prover_answer fmt = function
-  | Valid -> fprintf fmt "Valid"
-  | Invalid -> fprintf fmt "Invalid"
-  | Timeout -> fprintf fmt "Timeout"
+  | Valid -> pp_print_string fmt "Valid"
+  | Invalid -> pp_print_string fmt "Invalid"
+  | Timeout -> pp_print_string fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Out@ of@ memory"
   | StepLimitExceeded -> fprintf fmt "Step@ limit@ exceeded"
   | Unknown s -> fprintf fmt "Unknown@ (%s)" s
   | Failure s -> fprintf fmt "Failure@ (%s)" s
-  | HighFailure -> fprintf fmt "High failure"
+  | HighFailure -> pp_print_string fmt "High failure"
 
 let print_prover_status fmt = function
   | Unix.WSTOPPED n -> fprintf fmt "stopped by signal %d" n

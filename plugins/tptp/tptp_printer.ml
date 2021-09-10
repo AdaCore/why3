@@ -170,9 +170,9 @@ and print_fmla info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "~@ %a" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "$true"
+      pp_print_string fmt "$true"
   | Tfalse ->
-      fprintf fmt "$false"
+      pp_print_string fmt "$false"
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "!" | Texists -> "?" in
       let vl, _tl, f = t_open_quant fq in
@@ -211,9 +211,9 @@ let print_decl info fmt d = match d.d_node with
   | Dtype { ts_args = _::_ } when info.info_fmt = TFF0 -> ()
   | Dtype ts when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Dtype ts ->
-      let print_arg fmt _ = fprintf fmt "$tType" in
+      let print_arg fmt _ = pp_print_string fmt "$tType" in
       let print_sig fmt ts = match ts.ts_args with
-        | [] -> fprintf fmt "$tType"
+        | [] -> pp_print_string fmt "$tType"
         | [_] -> fprintf fmt "$tType >@ $tType"
         | tl -> fprintf fmt "(%a) >@ $tType" (print_list star print_arg) tl
       in
@@ -409,9 +409,9 @@ let rec print_fmla info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "not(%a)" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "forall" | Texists -> "exists" in
       let vl, _tl, f = t_open_quant fq in

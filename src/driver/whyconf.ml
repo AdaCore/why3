@@ -125,10 +125,10 @@ type prover_upgrade_policy =
 
 let print_prover_upgrade_policy fmt p =
   match p with
-  | CPU_keep -> Format.fprintf fmt "keep"
+  | CPU_keep -> Format.pp_print_string fmt "keep"
   | CPU_upgrade p -> Format.fprintf fmt "upgrade to %a" print_prover p
   | CPU_duplicate p -> Format.fprintf fmt "copy to %a" print_prover p
-  | CPU_remove -> Format.fprintf fmt "remove"
+  | CPU_remove -> Format.pp_print_string fmt "remove"
 
 
 
@@ -1035,9 +1035,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
       Format.fprintf fmt "error in config file %s: %s" f s
   | WrongMagicNumber ->
-      Format.fprintf fmt "outdated config file; rerun 'why3 config'"
+      Format.pp_print_string fmt "outdated config file; rerun 'why3 config'"
   | RC_save.NonUniqueId ->
-    Format.fprintf fmt "InternalError: two provers share the same id"
+    Format.pp_print_string fmt "InternalError: two provers share the same id"
   | ProverNotFound (config,fp) ->
     fprintf fmt "No prover in %s corresponds to \"%a\"@."
       (get_conf_file config) print_filter_prover fp

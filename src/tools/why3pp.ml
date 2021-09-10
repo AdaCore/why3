@@ -171,7 +171,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
   let rec pp_pattern fmt p =
     match p.pat_desc with
     | Pwild ->
-        fprintf fmt "\\texttt{anything}"
+        pp_print_string fmt "\\texttt{anything}"
     | Pvar id ->
         pp_var ~arity:0 fmt id
     | Papp (qid, ps) ->
@@ -208,9 +208,9 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
   let rec pp_term fmt t =
     match t.term_desc with
     | Ttrue ->
-        fprintf fmt "\\top"
+        pp_print_string fmt "\\top"
     | Tfalse ->
-        fprintf fmt "\\bot"
+        pp_print_string fmt "\\bot"
     | Tconst n ->
         Constant.print_def fmt n
     | Tident qid ->

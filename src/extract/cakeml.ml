@@ -63,7 +63,7 @@ module Print = struct
 
   let rec print_pat info fmt = function
     | Pwild ->
-        fprintf fmt "_"
+        pp_print_string fmt "_"
     | Pvar {vs_name = id} ->
         print_lident info fmt id
     | Pas (p, {vs_name=id}) ->
@@ -122,8 +122,8 @@ module Print = struct
     | _ -> assert false end
 
   let print_for_direction fmt = function
-    | To     -> fprintf fmt "to"
-    | DownTo -> fprintf fmt "downto"
+    | To     -> pp_print_string fmt "to"
+    | DownTo -> pp_print_string fmt "downto"
 
   let rec print_apply_args info fmt = function
     | expr :: exprl, _ :: pvl ->
@@ -166,7 +166,7 @@ module Print = struct
               fprintf fmt "@[<hov 2>%a %a@]" (print_uident info) rs.rs_name
                 (print_list space (print_expr ~paren:true info)) tl
           | pjl, tl ->
-              let equal fmt () = fprintf fmt " = " in
+              let equal fmt () = pp_print_string fmt " = " in
               fprintf fmt "@[<hov 2>{ @[%a@] }@]"
                 (print_list2 semi equal (print_rs info) (print_expr info))
                 (pjl, tl) end
@@ -246,9 +246,9 @@ module Print = struct
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
     | Eapp (rs, [], false) when rs_equal rs rs_true ->
-        fprintf fmt "true"
+        pp_print_string fmt "true"
     | Eapp (rs, [], false) when rs_equal rs rs_false ->
-        fprintf fmt "false"
+        pp_print_string fmt "false"
     | Eapp (rs, pvl, _) ->
        fprintf fmt (protect_on paren "%a")
                (print_apply info rs) pvl
@@ -295,7 +295,7 @@ module Print = struct
              "@[<hv>@[<hov 2>if@ %a@ then@ (@[%a@])@] @;<1 0>else (@[%a@])@]")
           (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Eblock [] ->
-        fprintf fmt "()"
+        pp_print_string fmt "()"
     | Eblock [e] ->
         print_expr info fmt e
     | Eblock el ->
@@ -357,7 +357,7 @@ module Print = struct
 
   and print_xbranch case info fst fmt (xs, pvl, e) =
     let print_exn fmt () =
-      if case then fprintf fmt "exception " else fprintf fmt "" in
+      if case then pp_print_string fmt "exception " in
     let print_var fmt pv = print_lident info fmt (pv_name pv) in
     match query_syntax info.info_syn xs.xs_name, pvl with
     | Some s, _ ->

@@ -298,9 +298,9 @@ let rec print_fmla info defs fmt f =
   | Tnot f ->
       fprintf fmt "not %a" fmla f
   | Ttrue ->
-      fprintf fmt "(0 in [0,0])"
+      pp_print_string fmt "(0 in [0,0])"
   | Tfalse ->
-      fprintf fmt "(1 in [0,0])"
+      pp_print_string fmt "(1 in [0,0])"
   | Tif (_f1, _f2, _f3) ->
       unsupportedTerm f
         "gappa: you must eliminate if in formula"
@@ -541,7 +541,7 @@ let print_task args ?old:_ fmt task =
         (print_list nothing (print_hyp info defs)) hyps
         (print_fmla info defs) (t_not_simp goal)
         (print_list_delim
-           ~start:(fun fmt () -> fprintf fmt "$ ")
+           ~start:(fun fmt () -> pp_print_string fmt "$ ")
            ~stop:(fun fmt () -> fprintf fmt ";@\n")
            ~sep:comma print_bool2) bools
   with Contradiction -> fprintf fmt "{ 0 in [0,0] }@\n"
