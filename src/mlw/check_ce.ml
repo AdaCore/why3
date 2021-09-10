@@ -71,10 +71,6 @@ type classification = verdict * Log.exec_log
 let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
     fmt (model, (c, log)) =
   let open Json_base in
-  let print_model_field =
-    print_json_field "model" print_model_json in
-  let print_log_field =
-    print_json_field "log" (Log.print_log ?verb_lvl ~json:true) in
   match json with
   | None | Some `Values -> (
       match c with
@@ -90,10 +86,9 @@ let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
   | Some `All -> (
       match c with
       | NC | SW | NC_SW ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-            print_model_field model print_log_field log
+          print_json fmt (Record ["model", json_model model; "log", Log.json_log log])
       | INCOMPLETE _ ->
-          fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
+          print_json fmt (Record ["model", json_model model])
       | BAD_CE _ -> ()
     )
 
