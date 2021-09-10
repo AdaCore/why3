@@ -69,6 +69,12 @@ val print_json : Format.formatter -> json -> unit
 (* Get json fields. Return Not_found if no fields or field missing *)
 val get_field: json -> string -> json
 
+val get_string_field : json -> string -> string
+val get_int_field : json -> string -> int
+val get_list_field : json -> string -> json list
+val get_float_field : json -> string -> float
+val get_bool_field : json -> string -> bool
+
 val get_string: json -> string
 val get_int: json -> int
 val get_list: json -> json list

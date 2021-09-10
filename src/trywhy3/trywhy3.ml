@@ -1197,7 +1197,7 @@ module Controller =
         Dom.handler (fun ev ->
             let lb = Lexing.from_string (Js.to_string (ev ##. data)) in
             let result = Json_parser.value (fun x -> Json_lexer.read x) lb in
-            let id = Json_base.(get_int (get_field result "worker_id")) in
+            let id = Json_base.get_int_field result "worker_id" in
             let result =
               match Json_base.get_field result "status" with
               | Json_base.Record ["Unsat", _] -> Valid
@@ -1480,14 +1480,14 @@ let () =
   let load_config s =
     let lb = Lexing.from_string s in
     let config = Json_parser.value (fun x -> Json_lexer.read x) lb in
-    let default_steps = Json_base.(get_int (get_field config "default_step_limit")) in
-    let min_steps = Json_base.(get_int (get_field config "first_attempt_step_limit")) in
+    let default_steps = Json_base.get_int_field config "default_step_limit" in
+    let min_steps = Json_base.get_int_field config "first_attempt_step_limit" in
     Dialogs.input_num_steps ##. value := !!(string_of_int default_steps);
     Dialogs.input_min_steps ##. value := !!(string_of_int min_steps);
     Controller.alt_ergo_default_steps := default_steps;
     Controller.alt_ergo_min_steps := min_steps;
     for i = 0 to 2 do
-      let value = Json_base.(get_int (get_field config (Printf.sprintf "menu_step_limit%d" (i+1)))) in
+      let value = Json_base.get_int_field config (Printf.sprintf "menu_step_limit%d" (i+1)) in
       ContextMenu.(!alt_ergo_context_steps.(i) <- value);
       Dialogs.input_context_steps.(i) ##. value := !!(string_of_int value)
     done;

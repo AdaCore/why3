@@ -111,3 +111,9 @@ let get_bool_opt j def =
   match j with
   | Bool b -> b
   | _ -> def
+
+let get_string_field j s = get_string (get_field j s)
+let get_int_field j s = get_int (get_field j s)
+let get_list_field j s = get_list (get_field j s)
+let get_float_field j s = get_float (get_field j s)
+let get_bool_field j s = get_bool (get_field j s)
