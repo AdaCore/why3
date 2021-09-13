@@ -1385,8 +1385,7 @@ let wrt_exists vl f = wrt_rename sp_exists vl f
    variable in the range of [wr_i] is free in [sp_i]. *)
 
 let rec sp_expr env k rdm dst = match k with
-  | Kseq (Klet (v, t, f), 0, k2)
-    when not (has_a_model_attr v.pv_vs.vs_name) ->
+  | Kseq (Klet (v, t, f), 0, k2) ->
       let wp2, sp2, rd2 = sp_expr env k2 rdm dst in
       let rd1 = t_freepvs (t_freepvs rd2 t) f in
       let wp = wp_let env v t (sp_implies f wp2) in
