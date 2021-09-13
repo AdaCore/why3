@@ -10,26 +10,26 @@
               min_int =
                 {"proj_name": "int63'int",
                  "type": "Proj",
-                 "value": {"type": "Integer", "val": "-4611686018427387904"}}
+                 "value": {"type": "Integer", "val": "4611686018427387903"}}
             File tuple1.mlw:
               Line 6:
                 a =
                   {"proj_name": "int63'int",
                    "type": "Proj",
-                   "value": {"type": "Integer", "val": "0"}}
+                   "value": {"type": "Integer", "val": "4611686018427387903"}}
                 b =
                   {"proj_name": "int63'int",
                    "type": "Proj",
-                   "value": {"type": "Integer", "val": "0"}}
+                   "value": {"type": "Integer", "val": "4611686018427387903"}}
               Line 7:
                 a =
                   {"proj_name": "int63'int",
                    "type": "Proj",
-                   "value": {"type": "Integer", "val": "0"}}
+                   "value": {"type": "Integer", "val": "4611686018427387903"}}
                 b =
                   {"proj_name": "int63'int",
                    "type": "Proj",
-                   "value": {"type": "Integer", "val": "0"}}
+                   "value": {"type": "Integer", "val": "4611686018427387903"}}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -59,25 +59,25 @@
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74)
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-19:
 Sub-goal Integer overflow of goal swap'vc.
-Prover result is: Step limit exceeded (0.26s).
+Prover result is: Step limit exceeded (0.25s).
 The following counterexample model could not be verified
   (both RAC terminated because missing value for return value of call at "WHY3DATA/stdlib/mach/int.mlw", line 432, characters 22-74):
 File int.mlw:
   Line 432:
     max_int = {int63'int => 4611686018427387903 (0X3FFFFFFFFFFFFFFF)}
   Line 434:
-    min_int = {int63'int => -4611686018427387904 (-0X4000000000000000)}
+    min_int = {int63'int => 4611686018427387903 (0X3FFFFFFFFFFFFFFF)}
 File tuple1.mlw:
   Line 6:
-    a = {int63'int => 0}
-    b = {int63'int => 0}
+    a = {int63'int => 4611686018427387903 (0X3FFFFFFFFFFFFFFF)}
+    b = {int63'int => 4611686018427387903 (0X3FFFFFFFFFFFFFFF)}
   Line 7:
-    a = {int63'int => 0}
-    b = {int63'int => 0}
+    a = {int63'int => 4611686018427387903 (0X3FFFFFFFFFFFFFFF)}
+    b = {int63'int => 4611686018427387903 (0X3FFFFFFFFFFFFFFF)}
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 14-23:
 Sub-goal Integer overflow of goal swap'vc.
-Prover result is: Valid (0.00s, 7546 steps).
+Prover result is: Valid (0.01s, 7546 steps).
 
 File "bench/check-ce/tuple1.mlw", line 7, characters 3-8:
 Sub-goal Integer overflow of goal swap'vc.

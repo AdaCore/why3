@@ -47,6 +47,9 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 23:
+    result of call at line 23, characters 19-21 [@call_result:23:19:21:bench/ce/ref_mono.mlw]
+      [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "-1"}
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
@@ -94,6 +97,9 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 29:
+    result of call at line 29, characters 19-21 [@call_result:29:19:21:bench/ce/ref_mono.mlw]
+      [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "-42"}
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
@@ -151,18 +157,27 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 40:
+    result of call at line 40, characters 7-9 [@call_result:40:7:9:bench/ce/ref_mono.mlw]
+      [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "-1"}
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 41:
+    result of call at line 41, characters 9-13 [@call_result:41:9:13:bench/ce/ref_mono.mlw]
+      [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "174"}
     x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "175"}}]}}
   Line 42:
+    result of call at line 42, characters 9-13 [@call_result:42:9:13:bench/ce/ref_mono.mlw]
+      [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "175"}
     x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
@@ -274,6 +289,9 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 50:
+    result of call at line 50, characters 8-10 [@call_result:50:8:10:bench/ce/ref_mono.mlw]
+      [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "1"}
     [before iteration] x [@field:0:contents] [@introduced]
       [@loop:bench/ce/ref_mono.mlw:50:2:96]
       [@vc:written:50:2:96:bench/ce/ref_mono.mlw] =
@@ -301,6 +319,9 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 53:
+    result of call at line 53, characters 9-11 [@call_result:53:9:11:bench/ce/ref_mono.mlw]
+      [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "1"}
     [current iteration] x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
@@ -363,6 +384,9 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 50:
+    result of call at line 50, characters 8-10 [@call_result:50:8:10:bench/ce/ref_mono.mlw]
+      [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "0"}
     x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_mono.mlw:50:2:96]
       [@model_trace:x] [@vc:written:50:2:96:bench/ce/ref_mono.mlw] =
       {"type": "Record",
