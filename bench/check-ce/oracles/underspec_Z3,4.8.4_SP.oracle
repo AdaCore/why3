@@ -1,6 +1,6 @@
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.02s, 60 steps).
+Prover result is: Valid (0.01s, 60 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
 <check-ce>Checking model:
@@ -39,12 +39,13 @@ Prover result is: Valid (0.02s, 60 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Type default value for parameter `_` at NO LOC: ()
-<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/underspec.mlw", line 14, characters 17-18 at "bench/check-ce/underspec.mlw", line 14, characters 17-18: {contents=
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/underspec.mlw", line 14, characters 17-18 at "bench/check-ce/underspec.mlw", line 14, characters 17-18: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for return value of call at "bench/check-ce/underspec.mlw", line 15, characters 17-18 at "bench/check-ce/underspec.mlw", line 15, characters 17-18: {contents=
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/underspec.mlw", line 15, characters 17-18 at "bench/check-ce/underspec.mlw", line 15, characters 17-18: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
                                                                     (-401)}
+<rac-values>No value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -111,7 +112,7 @@ Prover result is: Valid (0.02s, 60 steps).
   - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139)
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Step limit exceeded (0.92s).
+Prover result is: Step limit exceeded (0.83s).
 The following counterexample model could not be verified
   (abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139):
 File underspec.mlw:
@@ -127,11 +128,11 @@ File underspec.mlw:
 
 File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.00s, 2619 steps).
+Prover result is: Valid (0.01s, 2619 steps).
 
 File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.00s, 159 steps).
+Prover result is: Valid (0.01s, 159 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
 <check-ce>Checking model:
@@ -179,7 +180,7 @@ Prover result is: Valid (0.00s, 159 steps).
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <rac-values>Value from model for variable `z` at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: {contents=
                                                                     2}
-<rac-values>Type default value for return value of call at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: ()
+<rac-values>Type default value for return value of call to g at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: ()
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -271,7 +272,7 @@ Prover result is: Valid (0.00s, 159 steps).
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
 File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Step limit exceeded (0.59s).
+Prover result is: Step limit exceeded (0.55s).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
