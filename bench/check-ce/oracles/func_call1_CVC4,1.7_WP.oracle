@@ -2,7 +2,7 @@ File "bench/check-ce/func_call1.mlw", line 15, characters 6-7:
 warning: unused variable w
 File "bench/check-ce/func_call1.mlw", line 8, characters 12-21:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Valid (0.03s, 1346 steps).
+Prover result is: Valid (0.05s, 1346 steps).
 
 File "bench/check-ce/func_call1.mlw", line 9, characters 12-26:
 Sub-goal Postcondition of goal g'vc.
@@ -56,7 +56,7 @@ Prover result is: Valid (0.02s, 1268 steps).
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <rac-values>Value from model for variable `z` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: {contents=
                                                                     2}
-<rac-values>Value from model for return value of call at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
+<rac-values>Value from model for return value of call to g at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -199,7 +199,7 @@ Prover result is: Valid (0.02s, 1268 steps).
 <rac-values>Type default value for parameter `_` at NO LOC: ()
 <rac-values>Value from model for variable `z` at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: {contents=
                                                                     2}
-<rac-values>Value from model for return value of call at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
+<rac-values>Value from model for return value of call to g at "bench/check-ce/func_call1.mlw", line 15, characters 10-15 at "bench/check-ce/func_call1.mlw", line 15, characters 10-15: 3
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -303,7 +303,7 @@ Prover result is: Valid (0.02s, 1268 steps).
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call1.mlw", line 16, characters 11-16)
 File "bench/check-ce/func_call1.mlw", line 16, characters 11-16:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 6519 steps).
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6519 steps).
 The contracts of some function or loop are too weak, for example during the
   following execution:
 File int.mlw:
