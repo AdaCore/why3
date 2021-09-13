@@ -115,23 +115,23 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File record_one_field.mlw:
   Line 13:
-    y [@at:'Old:loc:bench/ce/record_one_field.mlw:42] [@introduced] =
+    x23 [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 15:
+    x23 [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
-  Line 15:
-    y [@introduced] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
   Line 39:
     y [@at:'Old:loc:bench/ce/record_one_field.mlw:42] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 41:
     x23 [@at:'Old:loc:bench/ce/record_one_field.mlw:42] [@introduced] =
       {"type": "Record",
@@ -155,13 +155,13 @@ File record_one_field.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 45:
     y [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 46:
     x23 [@introduced] =
       {"type": "Record",

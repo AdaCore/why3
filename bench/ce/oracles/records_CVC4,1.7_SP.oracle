@@ -141,19 +141,6 @@ File ref.mlw:
               "val":
                {"Field":
                  [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
-                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
-  Line 20:
-    x [@field:0:contents] [@introduced] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents",
-            "value":
-             {"type": "Record",
-              "val":
-               {"Field":
-                 [{"field": ".my_field_f",
                    "value": {"type": "Integer", "val": "6"}},
                   {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
 File records.mlw:
@@ -300,19 +287,6 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    x [@field:0:contents] [@introduced] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents",
-            "value":
-             {"type": "Record",
-              "val":
-               {"Field":
-                 [{"field": ".my_field_f",
-                   "value": {"type": "Integer", "val": "3"}},
-                  {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}}
-  Line 20:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":

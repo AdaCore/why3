@@ -69,18 +69,17 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
   Line 18:
-    y [@at:'Old:loc:bench/ce/ref_ex.mlw:24] [@field:0:contents]
-      [@introduced] =
+    x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 20:
-    y [@field:0:contents] [@introduced] =
+    x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
 File ref_ex.mlw:
   Line 21:
     y [@at:'Old:loc:bench/ce/ref_ex.mlw:24] [@field:0:contents]
