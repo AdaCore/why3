@@ -311,18 +311,28 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
   match json with
   | Some `All ->
     let open Json_base in
-    let print_loc fmt (loc, fname) =
+    let loc =
       match loc with
-      | None -> fprintf fmt "{%a}" (print_json_field "filename" print_json) (String fname)
-      | Some loc -> Pretty.print_json_loc fmt loc in
-    let print_term fmt (loc, fname, goal_name, expls) =
-      fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-        (print_json_field "loc" print_loc) (loc, fname)
-        (print_json_field "goal_name" print_json) (String goal_name)
-        (print_json_field "explanations" print_json) (List (List.map (fun s -> String s) expls)) in
-    fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-      (print_json_field "term" print_term) (loc, fname, goal_name, expls)
-      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:true)) res
+      | None -> Record ["filename", String fname]
+      | Some loc ->
+          let f, l, b, e = Loc.get loc in
+          Record [
+              "filename", String f;
+              "line", Int l;
+              "start-char", Int b;
+              "end-char", Int e
+            ] in
+    let term =
+      Record [
+          "loc", loc;
+          "goal_name", String goal_name;
+          "explanations", List (List.map (fun s -> String s) expls)
+        ] in
+    print_json fmt
+      (Record [
+           "term", term;
+           "prover-result", Call_provers.json_prover_result res
+         ])
   | None | Some `Values as json ->
     ( match loc with
       | None -> fprintf fmt "File %s:@\n" fname

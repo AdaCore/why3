@@ -459,6 +459,118 @@ module Log = struct
     | Exec_ended ->
         fprintf fmt "@[<h2>Execution of main function terminated normally@]"
 
+  let json_log entry_log =
+    let open Json_base in
+    let string f x = String (Format.asprintf "%a" f x) in
+    let vs2string vs = vs.vs_name.id_string in
+    let id2string id = id.id_string in
+    let rs2string rs = rs.rs_name.id_string in
+    let json_kind = function
+      | Exec_giant_steps -> String "GIANT-STEPS"
+      | Exec_normal -> String "NORMAL" in
+    let value_or_undefined = function
+        | Value v -> string print_value v
+        | Invalid -> Null in
+    let key_value key2string (k,v) =
+      Record [
+          "name", String (key2string k);
+          "value", string print_value v
+        ] in
+    let key_value_or_undefined (k,v) =
+      Record [
+          "name", String (rs2string k);
+          "value", value_or_undefined v
+        ] in
+    let log_entry = function
+      | Val_assumed (id, v) ->
+          Record [
+              "kind", String "VAL_ASSUMED";
+              "vs", string print_decoded id.id_string;
+              "value", string print_value v
+            ]
+        | Res_assumed (None, v) ->
+            Record [
+                "kind", String "RES_ASSUMED";
+                "value", string print_value v
+              ]
+        | Res_assumed (Some rs, v) ->
+            Record [
+                "kind", String "RES_ASSUMED";
+                "rs", string print_rs rs;
+                "value", string print_value v
+              ]
+        | Const_init id ->
+            Record [
+                "kind", String "CONST_INIT";
+                "id", string print_decoded id.id_string
+              ]
+        | Exec_call (ors, mvs, kind) ->
+            Record [
+                "kind", String "EXEC_CALL";
+                "rs", (match ors with
+                       | Some rs -> string print_decoded rs.rs_name.id_string
+                       | None -> Null);
+                "exec", json_kind kind;
+                "args", List (List.map (key_value vs2string) (Mvs.bindings mvs))
+              ]
+        | Exec_pure (ls, kind) ->
+            Record [
+                "kind", String "EXEC_PURE";
+                "ls", string print_ls ls;
+                "exec", json_kind kind
+              ]
+        | Exec_any (ors,mvs) ->
+            Record [
+                "kind", String "EXEC_ANY";
+                "rs", (match ors with
+                       | Some rs -> string print_decoded rs.rs_name.id_string
+                       | None -> Null);
+                "args", List (List.map (key_value vs2string) (Mvs.bindings mvs))
+              ]
+        | Iter_loop kind ->
+            Record [
+                "kind", String "ITER_LOOP";
+                "exec", json_kind kind;
+              ]
+        | Exec_main (rs,mvs,mrs) ->
+            Record [
+                "kind", String "EXEC_MAIN";
+                "rs", string print_decoded rs.rs_name.id_string;
+                "env", List (List.map (key_value vs2string) (Mvs.bindings mvs));
+                "globals", List (List.map key_value_or_undefined (Mrs.bindings mrs))
+              ]
+        | Exec_failed (reason,mid) ->
+            Record [
+                "kind", String "FAILED";
+                "reason", String reason;
+                "state", List (List.map (key_value id2string) (Mid.bindings mid))
+              ]
+        | Exec_stucked (reason,mid) ->
+            Record [
+                "kind", String "STUCKED";
+                "reason", String reason;
+                "state", List (List.map (key_value id2string) (Mid.bindings mid))
+              ]
+        | Exec_ended ->
+            Record [ "kind", String "ENDED" ] in
+    let entry e =
+      let loc =
+        match e.log_loc with
+        | None -> String "NOLOC"
+        | Some loc ->
+            let f, l, b, e = Loc.get loc in
+            Record [
+                "filename", String f;
+                "line", Int l;
+                "start-char", Int b;
+                "end-char", Int e
+              ] in
+      Record [
+          "loc", loc;
+          "entry", log_entry e.log_desc
+        ] in
+    List (List.map entry entry_log)
+
   (** verbosity level:
      1 : just imported values
      2 : + execution of function calls
@@ -468,104 +580,7 @@ module Log = struct
    *)
   let print_log ?(verb_lvl=4) ~json fmt entry_log =
     if json then
-      let open Json_base in
-      let string f = kasprintf (fun s -> String s) f in
-      let vs2string vs = vs.vs_name.id_string in
-      let id2string id = id.id_string in
-      let rs2string rs = rs.rs_name.id_string in
-      let print_json_kind fmt = function
-        | Exec_giant_steps -> print_json fmt (string "GIANT-STEPS")
-        | Exec_normal -> print_json fmt (string "NORMAL") in
-      let print_value_or_undefined fmt = function
-        | Value v -> print_value fmt v
-        | Invalid -> print_json fmt Null in
-      let print_key_value key2string fmt (k,v) =
-        fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-          (print_json_field "name" print_json) (String (key2string k))
-          (print_json_field "value" print_value) v in
-      let print_key_value_or_undefined fmt (k,v) =
-        fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-          (print_json_field "name" print_json) (String (rs2string k))
-          (print_json_field "value" print_value_or_undefined) v in
-      let print_log_entry fmt = function
-        | Val_assumed (id, v) ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "VAL_ASSUMED")
-              (print_json_field "vs" print_json)
-              (string "%a" print_decoded id.id_string)
-              (print_json_field "value" print_value) v
-        | Res_assumed (None, v) ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "RES_ASSUMED")
-              (print_json_field "value" print_value) v
-        | Res_assumed (Some rs, v) ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "RES_ASSUMED")
-              (print_json_field "rs" print_json)
-              (string "%a" print_rs rs)
-              (print_json_field "value" print_value) v
-        | Const_init id ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "CONST_INIT")
-              (print_json_field "id" print_json)
-              (string "%a" print_decoded id.id_string)
-        | Exec_call (ors, mvs, kind) ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "EXEC_CALL")
-              (print_json_field "rs" print_json) (match ors with
-                  | Some rs -> string "%a" print_decoded rs.rs_name.id_string
-                  | None -> Null)
-              (print_json_field "exec" print_json_kind) kind
-              (print_json_field "args" (list (print_key_value vs2string)))
-              (Mvs.bindings mvs)
-        | Exec_pure (ls, kind) ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "EXEC_PURE")
-              (print_json_field "ls" print_json) (string "%a" print_ls ls)
-              (print_json_field "exec" print_json_kind) kind
-        | Exec_any (ors,mvs) ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "EXEC_ANY")
-              (print_json_field "rs" print_json) (match ors with
-                  | Some rs -> string "%a" print_decoded rs.rs_name.id_string
-                  | None -> Null)
-              (print_json_field "args" (list (print_key_value vs2string)))
-              (Mvs.bindings mvs)
-        | Iter_loop kind ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "ITER_LOOP")
-              (print_json_field "exec" print_json_kind) kind
-        | Exec_main (rs,mvs,mrs) ->
-           fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]}@]"
-             (print_json_field "kind" print_json) (string "EXEC_MAIN")
-             (print_json_field "rs" print_json)
-             (string "%a" print_decoded rs.rs_name.id_string)
-             (print_json_field "env" (list (print_key_value vs2string)))
-             (Mvs.bindings mvs)
-             (print_json_field "globals" (list print_key_value_or_undefined))
-             (Mrs.bindings mrs)
-        | Exec_failed (reason,mid) ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "FAILED")
-              (print_json_field "reason" print_json) (String reason)
-              (print_json_field "state" (list (print_key_value id2string)))
-              (Mid.bindings mid)
-        | Exec_stucked (reason,mid) ->
-            fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-              (print_json_field "kind" print_json) (string "STUCKED")
-              (print_json_field "reason" print_json) (String reason)
-              (print_json_field "state" (list (print_key_value id2string)))
-              (Mid.bindings mid)
-        | Exec_ended ->
-            fprintf fmt "@[@[<hv1>{%a@]}@]"
-              (print_json_field "kind" print_json) (string "ENDED") in
-      let print_json_entry fmt e =
-        fprintf fmt "@[@[<hv1>{@[<hv2>%a@];@ @[<hv2>%a@]@]}@]"
-          (Pp.print_option_or_default "NOLOC"
-             (print_json_field "loc" print_json_loc)) e.log_loc
-          (print_json_field "entry" print_log_entry) e.log_desc in
-      fprintf fmt "@[@[<hv1>[%a@]@]"
-        Pp.(print_list comma print_json_entry) entry_log
+      Json_base.print_json fmt (json_log entry_log)
     else
       let entry_log = List.filter (fun le ->
             match le.log_desc with

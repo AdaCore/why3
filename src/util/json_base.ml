@@ -29,11 +29,7 @@ let string fmt s =
 
 let int = pp_print_int
 let bool fmt b = fprintf fmt "%b" b
-let standard_float fmt f = fprintf fmt "%f" f
 let float fmt f = fprintf fmt "%g" f
-
-let print_json_field key value_pr fmt value =
-  fprintf fmt "@[<hv 1>%a:@ %a@]" string key value_pr value
 
 let rec seq pr fmt = function
   | [] -> ()
@@ -45,13 +41,6 @@ let rec seq pr fmt = function
 
 let list pr fmt l =
   fprintf fmt "@[<hv 1>[%a]@]" (seq pr) l
-
-let print_map_binding key_to_str value_pr fmt binding =
-  let (key, value) = binding in
-  print_json_field (key_to_str key) value_pr fmt value
-
-let map_bindings key_to_str value_pr fmt map_bindings =
-  fprintf fmt "@[<hv 1>{%a}@]" (seq (print_map_binding key_to_str value_pr)) map_bindings
 
 type json =
   | Record of (string * json) list
@@ -67,13 +56,18 @@ let rec print_json fmt v =
   | Record r ->
       (* FIXME: sorting is only needed because tests are doing purely syntactic checks. *)
       let r = List.sort (fun (k1,_) (k2,_) -> String.compare k1 k2) r in
-      map_bindings (fun x -> x) print_json fmt r
+      map_bindings fmt r
   | List l -> list print_json fmt l
   | String s -> string fmt s
   | Int i -> int fmt i
   | Float f -> float fmt f
   | Bool b -> bool fmt b
   | Null -> pp_print_string fmt "null"
+and map_binding fmt binding =
+  let (key, value) = binding in
+  fprintf fmt "@[<hv 1>%a:@ %a@]" string key print_json value
+and map_bindings fmt map_bindings =
+  fprintf fmt "@[<hv 1>{%a}@]" (seq map_binding) map_bindings
 
 
 (* Get json fields. Return Not_found if no fields or field missing *)
@@ -111,3 +105,9 @@ let get_bool_opt j def =
   match j with
   | Bool b -> b
   | _ -> def
+
+let get_string_field j s = get_string (get_field j s)
+let get_int_field j s = get_int (get_field j s)
+let get_list_field j s = get_list (get_field j s)
+let get_float_field j s = get_float (get_field j s)
+let get_bool_field j s = get_bool (get_field j s)

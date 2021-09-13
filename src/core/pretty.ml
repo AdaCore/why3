@@ -88,7 +88,6 @@ module type Printer = sig
     val print_attrs : formatter -> Sattr.t -> unit
     val print_loc : formatter -> Loc.position -> unit
     val print_loc' : formatter -> Loc.position -> unit
-    val print_json_loc : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit
     val print_meta_arg_type : formatter -> meta_arg_type -> unit
@@ -172,15 +171,6 @@ let print_loc fmt l =
 let print_loc' fmt l =
   let (f,l,b,e) = Loc.get l in
   fprintf fmt "%S, line %d, characters %d-%d" f l b e
-
-let print_json_loc fmt loc =
-  let open Json_base in
-  let f, l, b, e = Loc.get loc in
-  fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]@,}@]"
-    (print_json_field "filename" print_json) (String f)
-    (print_json_field "line" print_json) (Int l)
-    (print_json_field "start-char" print_json) (Int b)
-    (print_json_field "end-char" print_json) (Int e)
 
 let print_id_attrs fmt id =
   if Debug.test_flag debug_print_attrs &&
