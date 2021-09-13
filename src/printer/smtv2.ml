@@ -579,7 +579,7 @@ let rec has_quantification f =
   | Tquant _ | Teps _ -> true
   | _ -> Term.t_any has_quantification f
 
-let print_logic_decl info fmt (ls,def) =
+let print_logic_decl_aux flag info fmt (ls,def) =
   if not (Mid.mem ls.ls_name info.info_syn) then begin
     collect_model_ls info ls;
     let vsl,expr = Decl.open_ls_defn def in
@@ -592,8 +592,8 @@ let print_logic_decl info fmt (ls,def) =
       info.incr_list_ldecls <- (ls, vsl, expr) :: info.incr_list_ldecls
     end else
       let tvs = Term.ls_ty_freevars ls in
-      fprintf fmt ";; %s@\n@[<v2>(define-fun %a %a)@]@\n@\n"
-        ls.ls_name.id_string
+      fprintf fmt ";; %s@\n@[<v2>(define-fun%s %a %a)@]@\n@\n"
+        ls.ls_name.id_string flag
         (print_ident info) ls.ls_name
         (print_par info
            (fun fmt -> Format.fprintf fmt "@[<h>(%a) %a@]@ %a"
@@ -602,6 +602,41 @@ let print_logic_decl info fmt (ls,def) =
                (print_expr info) expr)) tvs;
       List.iter (forget_var info) vsl
   end
+
+let print_logic_decl = print_logic_decl_aux ""
+
+let print_rec_logic_decl info fmt = function
+  | [] -> ()
+  | [ld] ->
+      print_logic_decl_aux "-rec" info fmt ld
+  | l ->
+      let l = List.map (fun (ls,def) ->
+          let vsl,expr = Decl.open_ls_defn def in
+          (ls,vsl,expr)
+        ) l
+      in
+      let print_decl fmt (ls,vsl,_) =
+        if Mid.mem ls.ls_name info.info_syn then () else begin
+          collect_model_ls info ls;
+          let tvs = Term.ls_ty_freevars ls in
+          fprintf fmt "@[<hov 2>(%a %a)@]@\n@\n"
+            (print_ident info) ls.ls_name
+            (print_par info
+               (fun fmt -> Format.fprintf fmt "(%a) %a"
+                   (print_var_list info) vsl
+                   (print_type_value info) ls.ls_value)) tvs;
+        end
+      in
+      let print_term fmt (ls,_,expr) =
+        if Mid.mem ls.ls_name info.info_syn then () else begin
+          fprintf fmt "@[<hov 2>%a@]"
+            (print_expr info) expr
+        end
+      in
+      fprintf fmt "@[<hov 2>(define-funs-rec %a %a)@]@\n@\n"
+        (print_list nothing print_decl) l
+        (print_list nothing print_term) l;
+      List.iter (fun (_,vsl,_) -> List.iter (forget_var info) vsl) l
 
 let print_info_model info =
   (* Prints the content of info.info_model *)
@@ -776,8 +811,19 @@ let print_decl vc_loc vc_attrs args info fmt d =
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
-  | Dlogic dl ->
-      print_list nothing (print_logic_decl info) fmt dl
+  | Dlogic dl -> begin
+      match info.info_version with
+      | V20 | V26 ->
+          print_list nothing (print_logic_decl info) fmt dl
+      | V26Par -> begin
+          match dl with
+          | ([(s,_) as dl])
+            when not (Sid.mem s.ls_name (get_decl_syms d)) ->
+              print_logic_decl info fmt dl
+          | dl ->
+              print_rec_logic_decl info fmt dl
+        end
+    end
   | Dind _ -> unsupportedDecl d
       "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
