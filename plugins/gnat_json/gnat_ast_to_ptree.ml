@@ -319,6 +319,13 @@ let rec no_vcs_no_side_effects e = match e.expr_desc with
    the target type raise an exception [Failure] (but that should only happen when there is
    a problem in the generated [Gnat_ast]). *)
 
+let next_call_id =
+  let counter = ref 0 in
+  fun () -> incr counter; !counter
+
+let mk_call_id_str () =
+  mk_str (Format.sprintf "rac:call_id:%d" (next_call_id ()))
+
 let process_call : 'a . (module E_or_T with type t = 'a) -> 'b why_node_id -> identifier_id -> 'a list  -> 'a =
   fun (type t) (module E_or_T : E_or_T with type t = t) (node : 'b why_node_id) id args : t ->
   (* Convert unquantified op1 operations (=, <, etc.) to innfix, binary only *)
@@ -340,14 +347,16 @@ let process_call : 'a . (module E_or_T with type t = 'a) -> 'b why_node_id -> id
           List.get_last (conversion_error node.info.id "empty operator name")
             (mk_idents_of_identifier ~notation:(Some Ident.op_prefix) [] id) in
         mk_qualid [ident] in
-      mk_idapp qid args
+      mk_attr (mk_call_id_str ())
+        (mk_idapp qid args)
     | [_;_] ->
     let qid =
       let ident =
         List.get_last (conversion_error node.info.id "empty operator name")
           (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] id) in
       mk_qualid [ident] in
-      mk_idapp qid args
+      mk_attr (mk_call_id_str ())
+        (mk_idapp qid args)
     | _ ->
         conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
   end else (begin
@@ -361,8 +370,9 @@ let process_call : 'a . (module E_or_T with type t = 'a) -> 'b why_node_id -> id
         | 2 -> Some Ident.op_infix
         | _ -> conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
       else None in
-      let f = mk_var (mk_qualid (mk_idents_of_identifier ~notation [] id)) in
-      List.fold_left (mk_apply ?loc:None) f args
+    let f = mk_var (mk_qualid (mk_idents_of_identifier ~notation [] id)) in
+    mk_attr (mk_call_id_str ())
+      (List.fold_left (mk_apply ?loc:None) f args)
   end)
 
 let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
@@ -729,7 +739,8 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
                          (map mk_term_of_pred r.post))) in
                let reads, writes, xpost = Opt.(get ([], [], []) (map mk_effects r.effects)) in
                mk_spec ~pre ~post ~reads ~writes ~xpost () in
-             mk_any [] Expr.RKnone (Some pty) P.(mk_wild ()) Ity.MaskVisible spec in
+             let any = mk_any [] Expr.RKnone (Some pty) P.(mk_wild ()) Ity.MaskVisible spec in
+             mk_attr (mk_call_id_str ()) any in
            let body = mk_var (Qident id) in
            mk_let id value body)
 
@@ -871,7 +882,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
                let body =
                  let id = mk_ident [] "_" in
                  let body = mk_tuple [] in
-                 mk_let id expr body in
+                 mk_attr (mk_call_id_str ()) (mk_let id expr body) in
                mk_fun [] None pat Ity.MaskVisible spec body)
 
     | Assert r ->
