@@ -252,9 +252,9 @@ type check_value = Ity.ity -> value -> unit
 
 type oracle = {
   for_variable:
-    ?check:check_value -> ?loc:Loc.position -> env -> Ident.ident -> Ity.ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position option -> Ident.ident -> Ity.ity -> value option;
   for_result:
-    ?check:check_value -> env -> Loc.position -> Ity.ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position -> call_id:int option -> Ity.ity -> value option;
 }
 (** An oracle provides values during execution in {!Pinterp} for program
     parameters and during giant steps. The [check] is called on the value and

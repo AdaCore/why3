@@ -697,14 +697,14 @@ type check_value = ity -> value -> unit
 
 type oracle = {
   for_variable:
-    ?check:check_value -> ?loc:Loc.position -> env -> ident -> ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position option -> Ident.ident -> Ity.ity -> value option;
   for_result:
-    ?check:check_value -> env -> Loc.position -> ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position -> call_id:int option -> Ity.ity -> value option;
 }
 
 let oracle_dummy = {
-  for_variable= (fun ?check:_ ?loc:_ _ _ _ -> None);
-  for_result= (fun ?check:_ _ _ _ -> None);
+  for_variable= (fun _ ?check:_ ~loc:_ _ _ -> None);
+  for_result= (fun _ ?check:_ ~loc:_ ~call_id:_ _ -> None);
 }
 
 (******************************************************************************)

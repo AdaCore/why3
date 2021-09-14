@@ -641,13 +641,13 @@ let gen_model_variable ?check ({giant_steps} as ctx) ?loc id ity : value_gen =
     Opt.apply () check id;
     try
       let check = check_assume_type_invs ctx.rac ?loc ~giant_steps ctx.env in
-      ctx.oracle.for_variable ?loc ~check ctx.env id ity
+      ctx.oracle.for_variable ~loc ~check ctx.env id ity
     with Stuck _ when is_ignore_id id -> None
 
 (** Generate a value by querying the model for a result *)
-let gen_model_result ({giant_steps} as ctx) loc ity : value_gen =
+let gen_model_result ({giant_steps} as ctx) oid loc ity : value_gen =
   "value from model", fun () ->
-    let res = ctx.oracle.for_result ctx.env loc ity in
+    let res = ctx.oracle.for_result ctx.env ~call_id:oid ~loc ity in
     Opt.iter (check_assume_type_invs ctx.rac ~loc ~giant_steps ctx.env ity) res;
     res
 
@@ -716,12 +716,13 @@ let get_and_register_variable ctx ?def ?loc id ity =
   register_used_value ctx.env oloc id value;
   value
 
-let get_and_register_result ?def ?rs ctx posts loc ity =
-  let ctx_desc = asprintf "return value of call%t at %a"
+let get_and_register_result ?def ?rs ctx posts oid loc ity =
+  let ctx_desc = asprintf "return value of call%t at %a%t"
       (fun fmt -> Opt.iter (fprintf fmt " to %a" print_rs) rs)
-      Pretty.print_loc' loc in
+      Pretty.print_loc' loc
+      (fun fmt -> Opt.iter (fprintf fmt " call id %d") oid) in
   let gens = [
-    gen_model_result ctx loc ity;
+    gen_model_result ctx oid loc ity;
     gen_default def;
     gen_from_post ctx posts;
     gen_type_default ~really:true ~posts ctx ity;
@@ -963,7 +964,7 @@ and exec_expr' ctx e =
           | [] ->
              if ctx.giant_steps then begin
                  register_call ctx.env e.e_loc None mvs Log.Exec_giant_steps;
-                 exec_call_abstract ?loc:e.e_loc ~attrs:e.e_attrs
+                 exec_call_abstract ?loc:e.e_loc ~attrs:e'.e_attrs
                    ~snapshot:cty.cty_oldies ctx ce.c_cty [] e.e_ity
                end
              else begin
@@ -1537,7 +1538,8 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs ctx cty arg_pvs ity_result =
   let asgn_wrt =
     assign_written_vars ~vars_map cty.cty_effect.eff_writes loc ctx in
   List.iter asgn_wrt (Mvs.keys ctx.env.vsenv);
-  let res_v = get_and_register_result ?rs ctx cty.cty_post loc ity_result in
+  let oid = Opt.bind attrs (Ident.search_attribute_value Ident.get_call_id_value) in
+  let res_v = get_and_register_result ?rs ctx cty.cty_post oid loc ity_result in
   (* assert2 *)
   let desc = match rs with
     | None -> "of anonymous function"

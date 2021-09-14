@@ -57,9 +57,9 @@ let print_pv_attr fmt v =
     Pretty.print_id_attrs v.pv_vs.vs_name
  *)
 
-let model_trace_result_attributes = Sattr.singleton (create_model_trace_attr "result")
+let model_trace_result_attribute = create_model_trace_attr "result"
 
-let explicit_result loc ce ity =
+let explicit_result loc attrs ce ity =
   let name = match ce.c_node with
     | Capp (rs, _) ->
        Format.asprintf "%a'result" Ident.print_decoded rs.rs_name.id_string
@@ -68,7 +68,8 @@ let explicit_result loc ce ity =
     | Cfun _ -> "anonymous'result"
     | Cany -> "any'result"
   in
-  let attrs = model_trace_result_attributes in
+  let attrs = Sattr.filter (fun a -> Ident.get_call_id_value a <> None) attrs in
+  let attrs = Sattr.add model_trace_result_attribute attrs in
   let attrs = match loc with
     | Some l -> Sattr.add (create_call_result_attr l) attrs
     | None -> attrs in
@@ -684,7 +685,7 @@ let rec k_expr env lps e res xmap =
           | _ -> true
             in
           if env.keep_trace && need_trace then
-            let vv = explicit_result loc ce v.pv_ity in
+            let vv = explicit_result loc e.e_attrs ce v.pv_ity in
             Kseq(k v,0,Klet(vv, t_var v.pv_vs, t_true))
           else
             k v

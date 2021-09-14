@@ -520,13 +520,24 @@ let search_model_element_for_id m ?loc id =
     then Some me else None in
   search_model_element m p
 
-let search_model_element_call_result model loc =
-  let p me = (* [@model_trace:result] [@call_result_loc:<loc>] *)
+let matching_call_id id attrs =
+  Opt.equal Int.equal (Some id)
+    (search_attribute_value get_call_id_value attrs)
+
+let matching_call_result_loc attrs loc =
+  Opt.equal Loc.equal (Some loc)
+    (search_attribute_value get_call_result_loc attrs)
+
+let search_model_element_call_result model call_id loc =
+  let p me = (* [@model_trace:result] [@call_result_loc:<loc>] [@RAC:call_id:<id>] *)
     let has_model_trace_result attrs =
       get_model_trace_string ~name:"" ~attrs = "result" in
-    if has_model_trace_result me.me_name.men_attrs &&
-       let oloc = search_attribute_value get_call_result_loc me.me_name.men_attrs in
-       Opt.equal Loc.equal oloc (Some loc)
+    if (match call_id with
+        | Some call_id ->
+            matching_call_id call_id me.me_name.men_attrs
+        | None ->
+            has_model_trace_result me.me_name.men_attrs &&
+            matching_call_result_loc me.me_name.men_attrs loc)
     then Some me else None in
   search_model_element model p
 
@@ -552,9 +563,12 @@ let print_model_element ?(print_locs=false) ~print_attrs ~print_model_value ~me_
                (Pp.print_option_or_default "NO LOC "Pretty.print_loc) m_element.me_location)
         print_model_value m_element.me_value
 
+let find_call_id = Ident.search_attribute_value Ident.get_call_id_value
+
 let similar_model_element_names n1 n2 =
   Ident.get_model_trace_string ~name:n1.men_name ~attrs:n1.men_attrs
   = Ident.get_model_trace_string ~name:n2.men_name ~attrs:n2.men_attrs &&
+  Opt.equal (=) (find_call_id n1.men_attrs) (find_call_id n2.men_attrs) &&
   n1.men_kind = n2.men_kind &&
   Strings.has_suffix unused_suffix n1.men_name =
   Strings.has_suffix unused_suffix n2.men_name
