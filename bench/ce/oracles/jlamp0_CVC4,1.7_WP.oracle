@@ -140,6 +140,12 @@ File ref.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -199,6 +205,12 @@ File ref.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -257,7 +269,13 @@ File ref.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "8"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -277,13 +295,13 @@ File jlamp0.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
     [before iteration] c [@field:0:contents] [@introduced]
       [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "8"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
   Line 23:
     [current iteration] a [@field:0:contents] [@introduced]
       [@model_trace:a] =
@@ -302,7 +320,7 @@ File jlamp0.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
 
 File "bench/ce/jlamp0.mlw", line 19, characters 15-28:
 Sub-goal Postcondition of goal p2'vc.

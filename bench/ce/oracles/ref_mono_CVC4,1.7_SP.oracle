@@ -105,18 +105,17 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
-    y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
-      [@introduced] =
+    x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 11:
-    y [@field:0:contents] [@introduced] =
+    x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
   Line 35:
     y [@introduced] [@model_trace:y] =
       {"type": "Record",

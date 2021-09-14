@@ -251,8 +251,13 @@ let pp_idapp ~attr pp fmt qid xs =
             pp_maybe_marker id.id_loc s
       | _ -> failwith "pp_idapp"
 
-let pp_apply pp fmt x1 x2 =
-  fprintf fmt "@[<hv 2>%a@ %a@]" pp.closed x1 pp.closed x2
+let pp_apply split_apply pp fmt x1 x2 =
+  let rec flatten_applies sofar x =
+    match split_apply x with
+    | None -> x :: sofar
+    | Some (x1, x2) -> flatten_applies (x2 :: sofar) x1 in
+  fprintf fmt "@[<hv 2>%a@]"
+    (pp_print_opt_list ~sep:"@ " pp.closed) (flatten_applies [x2] x1)
 
 let pp_infix pp fmt x ops =
   let pp_op fmt (op, x) =
@@ -632,7 +637,9 @@ and pp_expr ~attr =
     | Eidapp (qid, es) ->
         pp_idapp ~attr (pp_expr ~attr) fmt qid es
     | Eapply (e1, e2) ->
-        pp_apply (pp_expr ~attr) fmt e1 e2
+        let split_apply e = match e.expr_desc with
+            Eapply (e1, e2) -> Some (e1, e2) | _ -> None in
+        pp_apply split_apply (pp_expr ~attr) fmt e1 e2
     | Einfix (e, op, e') ->
         let rec collect op e = match e.expr_desc with
           | Einfix (e, op', e') -> (op, e) :: collect op' e'
@@ -836,7 +843,9 @@ and pp_term ~attr =
     | Tidapp (qid, ts) ->
         pp_idapp ~attr (pp_term ~attr) fmt qid ts
     | Tapply (t1, t2) ->
-        pp_apply (pp_term ~attr) fmt t1 t2
+        let split_apply t = match t.term_desc with
+            Tapply (t1, t2) -> Some (t1, t2) | _ -> None in
+        pp_apply split_apply (pp_term ~attr) fmt t1 t2
     | Tinfix (t, op, t') ->
         let rec collect op t = match t.term_desc with
           | Tinfix (t, op', t') -> (op, t) :: collect op' t'

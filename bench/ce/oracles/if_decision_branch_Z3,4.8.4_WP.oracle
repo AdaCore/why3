@@ -10,12 +10,12 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
   Line 16:
-    a [@introduced] = {"type": "Integer", "val": "0"}
+    a [@introduced] = {"type": "Integer", "val": "5"}
 File if_decision_branch.mlw:
   Line 18:
-    a [@introduced] = {"type": "Integer", "val": "0"}
+    a [@introduced] = {"type": "Integer", "val": "5"}
   Line 19:
-    result [@introduced] = {"type": "Integer", "val": "22"}
+    result [@introduced] = {"type": "Integer", "val": "15"}
   Line 22:
     TEMP_NAME [@branch_id=5454] [@field:0:sel_path] [@introduced]
       [@model_trace:TEMP_NAME] =
@@ -26,15 +26,15 @@ File if_decision_branch.mlw:
     result of call at line 22, characters 34-41 [@call_result:22:34:41:bench/ce/if_decision_branch.mlw]
       [@introduced] [@model_trace:result] =
       {"type": "Boolean", "val": false}
-    result [@introduced] = {"type": "Integer", "val": "22"}
+    result [@introduced] = {"type": "Integer", "val": "15"}
   Line 27:
     TEMP_NAME [@branch_id=121] [@field:0:sel_path] [@introduced]
       [@model_trace:TEMP_NAME] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "sel_path", "value": {"type": "Boolean", "val": false}}]}}
+          [{"field": "sel_path", "value": {"type": "Boolean", "val": true}}]}}
     result of call at line 27, characters 36-43 [@call_result:27:36:43:bench/ce/if_decision_branch.mlw]
       [@introduced] [@model_trace:result] =
-      {"type": "Boolean", "val": false}
+      {"type": "Boolean", "val": true}
 

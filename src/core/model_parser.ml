@@ -974,6 +974,7 @@ let build_model_rec pm (elts: model_element list) : model_files =
         Debug.dprintf debug "No term for %s@." me.me_name.men_name;
         None
     | t ->
+        (* model elements are preliminary so far: *)
         assert (me.me_location = None && me.me_term = None);
         let attrs = Sattr.union me.me_name.men_attrs t.t_attrs in
         let name, attrs = match t.t_node with
