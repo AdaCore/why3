@@ -217,7 +217,7 @@ AX_VERSION_GE([$OCAMLVERSION], 4.05.0, [],
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
-OCAMLLIB=`$OCAMLC -where | tr -d '\\r'`
+OCAMLLIB=`which ocamlc | xargs dirname | xargs dirname`/lib/ocaml
 echo "ocaml library path is $OCAMLLIB"
 
 # then we look for ocamlopt; if not present, we issue a warning
