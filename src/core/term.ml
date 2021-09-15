@@ -412,7 +412,7 @@ let t_similar t1 t2 =
     | Ttrue, Ttrue | Tfalse, Tfalse -> true
     | _, _ -> false
 
-let t_hash ~trigger ~attr t =
+let t_hash ~trigger ~attr ~const t =
   let rec pat_hash bnd bv p = match p.pat_node with
     | Pwild -> bnd, bv, 0
     | Pvar v -> bnd + 1, Mvs.add v bnd bv, bnd + 1
@@ -449,7 +449,10 @@ let t_hash ~trigger ~attr t =
       | Trm (t,vml) ->
           begin match t.t_node with
           | Tvar v -> vs_hash v
-          | Tconst c -> Hashtbl.hash c
+          | Tconst c when const -> Hashtbl.hash c
+          | Tconst (Constant.ConstInt {Number.il_int = c}) -> Hashtbl.hash c
+          | Tconst (Constant.ConstReal {Number.rl_real = c}) -> Hashtbl.hash c
+          | Tconst (Constant.ConstStr c) -> Hashtbl.hash c
           | Tapp (s,l) ->
               Hashcons.combine_list (t_hash bnd vml) (ls_hash s) l
           | Tif (f,t,e) ->
@@ -498,7 +501,8 @@ let t_hash ~trigger ~attr t =
     end in
   t_hash 0 [] t
 
-let t_hash_generic ~trigger ~attr t = t_hash ~trigger ~attr t
+let t_hash_generic ~trigger ~attr ~const t =
+  t_hash ~trigger ~attr ~const t
 let t_compare_generic ~trigger ~attr ~loc ~const t1 t2=
   t_compare ~trigger ~attr ~loc ~const t1 t2
 let t_equal_generic ~trigger ~attr ~loc ~const t1 t2 =
@@ -520,11 +524,12 @@ let hterm_generic ~trigger ~attr ~loc ~const
     : (module (Exthtbl.S with type key = term)) =
   (module (Exthtbl.Make(struct
       type t = term
-      let hash t = t_hash ~trigger ~attr t
+      let hash t = t_hash ~trigger ~attr ~const t
       let equal t1 t2 = t_compare ~trigger ~attr ~loc ~const t1 t2 = 0
     end)))
 
-let t_hash_strict t = t_hash ~trigger:true ~attr:true t
+let t_hash_strict t =
+  t_hash ~trigger:true ~attr:true ~const:true t
 let t_equal_strict t1 t2 =
   t_compare ~trigger:true ~attr:true ~loc:true ~const:true t1 t2 = 0
 let t_compare_strict t1 t2 =
@@ -537,18 +542,19 @@ module Sterm_strict =
 module Hterm_strict=
   (val (hterm_generic ~trigger:true ~attr:true ~loc:true ~const:true))
 
-let t_hash t = t_hash ~trigger:false ~attr:false t
+let t_hash t =
+  t_hash ~trigger:false ~attr:false ~const:false t
 let t_equal t1 t2 =
-  t_compare ~trigger:false ~attr:false ~loc:false ~const:true t1 t2 = 0
+  t_compare ~trigger:false ~attr:false ~loc:false ~const:false t1 t2 = 0
 let t_compare t1 t2 =
-  t_compare ~trigger:false ~attr:false ~loc:false ~const:true t1 t2
+  t_compare ~trigger:false ~attr:false ~loc:false ~const:false t1 t2
 
 module Mterm =
-  (val (mterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+  (val (mterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
 module Sterm =
-  (val (sterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+  (val (sterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
 module Hterm =
-  (val (hterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+  (val (hterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
 
 (* type checking *)
 
