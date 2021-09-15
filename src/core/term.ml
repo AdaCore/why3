@@ -543,18 +543,18 @@ module Hterm_strict=
   (val (hterm_generic ~trigger:true ~attr:true ~loc:true ~const:true))
 
 let t_hash t =
-  t_hash ~trigger:false ~attr:false ~const:true t
+  t_hash ~trigger:false ~attr:false ~const:false t
 let t_equal t1 t2 =
-  t_compare ~trigger:false ~attr:false ~loc:false ~const:true t1 t2 = 0
+  t_compare ~trigger:false ~attr:false ~loc:false ~const:false t1 t2 = 0
 let t_compare t1 t2 =
-  t_compare ~trigger:false ~attr:false ~loc:false ~const:true t1 t2
+  t_compare ~trigger:false ~attr:false ~loc:false ~const:false t1 t2
 
 module Mterm =
-  (val (mterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+  (val (mterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
 module Sterm =
-  (val (sterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+  (val (sterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
 module Hterm =
-  (val (hterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+  (val (hterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
 
 (* type checking *)
 

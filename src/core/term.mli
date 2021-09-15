@@ -183,7 +183,7 @@ module Mterm_strict : Extmap.S with type key = term
 module Sterm_strict : Extset.S with type M.key = term
 module Hterm_strict : Exthtbl.S with type key = term
 
-(** {2 Term equality modulo alpha-equivalence, attributes, triggers, and locations} *)
+(** {2 Term equality modulo alpha-equivalence, attributes, triggers, locations, and constant syntax} *)
 
 val t_equal : term -> term -> bool
 val t_compare : term -> term -> int
