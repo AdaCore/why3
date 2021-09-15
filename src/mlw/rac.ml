@@ -217,10 +217,11 @@ module Why = struct
     trans             : Task.task Trans.tlist option;
     why_prover        : why_prover option;
     oracle_quant_var  : oracle_quant_var;
+    elim_eps          : Task.task Trans.trans;
   }
 
-  let mk_config ?(metas=[]) ?trans ?why_prover ?(oracle_quant_var=oracle_quant_var_dummy) () =
-    {metas; trans; why_prover; oracle_quant_var}
+  let mk_config ?(metas=[]) ?trans ?why_prover ?(oracle_quant_var=oracle_quant_var_dummy) ~elim_eps () =
+    {metas; trans; why_prover; oracle_quant_var; elim_eps}
 
   let mk_meta_lit (meta, s) =
     let open Theory in
@@ -253,7 +254,8 @@ module Why = struct
         let limit = Call_provers.{empty_limit with limit_time; limit_mem} in
         mk_why_prover ~command driver limit in
       Opt.map aux why_prover_lit in
-    mk_config ~metas ?trans ?why_prover ?oracle_quant_var ()
+    let elim_eps = Trans.lookup_transform "eliminate_epsilon" env in
+    mk_config ~metas ?trans ?why_prover ?oracle_quant_var ~elim_eps ()
 
   (******************************************************************************)
   (*                                CHECK TERM                                  *)
@@ -395,6 +397,7 @@ module Why = struct
       else res in
     let task_filename = match Sys.getenv_opt "WHY3RACTASKDIR" with
       | Some temp_dir when Debug.test_flag debug_rac_check_term_result ->
+          let task = Trans.apply cnf.elim_eps task in
           let filename = Filename.temp_file ~temp_dir "gnatwhy3-task" ".why" in
           let out = open_out filename in
           fprintf (formatter_of_out_channel out) "%a@." Pretty.print_task task;
@@ -417,8 +420,8 @@ module Why = struct
           report_cntr_head (ctx, msg, t) pp_task_filename;
         incomplete "%a" report_cntr_title (ctx, msg)
 
-  let mk_check_term ?metas ?trans ?why_prover ?oracle_quant_var () =
-    check_term (mk_config ?metas ?trans ?why_prover ?oracle_quant_var ())
+  let mk_check_term ?metas ?trans ?why_prover ?oracle_quant_var ~elim_eps () =
+    check_term (mk_config ?metas ?trans ?why_prover ?oracle_quant_var ~elim_eps ())
 
   let mk_check_term_lit cnf env ?metas ?(trans="compute_in_goal") ?why_prover ?oracle_quant_var () =
     check_term (mk_config_lit cnf env ?metas ~trans ?why_prover ?oracle_quant_var ())
