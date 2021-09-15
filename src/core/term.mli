@@ -147,14 +147,15 @@ and trigger = term list list
 (** {2 Generic term equality} *)
 
 (**   flags enable comparison of the respective feature:
-  - [trigger]: triggers in qauntified terms
+  - [trigger]: triggers in quantified terms
   - [attr]: attributes
   - [loc]: source locations
-  - [const]: when false constants of the same mathematical
-  value are considered equal
+  - [const]: when false, mathematically equal constants are considered equal,
+    even if written differently
 *)
 
-val t_hash_generic : trigger:bool -> attr:bool -> term -> int
+val t_hash_generic :
+  trigger:bool -> attr:bool -> const:bool -> term -> int
 val t_compare_generic :
   trigger:bool -> attr:bool -> loc:bool -> const:bool
                -> term -> term -> int
