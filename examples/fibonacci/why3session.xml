@@ -2,9 +2,12 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="fibonacci.mlw"/>
 <theory name="FibonacciTest" proved="true">
@@ -24,7 +27,139 @@
 </theory>
 <theory name="FibonacciLinear" proved="true">
  <goal name="fib&#39;vc" expl="VC for fib" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="5878"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="5878"/></proof>
+ </goal>
+</theory>
+<theory name="FibonacciTailRecList" proved="true">
+ <goal name="sum_fib&#39;vc" expl="VC for sum_fib" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="sum_fib&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.95" steps="7491"/></proof>
+  </goal>
+  <goal name="sum_fib&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.98" steps="7444"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="sum_pow&#39;vc" expl="VC for sum_pow" proved="true">
+ <transf name="split_all_full" proved="true" >
+  <goal name="sum_pow&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.06" steps="269364"/></proof>
+  </goal>
+  <goal name="sum_pow&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.07" steps="301123"/></proof>
+  </goal>
+  <goal name="sum_pow&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="29473"/></proof>
+  </goal>
+  <goal name="sum_pow&#39;vc.3" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="sum_pow&#39;vc.3.0" expl="postcondition" proved="true">
+   <proof prover="5"><result status="valid" time="0.01" steps="33797"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="pow_pos" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="pow_pos.0" proved="true">
+  <transf name="induction" proved="true" arg1="x">
+   <goal name="pow_pos.0.0" expl="base case" proved="true">
+   <proof prover="5"><result status="valid" time="0.02" steps="27546"/></proof>
+   </goal>
+   <goal name="pow_pos.0.1" expl="recursive case" proved="true">
+   <proof prover="5"><result status="valid" time="0.02" steps="28070"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="sum_fib_acc&#39;vc" expl="VC for sum_fib_acc" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="sum_fib_acc&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="2.96" steps="26875"/></proof>
+  </goal>
+  <goal name="sum_fib_acc&#39;vc.1" expl="variant decrease" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="sum_fib_acc&#39;vc.1.0" expl="variant decrease" proved="true">
+   <proof prover="5"><result status="valid" time="0.02" steps="34723"/></proof>
+   </goal>
+   <goal name="sum_fib_acc&#39;vc.1.1" expl="variant decrease" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="366"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sum_fib_acc&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.06" steps="186709"/></proof>
+  </goal>
+  <goal name="sum_fib_acc&#39;vc.3" expl="assertion" proved="true">
+  <transf name="assert" proved="true" arg1="(u = x1 - 2 \/ mem u x)">
+   <goal name="sum_fib_acc&#39;vc.3.0" expl="asserted formula" proved="true">
+   <proof prover="5"><result status="valid" time="0.06" steps="275380"/></proof>
+   </goal>
+   <goal name="sum_fib_acc&#39;vc.3.1" expl="assertion" proved="true">
+   <transf name="destruct" proved="true" arg1="h">
+    <goal name="sum_fib_acc&#39;vc.3.1.0" expl="assertion" proved="true">
+    <proof prover="5"><result status="valid" time="0.02" steps="34257"/></proof>
+    </goal>
+    <goal name="sum_fib_acc&#39;vc.3.1.1" expl="assertion" proved="true">
+    <transf name="assert" proved="true" arg1="(mem u l)">
+     <goal name="sum_fib_acc&#39;vc.3.1.1.0" expl="asserted formula" proved="true">
+     <proof prover="1"><result status="valid" time="0.03" steps="7241"/></proof>
+     </goal>
+     <goal name="sum_fib_acc&#39;vc.3.1.1.1" expl="assertion" proved="true">
+     <proof prover="5"><result status="valid" time="0.02" steps="34738"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sum_fib_acc&#39;vc.4" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="8583"/></proof>
+  </goal>
+  <goal name="sum_fib_acc&#39;vc.5" expl="variant decrease" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="sum_fib_acc&#39;vc.5.0" expl="variant decrease" proved="true">
+   <proof prover="5"><result status="valid" time="0.01" steps="35672"/></proof>
+   </goal>
+   <goal name="sum_fib_acc&#39;vc.5.1" expl="variant decrease" proved="true">
+   <proof prover="1"><result status="valid" time="0.05" steps="12576"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sum_fib_acc&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.03" steps="35537"/></proof>
+  </goal>
+  <goal name="sum_fib_acc&#39;vc.7" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="sum_fib_acc&#39;vc.7.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="33810"/></proof>
+   </goal>
+   <goal name="sum_fib_acc&#39;vc.7.1" expl="postcondition" proved="true">
+   <transf name="assert" proved="true" arg1="(x1 &gt;= 0)">
+    <goal name="sum_fib_acc&#39;vc.7.1.0" expl="asserted formula" proved="true">
+    <transf name="apply" proved="true" arg1="Requires">
+     <goal name="sum_fib_acc&#39;vc.7.1.0.0" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.03" steps="7450"/></proof>
+     <proof prover="4" timelimit="5"><result status="valid" time="0.02" steps="7238"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="sum_fib_acc&#39;vc.7.1.1" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.03" steps="10682"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="fib&#39;vc" expl="VC for fib" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="9371"/></proof>
  </goal>
 </theory>
 <theory name="FibRecGhost" proved="true">
