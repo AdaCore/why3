@@ -200,7 +200,7 @@ and bool env ({Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } as e) =
 
 let no_params ~loc = [loc, None, false, Some (PTtuple [])]
 
-let rec stmt env ({Mc_ast.stmt_loc = loc; Mc_ast.stmt_desc = d } as s) =
+let rec stmt env {Mc_ast.stmt_loc = loc; Mc_ast.stmt_desc = d } =
   match d with
   | Mc_ast.Sskip ->
     mk_unit ~loc
@@ -213,13 +213,13 @@ let rec stmt env ({Mc_ast.stmt_loc = loc; Mc_ast.stmt_desc = d } as s) =
     mk_expr ~loc (Eraise (return ~loc, Some (expr env e)))
   | Mc_ast.Svar _ ->
      assert false
+  | Mc_ast.Sassign (id, _)
+    when not (Mstr.mem id.id_str env.vars) ->
+     Loc.errorm ~loc "unbound variable %s" id.id_str
   | Mc_ast.Sassign (id, e) ->
     let e = expr env e in
-    if Mstr.mem id.id_str env.vars then
-      let x = let loc = id.id_loc in mk_expr ~loc (Eident (Qident id)) in
-      mk_expr ~loc (Einfix (x, mk_id ~loc (Ident.op_infix ":="), e))
-    else
-      block env ~loc [s]
+    let x = let loc = id.id_loc in mk_expr ~loc (Eident (Qident id)) in
+    mk_expr ~loc (Einfix (x, mk_id ~loc (Ident.op_infix ":="), e))
   | Mc_ast.Sset (e1, e2, e3) ->
     array_set ~loc (expr env e1) (expr env e2) (expr env e3)
   | Mc_ast.Sassert (k, t) ->
