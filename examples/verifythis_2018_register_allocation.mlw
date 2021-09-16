@@ -175,9 +175,14 @@ lemma sym_merge :
 
 (** {2 Iterated Register Coalescing algorithm } *)
 
-(** We assume that the variables in the A dictionary have already been replaced by their
-    corresponding register so that we don't need a parameter for A. This is the same as
-    assuming that A is injective. *)
+(** We assume that the variables in the A dictionary have already been replaced
+    by their corresponding register so that we don't need a parameter for A.
+    This is the same as assuming that A is injective. We show that this is a
+    needed property by giving a counterexample. Assume that variables v₁, v₂ and
+    v₃ are such that v₁ and v₂ are mapped to register r₁ in A. Also assume that
+    variable v₃ is not yet assigned a register and that v₂ and v₃ interfere.
+    Then, by coalescing v₁ and v₃, we see that v₃ is assigned r₁, hence the
+    contradiction. *)
 
 let rec irc (g : Dvar.t Svar.set) (r : Svar.set) : Dvar.t var
     requires InclReg { forall v. mem v r -> Dvar.mem v g }
