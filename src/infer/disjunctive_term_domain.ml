@@ -37,7 +37,7 @@ module Make(TDom : TERM_DOMAIN) = struct
 
   let is_bottom man t =
     let man = fst man in
-    List.fold_left ( && ) true (List.map (TDom.is_bottom man) t.abs_values)
+    List.for_all (fun x -> TDom.is_bottom man x) t.abs_values
 
   let is_leq (man, _) a b =
     let rec aux = function
@@ -80,9 +80,9 @@ module Make(TDom : TERM_DOMAIN) = struct
     let rec zip a = function
       | [] -> a
       | t :: q ->
-         let x = List.map (TDom.is_leq man t) (q @ a) in
-         let p = List.fold_left (||) false x in
-         if p then zip a q else zip (t::a) q in
+          let f x = TDom.is_leq man t x in
+          if List.exists f q || List.exists f a
+          then zip a q else zip (t::a) q in
     let t = { abs_values = zip [] c; c = true; i } in
     let t = join_precise man (bottom () ()) t in
     { t with c = true; }
@@ -91,7 +91,7 @@ module Make(TDom : TERM_DOMAIN) = struct
     let a = cleanup man a in
     let b = cleanup man b in
     let i = (max a.i b.i) + 1 in
-    if i > 0 then
+    if i > 1 then
       let a = if List.length a.abs_values > threshold then join_one man a else a in
       let b = if List.length b.abs_values > threshold then join_one man b else b in
       let c = { abs_values = a.abs_values @ b.abs_values; i; c = false; } in
@@ -115,13 +115,13 @@ module Make(TDom : TERM_DOMAIN) = struct
     let b = cleanup_hard man b in
     let a = if List.length a.abs_values > threshold then join_one man a else a in
     let b = if List.length b.abs_values > threshold then join_one man b else b in
-    let b_leq = List.map (fun b ->
-        b,
-        try List.find (fun a -> TDom.is_leq (fst man) a b) a.abs_values
-        with | Not_found -> b
-      ) b.abs_values
-    in
-    let abs_values = List.map (fun (k, v) -> TDom.widening (fst man) v k) b_leq in
+    let abs_values =
+      List.map (fun b ->
+          let v =
+            try List.find (fun a -> TDom.is_leq (fst man) a b) a.abs_values
+            with Not_found -> b in
+          TDom.widening (fst man) v b
+        ) b.abs_values in
     cleanup man {abs_values; c = false; i = 0; }
 
   let rec extract_atom_from_conjuction l t =
