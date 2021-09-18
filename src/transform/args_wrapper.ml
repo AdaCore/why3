@@ -271,6 +271,13 @@ let type_ptree ~as_fmla t tables =
 
 exception Arg_parse_type_error of Loc.position * string * exn
 
+let () = Exn_printer.register (fun fmt e ->
+    match e with
+    | Arg_parse_type_error (loc, str, e) ->
+        Format.fprintf fmt "Error while parsing argument(s) %s at %a: %a"
+          str Pretty.print_loc loc Exn_printer.exn_printer e
+    | e -> raise e)
+
 let registered_lang_parsing_trans = Hashtbl.create 63
 
 exception Add_language_parser

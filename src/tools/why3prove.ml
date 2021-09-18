@@ -84,7 +84,11 @@ let add_opt_goal x =
   let l = Strings.split '.' x in
   Queue.push (x, l) glist
 
-let add_opt_trans x = opt_trans := x::!opt_trans
+let add_opt_trans x =
+  match String.split_on_char ' ' x with
+  | [] -> assert false
+  | name :: args ->
+      opt_trans := (name, args) :: !opt_trans
 
 let add_opt_meta meta =
   let meta_name, meta_arg =
@@ -408,16 +412,18 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
     | Some dir, _ -> output_task drv fname tname th task dir
 
 let do_tasks env drv fname tname th task =
-  let lookup acc t =
-    (try Trans.singleton (Trans.lookup_transform t env) with
-       Trans.UnknownTrans _ -> Trans.lookup_transform_l t env) :: acc
-  in
-  let trans = List.fold_left lookup [] !opt_trans in
-  let apply tasks tr =
-    List.rev (List.fold_left (fun acc task ->
-      List.rev_append (Trans.apply tr task) acc) [] tasks)
-  in
-  let tasks = List.fold_left apply [task] trans in
+  let table = Args_wrapper.build_naming_tables task in
+  let rec apply tasks = function
+    | [] -> tasks
+    | (name, args) :: trans ->
+        let apply_trans =
+          if args = [] then
+            Trans.apply_transform name env
+          else
+            let ffmt = Env.get_format ?format:!opt_parser fname in
+            Trans.apply_transform_args name env args table ffmt in
+        apply (List.concat (List.map apply_trans tasks)) trans in
+  let tasks = apply [task] !opt_trans in
   List.iter (do_task env drv fname tname th) tasks
 
 let do_theory env drv fname tname th glist elist =
