@@ -29,7 +29,8 @@ let add loc idk =
   | hash_f -> if not (Hashtbl.mem hash_f k) then Hashtbl.add hash_f k idk
   | exception Not_found ->
       let hash_f = Hashtbl.create 255 in
-      Hashtbl.add glob kf hash_f
+      Hashtbl.add glob kf hash_f;
+      Hashtbl.add hash_f k idk
 
 let def ~kind id =
   Opt.iter (fun loc -> add loc (id, Def, kind)) id.id_loc
