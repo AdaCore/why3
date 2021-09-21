@@ -1,20 +1,5 @@
 
-(** {1 Finite Maps}
-
-  - polymorphic maps to be used in specification/ghost only
-    (no executable functions)
-
-    - `Fmap`
-
-  - monomorphic finite maps to be used in programs only (no logical functions)
-
-    a program function `eq` deciding equality on the key type must be
-    provided when cloned
-
-    - `MapApp`, `MapAppInt`: immutable maps
-    - `MapImp`, `MapImpInt`: mutable maps
-
-*)
+(** {1 Finite Maps} *)
 
 (** {2 Polymorphic maps to be used in spec/ghost only} *)
 
@@ -98,7 +83,10 @@ module Fmap
 
 end
 
-(** {2 Finite monomorphic maps to be used in programs} *)
+(** {2 Finite monomorphic maps to be used in programs only}
+
+A program function `eq` deciding equality on the `key` type must be provided when cloned.
+*)
 
 (** {3 Applicative maps} *)
 

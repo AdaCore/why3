@@ -37,7 +37,7 @@ let style_css fname =
 \n.why3doc .superscript { font-size: smaller }\
 \n.why3doc .subscript { font-size: smaller }\
 \n.why3doc .warning { color: red; font-weight: bold }\
-\n.why3doc .info { margin-left: 3em; margin-right: 3em }\
+\n.why3doc .info { margin-left: 3em; margin-right: 3em; background-color: #dcc; }\
 \n.why3doc .info > p:first-child { margin-top: 0 }\
 \n.why3doc code { color: #465F91 }\
 \n.why3doc h1 { font-size: 20pt; border: 1px solid #000000; margin: 10pt 0; text-align: center; background-color: #90BDFF; padding: 10pt }\
