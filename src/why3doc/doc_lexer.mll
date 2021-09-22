@@ -91,7 +91,7 @@ let operator =
   | "[]<-"
 
 let space = [' ' '\t']
-let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']* | operator
+let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_' '\'']* | operator
 let special = ['\'' '"' '<' '>' '&']
 
 rule scan fmt empty delayed = parse
