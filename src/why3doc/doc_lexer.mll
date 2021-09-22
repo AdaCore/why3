@@ -176,9 +176,6 @@ and scan_embedded fmt ldelim = parse
             end }
   | "*)"  { backtrack lexbuf }
   | eof   { () }
-  | ident as s
-          { print_ident fmt lexbuf s;
-            scan_embedded fmt ldelim lexbuf }
   | "\n"  { new_line lexbuf;
             pp_print_char fmt '\n';
             scan_embedded fmt ldelim lexbuf }
