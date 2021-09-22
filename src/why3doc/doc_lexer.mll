@@ -107,6 +107,11 @@ rule scan fmt empty delayed = parse
             comment fmt true lexbuf;
             pp_print_string fmt "</span>";
             scan fmt false delayed lexbuf }
+  | ("[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)*) space* ']') as s
+          { pp_print_string fmt "<span class=\"attribute\">";
+            pp_print_string fmt s;
+            pp_print_string fmt "</span>";
+            scan fmt false delayed lexbuf }
   | eof   { pp_print_string fmt "</pre>\n";
             if delayed <> "" then
               fprintf fmt "<div class=\"info\">%s</div>" delayed }
