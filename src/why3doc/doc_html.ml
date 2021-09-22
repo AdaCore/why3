@@ -35,6 +35,7 @@ let style_css fname =
 \n.why3doc .attribute { color: #bbb }\
 \n.why3doc .comment { color: #990000 }\
 \n.why3doc .keyword { color: purple; font-weight: bold }\
+\n.why3doc .string { color: #a48 }\
 \n.why3doc .superscript { font-size: smaller }\
 \n.why3doc .subscript { font-size: smaller }\
 \n.why3doc .warning { color: red; font-weight: bold }\

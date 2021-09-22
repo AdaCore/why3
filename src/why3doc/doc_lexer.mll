@@ -139,8 +139,9 @@ rule scan fmt empty delayed = parse
             | true, s ->
               fprintf fmt "</pre>\n<div class=\"info\">%s</div>" s;
               scan_isolated fmt true false "" lexbuf }
-  | '"'   { pp_print_string fmt "&quot;";
+  | '"'   { pp_print_string fmt "<span class=\"string\">&quot;";
             string fmt true lexbuf;
+            pp_print_string fmt "</span>";
             scan fmt false delayed lexbuf }
   | "'\"'"
   | _ as s
