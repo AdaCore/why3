@@ -14,7 +14,10 @@ has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 shopt -s nullglob
 
 suffix=
-only=
+
+categories="badfiles drivers execution extraction goodfiles invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit validgoals validsplitgoals"
+
+enabled_categories=""
 
 while [ $# != 0 ]; do
     case "$1" in
@@ -22,24 +25,22 @@ while [ $# != 0 ]; do
             suffix="$2"
             shift 2
             ;;
-        "-only")
-            only="$2"
-            shift 2
-            ;;
         *)
-            echo "Usage: $0 [-suffix s] [-only category]"
-            echo "The suffix for calling bin/why3 and either '.opt' or '.byte' or ''."
-            echo "The category can be used to select only a specific bench test"
-            echo "and is one of the following:"
-            echo "  badfiles drivers execution extraction goodfiles invalidgoals list"
-            echo "  mlwprinter rac realizations replay replay-without-shapes stdlib"
-            echo "  steplimit validgoals validsplitgoals."
-            exit 1
+            if [[ ! " $categories " =~ " $1 " ]]; then
+                echo "Usage: $0 [-suffix s] [categories...]"
+                echo "The suffix for calling bin/why3 is either '.opt' or '.byte' or ''."
+                echo "Specific tests can be selected using some of the following categories:"
+                echo "  $categories"
+                exit 1
+            fi
+            enabled_categories="$enabled_categories $1"
+            shift 1
+            ;;
     esac
 done
 
 enabled () {
-    test -z "$only" -o "$only" = "$1"
+    [[ -z "$enabled_categories" || " $enabled_categories " =~ " $1 " ]]
 }
 
 simple_test() {
