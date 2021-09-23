@@ -240,7 +240,7 @@ replay_without_shape () {
 
 execute () {
     pgm="bin/why3$suffix execute"
-    printf "  ${@:1}... "
+    printf "  $1... "
     # Run why3execute, discard warnings from the reduction engine
     # Remove `[ $? -eq 2 ]` when value origins (default vs model) can be distinguished in RAC
     if ($pgm "$@" || [ $? -eq 2 ] ) > /dev/null 2> >(grep -v '$warning: reduction of term'); then
