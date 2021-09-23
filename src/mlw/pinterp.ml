@@ -207,6 +207,28 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
   | Mlmpfr_wrapper.Not_Implemented ->
       incomplete "mlmpfr wrapper is not implemented"
 
+let io_print_newline _ _ =
+  print_newline ();
+  Some unit_value
+
+let io_print_int _ = function
+  | [{ v_desc = Vnum n }] ->
+      print_string (BigInt.to_string n);
+      Some unit_value
+  | _ -> assert false
+
+let io_print_string _ = function
+  | [{ v_desc = Vstring s }] ->
+      print_string s;
+      Some unit_value
+  | _ -> assert false
+
+let debug_print _ = function
+  | [v] ->
+      Format.eprintf "%a\n@?" print_value v;
+      Some unit_value
+  | _ -> assert false
+
 let builtin_progs = Hrs.create 17
 
 type builtin = Builtin_module of {
@@ -280,6 +302,9 @@ let built_in_modules () =
       "True",          (fun _ _ -> Some (bool_value true));
       "False",         (fun _ _ -> Some (bool_value false));
     ];
+    builtin ["debug"] "Debug" [
+        "print", debug_print
+      ];
     builtin ["int"] "Int" int_ops;
     builtin ["int"] "MinMax" [
       "min",           eval_int_op BigInt.min;
@@ -300,6 +325,11 @@ let built_in_modules () =
       "RTN",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Toward_Minus_Infinity)));
       "RTZ",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Toward_Zero)));
     ]);
+    builtin ["io"] "StdIO" [
+        "print_int", io_print_int;
+        "print_newline", io_print_newline;
+        "print_string", io_print_string;
+      ];
     builtin ["real"] "Real" [
       op_infix "=",    eval_real Mode_relr Big_real.eq;
       op_infix "<",    eval_real Mode_relr Big_real.lt;
