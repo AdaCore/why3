@@ -243,7 +243,7 @@ let rec import_model_value loc env check known th_known ity v =
   let def = Pdecl.find_its_defn known ts in
   let res = match v with
       | Const c -> import_model_const loc env ity c
-      | Var _ -> undefined_value ity
+      | Var _ -> undefined_value env ity
       | Record r ->
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
             cannot_import "type with not exactly one constructors" in
@@ -253,8 +253,8 @@ let rec import_model_value loc env check known th_known ity v =
             match List.assoc field_name r with
             | v -> import_model_value loc env check known th_known field_ity v
             | exception Not_found ->
-                (* TODO Better create a default value? Requires an [Env.env]. *)
-                undefined_value field_ity in
+                (* TODO Better create a default value? *)
+                undefined_value env field_ity in
           let vs = List.map aux def.Pdecl.itd_fields in
           constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
@@ -308,7 +308,7 @@ let rec import_model_value loc env check known th_known ity v =
               a.arr_others in
           purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
       | Unparsed s -> cannot_import "unparsed value %s" s
-      | Undefined -> undefined_value ity in
+      | Undefined -> undefined_value env ity in
   check ity res;
   res
 

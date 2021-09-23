@@ -957,8 +957,8 @@ and exec_expr' ctx e =
          if ctx.do_rac then
            exec_call_abstract ?loc:e.e_loc ~attrs:e.e_attrs
              ~snapshot:cty.cty_oldies ctx cty [] e.e_ity
-         else (* We must check postconditions for abstract exec *)
-           incomplete "cannot evaluate any-value with RAC disabled"
+         else
+           Normal (undefined_value ctx.env e.e_ity)
       | Capp (rs, pvsl) when
           Opt.map is_prog_constant (Mid.find_opt rs.rs_name ctx.env.pmodule.Pmodule.mod_known)
           = Some true ->

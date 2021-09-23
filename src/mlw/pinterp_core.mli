@@ -90,7 +90,6 @@ val real_value : Big_real.real -> value
 val constr_value : Ity.ity -> Expr.rsymbol -> Expr.rsymbol list -> value list -> value
 val purefun_value : result_ity:Ity.ity -> arg_ity:Ity.ity -> value Mv.t -> value -> value
 val unit_value : value
-val undefined_value : Ity.ity -> value
 
 val range_value : Ity.ity -> BigInt.t -> value option
 (** Returns a range value, or [None] if the value is outside the range. *)
@@ -417,7 +416,7 @@ val check_variant : rac -> Ident.Sattr.elt -> Loc.position option -> env ->
   (Term.term * Term.lsymbol option) list -> unit
 (** @raise Fail when the variant is invalid. *)
 
-(** {2 Auxilaries} *)
+(** {2 Auxiliaries} *)
 
 val t_undefined : Ty.ty -> Term.term
 
@@ -441,6 +440,8 @@ val debug_array_as_update_chains_not_epsilon : Debug.flag
     As an update chain, it is instead converted into a formula:
 
     [(make n undefined)[0 <- a[0]]... [n-1 <- a[n-1]]]. *)
+
+val undefined_value : env -> Ity.ity -> value
 
 (**/**)
 

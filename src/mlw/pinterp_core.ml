@@ -180,9 +180,6 @@ let purefun_value ~result_ity ~arg_ity mv v =
 let unit_value =
   value (ty_tuple []) (Vconstr (Expr.rs_void, [], []))
 
-let undefined_value ity =
-  value (ty_of_ity ity) Vundefined
-
 (**********************************************************************)
 
 let range_value ity n =
@@ -875,7 +872,7 @@ let opt_or o1 o2 = if o1 <> None then o1 else o2
 
 let value_of_free_vars ctx t =
   let get_value get get_ty env x =
-    let def = undefined_value (ity_of_ty (get_ty x)) in
+    let def = value (get_ty x) Vundefined in
     snapshot (Opt.get_def def (get x env))  in
   let mid = t_v_fold (fun mvs vs ->
     let get_ty vs = vs.vs_ty in
@@ -1189,3 +1186,22 @@ let rec default_value_of_type env ity : value =
             constr_value ity rs fs vs
         | {Pdecl.itd_constructors= []} ->
             value ty Vundefined
+
+let rec undefined_value env ity : value =
+  let ty = ty_of_ity ity in
+  match ity.ity_node with
+  | Ityapp (ts,ityl1,_) when is_ts_tuple ts.its_ts ->
+      let vs = List.map (undefined_value env) ityl1 in
+      constr_value ity (rs_tuple (List.length ityl1)) [] vs
+  | Ityapp (its, l1, l2)
+  | Ityreg { reg_its = its; reg_args = l1; reg_regs = l2 } ->
+      begin match Pdecl.find_its_defn env.pmodule.Pmodule.mod_known its with
+      | { Pdecl.itd_constructors = [rs]; itd_fields = fs } ->
+          let subst = its_match_regs its l1 l2 in
+          let ityl = List.map (fun pv -> pv.pv_ity) rs.rs_cty.cty_args in
+          let tyl = List.map (ity_full_inst subst) ityl in
+          let vs = List.map (undefined_value env) tyl in
+          constr_value ity rs fs vs
+      | _ -> value ty Vundefined
+      end
+  | _ -> value ty Vundefined
