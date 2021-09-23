@@ -241,9 +241,7 @@ replay_without_shape () {
 execute () {
     pgm="bin/why3$suffix execute"
     printf "  $1... "
-    # Run why3execute, discard warnings from the reduction engine
-    # Remove `[ $? -eq 2 ]` when value origins (default vs model) can be distinguished in RAC
-    if ($pgm "$@" || [ $? -eq 2 ] ) > /dev/null 2> >(grep -v '$warning: reduction of term'); then
+    if $pgm "$@" > /dev/null; then
         echo "ok"
     else
         echo "failed!"
@@ -524,6 +522,7 @@ execute examples/euler001.mlw "bench ()" --use=Euler001
 execute examples/euler002.mlw "bench ()" --use=Solve
 execute examples/fibonacci.mlw "bench ()" --use=FibRecGhost
 execute examples/fibonacci.mlw "bench ()" --use=FibonacciLogarithmic
+execute examples/hello-world.mlw "main" --use=Test
 # fails: cannot execute Cany
 # execute examples/same_fringe.mlw SameFringe.bench
 # fails: cannot evaluate condition a=b (how to do it?)
