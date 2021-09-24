@@ -114,19 +114,38 @@ import:
   { Dimport (m, l) }
 
 func:
-| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
-  { Dlogic (true, id, l) }
-| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
-  { Dlogic (false, id, l) }
+| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  ty=option(function_type) NEWLINE
+  { Dlogic (id, l, Some ty) }
+| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR NEWLINE
+  { Dlogic (id, l, None) }
+
+param:
+| id=ident ty=option(param_type)
+  { id, ty }
+
+param_type:
+| COLON ty=typ
+  { ty }
+
+function_type:
+| ARROW ty=typ
+  { ty }
+
+typ:
+| id=ident
+  { Tapp (id, []) }
+| id=ident LEFTSQ tyl=separated_nonempty_list(COMMA, typ) RIGHTSQ
+  { Tapp (id, tyl) }
 
 def:
-| DEF f = ident LEFTPAR x = separated_list(COMMA, ident) RIGHTPAR
-  COLON NEWLINE BEGIN s=spec l=nonempty_list(stmt) END
+| DEF f = ident LEFTPAR x = separated_list(COMMA, param) RIGHTPAR
+  ty=option(function_type) COLON NEWLINE BEGIN s=spec l=nonempty_list(stmt) END
     {
       if f.id_str = "range" then
         let loc = floc $startpos $endpos in
         Loc.errorm ~loc "micro Python does not allow shadowing 'range'"
-      else Ddef (f, x, s, l)
+      else Ddef (f, x, ty, s, l)
     }
 ;
 

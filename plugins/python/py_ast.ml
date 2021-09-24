@@ -22,6 +22,11 @@ type binop =
   | Beq | Bneq | Blt | Ble | Bgt | Bge  (* == != < <= > >= *)
   | Band | Bor                          (* && || *)
 
+type typ =
+  | Tapp of ident * typ list
+
+type param = ident * typ option
+
 type expr = {
   expr_desc: expr_desc;
   expr_loc : Loc.position;
@@ -64,8 +69,8 @@ and block = decl list
 
 and decl =
   | Dimport of ident * ident list
-  | Ddef  of ident * ident list * Ptree.spec * block
+  | Ddef  of ident * param list * typ option * Ptree.spec * block
   | Dstmt of stmt
-  | Dlogic of bool (*is_func*) * ident * ident list
+  | Dlogic of ident * param list * typ option option
 
 type file = block
