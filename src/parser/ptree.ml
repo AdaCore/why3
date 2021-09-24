@@ -9,11 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Mysexplib.Std [@@warning "-33"]
-
-(** Parse trees *)
-
 (** {1 Parse trees} *)
+
+open Mysexplib.Std [@@warning "-33"]
 
 (** {2 Identifiers and attributes} *)
 
