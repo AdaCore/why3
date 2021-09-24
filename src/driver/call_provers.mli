@@ -145,7 +145,7 @@ val call_on_buffer :
   gen_new_file    : bool ->
   ?inplace        : bool ->
   Buffer.t -> prover_call
-(** Build a prover call on the task already printed in the {!type: Buffer.t} given.
+(** Build a prover call on the task already printed in the [Buffer.t] given.
 
     @param limit : set the available time limit (def. 0 : unlimited), memory
     limit (def. 0 : unlimited) and step limit (def. -1 : unlimited)

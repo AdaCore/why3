@@ -37,11 +37,11 @@ val pp_mlw_file : ?attr:bool -> Ptree.mlw_file Pp.pp
 
 (** {2 Markers}
 
-    When [Ptree] elements are generated (instead of being parsed from a
+    When {!Ptree} elements are generated (instead of being parsed from a
     whyml file), locations of typing errors are useless, because they do not
     correspond to any concrete syntax.
 
-    Alternatively, we can give every [Ptree] element a unique location,
+    Alternatively, we can give every {!Ptree} element a unique location,
     for example using the function {!val:Mlw_printer.next_pos}. When a
     located error is encountered, the function {!val:with_marker} can
     then be used to instruct the mlw-printer to insert a message as a

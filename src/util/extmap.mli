@@ -216,7 +216,7 @@ module type S =
         or return [d] if no such binding exists. *)
 
     val find_opt : key -> 'a t -> 'a option
-    (** [find_opt x m] returns the [Some] of the current binding
+    (** [find_opt x m] returns the [Some] of the current binding
         of [x] in [m], or return [None] if no such binding exists. *)
 
     val find_exn : exn -> key -> 'a t -> 'a
@@ -238,7 +238,7 @@ module type S =
     (** Same as {!Extmap.S.mapi_fold}, but may remove bindings. *)
 
     val fold_left: ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
-    (** same as {!fold} but in the order of {!List.fold_left} *)
+    (** same as {!fold} but in the order of [List.fold_left] *)
 
     val fold2_inter: (key -> 'a -> 'b -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
     (** fold the common keys of two map at the same time *)

@@ -179,7 +179,7 @@ val add_file_section :
 (** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
     subsections corresponding to theories [ths]. The tasks of each
-    theory nodes generated are computed using [Task.split_theory].
+    theory nodes generated are computed using {!Task.split_theory}.
 
     Note that this function does not read anything from the file
     system. The file name [fn] is taken as is
@@ -218,12 +218,13 @@ val graft_proof_attempt : ?file:Sysutil.file_path -> session -> proofNodeID ->
 *)
 
 exception NoProgress
+
 val apply_trans_to_goal :
   allow_no_effect:bool -> session -> Env.env -> string -> string list ->
   proofNodeID -> Task.task list
 (** [apply_trans_to_goal s env tr args id] applies the transformation
   [tr] with arguments [args] to the goal [id], and returns the
-  subtasks.  raises [NoProgress] if [allow_no_effect] is false and [tr]
+  subtasks. Raises {!NoProgress} if [allow_no_effect] is false and [tr]
   returns the task unchanged *)
 
 val graft_transf : session -> proofNodeID -> string -> string list ->
@@ -269,7 +270,7 @@ val remove_subtree: notification:notifier -> removed:notifier ->
     called on each removed node, and notifier [notification] on nodes
     whose proved state changes.
 
-    raises [RemoveError] when removal is forbidden, e.g. when called on
+    Raises {!RemoveError} when removal is forbidden, e.g. when called on
     a file, a theory or a goal that is not detached
  *)
 

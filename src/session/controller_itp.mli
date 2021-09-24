@@ -129,7 +129,7 @@ val reload_files : ?hard_reload:bool -> controller -> bool * bool
     session returned.
 
   If parsing or typing errors occurs, a list of errors is raised
-  inside exception Errors_list.
+  inside exception {!Errors_list}.
 
   The detailed process of reloading the files of the given session is
   as follows.
@@ -183,7 +183,7 @@ val reload_files : ?hard_reload:bool -> controller -> bool * bool
 val add_file : controller -> ?format:Env.fformat -> string -> unit
 (** [add_file cont ?fmt fname] parses the source file
     [fname] and add the resulting theories to the session of [cont].
-    parsing or typing errors are raised inside exception [Errors_list]
+    parsing or typing errors are raised inside exception {!Errors_list}
  *)
 
 val remove_subtree: notification:notifier -> removed:notifier ->
