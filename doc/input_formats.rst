@@ -234,8 +234,11 @@ interpreter (see below).
 .. rubric:: Logic declaration
 
 .. productionlist:: microPython
-   logic_declaration: "#@" "function" identifier "(" `params` ")" NEWLINE
-                 : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
+   logic_declaration: "#@" "function" identifier "(" `logic_params` ")" `logic_type`? NEWLINE
+                 : | "#@" "predicate" identifier "(" `logic_params` ")" NEWLINE
+   logic_params: `logic_param` ("," `logic_param`)*
+   logic_param: identifier (":" identifier)?
+   logic_type: "->" identifier
 
 Note that logic functions and predicates cannot be given definitions.
 Yet, they can be axiomatized, using toplevel ``assume`` statements.

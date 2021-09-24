@@ -388,15 +388,19 @@ let fresh_type_var =
   fun loc -> incr r;
     PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
 
-let logic_param id =
-  id.id_loc, Some id, false, fresh_type_var id.id_loc
+let logic_type loc = function
+  | None    -> fresh_type_var loc
+  | Some id -> PTtyapp (Qident id, [])
+
+let logic_param (id, ty) =
+  id.id_loc, Some id, false, logic_type id.id_loc ty
 
 let logic = function
-  | Py_ast.Dlogic (func, id, idl) ->
+  | Py_ast.Dlogic (id, idl, ty) ->
     let d = { ld_loc = id.id_loc;
               ld_ident = id;
               ld_params = List.map logic_param idl;
-              ld_type = if func then Some (fresh_type_var id.id_loc) else None;
+              ld_type = Option.map (logic_type id.id_loc) ty;
               ld_def = None } in
     Typing.add_decl id.id_loc (Dlogic [d])
   | _ -> ()

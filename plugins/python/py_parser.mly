@@ -114,10 +114,23 @@ import:
   { Dimport (m, l) }
 
 func:
-| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
-  { Dlogic (true, id, l) }
-| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
-  { Dlogic (false, id, l) }
+| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  ty=option(function_type) NEWLINE
+  { Dlogic (id, l, Some ty) }
+| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR NEWLINE
+  { Dlogic (id, l, None) }
+
+param:
+| id=ident ty=option(param_type)
+  { id, ty }
+
+param_type:
+| COLON ty=ident
+  { ty }
+
+function_type:
+| ARROW ty=ident
+  { ty }
 
 def:
 | DEF f = ident LEFTPAR x = separated_list(COMMA, ident) RIGHTPAR
