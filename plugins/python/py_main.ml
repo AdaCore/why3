@@ -388,9 +388,15 @@ let fresh_type_var =
   fun loc -> incr r;
     PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
 
+let rec typ = function
+  | Tapp ({id_str="list"} as id, []) ->
+      PTtyapp (Qident id, [fresh_type_var id.id_loc])
+  | Tapp (id, tyl) ->
+      PTtyapp (Qident id, List.map typ tyl)
+
 let logic_type loc = function
   | None    -> fresh_type_var loc
-  | Some id -> PTtyapp (Qident id, [])
+  | Some ty -> typ ty
 
 let logic_param (id, ty) =
   id.id_loc, Some id, false, logic_type id.id_loc ty

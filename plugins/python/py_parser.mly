@@ -125,12 +125,18 @@ param:
   { id, ty }
 
 param_type:
-| COLON ty=ident
+| COLON ty=typ
   { ty }
 
 function_type:
-| ARROW ty=ident
+| ARROW ty=typ
   { ty }
+
+typ:
+| id=ident
+  { Tapp (id, []) }
+| id=ident LEFTSQ tyl=separated_nonempty_list(COMMA, typ) RIGHTSQ
+  { Tapp (id, tyl) }
 
 def:
 | DEF f = ident LEFTPAR x = separated_list(COMMA, ident) RIGHTPAR
