@@ -400,7 +400,7 @@ let logic = function
     let d = { ld_loc = id.id_loc;
               ld_ident = id;
               ld_params = List.map logic_param idl;
-              ld_type = Option.map (logic_type id.id_loc) ty;
+              ld_type = Opt.map (logic_type id.id_loc) ty;
               ld_def = None } in
     Typing.add_decl id.id_loc (Dlogic [d])
   | _ -> ()
