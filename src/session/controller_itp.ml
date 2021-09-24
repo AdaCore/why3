@@ -804,10 +804,11 @@ let run_strategy_on_goal
       callback STShalt
     else
       match Array.get strat pc with
-      | Icall_prover(p,timelimit,memlimit) ->
+      | Icall_prover(p,timelimit,memlimit,steplimit) ->
          let main = Whyconf.get_main c.controller_config in
          let timelimit = Opt.get_def (Whyconf.timelimit main) timelimit in
          let memlimit = Opt.get_def (Whyconf.memlimit main) memlimit in
+         let steplimit = Opt.get_def 0 steplimit in
          let callback panid res =
            callback_pa panid res;
            match res with
@@ -826,9 +827,11 @@ let run_strategy_on_goal
                          (* should not happen *)
                          assert false
          in
-         let limit = { Call_provers.empty_limit with
+         let limit = {
                        Call_provers.limit_time = timelimit;
-                       limit_mem  = memlimit} in
+                       limit_mem  = memlimit;
+                       limit_steps = steplimit;
+                     } in
          schedule_proof_attempt c g p ?save_to:None ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
