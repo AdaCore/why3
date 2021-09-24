@@ -185,8 +185,11 @@ interpreter (see below).
 ..  rubric:: Function definition
 
 .. productionlist:: microPython
-    py_function: "def" identifier "(" `params`? ")" ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
-    params: identifier ("," identifier)*
+    py_function: "def" identifier "(" `params`? ")" `return_type`? ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
+    params: `param` ("," `param`)*
+    param: identifier (":" `py_type`)?
+    return_type: "->" `py_type`
+    py_type: identifier ("[" `py_type` ("," `py_type`)* "]")?
 
 .. rubric:: Function specification
 
@@ -234,11 +237,8 @@ interpreter (see below).
 .. rubric:: Logic declaration
 
 .. productionlist:: microPython
-   logic_declaration: "#@" "function" identifier "(" `logic_params` ")" `logic_type`? NEWLINE
-                 : | "#@" "predicate" identifier "(" `logic_params` ")" NEWLINE
-   logic_params: `logic_param` ("," `logic_param`)*
-   logic_param: identifier (":" identifier)?
-   logic_type: "->" identifier
+   logic_declaration: "#@" "function" identifier "(" `params` ")" `return_type`? NEWLINE
+                 : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
 Yet, they can be axiomatized, using toplevel ``assume`` statements.

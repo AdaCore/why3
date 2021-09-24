@@ -99,6 +99,8 @@ let is_const (e: Py_ast.expr list) =
 
 let add_var env id =
   { env with vars = Mstr.add id.id_str id env.vars }
+let add_param env (id, _) =
+  add_var env id
 
 let for_vars ~loc x =
   let x = x.id_str in
@@ -232,6 +234,16 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
 
 let no_params ~loc = [loc, None, false, Some (PTtuple [])]
 
+let fresh_type_var =
+  let r = ref 0 in
+  fun loc -> incr r;
+    PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
+
+let rec typ = function
+  | Tapp ({id_str="list"} as id, []) ->
+      PTtyapp (Qident id, [fresh_type_var id.id_loc])
+  | Tapp (id, tyl) ->
+      PTtyapp (Qident id, List.map typ tyl)
 
 let mk_for_params exps loc env =
 
@@ -354,45 +366,36 @@ and block env ~loc = function
   | Dstmt ({ Py_ast.stmt_loc = loc } as s) :: sl ->
     let s = stmt env s in
     if sl = [] then s else mk_expr ~loc (Esequence (s, block env ~loc sl))
-  | Ddef (id, idl, sp, bl) :: sl ->
+  | Ddef (id, idl, ty, sp, bl) :: sl ->
     (* f(x1,...,xn): body ==>
       let f x1 ... xn =
         let x1 = ref x1 in ... let xn = ref xn in
         try body with Return x -> x *)
-    let env' = List.fold_left add_var empty_env idl in
+    let env' = List.fold_left add_param empty_env idl in
     let body = block env' ~loc:id.id_loc bl in
     let body =
       let loc = id.id_loc in
       let id = mk_id ~loc return_id in
       { body with expr_desc = Eoptexn (id, Ity.MaskVisible, body) } in
-    let local bl id =
+    let local bl (id, _) =
       let loc = id.id_loc in
       let ref = mk_ref ~loc (mk_var ~loc id) in
       mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, ref, bl)) in
     let body = List.fold_left local body idl in
-    let param id = id.id_loc, Some id, false, None in
+    let param (id, ty) =
+      id.id_loc, Some id, false, Opt.map typ ty in
     let params = if idl = [] then no_params ~loc else List.map param idl in
     let s = block env ~loc sl in
     let p = mk_pat ~loc Pwild in
+    let ty = Opt.map typ ty in
     let e = if block_has_call id bl then
-      Erec ([id, false, Expr.RKnone, params, None, p, Ity.MaskVisible, sp, body], s)
+      Erec ([id, false, Expr.RKnone, params, ty, p, Ity.MaskVisible, sp, body], s)
     else
-      let e = Efun (params, None, p, Ity.MaskVisible, sp, body) in
+      let e = Efun (params, ty, p, Ity.MaskVisible, sp, body) in
       Elet (id, false, Expr.RKnone, mk_expr ~loc e, s) in
     mk_expr ~loc e
   | (Py_ast.Dimport _ | Py_ast.Dlogic _) :: sl ->
     block env ~loc sl
-
-let fresh_type_var =
-  let r = ref 0 in
-  fun loc -> incr r;
-    PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
-
-let rec typ = function
-  | Tapp ({id_str="list"} as id, []) ->
-      PTtyapp (Qident id, [fresh_type_var id.id_loc])
-  | Tapp (id, tyl) ->
-      PTtyapp (Qident id, List.map typ tyl)
 
 let logic_type loc = function
   | None    -> fresh_type_var loc

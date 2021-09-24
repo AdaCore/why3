@@ -19,3 +19,10 @@ def test2(x):
 
 print(test2([1,2,3]))
 
+def test3(x: list[int]) -> int:
+    #@ ensures result == g(x)
+    return len(x)
+
+def test4(x: list) -> int:
+    return len(x)
+
