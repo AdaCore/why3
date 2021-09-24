@@ -2253,35 +2253,9 @@ headers:
 		src/server/*.c src/server/*.h \
 		examples/use_api/*.ml
 
-#########
-# myself
-#########
-
-AUTOCONF_FILES = \
-	Makefile \
-	src/jessie/Makefile \
-	src/config.sh \
-	.merlin \
-	src/jessie/.merlin \
-	lib/why3/META \
-	lib/coq/version \
-	lib/pvs/version
-
-$(AUTOCONF_FILES): %: %.in config.status
-	./config.status chmod --file $@
-
 src/util/config.ml share/Makefile.config: src/config.sh
 	$(SHOW) 'Generate $@'
 	$(HIDE)BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) DATADIR=$(DATADIR) src/config.sh
-
-clean::
-	rm -f share/Makefile.config
-
-config.status: configure
-	./config.status --recheck
-
-configure: configure.in
-	autoconf -f
 
 ###################
 # clean and depend
