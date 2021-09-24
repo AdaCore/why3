@@ -4,9 +4,6 @@ dir=`dirname $0`
 
 is_xfail() {
     case "$1" in
-        "bv32" | "jlamp0")
-            return 0
-            ;;
         *)
             return 1
             ;;
