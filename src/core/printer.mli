@@ -35,31 +35,31 @@ type field_info = {
   field_ident: ident option; (** Identifier of the field *)
 }
 
-(* The printer mapping collects information during printing that is necessary to
+(** The printer mapping collects information during printing that is necessary to
    trace names in the output of the printer to elements of AST in its input. *)
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
-  (* The position of the term that triggers the VC *)
+  (** The position of the term that triggers the VC *)
   vc_term_attrs : Sattr.t;
-  (* The attributes of the term that triggers the VC *)
+  (** The attributes of the term that triggers the VC *)
   queried_terms : Term.term Mstr.t;
-  (* The list of terms that were queried for the counter-example
+  (** The list of terms that were queried for the counter-example
      by the printer *)
   list_projections: Ident.ident Mstr.t;
-  (* List of projections as printed in the model. They corresponds to an ident
+  (** List of projections as printed in the model. They corresponds to an ident
      which is kept so that we can approximate its used name in task. *)
   list_fields: Ident.ident Mstr.t;
-  (* These corresponds to meta_record_def (tagged on field function definition).
+  (** These corresponds to meta_record_def (tagged on field function definition).
      The difference with projections is that you are not allowed to reconstruct
      two projections into a record (at counterexample parsing level). *)
   list_records : field_info list Mstr.t;
-  (* Descriptions of the fields of all records. *)
+  (** Descriptions of the fields of all records. *)
   noarg_constructors: string list;
-  (* List of constructors with no arguments that can be confused for variables
+  (** List of constructors with no arguments that can be confused for variables
      during parsing. *)
   set_str: Sattr.t Mstr.t
-  (* List of attributes corresponding to a printed constants (that was on the
+  (** List of attributes corresponding to a printed constants (that was on the
      immediate term, not inside the ident) *)
 }
 
@@ -191,9 +191,9 @@ val catch_unsupportedType : (ty -> 'a) -> (ty -> 'a)
     - raise [UnsupportedType (arg,s)] if [f arg] raises [Unsupported s]*)
 
 val catch_unsupportedTerm : (term -> 'a) -> (term -> 'a)
-(** same as {! catch_unsupportedType} but use [UnsupportedExpr]
-    instead of [UnsupportedType]*)
+(** same as {!catch_unsupportedType} but use {!UnsupportedTerm}
+    instead of {!UnsupportedType} *)
 
 val catch_unsupportedDecl : (decl -> 'a) -> (decl -> 'a)
-(** same as {! catch_unsupportedType} but use [UnsupportedDecl]
-    instead of [UnsupportedType] *)
+(** same as {!catch_unsupportedType} but use {!UnsupportedDecl}
+    instead of {!UnsupportedType} *)

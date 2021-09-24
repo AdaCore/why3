@@ -16,7 +16,7 @@
 
 (** {3 Values} *)
 
-(** (Mutable) values used in [Pinterp] *)
+(** (Mutable) values used in {!Pinterp} *)
 module rec Value : sig
 
   type float_mode = Mlmpfr_wrapper.mpfr_rnd_t
@@ -216,7 +216,7 @@ val multibind_pvs : ?register:(Ident.ident -> value -> unit) ->
 (** {3 Exception for incomplete execution (and RAC)} *)
 
 exception Incomplete of string
-(** Raised when the execution in [Pinterp] is incomplete (not implemented or not
+(** Raised when the execution in {!Pinterp} is incomplete (not implemented or not
     possible), or when a check cannot be decided during the RAC. *)
 
 (** @raise Incomplete with the formatted string as reason *)
@@ -326,10 +326,10 @@ val report_cntr : (cntr_ctx * string * Term.term) Pp.pp
 (** {3 Exceptions for failures in RAC} *)
 
 exception Fail of cntr_ctx * Term.term
-(** Invalid assertions raise the exception [Fail] *)
+(** Caused by invalid assertions *)
 
 exception Stuck of cntr_ctx * Loc.position option * string
-(** Invalid assumptions raise the exception [Stuck] *)
+(** Caused by invalid assumptions *)
 
 val stuck : ?loc:Loc.position -> cntr_ctx ->
   ('a, Format.formatter, unit, 'b) format4 -> 'a

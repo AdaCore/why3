@@ -12,7 +12,7 @@
 (** Association tables over hashable types *)
 
 val hash : 'a -> int
-  (** the same as Hashtbl.hash *)
+  (** the same as [Hashtbl.hash] *)
 
 module type S =
 sig
@@ -44,7 +44,7 @@ sig
   type key
 
   val find : 'a t -> key -> 'a
-  (** Same as {!Hashtbl.find} *)
+  (** Same as [Hashtbl.find] *)
 
   val find_def : 'a t -> 'a -> key -> 'a
   (** return the first binding or the given value if none found *)
@@ -59,16 +59,16 @@ sig
   (** a shortcut less efficient than possible *)
 
   val iter : (key -> 'a -> unit) -> 'a t -> unit
-  (** Same as {!Hashtbl.iter} *)
+  (** Same as [Hashtbl.iter] *)
 
   val fold : (key -> 'a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
-  (** Same as {!Hashtbl.fold} *)
+  (** Same as [Hashtbl.fold] *)
 
   val mem : 'a t -> key -> bool
-  (** Same as {!Hashtbl.mem} *)
+  (** Same as [Hashtbl.mem] *)
 
   val length : 'a t -> int
-  (** Same as {!Hashtbl.length} *)
+  (** Same as [Hashtbl.length] *)
 
   val is_empty : 'a t -> bool
   (** test if the hashtbl is empty *)
