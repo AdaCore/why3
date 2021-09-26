@@ -1011,31 +1011,6 @@ let build_model_rec pm (elts: model_element list) : model_files =
     Sattr.fold add_written_loc me.me_name.men_attrs model in
   List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
 
-let handle_contradictory_vc vc_term_loc model_files =
-  (* The VC is contradictory if the location of the term that triggers VC
-     was collected, model_files is not empty, and there are no model elements
-     in this location.
-     If this is the case, add model element saying that VC is contradictory
-     to this location. *)
-  if Mstr.is_empty model_files then
-    (* If the counterexample model was not collected, then model_files
-       is empty and this does not mean that VC is contradictory. *)
-    model_files
-  else match vc_term_loc with
-    | None -> model_files
-    | Some pos ->
-        let filename, line_number, _, _ = Loc.get pos in
-        let model_file = get_model_file model_files filename in
-        match get_elements model_file line_number with
-        | [] ->
-            (* The vc is contradictory, add special model element  *)
-            let me = create_model_element
-                ~name:"the check fails with all inputs"
-                ~value:(Unparsed "contradictory vc")
-                ~attrs:Sattr.empty in
-            let me = {me with me_location= Some pos} in
-            add_to_model_if_loc ~kind:Error_message me model_files
-        | _ -> model_files
 
 (*
 ***************************************************************
@@ -1183,7 +1158,6 @@ let model_parser (raw: raw_model_parser) : model_parser =
   raw pm str |> debug_elements |> (* Eg for "smtv2": Smtv2_model_parser.parse *)
   build_model_rec pm |> debug_files "before" |>
   map_filter_model_files !clean#element |> debug_files "after" |>
-  handle_contradictory_vc pm.Printer.vc_term_loc |>
   fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
 
 exception KnownModelParser of string
