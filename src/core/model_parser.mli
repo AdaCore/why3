@@ -56,6 +56,8 @@ and proj_name = string
 
 and field_name = string
 
+val compare_model_value_const : model_value -> model_value -> int
+
 val array_create_constant :
   value : model_value ->
   model_array
