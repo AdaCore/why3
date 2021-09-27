@@ -167,7 +167,10 @@ and eval_prover_var seen ctx ty v =
 
 and eval_array ctx = function
   | Aconst t -> Model_parser.{arr_indices= []; arr_others= eval ctx None t}
-  | Avar v -> Format.ksprintf failwith "eval_array var %s" v
+  | Avar v ->
+      (match eval_const ctx v with
+       | Model_parser.Array a -> a
+       | _ -> Format.ksprintf failwith "eval array var %s not an array" v)
   | Astore (a, key, value) ->
       let a = eval_array ctx a in
       let arr_indices = Model_parser.({
