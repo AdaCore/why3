@@ -540,7 +540,7 @@ val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
     the same renaming is simultaneously applied to the variables of
     the substitution [mv] (both domain and codomain).
     Example: [t_subst_types {'a -> int} {x:'a -> t:'a} (f x)]
-       returns ({z:int -> t:int},(f z))   *)
+       returns [({z:int -> t:int},(f z))]   *)
 
 (** {2 Find free variables and type variables} *)
 

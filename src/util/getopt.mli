@@ -11,6 +11,8 @@
 
 (**
 
+Parsing of command-line options.
+
 Short keys represent [-l] options. Long keys represent [--long] options.
 Some options can support both formats at once, e.g., [-l] and [--long].
 

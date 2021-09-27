@@ -125,8 +125,8 @@ val create :
   Ident.ident_printer -> Ident.ident_printer ->
   Ident.ident_printer -> Ident.ident_printer ->
   bool -> (module Printer)
-(** `create spr apr tpr ppr forget` creates a new pretty-printing
-   module from the printer `spr` for variables and functions, `apr`
-   for type variables, `tpr` for type symbols and `ppr for proposition
-   names`. When the Boolean `forget` is true then all recorded names
+(** [create spr apr tpr ppr forget] creates a new pretty-printing
+   module from the printer [spr] for variables and functions, [apr]
+   for type variables, [tpr] for type symbols and [ppr] for proposition
+   names. If [forget] is true, then all recorded names
    are forgotten between printing of each tasks. *)

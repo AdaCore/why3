@@ -93,7 +93,7 @@ let add_model_trace_attr name attrs =
     @param vc_loc is the location of the vc_attr (returned value)
     @param vc_map is a container for generated vc_constant id (used to avoid duplication)
     @param vc_var contains the variables we can safely use as CE (ie: we introduced these)
-    @param t: current subterm of the goal
+    @param t current subterm of the goal
     @return list of declarations added by do_intro
  *)
 let rec do_intro info vc_loc vc_map vc_var t =

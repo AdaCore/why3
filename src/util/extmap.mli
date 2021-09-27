@@ -159,8 +159,6 @@ module type S =
     (** Same as {!Extmap.S.map}, but the function receives as arguments both
         the key and the associated value for each binding of the map. *)
 
-    (** @Added in Why3 *)
-
     val change : ('a option -> 'a option) -> key -> 'a t -> 'a t
     (** [change f x m] returns a map containing the same bindings as
         [m], except the binding of [x] in [m] is changed from [y] to
@@ -183,12 +181,12 @@ module type S =
         otherwise [Some d1] is returned, the key binds to [d1] in [m1] *)
 
     val submap : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
-    (** [submap pr m1 m2] verifies that all the keys in m1 are in m2
-        and that for each such binding pr is verified. *)
+    (** [submap pr m1 m2] verifies that all the keys in [m1] are in [m2]
+        and that for each such binding [pr] is verified. *)
 
     val disjoint : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
-    (** [disjoint pr m1 m2] verifies that for every common key in m1
-        and m2, pr is verified. *)
+    (** [disjoint pr m1 m2] verifies that for every common key in [m1]
+        and [m2], [pr] is verified. *)
 
     val set_union : 'a t -> 'a t -> 'a t
     (** [set_union = union (fun _ x _ -> Some x)] *)
