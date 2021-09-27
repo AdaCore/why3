@@ -252,9 +252,9 @@ type check_value = Ity.ity -> value -> unit
 
 type oracle = {
   for_variable:
-    ?check:check_value -> ?loc:Loc.position -> env -> Ident.ident -> Ity.ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position option -> Ident.ident -> Ity.ity -> value option;
   for_result:
-    ?check:check_value -> env -> Loc.position -> Ity.ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position -> call_id:int option -> Ity.ity -> value option;
 }
 (** An oracle provides values during execution in {!Pinterp} for program
     parameters and during giant steps. The [check] is called on the value and
@@ -303,17 +303,19 @@ val register_ended : env -> Loc.position option -> unit
 (** {3 The contradiction context} *)
 
 type cntr_ctx = {
-  attr     : Ident.attribute; (** Some attribute [Vc.expl_*] *)
-  desc     : string option;
-  loc      : Loc.position option;
-  attrs    : Ident.Sattr.t;
-  cntr_env : env;
+  attr        : Ident.attribute; (** Some attribute [Vc.expl_*] *)
+  desc        : string option;
+  loc         : Loc.position option;
+  attrs       : Ident.Sattr.t;
+  cntr_env    : env;
+  giant_steps : bool option; (* None in places where it doesn't matter *)
 }
 (** A contradiction context carries all necessary information
     about a contradiction (with snapshot'ed values). *)
 
 val mk_cntr_ctx :
-  env -> ?loc:Loc.position -> ?attrs:Ident.Sattr.t -> ?desc:string ->
+  env -> giant_steps:bool option ->
+  ?loc:Loc.position -> ?attrs:Ident.Sattr.t -> ?desc:string ->
   Ident.attribute -> cntr_ctx
 (** Construct a new {!cntr_ctx} with a snapshot of the environment [env]. *)
 
@@ -398,11 +400,12 @@ val check_assume_posts : rac -> cntr_ctx -> Value.value -> Ity.post list -> unit
 (** @raise Stuck when one of the postconditions is invalid for the given return
     value. *)
 
-val check_type_invs : rac -> ?loc:Loc.position -> env -> Ity.ity -> Value.value -> unit
+val check_type_invs : rac -> ?loc:Loc.position -> giant_steps:bool ->
+  env -> Ity.ity -> Value.value -> unit
 (** @raise Fail when one of the type invariant of the type is invalid for the
     given value *)
 
-val check_assume_type_invs : rac -> ?loc:Loc.position ->
+val check_assume_type_invs : rac -> ?loc:Loc.position -> giant_steps:bool ->
   env -> Ity.ity -> Value.value -> unit
 (** @raise Stuck when the type invariant for the given type is invalid for the
     given value. *)
@@ -411,7 +414,8 @@ val oldify_varl : env -> (Term.term * Term.lsymbol option) list ->
   (Term.term * Term.lsymbol option) list * Value.value Term.Mvs.t
 (** Prepare a variant for later call with {!check_variant}. *)
 
-val check_variant : rac -> Ident.Sattr.elt -> Loc.position option -> env ->
+val check_variant : rac -> Ident.Sattr.elt -> Loc.position option ->
+  giant_steps:bool -> env ->
   (Term.term * Term.lsymbol option) list * Value.value Term.Mvs.t ->
   (Term.term * Term.lsymbol option) list -> unit
 (** @raise Fail when the variant is invalid. *)

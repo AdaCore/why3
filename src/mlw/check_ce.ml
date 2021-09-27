@@ -216,7 +216,7 @@ let get_or_stuck loc env ity desc = function
   | Some v -> v
   | None ->
       let desc = asprintf "for %s %a" desc print_ity ity in
-      let cntr_ctx = mk_cntr_ctx env ~desc Vc.expl_pre in
+      let cntr_ctx = mk_cntr_ctx env ~desc ~giant_steps:None Vc.expl_pre in
       stuck ?loc cntr_ctx "%s" desc
 
 let import_model_const loc env ity = function
@@ -252,7 +252,8 @@ let rec import_model_value loc env check known th_known ity v =
       | Var _ -> undefined_value ity
       | Record r ->
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
-            cannot_import "type with not exactly one constructors" in
+            cannot_import "type with not exactly one constructors %a/%d"
+              print_its ts (List.length def.Pdecl.itd_constructors) in
           let aux field_rs =
             let field_name = trace_or_name field_rs.rs_name in
             let field_ity = ity_full_inst subst (fd_of_rs field_rs).pv_ity in
@@ -324,12 +325,12 @@ let oracle_of_model pm model =
         match oid with Some id -> id.id_loc | None -> None in
     import_model_value loc env check pm.Pmodule.mod_known
       pm.Pmodule.mod_theory.Theory.th_known ity me.me_value in
-  let for_variable ?(check=fun _ _ -> ()) ?loc env id ity =
+  let for_variable env ?(check=fun _ _ -> ()) ~loc id ity =
     Opt.map (import check (Some id) loc env ity)
       (search_model_element_for_id model ?loc id) in
-  let for_result ?(check=fun _ _ -> ()) env loc ity =
+  let for_result env ?(check=fun _ _ -> ()) ~loc ~call_id ity =
     Opt.map (import check None (Some loc) env ity)
-      (search_model_element_call_result model loc) in
+      (search_model_element_call_result model call_id loc) in
   { for_variable; for_result }
 
 (** Check and select solver counterexample models *)

@@ -56,6 +56,8 @@ and proj_name = string
 
 and field_name = string
 
+val compare_model_value_const : model_value -> model_value -> int
+
 val array_create_constant :
   value : model_value ->
   model_array
@@ -175,9 +177,9 @@ val search_model_element_for_id :
     identifier [id], at the location [id.id_loc], or at [loc], when given. *)
 
 val search_model_element_call_result :
-  model -> Loc.position -> model_element option
-(** [search_model_element_call_result m loc] searches for a model element that
-    holds the return value for a call at location [loc]. *)
+  model -> int option -> Loc.position -> model_element option
+(** [search_model_element_call_result m oid loc] searches for a model element
+   that holds the return value for a call with id [oid] at location [loc]. *)
 
 (** {2 Printing the model} *)
 

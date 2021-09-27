@@ -254,14 +254,17 @@ let print_type_decl fmt ts = match ts.ts_def with
       fprintf fmt "@[<hov 2>type %a%a%a =@ %a@]@\n@\n"
         print_ts ts print_ident_attrs ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args print_ty ty
-  | Range _ir -> (* TODO *)
-      fprintf fmt "@[<hov 2>type %a%a%a =@ <range ...>@]@\n@\n"
+  | Range ir ->
+      fprintf fmt "@[<hov 2>type %a%a%a =@ <range %s %s>@]@\n@\n"
         print_ts ts print_ident_attrs ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
-  | Float _fp -> (* TODO *)
-      fprintf fmt "@[<hov 2>type %a%a%a =@ <float ...>@]@\n@\n"
+        (BigInt.to_string ir.Number.ir_lower)
+        (BigInt.to_string ir.Number.ir_upper)
+  | Float fp ->
+      fprintf fmt "@[<hov 2>type %a%a%a =@ <float %d %d>@]@\n@\n"
         print_ts ts print_ident_attrs ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
+        fp.Number.fp_exponent_digits fp.Number.fp_significand_digits
 
 let print_type_decl fmt ts =
   if not (query_remove ts.ts_name) then
