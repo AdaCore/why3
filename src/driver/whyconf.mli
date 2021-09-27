@@ -46,9 +46,7 @@ val read_config : string option -> config
 
 val init_config : ?extra_config:string list -> string option -> config
 (** [init_config ?extra_config conf_file]
-
-    Add the automatically generated part of the configuration, and load plugins
-
+    adds the automatically generated part of the configuration, and loads plugins
 *)
 
 
@@ -57,7 +55,7 @@ val read_config_rc: string option -> string * Rc.t
    the parsed Rc file *)
 
 val add_extra_config : config -> string -> config
-(** [add_extra_config config filename] merge the content of [filename]
+(** [add_extra_config config filename] merges the content of [filename]
     into [config] *)
 
 val empty_rc : Rc.t
@@ -79,6 +77,7 @@ val get_conf_file : config -> string
 val rc_of_config : config -> Rc.t
 
 (** {2 Main section} *)
+
 type main
 
 val get_main : config -> main
@@ -128,6 +127,7 @@ val print_prover_parseable_format : Format.formatter -> prover -> unit
 val prover_parseable_format : prover -> string
 
 (** Printer for prover *)
+
 module Prover   : OrderedHashedType with type t = prover
 module Mprover  : Extmap.S with type key = prover
 module Sprover  : Extset.S with module M = Mprover
@@ -260,12 +260,12 @@ exception ProverAmbiguity of config * filter_prover * config_prover  Mprover.t
 exception ParseFilterProver of string
 
 val filter_one_prover : config -> filter_prover -> config_prover
-(** find the uniq prover that verify the filter. If it doesn't exists
-    raise ProverNotFound or raise ProverAmbiguity *)
+(** find the unique prover that verifies the filter. If it doesn't exist,
+    raise [ProverNotFound] or [ProverAmbiguity] *)
 
 val why3_regexp_of_string : string -> Re.Str.regexp
 
-(** {2 For accesing and modifying the user configuration } *)
+(** {2 For accessing and modifying the user configuration} *)
 
 module User: sig
 

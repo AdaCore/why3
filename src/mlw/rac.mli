@@ -1,6 +1,6 @@
-open Pinterp_core
-
 (** {1 RAC implementation(s)} *)
+
+open Pinterp_core
 
 type oracle_quant_var = env -> Term.vsymbol -> Value.value option
 (** An oracle to get all-quantified variables during RAC. Used to progress

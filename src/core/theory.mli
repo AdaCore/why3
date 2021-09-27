@@ -9,9 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Wstdlib
-
 (** Theories and Namespaces *)
+
+open Wstdlib
 
 open Ident
 open Ty

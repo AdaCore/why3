@@ -67,11 +67,11 @@ val array_add_element :
   value : model_value ->
   model_array
 (** Adds an element to the array.
-    @param array : the array to that the element will be added
+    @param array the array to that the element will be added
 
-    @param index : the index on which the element will be added.
+    @param index the index on which the element will be added.
 
-    @param value : the value of the element to be added
+    @param value the value of the element to be added
 *)
 
 val float_of_binary : model_float_binary -> model_float
@@ -141,13 +141,13 @@ val create_model_element :
   attrs     : Ident.Sattr.t ->
   model_element
 (** Creates a counter-example model element.
-    @param name : the name of the source-code element
+    @param name the name of the source-code element
 
-    @param value  : counter-example value for the element
+    @param value counter-example value for the element
 
-    @param location : source-code location of the element
+    @param location source-code location of the element
 
-    @param term : why term corresponding to the element
+    @param term why term corresponding to the element
 *)
 
   (** {2 Model definitions} *)
@@ -196,7 +196,7 @@ val print_model :
       names. The input is information about model element name. The
       output is the name of the model element that should be displayed.
     @param model the counter-example model to print
-    @param print_attrs: when set to true, the name is printed together with the
+    @param print_attrs when set to true, the name is printed together with the
     attrs associated to the specific ident.
 *)
 
@@ -220,21 +220,23 @@ val print_model_json : Format.formatter -> model -> unit
     - counterexample_line is JSON array (ordered list) with elements
       corresponding to counterexample_element
     - counterexample_element is JSON object with following fields
-      - "name": name of counterexample element
-      - "value": value of counterexample element
-      - "kind": kind of counterexample element:
-        - "result": Result of a function call (if the counter-example is for postcondition)
-        - "old": Old value of function argument (if the counter-example is for postcondition)
-        - "\@X": Value at label X
-        - "before_loop": Value before entering the loop
-        - "previous_iteration": Value in the previous loop iteration
-        - "current_iteration": Value in the current loop iteration
-        - "error_message": The model element represents error message, not source-code element.
-            The error message is saved in the name of the model element
-        - "other"
+      {ul
+      {- "name": name of counterexample element}
+      {- "value": value of counterexample element}
+      {- "kind": kind of counterexample element:
+        {ul
+        {- "result": Result of a function call (if the counter-example is for postcondition)}
+        {- "old": Old value of function argument (if the counter-example is for postcondition)}
+        {- "\@X": Value at label X}
+        {- "before_loop": Value before entering the loop}
+        {- "previous_iteration": Value in the previous loop iteration}
+        {- "current_iteration": Value in the current loop iteration}
+        {- "error_message": The model element represents error message, not source-code element.
+            The error message is saved in the name of the model element}
+        {- "other"}}}}
 
     Example:
-    [
+    {[
       "records.adb": {
           "84": [
             {
@@ -249,7 +251,7 @@ val print_model_json : Format.formatter -> model -> unit
             }
           ]
       }
-    ]
+    ]}
 *)
 
 val interleave_with_source :

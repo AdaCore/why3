@@ -142,25 +142,21 @@ val reload_files : ?hard_reload:bool -> controller -> bool * bool
 
   - each new theory is associated to a theory of the former session if
     the names match exactly. In case of no match:
-
-    . a new theory and its goals appear without any proof attempts in
-      it in the new session
-
-    . an unmatched old theory is kept in the new session together with
+    {ul {- a new theory and its goals appear without any proof attempts in
+         it in the new session}
+    {- an unmatched old theory is kept in the new session together with
       its former goals, proof attempts and transformations, but
-      without any tasks associated to goals and subgoals.
+      without any tasks associated to goals and subgoals.}}
 
   - within a new theory with a corresponding old theory, each goal is
     in turn associated to a former goal if possible. the match is done
     either on the goal name, or if no name match exactly, on the goal
     shape.
-
-    . a new goal without match is added with an empty set of proof
-      attempts and transformations
-
-    . an old goal without match is kept with all its former proof
+    {ul {- a new goal without match is added with an empty set of proof
+      attempts and transformations}
+    {- an old goal without match is kept with all its former proof
       attempts and transformations, but no task is associated to it,
-      neither to its subgoals.
+      neither to its subgoals.}}
 
   - on each new goal that has a matching old goal, old proof
     attempts are attached, with the status obsolete if the task has
@@ -170,10 +166,9 @@ val reload_files : ?hard_reload:bool -> controller -> bool * bool
     transformations are attached, and applied to the task, the
     generated subgoals are in turn matched to the old sub-goals, in
     the same manner as for goals in a theory
-
-    . an old sub-goals without a match is kept with all its former
+    {ul {- an old sub-goals without a match is kept with all its former
       proof attempts and transformations, but no task is associated to
-      it, neither to its subgoals.
+      it, neither to its subgoals.}}
 
   When the option [hard_reload] is true (false by default), libraries and
   drivers are also reloaded.

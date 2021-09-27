@@ -96,11 +96,13 @@ val decl_goal_l: (decl -> diff_decl list list) -> task -> task tlist
     end of the task is encountered.
 
     Example of use of this feature in the code of [destruct]:
+    {[
     H1: p1 -> p2
     H2: p3
     H3: ...
     -------------
     Goal: True
+    ]}
 
     In [destruct H1], we know that we will add a new goal [p1] before we read
     through the entire task, so we need to be able to generate a new goal.
