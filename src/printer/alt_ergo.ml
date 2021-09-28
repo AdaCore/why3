@@ -44,11 +44,10 @@ type info = {
   info_printer : ident_printer;
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
-  mutable info_in_goal: bool;
+  info_in_goal: bool;
   mutable list_projs: Ident.ident Mstr.t;
-  mutable list_field_def: Ident.ident Mstr.t;
+  list_field_def: Ident.ident Mstr.t;
   meta_model_projection: Sls.t;
-  meta_record_def : Sls.t;
   info_cntexample: bool
   }
 
@@ -503,7 +502,6 @@ let print_task args ?old:_ fmt task =
     list_projs = Mstr.empty;
     list_field_def = Mstr.empty;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
-    meta_record_def = Task.on_tagged_ls Theory.meta_record task;
     info_cntexample = cntexample;
   } in
   print_prelude fmt args.prelude;

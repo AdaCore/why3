@@ -35,16 +35,12 @@ let set_op ~loc   = Qident (mk_id ~loc (Ident.op_set ""))
 
 let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }
-let mk_term ~loc d =
-  { term_desc = d; term_loc = loc }
 let mk_pat ~loc d =
   { pat_desc = d; pat_loc = loc }
 let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
 let mk_var ~loc id =
   mk_expr ~loc (Eident (Qident id))
-let mk_tvar ~loc id =
-  mk_term ~loc (Tident (Qident id))
 let mk_ref ~loc e =
   mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e]))
 let array_set ~loc a i v =
@@ -84,12 +80,10 @@ let empty_spec = {
 
 type env = {
   vars: ident Mstr.t;
-  for_index: int;
 }
 
 let empty_env =
-  { vars = Mstr.empty;
-    for_index = 0; }
+  { vars = Mstr.empty }
 
 let is_const (e: Py_ast.expr list) =
   match List.nth e 2 with
@@ -98,7 +92,7 @@ let is_const (e: Py_ast.expr list) =
   | _ -> 0
 
 let add_var env id =
-  { env with vars = Mstr.add id.id_str id env.vars }
+  { vars = Mstr.add id.id_str id env.vars }
 let add_param env (id, _) =
   add_var env id
 

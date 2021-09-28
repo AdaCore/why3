@@ -169,8 +169,6 @@ type info = {
   realization : bool;
 }
 
-let print_path = print_list (constant_string ".") string
-
 let print_id fmt id = string fmt (id_unique iprinter id)
 
 let print_id_real info fmt id =
@@ -187,7 +185,6 @@ let print_id_real info fmt id =
 
 let print_ls_real info fmt ls = print_id_real info fmt ls.ls_name
 let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
-let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
 
 (** Types *)
 
@@ -225,19 +222,11 @@ let unambig_fs fs =
 
 (** Patterns, terms, and formulas *)
 
-let lparen_l fmt () = fprintf fmt "@ ("
 let lparen_r fmt () = fprintf fmt "(@,"
-let print_paren_l fmt x =
-  print_list_delim ~start:lparen_l ~stop:rparen ~sep:comma fmt x
 let print_paren_r fmt x =
   print_list_delim ~start:lparen_r ~stop:rparen ~sep:comma fmt x
 
-let arrow fmt () = fprintf fmt "@ -> "
-let print_arrow_list fmt x = print_list arrow fmt x
-let print_space_list fmt x = print_list space fmt x
 let print_comma_list fmt x = print_list comma fmt x
-let print_or_list fmt x = print_list (fun fmt () -> fprintf fmt " OR@\n") fmt x
-let comma_newline fmt () = fprintf fmt ",@\n"
 
 let rec print_pat info fmt p = match p.pat_node with
   | Pvar v ->
@@ -259,9 +248,6 @@ let rec print_pat info fmt p = match p.pat_node with
 let print_vsty_nopar info fmt v =
   fprintf fmt "%a:%a" print_vs v (print_ty info) v.vs_ty
 
-let print_vsty info fmt v =
-  fprintf fmt "(%a)" (print_vsty_nopar info) v
-
 let is_tuple0_ty = function
   | Some { ty_node = Tyapp (ts, _) } -> ts_equal ts (ts_tuple 0)
   | Some _ | None -> false
@@ -275,10 +261,6 @@ let print_binop fmt = function
   | Tor -> pp_print_string fmt "OR"
   | Timplies -> pp_print_string fmt "=>"
   | Tiff -> pp_print_string fmt "<=>"
-
-(* TODO: labels are lost, but we could print them as "% label \n",
-   it would result in an ugly output, though *)
-let print_attr _fmt (_l,_) = () (*fprintf fmt "(*%s*)" l*)
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
@@ -303,7 +285,6 @@ let rec print_term info fmt t = print_lrterm false false info fmt t
 and     print_fmla info fmt f = print_lrfmla false false info fmt f
 and print_opl_term info fmt t = print_lrterm true  false info fmt t
 and print_opl_fmla info fmt f = print_lrfmla true  false info fmt f
-and print_opr_term info fmt t = print_lrterm false true  info fmt t
 and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
 
 and print_lrterm opl opr info fmt t = match t.t_attrs with
@@ -444,12 +425,6 @@ and print_tuple_pat info t fmt p =
       (print_vsty_nopar info) vs (print_term info) t !i
   in
   print_comma_list print fmt l
-
-and print_branch print info fmt br =
-  let p,t = t_open_branch br in
-  fprintf fmt "@[<hov 4> %a:@ %a@]"
-    (print_pat info) p (print info) t;
-  Svs.iter forget_var p.pat_vars
 
 and print_branches ?(first=true) print info fmt = function
   | [] ->
@@ -734,9 +709,6 @@ let print_recursive_decl info fmt d =
     forget_tvs ()
   end
 
-let print_ind info fmt (pr,f) =
-  fprintf fmt "@[%% %a:@\n(%a)@]" print_pr pr (print_fmla info) f
-
 let print_ind_decl info fmt (ps,al) =
   let _, _, all_ty_params = ls_ty_vars ps in
   let vl = List.map (create_vsymbol (id_fresh "z")) ps.ls_args in
@@ -753,16 +725,6 @@ let print_ind_decl info fmt d =
     print_ind_decl info fmt d;
     forget_tvs ()
   end
-
-let re_lemma = Re.Str.regexp "\\(\\bLEMMA\\b\\|\\bTHEOREM\\b\\)"
-let rec find_lemma = function
-  | [] -> "AXIOM"
-  | s :: sl ->
-      (try let _ = Re.Str.search_forward re_lemma s 0 in Re.Str.matched_group 1 s
-       with Not_found -> find_lemma sl)
-let axiom_or_lemma = function
-  | Some (Edition (_, c)) -> find_lemma c
-  | _ -> "AXIOM"
 
 let print_prop_decl ~prev info fmt (k,pr,f) =
   ignore (prev);
@@ -813,12 +775,6 @@ let print_decl ~old info fmt d =
 
 let print_decls ~old info fmt dl =
   fprintf fmt "@[<hov>%a@]" (print_list nothing (print_decl ~old info)) dl
-
-let init_printer th =
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  let pr = create_ident_printer black_list ~sanitizer:isanitize in
-  Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
-  pr
 
 let print_task printer_args realize ?old fmt task =
   forget_all ();

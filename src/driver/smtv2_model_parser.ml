@@ -189,10 +189,6 @@ module FromSexp = struct
     | List [n; iret] -> name n, ireturn_type iret
     | sexp -> error sexp "arg"
 
-  let apply_eq = function
-    | List (Atom "=" :: _) -> ()
-    | sexp -> error sexp "apply_eq"
-
   let prover_name name =
     if Strings.has_prefix "@" name then
       let left = String.index name '_' + 1 in
@@ -229,28 +225,10 @@ module FromSexp = struct
     try Float (model_float sexp) with _ ->
       error sexp "value"
 
-  and boolean_expression = function
-    | List [Atom "forall"; args; t] ->
-        ignore (list arg args, term t)
-    | List [Atom "not"; t] ->
-        ignore (term t)
-    | List (Atom "and" :: ts) ->
-        ignore (List.map term ts)
-    | sexp -> error sexp "boolean_expression"
-
   and ite = function
     | List [Atom "ite"; t1; t2; t3] ->
         Tite (term t1, term t2, term t3)
     | sexp -> error sexp "ite"
-
-  and pair_equal = function
-    | List [Atom "="; t1; t2] ->
-        Some (term t1, term t2)
-    | _ -> None
-
-  and let_ = function
-    | List [n; t] -> name n, term t
-    | sexp -> error sexp "let"
 
   and let_term = function
     | List [Atom "let"; List bs; t] ->
@@ -308,10 +286,6 @@ module FromSexp = struct
 end
 
 (* Parses the model returned by CVC4 and Z3. *)
-
-let debug = Debug.register_info_flag "smtv2_model_parser"
-    ~desc:"Print@ debugging@ messages@ about@ parsing@ model@ \
-           returned@ from@ cvc4@ or@ z3."
 
 (*
 ***************************************************************

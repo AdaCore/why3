@@ -110,8 +110,6 @@ type decl =
   | Dexn    of xsymbol * ty option
   | Dmodule of string * decl list
 
-type namespace = (ident * decl list) list
-
 type from_module = {
   from_mod: Pmodule.pmodule option;
   from_km : Pdecl.known_map;

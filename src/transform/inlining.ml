@@ -95,7 +95,7 @@ let fold in_goal notls notdef task_hd (env, task) =
 let meta = Theory.register_meta "inline:no" [Theory.MTlsymbol]
   ~desc:"Disallow@ the@ inlining@ of@ the@ given@ function/predicate@ symbol."
 
-let t ?(use_meta=true) ?(in_goal=false) ~notls ~notdef =
+let t ~use_meta ~in_goal ~notls ~notdef =
   Trans.bind (Trans.store get_counterexmp) (fun for_counterexample ->
     let trans notls =
       Trans.fold_map (fold in_goal notls notdef) Mls.empty None in

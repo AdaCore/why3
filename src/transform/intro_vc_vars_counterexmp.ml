@@ -28,8 +28,6 @@ type vc_term_info = {
   (* true if the term that triggers VC is currently processed *)
   vc_loc : Loc.position option;
   (* the position of the term that triggers VC *)
-  vc_pre_or_post : bool;
-  (* true if VC was generated for precondition or postcondition *)
 }
 
 let is_model_vc_attr l =
@@ -46,7 +44,7 @@ let check_enter_vc_term t info vc_loc =
       vc_loc := t.t_loc;
       { vc_inside = true;
         vc_loc = t.t_loc;
-        vc_pre_or_post = Sattr.mem model_vc_post_attr t.t_attrs }
+      }
     end
   else
     info
@@ -300,7 +298,6 @@ let intro_vc_vars_counterexmp2 task =
   let info = {
     vc_inside = false;
     vc_loc = None;
-    vc_pre_or_post = false;
   } in
   let vc_loc = ref None in
   (* Do introduction and find location of term triggering VC *)

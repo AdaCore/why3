@@ -34,13 +34,6 @@ let () = set_opt_style default_style
 
 let opt_pp = ref []
 
-let set_opt_pp_in,set_opt_pp_cmd,set_opt_pp_out =
-  let suf = ref "" in
-  let cmd = ref "" in
-  (fun s -> suf := s),
-  (fun s -> cmd := s),
-  (fun s -> opt_pp := (!suf,(!cmd,s))::!opt_pp)
-
 let spec =
   let open Getopt in
   [ KShort 'o', Hnd1 (AString, fun s -> output_dir := s),
@@ -91,10 +84,6 @@ let run_file print_session fname =
 
 module Table =
 struct
-
-  let provers_stats s provers theory =
-    theory_iter_proof_attempt s (fun _ a ->
-      Hprover.replace provers a.prover a.prover) theory
 
   let print_prover = Whyconf.print_prover
 
