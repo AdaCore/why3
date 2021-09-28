@@ -54,6 +54,17 @@
     sp_partial = s1.sp_partial || s2.sp_partial;
   }
 
+  let fresh_type_var =
+    let r = ref 0 in
+    fun loc -> incr r;
+      PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
+
+  let logic_type loc = function
+  | None    -> fresh_type_var loc
+  | Some ty -> ty
+
+  let logic_param loc (id, ty) = id, logic_type loc ty
+
 %}
 
 %token <string> INTEGER
@@ -116,9 +127,11 @@ import:
 func:
 | FUNCTION id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
   ty=option(function_type) NEWLINE
-  { Dlogic (id, l, Some ty) }
+  { let loc = floc $startpos $endpos in
+    Dlogic (id, List.map (logic_param loc) l, Some (logic_type loc ty)) }
 | PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR NEWLINE
-  { Dlogic (id, l, None) }
+  { let loc = floc $startpos $endpos in
+    Dlogic (id, List.map (logic_param loc) l, None) }
 
 param:
 | id=ident ty=option(param_type)
@@ -132,11 +145,15 @@ function_type:
 | ARROW ty=typ
   { ty }
 
+/* Note: "list" is a legal type annotation in Python; we make it a
+ * polymorphic type "list 'a" in WhyML  */
 typ:
 | id=ident
-  { Tapp (id, []) }
+  { if id.id_str = "list"
+    then PTtyapp (Qident id, [fresh_type_var (floc $startpos $endpos)])
+    else PTtyapp (Qident id, []) }
 | id=ident LEFTSQ tyl=separated_nonempty_list(COMMA, typ) RIGHTSQ
-  { Tapp (id, tyl) }
+  { PTtyapp (Qident id, tyl) }
 
 def:
 | DEF f = ident LEFTPAR x = separated_list(COMMA, param) RIGHTPAR
@@ -391,8 +408,8 @@ term_:
     { Tif ($2, $4, $6) }
 | LET id=ident EQUAL t1=term IN t2=term
     { Tlet (id, t1, t2) }
-| q=quant l=comma_list1(ident) DOT t=term
-    { let var id = id.id_loc, Some id, false, None in
+| q=quant l=comma_list1(param) DOT t=term
+    { let var (id, ty) = id.id_loc, Some id, false, ty in
       Tquant (q, List.map var l, [], t) }
 | id=ident LEFTPAR l=separated_list(COMMA, term) RIGHTPAR
     { Tidapp (Qident id, l) }

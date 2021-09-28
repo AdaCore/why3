@@ -264,7 +264,7 @@ Yet, they can be axiomatized, using toplevel ``assume`` statements.
        : | `term` ( "+" | "-" | "*" | "//" | "%" ) `term`
        : | "if" `term` "then" `term` "else `term`
        : | "let" identifier "=" `term` "in" `term`
-       : | ( "forall" | "exists" ) identifier ("," identifier)* "." `term`
+       : | ( "forall" | "exists" ) param ("," param)* "." `term`
        : | identifier "(" (`term` ("," `term`)*)? ")"
 
 Built-in functions and predicates
