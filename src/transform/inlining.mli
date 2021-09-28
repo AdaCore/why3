@@ -26,8 +26,8 @@ val get_counterexmp : Task.task -> bool
 (** {2 Generic inlining} *)
 
 val t :
-  ?use_meta:bool ->
-  ?in_goal:bool ->
+  use_meta:bool ->
+  in_goal:bool ->
   notls:(for_counterexample:bool -> Term.lsymbol -> bool) ->
   notdef:(Term.term -> bool) ->
   Task.task Trans.trans
