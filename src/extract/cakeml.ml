@@ -176,9 +176,6 @@ module Print = struct
         fprintf fmt "@[<hov 2>%a %a@]" (print_lident info) rs.rs_name
           (print_apply_args info) (tl, rs.rs_cty.cty_args)
 
-  and print_svar fmt s =
-    Stv.iter (fun tv -> fprintf fmt "%a " print_tv tv) s
-
   and print_fun_type_args info fmt (args, _, _, e) =
     (* TODO: search if CakeML supports some form of polymorphic recursion *)
     (* if Stv.is_empty s then *)

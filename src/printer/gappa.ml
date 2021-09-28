@@ -94,7 +94,6 @@ let pat_match env nb_holes p t =
 
 type info = {
   info_env : Env.env;
-  info_symbols : Sid.t;
   info_ops_of_rel : (string * string * string) Mls.t;
   info_syn : syntax_map;
 }
@@ -130,12 +129,8 @@ let get_info env task =
     | _ -> assert false) Mls.empty task in
   (* sets of known symbols *)
   let syn = get_syntax_map task in
-  let symb = Mid.map (Util.const ()) syn in
-  let symb = Mls.fold (fun ls _ acc -> Sid.add ls.ls_name acc) ops symb in
-  let symb = Sid.add ps_equ.ls_name symb in
   {
     info_env = env;
-    info_symbols = symb;
     info_ops_of_rel = ops;
     info_syn = syn;
   }

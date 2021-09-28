@@ -304,9 +304,6 @@ let scheduled_proof_attempts : sched_pa_rec Queue.t = Queue.create ()
 (* type for prover tasks in progress *)
 type tasks_prog_rec =
   {
-    tp_session  : Session_itp.session;
-    tp_id       : proofNodeID;
-    tp_pr       : Whyconf.prover;
     tp_callback : (proof_attempt_status -> unit);
     tp_started  : bool;
     tp_call     : Call_provers.prover_call;
@@ -424,10 +421,7 @@ let build_prover_call spa =
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
           ~limit ~interactive driver task in
       let pa =
-        { tp_session  = c.controller_session;
-          tp_id       = spa.spa_id;
-          tp_pr       = spa.spa_pr;
-          tp_callback = spa.spa_callback;
+        { tp_callback = spa.spa_callback;
           tp_started  = false;
           tp_call     = call;
           tp_ores     = spa.spa_ores } in

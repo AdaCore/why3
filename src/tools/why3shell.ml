@@ -33,10 +33,6 @@ module Protocol_shell = struct
     Debug.dprintf debug_proto "[request]";
     Debug.dprintf debug_proto "%a" print_request r
 
-  let print_msg_debug m =
-    Debug.dprintf debug_proto "[message]";
-    Debug.dprintf debug_proto "%a@." print_msg m
-
   let print_notify_debug n =
     Debug.dprintf debug_proto "[notification]";
     Debug.dprintf debug_proto "%a@." print_notify n
@@ -96,7 +92,6 @@ type node = {
   node_type: shell_node_type;
   mutable node_proved: bool;
   mutable children_nodes: node_ID list;
-  mutable node_detached: bool
   }
 
 let root_node_ID = root_node
@@ -112,7 +107,6 @@ let root_node = {
   node_type = SRoot;
   node_proved = false;
   children_nodes = [];
-  node_detached = false
 }
 
 module Hnode = Wstdlib.Hint
@@ -223,7 +217,7 @@ let return_proof_info (t: node_type) =
     Some Controller_itp.Scheduled
   | _ -> None
 
-let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string) (detached: bool) =
+let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string) =
   if t = NRoot then () else
   let new_node = {
     node_ID = n;
@@ -235,7 +229,6 @@ let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string
     node_type = convert_to_shell_type t;
     node_proved = false;
     children_nodes = [];
-    node_detached = detached
   } in
   try
     let parent = Hnode.find nodes parent in
@@ -251,20 +244,14 @@ let change_node fmt (n: node_ID) (u: update_info) =
     (match u with
     | Proved b ->
         node.node_proved <- b
-    | Proof_status_change (pas, b, _rl) when node.node_type = SProofAttempt ->
-        node.node_proof <- Some pas;
-        node.node_detached <- b (* TODO check and print this *)
+    | Proof_status_change (pas, _b, _rl) when node.node_type = SProofAttempt ->
+        node.node_proof <- Some pas
     | Proof_status_change _ ->
         (* TODO Probably case that cannot occur. *)
         ()
     | Name_change _ -> fprintf fmt "Not yet supported@.") (* TODO *)
   with
     Not_found -> fprintf fmt "Could not find node %d@." n
-
-let is_proof_attempt node_type =
-  match node_type with
-  | NProofAttempt -> true
-  | _ -> false
 
 (*************************)
 (* Notification Handling *)
@@ -295,8 +282,8 @@ let treat_notification fmt n =
   | Reset_whole_tree                        -> print_session fmt
   | Node_change (id, info)                  ->
       change_node fmt id info
-  | New_node (id, pid, typ, name, detached) ->
-      add_new_node fmt id pid typ name detached
+  | New_node (id, pid, typ, name, _detached) ->
+      add_new_node fmt id pid typ name
   | Remove _id                              -> (* TODO *)
       fprintf fmt "got a Remove notification not yet supported@."
   | Ident_notif_loc _loc                    ->

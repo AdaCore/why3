@@ -35,9 +35,6 @@ module C = struct
   (* int x=2, *y ... *)
   and names = ty * (ident * expr) list
 
-  (* names with a single declaration *)
-  and name = ty * ident * expr
-
   (* return type, parameter list. Variadic functions not handled. *)
   and proto = ty * (ty * ident) list
 
@@ -96,8 +93,6 @@ module C = struct
 
   and body = definition list * stmt
 
-  type file = definition list
-
   exception NotAValue
 
   let rec is_nop = function
@@ -115,12 +110,6 @@ module C = struct
 
   let is_false = function
     | Sexpr(Econst(Cint (_,ic))) -> is_zero ic
-    | _ -> false
-
-  let rec one_stmt = function
-    | Snop -> true
-    | Sexpr _ -> true
-    | Sblock (d,s) -> d = [] && one_stmt s
     | _ -> false
 
   (** [assignify v] transforms a statement that computes a value into
@@ -157,86 +146,6 @@ module C = struct
     | Sfor _ -> raise (Unsupported "for/while (for)")
     | Sbreak -> raise NotAValue
     | Sreturn _ -> raise NotAValue
-
-  (** [propagate_in_expr id v] and the associated functions replace
-      all instances of [id] by [v] in an
-      expression/statement/definition/block. It is used for constant
-      propagation to reduce the number of variables. *)
-  let rec propagate_in_expr id (v:expr) = function
-    | Evar i when Ident.id_equal i id -> v
-    | Evar i -> Evar i
-    | Eunop (u,e) -> Eunop (u, propagate_in_expr id v e)
-    | Ebinop (b,e1,e2) -> Ebinop (b,
-                                  propagate_in_expr id v e1,
-                                  propagate_in_expr id v e2)
-    | Equestion (c,t,e) -> Equestion(propagate_in_expr id v c,
-                                     propagate_in_expr id v t,
-                                     propagate_in_expr id v e)
-    | Ecast (ty,e) -> Ecast (ty, propagate_in_expr id v e)
-    | Ecall (e, l) -> Ecall (propagate_in_expr id v e,
-                             List.map (propagate_in_expr id v) l)
-    | Esize_expr e -> Esize_expr (propagate_in_expr id v e)
-    | Eindex (e1,e2) -> Eindex (propagate_in_expr id v e1,
-                                propagate_in_expr id v e2)
-    | Edot (e,i) -> Edot (propagate_in_expr id v e, i)
-    | Earrow (e,i) -> Earrow (propagate_in_expr id v e, i)
-    | Esyntax (s,t,ta,l,p) ->
-       Esyntax (s,t,ta,List.map (fun (e,t) -> (propagate_in_expr id v e),t) l,p)
-    | Esyntaxrename (s, l) ->
-       Esyntaxrename (s, List.map (propagate_in_expr id v) l)
-    | Enothing -> Enothing
-    | Econst c -> Econst c
-    | Elikely e -> Elikely (propagate_in_expr id v e)
-    | Eunlikely e -> Eunlikely (propagate_in_expr id v e)
-    | Esize_type ty -> Esize_type ty
-
-  let rec propagate_in_stmt id v = function
-    | Sexpr e -> Sexpr (propagate_in_expr id v e)
-    | Sblock b -> Sblock(propagate_in_block id v b)
-    | Sseq (s1,s2) -> Sseq (propagate_in_stmt id v s1,
-                            propagate_in_stmt id v s2)
-    | Sif (e,s1,s2) -> Sif (propagate_in_expr id v e,
-                            propagate_in_stmt id v s1,
-                            propagate_in_stmt id v s2)
-    | Swhile (e, s) -> Swhile (propagate_in_expr id v e,
-                               propagate_in_stmt id v s)
-    | Sfor (e1,e2,e3,s) -> Sfor (propagate_in_expr id v e1,
-                                 propagate_in_expr id v e2,
-                                 propagate_in_expr id v e3,
-                                 propagate_in_stmt id v s)
-    | Sreturn e -> Sreturn (propagate_in_expr id v e)
-    | Snop -> Snop
-    | Sbreak -> Sbreak
-
-  and propagate_in_def id v d =
-    let rec aux = function
-      | [] -> [], true
-      | (i,e)::t ->
-        if Ident.id_equal i id then (i,e)::t, false
-        else let t,b = aux t in ((i,propagate_in_expr id v e)::t), b
-    in
-    match d with
-    | Ddecl (ty,l) ->
-      let l,b = aux l in
-      Ddecl (ty, l), b
-    | Dinclude (i,k) -> Dinclude (i,k), true
-    | Dstruct _ -> raise (Unsupported "struct declaration inside function")
-    | Dfun _ -> raise (Unsupported "nested function")
-    | Dextern _ | Dtypedef _ | Dproto _ | Dstruct_decl _ -> assert false
-
-  and propagate_in_block id v (dl, s) =
-    let dl, b = List.fold_left
-      (fun (dl, acc) d ->
-        if acc
-        then
-          let d, b = propagate_in_def id v d in
-          (d::dl, b)
-        else (d::dl, false))
-      ([],true) dl in
-    (List.rev dl, if b then propagate_in_stmt id v s else s)
-
-  let is_empty_block s = s = Sblock([], Snop)
-  let block_of_expr e = [], Sexpr e
 
 (** [flatten_defs d s] appends all definitions in the statement [s] to d. *)
   (* TODO check ident unicity ? *)
@@ -321,23 +230,6 @@ module C = struct
     | Swhile (c,s) -> Swhile (c, elim_nop s)
     | Sfor(e1,e2,e3,s) -> Sfor(e1,e2,e3,elim_nop s)
     | Snop | Sbreak | Sexpr _ | Sreturn _ as s -> s
-
-  let rec add_to_last_call params = function
-    | Sblock (d,s) -> Sblock (d, add_to_last_call params s)
-    | Sseq (s1,s2) when not (is_nop s2) ->
-      Sseq (s1, add_to_last_call params s2)
-    | Sseq (s1,_) -> add_to_last_call params s1
-    | Sexpr (Ecall(fname, args)) ->
-      Sexpr (Ecall(fname, params@args)) (*change name to ensure no renaming ?*)
-    | Sreturn (Ecall (fname, args)) ->
-       Sreturn (Ecall(fname, params@args))
-    | _ -> raise (Unsupported "tuple pattern matching with too complex def")
-
-  let rec stmt_of_list (l: stmt list) : stmt =
-    match l with
-    | [] -> Snop
-    | [s] -> s
-    | h::t -> Sseq (h, stmt_of_list t)
 
   let is_expr = function
     | Sexpr _ -> true
@@ -491,23 +383,9 @@ module C = struct
     | Sbreak -> Sbreak
     | Sreturn e -> Sreturn (fe e)
 
-  (** Integer type bounds *)
-  open BigInt
-  let min32 = minus (pow_int_pos 2 31)
-  let max32 = sub (pow_int_pos 2 31) one
-  let maxu32 = sub (pow_int_pos 2 32) one
-  let min64 = minus (pow_int_pos 2 63)
-  let max64 = sub (pow_int_pos 2 63) one
-  let maxu64 = sub (pow_int_pos 2 64) one
-
 end
 
 type info = {
-  env         : Env.env;
-  prelude     : Printer.prelude;
-  thprelude   : Printer.prelude_map;
-  thinterface : Printer.interface_map;
-  blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   literal     : Printer.syntax_map; (*TODO handle literals*)
   kn          : Pdecl.known_map;
@@ -832,11 +710,6 @@ module Print = struct
          Format.eprintf
            "Could not print declaration of %s. Unsupported: %s@."
            !current_decl_name s
-
-  let print_file fmt info ast =
-    Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
-    newline fmt ();
-    fprintf fmt "@[<v>%a@]@." (print_list newline print_global_def) ast
 
 end
 
@@ -1747,11 +1620,6 @@ let print_header_decl args fmt d =
   List.iter (Format.fprintf fmt "%a@." Print.print_global_def) cds
 
 let mk_info (args:Pdriver.printer_args) m = {
-    env = args.Pdriver.env;
-    prelude = args.Pdriver.prelude;
-    thprelude = args.Pdriver.thprelude;
-    thinterface = args.Pdriver.thinterface;
-    blacklist = args.Pdriver.blacklist;
     syntax = args.Pdriver.syntax;
     literal = args.Pdriver.literal;
     prec = args.Pdriver.prec;

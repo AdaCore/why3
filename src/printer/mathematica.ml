@@ -494,13 +494,6 @@ let print_dom _info fmt lsymbol =
 let print_param _info fmt lsymbol =
   print_ident fmt lsymbol.ls_name
 
-let print_var info fmt vsymbol =
-  (*fprintf fmt "%a" print_ident vsymbol.vs_name*)
-  begin match query_syntax info.info_syn vsymbol.vs_name with
-    | Some s -> syntax_arguments s (print_term info) fmt []
-    | None -> print_ident fmt vsymbol.vs_name
-  end
-
 let print_goal info fmt g =
   match g with
     | Goal_good(pr,f) ->

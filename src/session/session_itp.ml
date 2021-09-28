@@ -33,7 +33,7 @@ let print_proofAttemptID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
-  mutable theory_parent_name    : fileID;
+  theory_parent_name            : fileID;
   mutable theory_is_detached    : bool;
 }
 
@@ -1936,7 +1936,6 @@ open Format
 let save_string = Pp.html_string
 
 type save_ctxt = {
-  prover_ids : int PHprover.t;
   provers : (int * int * int * int) Mprover.t;
   ch_shapes : Compress.Compress_z.out_channel;
 }
@@ -2189,7 +2188,7 @@ let save fname shfname session =
       Termcode.Gshape.write_shape_to_file session.shapes.session_global_shapes chsh;
       Compress.Compress_z.output_string chsh "\n";
     end;
-  let ctxt = { prover_ids = prover_ids; provers = provers; ch_shapes = chsh } in
+  let ctxt = { provers = provers; ch_shapes = chsh } in
   Hfile.iter (save_file session ctxt fmt) session.session_files;
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";

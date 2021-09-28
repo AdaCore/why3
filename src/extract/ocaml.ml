@@ -29,7 +29,6 @@ type info = {
   info_literal      : syntax_map;
   info_current_th   : Theory.theory;
   info_current_mo   : Pmodule.pmodule option;
-  info_th_known_map : Decl.known_map;
   info_mo_known_map : Pdecl.known_map;
   info_fname        : string option;
   info_flat         : bool;
@@ -842,7 +841,6 @@ let print_decl =
       info_literal      = pargs.Pdriver.literal;
       info_current_th   = th;
       info_current_mo   = Some m;
-      info_th_known_map = th.th_known;
       info_mo_known_map = m.mod_known;
       info_fname        = Opt.map Ml_printer.clean_name fname;
       info_flat         = flat;

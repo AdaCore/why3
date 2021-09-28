@@ -135,10 +135,6 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Qident id
     | Qdot (_, id) -> id
 
-  let rec str_of_qualid = function
-    | Qident id -> id.id_str
-    | Qdot (qid, id) -> str_of_qualid qid^"."^id.id_str
-
   let pp_arg pp fmt =
     fprintf fmt "{%a}" pp
 

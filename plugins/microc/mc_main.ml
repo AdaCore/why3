@@ -28,16 +28,12 @@ let set_op ~loc   = Qident (mk_id ~loc (Ident.op_set ""))
 
 let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }
-let mk_term ~loc d =
-  { term_desc = d; term_loc = loc }
 let mk_pat ~loc d =
   { pat_desc = d; pat_loc = loc }
 let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
 let mk_var ~loc id =
   mk_expr ~loc (Eident (Qident id))
-let mk_tvar ~loc id =
-  mk_term ~loc (Tident (Qident id))
 let mk_ref ~loc e =
   mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e]))
 let array_set ~loc a i v =
@@ -57,42 +53,19 @@ let return_handler ~loc =
   let x = mk_id ~loc "x" in
   [return ~loc, Some (mk_pat ~loc (Pvar x)), mk_var ~loc x]
 let array_id ~loc id = Qdot (Qident (mk_id ~loc "Array"), id)
-let array_make ~loc n v =
-  mk_expr ~loc (Eidapp (array_id ~loc (mk_id ~loc "make"),
-                        [n; v]))
+
 let set_ref id =
   { id with id_ats = ATstr Pmodule.ref_attr :: id.id_ats }
 
-let empty_spec = {
-  sp_pre     = [];
-  sp_post    = [];
-  sp_xpost   = [];
-  sp_reads   = [];
-  sp_writes  = [];
-  sp_alias   = [];
-  sp_variant = [];
-  sp_checkrw = false;
-  sp_diverge = false;
-  sp_partial = false;
-}
-
 type env = {
   vars: ident Mstr.t;
-  for_index: int;
 }
 
 let empty_env =
-  { vars = Mstr.empty;
-    for_index = 0; }
+  { vars = Mstr.empty }
 
 let add_var env (_, id) =
-  { env with vars = Mstr.add id.id_str id env.vars }
-
-let for_vars ~loc env =
-  let i = env.for_index in
-  let env = { env with for_index = i + 1 } in
-  let i = string_of_int env.for_index in
-  mk_id ~loc ("for index " ^ i ), mk_id ~loc ("for list " ^ i), env
+  { vars = Mstr.add id.id_str id env.vars }
 
 let rec has_stmt p s =
   p s || begin match s.stmt_desc with
@@ -249,11 +222,6 @@ and block env ~loc = function
   | ({ Mc_ast.stmt_loc = loc } as s) :: sl ->
     let s = stmt env s in
     if sl = [] then s else mk_expr ~loc (Esequence (s, block env ~loc sl))
-
-let fresh_type_var =
-  let r = ref 0 in
-  fun loc -> incr r;
-    PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
 
 let type_unit loc = PTtyapp (Qident (mk_id ~loc "unit"), [])
 let type_int loc = PTtyapp (Qident (mk_id ~loc "int"), [])

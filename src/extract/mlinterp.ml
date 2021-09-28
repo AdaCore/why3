@@ -39,8 +39,6 @@ type value =
 and field = Fimmutable of value | Fmutable of value ref
 
 type info = {
-    env : Env.env;
-    mm  : Pmodule.pmodule Mstr.t;
     vars: value Mid.t;
     funs: decl Mrs.t;
     get_decl: rsymbol -> Mltree.decl;
@@ -865,9 +863,7 @@ let rec term_of_value = function
   | Vmatrix _ -> raise CannotReduce
 
 let init_info env mm rs vars =
-  { env = env;
-    mm = mm;
-    funs = Mrs.empty;
+  { funs = Mrs.empty;
     vars = vars;
     get_decl = get_decl env mm;
     cur_rs = rs;
