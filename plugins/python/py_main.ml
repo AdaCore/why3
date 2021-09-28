@@ -234,17 +234,6 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
 
 let no_params ~loc = [loc, None, false, Some (PTtuple [])]
 
-let fresh_type_var =
-  let r = ref 0 in
-  fun loc -> incr r;
-    PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
-
-let rec typ = function
-  | Tapp ({id_str="list"} as id, []) ->
-      PTtyapp (Qident id, [fresh_type_var id.id_loc])
-  | Tapp (id, tyl) ->
-      PTtyapp (Qident id, List.map typ tyl)
-
 let mk_for_params exps loc env =
 
   let mk_op1 op ub = mk_expr ~loc (Eidapp (infix ~loc op, [expr env ub; constant ~loc 1])) in
@@ -383,11 +372,10 @@ and block env ~loc = function
       mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, ref, bl)) in
     let body = List.fold_left local body idl in
     let param (id, ty) =
-      id.id_loc, Some id, false, Opt.map typ ty in
+      id.id_loc, Some id, false, ty in
     let params = if idl = [] then no_params ~loc else List.map param idl in
     let s = block env ~loc sl in
     let p = mk_pat ~loc Pwild in
-    let ty = Opt.map typ ty in
     let e = if block_has_call id bl then
       Erec ([id, false, Expr.RKnone, params, ty, p, Ity.MaskVisible, sp, body], s)
     else
@@ -397,19 +385,15 @@ and block env ~loc = function
   | (Py_ast.Dimport _ | Py_ast.Dlogic _) :: sl ->
     block env ~loc sl
 
-let logic_type loc = function
-  | None    -> fresh_type_var loc
-  | Some ty -> typ ty
-
 let logic_param (id, ty) =
-  id.id_loc, Some id, false, logic_type id.id_loc ty
+  id.id_loc, Some id, false, ty
 
 let logic = function
   | Py_ast.Dlogic (id, idl, ty) ->
     let d = { ld_loc = id.id_loc;
               ld_ident = id;
               ld_params = List.map logic_param idl;
-              ld_type = Opt.map (logic_type id.id_loc) ty;
+              ld_type = ty;
               ld_def = None } in
     Typing.add_decl id.id_loc (Dlogic [d])
   | _ -> ()
