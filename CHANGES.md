@@ -1,9 +1,15 @@
 :x: marks a potential source of incompatibility
 
+Standard library
+  * deeply revised library `mach.bv` for bitvectors operations in
+    programs with many renamings. Pre- and post-conditions are not
+    expressed both in terms of mathematical integers and in terms of
+    purely bit-vector formulas, thanks to conversion to 128 bits :x:
+
 API
   * improved documentation of [Ptree]
 
-Python
+Python front-end
   * added break and continue
   * added range with one, two or three argument(s)
   * added slice (`list[i1:i2]`)

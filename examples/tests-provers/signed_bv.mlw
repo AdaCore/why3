@@ -1,0 +1,34 @@
+
+use mach.bv.BVCheck8
+
+let add (x y : t) : t
+  requires { sle (0:t) x }
+  requires { sle x (42:t) }
+  requires { sle (0:t) y }
+  requires { sle y (67:t) }
+=
+  s_add x y
+
+let sub (x y : t) : t
+  requires { sle (0:t) x }
+  requires { sle x (42:t) }
+  requires { sle (0:t) y }
+  requires { sle y (67:t) }
+=
+  s_sub x y
+
+let mul (x y : t) : t
+  requires { sle (neg (10:t)) x }
+  requires { sle x (10:t) }
+  requires { sle (neg (7:t)) y }
+  requires { sle y (7:t) }
+=
+  s_mul x y
+
+let div (x y : t) : t
+  requires { sle (0:t) x }
+  requires { sle x (42:t) }
+  requires { slt (0:t) y }
+  requires { sle y (67:t) }
+=
+  s_div x y
