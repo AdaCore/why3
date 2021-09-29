@@ -149,7 +149,7 @@ deploy:
     - docker pull "$CACHE" || true
     - docker pull "$IMAGE" || true
     - docker build --force-rm --cache-from="$CACHE" --target=builder -t "$CACHE" -f misc/Dockerfile.deploy .
-    - docker build --force-rm --cache-from="$IMAGE" --cache-from="$CACHE" -t "$IMAGE" -f misc/Dockerfile.deploy .
+    - docker build --force-rm --cache-from="$CACHE" --cache-from="$IMAGE" -t "$IMAGE" -f misc/Dockerfile.deploy .
     - test -n "$CI_COMMIT_TAG" || docker push "$CACHE"
     - docker push "$IMAGE"
     - docker rmi "$CACHE"
