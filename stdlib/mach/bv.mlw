@@ -87,7 +87,7 @@ module BVCheck_Gen
 
   (** unsigned subtraction with overflow check *)
   val u_sub (a b:t) : t
-    requires { [@expl:arithmetic overflow] to_uint a >= to_uint b \/ sge a b }
+    requires { [@expl:arithmetic overflow] to_uint a >= to_uint b \/ uge a b }
     ensures  { result = sub a b }
     ensures  { to_uint result = to_uint a - to_uint b }
 
@@ -191,30 +191,25 @@ module BVCheck_Gen
   use int.ComputerDivision as CD
 
   (** signed division requires the second argument to be non-zero, but also that
-      either the dividend is not min_int or the divisor is not -1 *)
+      either the dividend is not [min_int] or the divisor is not [-1] *)
   val s_div (a b:t) : t
     requires { [@expl:division by zero] b <> zeros  \/ to_int b <> 0 }
-    requires { [@expl:signed division overflow check] a <> min_sint \/ b <> minus_one}
+    requires { [@expl:signed division overflow check] (a <> min_sint \/ b <> minus_one)
+                \/ (to_int a <> to_int min_sint \/ to_int b <> -1)}
     ensures  { to_int result = CD.div (to_int a) (to_int b) }
     ensures  { result = sdiv a b }
 
-  (** unsigned remainder requires the second argument to be non-zero *)
+  (** signed remainder requires the second argument to be non-zero *)
   val s_rem (a b:t) : t
     requires { [@expl:remainder by zero] b <> zeros \/ to_int b <> 0 }
     ensures  { to_int result = CD.mod (to_int a) (to_int b) }
     ensures  { result = srem a b }
 
   (** comparison operators have no preconditions *)
-  val u_eq (a b:t) : bool
+  val us_eq (a b:t) : bool
     ensures { result <-> a = b }
 
-  val s_eq (a b:t) : bool
-    ensures { result <-> a = b }
-
-  val u_ne (a b:t) : bool
-    ensures { result <-> a <> b }
-
-  val s_ne (a b:t) : bool
+  val us_ne (a b:t) : bool
     ensures { result <-> a <> b }
 
   val u_le (a b:t) : bool
