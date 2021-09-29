@@ -65,9 +65,9 @@ let convert_limit (l: Call_provers.resource_limit) =
 
 let convert_unix_process (ps: Unix.process_status) =
   match ps with
-  | Unix.WEXITED _   -> String "WEXITED"
-  | Unix.WSIGNALED _ -> String "WSIGNALED"
-  | Unix.WSTOPPED _  -> String "WSTOPPED"
+  | Unix.WEXITED n   -> "WEXITED", n
+  | Unix.WSIGNALED n -> "WSIGNALED", n
+  | Unix.WSTOPPED n  -> "WSTOPPED", n
 
 let convert_model (m: Model_parser.model) =
   String (Pp.string_of
@@ -80,10 +80,12 @@ let convert_models (ml: Model_parser.model list) =
 (* TODO pr_model should have a different format *)
 let convert_proof_result (pr: prover_result) =
   let (a,s) = convert_prover_answer pr.pr_answer in
+  let (us,ua) = convert_unix_process pr.pr_status in
   Record
     ["pr_answer", String a;
      "pr_answer_arg", String s;
-     "pr_status", convert_unix_process pr.pr_status;
+     "pr_status", String us;
+     "pr_status_arg", Int ua;
      "pr_output", String pr.pr_output;
      "pr_time", Float pr.pr_time;
      "pr_steps", Int pr.pr_steps;
@@ -552,9 +554,9 @@ let parse_prover_answer a d =
 
 let parse_unix_process j arg =
   match j with
-  | "WEXITED" -> Unix.WEXITED arg (* TODO dummy value *)
-  | "WSIGNALED" -> Unix.WSIGNALED arg (* TODO dummy value *)
-  | "WSTOPPED" -> Unix.WSTOPPED arg (* TODO dummy value *)
+  | "WEXITED" -> Unix.WEXITED arg
+  | "WSIGNALED" -> Unix.WSIGNALED arg
+  | "WSTOPPED" -> Unix.WSTOPPED arg
   | _ -> Unix.WSIGNALED (-1) (* default, should never happen *)
 
 let parse_prover_result j =
@@ -803,6 +805,9 @@ let parse_notification constr j =
   | "Ident_notif_loc" ->
       let loc = parse_loc (get_field j "ident_loc") in
       Ident_notif_loc loc
+
+  | "Saving_needed" ->
+      Saving_needed (get_bool_field j "need_saving")
 
   | s -> raise (NotNotification ("<from parse_notification> " ^ s))
 
