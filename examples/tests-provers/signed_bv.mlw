@@ -7,7 +7,7 @@ let add (x y : t) : t
   requires { sle (0:t) y }
   requires { sle y (67:t) }
 =
-  sadd_check x y
+  s_add x y
 
 let sub (x y : t) : t
   requires { sle (0:t) x }
@@ -15,7 +15,7 @@ let sub (x y : t) : t
   requires { sle (0:t) y }
   requires { sle y (67:t) }
 =
-  ssub_check x y
+  s_sub x y
 
 let mul (x y : t) : t
   requires { sle (neg (10:t)) x }
@@ -23,7 +23,7 @@ let mul (x y : t) : t
   requires { sle (neg (7:t)) y }
   requires { sle y (7:t) }
 =
-  smul_check x y
+  s_mul x y
 
 let div (x y : t) : t
   requires { sle (0:t) x }
@@ -31,4 +31,4 @@ let div (x y : t) : t
   requires { slt (0:t) y }
   requires { sle y (67:t) }
 =
-  sdiv_check x y
+  s_div x y
