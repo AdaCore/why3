@@ -1481,6 +1481,8 @@ and exec_call ?(main_function=false) ?loc ?attrs ctx rs arg_pvs ity_result =
                                print_value v print_rs rs
                     in
                     search cstr.rs_cty.cty_args args
+                | _, [{v_desc= Vundefined}] ->
+                    incomplete "cannot project undefined by %a" print_rs rs
                 | _ -> kasprintf failwith "Cannot project values %a by %a"
                          Pp.(print_list comma print_value) arg_vs
                          print_rs rs )
