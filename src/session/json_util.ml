@@ -65,9 +65,9 @@ let convert_limit (l: Call_provers.resource_limit) =
 
 let convert_unix_process (ps: Unix.process_status) =
   match ps with
-  | Unix.WEXITED _   -> String "WEXITED"
-  | Unix.WSIGNALED _ -> String "WSIGNALED"
-  | Unix.WSTOPPED _  -> String "WSTOPPED"
+  | Unix.WEXITED n   -> "WEXITED", n
+  | Unix.WSIGNALED n -> "WSIGNALED", n
+  | Unix.WSTOPPED n  -> "WSTOPPED", n
 
 let convert_model (m: Model_parser.model) =
   String (Pp.string_of
@@ -80,10 +80,12 @@ let convert_models (ml: Model_parser.model list) =
 (* TODO pr_model should have a different format *)
 let convert_proof_result (pr: prover_result) =
   let (a,s) = convert_prover_answer pr.pr_answer in
+  let (us,ua) = convert_unix_process pr.pr_status in
   Record
     ["pr_answer", String a;
      "pr_answer_arg", String s;
-     "pr_status", convert_unix_process pr.pr_status;
+     "pr_status", String us;
+     "pr_status_arg", Int ua;
      "pr_output", String pr.pr_output;
      "pr_time", Float pr.pr_time;
      "pr_steps", Int pr.pr_steps;
@@ -127,56 +129,15 @@ let convert_update u =
        "limit", convert_limit l]
   )
 
-let convert_notification_constructor n =
-  match n with
-  | Reset_whole_tree             -> String "Reset_whole_tree"
-  | New_node _                   -> String "New_node"
-  | Node_change _                -> String "Node_change"
-  | Remove _                     -> String "Remove"
-  | Next_Unproven_Node_Id (_, _) -> String "Next_Unproven_Node_Id"
-  | Initialized _                -> String "Initialized"
-  | Saved                        -> String "Saved"
-  | Saving_needed _              -> String "Saving_needed"
-  | Message _                    -> String "Message"
-  | Dead _                       -> String "Dead"
-  | Task _                       -> String "Task"
-  | File_contents _              -> String "File_contents"
-  | Source_and_ce _              -> String "Source_and_ce"
-  | Ident_notif_loc _            -> String "Ident_notif_loc"
-
-let convert_node_type_string nt =
-  match nt with
+let convert_node_type nt =
+  String (match nt with
   | NRoot           -> "NRoot"
   | NFile           -> "NFile"
   | NTheory         -> "NTheory"
   | NTransformation -> "NTransformation"
   | NGoal           -> "NGoal"
   | NProofAttempt   -> "NProofAttempt"
-
-let convert_node_type nt =
-  String (convert_node_type_string nt)
-
-let convert_request_constructor (r: ide_request) =
-  match r with
-  | Command_req _             -> String "Command_req"
-  | Add_file_req _            -> String "Add_file_req"
-  | Save_file_req _           -> String "Save_file_req"
-  | Set_config_param _        -> String "Set_config_param"
-  | Set_prover_policy _       -> String "Set_prover_policy"
-  | Get_file_contents _       -> String "Get_file_contents"
-  | Get_task _                -> String "Get_task"
-  | Remove_subtree _          -> String "Remove_subtree"
-  | Copy_paste _              -> String "Copy_paste"
-  | Get_first_unproven_node _ -> String "Get_first_unproven_node"
-  | Find_ident_req _          -> String "Find_ident_req"
-  | Unfocus_req               -> String "Unfocus_req"
-  | Save_req                  -> String "Save_req"
-  | Check_need_saving_req     -> String "Check_need_saving_req"
-  | Reload_req                -> String "Reload_req"
-  | Exit_req                  -> String "Exit_req"
-  | Interrupt_req             -> String "Interrupt_req"
-  | Reset_proofs_req          -> String "Reset_proofs_req"
-  | Get_global_infos          -> String "Get_global_infos"
+  )
 
 let convert_loc (loc: Loc.position) : Json_base.json =
   let (file, line, col1, col2) = Loc.get loc in
@@ -211,71 +172,62 @@ let parse_strat j =
   | _ -> assert false
 
 let convert_request (r: ide_request): Json_base.json =
-  let cc = convert_request_constructor in
   Record (
   match r with
   | Command_req (nid, s) ->
-      ["ide_request", cc r;
+      ["ide_request", String "Command_req";
        "node_ID", Int nid;
        "command", String s]
   | Add_file_req f ->
-      ["ide_request", cc r;
+      ["ide_request", String "Add_file_req";
        "file", String f]
   | Save_file_req (f,_) ->
-      ["ide_request", cc r;
+      ["ide_request", String "Save_file_req";
        "file", String f]
   | Set_config_param(s,n) ->
-      ["ide_request", cc r;
+      ["ide_request", String "Set_config_param";
        "param", String s; "value", Int n]
   | Set_prover_policy(p,u) ->
-      ["ide_request", cc r] @
+      ["ide_request", String "Set_prover_policy"] @
         convert_prover_aux "" p @ convert_policy u
   | Get_task(n,b,loc) ->
-      ["ide_request", cc r;
+      ["ide_request", String "Get_task";
        "node_ID", Int n;
        "full_context", Bool b;
        "loc", Bool loc]
   | Get_file_contents s ->
-      ["ide_request", cc r;
+      ["ide_request", String "Get_file_contents";
        "file", String s]
   | Find_ident_req loc ->
-      ["ide_request", cc r;
+      ["ide_request", String "Find_ident_req";
        "loc", convert_loc loc]
   | Remove_subtree n ->
-      ["ide_request", cc r;
+      ["ide_request", String "Remove_subtree";
        "node_ID", Int n]
   | Copy_paste (from_id, to_id) ->
-      ["ide_request", cc r;
+      ["ide_request", String "Copy_paste";
        "node_ID1", Int from_id;
        "node_ID2", Int to_id]
   | Get_first_unproven_node (str, id) ->
-      ["ide_request", cc r;
+      ["ide_request", String "Get_first_unproven_node";
        "node_ID", Int id;
        "strat", convert_strat str]
-  | Check_need_saving_req
-  | Unfocus_req
-  | Save_req
-  | Reload_req
-  | Exit_req
-  | Interrupt_req
-  | Reset_proofs_req
+  | Check_need_saving_req ->
+      ["ide_request", String "Check_need_saving_req"]
+  | Unfocus_req ->
+      ["ide_request", String "Unfocus_req"]
+  | Save_req ->
+      ["ide_request", String "Save_req"]
+  | Reload_req ->
+      ["ide_request", String "Reload_req"]
+  | Exit_req ->
+      ["ide_request", String "Exit_req"]
+  | Interrupt_req ->
+      ["ide_request", String "Interrupt_req"]
+  | Reset_proofs_req ->
+      ["ide_request", String "Reset_proofs_req"]
   | Get_global_infos ->
-      ["ide_request", cc r])
-
-let convert_constructor_message (m: message_notification) =
-  match m with
-  | Proof_error _         -> String "Proof_error"
-  | Transf_error _        -> String "Transf_error"
-  | Strat_error _         -> String "Strat_error"
-  | Replay_Info _         -> String "Replay_Info"
-  | Query_Info _          -> String "Query_Info"
-  | Query_Error _         -> String "Query_Error"
-  | Information _         -> String "Information"
-  | Task_Monitor _        -> String "Task_Monitor"
-  | Parse_Or_Type_Error _ -> String "Parse_Or_Type_Error"
-  | Error _               -> String "Error"
-  | Open_File_Error _     -> String "Open_File_Error"
-  | File_Saved _          -> String "File_Saved"
+      ["ide_request", String "Get_global_infos"])
 
 (* Converted to a Json list for simplicity *)
 let convert_option_loc (loc: Loc.position option) : Json_base.json =
@@ -287,14 +239,13 @@ let convert_option_loc (loc: Loc.position option) : Json_base.json =
   List l
 
 let convert_message (m: message_notification) =
-  let cc = convert_constructor_message in
   Record (match m with
   | Proof_error (nid, s) ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Proof_error";
        "node_ID", Int nid;
        "error", String s]
   | Transf_error (is_fatal, nid, tr, arg, loc, s, doc) ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Transf_error";
        "is_fatal", Bool is_fatal;
        "node_ID", Int nid;
        "tr_name", String tr;
@@ -303,39 +254,39 @@ let convert_message (m: message_notification) =
        "error", String s;
        "doc", String doc]
   | Strat_error (nid, s) ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Strat_error";
        "node_ID", Int nid;
        "error", String s]
   | Replay_Info s ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Replay_Info";
        "replay_info", String s]
   | Query_Info (nid, s) ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Query_Info";
        "node_ID", Int nid;
        "qinfo", String s]
   | Query_Error (nid, s) ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Query_Error";
        "node_ID", Int nid;
        "qerror", String s]
   | Information s ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Information";
        "information", String s]
   | Task_Monitor (n, k, p) ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Task_Monitor";
        "monitor", List [Int n; Int k; Int p]]
   | Parse_Or_Type_Error (loc, rel_loc,s) ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Parse_Or_Type_Error";
        "loc", convert_loc loc;
        "rel_loc", convert_loc rel_loc;
        "error", String s]
   | Error s ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Error";
        "error", String s]
   | Open_File_Error s ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "Open_File_Error";
        "open_error", String s]
   | File_Saved s ->
-      ["mess_notif", cc m;
+      ["mess_notif", String "File_Saved";
        "information", String s])
 
 let convert_color (color: color) : Json_base.json =
@@ -405,63 +356,63 @@ let parse_opt_loc (j: json): Loc.position option =
   | _ -> None (* Ignore this case that should not happen *)
 
 let convert_notification (n: notification): json =
-  let cc = convert_notification_constructor in
   Record (
   match n with
-  | Reset_whole_tree -> ["notification", cc n]
+  | Reset_whole_tree ->
+      ["notification", String "Reset_whole_tree"]
   | New_node (nid, parent, node_type, name, detached) ->
-      ["notification", cc n;
+      ["notification", String "New_node";
        "node_ID", Int nid;
        "parent_ID", Int parent;
        "node_type", convert_node_type node_type;
        "name", String name;
        "detached", Bool detached]
   | Node_change (nid, update) ->
-      ["notification", cc n;
+      ["notification", String "Node_change";
        "node_ID", Int nid;
        "update", convert_update update]
   | Remove nid ->
-      ["notification", cc n;
+      ["notification", String "Remove";
        "node_ID", Int nid]
   | Next_Unproven_Node_Id (from_id, unproved_id) ->
-      ["notification", cc n;
+      ["notification", String "Next_Unproven_Node_Id";
        "node_ID1", Int from_id;
        "node_ID2", Int unproved_id]
   | Initialized infos ->
-      ["notification", cc n;
+      ["notification", String "Initialized";
        "infos", convert_infos infos]
   | Saved ->
-      ["notification", cc n]
+      ["notification", String "Saved"]
   | Saving_needed b ->
-      ["notification", cc n;
+      ["notification", String "Saving_needed";
        "need_saving", Bool b]
   | Message m ->
-      ["notification", cc n;
+      ["notification", String "Message";
        "message", convert_message m]
   | Dead s ->
-      ["notification", cc n;
+      ["notification", String "Dead";
        "message", String s]
   | Task (nid, s, list_loc, goal_loc, lang) ->
-      ["notification", cc n;
+      ["notification", String "Task";
        "node_ID", Int nid;
        "task", String s;
        "loc_list", convert_list_loc list_loc;
        "goal_loc", convert_option_loc goal_loc;
        "lang", String lang]
   | File_contents (f, s, f_format, read_only) ->
-      ["notification", cc n;
+      ["notification", String "File_contents";
        "file", String f;
        "content", String s;
        "file_format", String f_format;
        "read_only", Bool read_only]
   | Source_and_ce (s, list_loc, goal_loc, f_format) ->
-      ["notification", cc n;
+      ["notification", String "Source_and_ce";
        "content", String s;
        "loc_list", convert_list_loc list_loc;
        "goal_loc", convert_option_loc goal_loc;
        "file_format", String f_format]
   | Ident_notif_loc loc ->
-      ["notification", cc n;
+      ["notification", String "Ident_notif_loc";
        "ident_loc", convert_loc loc]
 )
 
@@ -565,7 +516,9 @@ let parse_request (constr: string) j =
     Reset_proofs_req
   | "Exit_req" ->
     Exit_req
-  | _ -> raise (NotRequest "")
+  | "Check_need_saving_req" -> Check_need_saving_req
+  | "Get_global_infos" -> Get_global_infos
+  | _ -> raise (NotRequest constr)
 
 let parse_request_json (j: json): ide_request =
   try
@@ -601,9 +554,9 @@ let parse_prover_answer a d =
 
 let parse_unix_process j arg =
   match j with
-  | "WEXITED" -> Unix.WEXITED arg (* TODO dummy value *)
-  | "WSIGNALED" -> Unix.WSIGNALED arg (* TODO dummy value *)
-  | "WSTOPPED" -> Unix.WSTOPPED arg (* TODO dummy value *)
+  | "WEXITED" -> Unix.WEXITED arg
+  | "WSIGNALED" -> Unix.WSIGNALED arg
+  | "WSTOPPED" -> Unix.WSTOPPED arg
   | _ -> Unix.WSIGNALED (-1) (* default, should never happen *)
 
 let parse_prover_result j =
@@ -852,6 +805,9 @@ let parse_notification constr j =
   | "Ident_notif_loc" ->
       let loc = parse_loc (get_field j "ident_loc") in
       Ident_notif_loc loc
+
+  | "Saving_needed" ->
+      Saving_needed (get_bool_field j "need_saving")
 
   | s -> raise (NotNotification ("<from parse_notification> " ^ s))
 

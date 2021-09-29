@@ -93,6 +93,7 @@ let get_list j =
 
 let get_float j =
   match j with
+  | Int n -> float_of_int n
   | Float f -> f
   | _ -> raise Not_found
 
