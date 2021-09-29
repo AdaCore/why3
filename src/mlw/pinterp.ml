@@ -1516,7 +1516,6 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs ctx cty arg_pvs ity_result =
      (postcondition does not hold with the values obtained
      from the counterexample)
    *)
-  let res = with_push_premises ctx.env.premises @@ fun () -> (
   let exn = Incomplete "Giant-step call without location" in
   let loc = Opt.get_exn exn loc in
   let ctx = match snapshot with
@@ -1524,6 +1523,7 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs ctx cty arg_pvs ity_result =
         let vsenv = snapshot_oldies oldies ctx.env.vsenv in
         {ctx with env= {ctx.env with vsenv}}
     | None -> ctx in
+  let res = with_push_premises ctx.env.premises @@ fun () -> (
   (* assert1 is already done above *)
   let vars_map = Mpv.of_list (List.combine cty.cty_args arg_pvs) in
   let asgn_wrt =
