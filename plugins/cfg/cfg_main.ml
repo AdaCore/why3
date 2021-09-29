@@ -22,21 +22,11 @@ let unit_type = PTtuple []
 let mk_id ~loc name =
   { id_str = name; id_ats = []; id_loc = loc }
 
-let mk_term ~loc d =
-  { term_desc = d; term_loc = loc }
-
-let term_true ~loc = mk_term ~loc Ttrue
-
-let term_false ~loc = mk_term ~loc Tfalse
-
 let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }
 
 let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
-
-let mk_assert ~loc t =
-  mk_expr ~loc (Eassert(Expr.Assert,t))
 
 let mk_check ~loc t =
   mk_expr ~loc (Eassert(Expr.Check,t))
@@ -66,7 +56,7 @@ let empty_spec = {
 
 
 let pp_id fmt id =
-  Format.fprintf fmt "%s" id.id_str
+  Format.pp_print_string fmt id.id_str
 
 let rec pp_qid fmt qid =
   match qid with
@@ -80,7 +70,7 @@ let rec pp_pty fmt t =
        pp_qid qid
        (Pp.print_list Pp.semi pp_pty) l
   | _ ->
-     Format.fprintf fmt "<unknown pp_pty>"
+     Format.pp_print_string fmt "<unknown pp_pty>"
 
 let divergent_attr = ATstr (Ident.create_attribute "vc:divergent")
 

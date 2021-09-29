@@ -71,11 +71,6 @@ type classification = verdict * Log.exec_log
 let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
     fmt (model, (c, log)) =
   let open Json_base in
-  let print_model_field =
-    print_json_field "model"
-      (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int) in
-  let print_log_field =
-    print_json_field "log" (Log.print_log ?verb_lvl ~json:true) in
   match json with
   | None | Some `Values -> (
       match c with
@@ -91,10 +86,9 @@ let print_classification_log_or_model ?verb_lvl ?json ~print_attrs
   | Some `All -> (
       match c with
       | NC | SW | NC_SW ->
-          fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-            print_model_field model print_log_field log
+          print_json fmt (Record ["model", json_model model; "log", Log.json_log log])
       | INCOMPLETE _ ->
-          fprintf fmt "@[@[<hv1>{%a@]}@]" print_model_field model
+          print_json fmt (Record ["model", json_model model])
       | BAD_CE _ -> ()
     )
 
@@ -104,10 +98,16 @@ type rac_result_state =
   | Res_stuck of string
   | Res_incomplete of string
 
+let string_of_rac_result_state = function
+  | Res_normal -> "NORMAL"
+  | Res_fail _ -> "FAILURE"
+  | Res_stuck _ -> "STUCK"
+  | Res_incomplete _ -> "INCOMPLETE"
+
 type rac_result = rac_result_state * Log.exec_log
 
 let print_rac_result_state fmt = function
-  | Res_normal -> fprintf fmt "NORMAL"
+  | Res_normal -> pp_print_string fmt "NORMAL"
   | Res_fail (ctx, t) ->
       fprintf fmt "FAILURE (%a at %a)"
         Vc.print_expl ctx.attr
@@ -188,7 +188,7 @@ let print_model_classification ?verb_lvl ?json ?check_ce fmt (m, c) =
        | NC | SW | NC_SW ->
            fprintf fmt ",@ for@ example@ during@ the@ following@ execution:"
        | INCOMPLETE _ ->
-           fprintf fmt ":"
+           pp_print_string fmt ":"
        | _ -> ());
   let print_attrs = Debug.test_flag Call_provers.debug_attrs in
   fprintf fmt "@ %a"
@@ -214,11 +214,11 @@ let get_or_stuck loc env ity desc = function
       stuck ?loc cntr_ctx "%s" desc
 
 let import_model_const loc env ity = function
-  | Integer s ->
+  | Integer {int_value= v} | Bitvector {bv_value= v} ->
       if ity_equal ity ity_int then
-        int_value s.int_value
+        int_value v
       else if is_range_ty (ty_of_ity ity) then
-        get_or_stuck loc env ity "range" (range_value ity s.int_value)
+        get_or_stuck loc env ity "range" (range_value ity v)
       else
         cannot_import "type %a instead of int or range type" print_ity ity
   | String s ->
@@ -227,7 +227,7 @@ let import_model_const loc env ity = function
   | Boolean b ->
       ity_equal_check ity ity_bool;
       bool_value b
-  | Decimal _ | Fraction _ | Float _ | Bitvector _ as v ->
+  | Decimal _ | Fraction _ | Float _ as v ->
       cannot_import "not implemented for value %a" print_model_const_human v
 
 (** Import a value from the prover model to an interpreter value.
@@ -243,7 +243,7 @@ let rec import_model_value loc env check known th_known ity v =
   let def = Pdecl.find_its_defn known ts in
   let res = match v with
       | Const c -> import_model_const loc env ity c
-      | Var _ -> undefined_value ity
+      | Var _ -> undefined_value env ity
       | Record r ->
           let rs = match def.Pdecl.itd_constructors with [rs] -> rs | _ ->
             cannot_import "type with not exactly one constructors" in
@@ -253,8 +253,8 @@ let rec import_model_value loc env check known th_known ity v =
             match List.assoc field_name r with
             | v -> import_model_value loc env check known th_known field_ity v
             | exception Not_found ->
-                (* TODO Better create a default value? Requires an [Env.env]. *)
-                undefined_value field_ity in
+                (* TODO Better create a default value? *)
+                undefined_value env field_ity in
           let vs = List.map aux def.Pdecl.itd_fields in
           constr_value ity rs def.Pdecl.itd_fields vs
       | Apply (s, vs) ->
@@ -308,18 +308,23 @@ let rec import_model_value loc env check known th_known ity v =
               a.arr_others in
           purefun_value ~result_ity:ity ~arg_ity:key_ity mv v0
       | Unparsed s -> cannot_import "unparsed value %s" s
-      | Undefined -> undefined_value ity in
+      | Undefined -> undefined_value env ity in
   check ity res;
   res
 
-let oracle_of_model pm model : oracle =
-  fun ?loc env check id ity ->
-  match search_model_element_for_id model ?loc id with
-  | me ->
-      let loc = if loc <> None then loc else id.id_loc in
-      Some (import_model_value loc env check pm.Pmodule.mod_known
-              pm.Pmodule.mod_theory.Theory.th_known ity me.me_value)
-  | exception Not_found -> None
+let oracle_of_model pm model =
+  let import check oid loc env ity me =
+    let loc = if loc <> None then loc else
+        match oid with Some id -> id.id_loc | None -> None in
+    import_model_value loc env check pm.Pmodule.mod_known
+      pm.Pmodule.mod_theory.Theory.th_known ity me.me_value in
+  let for_variable ?(check=fun _ _ -> ()) ?loc env id ity =
+    Opt.map (import check (Some id) loc env ity)
+      (search_model_element_for_id model ?loc id) in
+  let for_result ?(check=fun _ _ -> ()) env loc ity =
+    Opt.map (import check None (Some loc) env ity)
+      (search_model_element_call_result model loc) in
+  { for_variable; for_result }
 
 (** Check and select solver counterexample models *)
 
@@ -670,8 +675,8 @@ let model_of_exec_log ~original_model log =
     let name = asprintf "%a" print_decoded id.id_string in
     let men_name = get_model_trace_string ~name ~attrs:id.id_attrs in
     let men_kind = match search_model_element_for_id original_model id with
-      | me -> me.me_name.men_kind
-      | exception Not_found -> Other in
+      | Some me -> me.me_name.men_kind
+      | None -> Other in
     let me_name = { men_name; men_kind; men_attrs= id.id_attrs } in
     let me_value = model_value value in
     {me_name; me_value; me_location= Some loc; me_term= None} in

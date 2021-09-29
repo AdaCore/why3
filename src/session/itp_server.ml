@@ -147,7 +147,7 @@ let p s id =
 
 let print_opt_type ~print_type fmt t =
   match t with
-  | None -> Format.fprintf fmt "bool"
+  | None -> Format.pp_print_string fmt "bool"
   | Some t -> print_type fmt t
 
 (* Exception reporting *)
@@ -171,7 +171,7 @@ let bypass_pretty s id =
   | Ty.UnboundTypeVar tv ->
       fprintf fmt "Unbound type variable: %a" P.print_tv tv
   | Ty.UnexpectedProp ->
-      fprintf fmt "Unexpected propositional type"
+      pp_print_string fmt "Unexpected propositional type"
   | Term.BadArity ({Term.ls_args = []} as ls, _) ->
       fprintf fmt "%s %a expects no arguments"
         (if ls.Term.ls_value = None then "Predicate" else "Function") P.print_ls ls
@@ -181,7 +181,7 @@ let bypass_pretty s id =
         (if ls.Term.ls_value = None then "Predicate" else "Function")
         P.print_ls ls i (if i = 1 then "" else "s") app_arg
   | Term.EmptyCase ->
-      fprintf fmt "Empty match expression"
+      pp_print_string fmt "Empty match expression"
   | Term.DuplicateVar vs ->
       fprintf fmt "Variable %a is used twice" P.print_vsty vs
   | Term.UncoveredVar vs ->
@@ -237,7 +237,7 @@ let bypass_pretty s id =
   | Decl.ClashIdent id ->
       fprintf fmt "Ident %s is defined twice" id.Ident.id_string
   | Decl.EmptyDecl ->
-      fprintf fmt "Empty declaration"
+      pp_print_string fmt "Empty declaration"
   | Decl.EmptyAlgDecl ts ->
       fprintf fmt "Algebraic type %a has no constructors" P.print_ts ts
   | Decl.EmptyIndDecl ls ->
@@ -301,7 +301,7 @@ let get_exception_message ses id e =
   | Generic_arg_trans_utils.Arg_trans_missing (s, svs) ->
       Pp.sprintf "Error in transformation function:\n%s %a\n" s
         (* The arguments should appear on one line (no @) *)
-        (Pp.print_list (fun fmt () -> fprintf fmt ", ") P.print_vs)
+        (Pp.print_list (fun fmt () -> pp_print_string fmt ", ") P.print_vs)
         (Term.Svs.elements svs),
       Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
@@ -323,11 +323,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Parsing error: %a" Exn_printer.exn_printer e, loc, arg
   | Trans.Unnecessary_arguments l ->
       Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
-        (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l, Loc.dummy_position, ""
+        (Pp.print_list Pp.newline pp_print_string) l, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Unnecessary_terms l ->
       Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
-        (Pp.print_list Pp.newline
-           (fun fmt s -> Format.fprintf fmt "%a" P.print_term s)) l, Loc.dummy_position, ""
+        (Pp.print_list Pp.newline P.print_term) l, Loc.dummy_position, ""
   | Args_wrapper.Arg_expected_none s ->
       Pp.sprintf "An argument was expected of type %s, none were given" s, Loc.dummy_position, ""
   | e ->
@@ -1205,7 +1204,7 @@ match pa.proof_state with
     | None -> P.notify (Message (Error "Please select a node id"))
     | Some any ->
         let unproven_goals = unproven_goals_below_id d.cont any in
-        List.iter (fun id -> C.schedule_proof_attempt ?save_to:None d.cont id
+        List.iter (fun id -> C.schedule_proof_attempt d.cont id
             prover ~limit ~callback ~notification:(notify_change_proved d.cont))
           unproven_goals
 

@@ -108,7 +108,7 @@ let handler (addr,req) script cont fmt =
        Wserver.http_header fmt "HTTP/1.0 200 OK";
        fprintf fmt "Access-Control-Allow-Origin: *\n";
        fprintf fmt "\n"; (* end of header *)
-       fprintf fmt "%s" ans;
+       pp_print_string fmt ans;
        fprintf fmt "@."
 
 let help () =

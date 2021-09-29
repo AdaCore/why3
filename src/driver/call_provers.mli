@@ -9,9 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Model_parser
-
 (** {1 Call provers and parse their outputs} *)
+
+open Model_parser
 
 (** {2 data types for prover answers} *)
 
@@ -56,6 +56,8 @@ val print_prover_result : ?json:bool -> Format.formatter -> prover_result -> uni
 (** Pretty-print a prover_result. The answer and the time are output. The output of the
    prover is printed if and only if the answer is a [HighFailure]. *)
 
+val json_prover_result : prover_result -> Json_base.json
+
 val debug : Debug.flag
 (** debug flag for the calling procedure (option "--debug call_prover")
     If set [call_on_buffer] prints on stderr the commandline called
@@ -89,13 +91,13 @@ type prover_result_parser = {
     the first field are substituted in the second field (\0,\1,...).
     The regexps are tested in the order of the list.
 
-    @param timeregexps : a list of regular expressions with special
+    @param timeregexps a list of regular expressions with special
     markers '%h','%m','%s','%i' (for milliseconds), constructed with
     [timeregexp] function, and used to extract the time usage from
     the prover's output. If the list is empty, wallclock is used.
     The regexps are tested in the order of the list.
 
-    @param exitcodes : if the first field is the exit code, then
+    @param exitcodes if the first field is the exit code, then
     the second field is the answer. Exit codes are tested in the order
     of the list and before the regexps.
 *)
@@ -143,23 +145,23 @@ val call_on_buffer :
   gen_new_file    : bool ->
   ?inplace        : bool ->
   Buffer.t -> prover_call
-(** Build a prover call on the task already printed in the {!type: Buffer.t} given.
+(** Build a prover call on the task already printed in the [Buffer.t] given.
 
-    @param limit : set the available time limit (def. 0 : unlimited), memory
+    @param limit set the available time limit (def. 0 : unlimited), memory
     limit (def. 0 : unlimited) and step limit (def. -1 : unlimited)
 
-    @param res_parser : prover result parser
+    @param res_parser prover result parser
 
-    @param filename : the suffix of the proof task's file, if the prover
+    @param filename the suffix of the proof task's file, if the prover
     doesn't accept stdin.
 
-    @param inplace : it is used to make a save of the file on which the
+    @param inplace it is used to make a save of the file on which the
     prover was called. It is renamed as %f.save if inplace=true and the command
     [actualcommand] fails
 
-    @param maybe_ce_model : function to validate the model for counter-examples
+    @param maybe_ce_model function to validate the model for counter-examples
 
-    @param gen_new_file: When set, this generates a new temp file to run the
+    @param gen_new_file When set, this generates a new temp file to run the
     prover on. Otherwise it reuses the filename already given.
 
 *)

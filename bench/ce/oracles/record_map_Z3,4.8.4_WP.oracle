@@ -28,7 +28,8 @@ File record_map.mlw:
                  "value": {"type": "Integer", "val": "1"}},
                 {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
   Line 44:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "1"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "1"}
 
 File "bench/ce/record_map.mlw", line 47, characters 12-22:
 Sub-goal Postcondition of goal record_map_proj_test2'vc.
@@ -57,7 +58,8 @@ File record_map.mlw:
               "val": [{"others": {"type": "Integer", "val": "1"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 49:
-    result'unused'unused [@introduced] = {"type": "Integer", "val": "1"}
+    result [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "1"}
 
 File "bench/ce/record_map.mlw", line 54, characters 12-31:
 Sub-goal Postcondition of goal record_map_proj_test3'vc.
@@ -105,7 +107,7 @@ File record_map.mlw:
               "val": [{"others": {"type": "Integer", "val": "0"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 56:
-    result'unused'unused [@introduced] =
+    result [@introduced] [@model_trace:result] =
       {"type": "Record",
        "val":
         {"Field":

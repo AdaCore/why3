@@ -207,6 +207,28 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
   | Mlmpfr_wrapper.Not_Implemented ->
       incomplete "mlmpfr wrapper is not implemented"
 
+let io_print_newline _ _ =
+  print_newline ();
+  Some unit_value
+
+let io_print_int _ = function
+  | [{ v_desc = Vnum n }] ->
+      print_string (BigInt.to_string n);
+      Some unit_value
+  | _ -> assert false
+
+let io_print_string _ = function
+  | [{ v_desc = Vstring s }] ->
+      print_string s;
+      Some unit_value
+  | _ -> assert false
+
+let debug_print _ = function
+  | [v] ->
+      Format.eprintf "%a\n@?" print_value v;
+      Some unit_value
+  | _ -> assert false
+
 let builtin_progs = Hrs.create 17
 
 type builtin = Builtin_module of {
@@ -280,6 +302,9 @@ let built_in_modules () =
       "True",          (fun _ _ -> Some (bool_value true));
       "False",         (fun _ _ -> Some (bool_value false));
     ];
+    builtin ["debug"] "Debug" [
+        "print", debug_print
+      ];
     builtin ["int"] "Int" int_ops;
     builtin ["int"] "MinMax" [
       "min",           eval_int_op BigInt.min;
@@ -300,6 +325,11 @@ let built_in_modules () =
       "RTN",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Toward_Minus_Infinity)));
       "RTZ",           (fun _ _ -> Some (value (ty_app ts []) (Vfloat_mode Toward_Zero)));
     ]);
+    builtin ["io"] "StdIO" [
+        "print_int", io_print_int;
+        "print_newline", io_print_newline;
+        "print_string", io_print_string;
+      ];
     builtin ["real"] "Real" [
       op_infix "=",    eval_real Mode_relr Big_real.eq;
       op_infix "<",    eval_real Mode_relr Big_real.lt;
@@ -582,7 +612,8 @@ let try_eval_ensures ctx posts =
   let is_ensures_result = function
     | {t_node= Teps tb} -> let vs, t = t_open_bound tb in loop vs t
     | _ -> None in
-  try Some (Lists.first is_ensures_result posts) with Not_found -> None
+  try Some (Lists.first is_ensures_result posts)
+  with Not_found | Incomplete _ -> None
 
 (******************************************************************************)
 (*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
@@ -604,8 +635,16 @@ let gen_model_variable ?check ctx ?loc id ity : value_gen =
   "value from model", fun () ->
     Opt.apply () check id;
     try
-      ctx.oracle ?loc ctx.env (check_assume_type_invs ctx.rac ?loc ctx.env) id ity
+      let check = check_assume_type_invs ctx.rac ?loc ctx.env in
+      ctx.oracle.for_variable ?loc ~check ctx.env id ity
     with Stuck _ when is_ignore_id id -> None
+
+(** Generate a value by querying the model for a result *)
+let gen_model_result ctx loc ity : value_gen =
+  "value from model", fun () ->
+    let res = ctx.oracle.for_result ctx.env loc ity in
+    Opt.iter (check_assume_type_invs ctx.rac ~loc ctx.env ity) res;
+    res
 
 (** Generator for a default value *)
 let gen_default def : value_gen =
@@ -614,7 +653,7 @@ let gen_default def : value_gen =
 (** Generate a value by computing the postcondition *)
 let gen_from_post env posts : value_gen =
   "value computed from postcondition", fun () ->
-    Opt.bind posts (try_eval_ensures env)
+    try_eval_ensures env posts
 
 (** Generator for the type default value, when [posts] are not none or [really]
     is true. *)
@@ -649,6 +688,8 @@ let gen_eval_expr cnf exec_expr id oexp =
     if no value is generated. *)
 let get_value' ctx_desc oloc gens =
   let desc, value = try get_value gens with Not_found ->
+    Debug.dprintf debug_rac_values "@[<h>No value for %s at %a@]@." ctx_desc
+      (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc;
     incomplete "missing value for %s" ctx_desc
       (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc in
   Debug.dprintf debug_rac_values "@[<h>%s for %s at %a: %a@]@."
@@ -656,7 +697,7 @@ let get_value' ctx_desc oloc gens =
     (Pp.print_option_or_default "NO LOC" Pretty.print_loc') oloc print_value value;
   value
 
-let get_and_register_value ctx ?def ?loc ?posts id ity =
+let get_and_register_variable ctx ?def ?loc id ity =
   let ctx_desc = asprintf "variable `%a`%t" print_decoded id.id_string
       (fun fmt -> match loc with
          | Some loc -> fprintf fmt " at %a" Pretty.print_loc' loc
@@ -664,12 +705,25 @@ let get_and_register_value ctx ?def ?loc ?posts id ity =
   let oloc = if loc <> None then loc else id.id_loc in
   let gens = [
     gen_model_variable ctx ?loc id ity;
-    gen_from_post ctx posts;
     gen_default def;
-    gen_type_default ~really:(is_ignore_id id) ?posts ctx ity;
+    gen_type_default ~really:(is_ignore_id id) ctx ity;
   ] in
   let value = get_value' ctx_desc oloc gens in
   register_used_value ctx.env oloc id value;
+  value
+
+let get_and_register_result ?def ?rs ctx posts loc ity =
+  let ctx_desc = asprintf "return value of call%t at %a"
+      (fun fmt -> Opt.iter (fprintf fmt " to %a" print_rs) rs)
+      Pretty.print_loc' loc in
+  let gens = [
+    gen_model_result ctx loc ity;
+    gen_default def;
+    gen_from_post ctx posts;
+    gen_type_default ~really:true ~posts ctx ity;
+  ] in
+  let value = get_value' ctx_desc (Some loc) gens in
+  register_res_value ctx.env loc rs value;
   value
 
 let get_and_register_param ctx id ity =
@@ -728,7 +782,7 @@ let assign_written_vars ?(vars_map=Mpv.empty) wrt loc ctx vs =
       pp_indent print_pv pv
       (Pp.print_option print_loc') pv.pv_vs.vs_name.id_loc;
     let pv = Mpv.find_def pv pv vars_map in
-    let value = get_and_register_value ctx ~loc pv.pv_vs.vs_name pv.pv_ity in
+    let value = get_and_register_variable ctx ~loc pv.pv_vs.vs_name pv.pv_ity in
     set_constr (get_vs ctx.env vs) value )
 
 (******************************************************************************)
@@ -933,8 +987,8 @@ and exec_expr' ctx e =
          if ctx.do_rac then
            exec_call_abstract ?loc:e.e_loc ~attrs:e.e_attrs
              ~snapshot:cty.cty_oldies ctx cty [] e.e_ity
-         else (* We must check postconditions for abstract exec *)
-           incomplete "cannot evaluate any-value with RAC disabled"
+         else
+           Normal (undefined_value ctx.env e.e_ity)
       | Capp (rs, pvsl) when
           Opt.map is_prog_constant (Mid.find_opt rs.rs_name ctx.env.pmodule.Pmodule.mod_known)
           = Some true ->
@@ -1110,7 +1164,7 @@ and exec_expr' ctx e =
           bind_vs i a;
           assert1 {I};
           assign_written_vars_with_ce;
-          let i = get_and_register_value ~def:(b+1) i in
+          let i = get_and_register_variable ~def:(b+1) i in
           if not (a <= i <= b + 1) then abort1;
           if a <= i <= b then begin
             assert2* { I };
@@ -1150,7 +1204,7 @@ and exec_expr' ctx e =
           List.iter (assign_written_vars e.e_effect.eff_writes loc_or_dummy ctx)
             (Mvs.keys ctx.env.vsenv);
           let def = int_value (suc b) in
-          let i_val = get_and_register_value ctx ~def i.pv_vs.vs_name i.pv_ity in
+          let i_val = get_and_register_variable ctx ~def i.pv_vs.vs_name i.pv_ity in
           let ctx = {ctx with env= bind_vs i.pv_vs i_val ctx.env} in
           let i_bi = big_int_of_value i_val in
           if not (le a i_bi && le i_bi (suc b)) then begin
@@ -1471,15 +1525,11 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs ctx cty arg_pvs ity_result =
         {ctx with env= {ctx.env with vsenv}}
     | None -> ctx in
   (* assert1 is already done above *)
-  let res = match cty.cty_post with
-    | p :: _ -> let (vs,_) = open_post p in vs.vs_name
-    | _ -> id_register (id_fresh "result") in
   let vars_map = Mpv.of_list (List.combine cty.cty_args arg_pvs) in
   let asgn_wrt =
     assign_written_vars ~vars_map cty.cty_effect.eff_writes loc ctx in
   List.iter asgn_wrt (Mvs.keys ctx.env.vsenv);
-  let res_v =
-    get_and_register_value ctx ~loc ~posts:cty.cty_post res ity_result in
+  let res_v = get_and_register_result ?rs ctx cty.cty_post loc ity_result in
   (* assert2 *)
   let desc = match rs with
     | None -> "of anonymous function"

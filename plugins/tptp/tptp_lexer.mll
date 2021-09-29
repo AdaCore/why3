@@ -26,7 +26,7 @@
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalLexeme s -> fprintf fmt "illegal lexeme %s" s
-    | UnterminatedComment -> fprintf fmt "unterminated comment"
+    | UnterminatedComment -> pp_print_string fmt "unterminated comment"
     | UnknownDDW s -> fprintf fmt "unknown system_word %s" s
     | UnknownDW s -> fprintf fmt "unknown defined_word %s" s
     | _ -> raise e)

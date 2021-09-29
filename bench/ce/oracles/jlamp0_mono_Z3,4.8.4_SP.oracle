@@ -1,0 +1,428 @@
+Strongest Postcondition
+File "bench/ce/jlamp0_mono.mlw", line 9, characters 25-31:
+Sub-goal Postcondition of goal infix :='vc.
+Prover result is: Valid.
+
+File "bench/ce/jlamp0_mono.mlw", line 17, characters 13-26:
+Sub-goal Assertion of goal p1'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0_mono.mlw:
+  Line 7:
+    b [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
+  Line 9:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "16"}}]}}
+  Line 11:
+    a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 13:
+    b [@introduced] [@model_trace:b] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
+  Line 16:
+    a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "16"}}]}}
+  Line 17:
+    a [@field:0:contents] [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "16"}}]}}
+
+File "bench/ce/jlamp0_mono.mlw", line 15, characters 15-29:
+Sub-goal Postcondition of goal p1'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0_mono.mlw:
+  Line 7:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 9:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 11:
+    a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 13:
+    b [@introduced] [@model_trace:b] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 15:
+    a [@field:0:contents] [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 16:
+    a [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 18:
+    a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+
+File "bench/ce/jlamp0_mono.mlw", line 27, characters 18-31:
+Sub-goal Loop invariant init of goal p2'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0_mono.mlw:
+  Line 9:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 11:
+    a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 25:
+    c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 27:
+    c [@field:0:contents] [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+
+File "bench/ce/jlamp0_mono.mlw", line 28, characters 18-31:
+Sub-goal Loop invariant init of goal p2'vc.
+Prover result is: Valid.
+
+File "bench/ce/jlamp0_mono.mlw", line 29, characters 16-18:
+Sub-goal Loop variant decrease of goal p2'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0_mono.mlw:
+  Line 7:
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 9:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+  Line 11:
+    a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 20:
+    c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 25:
+    c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 26:
+    [before iteration] a [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157] [@model_trace:a]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    [before iteration] c [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157] [@model_trace:c]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 28:
+    [current iteration] a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 29:
+    [current iteration] c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157] [@model_trace:c]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 30:
+    [current iteration] a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "5"}}]}}
+  Line 31:
+    [current iteration] c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+
+File "bench/ce/jlamp0_mono.mlw", line 27, characters 18-31:
+Sub-goal Loop invariant preservation of goal p2'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0_mono.mlw:
+  Line 7:
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 9:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+  Line 11:
+    a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 20:
+    c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 25:
+    c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 26:
+    [before iteration] a [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157] [@model_trace:a]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    [before iteration] c [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157] [@model_trace:c]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 27:
+    [current iteration] c [@field:0:contents] [@introduced]
+      [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+  Line 28:
+    [current iteration] a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 30:
+    [current iteration] a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "13"}}]}}
+  Line 31:
+    [current iteration] c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
+
+File "bench/ce/jlamp0_mono.mlw", line 28, characters 18-31:
+Sub-goal Loop invariant preservation of goal p2'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0_mono.mlw:
+  Line 7:
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 9:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+  Line 11:
+    a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 20:
+    c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 25:
+    c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 26:
+    [before iteration] a [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157] [@model_trace:a]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "9"}}]}}
+    [before iteration] c [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157] [@model_trace:c]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 28:
+    [current iteration] a [@field:0:contents] [@introduced]
+      [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+  Line 30:
+    [current iteration] a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+  Line 31:
+    [current iteration] c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
+
+File "bench/ce/jlamp0_mono.mlw", line 24, characters 15-28:
+Sub-goal Postcondition of goal p2'vc.
+Prover result is: Unknown (sat)
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File jlamp0_mono.mlw:
+  Line 7:
+    c [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+  Line 9:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 11:
+    a [@introduced] [@model_trace:a] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+  Line 20:
+    c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+  Line 24:
+    a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0_mono.mlw:26:4:157]
+      [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+  Line 25:
+    c [@introduced] [@model_trace:c] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+  Line 26:
+    a [@introduced] [@loop:bench/ce/jlamp0_mono.mlw:26:4:157]
+      [@model_trace:a] [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    c [@introduced] [@loop:bench/ce/jlamp0_mono.mlw:26:4:157]
+      [@model_trace:c] [@vc:written:26:4:157:bench/ce/jlamp0_mono.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "11"}}]}}
+

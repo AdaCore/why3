@@ -147,14 +147,15 @@ and trigger = term list list
 (** {2 Generic term equality} *)
 
 (**   flags enable comparison of the respective feature:
-  - [trigger]: triggers in qauntified terms
+  - [trigger]: triggers in quantified terms
   - [attr]: attributes
   - [loc]: source locations
-  - [const]: when false constants of the same mathematical
-  value are considered equal
+  - [const]: when false, mathematically equal constants are considered equal,
+    even if written differently
 *)
 
-val t_hash_generic : trigger:bool -> attr:bool -> term -> int
+val t_hash_generic :
+  trigger:bool -> attr:bool -> const:bool -> term -> int
 val t_compare_generic :
   trigger:bool -> attr:bool -> loc:bool -> const:bool
                -> term -> term -> int
@@ -182,7 +183,7 @@ module Mterm_strict : Extmap.S with type key = term
 module Sterm_strict : Extset.S with type M.key = term
 module Hterm_strict : Exthtbl.S with type key = term
 
-(** {2 Term equality modulo alpha-equivalence, attributes, triggers, and locations} *)
+(** {2 Term equality modulo alpha-equivalence, attributes, triggers, locations, and constant syntax} *)
 
 val t_equal : term -> term -> bool
 val t_compare : term -> term -> int
@@ -539,7 +540,7 @@ val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
     the same renaming is simultaneously applied to the variables of
     the substitution [mv] (both domain and codomain).
     Example: [t_subst_types {'a -> int} {x:'a -> t:'a} (f x)]
-       returns ({z:int -> t:int},(f z))   *)
+       returns [({z:int -> t:int},(f z))]   *)
 
 (** {2 Find free variables and type variables} *)
 

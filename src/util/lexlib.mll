@@ -17,9 +17,9 @@
   exception UnterminatedString
 
   let () = Exn_printer.register (fun fmt e -> match e with
-    | IllegalEscape -> Format.fprintf fmt "illegal escape"
-    | IllegalCharInString -> Format.fprintf fmt "illegal character in string"
-    | UnterminatedString -> Format.fprintf fmt "unterminated string"
+    | IllegalEscape -> Format.pp_print_string fmt "illegal escape"
+    | IllegalCharInString -> Format.pp_print_string fmt "illegal character in string"
+    | UnterminatedString -> Format.pp_print_string fmt "unterminated string"
     | _ -> raise e)
 
   let loc lb = Loc.extract (lb.lex_start_p,lb.lex_curr_p)
@@ -103,7 +103,7 @@ and string_skip_spaces buf = parse
   exception IllegalCharacter of string
 
   let () = Exn_printer.register (fun fmt e -> match e with
-    | UnterminatedComment -> Format.fprintf fmt "unterminated comment"
+    | UnterminatedComment -> Format.pp_print_string fmt "unterminated comment"
     | IllegalCharacter s -> Format.fprintf fmt "illegal character %s" s
     | _ -> raise e)
 

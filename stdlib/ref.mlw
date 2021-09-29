@@ -2,13 +2,13 @@
 (** {1 References}
 
    A mutable variable, or "reference" in ML terminology, is simply a
-   record with a single mutable field [contents].
+   record with a single mutable field `contents`.
 *)
 
 (** {2 Generic references}
 
-   Creation, access, and assignment are provided as [ref], prefix [!], and
-   infix [:=], respectively.
+   Creation, access, and assignment are provided as `ref`, prefix `!`, and
+   infix `:=`, respectively.
 *)
 
 module Ref
@@ -23,7 +23,7 @@ end
 
 (** {2 Integer References}
 
-a few operations specific to integer references *)
+A few operations specific to integer references. *)
 
 module Refint
 

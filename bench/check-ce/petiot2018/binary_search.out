@@ -1,0 +1,679 @@
+* Experiment binary_search
+** Original
+File "bench/check-ce/petiot2018/binary_search.mlw", line 12, characters 19-44:
+Sub-goal Loop invariant init of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 13, characters 45-54:
+Sub-goal Loop invariant init of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant init of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 16, characters 12-31:
+Sub-goal Precondition of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 17, characters 7-11:
+Sub-goal Index in array bounds of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 15, characters 14-21:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 12, characters 19-44:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 13, characters 45-54:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 15, characters 14-21:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 12, characters 19-44:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 13, characters 45-54:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 6, characters 15-43:
+Sub-goal Postcondition of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 7, characters 45-54:
+Sub-goal Postcondition of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/binary_search.mlw", line 8, characters 50-58:
+Sub-goal Postcondition of goal binary_search'vc.
+Prover result is: Valid.
+
+** binary_search-B1
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B1.mlw --apply-transform=split_vc --prover=CVC4,1.7,counterexamples --timelimit=15 --check-ce --rac-prover=CVC4,1.7 --sub-goal=:15@loop variant decrease --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/binary_search-B1.mlw", line 15, characters 10-23:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Step limit exceeded.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File binary_search-B1.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 2; elts= [|; _ -> 0|]}
+      x = (-1)
+      zero = 0
+      one = 1
+  Line 9:
+    Normal execution of function `int_ref` with args:
+      i = (-1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-1)
+File binary_search-B1.mlw:
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 2; elts= [|; _ -> 0|]}
+    Normal execution of function `(-)` with args:
+      x = 2
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 2
+      _ = (-1)
+File binary_search-B1.mlw:
+  Line 10:
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = (-1)
+      _ = 1
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File binary_search-B1.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B1.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 1
+    Normal execution of function `div` with args:
+      x = 1
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 2; elts= [|; _ -> 0|]}
+      i = 0
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 2; elts= [|; _ -> 0|]}
+    Normal execution of function `(@)` with args:
+      u = [|; _ -> 0|]
+      u = 0
+File binary_search-B1.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = 0
+      y = (-1)
+  Line 18:
+    Normal execution of function `(-)` with args:
+      x = 0
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = (-1)
+File binary_search-B1.mlw:
+  Line 18:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 1}
+      i = (-1)
+  Line 15:
+    Property failure at loop variant decrease with:
+      t = {length= 2; elts= [|; _ -> 0|]}
+      r = {contents= (-1)}
+      r = {contents= 1}
+      t = {length= 2; elts= [|; _ -> 0|]}
+
+File "bench/check-ce/petiot2018/experiments/binary_search-B1.mlw", line 15, characters 10-23:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Step limit exceeded.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File binary_search-B1.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 2; elts= [|; _ -> 0|]}
+      x = 0
+      zero = 0
+      one = 1
+  Line 9:
+    Normal execution of function `int_ref` with args:
+      i = (-1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-1)
+File binary_search-B1.mlw:
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 2; elts= [|; _ -> 0|]}
+    Normal execution of function `(-)` with args:
+      x = 2
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 2
+      _ = (-1)
+File binary_search-B1.mlw:
+  Line 10:
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B1.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = (-1)
+      _ = 1
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File binary_search-B1.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B1.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 1
+    Normal execution of function `div` with args:
+      x = 1
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 2; elts= [|; _ -> 0|]}
+      i = 0
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 2; elts= [|; _ -> 0|]}
+    Normal execution of function `(@)` with args:
+      u = [|; _ -> 0|]
+      u = 0
+File binary_search-B1.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = 0
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= (-1)}
+      i = 0
+  Line 15:
+    Property failure at loop variant decrease with:
+      t = {length= 2; elts= [|; _ -> 0|]}
+      r = {contents= 1}
+      r = {contents= 1}
+      t = {length= 2; elts= [|; _ -> 0|]}
+
+** binary_search-B2
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B2.mlw --apply-transform=split_vc --prover=CVC4,1.7,counterexamples --timelimit=15 --check-ce --rac-prover=CVC4,1.7 --sub-goal=:15@loop variant decrease --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/binary_search-B2.mlw", line 15, characters 14-21:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/experiments/binary_search-B2.mlw", line 15, characters 14-21:
+Sub-goal Loop variant decrease of goal binary_search'vc.
+Prover result is: Unknown (unknown + incomplete).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File binary_search-B2.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 2; elts= [|; _ -> 0|]}
+      x = 0
+      zero = 0
+      one = 1
+  Line 9:
+    Normal execution of function `int_ref` with args:
+      i = (-1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-1)
+File binary_search-B2.mlw:
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 2; elts= [|; _ -> 0|]}
+    Normal execution of function `(-)` with args:
+      x = 2
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 2
+      _ = (-1)
+File binary_search-B2.mlw:
+  Line 10:
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = (-1)
+      _ = 1
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 1
+    Normal execution of function `div` with args:
+      x = 0
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 2; elts= [|; _ -> 0|]}
+      i = 0
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 2; elts= [|; _ -> 0|]}
+    Normal execution of function `(@)` with args:
+      u = [|; _ -> 0|]
+      u = 0
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = 0
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= (-1)}
+      i = 0
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 0}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+File binary_search-B2.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = 0
+      _ = 1
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 1}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 0}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+File binary_search-B2.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 1
+    Normal execution of function `div` with args:
+      x = 1
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 2; elts= [|; _ -> 0|]}
+      i = 0
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 2; elts= [|; _ -> 0|]}
+    Normal execution of function `(@)` with args:
+      u = [|; _ -> 0|]
+      u = 0
+File binary_search-B2.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = 0
+      y = 0
+  Line 19:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 0}
+      i = 0
+  Line 15:
+    Property failure at loop variant decrease with:
+      l = {contents= 0}
+      r = {contents= 1}
+      r = {contents= 1}
+      l = {contents= 0}
+
+** binary_search-B3
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B3.mlw --apply-transform=split_vc --prover=CVC4,1.7,counterexamples --timelimit=15 --check-ce --rac-prover=CVC4,1.7 --sub-goal=:14@loop invariant preservation --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/binary_search-B3.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Step limit exceeded.
+The program does not comply to the verification goal, for example during the
+  following execution:
+File binary_search-B3.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+      x = 0
+      zero = 0
+      one = 1
+  Line 9:
+    Normal execution of function `int_ref` with args:
+      i = (-1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-1)
+File binary_search-B3.mlw:
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+    Normal execution of function `(-)` with args:
+      x = 3
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 3
+      _ = (-1)
+File binary_search-B3.mlw:
+  Line 10:
+    Normal execution of function `int_ref` with args:
+      i = 2
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 2
+File binary_search-B3.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= 2}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+File binary_search-B3.mlw:
+  Line 11:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B3.mlw:
+  Line 11:
+    Normal execution of function `(<)` with args:
+      _ = (-1)
+      _ = 2
+    Normal iteration of loop
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= 2}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+File binary_search-B3.mlw:
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-1)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-1)}
+File binary_search-B3.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 2
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 1
+    Normal execution of function `div` with args:
+      x = 2
+      y = 2
+  Line 17:
+    Normal execution of function `([])` with args:
+      a = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+      i = 1
+File lib.mlw:
+  Line 43:
+    Normal execution of function `elts` with args:
+      arg = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+    Normal execution of function `(@)` with args:
+      u = [|1 -> 1; _ -> 0|]
+      u = 1
+File binary_search-B3.mlw:
+  Line 17:
+    Normal execution of function `(>)` with args:
+      x = 1
+      y = 0
+  Line 18:
+    Normal execution of function `(-)` with args:
+      x = 1
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = (-1)
+File binary_search-B3.mlw:
+  Line 18:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 2}
+      i = 0
+  Line 14:
+    Property failure at loop invariant preservation with:
+      t = {length= 3; elts= [|1 -> 1; _ -> 0|]}
+      x = 0
+      r = {contents= 0}
+
+File "bench/check-ce/petiot2018/experiments/binary_search-B3.mlw", line 14, characters 50-58:
+Sub-goal Loop invariant preservation of goal binary_search'vc.
+Prover result is: Valid.
+
+** binary_search-B4
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/binary_search-B4.mlw --apply-transform=split_vc --prover=CVC4,1.7,counterexamples --timelimit=15 --check-ce --rac-prover=CVC4,1.7 --sub-goal=:8@postcondition --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/binary_search-B4.mlw", line 8, characters 50-58:
+Sub-goal Postcondition of goal binary_search'vc.
+Prover result is: Unknown (unknown + incomplete).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
+File binary_search-B4.mlw:
+  Line 3:
+    Execution of main function `binary_search` with env:
+      t = {length= 2; elts= [|; _ -> 0|]}
+      x = 0
+      zero = 0
+      one = 1
+  Line 9:
+    Giant-step execution of function `int_ref` with args:
+      i = (-1)
+    result of `int_ref` = {contents= (-1)}
+  Line 10:
+    Normal execution of function `length` with args:
+      arg = {length= 2; elts= [|; _ -> 0|]}
+    Giant-step execution of function `(-)` with args:
+      x = 2
+      y = 1
+    result of `(-)` = 1
+    Giant-step execution of function `int_ref` with args:
+      i = 1
+    result of `int_ref` = {contents= 1}
+  Line 11:
+    Giant-step iteration of loop
+    l = {contents= 0}
+    r = {contents= 0}
+    Giant-step execution of function `(!)` with args:
+      r = {contents= 0}
+    result of `(!)` = 0
+    Giant-step execution of function `(!)` with args:
+      r = {contents= 0}
+    result of `(!)` = 0
+    Normal execution of function `(<)` with args:
+      _ = 0
+      _ = 0
+  Line 21:
+    Giant-step execution of function `(!)` with args:
+      r = {contents= 0}
+    result of `(!)` = 0
+  Line 8:
+    Property failure at postcondition of `binary_search` with:
+      t = {length= 2; elts= [|; _ -> 0|]}
+      x = 0
+      result = 0
+

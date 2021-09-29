@@ -13,25 +13,25 @@ end
 On task 1, CVC4,1.7 answers Unknown (sat) (0.0xs, 84 steps)
 Model is {"myfile.my_ext":
            {"28":
-             [{"name": "my_A",
-               "attrs": ["model_trace:my_A"],
-               "value": {"type": "Boolean", "val": true},
-               "kind": "other"}],
+             [{"attrs": ["model_trace:my_A"],
+               "kind": "other",
+               "name": "my_A",
+               "value": {"type": "Boolean", "val": true}}],
             "42":
-             [{"name": "my_A",
-               "attrs": ["model_trace:my_A"],
-               "value": {"type": "Boolean", "val": true},
-               "kind": "other"},
-              {"name": "my_B",
-               "attrs": ["model_trace:my_B"],
-               "value": {"type": "Boolean", "val": false},
-               "kind": "other"}]},
+             [{"attrs": ["model_trace:my_A"],
+               "kind": "other",
+               "name": "my_A",
+               "value": {"type": "Boolean", "val": true}},
+              {"attrs": ["model_trace:my_B"],
+               "kind": "other",
+               "name": "my_B",
+               "value": {"type": "Boolean", "val": false}}]},
           "myfile.my_ext2":
            {"101":
-             [{"name": "my_B",
-               "attrs": ["model_trace:my_B"],
-               "value": {"type": "Boolean", "val": false},
-               "kind": "other"}]}}
+             [{"attrs": ["model_trace:my_B"],
+               "kind": "other",
+               "name": "my_B",
+               "value": {"type": "Boolean", "val": false}}]}}
 
 == Check CE
 

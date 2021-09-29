@@ -1,10 +1,10 @@
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant init of goal f'vc.
-Prover result is: Valid (0.03s, 1568 steps).
+Prover result is: Valid (0.04s, 1286 steps).
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.02s, 2041 steps).
+Prover result is: Valid (0.02s, 1670 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/while.mlw", line 10, characters 25-32)
 <check-ce>Checking model:
@@ -29,16 +29,28 @@ Prover result is: Valid (0.02s, 2041 steps).
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
+                      "value": {"type": "Integer", "val": "-2"}}]}}
             Line 10:
+              i =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "1"}}]}}
               x1 =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+              x1 =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
             Line 11:
-              result = {"type": "Boolean", "val": false}
+              result = {"type": "Boolean", "val": true}
             Line 12:
               x1 =
                 {"type": "Record",
@@ -52,19 +64,20 @@ Prover result is: Valid (0.02s, 2041 steps).
                  "val":
                   {"Field":
                     [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
+                      "value": {"type": "Integer", "val": "1"}}]}}
 <check-ce>Giant-step RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 5, characters 15-16 at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/while.mlw", line 5, characters 15-16 at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 6, characters 15-16 at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/while.mlw", line 6, characters 15-16 at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
-                                                                    0}
+                                                                    (-2)}
+<rac-values>No value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -186,6 +199,18 @@ Prover result is: Valid (0.02s, 2041 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "-2"}}]}}
             Line 10:
+              i =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "1"}}]}}
+              x1 =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
               x1 =
                 {"type": "Record",
                  "val":
@@ -212,14 +237,15 @@ Prover result is: Valid (0.02s, 2041 steps).
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
 <rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 5, characters 15-16 at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/while.mlw", line 5, characters 15-16 at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 6, characters 15-16 at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/while.mlw", line 6, characters 15-16 at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
                                                                     0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
                                                                     0}
 <rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
                                                                     (-2)}
+<rac-values>No value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161
 <check-ce>Normal RAC
 <rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
 <rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
@@ -316,174 +342,16 @@ Prover result is: Valid (0.02s, 2041 steps).
                   Execution of main function terminated normally
             - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
               
-<check-ce>Check model 2 ("bench/check-ce/while.mlw", line 10, characters 25-32)
-<check-ce>Checking model:
-          File while.mlw:
-            Line 4:
-              z = {"type": "Integer", "val": "0"}
-            Line 8:
-              i =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-              i =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-              x1 =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-2"}}]}}
-            Line 10:
-              x1 =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-1"}}]}}
-            Line 11:
-              result = {"type": "Boolean", "val": true}
-            Line 12:
-              x1 =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "-1"}}]}}
-            Line 15:
-              i =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "1"}}]}}
-<check-ce>Giant-step RAC
-<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 5, characters 15-16 at "bench/check-ce/while.mlw", line 5, characters 15-16: {contents=
-                                                                    0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 6, characters 15-16 at "bench/check-ce/while.mlw", line 6, characters 15-16: {contents=
-                                                                    0}
-<rac-values>Value computed from postcondition for variable `result` at "bench/check-ce/while.mlw", line 7, characters 14-15 at "bench/check-ce/while.mlw", line 7, characters 14-15: {contents=
-                                                                    0}
-<rac-values>Value from model for variable `x1` at "bench/check-ce/while.mlw", line 8, characters 2-161 at "bench/check-ce/while.mlw", line 8, characters 2-161: {contents=
-                                                                    (-2)}
-<check-ce>Normal RAC
-<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
-<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
-<rac-values>Value from model for parameter `z` at "bench/check-ce/while.mlw", line 4, characters 7-8: 0
-<check-ce>Result of checking model 2: INCOMPLETE
-            - Concrete RAC: NORMAL
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                  zero = 0
-                Line 14:
-                  Constant one initialization
-                  one = 1
-              File while.mlw:
-                Line 4:
-                  z = 0
-                  z = 0
-                  Execution of main function `f` with env:
-                    z = 0
-                    zero = 0
-                    one = 1
-                Line 5:
-                  Normal execution of function `ref` with args:
-                    contents = 0
-                  Normal execution of function `ref'mk` with args:
-                    contents = 0
-                Line 6:
-                  Normal execution of function `ref` with args:
-                    contents = 0
-                  Normal execution of function `ref'mk` with args:
-                    contents = 0
-                Line 7:
-                  Normal execution of function `ref` with args:
-                    contents = 0
-                  Normal execution of function `ref'mk` with args:
-                    contents = 0
-                Line 8:
-                  Normal execution of function `contents` with args:
-                    arg = {contents= 0}
-                  Normal execution of function `(<)` with args:
-                    _ = 0
-                    _ = 2
-                  Normal iteration of loop
-                Line 11:
-                  Normal execution of function `contents` with args:
-                    arg = {contents= 0}
-                  Normal execution of function `(=)` with args:
-                    x = 0
-                    y = 0
-                Line 12:
-                  Normal execution of function `contents` with args:
-                    arg = {contents= 0}
-                  Normal execution of function `(+)` with args:
-                    _ = 0
-                    _ = 1
-                Line 15:
-                  Normal execution of function `contents` with args:
-                    arg = {contents= 0}
-                  Normal execution of function `(+)` with args:
-                    _ = 0
-                    _ = 1
-                Line 8:
-                  Normal execution of function `contents` with args:
-                    arg = {contents= 1}
-                  Normal execution of function `(<)` with args:
-                    _ = 1
-                    _ = 2
-                  Normal iteration of loop
-                Line 11:
-                  Normal execution of function `contents` with args:
-                    arg = {contents= 1}
-                  Normal execution of function `(=)` with args:
-                    x = 1
-                    y = 0
-                Line 14:
-                  Normal execution of function `contents` with args:
-                    arg = {contents= 0}
-                  Normal execution of function `(+)` with args:
-                    _ = 0
-                    _ = 1
-                Line 15:
-                  Normal execution of function `contents` with args:
-                    arg = {contents= 1}
-                  Normal execution of function `(+)` with args:
-                    _ = 1
-                    _ = 1
-                Line 8:
-                  Normal execution of function `contents` with args:
-                    arg = {contents= 2}
-                  Normal execution of function `(<)` with args:
-                    _ = 2
-                    _ = 2
-                Line 4:
-                  Execution of main function terminated normally
-            - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
-              
 <check-ce-summary>Results:
 - Checked model 0: INCOMPLETE
   - Concrete RAC: NORMAL
   - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
-- Checked model 1: INCOMPLETE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
-- Selected model 2: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: NORMAL
   - Abstract RAC: INCOMPLETE (terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161)
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Unknown (unknown + incomplete) (0.04s, 7029 steps).
+Prover result is: Unknown (unknown + incomplete) (0.04s, 6748 steps).
 The following counterexample model could not be verified
   (abstract RAC terminated because missing value for variable `x2` at "bench/check-ce/while.mlw", line 8, characters 2-161):
 File while.mlw:
@@ -494,9 +362,10 @@ File while.mlw:
     [current iteration] i = 0
     [before iteration] x1 = -2
   Line 10:
+    [current iteration] i = 1
     [current iteration] x1 = -1
   Line 11:
-    [current iteration] result = true
+    result of call at line 11, characters 7-12 = true
   Line 12:
     [current iteration] x1 = -1
   Line 15:
@@ -504,9 +373,9 @@ File while.mlw:
 
 File "bench/check-ce/while.mlw", line 9, characters 14-19:
 Sub-goal Loop variant decrease of goal f'vc.
-Prover result is: Valid (0.01s, 2007 steps).
+Prover result is: Valid (0.01s, 1713 steps).
 
 File "bench/check-ce/while.mlw", line 10, characters 25-32:
 Sub-goal Loop invariant preservation of goal f'vc.
-Prover result is: Valid (0.02s, 1944 steps).
+Prover result is: Valid (0.02s, 1610 steps).
 

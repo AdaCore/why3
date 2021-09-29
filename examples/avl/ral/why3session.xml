@@ -2,10 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="ral.mlw"/>
 <theory name="RAL" proved="true">
+ <goal name="balancing&#39;vc" expl="VC for balancing" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
  <goal name="M.assoc" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>

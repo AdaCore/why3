@@ -36,7 +36,6 @@
 open Why3
 open Wstdlib
 
-type vars = Term.term array
 let get_indice i =
   if i > 0 then (i-1)*2
   else if i < 0 then (-i-1)*2+1

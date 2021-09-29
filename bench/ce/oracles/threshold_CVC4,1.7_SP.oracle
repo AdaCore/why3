@@ -9,24 +9,24 @@ File threshold.mlw:
     max [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1"}}
+       "value": {"type": "Integer", "val": "-2147483648"}}
     min [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-2147483648"}}
+       "value": {"type": "Integer", "val": "-1"}}
     n [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-2147483648"}}
+       "value": {"type": "Integer", "val": "-1"}}
   Line 10:
     max [@introduced] [@model_trace:max] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1"}}
+       "value": {"type": "Integer", "val": "-2147483648"}}
     min [@introduced] [@model_trace:min] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-2147483648"}}
+       "value": {"type": "Integer", "val": "-1"}}
 
 File "bench/ce/threshold.mlw", line 8, characters 13-33:
 Sub-goal Postcondition of goal f'vc.
@@ -38,37 +38,37 @@ File threshold.mlw:
     max [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "2"}}
+       "value": {"type": "Integer", "val": "-3"}}
     min [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "3"}}
+       "value": {"type": "Integer", "val": "-2"}}
     n [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "4"}}
+       "value": {"type": "Integer", "val": "-4"}}
   Line 8:
     max [@introduced] [@model_trace:max] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "2"}}
+       "value": {"type": "Integer", "val": "-3"}}
     min [@introduced] [@model_trace:min] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "3"}}
+       "value": {"type": "Integer", "val": "-2"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "2"}}
+       "value": {"type": "Integer", "val": "-2"}}
   Line 10:
     _x [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "5"}}
+       "value": {"type": "Integer", "val": "-5"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "2"}}
+       "value": {"type": "Integer", "val": "-2"}}
 
 File "bench/ce/threshold.mlw", line 25, characters 11-29:
 Sub-goal Arithmetic overflow of goal f'vc.
@@ -93,14 +93,16 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 21:
-    max [@introduced] = {"type": "Integer", "val": "0"}
-    min [@introduced] = {"type": "Integer", "val": "1"}
-    n [@introduced] = {"type": "Integer", "val": "0"}
+    max [@introduced] = {"type": "Integer", "val": "2147483647"}
+    min [@introduced] = {"type": "Integer", "val": "2147483648"}
+    n [@introduced] = {"type": "Integer", "val": "4294967295"}
   Line 22:
-    max [@introduced] [@model_trace:max] = {"type": "Integer", "val": "0"}
-    min [@introduced] [@model_trace:min] = {"type": "Integer", "val": "1"}
-    result [@introduced] = {"type": "Integer", "val": "0"}
+    max [@introduced] [@model_trace:max] =
+      {"type": "Integer", "val": "2147483647"}
+    min [@introduced] [@model_trace:min] =
+      {"type": "Integer", "val": "2147483648"}
+    result [@introduced] = {"type": "Integer", "val": "2147483647"}
   Line 25:
-    _x [@introduced] = {"type": "Integer", "val": "1"}
-    result [@introduced] = {"type": "Integer", "val": "0"}
+    _x [@introduced] = {"type": "Integer", "val": "4294967295"}
+    result [@introduced] = {"type": "Integer", "val": "2147483647"}
 

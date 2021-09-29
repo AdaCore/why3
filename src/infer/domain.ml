@@ -275,9 +275,7 @@ module Make_from_apron(M:sig
                 begin
 
                   let myi = match c with
-                    | Coeff.Scalar s ->
-                      let s = Scalar.to_string s in
-                      int_of_string s
+                    | Coeff.Scalar s -> int_of_s s
                     | _ -> assert false
                   in
                   Lincons1.set_coeff l' v (Coeff.s_of_int (if myi < 0 then -1 else 1));
@@ -307,37 +305,26 @@ module Make_from_apron(M:sig
     let open Apron in
     let linexpr_a = Abstract1.to_lincons_array man a in
     let linexpr_b = Abstract1.to_lincons_array man b in
-    let _ (* a *), b, _ (* linexpr_a *), _ (* linexpr_b *) =
+    let a, b, linexpr_a, linexpr_b =
       if Lincons1.array_length linexpr_a > Lincons1.array_length linexpr_b then
         b, a, linexpr_b, linexpr_a
       else a, b, linexpr_a, linexpr_b
     in
-    let precise = ref true in
+    ignore a;
+    ignore linexpr_b;
+    try
     for i = 0 to Lincons1.array_length linexpr_a - 1 do
       let line = Lincons1.array_get linexpr_a i in
-      (* FIXME: sat lincons *)
-      let opp_typ =
-        let typ = Lincons1.get_typ line in
-        if typ = Lincons1.EQ then [Lincons1.SUP, 1; Lincons1.SUP, -1]
-        else if typ = Lincons1.SUP then [Lincons1.SUPEQ, -1]
-        else if typ = Lincons1.SUPEQ then [Lincons1.SUP, -1]
-        else assert false
-      in
-      let aux p (ty, new_coeff) = p &&
+      let aux ty negate =
         let cp = Lincons1.copy line in
         let cst = Lincons1.get_cst cp in
-        let cst =
-          if      new_coeff = -1 then Coeff.neg cst
-          else if new_coeff = 1  then cst
-          else assert false in
+        let cst = if negate then Coeff.neg cst else cst in
         Lincons1.set_cst cp cst;
         Lincons1.set_typ cp ty;
         Lincons1.iter (fun coeff var ->
-            let coeff =
-              if      new_coeff = -1 then Coeff.neg coeff
-              else if new_coeff = 1 then coeff
-              else assert false in
-            Lincons1.set_coeff cp var coeff) line;
+            let coeff = if negate then Coeff.neg coeff else coeff in
+            Lincons1.set_coeff cp var coeff
+          ) line;
         let a = Lincons1.array_make (Lincons1.get_env cp) 1 in
         Lincons1.array_set a 0 cp;
         let new_c = meet_lincons_array man c a in
@@ -348,9 +335,19 @@ module Make_from_apron(M:sig
           with Not_int -> false
         end
       in
-      precise := !precise && List.fold_left aux true opp_typ;
+      let r =
+        match Lincons1.get_typ line with
+        | Lincons1.EQ ->
+            aux Lincons1.SUP false && aux Lincons1.SUP true
+        | Lincons1.SUP ->
+            aux Lincons1.SUPEQ true
+        | Lincons1.SUPEQ ->
+            aux Lincons1.SUP true
+        | _ -> assert false in
+      if not r then raise Exit
     done;
-    if !precise then Some c else None
+    Some c
+    with Exit -> None
 
 end
 

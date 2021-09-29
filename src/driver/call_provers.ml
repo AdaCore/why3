@@ -145,14 +145,14 @@ type prover_result_parser = {
 }
 
 let print_prover_answer fmt = function
-  | Valid -> fprintf fmt "Valid"
-  | Invalid -> fprintf fmt "Invalid"
-  | Timeout -> fprintf fmt "Timeout"
+  | Valid -> pp_print_string fmt "Valid"
+  | Invalid -> pp_print_string fmt "Invalid"
+  | Timeout -> pp_print_string fmt "Timeout"
   | OutOfMemory -> fprintf fmt "Out@ of@ memory"
   | StepLimitExceeded -> fprintf fmt "Step@ limit@ exceeded"
   | Unknown s -> fprintf fmt "Unknown@ (%s)" s
   | Failure s -> fprintf fmt "Failure@ (%s)" s
-  | HighFailure -> fprintf fmt "High failure"
+  | HighFailure -> pp_print_string fmt "High failure"
 
 let print_prover_status fmt = function
   | Unix.WSTOPPED n -> fprintf fmt "stopped by signal %d" n
@@ -162,26 +162,26 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
+let json_prover_result r =
+  let open Json_base in
+  let convert_model (a, m) =
+    if not (is_model_empty m) then
+      Record [
+          "model", json_model m;
+          "answer", String (asprintf "%a" print_prover_answer a)
+        ]
+    else Null in
+  Record [
+      "answer", String (asprintf "%a" print_prover_answer r.pr_answer);
+      "time", Float r.pr_time;
+      "step", Int r.pr_steps;
+      "ce-models", List (List.map convert_model r.pr_models);
+      "status", String (asprintf "%a" print_prover_status r.pr_status)
+    ]
+
 let print_prover_result ?(json=false) fmt r =
   if json then
-    let open Json_base in
-    let print_json_model fmt (a,m) =
-      fprintf fmt "@[@[<hv1>{%a;@ %a}@]}@]"
-        (print_json_field "model"
-           (print_model_json ?me_name_trans:None ~vc_line_trans:string_of_int)) m
-        (print_json_field "answer" print_prover_answer) a in
-    let print_model fmt (a,m) =
-      if not (is_model_empty m) then
-          print_json_model fmt (a,m)
-      else print_json fmt Null in
-    fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a;@ %a@]}@]"
-      (print_json_field "answer" print_json)
-      (String (asprintf "%a" print_prover_answer r.pr_answer))
-      (print_json_field "time" print_json) (Float r.pr_time)
-      (print_json_field "step" print_json) (Int r.pr_steps)
-      (* TODO not sure if models should be printed here *)
-      (print_json_field "ce-models" (list print_model)) r.pr_models
-      (print_json_field "status" print_json) (String (asprintf "%a" print_prover_status r.pr_status))
+    Json_base.print_json fmt (json_prover_result r)
   else
     let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "yellow" in
     fprintf fmt "@{<bold %s>%a@}@ (%.2fs%a)"
@@ -207,10 +207,10 @@ let rec grep out l = match l with
 let craft_efficient_re l =
   let s = Format.asprintf "%a"
     (Pp.print_list_delim
-       ~start:(fun fmt () -> Format.fprintf fmt "\\(")
-       ~stop:(fun fmt () -> Format.fprintf fmt "\\)")
-       ~sep:(fun fmt () -> Format.fprintf fmt "\\|")
-       (fun fmt (a, _b) -> Format.fprintf fmt "%s" a)) l
+       ~start:(fun fmt () -> Format.pp_print_string fmt "\\(")
+       ~stop:(fun fmt () -> Format.pp_print_string fmt "\\)")
+       ~sep:(fun fmt () -> Format.pp_print_string fmt "\\|")
+       (fun fmt (a, _b) -> Format.pp_print_string fmt a)) l
   in
   Re.Str.regexp s
 

@@ -34,13 +34,13 @@ type proof_attempt_status =
 
 let print_status fmt st =
   match st with
-  | Undone            -> fprintf fmt "Undone"
-  | Scheduled         -> fprintf fmt "Scheduled"
-  | Running           -> fprintf fmt "Running"
+  | Undone            -> pp_print_string fmt "Undone"
+  | Scheduled         -> pp_print_string fmt "Scheduled"
+  | Running           -> pp_print_string fmt "Running"
   | Done r            -> fprintf fmt "Done(@[<h>%a@])"
                            (Call_provers.print_prover_result ~json:false) r
-  | Interrupted       -> fprintf fmt "Interrupted"
-  | Detached          -> fprintf fmt "Detached"
+  | Interrupted       -> pp_print_string fmt "Interrupted"
+  | Detached          -> pp_print_string fmt "Detached"
   | InternalFailure e ->
       fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
   | Uninstalled pr    ->
@@ -56,10 +56,10 @@ type transformation_status =
 
 let print_trans_status fmt st =
   match st with
-  | TSscheduled -> fprintf fmt "TScheduled"
-  | TSdone _tid -> fprintf fmt "TSdone" (* TODO print tid *)
-  | TSfailed _e -> fprintf fmt "TSfailed"
-  | TSfatal _e -> fprintf fmt "TSfatal"
+  | TSscheduled -> pp_print_string fmt "TScheduled"
+  | TSdone _tid -> pp_print_string fmt "TSdone" (* TODO print tid *)
+  | TSfailed _e -> pp_print_string fmt "TSfailed"
+  | TSfatal _e -> pp_print_string fmt "TSfatal"
 
 type strategy_status = STSgoto of proofNodeID * int | STShalt
                      | STSfatal of string * proofNodeID * exn
@@ -68,8 +68,8 @@ let print_strategy_status fmt st =
   match st with
   | STSgoto(id,n) ->
       fprintf fmt "goto step %d in proofNode %a" n print_proofNodeID id
-  | STShalt -> fprintf fmt "halt"
-  | STSfatal _ -> fprintf fmt "fatal"
+  | STShalt -> pp_print_string fmt "halt"
+  | STSfatal _ -> pp_print_string fmt "fatal"
 
 
 type controller =
@@ -304,9 +304,6 @@ let scheduled_proof_attempts : sched_pa_rec Queue.t = Queue.create ()
 (* type for prover tasks in progress *)
 type tasks_prog_rec =
   {
-    tp_session  : Session_itp.session;
-    tp_id       : proofNodeID;
-    tp_pr       : Whyconf.prover;
     tp_callback : (proof_attempt_status -> unit);
     tp_started  : bool;
     tp_call     : Call_provers.prover_call;
@@ -424,10 +421,7 @@ let build_prover_call spa =
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
           ~limit ~interactive driver task in
       let pa =
-        { tp_session  = c.controller_session;
-          tp_id       = spa.spa_id;
-          tp_pr       = spa.spa_pr;
-          tp_callback = spa.spa_callback;
+        { tp_callback = spa.spa_callback;
           tp_started  = false;
           tp_call     = call;
           tp_ores     = spa.spa_ores } in
@@ -567,7 +561,7 @@ let run_idle_handler () =
       S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
-let schedule_proof_attempt c id pr ?save_to ~limit ~callback ~notification =
+let schedule_proof_attempt c id pr ~limit ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
     begin
@@ -605,16 +599,13 @@ let schedule_proof_attempt c id pr ?save_to ~limit ~callback ~notification =
       let use_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
       let limit = adapt_limits ~interactive ~use_steps limit a in
       let script =
-        if save_to = None then
           Opt.map (fun s ->
               let s = Pp.sprintf "%a" Sysutil.print_file_path s in
               Debug.dprintf debug_sched "Script file = %s@." s;
               Filename.concat (get_dir ses) s) a.proof_script
-        else
-          save_to
       in
       limit, old_res, script
-    with Not_found | Session_itp.BadID -> limit,None,save_to
+    with Not_found | Session_itp.BadID -> limit,None,None
   in
   let panid = graft_proof_attempt ~limit ses id pr in
   let spa =
@@ -804,10 +795,11 @@ let run_strategy_on_goal
       callback STShalt
     else
       match Array.get strat pc with
-      | Icall_prover(p,timelimit,memlimit) ->
+      | Icall_prover(p,timelimit,memlimit,steplimit) ->
          let main = Whyconf.get_main c.controller_config in
          let timelimit = Opt.get_def (Whyconf.timelimit main) timelimit in
          let memlimit = Opt.get_def (Whyconf.memlimit main) memlimit in
+         let steplimit = Opt.get_def 0 steplimit in
          let callback panid res =
            callback_pa panid res;
            match res with
@@ -826,10 +818,12 @@ let run_strategy_on_goal
                          (* should not happen *)
                          assert false
          in
-         let limit = { Call_provers.empty_limit with
+         let limit = {
                        Call_provers.limit_time = timelimit;
-                       limit_mem  = memlimit} in
-         schedule_proof_attempt c g p ?save_to:None ~limit ~callback ~notification
+                       limit_mem  = memlimit;
+                       limit_steps = steplimit;
+                     } in
+         schedule_proof_attempt c g p ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
            callback_tr trname [] ntr;
@@ -851,7 +845,11 @@ let run_strategy_on_goal
                  S.idle ~prio:0 run_next)
                 (get_sub_tasks c.controller_session tid)
          in
-         schedule_transformation c g trname [] ~callback ~notification
+         begin match Session_itp.get_transformation c.controller_session g trname [] with
+         | tid -> callback (TSdone tid)
+         | exception Not_found ->
+             schedule_transformation c g trname [] ~callback ~notification
+         end
       | Igoto pc ->
          callback (STSgoto (g,pc));
          exec_strategy pc strat g
@@ -966,7 +964,7 @@ let rec copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any =
  *)
     | APn from_pn, APn to_pn ->
       let from_pa_list = get_proof_attempts s from_pn in
-      List.iter (fun x -> schedule_pa_with_same_arguments ?save_to:None c x to_pn
+      List.iter (fun x -> schedule_pa_with_same_arguments c x to_pn
           ~callback:callback_pa ~notification) from_pa_list;
       let from_tr_list = get_transformations s from_pn in
       let callback x tr args st = callback_tr tr args st;
@@ -1063,7 +1061,7 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
      try
        if pr' <> pr then callback id (UpgradeProver pr');
        let _ = get_task c.controller_session parid in
-       schedule_proof_attempt ?save_to:None c parid pr' ~limit ~callback ~notification
+       schedule_proof_attempt c parid pr' ~limit ~callback ~notification
      with Not_found ->
        callback id Detached
 
@@ -1088,11 +1086,11 @@ let print_report fmt (r: report) =
   | CallFailed e ->
     Format.fprintf fmt "Callfailed %a" Exn_printer.exn_printer e
   | Replay_interrupted ->
-    Format.fprintf fmt "Interrupted"
+    Format.pp_print_string fmt "Interrupted"
   | Prover_not_installed ->
-    Format.fprintf fmt "Prover not installed"
+    Format.pp_print_string fmt "Prover not installed"
   | Edited_file_absent _ ->
-    Format.fprintf fmt "No edited file"
+    Format.pp_print_string fmt "No edited file"
   | No_former_result new_r ->
     Format.fprintf fmt "new_result = %a, no former result"
       (Call_provers.print_prover_result ~json:false) new_r
@@ -1284,7 +1282,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                        (Call_provers.print_prover_result ~json:false) res
                   end
                 in
-                schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification
+                schedule_proof_attempt c pn prover ~limit ~callback ~notification
              | _ -> assert false
           end
         in
@@ -1366,7 +1364,7 @@ later on. We do has if proof fails. *)
             in
             Debug.dprintf
               debug "[Bisect] running the prover on subtask@.";
-            schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification
+            schedule_proof_attempt c pn prover ~limit ~callback ~notification
          | _ -> assert false
       end
     in

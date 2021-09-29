@@ -7,8 +7,14 @@
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="skew_heaps.mlw"/>
+<theory name="Heap" proved="true">
+ <goal name="empty&#39;vc" expl="VC for empty" proved="true">
+ <proof prover="5"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
+</theory>
 <theory name="SkewHeaps" proved="true">
  <goal name="root_is_min&#39;vc" expl="VC for root_is_min" proved="true">
  <proof prover="2"><result status="valid" time="0.65" steps="1275"/></proof>

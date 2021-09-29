@@ -120,4 +120,4 @@ and print_definition fmt =
           Pp.(print_option string) iret
           print_term t
     | Dterm t -> fprintf fmt "@[<hv2>(Term %a)@]" print_term t
-    | Dnoelement -> fprintf fmt "Noelement"
+    | Dnoelement -> pp_print_string fmt "Noelement"

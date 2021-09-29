@@ -44,11 +44,10 @@ type info = {
   info_printer : ident_printer;
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
-  mutable info_in_goal: bool;
+  info_in_goal: bool;
   mutable list_projs: Ident.ident Mstr.t;
-  mutable list_field_def: Ident.ident Mstr.t;
+  list_field_def: Ident.ident Mstr.t;
   meta_model_projection: Sls.t;
-  meta_record_def : Sls.t;
   info_cntexample: bool
   }
 
@@ -79,7 +78,7 @@ let ident_printer () =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident info fmt id =
-  fprintf fmt "%s" (id_unique info.info_printer id)
+  pp_print_string fmt (id_unique info.info_printer id)
 
 let print_attr fmt l = fprintf fmt "\"%s\"" l.attr_string
 
@@ -223,8 +222,15 @@ let rec print_term info fmt t =
 		(print_tapp info) tl (print_type info) (t_type t)
 	    end
      end
-  | Tlet _ -> unsupportedTerm t
-      "alt-ergo: you must eliminate let in term"
+  | Tlet (t1, tb) ->
+      let v, t2 = t_open_bound tb in
+      fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
+        (print_ident info) v.vs_name
+        (print_term info) t1
+         (** some version of alt-ergo have an inefficient typing of let *)
+        (print_type info) v.vs_ty
+        (print_term info) t2;
+      forget_var info v
   | Tif(t1,t2,t3) ->
      fprintf fmt "(if %a then %a else %a)"
        (print_fmla info) t1 (print_term info) t2 (print_term info) t3
@@ -291,9 +297,9 @@ and print_fmla_node info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "(not %a)" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tif(t1,t2,t3) ->
      fprintf fmt "(if %a then %a else %a)"
        (print_fmla info) t1 (print_fmla info) t2 (print_fmla info) t3
@@ -496,7 +502,6 @@ let print_task args ?old:_ fmt task =
     list_projs = Mstr.empty;
     list_field_def = Mstr.empty;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
-    meta_record_def = Task.on_tagged_ls Theory.meta_record task;
     info_cntexample = cntexample;
   } in
   print_prelude fmt args.prelude;

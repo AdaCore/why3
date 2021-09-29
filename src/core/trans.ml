@@ -553,6 +553,9 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Bad parameter %s for the meta %s@." s m.meta_name;
       Format.fprintf fmt "Known parameters: %a"
         (Pp.print_list Pp.space Pp.string) l
+  | Unnecessary_arguments args ->
+      Format.fprintf fmt "Unnecessary argument(s) (%a) for transformation"
+        Pp.(print_list_or_default "none" space string) args
   | IllegalFlagTrans m ->
       Format.fprintf fmt "Meta %s must be exclusive string-valued" m.meta_name
   | TransFailure (s,e) ->

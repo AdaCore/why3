@@ -13,13 +13,6 @@ open Format
 open Why3
 open Whyconf
 
-let opt_list_transforms = ref false
-let opt_list_printers = ref false
-let opt_list_provers = ref false
-let opt_list_formats = ref false
-let opt_list_metas = ref false
-let opt_list_attrs = ref false
-
 let option_list =
   let open Getopt in
   Args.common_options @

@@ -15,6 +15,8 @@ val intro_attr : Ident.attribute
 
 val meta : Theory.meta
 
+val meta_get_counterexmp : Theory.meta
+
 val get_counterexmp : Task.task -> bool
 (**
    Returns true if counterexample should be get for the task.
@@ -24,8 +26,8 @@ val get_counterexmp : Task.task -> bool
 (** {2 Generic inlining} *)
 
 val t :
-  ?use_meta:bool ->
-  ?in_goal:bool ->
+  use_meta:bool ->
+  in_goal:bool ->
   notls:(for_counterexample:bool -> Term.lsymbol -> bool) ->
   notdef:(Term.term -> bool) ->
   Task.task Trans.trans

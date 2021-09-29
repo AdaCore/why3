@@ -34,13 +34,6 @@ let () = set_opt_style default_style
 
 let opt_pp = ref []
 
-let set_opt_pp_in,set_opt_pp_cmd,set_opt_pp_out =
-  let suf = ref "" in
-  let cmd = ref "" in
-  (fun s -> suf := s),
-  (fun s -> cmd := s),
-  (fun s -> opt_pp := (!suf,(!cmd,s))::!opt_pp)
-
 let spec =
   let open Getopt in
   [ KShort 'o', Hnd1 (AString, fun s -> output_dir := s),
@@ -92,15 +85,11 @@ let run_file print_session fname =
 module Table =
 struct
 
-  let provers_stats s provers theory =
-    theory_iter_proof_attempt s (fun _ a ->
-      Hprover.replace provers a.prover a.prover) theory
-
   let print_prover = Whyconf.print_prover
 
 
   let color_of_status ?(dark=false) fmt b =
-    fprintf fmt "%s" (if b then
+    pp_print_string fmt (if b then
         if dark then "008000" else "C0FFC0"
       else "FF0000")
 
@@ -119,7 +108,7 @@ let print_results fmt s provers proofs =
 		| Call_provers.Valid ->
                   fprintf fmt "C0FFC0\">%.2f" res.Call_provers.pr_time
 		| Call_provers.Invalid ->
-                  fprintf fmt "FF0000\">Invalid"
+                  pp_print_string fmt "FF0000\">Invalid"
 		| Call_provers.Timeout ->
                   fprintf fmt "FF8000\">Timeout (%ds)"
                     pr.limit.Call_provers.limit_time
@@ -127,20 +116,20 @@ let print_results fmt s provers proofs =
                   fprintf fmt "FF8000\">Out Of Memory (%dM)"
                     pr.limit.Call_provers.limit_mem
 		| Call_provers.StepLimitExceeded ->
-                  fprintf fmt "FF8000\">Step limit exceeded"
+                  pp_print_string fmt "FF8000\">Step limit exceeded"
 		| Call_provers.Unknown _ ->
                   fprintf fmt "FF8000\">%.2f" res.Call_provers.pr_time
 		| Call_provers.Failure _ ->
-                  fprintf fmt "FF8000\">Failure"
+                  pp_print_string fmt "FF8000\">Failure"
 		| Call_provers.HighFailure ->
-                  fprintf fmt "FF8000\">High Failure"
+                  pp_print_string fmt "FF8000\">High Failure"
 	    end
-	  | None -> fprintf fmt "E0E0E0\">result missing"
+	  | None -> pp_print_string fmt "E0E0E0\">result missing"
         end;
-        if pr.S.proof_obsolete then fprintf fmt " (obsolete)"
-      with Not_found -> fprintf fmt "E0E0E0\">---"
+        if pr.S.proof_obsolete then pp_print_string fmt " (obsolete)"
+      with Not_found -> pp_print_string fmt "E0E0E0\">---"
     end;
-    fprintf fmt "</td>") provers
+    pp_print_string fmt "</td>") provers
 
 let rec num_lines s acc tr =
   List.fold_left
@@ -150,7 +139,7 @@ let rec num_lines s acc tr =
     acc (get_sub_tasks s tr)
 
   let rec print_transf fmt s depth max_depth provers tr =
-    fprintf fmt "<tr>";
+    pp_print_string fmt "<tr>";
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (tn_proved s tr)
       (max_depth - depth + 1);
@@ -200,8 +189,8 @@ let rec num_lines s acc tr =
       (color_of_status ~dark:true) (th_proved s th)
       name;
     if th_proved s th then
-      fprintf fmt "fully verified" (*TODO in %%.02f s*)
-    else fprintf fmt "not fully verified";
+      pp_print_string fmt "fully verified" (*TODO in %%.02f s*)
+    else pp_print_string fmt "not fully verified";
     fprintf fmt "</span></h2>@\n";
 
     fprintf fmt "<table border=\"1\" style=\"border-collapse:collapse\"><tr><td colspan=\"%d\">Obligations</td>" depth;
@@ -217,14 +206,11 @@ let rec num_lines s acc tr =
     (* fprintf fmt "<h1>File %s</h1>@\n" f.file_name; *)
     let fn = Sysutil.basename (file_path f) in
     let fn = Filename.chop_extension fn in
-    fprintf fmt "%a"
-      (Pp.print_list Pp.newline (print_theory s fn)) (file_theories f)
+    Pp.print_list Pp.newline (print_theory s fn) fmt (file_theories f)
 
   let print_session name fmt s =
     fprintf fmt "<h1>Why3 Proof Results for Project \"%s\"</h1>@\n" name;
-    fprintf fmt "%a"
-      (Pp.print_iter2 Hfile.iter Pp.newline Pp.nothing Pp.nothing
-         (print_file s)) (get_files s)
+    Pp.print_iter2 Hfile.iter Pp.newline Pp.nothing Pp.nothing (print_file s) fmt (get_files s)
 
 end
 
@@ -234,7 +220,7 @@ struct
   let print_prover = Whyconf.print_prover
 
   let print_proof_status fmt = function
-    | None -> fprintf fmt "No result"
+    | None -> pp_print_string fmt "No result"
     | Some res -> fprintf fmt "@[<h>Done: %a@]"
                     (Call_provers.print_prover_result ~json:false) res
 

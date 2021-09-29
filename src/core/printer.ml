@@ -329,7 +329,7 @@ let syntax_range_literal ?(cb=None) s fmt c =
           None
       in
       if base = 10 then begin
-          if BigInt.lt v BigInt.zero then fprintf fmt "-";
+          if BigInt.lt v BigInt.zero then pp_print_string fmt "-";
           Number.print_in_base base digits fmt (BigInt.abs v)
         end
       else

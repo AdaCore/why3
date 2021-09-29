@@ -23,35 +23,35 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 11:
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-2"}}]}}
   Line 20:
-    x [@introduced] = {"type": "Integer", "val": "1"}
+    x [@introduced] = {"type": "Integer", "val": "0"}
     y [@at:'Old:loc:bench/ce/ref_mono.mlw:21] [@field:0:contents]
       [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 21:
-    x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "1"}
+    x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "0"}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:21]
       [@field:0:contents] [@introduced] [@model_trace:y] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 23:
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-2"}}]}}
 
 File "bench/ce/ref_mono.mlw", line 27, characters 14-29:
 Sub-goal Postcondition of goal test_post2'vc.
@@ -65,13 +65,13 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-42"}}]}}
   Line 11:
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 25:
     x [@introduced] = {"type": "Integer", "val": "43"}
     y [@at:'Old:loc:bench/ce/ref_mono.mlw:27] [@field:0:contents]
@@ -79,7 +79,7 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-42"}}]}}
   Line 27:
     x [@introduced] [@model_trace:x] = {"type": "Integer", "val": "43"}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:27]
@@ -87,18 +87,18 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-42"}}]}}
     y [@field:0:contents] [@introduced] [@model_trace:y] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 29:
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
 
 File "bench/ce/ref_mono.mlw", line 38, characters 12-36:
 Sub-goal Postcondition of goal incr'vc.
@@ -107,68 +107,67 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref_mono.mlw:
   Line 9:
-    y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
-      [@introduced] =
+    x23 [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "175"}}]}}
+  Line 11:
+    x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "176"}}]}}
-  Line 11:
-    y [@field:0:contents] [@introduced] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "177"}}]}}
   Line 35:
     y [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
       [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "176"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 37:
     x23 [@at:'Old:loc:bench/ce/ref_mono.mlw:38] [@field:0:contents]
       [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "174"}}]}}
   Line 38:
     old x23 [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
       [@field:0:contents] [@introduced] [@model_trace:x23] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "174"}}]}}
     x23 [@field:0:contents] [@introduced] [@model_trace:x23] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "176"}}]}}
     old y [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
       [@field:0:contents] [@introduced] [@model_trace:y] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "176"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 40:
     y [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "177"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 41:
     x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "175"}}]}}
   Line 42:
     x23 [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "176"}}]}}
 
 File "bench/ce/ref_mono.mlw", line 51, characters 14-36:
 Sub-goal Loop invariant init of goal test_loop'vc.
@@ -182,7 +181,7 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "400"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "398"}}]}}
   Line 38:
     old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
       [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
@@ -196,22 +195,14 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "402"}}]}}
-  Line 44:
-    x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
-      [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
-      [@introduced] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "400"}}]}}
   Line 48:
     x [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
       [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "402"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "400"}}]}}
   Line 51:
     x at L [@at:L] [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
       [@introduced] [@model_trace:x] =
@@ -224,12 +215,12 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "402"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "400"}}]}}
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "402"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "400"}}]}}
 
 File "bench/ce/ref_mono.mlw", line 52, characters 12-14:
 Sub-goal Loop variant decrease of goal test_loop'vc.
@@ -270,14 +261,6 @@ File ref_mono.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
     x [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
-      [@introduced] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
-  Line 44:
-    x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
-      [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
       [@introduced] =
       {"type": "Record",
        "val":
@@ -343,7 +326,7 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "347"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-3"}}]}}
   Line 38:
     old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
       [@at:'Old:loc:bench/ce/ref_mono.mlw:45]
@@ -352,29 +335,20 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-175"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
     x [@at:M:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
       [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "174"}}]}}
-  Line 44:
-    x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:38]
-      [@at:'Old:loc:bench/ce/ref_mono.mlw:45]
-      [@at:L:loc:bench/ce/ref_mono.mlw:51] [@field:0:contents]
-      [@introduced] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-175"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 45:
     old x [@at:'Old] [@at:'Old:loc:bench/ce/ref_mono.mlw:45]
       [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "-175"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
     x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_mono.mlw:50:2:96]
       [@model_trace:x] [@vc:written:50:2:96:bench/ce/ref_mono.mlw] =
       {"type": "Record",
@@ -387,7 +361,7 @@ File ref_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "174"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "-1"}}]}}
   Line 50:
     x [@field:0:contents] [@introduced] [@loop:bench/ce/ref_mono.mlw:50:2:96]
       [@model_trace:x] [@vc:written:50:2:96:bench/ce/ref_mono.mlw] =

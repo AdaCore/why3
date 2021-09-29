@@ -68,13 +68,10 @@ let explicit_result loc ce ity =
     | Cfun _ -> "anonymous'result"
     | Cany -> "any'result"
   in
-  let attrs =
-    match loc with
-    | Some l ->
-       let a = create_model_result_call_loc_attr l in
-       Sattr.add a model_trace_result_attributes
-    | None -> model_trace_result_attributes
-  in
+  let attrs = model_trace_result_attributes in
+  let attrs = match loc with
+    | Some l -> Sattr.add (create_call_result_attr l) attrs
+    | None -> attrs in
   create_pvsymbol (id_fresh ?loc ~attrs name) ity
 
 
@@ -92,7 +89,10 @@ let wp_attr = Ident.create_attribute "vc:wp"
 let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
 let nt_attr = Ident.create_attribute "vc:divergent"
+
 let do_not_keep_trace_attr = Ident.create_attribute "vc:do_not_keep_trace"
+let do_not_keep_trace_flag = Debug.register_flag "vc:do_not_keep_trace"
+    ~desc:"Do@ not@ keep@ trace@ variables@ in@ model"
 
 let vc_attrs =
   Sattr.add nt_attr (Sattr.add kp_attr (Sattr.add wb_attr
@@ -120,7 +120,8 @@ let mk_env ?(attrs=Sattr.empty)
       {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs =
   (* generate traceability info for counterexamples if asked *)
   let keep_trace =
-    if Sattr.mem do_not_keep_trace_attr attrs then
+    if Debug.test_flag do_not_keep_trace_flag ||
+       Sattr.mem do_not_keep_trace_attr attrs then
       begin
         Debug.dprintf debug_vc "keep_trace is unset@.";
         false
@@ -461,7 +462,7 @@ let rec k_print fmt k = match k with
       "@[<hov 4>ASSERT %a@]" Pretty.print_term f
   | Kstop f -> Format.fprintf fmt
       "@[<hov 4>STOP %a@]" Pretty.print_term f
-  | Kcont 0 -> Format.fprintf fmt "SKIP"
+  | Kcont 0 -> Format.pp_print_string fmt "SKIP"
   | Kcont i -> Format.fprintf fmt "RAISE %d" i
   | Kaxiom k -> Format.fprintf fmt "@[<hov 4>AXIOM %a@]" k_print k
   | Ktag (WP, k) -> Format.fprintf fmt "@[<hov 4>WP %a@]" k_print k
@@ -1657,10 +1658,12 @@ let rec is_trivial_vc f =
   | Tif(_,t1,t2) -> is_trivial_vc t1 && is_trivial_vc t2
   | _ -> false
 
+let rec has_attr a f =
+  Sattr.mem annot_attr f.t_attrs || t_any (has_attr a) f
 
-let add_vc_decl env id f vcl =
-  if not (Sattr.mem annot_attr f.t_attrs) && is_trivial_vc f
-  then vcl else mk_vc_decl env id f :: vcl
+let add_vc_decl kn id f vcl =
+  if is_trivial_vc f && not (has_attr annot_attr f)
+  then vcl else mk_vc_decl kn id f :: vcl
 
 let infer_invs = ref (fun _ _ _ _ _ _ -> [])
 let set_infer_invs f = infer_invs := f

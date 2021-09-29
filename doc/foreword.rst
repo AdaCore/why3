@@ -40,7 +40,7 @@ Contact
 ~~~~~~~
 
 There is a public mailing list for users’ discussions:
-http://lists.gforge.inria.fr/mailman/listinfo/why3-club.
+https://groupes.renater.fr/sympa/info/why3-club.
 
 Report any bug to the Why3 Bug Tracking System:
 https://gitlab.inria.fr/why3/why3/issues.

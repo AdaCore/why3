@@ -35,31 +35,31 @@ type field_info = {
   field_ident: ident option; (** Identifier of the field *)
 }
 
-(* The printer mapping collects information during printing that is necessary to
+(** The printer mapping collects information during printing that is necessary to
    trace names in the output of the printer to elements of AST in its input. *)
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
-  (* The position of the term that triggers the VC *)
+  (** The position of the term that triggers the VC *)
   vc_term_attrs : Sattr.t;
-  (* The attributes of the term that triggers the VC *)
+  (** The attributes of the term that triggers the VC *)
   queried_terms : Term.term Mstr.t;
-  (* The list of terms that were queried for the counter-example
+  (** The list of terms that were queried for the counter-example
      by the printer *)
   list_projections: Ident.ident Mstr.t;
-  (* List of projections as printed in the model. They corresponds to an ident
+  (** List of projections as printed in the model. They corresponds to an ident
      which is kept so that we can approximate its used name in task. *)
   list_fields: Ident.ident Mstr.t;
-  (* These corresponds to meta_record_def (tagged on field function definition).
+  (** These corresponds to meta_record_def (tagged on field function definition).
      The difference with projections is that you are not allowed to reconstruct
      two projections into a record (at counterexample parsing level). *)
   list_records : field_info list Mstr.t;
-  (* Descriptions of the fields of all records. *)
+  (** Descriptions of the fields of all records. *)
   noarg_constructors: string list;
-  (* List of constructors with no arguments that can be confused for variables
+  (** List of constructors with no arguments that can be confused for variables
      during parsing. *)
   set_str: Sattr.t Mstr.t
-  (* List of attributes corresponding to a printed constants (that was on the
+  (** List of attributes corresponding to a printed constants (that was on the
      immediate term, not inside the ident) *)
 }
 
@@ -76,36 +76,75 @@ type printer_args = {
 }
 
 type printer = printer_args -> ?old:in_channel -> task Pp.pp
+(** A printer receives a [printer_args] which is created from the information
+   contained in the driver file. [old] is used for interactive prover where
+   users edits the file. In this case the printer should try to keep the user
+   edited part as much as possible *)
 
 val get_default_printer_mapping : printer_mapping
+(** Empty mapping *)
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
+(** [register_printer ~desc name printer] Register the printer [printer] so that
+    drivers of prover can mention it using [name]. *)
 
 val lookup_printer : string -> printer
 
 val list_printers : unit -> (string * Pp.formatted) list
+(** List registered printers *)
 
 (** {2 Use printers} *)
 
 val print_prelude : prelude Pp.pp
+(** Print a prelude *)
+
 val print_th_prelude : task -> prelude_map Pp.pp
+(** print the prelude of the theory present in the task *)
+
 val print_interface : interface Pp.pp
 
 val meta_syntax_type : meta
+(** Meta used to mark in a task type that are associated with a syntax. Mainly
+    used for the transformation which eliminate definitions of builtin type. *)
+
 val meta_syntax_logic : meta
+(** Meta used to mark in a task function that are associated with a syntax. *)
+
 val meta_syntax_literal : meta
+(** Meta used to mark in a task literals that will be printed particularly. *)
+
 val meta_remove_prop : meta
+(** Meta used to mark in a task proposition that must be removed before printing *)
+
 val meta_remove_logic : meta
+(** Meta used to mark in a task function that must be removed before printing *)
+
 val meta_remove_type : meta
+(** Meta used to mark in a task type that must be removed before printing *)
+
 val meta_realized_theory : meta
+(** Meta used for implementing modular realization of theories. The meta stores
+    the association between a module and the name that should be used *)
 
 val syntax_type : tysymbol -> string -> bool -> tdecl
+(** create a meta declaration for the builtin syntax of a type *)
+
 val syntax_logic : lsymbol -> string -> bool -> tdecl
+(** create a meta declaration for the builtin syntax of a function *)
+
 val syntax_literal : tysymbol -> string -> bool -> tdecl
+(** create a meta declaration for the builtin syntax of a literal *)
+
 val remove_prop : prsymbol -> tdecl
+(** create a meta declaration for a proposition to remove *)
 
 val check_syntax_type: tysymbol -> string -> unit
+(** [check_syntax_type tys syntax] check that [syntax] doesn't mention arguments
+    that [tys] doesn't have *)
+
 val check_syntax_logic: lsymbol -> string -> unit
+(** [check_syntax_logic ls syntax] check that [syntax] doesn't mention arguments
+   that [ls] doesn't have *)
 
 type syntax_map = (string*int) Mid.t
 (* [syntax_map] maps the idents of removed props to "" *)
@@ -130,6 +169,9 @@ val syntax_arguments_prec : string -> (int -> 'a Pp.pp) -> int list -> 'a list P
     [print_arg], and the precedence list [prec_list] *)
 
 val syntax_arguments : string -> 'a Pp.pp -> 'a list Pp.pp
+(** [syntax_arguments templ print_arg fmt l] prints in the
+    formatter [fmt] the list [l] using the syntax [templ], and the printer
+    [print_arg] *)
 
 val gen_syntax_arguments_prec :
   Format.formatter -> string ->
@@ -145,6 +187,11 @@ val syntax_arguments_typed_prec :
 
 val syntax_arguments_typed :
   string -> term Pp.pp -> ty Pp.pp -> term -> term list Pp.pp
+(** [syntax_arguments_typed templ print_arg print_type t fmt l]
+    prints in the formatter [fmt] the list [l] using the template [templ], the
+    printers [print_arg] and [print_type].
+    The term [t] should be akin to [Tapp (_, l)] and is used to fill ["%t0"]
+    and ["%si"]. *)
 
 val syntax_range_literal :
   ?cb:(Number.int_constant Pp.pp option) -> string -> Number.int_constant Pp.pp
@@ -172,10 +219,19 @@ exception UnsupportedDecl of decl * string
 exception NotImplemented  of        string
 
 val unsupportedType : ty   -> string -> 'a
+(** Should be used by the printer for handling the error of an unsupported type *)
+
 val unsupportedTerm : term -> string -> 'a
+(** Should be used by the printer for handling the error of an unsupported term *)
+
 val unsupportedPattern : pattern -> string -> 'a
+(** Should be used by the printer for handling the error of an unsupported pattern *)
+
 val unsupportedDecl : decl -> string -> 'a
+(** Should be used by the printer for handling the error of an unsupported declaration *)
+
 val notImplemented  :         string -> 'a
+(** Should be used by the printer for handling partial implementation *)
 
 (** {3 Functions that catch inner error} *)
 
@@ -191,9 +247,9 @@ val catch_unsupportedType : (ty -> 'a) -> (ty -> 'a)
     - raise [UnsupportedType (arg,s)] if [f arg] raises [Unsupported s]*)
 
 val catch_unsupportedTerm : (term -> 'a) -> (term -> 'a)
-(** same as {! catch_unsupportedType} but use [UnsupportedExpr]
-    instead of [UnsupportedType]*)
+(** same as {!catch_unsupportedType} but use {!UnsupportedTerm}
+    instead of {!UnsupportedType} *)
 
 val catch_unsupportedDecl : (decl -> 'a) -> (decl -> 'a)
-(** same as {! catch_unsupportedType} but use [UnsupportedDecl]
-    instead of [UnsupportedType] *)
+(** same as {!catch_unsupportedType} but use {!UnsupportedDecl}
+    instead of {!UnsupportedType} *)

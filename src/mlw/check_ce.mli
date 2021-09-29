@@ -53,6 +53,9 @@ type rac_result = rac_result_state * Log.exec_log
 (** The result of a RAC execution is comprised of the final state and the
    execution log. *)
 
+val string_of_rac_result_state : rac_result_state -> string
+(** String of the RAC result state variant *)
+
 val print_rac_result : ?verb_lvl:int -> rac_result Pp.pp
 (** Print the result state of a RAC execution with the execution log *)
 
@@ -79,7 +82,7 @@ val oracle_of_model : Pmodule.pmodule -> Model_parser.model -> Pinterp_core.orac
 (** Create an oracle from a (prover model-derived) candidate counterexample. *)
 
 val model_of_exec_log : original_model:model -> Log.exec_log -> model
-(** [model_of_exec_log ~original_model log)] populates a [Model_parser.model] from an
+(** [model_of_exec_log ~original_model log)] populates a {!Model_parser.model} from an
    execution log [log] *)
 
 (* val find_ls : Theory.theory -> Loc.position -> Term.lsymbol *)
@@ -141,8 +144,8 @@ val select_model :
   (Call_provers.prover_answer * model) list -> (model * classification) option
 (** Select one of the given models. By default, counterexample classification
     ([check_ce]) is disabled. When counterexample checking is enabled, the first
-    good model is selected (with verdict {!variant:NC}, {!variant:SW}, or
-    {!variant:NC_SW}, if any), or the last non-empty model otherwise. The RAC
+    good model is selected (with verdict {!const:verdict.NC}, {!const:verdict.SW}, or
+    {!const:verdict.NC_SW}, if any), or the last non-empty model otherwise. The RAC
     reduce configuration [rac] is used only when counterexample checking is
     enabled. *)
 

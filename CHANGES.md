@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+API
+  * improved documentation of [Ptree]
+
 Python
   * added break and continue
   * added range with one, two or three argument(s)

@@ -15,7 +15,7 @@
   open Py_ast
 
   let () = Exn_printer.register (fun fmt exn -> match exn with
-    | Error -> Format.fprintf fmt "syntax error"
+    | Error -> Format.pp_print_string fmt "syntax error"
     | _ -> raise exn)
 
   let floc s e = Loc.extract (s,e)
@@ -53,6 +53,17 @@
     sp_diverge = s1.sp_diverge || s2.sp_diverge;
     sp_partial = s1.sp_partial || s2.sp_partial;
   }
+
+  let fresh_type_var =
+    let r = ref 0 in
+    fun loc -> incr r;
+      PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
+
+  let logic_type loc = function
+  | None    -> fresh_type_var loc
+  | Some ty -> ty
+
+  let logic_param loc (id, ty) = id, logic_type loc ty
 
 %}
 
@@ -114,19 +125,44 @@ import:
   { Dimport (m, l) }
 
 func:
-| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
-  { Dlogic (true, id, l) }
-| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
-  { Dlogic (false, id, l) }
+| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  ty=option(function_type) NEWLINE
+  { let loc = floc $startpos $endpos in
+    Dlogic (id, List.map (logic_param loc) l, Some (logic_type loc ty)) }
+| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR NEWLINE
+  { let loc = floc $startpos $endpos in
+    Dlogic (id, List.map (logic_param loc) l, None) }
+
+param:
+| id=ident ty=option(param_type)
+  { id, ty }
+
+param_type:
+| COLON ty=typ
+  { ty }
+
+function_type:
+| ARROW ty=typ
+  { ty }
+
+/* Note: "list" is a legal type annotation in Python; we make it a
+ * polymorphic type "list 'a" in WhyML  */
+typ:
+| id=ident
+  { if id.id_str = "list"
+    then PTtyapp (Qident id, [fresh_type_var (floc $startpos $endpos)])
+    else PTtyapp (Qident id, []) }
+| id=ident LEFTSQ tyl=separated_nonempty_list(COMMA, typ) RIGHTSQ
+  { PTtyapp (Qident id, tyl) }
 
 def:
-| DEF f = ident LEFTPAR x = separated_list(COMMA, ident) RIGHTPAR
-  COLON NEWLINE BEGIN s=spec l=nonempty_list(stmt) END
+| DEF f = ident LEFTPAR x = separated_list(COMMA, param) RIGHTPAR
+  ty=option(function_type) COLON NEWLINE BEGIN s=spec l=nonempty_list(stmt) END
     {
       if f.id_str = "range" then
         let loc = floc $startpos $endpos in
         Loc.errorm ~loc "micro Python does not allow shadowing 'range'"
-      else Ddef (f, x, s, l)
+      else Ddef (f, x, ty, s, l)
     }
 ;
 
@@ -372,8 +408,8 @@ term_:
     { Tif ($2, $4, $6) }
 | LET id=ident EQUAL t1=term IN t2=term
     { Tlet (id, t1, t2) }
-| q=quant l=comma_list1(ident) DOT t=term
-    { let var id = id.id_loc, Some id, false, None in
+| q=quant l=comma_list1(param) DOT t=term
+    { let var (id, ty) = id.id_loc, Some id, false, ty in
       Tquant (q, List.map var l, [], t) }
 | id=ident LEFTPAR l=separated_list(COMMA, term) RIGHTPAR
     { Tidapp (Qident id, l) }
@@ -435,12 +471,12 @@ comma_list1(X):
 (* parsing of a single term *)
 
 term_eof:
-| term EOF { $1 }
+| term NEWLINE EOF { $1 }
 
 ident_comma_list_eof:
-| comma_list1(ident) EOF { $1 }
+| comma_list1(ident) NEWLINE EOF { $1 }
 
 term_comma_list_eof:
-| comma_list1(term) EOF { $1 }
+| comma_list1(term) NEWLINE EOF { $1 }
 (* we use single_term to avoid conflict with tuples, that
    do not need parentheses *)

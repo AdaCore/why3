@@ -182,18 +182,30 @@ let () =
     ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ mutually@ \
            recursive@ definitions."
 
-(** conditional transformations, only applied when polymorphic types occur *)
+(** conditional transformations, only applied when some metas occur (or not)
 
-let eliminate_definition_if_poly =
+  we eliminate all definitions if either :
+   - some type polymorphism occur
+          (true when the meta monomorphic_types_only is NOT there)
+   - there is request for counterexample tracing
+          (true when the meta get_counexeamp is there)
+*)
+
+let eliminate_const_definition =
+  eliminate_definition_gen (fun ls -> ls.ls_args = [])
+
+let eliminate_definition_conditionally =
   Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
     (function
-    | [] -> eliminate_definition
-    | _ -> eliminate_recursion)
+      | [] -> eliminate_definition
+      | _ -> Trans.on_meta Inlining.meta_get_counterexmp (function
+          | [] -> eliminate_recursion
+          | _ -> Trans.compose eliminate_recursion eliminate_const_definition))
 
 let () =
-  Trans.register_transform "eliminate_definition_if_poly"
-    eliminate_definition_if_poly
-    ~desc:"Same@ as@ eliminate_definition@ but@ only@ if@ polymorphism@ appear."
+  Trans.register_transform "eliminate_definition_conditionally"
+    eliminate_definition_conditionally
+    ~desc:"Same@ as@ eliminate_definition@ but@ conditionally@ to@ some@ metas"
 
 
 

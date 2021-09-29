@@ -6,9 +6,13 @@
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bellman_ford.mlw"/>
 <theory name="Graph" proved="true">
+ <goal name="s&#39;vc" expl="VC for s" proved="true">
+ <proof prover="4"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
  <goal name="vertices_cardinal_pos" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>

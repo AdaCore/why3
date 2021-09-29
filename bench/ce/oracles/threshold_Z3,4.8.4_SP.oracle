@@ -34,37 +34,37 @@ File threshold.mlw:
     max [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1"}}
+       "value": {"type": "Integer", "val": "0"}}
     min [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "1"}}
     n [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1"}}
+       "value": {"type": "Integer", "val": "0"}}
   Line 8:
     max [@introduced] [@model_trace:max] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1"}}
+       "value": {"type": "Integer", "val": "0"}}
     min [@introduced] [@model_trace:min] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "1"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "1"}}
   Line 10:
     _x [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "-1"}}
+       "value": {"type": "Integer", "val": "1"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "1"}}
 
 File "bench/ce/threshold.mlw", line 25, characters 11-29:
 Sub-goal Arithmetic overflow of goal f'vc.
@@ -73,13 +73,13 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 21:
-    max [@introduced] = {"type": "Integer", "val": "2147483776"}
-    min [@introduced] = {"type": "Integer", "val": "2147483651"}
+    max [@introduced] = {"type": "Integer", "val": "2952783303"}
+    min [@introduced] = {"type": "Integer", "val": "4260098813"}
   Line 25:
     max [@introduced] [@model_trace:max] =
-      {"type": "Integer", "val": "2147483776"}
+      {"type": "Integer", "val": "2952783303"}
     min [@introduced] [@model_trace:min] =
-      {"type": "Integer", "val": "2147483651"}
+      {"type": "Integer", "val": "4260098813"}
 
 File "bench/ce/threshold.mlw", line 22, characters 13-45:
 Sub-goal Postcondition of goal f'vc.
@@ -88,16 +88,15 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 21:
-    max [@introduced] = {"type": "Integer", "val": "407257092"}
-    min [@introduced] = {"type": "Integer", "val": "541605897"}
-    n [@introduced] = {"type": "Integer", "val": "809926657"}
+    max [@introduced] = {"type": "Integer", "val": "0"}
+    min [@introduced] = {"type": "Integer", "val": "787335"}
+    n [@introduced] = {"type": "Integer", "val": "1"}
   Line 22:
-    max [@introduced] [@model_trace:max] =
-      {"type": "Integer", "val": "407257092"}
+    max [@introduced] [@model_trace:max] = {"type": "Integer", "val": "0"}
     min [@introduced] [@model_trace:min] =
-      {"type": "Integer", "val": "541605897"}
-    result [@introduced] = {"type": "Integer", "val": "407257092"}
+      {"type": "Integer", "val": "787335"}
+    result [@introduced] = {"type": "Integer", "val": "787335"}
   Line 25:
-    _x [@introduced] = {"type": "Integer", "val": "948862989"}
-    result [@introduced] = {"type": "Integer", "val": "407257092"}
+    _x [@introduced] = {"type": "Integer", "val": "787335"}
+    result [@introduced] = {"type": "Integer", "val": "787335"}
 
