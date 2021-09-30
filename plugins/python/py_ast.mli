@@ -24,8 +24,6 @@ type binop =
 
 type typ = Ptree.pty
 
-type param = ident * typ
-
 type expr = {
   expr_desc: expr_desc;
   expr_loc : Loc.position;
@@ -70,6 +68,6 @@ and decl =
   | Dimport of ident * ident list
   | Ddef  of ident * (ident * typ option) list * typ option * Ptree.spec * block
   | Dstmt of stmt
-  | Dlogic of ident * param list * typ option
+  | Dlogic of ident * (ident * typ) list * typ option * Ptree.term option
 
 type file = block
