@@ -383,12 +383,12 @@ let logic_param (id, ty) =
   id.id_loc, Some id, false, ty
 
 let logic = function
-  | Py_ast.Dlogic (id, idl, ty) ->
+  | Py_ast.Dlogic (id, idl, ty, def) ->
     let d = { ld_loc = id.id_loc;
               ld_ident = id;
               ld_params = List.map logic_param idl;
               ld_type = ty;
-              ld_def = None } in
+              ld_def = def } in
     Typing.add_decl id.id_loc (Dlogic [d])
   | _ -> ()
 

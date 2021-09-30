@@ -190,6 +190,7 @@ interpreter (see below).
     param: identifier (":" `py_type`)?
     return_type: "->" `py_type`
     py_type: identifier ("[" `py_type` ("," `py_type`)* "]")?
+          : | "'" identifier
 
 .. rubric:: Function specification
 
@@ -237,8 +238,8 @@ interpreter (see below).
 .. rubric:: Logic declaration
 
 .. productionlist:: microPython
-   logic_declaration: "#@" "function" identifier "(" `params` ")" `return_type`? NEWLINE
-                 : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
+   logic_declaration: "#@" "function" identifier "(" `params` ")" `return_type`? ("=" `term`)? NEWLINE
+                 : | "#@" "predicate" identifier "(" `params` ")" ("=" `term`)? NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
 Yet, they can be axiomatized, using toplevel ``assume`` statements.

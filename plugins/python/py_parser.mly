@@ -70,7 +70,7 @@
 %token <string> INTEGER
 %token <string> STRING
 %token <Py_ast.binop> CMP
-%token <string> IDENT QIDENT
+%token <string> IDENT QIDENT TVAR
 %token DEF IF ELSE ELIF RETURN WHILE FOR IN AND OR NOT NONE TRUE FALSE
 %token FROM IMPORT BREAK CONTINUE
 %token EOF
@@ -126,12 +126,17 @@ import:
 
 func:
 | FUNCTION id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
-  ty=option(function_type) NEWLINE
+  ty=option(function_type) def=option(logic_body) NEWLINE
   { let loc = floc $startpos $endpos in
-    Dlogic (id, List.map (logic_param loc) l, Some (logic_type loc ty)) }
-| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR NEWLINE
+    Dlogic (id, List.map (logic_param loc) l, Some (logic_type loc ty), def) }
+| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  def=option(logic_body) NEWLINE
   { let loc = floc $startpos $endpos in
-    Dlogic (id, List.map (logic_param loc) l, None) }
+    Dlogic (id, List.map (logic_param loc) l, None, def) }
+
+logic_body:
+| EQUAL t=term
+  { t }
 
 param:
 | id=ident ty=option(param_type)
@@ -148,6 +153,8 @@ function_type:
 /* Note: "list" is a legal type annotation in Python; we make it a
  * polymorphic type "list 'a" in WhyML  */
 typ:
+| id=type_var
+  { PTtyvar id }
 | id=ident
   { if id.id_str = "list"
     then PTtyapp (Qident id, [fresh_type_var (floc $startpos $endpos)])
@@ -376,6 +383,9 @@ ident:
 ;
 quote_ident:
   id = QIDENT { mk_id id $startpos $endpos }
+;
+type_var:
+  id = TVAR { mk_id id $startpos $endpos }
 ;
 
 /* logic */

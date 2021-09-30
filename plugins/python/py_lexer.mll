@@ -85,6 +85,8 @@ rule next_tokens = parse
             { [id_or_kwd id] }
   | (ident ("'" ident)+) as id
             { [QIDENT id] }
+  | "'" (ident as id)
+            { [TVAR id] }
   | '+'     { [PLUS] }
   | "+="    { [PLUSEQUAL] }
   | "-="    { [MINUSEQUAL] }
