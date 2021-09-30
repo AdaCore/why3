@@ -239,7 +239,7 @@ interpreter (see below).
 
 .. productionlist:: microPython
    logic_declaration: "#@" "function" identifier "(" `params` ")" `return_type`? ("=" `term`)? NEWLINE
-                 : | "#@" "predicate" identifier "(" `params` ")" ("=" `term`) ?NEWLINE
+                 : | "#@" "predicate" identifier "(" `params` ")" ("=" `term`)? NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
 Yet, they can be axiomatized, using toplevel ``assume`` statements.
