@@ -388,7 +388,7 @@ let print_tdecl fmt td = match td.td_node with
       let ym = Mts.fold (fun x y a -> (x,y)::a) sm.sm_ty [] in
       let lm = Mls.fold (fun x y a -> (x,y)::a) sm.sm_ls [] in
       let pm = Mpr.fold (fun x y a -> (x,y)::a) sm.sm_pr [] in
-      fprintf fmt "@[<hov 2>(* clone %a with %a%a%a%a *)@]"
+      fprintf fmt "@[<hov 2>(* clone %a with %a%a%a%a *)@]@\n@\n"
         print_qt th (print_list_suf comma print_inst_ts) tm
                     (print_list_suf comma print_inst_ty) ym
                     (print_list_suf comma print_inst_ls) lm
