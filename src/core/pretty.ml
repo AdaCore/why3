@@ -413,6 +413,9 @@ and print_tnode ?(ext_printer=true) pri fmt t =
         print_lterm pri fmt (t_attr_set t1.t_attrs t1)
     | Tapp (fs, tl) when is_fs_tuple fs ->
         fprintf fmt "(%a)" (print_list comma print_term) tl
+    | Tapp (fs, [t1;t2]) when ls_equal fs ps_equ ->
+        fprintf fmt (protect_on (pri > 6) "@[%a =@ %a@]")
+          (print_lterm 6) t1 (print_lterm 6) t2
     | Tapp (fs, tl) when unambig_fs fs ->
         print_app pri fs fmt tl
     | Tapp (fs, tl) ->
