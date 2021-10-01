@@ -130,8 +130,10 @@ let debug_print_coercions = Debug.register_info_flag "print_coercions"
 let debug_print_qualifs = Debug.register_info_flag "print_qualifs"
   ~desc:"Print@ qualifiers@ of@ identifiers@ in@ error@ messages."*)
 
-let create ?(print_ext_any=(fun (printer: any_pp Pp.pp) -> printer)) sprinter aprinter
-    tprinter pprinter do_forget_all =
+let create
+      ?(print_ext_any = (fun (printer: any_pp Pp.pp) -> printer))
+      ?(do_forget_all = true) ?(shorten_axioms = false)
+      sprinter aprinter tprinter pprinter =
   (module (struct
 
 (* Using a reference for customized external printer. This avoids changing the
@@ -578,7 +580,8 @@ let print_axiom fmt (pr, f) =
      forget_tvs ())
 
 let print_prop_decl fmt (k,pr,f) =
-  if k == Paxiom && not (Sattr.exists (Ident.attr_equal Ident.useraxiom_attr) pr.pr_name.id_attrs) then
+  if shorten_axioms && k == Paxiom &&
+       not (Sattr.exists (Ident.attr_equal Ident.useraxiom_attr) pr.pr_name.id_attrs) then
     print_axiom fmt (pr, f)
   else
     (fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
@@ -778,7 +781,7 @@ module LegacyPrinter =
     create_ident_printer why3_keywords ~sanitizer:same,
     create_ident_printer why3_keywords ~sanitizer:same
   in
-  create sprinter aprinter tprinter pprinter true))
+  create ~do_forget_all:true ~shorten_axioms:false sprinter aprinter tprinter pprinter))
 
 include LegacyPrinter
 
