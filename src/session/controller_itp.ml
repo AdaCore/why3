@@ -1214,11 +1214,12 @@ let create_rem_list =
     Buffer.add_string b (Pp.string_of pr id)
   in
   let module P = (val Pretty.create
+      ~do_forget_all:false
       rem.Eliminate_definition.rem_nt.Trans.printer
       rem.Eliminate_definition.rem_nt.Trans.aprinter
       rem.Eliminate_definition.rem_nt.Trans.printer
       rem.Eliminate_definition.rem_nt.Trans.printer
-      false) in
+      ) in
   let remove_ts ts = add P.print_ts ts in
   let remove_ls ls = add P.print_ls ls in
   let remove_pr pr = add P.print_pr pr in

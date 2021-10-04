@@ -143,7 +143,7 @@ let p s id =
   let pr = Ident.duplicate_ident_printer tables.Trans.printer in
   let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
   (* Use the external printer for exception reporting (default is identity) *)
-  (Pretty.create ~print_ext_any:(print_ext_any task lang) pr apr pr pr false)
+  (Pretty.create ~do_forget_all:false ~print_ext_any:(print_ext_any task lang) pr apr pr pr)
 
 let print_opt_type ~print_type fmt t =
   match t with
@@ -913,8 +913,10 @@ end
       let apr = tables.Trans.aprinter in
       (* For task printing we use the external printer (the default one is
          identity). *)
-      let module P = (val Pretty.create ~print_ext_any:(print_ext_any task lang) pr apr
-                         pr pr false) in
+      let module P =
+        (val Pretty.create ~print_ext_any:(print_ext_any task lang)
+               ~do_forget_all:false ~shorten_axioms:true
+               pr apr pr pr) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in
     task_text, loc_color_list, goal_loc

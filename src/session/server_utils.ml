@@ -158,7 +158,7 @@ let print_id s tables =
   *)
   let pr = Ident.duplicate_ident_printer tables.Trans.printer in
   let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
-  let module P = (val Pretty.create pr apr pr pr false) in
+  let module P = (val Pretty.create ~do_forget_all:false pr apr pr pr) in
   (* Different constructs are printed differently *)
   match d.Decl.d_node, table_id with
   | Decl.Dind (_, il), Args_wrapper.Tsprsymbol pr ->
@@ -229,7 +229,7 @@ let search ~search_both s tables =
       *)
       let pr = Ident.duplicate_ident_printer tables.Trans.printer in
       let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
-      let module P = (val Pretty.create pr apr pr pr false) in
+      let module P = (val Pretty.create ~do_forget_all:false pr apr pr pr) in
       Pp.string_of (Pp.print_list Pp.newline2 P.print_decl) l
 
 let locate_id _cont task args =
