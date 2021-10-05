@@ -404,11 +404,21 @@ let create_call_result_attr = create_loc_attr call_result_name
 
 let get_call_result_loc = get_loc_attr call_result_name
 
+let create_call_id_attr_string id = Format.sprintf "RAC:call_id:%d" id
+
+let get_call_id_value a =
+  match Strings.bounded_split ':' a.attr_string 3 with
+  | ["rac"; "call_id"; id] -> Some (int_of_string id)
+  | _ -> None
+
 let search_attribute_value f attrs =
   try Some (Lists.first f (Sattr.elements attrs)) with Not_found -> None
 
 let get_model_trace_attr ~attrs =
   Sattr.choose (Sattr.filter is_model_trace_attr attrs)
+
+let has_rac_assume =
+  Sattr.exists (fun a -> a.attr_string = "RAC:assume")
 
 let transform_model_trace_attr attrs trans_fun =
   try

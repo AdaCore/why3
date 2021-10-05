@@ -49,6 +49,7 @@ module Why : sig
     ?trans:Task.task Trans.tlist ->
     ?why_prover:why_prover ->
     ?oracle_quant_var:oracle_quant_var ->
+    elim_eps:Task.task Trans.trans ->
     unit -> check_term
   (** Metas are applied to all tasks, the tasks are first reduce using [trans],
      and if this is insufficient for deciding the term, checked using

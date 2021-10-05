@@ -80,7 +80,9 @@ let rec eval ctx oty t =
       let values = List.fold_left aux ctx.values bs in
       eval {ctx with values} oty t
   | Tapply ("=", [t1; t2]) ->
-      Const (Boolean (eval ctx None t1 = eval ctx None t2))
+      let v1 = eval ctx None t1 in
+      let v2 = eval ctx None t2 in
+      Const (Boolean (compare_model_value_const v1 v2 = 0))
   | Tapply ("or", ts) ->
       Const (Boolean List.(exists is_true (map (eval ctx None) ts)))
   | Tapply ("and", ts) ->
@@ -167,7 +169,10 @@ and eval_prover_var seen ctx ty v =
 
 and eval_array ctx = function
   | Aconst t -> Model_parser.{arr_indices= []; arr_others= eval ctx None t}
-  | Avar v -> Format.ksprintf failwith "eval_array var %s" v
+  | Avar v ->
+      (match eval_const ctx v with
+       | Model_parser.Array a -> a
+       | _ -> Format.ksprintf failwith "eval array var %s not an array" v)
   | Astore (a, key, value) ->
       let a = eval_array ctx a in
       let arr_indices = Model_parser.({
