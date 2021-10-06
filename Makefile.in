@@ -2140,10 +2140,10 @@ dist: $(MORE_DIST)
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		Makefile.in configure.in \
-		src/*/*.ml src/*/*.ml[iyl4] \
+		src/*/*.ml src/*/*.ml[ily] \
 		plugins/*/*.ml plugins/*/*.ml[ily] \
 		lib/coq/*.v lib/coq/*/*.v \
-		src/server/*.c src/server/*.h \
+		src/server/*.[ch] \
 		examples/use_api/*.ml
 
 #########

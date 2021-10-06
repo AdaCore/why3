@@ -1,12 +1,10 @@
 # no header
-| "META.in" -> no
+| "dimacs.mll" -> no
 | "extmap.ml[i]?" -> no
 | "literals.mll" -> no
 | "report.ml[i]?" -> no
 # Objective Caml source
-| ".*\\.ml[il4]?" -> frame width:62 open:"(*" line:"*" close:"*)"
-| ".*\\.ml[il4]?\\.in" -> frame width:62 open:"(*" line:"*" close:"*)"
-| ".*\\.mly"      -> frame width:62 open:"(*" line:"*" close:"*)"
+| ".*\\.ml[ily]?" -> frame width:62 open:"(*" line:"*" close:"*)"
 # Coq source
 | ".*\\.v"      -> frame width:62 open:"(*" line:"*" close:"*)"
 # C source
@@ -14,4 +12,3 @@
 # Misc
 | "configure.in" -> frame width:62 open:"#"  line:"#" close:"#"
 | "Makefile.in" -> frame width:62 open:"#"  line:"#" close:"#"
-| "README"   -> frame width:62 open:"#"  line:"#" close:"#"
