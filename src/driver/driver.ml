@@ -25,6 +25,14 @@ let driver_debug =
   Debug.register_flag "interm_task"
     ~desc:"Print intermediate task generated during processing of a driver"
 
+let meta_get_counterexmp =
+  Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
+  ~desc:"Set@ when@ counter-example@ should@ be@ get."
+
+let get_counterexmp task =
+  let ce_meta = Task.find_meta_tds task meta_get_counterexmp in
+  not (Theory.Stdecl.is_empty ce_meta.tds_set)
+
 (** drivers *)
 
 type driver = {

@@ -14,7 +14,7 @@ let debug = Debug.register_info_flag "prepare_for_counterexmp"
     for@ getting@ counter-example."
 
 let prepare_for_counterexmp2 env task =
-  if not (Inlining.get_counterexmp task) then begin
+  if not (Driver.get_counterexmp task) then begin
     (* Counter-example will not be queried, do nothing *)
     Debug.dprintf debug "Not get ce@.";
     task

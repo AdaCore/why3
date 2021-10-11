@@ -64,9 +64,7 @@ let task2 = None
 let task2 = Task.add_param_decl task2 prop_var_A
 let task2 = Task.add_param_decl task2 prop_var_B
 (* BEGIN{ce_nobuiltin} *)
-let meta_ce = Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
-  ~desc:"Set@ when@ counter-example@ should@ be@ get."
-let task2 = Task.add_meta task2 meta_ce [Theory.MAstr ""]
+let task2 = Task.add_meta task2 Driver.meta_get_counterexmp [Theory.MAstr ""]
 (* END{ce_nobuiltin} *)
 let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2")
 let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2

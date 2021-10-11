@@ -852,7 +852,7 @@ let meta_supports_reason_unknown =
 
 
 let print_task version args ?old:_ fmt task =
-  let cntexample = Inlining.get_counterexmp task in
+  let cntexample = Driver.get_counterexmp task in
   let incremental =
     let incr_meta = Task.find_meta_tds task meta_incremental in
     not (Theory.Stdecl.is_empty incr_meta.Task.tds_set)

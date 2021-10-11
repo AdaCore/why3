@@ -94,3 +94,12 @@ val prove_task_prepared :
 (** Traverse all metas from a driver *)
 
 val syntax_map: driver -> Printer.syntax_map
+
+(** Information on conuterexample generation *)
+
+val meta_get_counterexmp : Theory.meta
+(** Set in drivers that generate counterexamples *)
+
+val get_counterexmp : Task.task -> bool
+(** Returns true if counterexample should be get for the task (according to
+    [meta_get_counterexmp]. *)
