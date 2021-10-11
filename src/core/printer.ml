@@ -40,6 +40,7 @@ type field_info = {
 
 type printer_mapping = {
   lsymbol_m          : string -> Term.lsymbol;
+  get_counterexmp    : bool;
   vc_term_loc        : Loc.position option;
   vc_term_attrs      : Sattr.t;
   queried_terms      : Term.term Mstr.t;
@@ -70,8 +71,9 @@ let printers : reg_printer Hstr.t = Hstr.create 17
 exception KnownPrinter of string
 exception UnknownPrinter of string
 
-let get_default_printer_mapping = {
+let get_default_printer_mapping ~get_counterexmp = {
   lsymbol_m = (function _ -> raise Not_found);
+  get_counterexmp;
   vc_term_loc = None;
   vc_term_attrs = Sattr.empty;
   queried_terms = Mstr.empty;

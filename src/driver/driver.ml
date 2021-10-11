@@ -358,7 +358,8 @@ let print_task_prepared ?old drv fmt task =
       prelude     = drv.drv_prelude;
       th_prelude  = drv.drv_thprelude;
       blacklist   = drv.drv_blacklist;
-      printer_mapping = get_default_printer_mapping;
+      printer_mapping = get_default_printer_mapping
+          ~get_counterexmp:(get_counterexmp task);
     } in
   let printer = lookup_printer p printer_args in
   fprintf fmt "@[%a@]@?" (printer ?old) task;

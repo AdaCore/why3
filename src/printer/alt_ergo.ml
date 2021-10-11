@@ -432,6 +432,7 @@ let print_prop_decl vc_loc vc_attrs args info fmt k pr f =
   | Pgoal ->
       let model_list = print_info_model info in
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
+                                get_counterexmp = args.printer_mapping.get_counterexmp;
                                 vc_term_loc = vc_loc;
                                 vc_term_attrs = vc_attrs;
                                 queried_terms = model_list;

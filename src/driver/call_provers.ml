@@ -262,11 +262,13 @@ let analyse_result exit_result res_parser printer_mapping out =
         if res = Valid then
           (Valid, [])
         else
-          (* get model if possible *)
-          let m = res_parser.prp_model_parser printer_mapping model_str in
-          Debug.dprintf debug "Call_provers: model:@.";
-          debug_print_model ~print_attrs:false m;
-          analyse ((res, m) :: saved_models) (Some res) tl
+          if printer_mapping.Printer.get_counterexmp then
+            let m = res_parser.prp_model_parser printer_mapping model_str in
+            Debug.dprintf debug "Call_provers: model:@.";
+            debug_print_model ~print_attrs:false m;
+            analyse ((res, m) :: saved_models) (Some res) tl
+          else
+            analyse saved_models (Some res) tl
     | Answer res :: tl ->
         if res = Valid then
           (Valid, [])

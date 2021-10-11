@@ -39,6 +39,9 @@ type field_info = {
    trace names in the output of the printer to elements of AST in its input. *)
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
+  get_counterexmp : bool;
+  (** Reflects if counterexamples where requested (according to
+      [Inlining.get_counterexmp]) *)
   vc_term_loc   : Loc.position option;
   (** The position of the term that triggers the VC *)
   vc_term_attrs : Sattr.t;
@@ -81,7 +84,7 @@ type printer = printer_args -> ?old:in_channel -> task Pp.pp
    users edits the file. In this case the printer should try to keep the user
    edited part as much as possible *)
 
-val get_default_printer_mapping : printer_mapping
+val get_default_printer_mapping : get_counterexmp:bool -> printer_mapping
 (** Empty mapping *)
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
