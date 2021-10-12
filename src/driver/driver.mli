@@ -80,7 +80,7 @@ val prepare_task : driver -> Task.task -> Task.task
 
 val print_task_prepared :
   ?old       : in_channel ->
-  driver -> Format.formatter -> Task.task -> Printer.printer_mapping
+  driver -> Format.formatter -> Task.task -> Printer.printing_info
 
 val prove_task_prepared :
   command      : string ->

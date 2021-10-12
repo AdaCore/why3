@@ -1149,8 +1149,8 @@ let model_for_positions_and_decls model ~positions =
 ***************************************************************
 *)
 
-type model_parser = printer_mapping -> string -> model
-type raw_model_parser = printer_mapping -> string -> model_element list
+type model_parser = printing_info -> string -> model
+type raw_model_parser = printing_info -> string -> model_element list
 
 let debug_elements elts =
   let me_name_trans men = men.men_name in

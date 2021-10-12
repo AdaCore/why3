@@ -30,17 +30,13 @@ type interface_map = interface Mid.t
 type interface_export_map = interface Mid.t
 type blacklist = string list
 
-type 'a pp = Pp.formatter -> 'a -> unit
-
 type field_info = {
   field_name: string;
   field_trace: string;
   field_ident: ident option;
 }
 
-type printer_mapping = {
-  lsymbol_m          : string -> Term.lsymbol;
-  get_counterexmp    : bool;
+type printing_info = {
   vc_term_loc        : Loc.position option;
   vc_term_attrs      : Sattr.t;
   queried_terms      : Term.term Mstr.t;
@@ -55,25 +51,21 @@ let fields_projs pm =
   Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_fields pm.list_projections
 
 type printer_args = {
-  env        : Env.env;
-  prelude    : prelude;
-  th_prelude : prelude_map;
-  blacklist  : blacklist;
-  mutable printer_mapping : printer_mapping;
+  env           : Env.env;
+  prelude       : prelude;
+  th_prelude    : prelude_map;
+  blacklist     : blacklist;
+  printing_info : printing_info option ref;
 }
 
-type printer = printer_args -> ?old:in_channel -> task pp
+type printer = printer_args -> ?old:in_channel -> task Pp.pp
 
-type reg_printer = Pp.formatted * printer
-
-let printers : reg_printer Hstr.t = Hstr.create 17
+let printers : (Pp.formatted * printer) Hstr.t = Hstr.create 17
 
 exception KnownPrinter of string
 exception UnknownPrinter of string
 
-let get_default_printer_mapping ~get_counterexmp = {
-  lsymbol_m = (function _ -> raise Not_found);
-  get_counterexmp;
+let default_printing_info = {
   vc_term_loc = None;
   vc_term_attrs = Sattr.empty;
   queried_terms = Mstr.empty;
@@ -97,7 +89,7 @@ let list_printers () =
 
 let () = register_printer
   ~desc:"Dummy@ printer@ with@ no@ output@ (used@ for@ debugging)." "(null)"
-  (fun _ ?old:_ _ _ -> ())
+  (fun _ ?old:_ -> Pp.nothing)
 
 (** Syntax substitutions *)
 

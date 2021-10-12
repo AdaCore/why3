@@ -343,12 +343,12 @@ val customize_clean : #clean -> unit
 ***************************************************************
 *)
 
-type model_parser = Printer.printer_mapping -> string -> model
+type model_parser = Printer.printing_info -> string -> model
 (** Parses the input string into model elements, estabilishes a mapping between these
    elements and mapping from printer and builds model data structure. The model still has
    to be cleaned using [clean]. *)
 
-type raw_model_parser = Printer.printer_mapping -> string -> model_element list
+type raw_model_parser = Printer.printing_info -> string -> model_element list
 
 val register_remove_field:
   (Ident.Sattr.t * model_value -> Ident.Sattr.t * model_value) -> unit
