@@ -35,10 +35,9 @@ type field_info = {
   field_ident: ident option; (** Identifier of the field *)
 }
 
-(** The printer mapping collects information during printing that is necessary to
-   trace names in the output of the printer to elements of AST in its input. *)
-type printer_mapping = {
-  lsymbol_m     : string -> Term.lsymbol;
+(** The printing info is collected while printing a task to trace back elements
+    in the output of the printer to elements in the task and the AST. *)
+type printing_info = {
   vc_term_loc   : Loc.position option;
   (** The position of the term that triggers the VC *)
   vc_term_attrs : Sattr.t;
@@ -63,16 +62,20 @@ type printer_mapping = {
      immediate term, not inside the ident) *)
 }
 
+val default_printing_info : printing_info
+(** Empty mapping *)
 
-(** Return the union of projections and fields of a printer_mapping *)
-val fields_projs : printer_mapping -> ident Mstr.t
+(** Return the union of projections and fields of a printing_info *)
+val fields_projs : printing_info -> ident Mstr.t
 
 type printer_args = {
-  env        : Env.env;
-  prelude    : prelude;
-  th_prelude : prelude_map;
-  blacklist  : blacklist;
-  mutable printer_mapping : printer_mapping;
+  env           : Env.env;
+  prelude       : prelude;
+  th_prelude    : prelude_map;
+  blacklist     : blacklist;
+  printing_info : printing_info option ref;
+  (* printing_info is a reference because it is easier to pass around in the
+     printer *)
 }
 
 type printer = printer_args -> ?old:in_channel -> task Pp.pp
@@ -80,9 +83,6 @@ type printer = printer_args -> ?old:in_channel -> task Pp.pp
    contained in the driver file. [old] is used for interactive prover where
    users edits the file. In this case the printer should try to keep the user
    edited part as much as possible *)
-
-val get_default_printer_mapping : printer_mapping
-(** Empty mapping *)
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
 (** [register_printer ~desc name printer] Register the printer [printer] so that

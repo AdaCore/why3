@@ -42,7 +42,7 @@ type context = {
 
   (** Other info fields *)
   fields_projs: Ident.ident Mstr.t;
-  pm: printer_mapping;
+  info : printing_info;
   list_records: string list Mstr.t;
 }
 
@@ -55,7 +55,7 @@ let rec eval ctx oty t =
   match t with
   | Tconst c -> Const c
   | Tunparsed s -> Unparsed s
-  | Tvar v when List.mem v ctx.pm.noarg_constructors ->
+  | Tvar v when List.mem v ctx.info.noarg_constructors ->
       Apply (v, [])
   | Tvar v -> (
       try Mstr.find v ctx.values with Not_found ->
@@ -161,9 +161,9 @@ and eval_prover_var seen ctx ty v =
   | [] -> None
   | fs ->
       let field_name_in m (f, _) = Mstr.mem f m in
-      if List.for_all (field_name_in ctx.pm.list_fields) fs then
+      if List.for_all (field_name_in ctx.info.list_fields) fs then
         Some (Model_parser.Record fs)
-      else match List.find_opt (field_name_in ctx.pm.list_projections) fs with
+      else match List.find_opt (field_name_in ctx.info.list_projections) fs with
         | Some (f, t) -> Some (Model_parser.Proj (f, t))
         | None -> None
 
@@ -213,7 +213,7 @@ and eval_to_array ctx = function
 (** Create a mapping from the names of constants among the definitions to model
     values, which are obtained by evaluating the SMTv2 expressions by which
     the constants are defined. *)
-let create_list pm (defs: definition Mstr.t) =
+let create_list info (defs: definition Mstr.t) =
 
   (* Convert list_records to take replace fields with model_trace when
      necessary. *)
@@ -223,9 +223,9 @@ let create_list pm (defs: definition Mstr.t) =
         match fi.field_ident with
         | Some id -> id.Ident.id_string
         | None -> fi.field_name in
-    Mstr.mapi (fun _ -> List.map select) pm.Printer.list_records in
+    Mstr.mapi (fun _ -> List.map select) info.Printer.list_records in
 
-  let fields_projs = fields_projs pm in
+  let fields_projs = fields_projs info in
 
   let print_def fmt (s, def) =
     Format.fprintf fmt "%s: %a" s print_definition def in
@@ -245,7 +245,7 @@ let create_list pm (defs: definition Mstr.t) =
     let is_const nm def =
       def.args = [] &&
       not (Mstr.mem nm fields_projs) &&
-      not (List.mem nm pm.noarg_constructors) in
+      not (List.mem nm info.noarg_constructors) in
     Mstr.keys (Mstr.filter is_const function_defs) in
 
   Debug.dprintf debug_cntex "@[<hov2>Const defs:%a@]@."
@@ -254,7 +254,7 @@ let create_list pm (defs: definition Mstr.t) =
   (* The evaluation context *)
   let ctx =
     { values= Mstr.empty; consts= Hstr.create 7; prover_values= Hstr.create 7;
-      function_defs; fields_projs; pm; list_records;
+      function_defs; fields_projs; info; list_records;
       interprete_prover_vars= true } in
 
   (* Evaluate the expressions by which the constants are defined *)

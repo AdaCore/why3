@@ -1006,13 +1006,8 @@ match pa.proof_state with
    begin
      let open Call_provers in
      let result = Pp.string_of print_prover_answer res.pr_answer in
-     let {controller_env= env} as cont = d.cont in
-     let selected_model =
-       let th = Session_itp.find_th cont.controller_session parid in
-       let pm = Pmodule.restore_module (Theory.restore_theory (theory_name th)) in
-       let rac = Pinterp.mk_rac (Rac.Why.mk_check_term_lit cont.controller_config env ()) in
-       let sel = Check_ce.select_model ~check_ce:true rac env pm res.pr_models in
-       match sel with None -> Model_parser.empty_model | Some (m,_) -> m in
+     let selected_model = Opt.get_def Model_parser.empty_model
+         (Check_ce.select_model_last_non_empty res.pr_models) in
      let ce_result =
        Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs ?me_name_trans:None)
          selected_model in
@@ -1024,7 +1019,7 @@ match pa.proof_state with
        let result_pr =
          result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result in
        let (source_result, list_loc, goal_loc, file_format) =
-         create_ce_tab cont.controller_session ~print_attrs
+         create_ce_tab d.cont.controller_session ~print_attrs
            selected_model any old_list_loc old_goal_loc in
        (P.notify (Source_and_ce (source_result, list_loc, goal_loc, file_format));
        P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc, lang)))

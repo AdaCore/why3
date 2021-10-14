@@ -198,7 +198,7 @@ let eliminate_definition_conditionally =
   Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
     (function
       | [] -> eliminate_definition
-      | _ -> Trans.on_meta Inlining.meta_get_counterexmp (function
+      | _ -> Trans.on_meta Driver.meta_get_counterexmp (function
           | [] -> eliminate_recursion
           | _ -> Trans.compose eliminate_recursion eliminate_const_definition))
 

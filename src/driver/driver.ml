@@ -25,6 +25,14 @@ let driver_debug =
   Debug.register_flag "interm_task"
     ~desc:"Print intermediate task generated during processing of a driver"
 
+let meta_get_counterexmp =
+  Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
+  ~desc:"Set@ when@ counter-example@ should@ be@ get."
+
+let get_counterexmp task =
+  let ce_meta = Task.find_meta_tds task meta_get_counterexmp in
+  not (Theory.Stdecl.is_empty ce_meta.tds_set)
+
 (** drivers *)
 
 type driver = {
@@ -274,10 +282,10 @@ let file_of_theory drv input_file th =
   get_filename drv ~input_file ~theory_name:th.th_name.Ident.id_string ~goal_name:"null"
 
 let call_on_buffer ~command ~limit ~gen_new_file ?inplace ~filename
-    ~printer_mapping drv buffer =
+    ~printing_info drv buffer =
   Call_provers.call_on_buffer
     ~command ~limit ~gen_new_file ~res_parser:drv.drv_res_parser
-    ~filename ~printer_mapping ?inplace buffer
+    ~filename ~printing_info ?inplace buffer
 
 (** print'n'prove *)
 
@@ -346,15 +354,15 @@ let print_task_prepared ?old drv fmt task =
     | None -> raise NoPrinter
     | Some p -> p
   in
-  let printer_args = { Printer.env = drv.drv_env;
-      prelude     = drv.drv_prelude;
-      th_prelude  = drv.drv_thprelude;
-      blacklist   = drv.drv_blacklist;
-      printer_mapping = get_default_printer_mapping;
+  let printer_args = Printer.{
+      env           = drv.drv_env;
+      prelude       = drv.drv_prelude;
+      th_prelude    = drv.drv_thprelude;
+      blacklist     = drv.drv_blacklist;
+      printing_info = ref None;
     } in
-  let printer = lookup_printer p printer_args in
-  fprintf fmt "@[%a@]@?" (printer ?old) task;
-  printer_args.printer_mapping
+  fprintf fmt "@[%a@]@?" (lookup_printer p ?old printer_args) task;
+  Opt.get_def default_printing_info !(printer_args.printing_info)
 
 let print_task ?old drv fmt task =
   let task = prepare_task drv task in
@@ -409,15 +417,15 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
 let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
-  let gen_new_file, filename =
-    file_name_of_task ?old ?inplace ?interactive drv task in
   let old_channel = Opt.map open_in old in
-  let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
+  let printing_info = print_task_prepared ?old:old_channel drv fmt task in
   pp_print_flush fmt ();
   Opt.iter close_in old_channel;
-  let res =
-    call_on_buffer ~command ~limit ~gen_new_file ?inplace
-      ~filename ~printer_mapping drv buf in
+  let gen_new_file, filename =
+    file_name_of_task ?old ?inplace ?interactive drv task in
+  let get_counterexmp = get_counterexmp task in
+  let res = call_on_buffer ~command ~limit ~gen_new_file ?inplace ~filename
+              ~get_counterexmp ~printing_info drv buf in
   Buffer.reset buf;
   res
 
