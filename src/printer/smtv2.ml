@@ -623,7 +623,7 @@ let print_rec_logic_decl info fmt = function
             (print_ident info) ls.ls_name
             (print_par info
                (fun fmt -> Format.fprintf fmt "(%a) %a"
-                   (print_var_list info) vsl
+                   (print_typed_var_list info) vsl
                    (print_type_value info) ls.ls_value)) tvs;
         end
       in
@@ -633,7 +633,7 @@ let print_rec_logic_decl info fmt = function
             (print_expr info) expr
         end
       in
-      fprintf fmt "@[<hov 2>(define-funs-rec %a %a)@]@\n@\n"
+      fprintf fmt "@[<hov 2>(define-funs-rec (%a) (%a))@]@\n@\n"
         (print_list nothing print_decl) l
         (print_list nothing print_term) l;
       List.iter (fun (_,vsl,_) -> List.iter (forget_var info) vsl) l

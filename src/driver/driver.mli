@@ -59,6 +59,7 @@ val call_on_buffer :
 val print_task :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
+(** Prepare the task for the prover and prints it *)
 
 val print_theory :
   ?old       : in_channel ->
@@ -75,7 +76,7 @@ val prove_task :
 
 (** Split the previous function in two simpler functions *)
 
-(* Apply driver's transformations to the task *)
+(** Apply driver's transformations to the task *)
 val prepare_task : driver -> Task.task -> Task.task
 
 val print_task_prepared :
