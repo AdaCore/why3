@@ -24,13 +24,6 @@ jobs:
 
       - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v2
-        if: runner.os != 'Windows'
-        with:
-          ocaml-version: ${{ matrix.ocaml-version }}
-
-      - name: Use Setup OCaml v1 ${{ matrix.ocaml-version }}
-        uses: avsm/setup-ocaml@v1
-        if: runner.os == 'Windows'
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
 
