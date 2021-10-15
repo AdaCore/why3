@@ -28,6 +28,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <string.h>
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
