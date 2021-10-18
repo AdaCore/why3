@@ -15,7 +15,7 @@ shopt -s nullglob
 
 suffix=
 
-categories="badfiles drivers execution extraction goodfiles invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit validgoals validsplitgoals"
+categories="badfiles drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit validgoals validsplitgoals"
 
 enabled_categories=""
 
@@ -659,7 +659,7 @@ echo "=== Checking mlw_printer ==="
 test_mlw_printer
 fi
 
-if test -n "$has_infer"; then
+if enabled inferloop && test -n "$has_infer"; then
     echo "=== Checking loop invariant inference ==="
     bench/infer-bench bench/infer
 fi
