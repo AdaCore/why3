@@ -806,9 +806,9 @@ module Make(S:sig
     if Ty.(ty_equal ty ty_bool) then
       match t.t_node with
       | Tconst (Constant.ConstInt n)
-           when BigInt.to_int n.il_int = 1 -> t_bool_true
+           when BigInt.to_int n.Number.il_int = 1 -> t_bool_true
       | Tconst (Constant.ConstInt n)
-           when BigInt.to_int n.il_int = 0 -> t_bool_false
+           when BigInt.to_int n.Number.il_int = 0 -> t_bool_false
       | _ -> assert false
     else t
 
