@@ -8,10 +8,17 @@ designed for teaching purposes. They come with their own specification
 languages, written in special comments.
 These input formats are described below.
 
-Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.) can be passed a file
-with a suffix :file:`.c` or :file:`.py`, which triggers the corresponding input format.
-These input formats can also be used in on-line versions of Why3, at
-http://why3.lri.fr/micro-C/ and http://why3.lri.fr/python/, respectively.
+Why3 also supports the format MLCFG, which is an extension of WhyML
+allowing to define function bodies in an unstructured style, with goto
+statements.
+
+Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.)
+can be passed a file with a suffix :file:`.c`, :file:`.py` or
+:file:`.mlcfg`, which triggers the corresponding input format.
+
+The input formats for C and Python can also be used in on-line
+versions of Why3, at http://why3.lri.fr/micro-C/ and
+http://why3.lri.fr/python/, respectively.
 
 .. index:: micro-C
 .. _format.micro-C:
@@ -296,7 +303,7 @@ Python lists are modeled as arrays, whose size cannot be modified.
 .. index:: CFG
 .. _format.CFG:
 
-MLCFG: function bodies on the style of control-flow graphs
+MLCFG: function bodies in the style of control-flow graphs
 ----------------------------------------------------------
 
 The MLCFG language is an experimental extension of the regular WhyML
@@ -336,7 +343,7 @@ composed of a zero or more instructions followed by a terminator, and a
 sequence of other blocks, each denoted by a label (:math:`L_1 \ldots L_j` above).
 The instructions are semi-colon separated sequences of regular
 WhyML expressions of type ``unit``, excluding ``return`` or ``absurd``
-expressions or code invariants:
+expressions, or code invariants:
 
 - a code invariant: :samp:`invariant {I} \\{ {t} }` where *I* is a
   name and *t* a predicate. It is similar to an assert expression,
@@ -426,7 +433,7 @@ The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_
    :caption: Control-flow graph of the ``max_array`` function.
    :name: fig.cfg.max_array
 
-Below is a version of this code in the Why3-CFG language, where label
+Below is a version of this code in the MLCFG language, where label
 ``L`` corresponds to node ``L``, label ``L1`` to node ``invariant``,
 label ``L2`` to node ``do``.
 
@@ -473,7 +480,7 @@ The consecutive invariants act as a single cut in the generation of VCs.
 Error messages
 ~~~~~~~~~~~~~~
 
-The translation from the CFG language to regular WhyML code may raise
+The translation from the MLCFG language to regular WhyML code may raise
 the following errors.
 
 - “cycle without invariant”: in order to perform the translation, any
