@@ -330,10 +330,10 @@ program function of the following form, introduced by keywords ``let cfg``:
     var *y*:sub:`1`: *u*:sub:`1`;
     ...
     var *y*:sub:`k`: *u*:sub:`k`;
-    { *instructions*;*terminator* }
-    *L*:sub:`1` { *instructions*:sub:`1`;*terminator*:sub:`1` }
+    { *instructions*; *terminator* }
+    *L*:sub:`1` { *instructions*:sub:`1`; *terminator*:sub:`1` }
     ...
-    *L*:sub:`j` { *instructions*:sub:`j`;*terminator*:sub:`j` }
+    *L*:sub:`j` { *instructions*:sub:`j`; *terminator*:sub:`j` }
 
 
 It defines a program function *f*, with the usual syntax for
@@ -367,7 +367,7 @@ Each block is ended by one of the following terminators:
      | *pat*:sub:`k` -> *terminator*:sub:`k`
      end
 
-- a ``return`` statement: :samp:`return *expr*`
+- a ``return`` statement: :samp:`return {expr}`
 - an ``absurd`` statement: indicating that this block should be unreachable.
 
 The extension of syntax is described by the following rules.
