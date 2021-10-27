@@ -1,0 +1,8 @@
+use list.List
+
+let predicate f (l: list 'a)
+  requires { l = Nil }
+= match l with
+  | Nil -> False
+  | _ -> absurd
+  end

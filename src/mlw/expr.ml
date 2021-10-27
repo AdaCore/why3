@@ -642,7 +642,7 @@ let rec post_of_expr res e = match e.e_node with
   | Epure t -> post_of_term res t
   | Eghost e | Eexn (_,e) -> post_of_expr res e
   | Eexec (_,c) ->
-      let conv q = open_post_with res q in
+      let conv q = open_post_with (term_of_fmla res) q in
       copy_attrs e (t_and_l (List.map conv c.cty_post))
   | Elet (LDvar (v,_d),e) when ity_equal v.pv_ity ity_unit ->
       copy_attrs e (t_subst_single v.pv_vs t_void (post_of_expr res e))
