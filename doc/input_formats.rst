@@ -280,6 +280,7 @@ Built-in functions and predicates
 
 .. rubric:: Python code
 
+* built-in function ``pow`` over integers
 * ``len(l)`` returns the length of list ``l``.
 * ``int(input())`` reads an integer from standard input.
 * ``range(l, u)`` returns the list of integers
