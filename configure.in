@@ -501,7 +501,7 @@ if test "$enable_zip" = yes; then
    DIR=
    if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query zip)
-      if test -n "DIR"; then
+      if test -n "$DIR"; then
          echo "ocamlfind found camlzip in $DIR"
          ZIPINCLUDE="-I $DIR"
       else
