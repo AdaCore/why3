@@ -534,4 +534,6 @@ let id_unique_attr printer ?(sanitizer = same) id =
     Hid.replace printer.values id name;
     name
 
+let unused_attr = create_attribute "id:unused"
+
 let unused_suffix = "'unused"

@@ -12,7 +12,7 @@ File if_assign.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 12:
-    result [@introduced] [@model_trace:result] =
+    result [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "42"}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -33,7 +33,7 @@ File if_assign.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 18:
-    result [@introduced] [@model_trace:result] =
+    result [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "42"}
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -70,7 +70,7 @@ File if_assign.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "42"}}]}}
   Line 24:
-    result [@introduced] [@model_trace:result] =
+    result [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "42"}
   Line 25:
     x [@field:0:contents] [@introduced] [@model_trace:x]
@@ -102,7 +102,7 @@ File if_assign.mlw:
     a [@introduced] = {"type": "Integer", "val": "0"}
   Line 33:
     result of call at line 33, characters 6-11 [@call_result:33:6:11:bench/ce/if_assign.mlw]
-      [@introduced] [@model_trace:result] =
+      [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Boolean", "val": true}
   Line 34:
     x [@field:0:contents] [@introduced] =
@@ -134,7 +134,7 @@ File if_assign.mlw:
   Line 30:
     a [@introduced] = {"type": "Integer", "val": "-1"}
   Line 33:
-    result [@introduced] [@model_trace:result] =
+    result [@id:unused] [@introduced] [@model_trace:result] =
       {"type": "Integer", "val": "17"}
   Line 34:
     x [@field:0:contents] [@introduced] =
