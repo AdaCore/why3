@@ -269,3 +269,6 @@ val get_hyp_name: attrs:Sattr.t -> string option
 
 val unused_suffix : string
 (** Suffix for unused variables kept for counterexample generation *)
+
+val unused_attr : attribute
+(** attribute for unused variables kept for counterexample generation *)

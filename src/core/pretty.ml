@@ -721,6 +721,12 @@ let print_goal fmt d =
    | _ -> assert false
 *)
 
+let useful_decl d =
+  match d.d_node with
+  | Dparam ls | Dlogic([ls,_]) ->
+    not (Sattr.mem Ident.unused_attr ls.ls_name.Ident.id_attrs)
+  | _ -> false
+
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in
   let ld = Task.local_decls task ut in
@@ -729,7 +735,8 @@ let print_sequent fmt task =
       | [] -> ()
       | [_] -> ()
       | d :: r ->
-         fprintf fmt "@[%a@]@\n@\n" print_decl d;
+         if useful_decl d then
+           fprintf fmt "@[%a@]@\n@\n" print_decl d;
          aux fmt r
   in
   let rec last fmt l =
