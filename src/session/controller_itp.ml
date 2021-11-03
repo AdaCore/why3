@@ -757,25 +757,26 @@ let schedule_transformation c id name args ~callback ~notification =
     callback s
   in
   let apply_trans () =
-    begin
+    let status =
       try
         let subtasks =
           apply_trans_to_goal ~allow_no_effect:false
                               c.controller_session c.controller_env name args id
         in
         let tid = graft_transf c.controller_session id name args subtasks in
-        callback (TSdone tid)
+        TSdone tid
       with
       | NoProgress ->
           (* if result is same as input task, consider it as a failure *)
-          callback (TSfailed (id, NoProgress))
+          TSfailed (id, NoProgress)
       | e when not (is_fatal e) ->
-          callback (TSfailed (id, e))
+          TSfailed (id, e)
       | e when not (Debug.test_flag Debug.stack_trace) ->
           (* "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
-          callback (TSfatal (id, e))
-    end;
+          TSfatal (id, e)
+    in
+    callback status;
     false
   in
   if Session_itp.is_detached c.controller_session (APn id) then
