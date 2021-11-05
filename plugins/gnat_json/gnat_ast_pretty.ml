@@ -482,19 +482,62 @@ and pp_epsilon fmt (n : epsilon_id) =
   Format.fprintf fmt "@[(epsilon %a : %a {@[%a@]})@]"
     pp_why_node r.name pp_why_node r.typ pp_why_node r.pred
 
+and pp_not fmt (n : not_id) =
+  let Not r = n.desc in
+  Format.fprintf fmt "@[(not %a)@]" pp_why_node r.right
+
+and pp_transparent_type_definition fmt (n : transparent_type_definition_id) =
+  let Transparent_type_definition r = n.desc in
+  pp_why_node fmt r.type_definition
+
+and pp_universal_quantif fmt (n : universal_quantif_id) =
+  let Universal_quantif r = n.desc in
+  Format.fprintf fmt "@[(%a forall@ %a@ :@ %a@ [%a].@[%a@])@]"
+  pp_symbol_set_label r.labels
+  pp_why_node_list (r.variables.elt0 :: r.variables.elts)
+  pp_why_node r.var_type
+  pp_why_node_option r.triggers
+  pp_why_node r.pred
+
+and pp_existential_quantif fmt (n : existential_quantif_id) =
+  let Existential_quantif r = n.desc in
+  Format.fprintf fmt "@[(%a exists@ %a@ :@ %a@ .@[%a@])@]"
+  pp_symbol_set_label r.labels
+  pp_why_node_list (r.variables.elt0 :: r.variables.elts)
+  pp_why_node r.var_type
+  pp_why_node r.pred
+
+and pp_triggers fmt (n : triggers_id) =
+  let Triggers r = n.desc in
+  pp_print_list ~pp_sep:(fun fmt () -> Format.fprintf fmt " | ") pp_why_node fmt (r.triggers.elt0 :: r.triggers.elts)
+
+and pp_trigger fmt (n : trigger_id) =
+  let Trigger r = n.desc in
+  pp_print_list ~pp_sep:Why3.Pp.comma pp_why_node fmt (r.terms.elt0 :: r.terms.elts)
+
+and pp_exception_declaration fmt (n : exception_declaration_id) =
+  let Exception_declaration r = n.desc in
+  Format.fprintf fmt "exception %a %a" pp_why_node r.name pp_why_node_option r.arg
+
+and pp_record_aggregate fmt (n : record_aggregate_id) =
+  let Record_aggregate r = n.desc in
+  Format.fprintf fmt "@[{%a}@]" (pp_print_list ~pp_sep:Why3.Pp.semi pp_why_node) (r.associations.elt0 :: r.associations.elts)
+
+and pp_field_association fmt (n : field_association_id) =
+  let Field_association r = n.desc in
+  Format.fprintf fmt "%a : %a" pp_why_node r.field pp_why_node r.value
+
+and pp_tagged fmt (n : tagged_id) =
+  let Tagged r = n.desc in
+  Format.fprintf fmt "@[(at %a %a)@]" pp_symbol r.tag pp_why_node r.def
+
+and pp_record_update fmt (n : record_update_id) =
+  let Record_update r = n.desc in
+  Format.fprintf fmt "@[{%a with %a}@]" pp_why_node r.name (pp_print_list ~pp_sep:Why3.Pp.semi pp_why_node) (r.updates.elt0 :: r.updates.elts)
+
+
 and pp_effects fmt (_ : effects_id) = Format.fprintf fmt "--pp_effects NOT IMPLEMENTED"
-and pp_transparent_type_definition fmt (_ : transparent_type_definition_id) = Format.fprintf fmt "--pp_transparent_type_definition NOT IMPLEMENTED"
-and pp_triggers fmt (_ : triggers_id) = Format.fprintf fmt "--pp_triggers NOT IMPLEMENTED"
-and pp_trigger fmt (_ : trigger_id) = Format.fprintf fmt "--pp_trigger NOT IMPLEMENTED"
-and pp_field_association fmt (_ : field_association_id) = Format.fprintf fmt "--pp_field_association NOT IMPLEMENTED"
-and pp_universal_quantif fmt (_ : universal_quantif_id) = Format.fprintf fmt "--pp_universal_quantif NOT IMPLEMENTED"
-and pp_existential_quantif fmt (_ : existential_quantif_id) = Format.fprintf fmt "--pp_existential_quantif NOT IMPLEMENTED"
-and pp_not fmt (_ : not_id) = Format.fprintf fmt "--pp_not NOT IMPLEMENTED"
-and pp_tagged fmt (_ : tagged_id) = Format.fprintf fmt "--pp_tagged NOT IMPLEMENTED"
-and pp_record_update fmt (_ : record_update_id) = Format.fprintf fmt "--pp_record_update NOT IMPLEMENTED"
-and pp_record_aggregate fmt (_ : record_aggregate_id) = Format.fprintf fmt "--pp_record_aggregate NOT IMPLEMENTED"
 and pp_binding_ref fmt (_ : binding_ref_id) = Format.fprintf fmt "--pp_binding_ref NOT IMPLEMENTED"
-and pp_exception_declaration fmt (_ : exception_declaration_id) = Format.fprintf fmt "--pp_exception_declaration NOT IMPLEMENTED"
 
 let pp_file fmt f =
   pp_print_list ~pp_sep:Why3.Pp.newline2 pp_why_node fmt f.theory_declarations

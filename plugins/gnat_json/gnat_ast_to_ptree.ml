@@ -795,33 +795,41 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
           (let true_expr = E.mk_var (mk_qualid [(mk_ident [] "True")]) in
            let false_pred = T.mk_var (mk_qualid [mk_ident [] "False"]) in
            let invariants = List.(map (T.name_term "LoopInvariant") (map mk_term_of_pred r.invariants)) in
-           let mk_variant_ident (v : variant_id) =
+           let mk_variant_ident ~old (v : variant_id) =
+              let base = if old then "loop_var" else "loop_var_new" in
              (* creating a unique tmp var for this loop variant, by using the node id *)
-              mk_ident [] ("loop_var___" ^ string_of_int v.info.id) in
-           let check_variant (v : variant_id) acc =
+              mk_ident [] (base ^ "___" ^ string_of_int v.info.id) in
+           let check_variant (v : variant_id) (vardefs, pred) =
              (* checking a single variant; we compare the old value (stored in
                 the tmp var) to the new value computed by the term. The
                 comparison operator is provided in the tree.
                 The accumulator contains the check coditions if this variant
                 doesn't progress (stays the same). *)
               let Variant r = v.desc in
-              let new_ = mk_term_of_term r.expr in
-              let old = T.mk_var (mk_qualid [mk_variant_ident v]) in
-              let expr = process_call (module T) v r.cmp_op [new_;old] in
+              let new_expr = mk_expr_of_term r.expr in
+              let new_var = mk_variant_ident ~old:false v in
+              let new_var_term = T.mk_var (mk_qualid [new_var]) in
+              let old = T.mk_var (mk_qualid [mk_variant_ident ~old:true v]) in
+              let expr = process_call (module T) v r.cmp_op [new_var_term;old] in
               let eq = mk_ident [] (Ident.op_infix "=") in
-              T.mk_attrs (List.filter_map mk_label r.labels)
-                (T.mk_binop
-                  expr
-                  `Or_asym
-                  (T.mk_binop (T.mk_infix new_ eq old) `And_asym acc)) in
+              let res =
+                T.mk_attrs (List.filter_map mk_label r.labels)
+                  (T.mk_binop
+                    expr
+                    `Or_asym
+                    (T.mk_binop (T.mk_infix new_var_term eq old) `And_asym pred)) in
+              (new_var, new_expr) :: vardefs, res
+            in
            (* checking all variants of a given Variants node is just a fold
               which starts at the end, starting with the false condition. *)
            let check_variants (v : variants_id) =
               let Variants v = v.desc in
-              let pred =
+              let vardefs, pred =
                 List.fold_right check_variant (v.variants.elt0 :: v.variants.elts)
-                  false_pred in
-              E.mk_assert Expr.Assert pred in
+                  ([], false_pred) in
+              let assert_ = E.mk_assert Expr.Assert pred in
+              List.fold_left (fun acc (v, def) -> E.mk_let v def acc) assert_ vardefs
+           in
            (* Each Variants node is checked indepently of the others, so here
               we just map over the list of Variants nodes.
             *)
@@ -838,7 +846,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
                 List.fold_right (fun v acc ->
                   let Variant r = v.desc in
                   let value = mk_expr_of_term r.expr in
-                  E.mk_let (mk_variant_ident v) value acc)
+                  E.mk_let (mk_variant_ident ~old:true v) value acc)
                   (vs.variants.elt0 :: vs.variants.elts) acc) r.variants in
            let code_after = mk_expr_of_prog r.code_after in
            let code_before = mk_expr_of_prog r.code_before in
