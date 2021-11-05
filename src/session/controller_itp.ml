@@ -808,9 +808,9 @@ let run_strategy_on_goal
            | Done { Call_provers.pr_answer = Call_provers.Valid } ->
               (* proof succeeded, nothing more to do *)
               callback STShalt
-           | Interrupted | InternalFailure _ ->
+           | Interrupted ->
               callback STShalt
-           | Done _ ->
+           | Done _ | InternalFailure _ ->
               (* proof did not succeed, goto to next step *)
               callback (STSgoto (g,pc+1));
               let run_next () = exec_strategy (pc+1) strat g; false in
