@@ -671,10 +671,10 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         let prefix =
           let Type r = r.typ.desc in
           match unroll_name r.name with
-          | Some (Some "_gnatprove_standard", Some ("Float32"|"Float64" as s)), Some "t" ->
+          | Some (Some "_gnatprove_standard", Some ("Float32"|"Float64"|"Float80" as s)), Some "t" ->
               mk_ident [] s
           | _ ->
-              conversion_error node.info.id "float_constant must be Float32.t or Float64.t" ()
+              conversion_error node.info.id "float_constant must be Float32.t, Float64.t or Float80.t" ()
         in
         let const =
           let Ureal r' = r.value in

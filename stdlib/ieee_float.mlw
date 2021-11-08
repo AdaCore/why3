@@ -188,6 +188,7 @@ module GenericFloat
   (* note values >= than the below should result in infinities              *)
   (*    float32 : 0x1ffffff * 2^103                                         *)
   (*    float64 : 0x3fffffffffffff * 2^970                                  *)
+  (*    float80 : 0x1ffffffffffffffff * 2^16319                             *)
   (* also note that this function never yields a subnormal, or a NaN, or -0 *)
   function of_int (m:mode) (x:int) : t
 
@@ -197,6 +198,7 @@ module GenericFloat
   (* suitably sized bitvector. Safe minimum sizes are given below:         *)
   (*    float32 : 129                                                      *)
   (*    float64 : 1025                                                     *)
+  (*    float80 : 16385                                                    *)
   (* In particular this function should be uninterpreted for infinities    *)
   (* and NaN. Take care that no conclusion can be made on the result based *)
   (* on the size of the bitvector chosen in those cases, i.e. this should  *)
@@ -842,8 +844,7 @@ module Float_BV_Converter
   axiom of_ubv16_to_real: forall m, x.
     to_real (of_ubv16 m x) = FromInt.from_int (BV16.t'int x)
   (* of_ubv32_to_real is defined at cloning *)
-  axiom of_ubv64_to_real: forall m, x.
-    to_real (of_ubv64 m x) = round m (FromInt.from_int (BV64.t'int x))
+  (* of_ubv64_to_real is defined at cloning *)
 end
 
 (** {2 Standard simple precision floats (32 bits)} *)
@@ -918,32 +919,131 @@ module Float64
       x - 0x1p-52 * Abs.abs(x) - 0x1p-1074 <= round m x <= x + 0x1p-52 * Abs.abs(x) + 0x1p-1074
 end
 
+(** {2 Standard extended precision floats (80 bits)} *)
+
+module Float80
+  use int.Int as Int
+  use real.Real
+
+  type t = < float 15 64 >
+
+  constant pow2sb : int = 18446744073709551616
+  constant max_real : real = 0x1.FFFFFFFFFFFFFFFEp16383
+
+  clone export GenericFloat with
+    type t = t,
+    constant eb = t'eb,
+    constant sb = t'sb,
+    constant max_real = max_real,
+    constant pow2sb = pow2sb,
+    function to_real = t'real,
+    predicate is_finite = t'isFinite,
+    goal eb_gt_1,
+    goal sb_gt_1,
+    goal max_int,
+    goal pow2sb,
+    axiom . (* TODO: "lemma"? "goal"? *)
+
+  lemma round_bound_ne :
+    forall x:real [round RNE x].
+      no_overflow RNE x ->
+        x - 0x1p-64 * Abs.abs(x) - 0x1p-16446 <= round RNE x <= x + 0x1p-64 * Abs.abs(x) + 0x1p-16446
+
+  lemma round_bound :
+    forall m:mode, x:real [round m x].
+      no_overflow m x ->
+      x - 0x1p-63 * Abs.abs(x) - 0x1p-16445 <= round m x <= x + 0x1p-63 * Abs.abs(x) + 0x1p-16445
+end
+
 (** {2 Conversions between float formats} *)
 
 module FloatConverter
 
-  use Float64 as Float64
-  use Float32 as Float32
+  type t_small    (* smaller float *)
+  type t_large    (* larger float *)
 
   use export RoundingMode
 
-  function to_float64 mode Float32.t : Float64.t
-  function to_float32 mode Float64.t : Float32.t
+  function small_to_real t_small : real
+  predicate small_is_finite t_small
+  function small_round mode real : real
+  predicate small_no_overflow mode real
 
-  lemma round_double_single :
-  forall m1 m2:mode, x:real.
-    Float64.round m1 (Float32.round m2 x) = Float32.round m2 x
+  function large_to_real t_large : real
+  predicate large_is_finite t_large
+  function large_round mode real : real
 
-  lemma to_float64_exact:
-    forall m:mode, x:Float32.t. Float32.t'isFinite x ->
-      Float64.t'isFinite (to_float64 m x)
-   /\ Float64.t'real (to_float64 m x) = Float32.t'real x
+  function to_large mode t_small : t_large
+  function to_small mode t_large : t_small
 
-  lemma to_float32_conv:
-    forall m:mode, x:Float64.t. Float64.t'isFinite x ->
-      Float32.no_overflow m (Float64.t'real x) ->
-        Float32.t'isFinite (to_float32 m x)
-     /\ Float32.t'real (to_float32 m x) = Float32.round m (Float64.t'real x)
+  lemma round_large_small:
+    forall m1 m2:mode, x:real.
+      large_round m1 (small_round m2 x) = small_round m2 x
+
+  lemma to_large_exact:
+    forall m:mode, x:t_small. small_is_finite x ->
+      large_is_finite (to_large m x)
+   /\ large_to_real (to_large m x) = small_to_real x
+
+  lemma to_small_conv:
+    forall m:mode, x:t_large. large_is_finite x ->
+      small_no_overflow m (large_to_real x) ->
+        small_is_finite (to_small m x)
+     /\ small_to_real (to_small m x) = small_round m (large_to_real x)
+
+end
+
+module Float32_64_Converter
+
+  use Float32 as Float32
+  use Float64 as Float64
+
+  clone export FloatConverter with
+    type t_small = Float32.t,
+    type t_large = Float64.t,
+    function small_to_real = Float32.t'real,
+    predicate small_is_finite = Float32.t'isFinite,
+    function small_round = Float32.round,
+    predicate small_no_overflow = Float32.no_overflow,
+    function large_to_real = Float64.t'real,
+    predicate large_is_finite = Float64.t'isFinite,
+    function large_round = Float64.round
+
+end
+
+module Float32_80_Converter
+
+  use Float32 as Float32
+  use Float80 as Float80
+
+  clone export FloatConverter with
+    type t_small = Float32.t,
+    type t_large = Float80.t,
+    function small_to_real = Float32.t'real,
+    predicate small_is_finite = Float32.t'isFinite,
+    function small_round = Float32.round,
+    predicate small_no_overflow = Float32.no_overflow,
+    function large_to_real = Float80.t'real,
+    predicate large_is_finite = Float80.t'isFinite,
+    function large_round = Float80.round
+
+end
+
+module Float64_80_Converter
+
+  use Float64 as Float64
+  use Float80 as Float80
+
+  clone export FloatConverter with
+    type t_small = Float64.t,
+    type t_large = Float80.t,
+    function small_to_real = Float64.t'real,
+    predicate small_is_finite = Float64.t'isFinite,
+    function small_round = Float64.round,
+    predicate small_no_overflow = Float64.no_overflow,
+    function large_to_real = Float80.t'real,
+    predicate large_is_finite = Float80.t'isFinite,
+    function large_round = Float80.round
 
 end
 
@@ -960,6 +1060,8 @@ module Float32_BV_Converter
 
   axiom of_ubv32_to_real : forall m, x.
     t'real (of_ubv32 m x) = round m (FromInt.from_int (BV32.t'int x))
+  axiom of_ubv64_to_real: forall m, x.
+    t'real (of_ubv64 m x) = round m (FromInt.from_int (BV64.t'int x))
 end
 
 module Float64_BV_Converter
@@ -975,4 +1077,23 @@ module Float64_BV_Converter
 
   axiom of_ubv32_to_real : forall m, x.
     t'real (of_ubv32 m x) = FromInt.from_int (BV32.t'int x)
+  axiom of_ubv64_to_real: forall m, x.
+    t'real (of_ubv64 m x) = round m (FromInt.from_int (BV64.t'int x))
+end
+
+module Float80_BV_Converter
+  use Float80
+
+  clone export Float_BV_Converter with
+    type t = t,
+    predicate is_finite = t'isFinite,
+    predicate le = (.<=),
+    function to_real = t'real,
+    function round = round,
+    axiom . (* TODO: "lemma"? "goal"? *)
+
+  axiom of_ubv32_to_real : forall m, x.
+    t'real (of_ubv32 m x) = FromInt.from_int (BV32.t'int x)
+  axiom of_ubv64_to_real: forall m, x.
+    t'real (of_ubv64 m x) = FromInt.from_int (BV64.t'int x)
 end

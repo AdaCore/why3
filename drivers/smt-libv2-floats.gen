@@ -131,10 +131,55 @@ theory ieee_float.Float64
   remove allprops
 end
 
-theory ieee_float.FloatConverter
+theory ieee_float.Float80
   (* Part I *)
-   syntax function to_float32 "((_ to_fp 8 24) %1 %2)"
-   syntax function to_float64 "((_ to_fp 11 53) %1 %2)"
+  syntax type t "Float80"
+  meta "literal:keep" type t
+  syntax literal t "(fp #b%s1b #b%e15b #b%m63b)"
+
+  syntax function zeroF     "((_ to_fp 15 64) #x00000000000000000000)"
+
+  prelude "(define-fun fp.isFinite80 ((x Float80)) Bool (not (or (fp.isInfinite x) (fp.isNaN x))))"
+  prelude "(define-fun fp.isIntegral80 ((x Float80)) Bool (or (fp.isZero x) (and (fp.isNormal x) (= x (fp.roundToIntegral RNE x)))))"
+
+  syntax predicate t'isFinite "(fp.isFinite80 %1)"
+  syntax predicate is_int "(fp.isIntegral80 %1)"
+
+  (* Faithful translations of the axiomatisation, mainly to remove this crud
+     from the smtlib output of SPARK. *)
+  syntax function round "(fp.to_real ((_ to_fp 15 64) %1 %2))"
+
+  syntax predicate in_range "\
+   (and \
+    (<= \
+     (fp.to_real (fp #b1 #b111111111111110 #b111111111111111111111111111111111111111111111111111111111111111)) \
+     %1) \
+    (<= %1 \
+     (fp.to_real (fp #b0 #b111111111111110 #b111111111111111111111111111111111111111111111111111111111111111)))"
+
+  syntax predicate no_overflow "\
+   (and \
+    (<= \
+     (fp.to_real (fp #b1 #b111111111111110 #b111111111111111111111111111111111111111111111111111111111111111)) \
+     (fp.to_real ((_ to_fp 15 64) %1 %2))) \
+    (<= \
+     (fp.to_real ((_ to_fp 15 64) %1 %2)) \
+     (fp.to_real (fp #b0 #b111111111111110 #b111111111111111111111111111111111111111111111111111111111111111)))"
+
+  remove allprops
+end
+
+theory ieee_float.FloatConverter
+  (* Part II *)
+
+  remove allprops
+end
+
+
+theory ieee_float.Float32_64_Converter
+  (* Part I *)
+   syntax function to_small "((_ to_fp 8 24) %1 %2)"
+   syntax function to_large "((_ to_fp 11 53) %1 %2)"
 
    remove allprops
 end
@@ -165,6 +210,16 @@ theory ieee_float.Float64_BV_Converter
   syntax function of_ubv16 "((_ to_fp_unsigned 11 53) %1 %2)"
   syntax function of_ubv32 "((_ to_fp_unsigned 11 53) %1 %2)"
   syntax function of_ubv64 "((_ to_fp_unsigned 11 53) %1 %2)"
+
+  remove allprops
+end
+
+theory ieee_float.Float80_BV_Converter
+  (* Part I *)
+  syntax function of_ubv8  "((_ to_fp_unsigned 15 64) %1 %2)"
+  syntax function of_ubv16 "((_ to_fp_unsigned 15 64) %1 %2)"
+  syntax function of_ubv32 "((_ to_fp_unsigned 15 64) %1 %2)"
+  syntax function of_ubv64 "((_ to_fp_unsigned 15 64) %1 %2)"
 
   remove allprops
 end
