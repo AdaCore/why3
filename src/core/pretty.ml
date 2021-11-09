@@ -725,7 +725,7 @@ let useful_decl d =
   match d.d_node with
   | Dparam ls | Dlogic([ls,_]) ->
     not (Sattr.mem Ident.unused_attr ls.ls_name.Ident.id_attrs)
-  | _ -> false
+  | _ -> true
 
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in
