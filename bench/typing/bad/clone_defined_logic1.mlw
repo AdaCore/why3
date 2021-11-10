@@ -1,0 +1,15 @@
+module M
+
+  type t
+
+  function f (x : int) : int = x
+
+end
+
+module N
+
+  function f (x : int) : int
+
+  clone M with function f
+
+end

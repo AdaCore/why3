@@ -664,6 +664,23 @@ let clone_decl inst cl uc d = match d.d_node with
   | Dparam ls ->
       let d = create_param_decl (clone_ls cl ls) in
       add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
+  | Dlogic ((ls, _) :: _ as ldl) when Mls.mem ls inst.mi_ls ->
+      List.iter (fun (ls, _) ->
+          (* When one logic definition is instantiated, they must all be *)
+          if not (Mls.mem ls inst.mi_ls)
+          then raise (CannotInstantiate ls.ls_name);
+          let ls' = Mls.find ls inst.mi_ls in
+          cl.ls_table <- Mls.add ls ls' cl.ls_table) ldl;
+      List.iter (fun (ls, ld) ->
+          let ls' = Mls.find ls inst.mi_ls in
+          let ld' = match find_logic_definition uc.muc_theory.uc_known ls' with
+            | Some ld' -> ld'
+            | None -> raise (CannotInstantiate ls.ls_name) in
+          let lda = clone_fmla cl (ls_defn_axiom ld) in
+          let lda' = ls_defn_axiom ld' in
+          if not (t_equal lda lda')
+          then raise (CannotInstantiate ls.ls_name)) ldl;
+      uc
   | Dlogic ldl ->
       List.iter (fun (ls,_) ->
         if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
