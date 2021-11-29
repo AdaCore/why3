@@ -809,7 +809,10 @@ module Make(S:sig
            when BigInt.to_int n.Number.il_int = 1 -> t_bool_true
       | Tconst (Constant.ConstInt n)
            when BigInt.to_int n.Number.il_int = 0 -> t_bool_false
-      | _ -> assert false
+      | _ ->
+         Format.eprintf "[Uf_domain.adjust_term] Warning: unexpected Boolean term: '%a'@."
+           Pretty.print_term t;
+         t (* was : assert false *)
     else t
 
   let rec forget_term (man, uf_man) t =
