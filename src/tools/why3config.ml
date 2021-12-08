@@ -39,6 +39,9 @@ module DetectProvers = struct
     let binaries = request_binaries_version config datas in
     ignore (compute_builtin_prover binaries datas);
     let config = set_binaries_detected binaries config in
+    let config =
+      Whyconf.User.set_dirs ~libdir:Config.libdir ~datadir:Config.datadir config
+    in
     Format.printf "Save config to %s@." (Whyconf.get_conf_file config);
     Whyconf.save_config config
 

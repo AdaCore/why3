@@ -680,7 +680,7 @@ let read_auto_detection_data config =
   Prover_autodetection_data.read_auto_detection_data main
 
 let () =
-  let provers_from_detected_provers ~save_to rc =
+  let provers_from_detected_provers config rc =
     let provers_output = Detected_binary.load_rc rc in
     let of_exec_name, of_name =
       List.fold_left (fun (of_exec_name,of_name) (p:Detected_binary.t) ->
@@ -697,7 +697,6 @@ let () =
         (Mstr.empty,Mstr.empty) provers_output
     in
     let binaries = { of_exec_name; of_name } in
-    let config = Whyconf.default_config save_to in
     let datas = read_auto_detection_data config in
     let env = create_env binaries datas.shortcuts in
     let detected = run_auto_detection env datas.skeletons in

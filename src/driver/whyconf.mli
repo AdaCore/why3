@@ -277,6 +277,8 @@ module User: sig
 
   val set_limits : time:int -> mem:int -> j:int -> config -> config
 
+  val set_dirs : libdir:string -> datadir:string -> config -> config
+
   val set_prover_upgrade_policy :
     config -> Mprover.key -> prover_upgrade_policy -> config
 
@@ -355,6 +357,6 @@ val unknown_to_known_provers  :
 
 (** Internal, recursive functionality with Autodetection  *)
 
-val provers_from_detected_provers: (save_to:string -> Rc.t -> config) ref
+val provers_from_detected_provers: (config -> Rc.t -> config) ref
 
 (**/**)
