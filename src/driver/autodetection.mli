@@ -63,6 +63,7 @@ val update_binaries_detected:
 
 val compute_builtin_prover:
   binaries ->
+  Whyconf.config ->
   Prover_autodetection_data.t ->
   Whyconf.config_prover Whyconf.Mprover.t
 (** Compute the builtin prover. Only print errors if {!is_config_command} is

@@ -318,7 +318,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_counterexmp
     pr_models = models;
   }
 
-let actualcommand command limit file =
+let actualcommand ~libdir ~datadir command limit file =
   let stime = string_of_int limit.limit_time in
   let smem = string_of_int limit.limit_mem in
   let arglist = Cmdline.cmdline_split command in
@@ -330,11 +330,8 @@ let actualcommand command limit file =
     | "f" -> use_stdin := false; file
     | "t" -> on_timelimit := true; stime
     | "m" -> smem
-    (* FIXME: libdir and datadir can be changed in the configuration file
-       Should we pass them as additional arguments? Or would it be better
-       to prepare the command line in a separate function? *)
-    | "l" -> Config.libdir
-    | "d" -> Config.datadir
+    | "l" -> libdir
+    | "d" -> datadir
     | "S" -> string_of_int limit.limit_steps
     | _ -> failwith "unknown specifier, use %%, %f, %t, %m, %l, %d or %S"
   in
@@ -343,10 +340,10 @@ let actualcommand command limit file =
   in
   args, !use_stdin, !on_timelimit
 
-let actualcommand ~cleanup ~inplace command limit file =
+let actualcommand ~cleanup ~inplace ~libdir ~datadir command limit file =
   try
     let (cmd, _,_) as x =
-      actualcommand command limit file
+      actualcommand ~libdir ~datadir command limit file
     in
     Debug.dprintf debug "@[<hv 2>Call_provers: actual command is:@ @[%a@]@]@."
                   (Pp.print_list Pp.space pp_print_string) cmd;
@@ -428,10 +425,12 @@ type prover_call =
   | ServerCall of server_id
   | EditorCall of int
 
-let call_on_file ~command ~limit ~res_parser ~get_counterexmp ~printing_info ?(inplace=false) fin =
+let call_on_file
+      ~libdir ~datadir ~command ~limit ~res_parser ~get_counterexmp
+      ~printing_info ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
-    actualcommand ~cleanup:true ~inplace command limit fin in
+    actualcommand ~cleanup:true ~inplace ~libdir ~datadir command limit fin in
   let save = {
     vc_file         = fin;
     inplace         = inplace;
@@ -448,7 +447,7 @@ let call_on_file ~command ~limit ~res_parser ~get_counterexmp ~printing_info ?(i
     "Request sent to prove_client:@ timelimit=%d@ memlimit=%d@ cmd=@[[%a]@]@."
     limit.limit_time limit.limit_mem
     (Pp.print_list Pp.comma Pp.string) cmd;
-  send_request ~use_stdin ~id
+  send_request ~libdir ~use_stdin ~id
                             ~timelimit:limit.limit_time
                             ~memlimit:limit.limit_mem
                             ~cmd;
@@ -505,9 +504,9 @@ let query_call = function
       if pid = 0 then NoUpdates else
       ProverFinished (editor_result ret)
 
-let interrupt_call = function
+let interrupt_call ~libdir = function
   | ServerCall id ->
-      Prove_client.send_interrupt ~id
+      Prove_client.send_interrupt ~id ~libdir
   | EditorCall pid ->
       (try Unix.kill pid Sys.sigkill with Unix.Unix_error _ -> ())
 
@@ -523,7 +522,7 @@ let rec wait_on_call = function
       let _, ret = Unix.waitpid [] pid in
       editor_result ret
 
-let call_on_buffer ~command ~limit ~res_parser ~filename ~get_counterexmp ~printing_info
+let call_on_buffer ~command ~libdir ~datadir ~limit ~res_parser ~filename ~get_counterexmp ~printing_info
     ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
@@ -537,11 +536,13 @@ let call_on_buffer ~command ~limit ~res_parser ~filename ~get_counterexmp ~print
       end
   in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~limit ~res_parser ~get_counterexmp ~printing_info ~inplace fin
+  call_on_file ~command ~libdir ~datadir ~limit ~res_parser ~get_counterexmp ~printing_info ~inplace fin
 
-let call_editor ~command fin =
+let call_editor ~libdir ~datadir ~command fin =
   let command, use_stdin, _ =
-    actualcommand ~cleanup:false ~inplace:false command empty_limit fin in
+    actualcommand
+      ~cleanup:false ~inplace:false ~libdir ~datadir command empty_limit fin
+  in
   let exec = List.hd command in
   let argarray = Array.of_list command in
   let fd_in =

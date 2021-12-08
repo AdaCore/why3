@@ -493,11 +493,11 @@ let generate_auto_strategies env =
   in
   [split ; auto0 ; auto1 ; auto2 ; auto3]
 
-let check_support_library (data:Prover_autodetection_data.data) ver =
+let check_support_library main (data:Prover_autodetection_data.data) ver =
   let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
   let replace s = match Re.Str.matched_group 1 s with
-    | "l" -> Config.libdir
-    | "d" -> Config.datadir
+    | "l" -> Whyconf.libdir main
+    | "d" -> Whyconf.datadir main
     | c -> c in
   let sl = Re.Str.global_substitute cmd_regexp replace data.support_library in
   try
@@ -518,7 +518,7 @@ let check_support_library (data:Prover_autodetection_data.data) ver =
       data.prover_name ver;
     false
 
-let detect_exec env (data:Prover_autodetection_data.data) provers (p:Detected_binary.t) =
+let detect_exec env main (data:Prover_autodetection_data.data) provers (p:Detected_binary.t) =
   let binary = Detected_binary.binary p.name in
   (* bad here means not good, it is not the same thing as a version
      of a prover with known problems *)
@@ -573,7 +573,8 @@ let detect_exec env (data:Prover_autodetection_data.data) provers (p:Detected_bi
           unknown_version env binary shortcut prover_config data priority;
           provers
         end
-        else if data.support_library <> "" && not (check_support_library data p.version) then begin
+        else if data.support_library <> ""
+                && not (check_support_library main data p.version) then begin
           (* The prover needs compile-time support and it is not available *)
           known_version env binary;
           provers
@@ -600,8 +601,8 @@ let detect_exec env (data:Prover_autodetection_data.data) provers (p:Detected_bi
           known_version env binary;
           Mprover.add prover prover_config provers
 
-let detect_exec env acc data =
-  let fold = List.fold_left (detect_exec env data) in
+let detect_exec env main acc data =
+  let fold = List.fold_left (detect_exec env main data) in
   let acc =
     List.fold_left (fun acc exec_name ->
         fold acc (Mstr.find_def [] exec_name env.binaries.of_exec_name)
@@ -614,9 +615,10 @@ let pp_versions =
   Pp.print_list Pp.comma
                 (Pp.print_pair_delim Pp.nothing Pp.nothing Pp.nothing Pp.string Pp.nothing)
 
-let detect_unknown env provers uv =
+let detect_unknown env main provers uv =
   let ver = uv.prover_config.prover.prover_version in
-  if uv.data.support_library <> "" && not (check_support_library uv.data ver) then begin
+  if uv.data.support_library <> ""
+     && not (check_support_library main uv.data ver) then begin
     (* The prover needs compile-time support and it is not available *)
     provers
   end else begin
@@ -634,7 +636,7 @@ let detect_unknown env provers uv =
     Mprover.add prover prover_config provers
   end
 
-let detect_unknown env detected =
+let detect_unknown env main detected =
   Hstr.fold (fun _ pc acc ->
       match pc with
       | None ->
@@ -643,7 +645,7 @@ let detect_unknown env detected =
       | Some uv ->
           (* The version never appeared in any section,
              so we take the first not bad section *)
-          detect_unknown env acc uv
+          detect_unknown env main acc uv
     ) env.prover_unknown_version detected
 
 let convert_shortcuts env =
@@ -651,10 +653,12 @@ let convert_shortcuts env =
     check_prover_auto_level env p; Mstr.add s p acc
   ) env.prover_shortcuts Mstr.empty
 
-let run_auto_detection env skeletons =
-  let detected = List.fold_left (detect_exec env) Mprover.empty skeletons in
+let run_auto_detection env main skeletons =
+  let detected =
+    List.fold_left (detect_exec env main) Mprover.empty skeletons
+  in
   let length_recognized = Mprover.cardinal detected in
-  let detected = detect_unknown env detected in
+  let detected = detect_unknown env main detected in
   let length_detected = Mprover.cardinal detected in
   if length_detected > length_recognized then
     print_info
@@ -699,7 +703,8 @@ let () =
     let binaries = { of_exec_name; of_name } in
     let datas = read_auto_detection_data config in
     let env = create_env binaries datas.shortcuts in
-    let detected = run_auto_detection env datas.skeletons in
+    let main = Whyconf.get_main config in
+    let detected = run_auto_detection env main datas.skeletons in
     generate_builtin_config env datas detected config
   in
   Whyconf.provers_from_detected_provers :=
@@ -819,6 +824,7 @@ let update_binaries_detected binaries config =
   List.fold_left Detected_binary.add config (detected_of_binaries binaries)
 
 
-let compute_builtin_prover binaries datas =
+let compute_builtin_prover binaries config datas =
   let env = create_env binaries datas.Prover_autodetection_data.shortcuts in
-  run_auto_detection env datas.skeletons
+  let main = Whyconf.get_main config in
+  run_auto_detection env main datas.skeletons

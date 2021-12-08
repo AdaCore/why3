@@ -68,6 +68,8 @@ val print_theory :
 
 val prove_task :
   command      : string ->
+  libdir       : string ->
+  datadir      : string ->
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
@@ -85,6 +87,8 @@ val print_task_prepared :
 
 val prove_task_prepared :
   command      : string ->
+  libdir       : string ->
+  datadir      : string ->
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->

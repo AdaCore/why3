@@ -417,9 +417,12 @@ let build_prover_call spa =
                   (Pp.print_option Pp.string) spa.spa_pr_scr;
     let inplace = config_pr.Whyconf.in_place in
     let interactive = config_pr.Whyconf.interactive in
+    let main = Whyconf.get_main c.controller_config in
+    let libdir = Whyconf.libdir main in
+    let datadir = Whyconf.datadir main in
     try
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
-          ~limit ~interactive driver task in
+          ~limit ~interactive ~libdir ~datadir driver task in
       let pa =
         { tp_callback = spa.spa_callback;
           tp_started  = false;
@@ -525,11 +528,12 @@ let idle_handler () =
   end;
   !idle_handler_running
 
-let interrupt () =
+let interrupt c =
+  let libdir = Whyconf.libdir (Whyconf.get_main c.controller_config) in
   (* Interrupt provers *)
   Hashtbl.iter
     (fun call e ->
-     Call_provers.interrupt_call call;
+     Call_provers.interrupt_call ~libdir call;
      e.tp_callback Interrupted)
     prover_tasks_in_progress;
   Hashtbl.clear prover_tasks_in_progress;
@@ -737,7 +741,10 @@ let schedule_edition c id pr ~callback ~notification =
   Debug.dprintf debug_sched "[Editing] goal %s with command '%s' on file %s@."
                 (Session_itp.get_proof_name session id).Ident.id_string
                 editor file;
-  let call = Call_provers.call_editor ~command:editor file in
+  let main = Whyconf.get_main config in
+  let libdir = Whyconf.libdir main in
+  let datadir = Whyconf.datadir main in
+  let call = Call_provers.call_editor ~command:editor ~libdir ~datadir file in
   callback panid Running;
   Queue.add (callback panid,call,old_res) prover_tasks_edited;
   run_idle_handler ()

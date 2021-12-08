@@ -18,8 +18,8 @@ val connect_external : string -> unit
   raise AlreadyConnected if a server is already running
  *)
 
-val connect_internal : unit -> unit
-(** starts a new process for a server and connects to it
+val connect_internal : string -> unit
+(** starts a new process for a server in the given directory and connects to it
 
    raise AlreadyConnected if a server is already running
  *)
@@ -36,6 +36,7 @@ val disconnect : unit -> unit
 val set_max_running_provers : int -> unit
 
 val send_request :
+  libdir:string ->
   id:int ->
   timelimit:int ->
   memlimit:int ->
@@ -43,7 +44,7 @@ val send_request :
   cmd:string list ->
   unit
 
-val send_interrupt : id:int -> unit
+val send_interrupt : libdir:string -> id:int -> unit
 
 type final_answer = {
   id        : int;
