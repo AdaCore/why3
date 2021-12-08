@@ -77,6 +77,9 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 let config = Whyconf.init_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
+(* the library and data directories, from the config file *)
+let libdir = Whyconf.libdir main
+let datadir = Whyconf.datadir main
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
@@ -109,8 +112,11 @@ let cvc4_driver : Driver.driver =
 (* calls CVC4 *)
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
-    (Driver.prove_task ~limit:Call_provers.empty_limit
-                       ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
+    (Driver.prove_task
+       ~limit:Call_provers.empty_limit
+       ~libdir
+       ~datadir
+       ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
     cvc4_driver task2)
 
 (* BEGIN{ce_callprover} *)
@@ -162,6 +168,8 @@ let task =
 let {Call_provers.pr_models= models} =
   Call_provers.wait_on_call
     (Driver.prove_task ~limit:Call_provers.empty_limit
+       ~libdir
+       ~datadir
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
        cvc4_driver task)
 
