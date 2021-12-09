@@ -73,8 +73,9 @@ let space = ' ' | '\t'
 let comment = "#" [^'@''\n'] [^'\n']*
 
 rule next_tokens = parse
-  | '\n'    { new_line lexbuf; update_stack (indentation lexbuf) }
-  | (space | comment)+
+  | '\n' | "#\n"
+            { new_line lexbuf; update_stack (indentation lexbuf) }
+  | space+ | comment
             { next_tokens lexbuf }
   | "\\" space* '\n' space* "#@"?
             { next_tokens lexbuf }
@@ -123,7 +124,7 @@ rule next_tokens = parse
 
 (* count the indentation, i.e. the number of space characters from bol *)
 and indentation = parse
-  | (space | comment)* '\n'
+  | (space+ | comment | '#')* '\n'
       (* skip empty lines *)
       { new_line lexbuf; indentation lexbuf }
   | space* as s
