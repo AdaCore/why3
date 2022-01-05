@@ -1002,9 +1002,9 @@ let effect_of_dspec dsp =
 (* TODO: add warnings for empty postconditions (anywhere)
     and empty exceptional postconditions (toplevel). *)
 let check_spec inr dsp ecty ({e_loc = loc} as e) =
+  let reg_submap wr1 wr2 = Mreg.submap (Util.const Spv.subset) wr1 wr2 in
   let bad_read  reff eff = not (Spv.subset reff.eff_reads  eff.eff_reads) in
-  let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
-                                           weff.eff_writes eff.eff_writes) in
+  let bad_write weff eff = not (reg_submap weff.eff_writes eff.eff_writes) in
   let bad_raise xeff eff = not (Sxs.subset xeff.eff_raises eff.eff_raises) in
   (* computed effect vs user effect *)
   let uwrl, ue = effect_of_dspec dsp in
@@ -1038,7 +1038,8 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
       which@ is@ left@ out@ in@ the@ specification"
     Pretty.print_vs (Spv.choose (Spv.diff eeff.eff_reads ueff.eff_reads)).pv_vs;
   if check_rw && bad_write eeff ueff then
-    Loc.errorm ?loc:(e_locate_effect (fun eff -> bad_write eff ueff) e)
+    Loc.errorm ?loc:(e_locate_effect (fun eff -> not (reg_submap
+          (Mreg.set_inter eff.eff_writes eeff.eff_writes) ueff.eff_writes)) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sxs.iter (fun xs ->
     Loc.errorm ?loc:(e_locate_effect (fun eff -> Sxs.mem xs eff.eff_raises) e)
