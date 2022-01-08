@@ -1487,8 +1487,11 @@ bin/isabelle_client.opt: lib/why3/why3.cmxa $(ISABELLECCMX)
 
 bin/isabelle_client.byte: lib/why3/why3.cma $(ISABELLECCMO)
 
-install_no_local::
+install-bin::
 	cp -f bin/isabelle_client.@OCAMLBEST@ $(BINDIR)/isabelle_client$(EXE)
+
+uninstall-bin::
+	rm -f $(BINDIR)/isabelle_client$(EXE)
 
 MAKEINC += $(ISABELLECDEP)
 
