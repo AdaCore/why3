@@ -13,8 +13,6 @@ fi
 
 export OCAMLRUNPARAM=o=20,O=200
 
-opam install -y ocamlgraph
-
 section_start configure Configuration
 ./autogen.sh
 ./configure --enable-local
