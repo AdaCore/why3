@@ -56,3 +56,4 @@ type cfg_decl =
 
 type cfg_file = (ident * cfg_decl list) list
   (** a list of modules containing lists of declarations *)
+

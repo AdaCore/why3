@@ -11,11 +11,13 @@ has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
 has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
+has_stackify=`sed -n -e 's/STACKIFY *= *\(yes\)/\1/p' share/Makefile.config`
+
 shopt -s nullglob
 
 suffix=
 
-categories="badfiles drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit validgoals validsplitgoals"
+categories="badfiles drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit validgoals validsplitgoals stackify"
 
 enabled_categories=""
 
@@ -636,6 +638,12 @@ replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_
 replay examples/mlcfg --merging-only
 echo ""
 fi
+
+if enabled stackify && test -n "$has_stackify"; then
+    echo "=== Checking stackify ==="
+    replay examples/stackify --merging-only
+fi
+
 
 if enabled list; then
 echo "=== Checking lists ==="

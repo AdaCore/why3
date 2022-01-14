@@ -532,7 +532,11 @@ PLUG_TRANSFORM =
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_parser py_lexer py_main
 PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
-PLUG_CFG = cfg_parser cfg_lexer cfg_main
+PLUG_CFG = cfg_parser cfg_lexer cfg_paths cfg_main
+ifeq (@enable_stackify@,yes)
+PLUG_CFG += stackify cfg_stackify
+endif
+
 PLUG_CMIONLY = tptp/tptp_ast python/py_ast microc/mc_ast cfg/cfg_ast
 
 PLUGINS = genequlin dimacs tptp python microc cfg
@@ -578,6 +582,19 @@ PLUGCMI = $(addsuffix .cmi, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.cmi)
 
 PLUGDIRS = parser printer transform tptp python microc cfg
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
+
+ifeq (@enable_stackify@,yes)
+plugins/cfg/stackify.cmx: EXTINCLUDES += -I @OCAMLGRAPHLIB@
+plugins/cfg/stackify.cmo: EXTINCLUDES += -I @OCAMLGRAPHLIB@
+plugins/cfg/stackify.cmx: EXTLIBS += graph.cmxa
+plugins/cfg/stackify.cmo: EXTOBJS += graph.cma
+ifeq (@enable_ocamlfind@,yes)
+plugins/cfg/stackify.cmx: FLAGS += -package ocamlgraph
+plugins/cfg/stackify.cmo: FLAGS += -package ocamlgraph
+lib/plugins/cfg.cmxs: FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
+lib/plugins/cfg.cma:  FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
+endif
+endif
 
 $(PLUGDEP) $(PLUGCMO) $(PLUGCMX) $(PLUGCMI): INCLUDES += $(PLUGINCLUDES)
 
