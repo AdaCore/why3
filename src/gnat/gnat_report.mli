@@ -56,10 +56,14 @@ open Why3
 
   The "node" information of the extra_info type contains the node of the Ada
   expression which represents the unproved part of the VC (0 indicates no such
-  node could be obtained). If this node was obtained by inlining symbols inside
-  why3, the "inline" field is set to a non-zero value, otherwise it is set to
-  0. If the "inline" node is positive, it contains the Ada node that
-  corresponds to the expression prior to inlining.
+  node could be obtained).
+  The node in "node" may have been obtained by inlining symbols inside Why3.
+  The "inline" field gives information about this as follows:
+    0  - The node was not obtained via inlining
+    >0 - The node was obtained by inlining, and the value is the Ada node prior
+         to inlining
+    -1 - The node was obtained by inlining, but we do not have info about the
+         node prior to inlining
 
   The counter example information is stored in the cntexmp field. At the top
   level, this is a mapping from file names to linesentry record.

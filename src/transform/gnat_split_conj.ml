@@ -28,12 +28,6 @@ let rec split acc f =
       f :: acc
   | Tapp (equ, [{t_node = Tif (c,t,e)} ;r])
     when ls_equal equ ps_equ && is_bool_true t && is_bool_false e ->
-    (* the unfolding transformation creates terms of the form
-          (if P = True then True else False) = True)
-       where P is an expression that we want to split further.  We recognize
-       such expressions and (want to) simplify them to just "P".  However, we
-       introduce a dummy "let" binding so that the labels attached to "P" are
-       separated from the labels attached to the larger equality. *)
       if is_bool_true r then begin
         (* The t_attr_copy below may copy enclosing labels at the same node
           as more specific labels. This messes up reporting (which is the
@@ -286,7 +280,10 @@ let fold env d =
       | Dlogic [ls,ld]
         when should_unfold ls ->
           let vl,e = open_ls_defn ld in
-          if has_pretty_labels e then Mls.add ls (vl,e) env else env
+          if has_pretty_labels e then
+            let e = t_attr_add inlined_attr e in
+            Mls.add ls (vl,e) env
+          else env
       | Dprop (Paxiom, _, t) ->
           let env = extract_def_from_axiom env t in
           env
