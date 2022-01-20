@@ -174,7 +174,7 @@ let rec unfold_right n env f =
       t_attr_copy f (t_forall (close vsl trl (unfold_right n env f1)))
   | Tapp (ls, tl) ->
     let tl = List.map (unfold_right n env) tl in
-    if should_unfold ls then
+    if should_unfold ls && Mls.mem ls env then
       let f = t_attr_copy f (t_unfold f.t_loc env ls tl f.t_ty) in
       unfold_right (n-1) env f
     else
@@ -303,7 +303,7 @@ let unfold_trans = Trans.store (fun task ->
           begin try
             let g = (unfold_right 1 env t) in
             add_tdecl task (create_decl (create_prop_decl Pgoal sym g))
-          with _ ->
+          with e ->
             add_tdecl task goal
           end
         | _ -> assert false
@@ -329,9 +329,9 @@ let () =
 let () =
   let trans =
     Trans.compose_l
-      Introduction.split_vc
+      (Trans.singleton unfold_trans)
       (Trans.compose_l
-        (Trans.singleton unfold_trans)
+        Introduction.split_vc
           split_conj)
   in
   Trans.register_transform_l "split_vc_conj" trans
