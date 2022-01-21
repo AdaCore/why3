@@ -303,7 +303,7 @@ let unfold_trans = Trans.store (fun task ->
           begin try
             let g = (unfold_right 1 env t) in
             add_tdecl task (create_decl (create_prop_decl Pgoal sym g))
-          with e ->
+          with _ ->
             add_tdecl task goal
           end
         | _ -> assert false
