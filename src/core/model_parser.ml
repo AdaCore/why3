@@ -95,10 +95,55 @@ let compare_model_const c1 c2 = match c1, c2 with
   | Decimal _, _ -> -1 | _, Decimal _ -> 1
   | Fraction f1, Fraction f2 -> (match BigInt.compare f1.frac_nom f2.frac_nom with 0 -> BigInt.compare f1.frac_den f2.frac_den | n -> n)
 
-let compare_model_value_const v1 v2 = match v1, v2 with
+let rec compare_model_value v1 v2 =
+  match v1, v2 with
   | Const c1, Const c2 -> compare_model_const c1 c2
   | Const _, _ -> -1 | _, Const _ -> 1
-  | _ -> 0
+  | Array a1, Array a2 ->
+    let c =
+      Lists.compare
+        (fun ai1 ai2 ->
+          let c = compare_model_value ai1.arr_index_key ai2.arr_index_key in
+          if c = 0 then
+            compare_model_value ai1.arr_index_value ai2.arr_index_value
+          else
+            c)
+        a1.arr_indices a2.arr_indices
+    in
+    if c = 0 then
+      compare_model_value a1.arr_others a2.arr_others
+    else
+      c
+  | Array _, _ -> -1 | _, Array _ -> 1
+  | Record r1, Record r2 ->
+    Lists.compare
+      (fun (f1, v1) (f2, v2) ->
+        let c = String.compare f1 f2 in
+        if c = 0 then
+          compare_model_value v1 v2
+        else
+          c)
+      r1 r2
+  | Record _, _ -> -1 | _, Record _ -> 1
+  | Proj (p1, v1), Proj (p2, v2) ->
+    let c = String.compare p1 p2 in
+    if c = 0 then
+      compare_model_value v1 v2
+    else
+      c
+  | Proj _, _ -> -1 | _, Proj _ -> 1
+  | Apply (s1, lv1), Apply (s2, lv2) ->
+    let c = String.compare s1 s2 in
+    if c = 0 then
+      Lists.compare compare_model_value lv1 lv2
+    else
+      c
+  | Apply _, _ -> -1 | _, Apply _ -> 1
+  | Var v1, Var v2 -> String.compare v1 v2
+  | Var _, _ -> -1 | _, Var _ -> 1
+  | Undefined, Undefined -> 0
+  | Undefined, _ -> -1 | _, Undefined -> 1
+  | Unparsed s1, Unparsed s2 -> String.compare s1 s2
 
 let array_create_constant ~value = {arr_others= value; arr_indices= []}
 
@@ -281,7 +326,7 @@ let rec convert_model_value value : Json_base.json =
 
 and convert_array a =
   let m_others = ["others", convert_model_value a.arr_others] in
-  let cmp_ix i1 i2 = compare_model_value_const i1.arr_index_key i2.arr_index_key in
+  let cmp_ix i1 i2 = compare_model_value i1.arr_index_key i2.arr_index_key in
   convert_indices (List.sort cmp_ix a.arr_indices) @ [Json_base.Record m_others]
 
 and convert_indices indices =
@@ -366,7 +411,7 @@ let rec print_array_human fmt (arr : model_array) =
     let {arr_index_key= key; arr_index_value= v} = arr in
     fprintf fmt "@[%a =>@ %a@]" print_model_value_human key
       print_model_value_human v in
-  let sort_ix i1 i2 = compare_model_value_const i1.arr_index_key i2.arr_index_key in
+  let sort_ix i1 i2 = compare_model_value i1.arr_index_key i2.arr_index_key in
   fprintf fmt "@[(%a%a)@]"
     (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.comma ~sep:Pp.comma
        print_key_val)

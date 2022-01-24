@@ -82,7 +82,8 @@ let rec eval ctx oty t =
   | Tapply ("=", [t1; t2]) ->
       let v1 = eval ctx None t1 in
       let v2 = eval ctx None t2 in
-      Const (Boolean (compare_model_value_const v1 v2 = 0))
+      (* This code looks dubious if [v1] and [v2] are not [Const]s. *)
+      Const (Boolean (compare_model_value v1 v2 = 0))
   | Tapply ("or", ts) ->
       Const (Boolean List.(exists is_true (map (eval ctx None) ts)))
   | Tapply ("and", ts) ->
