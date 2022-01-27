@@ -870,13 +870,12 @@ let schedule_goal_with_prover ~callback c g p =
   in
   run_goal ?save_to ~callback c p g
 
-let schedule_goal ~cntexample ~callback c g =
+let schedule_goal ~callback c g =
    (* actually schedule the goal, ie call the prover. This function returns
       immediately. *)
   let check = get_objective g in
   let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason check) in
   let p = if warn then Opt.get (Gnat_config.prover_warn)
-    else if cntexample then Opt.get (Gnat_config.prover_ce)
     else find_best_untried_prover c.Controller_itp.controller_session g in
   schedule_goal_with_prover ~callback c g p
 

@@ -129,7 +129,7 @@ and schedule_goal (c: Controller_itp.controller) (g : Session_itp.proofNodeID) =
    end
 
 and actually_schedule_goal c g =
-  C.schedule_goal ~cntexample:false ~callback:(interpret_result c) c g
+  C.schedule_goal ~callback:(interpret_result c) c g
 
 let handle_obj c obj =
    if Gnat_objectives.objective_status obj <> Gnat_objectives.Proved then begin

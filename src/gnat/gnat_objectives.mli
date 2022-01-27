@@ -133,7 +133,6 @@ val register_result : Controller_itp.controller -> goal_id -> bool -> objective 
  * status of the objective, as well as the objective itself *)
 
 val schedule_goal :
-    cntexample: bool ->
     callback:(Session_itp.proofAttemptID -> Controller_itp.proof_attempt_status -> unit) ->
     Controller_itp.controller -> goal_id -> unit
 (* schedule a goal for proof with default prover and
