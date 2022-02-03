@@ -52,8 +52,8 @@ module Fact
       invariant I2 { fact x * y = fact x0 };
       switch (x <= 0)
       | True  -> return y
-      | False -> goto L1
+      | False -> goto L2
       end
     }
-    L2 { y <- x * y; x <- x - 1; goto L1 }
+    L2 { assert { fact x = fact (x - 1) * x }; y <- x * y; x <- x - 1; goto L1 }
 end

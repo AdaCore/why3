@@ -64,9 +64,7 @@ let task2 = None
 let task2 = Task.add_param_decl task2 prop_var_A
 let task2 = Task.add_param_decl task2 prop_var_B
 (* BEGIN{ce_nobuiltin} *)
-let meta_ce = Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
-  ~desc:"Set@ when@ counter-example@ should@ be@ get."
-let task2 = Task.add_meta task2 meta_ce [Theory.MAstr ""]
+let task2 = Task.add_meta task2 Driver.meta_get_counterexmp [Theory.MAstr ""]
 (* END{ce_nobuiltin} *)
 let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2")
 let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
@@ -122,8 +120,78 @@ let () = printf "@[On task 1, CVC4,1.7 answers %a@."
 
 let () = printf "Model is %t@."
     (fun fmt ->
-       match result1.Call_provers.pr_models with
-       | [(_,m)] -> (* TODO select_model *)
-           Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None fmt m
-       | _ -> fprintf fmt "unavailable")
+       match Check_ce.select_model_last_non_empty
+                result1.Call_provers.pr_models with
+       | Some m -> Model_parser.print_model_json fmt m
+       | None -> fprintf fmt "unavailable")
 (* END{ce_callprover} *)
+
+(* Construct program:
+   module M =
+     let f (x: int) = assert { x <> 42 }
+   end *)
+let mlw_file =
+  let loc () = (* The counterexample selections requires unique locations *)
+    Mlw_printer.id_loc () in
+  let open Ptree in
+  let open Ptree_helpers in
+  let let_f =
+    let equ = Qident (ident ~loc:(loc ()) Ident.op_equ) in
+    let t_x = tvar ~loc:(loc ()) (Qident (ident "x")) in
+    let t_42 = tconst ~loc:(loc ()) 42 in
+    let t = term ~loc:(loc ()) (Tidapp (equ, [t_x; t_42])) in
+    let t = term ~loc:(loc ()) (Tnot t) in
+    let body = expr ~loc:(loc ()) (Eassert (Expr.Assert, t)) in
+    let pty_int = PTtyapp (Qident (ident "int"), []) in
+    let arg = loc (), Some (ident ~loc:(loc ()) "x"), false, Some pty_int in
+    let efun =
+      Efun ([arg], None, pat Ptree.Pwild, Ity.MaskVisible, empty_spec, body) in
+    let e = expr ~loc:(loc ()) efun in
+    Dlet (ident "f", false, Expr.RKnone, e) in
+  Decls [let_f]
+
+let pm =
+  let pms = Typing.type_mlw_file env [] "myfile.mlw" mlw_file in
+  Wstdlib.Mstr.find "" pms
+
+let task =
+  match Task.split_theory pm.Pmodule.mod_theory None None with
+  | [task] -> task
+  | _ -> failwith "Not exactly one task"
+
+let {Call_provers.pr_models= models} =
+  Call_provers.wait_on_call
+    (Driver.prove_task ~limit:Call_provers.empty_limit
+       ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
+       cvc4_driver task)
+
+let () = print_endline "\n== Check CE"
+
+(* BEGIN{check_ce} *)
+let () =
+  let rac = Pinterp.mk_rac ~ignore_incomplete:false
+      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+  let model, clsf = Opt.get_exn (Failure "No good model found")
+      (Check_ce.select_model ~check_ce:true rac env pm models) in
+  printf "%a@." (Check_ce.print_model_classification
+                   ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
+(* END{check_ce} *)
+
+let () = print_endline "\n== RAC execute giant steps\n"
+
+(* BEGIN{check_ce_giant_step} *)
+let () =
+  let model = Opt.get_exn (Failure "No non-empty model")
+      (Check_ce.select_model_last_non_empty models) in
+  let loc = Opt.get_exn (Failure "No model term location")
+      (Model_parser.get_model_term_loc model) in
+  let rs = Opt.get_exn (Failure "No procedure symbol found")
+      (Check_ce.find_rs pm loc) in
+  let rac = Pinterp.mk_rac ~ignore_incomplete:false
+      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+  let oracle = Check_ce.oracle_of_model pm model in
+  let env = Pinterp.mk_empty_env env pm in
+  let ctx = Pinterp.mk_ctx env ~do_rac:true ~rac ~giant_steps:true ~oracle () in
+  let res = Check_ce.rac_execute ctx rs in
+  printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
+(* END{check_ce_giant_step} *)

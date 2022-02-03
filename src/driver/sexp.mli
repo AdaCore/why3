@@ -27,6 +27,9 @@ type sexp =
   | Atom of string
   | List of sexp list
 
+val exists : (sexp -> bool) -> sexp -> bool
+(** Check if the node or any of its sub-nodes satisfies the predicate. *)
+
 exception Error
 
 val read : Lexing.lexbuf -> sexp

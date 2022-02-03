@@ -1,0 +1,23 @@
+module IfCfg
+
+use int.Int
+
+let cfg if_stmt (b : bool) : int 
+ensures { b = true -> result = 6 } 
+ensures { b = false -> result = 11 }
+=
+var r : int; 
+{ r <- 0; goto S }
+S { switch (b) 
+	| True -> goto L1
+	| False -> goto R1
+	end
+}
+Return { r <- r + 1; return r }
+
+R1 { r <- 10; goto R2 }
+L1 { r <- 5; goto L2}
+R2 { goto Return }
+
+L2 { goto Return }
+end

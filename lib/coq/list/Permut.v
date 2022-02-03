@@ -21,6 +21,8 @@ Require list.Append.
 Require list.Reverse.
 Require list.NumOcc.
 
+Require Import Lia.
+
 (* Why3 assumption *)
 Definition permut {a:Type} {a_WT:WhyType a} (l1:Init.Datatypes.list a)
     (l2:Init.Datatypes.list a) : Prop :=
@@ -147,7 +149,7 @@ induction l1 as [|l1h l1t IHl1].
   simpl.
   case why_decidable_eq ; intros H.
   generalize (NumOcc.Num_Occ_NonNeg l2h l2t).
-  omega.
+  lia.
   now elim H.
 - intros l2 H.
   assert (H': Mem.mem l1h l2).
@@ -157,7 +159,7 @@ induction l1 as [|l1h l1t IHl1].
     destruct (why_decidable_eq l1h l1h) as [_|H'].
     2: now elim H'.
     generalize (NumOcc.Num_Occ_NonNeg l1h l1t).
-    omega.
+    lia.
   destruct (Append.mem_decomp _ _ H') as [l2a [l2b Hl2]].
   rewrite Hl2.
   rewrite Append.Append_length.
@@ -175,6 +177,6 @@ induction l1 as [|l1h l1t IHl1].
   intros l H y.
   specialize (H y).
   simpl in H.
-  omega.
+  lia.
 Qed.
 

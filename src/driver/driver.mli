@@ -38,6 +38,13 @@ val file_of_theory : driver -> string -> Theory.theory -> string
 (** [file_of_theory d f th] produces a filename
     for the prover of driver [d], for a theory [th] from filename [f] *)
 
+val get_filename : driver ->
+  input_file:string ->
+  theory_name:string ->
+  goal_name:string ->
+  string
+(** Mangles a filename for the prover of the given driver *)
+
 (* unused outside ?
 val call_on_buffer :
   command      : string ->
@@ -52,6 +59,7 @@ val call_on_buffer :
 val print_task :
   ?old       : in_channel ->
   driver -> Format.formatter -> Task.task -> unit
+(** Prepare the task for the prover and prints it *)
 
 val print_theory :
   ?old       : in_channel ->
@@ -68,12 +76,12 @@ val prove_task :
 
 (** Split the previous function in two simpler functions *)
 
-(* Apply driver's transformations to the task *)
+(** Apply driver's transformations to the task *)
 val prepare_task : driver -> Task.task -> Task.task
 
 val print_task_prepared :
   ?old       : in_channel ->
-  driver -> Format.formatter -> Task.task -> Printer.printer_mapping
+  driver -> Format.formatter -> Task.task -> Printer.printing_info
 
 val prove_task_prepared :
   command      : string ->
@@ -87,3 +95,12 @@ val prove_task_prepared :
 (** Traverse all metas from a driver *)
 
 val syntax_map: driver -> Printer.syntax_map
+
+(** Information on conuterexample generation *)
+
+val meta_get_counterexmp : Theory.meta
+(** Set in drivers that generate counterexamples *)
+
+val get_counterexmp : Task.task -> bool
+(** Returns true if counterexample should be get for the task (according to
+    [meta_get_counterexmp]. *)

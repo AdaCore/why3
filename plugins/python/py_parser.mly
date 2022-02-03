@@ -15,7 +15,7 @@
   open Py_ast
 
   let () = Exn_printer.register (fun fmt exn -> match exn with
-    | Error -> Format.fprintf fmt "syntax error"
+    | Error -> Format.pp_print_string fmt "syntax error"
     | _ -> raise exn)
 
   let floc s e = Loc.extract (s,e)
@@ -54,16 +54,28 @@
     sp_partial = s1.sp_partial || s2.sp_partial;
   }
 
+  let fresh_type_var =
+    let r = ref 0 in
+    fun loc -> incr r;
+      PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
+
+  let logic_type loc = function
+  | None    -> fresh_type_var loc
+  | Some ty -> ty
+
+  let logic_param loc (id, ty) = id, logic_type loc ty
+
 %}
 
 %token <string> INTEGER
 %token <string> STRING
 %token <Py_ast.binop> CMP
-%token <string> IDENT
+%token <string> IDENT QIDENT TVAR
 %token DEF IF ELSE ELIF RETURN WHILE FOR IN AND OR NOT NONE TRUE FALSE
-%token FROM IMPORT BREAK
+%token FROM IMPORT BREAK CONTINUE
 %token EOF
-%token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
+%token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE 
+       PLUSEQUAL MINUSEQUAL TIMESEQUAL DIVEQUAL MODEQUAL
 %token PLUS MINUS TIMES DIV MOD
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
@@ -113,15 +125,52 @@ import:
   { Dimport (m, l) }
 
 func:
-| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
-  { Dlogic (true, id, l) }
-| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
-  { Dlogic (false, id, l) }
+| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  ty=option(function_type) def=option(logic_body) NEWLINE
+  { let loc = floc $startpos $endpos in
+    Dlogic (id, List.map (logic_param loc) l, Some (logic_type loc ty), def) }
+| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  def=option(logic_body) NEWLINE
+  { let loc = floc $startpos $endpos in
+    Dlogic (id, List.map (logic_param loc) l, None, def) }
+
+logic_body:
+| EQUAL t=term
+  { t }
+
+param:
+| id=ident ty=option(param_type)
+  { id, ty }
+
+param_type:
+| COLON ty=typ
+  { ty }
+
+function_type:
+| ARROW ty=typ
+  { ty }
+
+/* Note: "list" is a legal type annotation in Python; we make it a
+ * polymorphic type "list 'a" in WhyML  */
+typ:
+| id=type_var
+  { PTtyvar id }
+| id=ident
+  { if id.id_str = "list"
+    then PTtyapp (Qident id, [fresh_type_var (floc $startpos $endpos)])
+    else PTtyapp (Qident id, []) }
+| id=ident LEFTSQ tyl=separated_nonempty_list(COMMA, typ) RIGHTSQ
+  { PTtyapp (Qident id, tyl) }
 
 def:
-| DEF f = ident LEFTPAR x = separated_list(COMMA, ident) RIGHTPAR
-  COLON NEWLINE BEGIN s=spec l=nonempty_list(stmt) END
-    { Ddef (f, x, s, l) }
+| DEF f = ident LEFTPAR x = separated_list(COMMA, param) RIGHTPAR
+  ty=option(function_type) COLON NEWLINE BEGIN s=spec l=nonempty_list(stmt) END
+    {
+      if f.id_str = "range" then
+        let loc = floc $startpos $endpos in
+        Loc.errorm ~loc "micro Python does not allow shadowing 'range'"
+      else Ddef (f, x, ty, s, l)
+    }
 ;
 
 spec:
@@ -140,6 +189,19 @@ ensures:
 | term
     { let id = mk_id "result" $startpos $endpos in
       [mk_pat (Pvar id) $startpos $endpos, $1] }
+;
+
+expr_dot:
+| d = expr_dot_
+   { mk_expr (floc $startpos $endpos) d }
+;
+
+expr_dot_:
+| id = ident
+    { Eident id }
+| LEFTPAR e = expr RIGHTPAR
+    { e.expr_desc }
+;
 
 expr:
 | d = expr_desc
@@ -157,10 +219,22 @@ expr_desc:
     { Eint c }
 | s = STRING
     { Estring s }
-| id = ident
-    { Eident id }
 | e1 = expr LEFTSQ e2 = expr RIGHTSQ
     { Eget (e1, e2) }
+
+| e1 = expr LEFTSQ e2=option(expr) COLON e3=option(expr) RIGHTSQ
+    {
+      let f = mk_id "slice" $startpos $endpos in
+      let none = mk_expr (floc $startpos $endpos) Enone in
+      let e2, e3 = match e2, e3 with
+        | None, None -> none, none
+        | Some e, None -> e, none
+        | None, Some e -> none, e
+        | Some e, Some e' -> e, e'
+      in
+      Ecall(f,[e1;e2;e3])
+    }
+
 | MINUS e1 = expr %prec unary_minus
     { Eunop (Uneg, e1) }
 | NOT e1 = expr
@@ -171,12 +245,20 @@ expr_desc:
     { match e1.expr_desc with
       | Elist [e1] -> Emake (e1, e2)
       | _ -> Ebinop (Bmul, e1, e2) }
+| e=expr_dot DOT f=ident LEFTPAR el=separated_list(COMMA, expr) RIGHTPAR
+    {
+      match f.id_str with
+      | "pop" | "append" | "reverse" | "clear" | "copy" | "sort" ->
+        Edot (e, f, el)
+      | m -> let loc = floc $startpos $endpos in
+             Loc.errorm ~loc "The method '%s' is not implemented" m
+    }
 | f = ident LEFTPAR e = separated_list(COMMA, expr) RIGHTPAR
     { Ecall (f, e) }
 | LEFTSQ l = separated_list(COMMA, expr) RIGHTSQ
     { Elist l }
-| LEFTPAR e = expr RIGHTPAR
-    { e.expr_desc }
+| e=expr_dot_
+    { e }
 ;
 
 %inline binop:
@@ -249,16 +331,46 @@ simple_stmt_desc:
     { Sreturn e }
 | id = ident EQUAL e = expr
     { Sassign (id, e) }
+| id=ident o=binop_equal e=expr
+    { Sassign (id, mk_expr (floc $startpos $endpos) (Ebinop (o, mk_expr (floc $startpos $endpos) (Eident id), e))) }
 | e1 = expr LEFTSQ e2 = expr RIGHTSQ EQUAL e3 = expr
     { Sset (e1, e2, e3) }
+| e0 = expr LEFTSQ e1 = expr RIGHTSQ o=binop_equal e2 = expr
+    {
+      let loc = floc $startpos $endpos in
+      let mk_expr_floc = mk_expr loc in
+
+      let id = mk_id "'i" $startpos $endpos in
+      let expr_id = mk_expr_floc (Eident id) in
+
+      let a = mk_id "'a" $startpos $endpos in
+      let expr_a = mk_expr_floc (Eident a) in
+
+      let operation = mk_expr_floc (Ebinop (o, mk_expr_floc (Eget(expr_a, expr_id)), e2)) in
+
+      let s1 = Dstmt ({ stmt_desc = Sassign (a, e0); stmt_loc = loc }) in
+      let s2 = Dstmt ({ stmt_desc = Sassign (id, e1); stmt_loc = loc }) in
+      let s3 = Dstmt ({ stmt_desc = Sset (expr_a, expr_id, operation); stmt_loc = loc }) in
+      Sblock [s1;s2;s3]
+    }
 | k=assertion_kind t = term
     { Sassert (k, t) }
 | e = expr
     { Seval e }
 | BREAK
     { Sbreak }
+| CONTINUE
+    { Scontinue }
 | LABEL id=ident
     { Slabel id }
+;
+
+%inline binop_equal:
+| PLUSEQUAL  { Badd }
+| MINUSEQUAL { Bsub }
+| DIVEQUAL   { Bdiv }
+| TIMESEQUAL { Bmul }
+| MODEQUAL   { Bmod }
 ;
 
 assertion_kind:
@@ -268,6 +380,12 @@ assertion_kind:
 
 ident:
   id = IDENT { mk_id id $startpos $endpos }
+;
+quote_ident:
+  id = QIDENT { mk_id id $startpos $endpos }
+;
+type_var:
+  id = TVAR { mk_id id $startpos $endpos }
 ;
 
 /* logic */
@@ -300,8 +418,8 @@ term_:
     { Tif ($2, $4, $6) }
 | LET id=ident EQUAL t1=term IN t2=term
     { Tlet (id, t1, t2) }
-| q=quant l=comma_list1(ident) DOT t=term
-    { let var id = id.id_loc, Some id, false, None in
+| q=quant l=comma_list1(param) DOT t=term
+    { let var (id, ty) = id.id_loc, Some id, false, ty in
       Tquant (q, List.map var l, [], t) }
 | id=ident LEFTPAR l=separated_list(COMMA, term) RIGHTPAR
     { Tidapp (Qident id, l) }
@@ -313,6 +431,7 @@ quant:
 term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
+| quote_ident { Tident (Qident $1) }
 | ident       { Tident (Qident $1) }
 | INTEGER     { Tconst (Constant.ConstInt Number.(int_literal ILitDec ~neg:false $1)) }
 | NONE        { Ttuple [] }
@@ -362,12 +481,12 @@ comma_list1(X):
 (* parsing of a single term *)
 
 term_eof:
-| term EOF { $1 }
+| term NEWLINE EOF { $1 }
 
 ident_comma_list_eof:
-| comma_list1(ident) EOF { $1 }
+| comma_list1(ident) NEWLINE EOF { $1 }
 
 term_comma_list_eof:
-| comma_list1(term) EOF { $1 }
+| comma_list1(term) NEWLINE EOF { $1 }
 (* we use single_term to avoid conflict with tuples, that
    do not need parentheses *)

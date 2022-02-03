@@ -19,6 +19,8 @@ Require list.Length.
 Require list.Nth.
 Require option.Option.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Lemma nth_none_1 {a:Type} {a_WT:WhyType a} :
   forall (l:Init.Datatypes.list a) (i:Numbers.BinNums.Z), (i < 0%Z)%Z ->
@@ -35,7 +37,7 @@ intros H'.
 now rewrite H' in H.
 intros _.
 apply IHq.
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -57,10 +59,10 @@ intros H'.
 rewrite H' in H.
 exfalso.
 generalize (Length.Length_nonnegative q).
-omega.
+lia.
 intros _.
 apply IHq.
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -73,7 +75,7 @@ intros l.
 induction l as [|h q].
 intros i _.
 simpl.
-omega.
+lia.
 intros i.
 simpl (Nth.nth i (h :: q)).
 change (Length.length (h :: q)) with (1 + Length.length q)%Z.
@@ -82,6 +84,6 @@ case Zeq_bool.
 easy.
 intros Hi H.
 specialize (IHq _ H).
-omega.
+lia.
 Qed.
 

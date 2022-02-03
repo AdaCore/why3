@@ -637,7 +637,7 @@ let clone_decl inst cl uc d = match d.d_node with
   | Dparam ls when Mls.mem ls inst.mi_ls ->
       let ls' = Mls.find ls inst.mi_ls in
       let mtch sb ty ty' = try ty_match sb ty' (clone_ty cl ty) with
-        | Ty.TypeMismatch _ -> raise (BadInstance (BadI_ls_type ls)) in
+        | Ty.TypeMismatch (ty1,ty2) -> raise (BadInstance (BadI_ls_type (ls,ty1,ty2))) in
       let sbs = match ls.ls_value,ls'.ls_value with
         | Some ty, Some ty' -> mtch Mtv.empty ty ty'
         | None, None -> Mtv.empty

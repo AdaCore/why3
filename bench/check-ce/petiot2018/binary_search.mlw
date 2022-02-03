@@ -1,0 +1,21 @@
+use int.Int, int.ComputerDivision, lib.IntArray, lib.IntRef
+
+let binary_search (t: int_array) (x: int) : int
+  requires P1 { 1 <= t.length <= 10000 }
+  requires P2 { forall i j. 0 <= i < j < t.length -> t[i] <= t[j] }
+  ensures Q1 { -1 <= result <= t.length - 1 }
+  ensures Q2 { forall i. 0 <= i <= result -> t[i] <= x }
+  ensures Q3 { forall i. result < i < t.length -> t[i] > x }
+= let l = int_ref (-1) in
+  let r = int_ref (t.length-1) in
+  while !l < !r do
+    invariant I1 { -1 <= !l <= !r < t.length }
+    invariant I2 { forall i. 0 <= i <= !l -> t[i] <= x }
+    invariant I3 { forall i. !r < i < t.length -> t[i] > x }
+    variant { !r - !l }
+    let m = div (!l + !r + 1) 2 in
+    if t[m] > x
+    then r := m-1
+    else l := m
+  done;
+  !l

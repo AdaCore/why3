@@ -251,8 +251,13 @@ let pp_idapp ~attr pp fmt qid xs =
             pp_maybe_marker id.id_loc s
       | _ -> failwith "pp_idapp"
 
-let pp_apply pp fmt x1 x2 =
-  fprintf fmt "@[<hv 2>%a@ %a@]" pp.closed x1 pp.closed x2
+let pp_apply split_apply pp fmt x1 x2 =
+  let rec flatten_applies sofar x =
+    match split_apply x with
+    | None -> x :: sofar
+    | Some (x1, x2) -> flatten_applies (x2 :: sofar) x1 in
+  fprintf fmt "@[<hv 2>%a@]"
+    (pp_print_opt_list ~sep:"@ " pp.closed) (flatten_applies [x2] x1)
 
 let pp_infix pp fmt x ops =
   let pp_op fmt (op, x) =
@@ -401,7 +406,7 @@ let rec pp_pty_mask ~attr fmt = function
 let rec pp_pty_pat_mask ~attr ~closed fmt =
   let pp_vis_ghost fmt = function
     | Ity.MaskVisible -> ()
-    | Ity.MaskGhost -> fprintf fmt "ghost "
+    | Ity.MaskGhost -> pp_print_string fmt "ghost "
     | Ity.MaskTuple _ -> fprintf fmt "TUPLE??" in
   let pp_aux fmt = function
     | PTtuple ptys, ({pat_desc = Ptuple ps; _}, Ity.MaskTuple ms) ->
@@ -430,7 +435,7 @@ let pp_opt_result ~attr fmt (opt_pty, p, m) = match opt_pty with
       fprintf fmt " : %a" (pp_pty_pat_mask ~attr ~closed:true) (pty, (p, m))
 
 let pp_exn ~attr fmt (id, pty, m) =
-  let pp_space fmt = if pty <> PTtuple [] then fprintf fmt " " in
+  let pp_space fmt = if pty <> PTtuple [] then pp_print_string fmt " " in
   fprintf fmt "@[<h>exception %a%t%a@]"
     (pp_id ~attr) id pp_space (pp_pty_mask ~attr) (pty, m)
 
@@ -484,11 +489,11 @@ let pp_clone_subst ~attr fmt = function
         fprintf fmt "exception %a = %a"
           (pp_qualid ~attr) qid (pp_qualid ~attr) qid'
   | CSprop Decl.Paxiom ->
-      fprintf fmt "axiom ."
+      pp_print_string fmt "axiom ."
   | CSprop Decl.Plemma ->
-      fprintf fmt "lemma ."
+      pp_print_string fmt "lemma ."
   | CSprop Decl.Pgoal ->
-      fprintf fmt "goal ."
+      pp_print_string fmt "goal ."
   | CSlemma qid ->
       fprintf fmt "lemma %a" (pp_qualid ~attr) qid
   | CSgoal qid ->
@@ -632,7 +637,9 @@ and pp_expr ~attr =
     | Eidapp (qid, es) ->
         pp_idapp ~attr (pp_expr ~attr) fmt qid es
     | Eapply (e1, e2) ->
-        pp_apply (pp_expr ~attr) fmt e1 e2
+        let split_apply e = match e.expr_desc with
+            Eapply (e1, e2) -> Some (e1, e2) | _ -> None in
+        pp_apply split_apply (pp_expr ~attr) fmt e1 e2
     | Einfix (e, op, e') ->
         let rec collect op e = match e.expr_desc with
           | Einfix (e, op', e') -> (op, e) :: collect op' e'
@@ -836,7 +843,9 @@ and pp_term ~attr =
     | Tidapp (qid, ts) ->
         pp_idapp ~attr (pp_term ~attr) fmt qid ts
     | Tapply (t1, t2) ->
-        pp_apply (pp_term ~attr) fmt t1 t2
+        let split_apply t = match t.term_desc with
+            Tapply (t1, t2) -> Some (t1, t2) | _ -> None in
+        pp_apply split_apply (pp_term ~attr) fmt t1 t2
     | Tinfix (t, op, t') ->
         let rec collect op t = match t.term_desc with
           | Tinfix (t, op', t') -> (op, t) :: collect op' t'
@@ -1171,7 +1180,7 @@ and pp_decl ?(attr=true) fmt = function
           (pp_fundef ~attr) in
       fprintf fmt "@[<v>@[<v 2>let rec %a@]@]" pp_fundefs defs
   | Dexn (id, pty, mask) ->
-      fprintf fmt "%a" (pp_exn ~attr) (id, pty, mask)
+      pp_exn ~attr fmt (id, pty, mask)
   | Dmeta (ident, args) ->
       let pp_metarg fmt = function
         | Mty ty -> fprintf fmt "type %a" (pp_pty ~attr).marked ty
@@ -1182,7 +1191,7 @@ and pp_decl ?(attr=true) fmt = function
         | Mgl qid -> fprintf fmt "goal %a" (pp_qualid ~attr) qid
         | Mval qid -> fprintf fmt "val %a" (pp_qualid ~attr) qid
         | Mstr s -> fprintf fmt "%S" s
-        | Mint i -> fprintf fmt "%d" i in
+        | Mint i -> pp_print_int fmt i in
       let pp_args = pp_print_list ~pp_sep:(pp_sep ", ") pp_metarg in
       fprintf fmt "meta \"%a\" %a" (pp_id ~attr) ident pp_args args
   | Dcloneexport (_, qid, substs) ->

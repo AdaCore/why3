@@ -76,7 +76,6 @@ module type Printer = sig
     val print_attrs : formatter -> Sattr.t -> unit
     val print_loc : formatter -> Loc.position -> unit
     val print_loc' : formatter -> Loc.position -> unit
-    val print_json_loc : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit
     val print_meta_arg_type : formatter -> meta_arg_type -> unit
@@ -123,11 +122,15 @@ type any_pp =
 
 val create :
   ?print_ext_any:(any_pp Pp.pp -> any_pp Pp.pp) ->
+  ?do_forget_all:bool ->
+  ?shorten_axioms:bool ->
   Ident.ident_printer -> Ident.ident_printer ->
   Ident.ident_printer -> Ident.ident_printer ->
-  bool -> (module Printer)
-(** `create spr apr tpr ppr forget` creates a new pretty-printing
-   module from the printer `spr` for variables and functions, `apr`
-   for type variables, `tpr` for type symbols and `ppr for proposition
-   names`. When the Boolean `forget` is true then all recorded names
-   are forgotten between printing of each tasks. *)
+  (module Printer)
+(** [create spr apr tpr ppr] creates a new pretty-printing
+   module from the printer [spr] for variables and functions, [apr]
+   for type variables, [tpr] for type symbols and [ppr] for proposition
+   names.
+   If [do_forget_all] is true (default), then all recorded names
+   are forgotten between printing of each tasks.
+   If [shorten_axioms] is false (default), axioms are prefixed by the keyword. *)

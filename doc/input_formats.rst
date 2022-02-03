@@ -8,10 +8,17 @@ designed for teaching purposes. They come with their own specification
 languages, written in special comments.
 These input formats are described below.
 
-Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.) can be passed a file
-with a suffix :file:`.c` or :file:`.py`, which triggers the corresponding input format.
-These input formats can also be used in on-line versions of Why3, at
-http://why3.lri.fr/micro-C/ and http://why3.lri.fr/python/, respectively.
+Why3 also supports the format MLCFG, which is an extension of WhyML
+allowing to define function bodies in an unstructured style, with goto
+statements.
+
+Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.)
+can be passed a file with a suffix :file:`.c`, :file:`.py` or
+:file:`.mlcfg`, which triggers the corresponding input format.
+
+The input formats for C and Python can also be used in on-line
+versions of Why3, at http://why3.lri.fr/micro-C/ and
+http://why3.lri.fr/python/, respectively.
 
 .. index:: micro-C
 .. _format.micro-C:
@@ -185,8 +192,12 @@ interpreter (see below).
 ..  rubric:: Function definition
 
 .. productionlist:: microPython
-    py_function: "def" identifier "(" `params`? ")" ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
-    params: identifier ("," identifier)*
+    py_function: "def" identifier "(" `params`? ")" `return_type`? ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
+    params: `param` ("," `param`)*
+    param: identifier (":" `py_type`)?
+    return_type: "->" `py_type`
+    py_type: identifier ("[" `py_type` ("," `py_type`)* "]")?
+          : | "'" identifier
 
 .. rubric:: Function specification
 
@@ -234,8 +245,8 @@ interpreter (see below).
 .. rubric:: Logic declaration
 
 .. productionlist:: microPython
-   logic_declaration: "#@" "function" identifier "(" `params` ")" NEWLINE
-                 : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
+   logic_declaration: "#@" "function" identifier "(" `params` ")" `return_type`? ("=" `term`)? NEWLINE
+                 : | "#@" "predicate" identifier "(" `params` ")" ("=" `term`)? NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
 Yet, they can be axiomatized, using toplevel ``assume`` statements.
@@ -261,7 +272,7 @@ Yet, they can be axiomatized, using toplevel ``assume`` statements.
        : | `term` ( "+" | "-" | "*" | "//" | "%" ) `term`
        : | "if" `term` "then" `term` "else `term`
        : | "let" identifier "=" `term` "in" `term`
-       : | ( "forall" | "exists" ) identifier ("," identifier)* "." `term`
+       : | ( "forall" | "exists" ) param ("," param)* "." `term`
        : | identifier "(" (`term` ("," `term`)*)? ")"
 
 Built-in functions and predicates
@@ -269,6 +280,7 @@ Built-in functions and predicates
 
 .. rubric:: Python code
 
+* built-in function ``pow`` over integers
 * ``len(l)`` returns the length of list ``l``.
 * ``int(input())`` reads an integer from standard input.
 * ``range(l, u)`` returns the list of integers
@@ -292,7 +304,7 @@ Python lists are modeled as arrays, whose size cannot be modified.
 .. index:: CFG
 .. _format.CFG:
 
-MLCFG: function bodies on the style of control-flow graphs
+MLCFG: function bodies in the style of control-flow graphs
 ----------------------------------------------------------
 
 The MLCFG language is an experimental extension of the regular WhyML
@@ -319,10 +331,10 @@ program function of the following form, introduced by keywords ``let cfg``:
     var *y*:sub:`1`: *u*:sub:`1`;
     ...
     var *y*:sub:`k`: *u*:sub:`k`;
-    { *instructions*;*terminator* }
-    *L*:sub:`1` { *instructions*:sub:`1`;*terminator*:sub:`1` }
+    { *instructions*; *terminator* }
+    *L*:sub:`1` { *instructions*:sub:`1`; *terminator*:sub:`1` }
     ...
-    *L*:sub:`j` { *instructions*:sub:`j`;*terminator*:sub:`j` }
+    *L*:sub:`j` { *instructions*:sub:`j`; *terminator*:sub:`j` }
 
 
 It defines a program function *f*, with the usual syntax for
@@ -332,7 +344,7 @@ composed of a zero or more instructions followed by a terminator, and a
 sequence of other blocks, each denoted by a label (:math:`L_1 \ldots L_j` above).
 The instructions are semi-colon separated sequences of regular
 WhyML expressions of type ``unit``, excluding ``return`` or ``absurd``
-expressions or code invariants:
+expressions, or code invariants:
 
 - a code invariant: :samp:`invariant {I} \\{ {t} }` where *I* is a
   name and *t* a predicate. It is similar to an assert expression,
@@ -356,7 +368,7 @@ Each block is ended by one of the following terminators:
      | *pat*:sub:`k` -> *terminator*:sub:`k`
      end
 
-- a ``return`` statement: :samp:`return *expr*`
+- a ``return`` statement: :samp:`return {expr}`
 - an ``absurd`` statement: indicating that this block should be unreachable.
 
 The extension of syntax is described by the following rules.
@@ -422,7 +434,7 @@ The code can be viewed as a control-flow graph as shown in :numref:`fig.cfg.max_
    :caption: Control-flow graph of the ``max_array`` function.
    :name: fig.cfg.max_array
 
-Below is a version of this code in the Why3-CFG language, where label
+Below is a version of this code in the MLCFG language, where label
 ``L`` corresponds to node ``L``, label ``L1`` to node ``invariant``,
 label ``L2`` to node ``do``.
 
@@ -469,7 +481,7 @@ The consecutive invariants act as a single cut in the generation of VCs.
 Error messages
 ~~~~~~~~~~~~~~
 
-The translation from the CFG language to regular WhyML code may raise
+The translation from the MLCFG language to regular WhyML code may raise
 the following errors.
 
 - “cycle without invariant”: in order to perform the translation, any

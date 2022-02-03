@@ -24,7 +24,7 @@ let wmpz_add (w u v: mpz_ptr) : unit
   ensures  { value_of w mpz = old (value_of u mpz + value_of v mpz) }
   ensures  { forall x. x <> w -> mpz_unchanged x mpz (old mpz) }
   ensures  { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
-=
+= [@vc:do_not_keep_trace] (* traceability info breaks the proofs *)
   label Start in
   let ref u = u in
   let ref v = v in

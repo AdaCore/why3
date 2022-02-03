@@ -202,7 +202,7 @@ rule token = parse
   let () = Exn_printer.register (fun fmt exn -> match exn with
   (* This ad hoc switch allows to not edit the automatically generated
      handcrafted.messages in ad hoc ways. *)
-  | Error None -> Format.fprintf fmt "syntax error"
+  | Error None -> Format.pp_print_string fmt "syntax error"
   | Error (Some s) -> Format.fprintf fmt "syntax error: %s" s
   | _ -> raise exn)
 

@@ -42,17 +42,26 @@
           Loc.user_position f l (s + 1) (e - 1)
         else loc in
       try
-        let id, def, kind = Glob.find loc in
-        match id.Ident.id_loc with
-        | None -> raise Not_found
-        | Some _ ->
-          match def with
-          | Glob.Def ->
-            fprintf fmt "<a name=\"%a\">%a</a>"
-              (Doc_def.pp_anchor ~kind) id Pp.html_string s
-          | Glob.Use ->
-            fprintf fmt "<a href=\"%a\">%a</a>"
-              (Doc_def.pp_locate ~kind) id Pp.html_string s
+        (* note that Doc_def.pp_{anchor,locate} might raise Not_found,
+           so they need to be executed before anything is printed *)
+        match Glob.find loc with
+        | (id, Glob.Def, kind) ->
+            let anchor = asprintf "%a" (Doc_def.pp_anchor ~kind) id in
+            fprintf fmt "<a name=\"%s\">%a</a>" anchor Pp.html_string s
+        | (id, Glob.Use, kind) ->
+            let loc =
+              match id.Ident.id_loc with
+              | None -> raise Not_found
+              | Some loc -> loc in
+            (* several identifiers might be defined at the same location,
+               so try to find the one with an anchor *)
+            let id =
+              match Glob.find loc with
+              | ({ Ident.id_loc = Some _ } as id, Glob.Def, _) -> id
+              | _ -> id
+              | exception Not_found -> id in
+            let target = asprintf "%a" (Doc_def.pp_locate ~kind) id in
+            fprintf fmt "<a href=\"%s\">%a</a>" target Pp.html_string s
       with Not_found ->
         (* otherwise, just print it *)
         Pp.html_string fmt s
@@ -82,7 +91,7 @@ let operator =
   | "[]<-"
 
 let space = [' ' '\t']
-let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']* | operator
+let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_' '\'']* | operator
 let special = ['\'' '"' '<' '>' '&']
 
 rule scan fmt empty delayed = parse
@@ -107,6 +116,11 @@ rule scan fmt empty delayed = parse
             comment fmt true lexbuf;
             pp_print_string fmt "</span>";
             scan fmt false delayed lexbuf }
+  | ("[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)*) space* ']') as s
+          { pp_print_string fmt "<span class=\"attribute\">";
+            pp_print_string fmt s;
+            pp_print_string fmt "</span>";
+            scan fmt false delayed lexbuf }
   | eof   { pp_print_string fmt "</pre>\n";
             if delayed <> "" then
               fprintf fmt "<div class=\"info\">%s</div>" delayed }
@@ -125,8 +139,9 @@ rule scan fmt empty delayed = parse
             | true, s ->
               fprintf fmt "</pre>\n<div class=\"info\">%s</div>" s;
               scan_isolated fmt true false "" lexbuf }
-  | '"'   { pp_print_string fmt "&quot;";
+  | '"'   { pp_print_string fmt "<span class=\"string\">&quot;";
             string fmt true lexbuf;
+            pp_print_string fmt "</span>";
             scan fmt false delayed lexbuf }
   | "'\"'"
   | _ as s
@@ -162,9 +177,6 @@ and scan_embedded fmt ldelim = parse
             end }
   | "*)"  { backtrack lexbuf }
   | eof   { () }
-  | ident as s
-          { print_ident fmt lexbuf s;
-            scan_embedded fmt ldelim lexbuf }
   | "\n"  { new_line lexbuf;
             pp_print_char fmt '\n';
             scan_embedded fmt ldelim lexbuf }

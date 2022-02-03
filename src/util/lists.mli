@@ -51,32 +51,32 @@ val part : ('a -> 'a -> int) -> 'a list -> 'a list list
 
 val first : ('a -> 'b option) -> 'a list -> 'b
 (** [first f l] returns the first result of the application of
-    [f] to an element of [l] which doesn't return [None]. [raise
-    Not_found] if all the element of [l] return [None] *)
+    [f] to an element of [l] that doesn't return [None].
+    Raise [Not_found] if all the elements of [l] return [None] *)
 
 val find_nth : ('a -> bool) -> 'a list -> int
 (** [find_nth p l] returns the index of the first element that
-    satifies the predicate [p]. [raise Not_found] if no element of [l]
+    satifies the predicate [p]. Raise [Not_found] if no element of [l]
     verify the predicate *)
 
 val drop_while : ('a -> bool) -> 'a list -> 'a list
 (** [drop_while p l] drops the initial elements of [l] that satisty [p] *)
 
 val first_nth : ('a -> 'b option) -> 'a list -> int * 'b
-(** The combinaison of {!list_first} and {!list_find_nth}. *)
+(** The combination of {!first} and {!find_nth}. *)
 
 val mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
 val iteri : (int -> 'a -> unit) -> 'a list -> unit
 val fold_lefti : ('a -> int -> 'b -> 'a) -> 'a -> 'b list -> 'a
-(** similar to List.map, List.iter and List.fold_left,
+(** similar to [List.map], [List.iter], and [List.fold_left],
     but with element index passed as extra argument (in 0..len-1) *)
 
 val prefix : int -> 'a list -> 'a list
-(** the first n elements of a list *)
+(** [prefix n l] returns the first [n] elements of [l] *)
 
 val chop : int -> 'a list -> 'a list
-(** removes the first n elements of a list;
-    raises Invalid_argument if the list is not long enough *)
+(** [chop n l] removes the first [n] elements of [l];
+    raises [Invalid_argument] if the list is not long enough *)
 
 val chop_last : 'a list -> 'a list * 'a
 (** removes (and returns) the last element of a list *)

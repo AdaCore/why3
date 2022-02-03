@@ -184,7 +184,7 @@ Proof.
   apply Zeq_bool_true.
   rewrite Digits.Zpos_digits2_pos.
   rewrite (Digits.Zdigits_unique radix2 _ sb).
-  assert (sb + (emax - sb) - sb = emax - sb)%Z by omega; rewrite H0.
+  assert (sb + (emax - sb) - sb = emax - sb)%Z by ring; rewrite H0.
   apply Zmax_left.
   assert (1 < emax)%Z.
   apply Z.le_lt_trans with (m := sb).
@@ -204,7 +204,7 @@ Proof.
   rewrite Z.pow_succ_r by trivial.
   assert (1 <= 2 ^ (sb - 1))%Z.
   apply Z.lt_pred_le, (Zpower_gt_0 radix2 (sb - 1)); trivial.
-  omega.
+  lia.
   apply Zle_bool_true; auto with zarith.
 Qed.
 
@@ -633,7 +633,7 @@ Proof.
   rewrite H0 in a.
   replace (Z.abs (Z.pos m)) with (Z.pos m) in a by auto with zarith.
   destruct a. clear H1.
-  assert (Z.pos m = radix2 ^ sb - 1 \/ Z.pos m < radix2 ^ sb - 1)%Z by omega.
+  assert (Z.pos m = radix2 ^ sb - 1 \/ Z.pos m < radix2 ^ sb - 1)%Z by lia.
   destruct H1.
   right.
   replace (radix2 ^ sb)%Z with (Z.pos 2 ^ Z.pos sb_pos)%Z in H1 by auto.
@@ -1212,9 +1212,9 @@ Proof.
   unfold FLT_exp.
   replace (sb - 1 + 1 + 1 - sb)%Z with 1%Z by ring.
   apply Z.max_l.
-  pose sb_gt_1; pose Hemax'; omega.
+  pose sb_gt_1; pose Hemax'; lia.
   apply Zle_bool_true.
-  pose Hemax'; pose Hsbb; omega.
+  pose Hemax'; pose Hsbb; lia.
 Qed.
 
 Definition Bmax_rep_int: t.
@@ -1288,15 +1288,15 @@ exists (Float radix2 z 0).
 unfold F2R ; simpl.
 now rewrite Rmult_1_r.
 easy.
-simpl; unfold emin; generalize Hsb' Hemax'; omega.
+simpl; unfold emin; generalize Hsb' Hemax'; lia.
 unfold pow2sb in Bz.
 change 2%Z with (radix_val radix2) in Bz.
 apply generic_format_abs_inv.
 rewrite <- abs_IZR, Bz, IZR_Zpower.
 apply generic_format_bpow.
 unfold FLT_exp, emin.
-clear Bz; generalize Hsb' Hemax'; zify.
-omega.
+clear Bz; generalize Hsb' Hemax'.
+lia.
 apply Zlt_le_weak.
 apply Hsb'.
 Qed.
@@ -2371,8 +2371,7 @@ intros m x y r.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
           + unfold to_real. rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-          apply Pos.pow_gt_1.
-          zify; auto with zarith.
+          now apply Pos.pow_gt_1.
         - split.
           destruct r; easy.
           intro.
@@ -2394,8 +2393,7 @@ intros m x y r.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
           + unfold to_real. rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-            apply Pos.pow_gt_1.
-            zify; auto with zarith.
+            now apply Pos.pow_gt_1.
           + assert (~is_nan r) by
                 (destruct r; try easy; destruct n; easy).
             rewrite is_positive_Bsign; easy. }
@@ -2412,16 +2410,14 @@ intros m x y r.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
           + unfold to_real. rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-            apply Pos.pow_gt_1.
-            zify; auto with zarith.
+            now apply Pos.pow_gt_1.
         - split.
           + intro; split.
             destruct r; try easy; destruct n; easy.
             replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
             * unfold to_real. rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
             *  rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-               apply Pos.pow_gt_1.
-               zify; auto with zarith.
+               now apply Pos.pow_gt_1.
            + easy. }
   - destruct H.
     pose proof (Bplus_correct sb emax Hsb' Hemax' nan_bf m x y H H0).
@@ -2635,8 +2631,7 @@ Proof.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
           + unfold to_real. rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-            apply Pos.pow_gt_1.
-            zify; auto with zarith.
+            now apply Pos.pow_gt_1.
         - split.
           destruct r; easy.
           intro.
@@ -2658,8 +2653,7 @@ Proof.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
           + unfold to_real. rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-              apply Pos.pow_gt_1.
-              zify; auto with zarith.
+              now apply Pos.pow_gt_1.
           + assert (~is_nan r) by
                 (destruct r; try easy; destruct n; easy).
             rewrite is_positive_Bsign; easy. }
@@ -2676,16 +2670,14 @@ Proof.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
           + unfold to_real. rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-            apply Pos.pow_gt_1.
-            zify; auto with zarith.
+            now apply Pos.pow_gt_1.
         - split.
           + intro; split.
             destruct r; try easy; destruct n; easy.
             replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
             * unfold to_real. rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
             *  rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-               apply Pos.pow_gt_1.
-               zify; auto with zarith.
+               now apply Pos.pow_gt_1.
           + easy. }
   - destruct H.
     pose proof (Bminus_correct sb emax Hsb' Hemax' nan_bf m x y H H0).
@@ -2854,8 +2846,7 @@ Proof.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
           + unfold to_real. rewrite <-min_real_is_F2R, <-FF2R_B2FF, H1; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-            apply Pos.pow_gt_1.
-            zify; auto with zarith.
+            now apply Pos.pow_gt_1.
         - split.
           assert (~is_nan r) by
               (destruct r; try easy; destruct n; easy).
@@ -2865,8 +2856,7 @@ Proof.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
           + unfold to_real. rewrite <-min_real_is_F2R, <-FF2R_B2FF, H1; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-            apply Pos.pow_gt_1.
-            zify; auto with zarith.
+            now apply Pos.pow_gt_1.
         - split.
           destruct r; easy.
           assert (~is_nan r) by
@@ -2883,8 +2873,7 @@ Proof.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
           + unfold to_real. rewrite <-max_real_is_F2R, <-FF2R_B2FF, H1; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-            apply Pos.pow_gt_1.
-            zify; auto with zarith. }
+            now apply Pos.pow_gt_1. }
         assert (~is_nan r) by
             (destruct r; try easy; destruct n; easy).
         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
@@ -2904,8 +2893,7 @@ Proof.
           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
           + unfold to_real. rewrite <-max_real_is_F2R, <-FF2R_B2FF, H1; auto.
           + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-            apply Pos.pow_gt_1.
-            zify; auto with zarith. }
+            now apply Pos.pow_gt_1. }
         assert (~is_nan r) by
             (destruct r; try easy; destruct n; easy).
         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy. }
@@ -2937,8 +2925,7 @@ Proof.
               (destruct r; try easy; destruct n; easy).
           rewrite is_positive_Bsign, H1'; intro h; contradict h; easy. }
       rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-      apply Pos.pow_gt_1.
-      zify; auto with zarith.
+      now apply Pos.pow_gt_1.
   - pose proof (Bmult_correct sb emax Hsb' Hemax' nan_bf m x y).
     destruct (Rlt_le_dec (Rabs (round m (to_real x * to_real y))) (bpow radix2 emax));
     [rewrite Rlt_bool_true in H1; auto| rewrite Rlt_bool_false in H1; auto].
@@ -3051,8 +3038,7 @@ Proof.
             simpl in H4.
             replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
                 (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
-                 apply Pos.pow_gt_1;
-                 zify; auto with zarith).
+                 now apply Pos.pow_gt_1).
             rewrite <-min_real_is_F2R; assumption. }
         split; intro; [destruct r; easy|].
         destruct r; try easy.
@@ -3069,8 +3055,7 @@ Proof.
             simpl in H4.
             replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
                 (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
-                 apply Pos.pow_gt_1;
-                 zify; auto with zarith).
+                 now apply Pos.pow_gt_1).
             rewrite <-max_real_is_F2R; assumption.
           + destruct r; try easy; try (destruct n; easy).
             destruct s; try easy.
@@ -3084,8 +3069,7 @@ Proof.
             simpl in H4.
             replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
                 (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
-                 apply Pos.pow_gt_1;
-                 zify; auto with zarith).
+                 now apply Pos.pow_gt_1).
             rewrite <-min_real_is_F2R; assumption.
           - split; [destruct r; try easy| ].
             apply (f_equal (FF2R radix2)) in H4.
@@ -3093,8 +3077,7 @@ Proof.
             simpl in H4.
             replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
                 (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
-                 apply Pos.pow_gt_1;
-                 zify; auto with zarith).
+                 now apply Pos.pow_gt_1).
             rewrite <-max_real_is_F2R; assumption.
           - contradict H5.
             destruct r; destruct s; easy. }
@@ -4541,7 +4524,7 @@ Proof.
   { assert (IZR (floor(to_real x)) < 0) by lra.
     assert (-2 < IZR (floor (to_real x))) by lra.
     apply lt_IZR in H1; apply lt_IZR in H2.
-    now replace (floor (to_real x)) with (-1)%Z by omega. }
+    now replace (floor (to_real x)) with (-1)%Z by lia. }
   lra.
 Qed.
 
@@ -4559,7 +4542,7 @@ Proof.
   { assert (0 < IZR (ceil( to_real x))) by lra.
     assert (IZR (ceil(to_real x)) < 2) by lra.
     apply lt_IZR in H1; apply lt_IZR in H2.
-    now replace (ceil (to_real x)) with 1%Z by omega. }
+    now replace (ceil (to_real x)) with 1%Z by lia. }
   lra.
 Qed.
 
@@ -4615,9 +4598,9 @@ Proof.
   unfold FLT_exp.
   replace (sb - 1 + 1 + - sb)%Z with 0%Z by ring.
   apply Z.max_l.
-  pose sb_gt_1; pose Hemax'; omega.
+  pose sb_gt_1; pose Hemax'; lia.
   apply Zle_bool_true.
-  pose Hemax'; pose sb_gt_1; omega.
+  pose Hemax'; pose sb_gt_1; lia.
 Qed.
 
 Definition half: t.

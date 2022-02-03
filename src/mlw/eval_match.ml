@@ -129,36 +129,38 @@ let rec add_quant kn d (vl,tl,f) ({vs_ty = ty} as v) =
   | None ->
       (v::vl, tl, f)
 
-let let_map fn env t1 tb =
+let let_map ~keep_trace fn env t1 tb =
   let x,t2,close = t_open_bound_cb tb in
   let t2 = fn (Mvs.add x t1 env) t2 in
   (* TODO/FIXME? convert (let x = if f then True else False in h)
      into (forall x. (x = True <-> f) -> h) ? *)
-  t_let_simp t1 (close x t2)
+  (**)
+  let keep = keep_trace && relevant_for_counterexample x.vs_name in
+  t_let_simp_keep_var ~keep t1 (close x t2)
 
 let branch_map fn env t1 bl =
   let mk_b b =
     let p,t2,close = t_open_branch_cb b in close p (fn env t2) in
   t_case t1 (List.map mk_b bl)
 
-let rec dive_to_constructor fn env t =
-  let dive env t = dive_to_constructor fn env t in
+let rec dive_to_constructor ~keep_trace fn env t =
+  let dive env t = dive_to_constructor ~keep_trace fn env t in
   t_attr_copy t (match t.t_node with
     | Tvar x -> dive env (Mvs.find_exn Exit x env)
-    | Tlet (t1,tb) -> let_map dive env t1 tb
+    | Tlet (t1,tb) -> let_map ~keep_trace dive env t1 tb
     | Tcase (t1,bl) -> branch_map dive env t1 bl
     | Tif (f,t1,t2) -> t_if_simp f (dive env t1) (dive env t2)
     | Tapp (ls,tl) when ls.ls_constr > 0 -> fn env t ls tl
     | _ -> raise Exit)
 
-let rec cs_equ env t1 t2 =
+let rec cs_equ ~keep_trace env t1 t2 =
   if t_equal t1 t2 then t_true else
   let right cs1 tl1 env _t2 cs2 tl2 =
     if not (ls_equal cs1 cs2) then t_false else
-    t_and_simp_l (List.map2 (cs_equ env) tl1 tl2) in
+    t_and_simp_l (List.map2 (cs_equ ~keep_trace env) tl1 tl2) in
   let left t2 env _t1 cs1 tl1 =
-    dive_to_constructor (right cs1 tl1) env t2 in
-  try dive_to_constructor (left t2) env t1
+    dive_to_constructor ~keep_trace (right cs1 tl1) env t2 in
+  try dive_to_constructor ~keep_trace (left t2) env t1
   with Exit -> t_equ t1 t2
 
 let flat_case t bl =
@@ -166,20 +168,20 @@ let flat_case t bl =
   let mk_case = t_case_close and mk_let = t_let_close_simp in
   Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl)
 
-let rec eval_match kn stop env t =
+let rec eval_match ~keep_trace kn stop env t =
   let stop = stop || t.t_ty <> None ||
              Sattr.mem Ity.annot_attr t.t_attrs in
-  let eval env t = eval_match kn stop env t in
+  let eval env t = eval_match ~keep_trace kn stop env t in
   t_attr_copy t (match t.t_node with
     | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
-        cs_equ env (eval env t1) (eval env t2)
+        cs_equ ~keep_trace env (eval env t1) (eval env t2)
     | Tnot { t_node = Tapp (ls, [t1;t2]) } when ls_equal ls ps_equ ->
-        t_not_simp (cs_equ env (eval env t1) (eval env t2))
+        t_not_simp (cs_equ ~keep_trace env (eval env t1) (eval env t2))
     | Tapp (ls, [t1]) when is_projection ls ->
         let t1 = eval env t1 in
         let fn _env _t2 cs tl =
           select_field ls (cs_fields kn cs) tl in
-        begin try dive_to_constructor fn env t1
+        begin try dive_to_constructor ~keep_trace fn env t1
         with Exit -> t_app ls [t1] t.t_ty end
     | Tapp (ls, tl) ->
         begin match unfold_inlineable kn ls tl t.t_ty with
@@ -188,12 +190,12 @@ let rec eval_match kn stop env t =
         end
     | Tlet (t1, tb2) ->
         let t1 = eval env t1 in
-        let_map eval env t1 tb2
+        let_map ~keep_trace eval env t1 tb2
     | Tcase (t1, bl1) ->
         let t1 = eval env t1 in
         let fn env t2 _cs _tl =
           eval env (Loc.try2 ?loc:t.t_loc flat_case t2 bl1) in
-        begin try dive_to_constructor fn env t1
+        begin try dive_to_constructor ~keep_trace fn env t1
         with Exit -> branch_map eval env t1 bl1 end
     | Tquant (q, qf) ->
         let vl,tl,f,close = t_open_quant_cb qf in
@@ -205,4 +207,4 @@ let rec eval_match kn stop env t =
     | _ ->
         t_map (eval env) t)
 
-let eval_match kn t = eval_match kn false Mvs.empty t
+let eval_match ~keep_trace kn t = eval_match ~keep_trace kn false Mvs.empty t

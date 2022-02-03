@@ -118,7 +118,8 @@ let rec basename p =
   | _ :: tl -> basename tl
 
 (* deprecated: let string_of_file_path p = String.concat "/" p *)
-let print_file_path fmt p = Format.fprintf fmt "%a" (Pp.print_list Pp.slash Pp.string) p
+let print_file_path fmt p =
+  Pp.print_list Pp.slash Pp.string fmt p
 
 
 let system_independent_path_of_file f =

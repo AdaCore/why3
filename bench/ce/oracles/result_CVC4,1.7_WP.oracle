@@ -1,6 +1,6 @@
 Weakest Precondition
 File "bench/ce/result.mlw", line 11, characters 15-38:
-Goal Postcondition from verification condition p1'vc.
+Sub-goal Postcondition of goal p1'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -30,9 +30,10 @@ File result.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+    result [@introduced] = {"type": "Integer", "val": "4"}
 
 File "bench/ce/result.mlw", line 18, characters 12-36:
-Goal Postcondition from verification condition f'vc.
+Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -62,6 +63,8 @@ File result.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+    result [@id:unused] [@introduced] [@model_trace:result] =
+      {"type": "Integer", "val": "2"}
   Line 20:
     A [@field:0:contents] [@introduced] [@model] [@model_trace:A] =
       {"type": "Record",

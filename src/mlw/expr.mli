@@ -208,6 +208,8 @@ val e_var : pvsymbol -> expr
 val e_const : Constant.constant -> ity -> expr
 val e_nat_const : int -> expr
 
+val proxy_attrs : Sattr.t
+
 val mk_proxy_decl : ghost:bool -> expr -> let_defn * pvsymbol
 (** [mk_proxy_decl ~ghost e] returns a pair [(ld,v)] providing a fresh
    variable [v] that can be used as a substitute for expression

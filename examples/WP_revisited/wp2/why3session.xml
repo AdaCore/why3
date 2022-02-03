@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -14,7 +15,7 @@
  <goal name="eval_subst_term" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="eval_subst_term.0" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="99"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="95"/></proof>
   </goal>
  </transf>
  </goal>
@@ -138,7 +139,7 @@
  </goal>
 </theory>
 <theory name="WP" proved="true">
- <goal name="S.eq&#39;vc" expl="VC for eq" proved="true">
+ <goal name="S.eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
  <proof prover="3"><result status="valid" time="0.05" steps="17930"/></proof>
  </goal>
  <goal name="assigns_refl" proved="true">
@@ -159,13 +160,13 @@
   <proof prover="2"><result status="valid" time="0.04" steps="44"/></proof>
   </goal>
   <goal name="compute_writes&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="44"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="44"/></proof>
   </goal>
   <goal name="compute_writes&#39;vc.2" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.03" steps="49"/></proof>
   </goal>
   <goal name="compute_writes&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="49"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="49"/></proof>
   </goal>
   <goal name="compute_writes&#39;vc.4" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.03" steps="49"/></proof>
@@ -179,10 +180,10 @@
    <proof prover="10"><result status="valid" time="0.24" steps="489642"/></proof>
    </goal>
    <goal name="compute_writes&#39;vc.5.2" expl="postcondition" proved="true">
-   <proof prover="10"><result status="valid" time="0.02" steps="57793"/></proof>
+   <proof prover="2" timelimit="1"><result status="valid" time="0.13" steps="69"/></proof>
    </goal>
    <goal name="compute_writes&#39;vc.5.3" expl="postcondition" proved="true">
-   <proof prover="2" timelimit="1"><result status="valid" time="0.13" steps="431"/></proof>
+   <proof prover="0"><result status="valid" time="0.13" steps="27845"/></proof>
    </goal>
    <goal name="compute_writes&#39;vc.5.4" expl="postcondition" proved="true">
    <proof prover="4" timelimit="0"><path name="wp2_WP_VC_compute_writes_2.v"/><result status="valid" time="0.42"/></proof>
@@ -229,7 +230,7 @@
    <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
    </goal>
    <goal name="wp&#39;vc.5.5" expl="postcondition" proved="true">
-   <proof prover="4" timelimit="0"><path name="wp2_WP_VC_wp_1.v"/><result status="valid" time="0.49"/></proof>
+   <proof prover="4" timelimit="0"><path name="wp2_WP_VC_wp_1.v"/><result status="valid" time="0.48"/></proof>
    </goal>
   </transf>
   </goal>

@@ -24,7 +24,7 @@ let ident_printer =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
+  pp_print_string fmt (id_unique ident_printer id)
 
 let forget_var v = forget_id ident_printer v.vs_name
 
@@ -99,9 +99,9 @@ and print_fmla info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "@[(NOT@ %a)@]" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "TRUE"
+      pp_print_string fmt "TRUE"
   | Tfalse ->
-      fprintf fmt "FALSE"
+      pp_print_string fmt "FALSE"
   | Tif _ ->
       unsupportedTerm f "simplify: you must eliminate if"
   | Tlet _ ->

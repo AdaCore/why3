@@ -246,11 +246,11 @@ LIB_CORE = \
 	parser_tokens keywords \
 	task pretty dterm env trans printer model_parser
 
-LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
+LIB_DRIVER = prove_client call_provers driver_parser driver_lexer driver \
 		whyconf autodetection smtv2_model_defs collect_data_model sexp smtv2_model_parser
 
 LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
-          pinterp counterexample
+          pinterp_core rac pinterp check_ce
 
 ifeq (@enable_infer@,yes)
 LIB_INFER = o2oterm domain infer_why3 quant_domain union_find disjunctive_term_domain uf_domain infer_cfg infer_loop
@@ -279,7 +279,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		generic_arg_trans_utils case apply subst \
 		introduction ind_itp destruct cut congruence \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
-		induction induction_pr matching reflection
+		induction induction_pr reflection
 
 LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
@@ -289,6 +289,8 @@ LIB_SESSION = compress xml termcode session_itp \
               strategy strategy_parser controller_itp \
 	      server_utils itp_communication \
 	      itp_server json_util unix_scheduler
+
+LIB_CMIONLY = driver/driver_ast
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
@@ -309,11 +311,12 @@ endif
 
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
-LIBDEP = $(addsuffix .dep, $(LIBMODULES))
+LIBDEP = $(addsuffix .dep, $(LIBMODULES)) $(LIB_CMIONLY:%=src/%.dep)
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
+LIBCMI = $(addsuffix .cmi, $(LIBMODULES)) $(LIB_CMIONLY:%=src/%.cmi)
 
-$(LIBDEP) $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
+$(LIBDEP) $(LIBCMO) $(LIBCMX) $(LIBCMI): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
@@ -526,10 +529,15 @@ PLUGGENERATED = \
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
 PLUG_TRANSFORM =
-PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
-PLUG_PYTHON = py_ast py_parser py_lexer py_main
-PLUG_MICROC = mc_ast mc_parser mc_lexer mc_printer mc_main
-PLUG_CFG = cfg_ast cfg_parser cfg_lexer cfg_main
+PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
+PLUG_PYTHON = py_parser py_lexer py_main
+PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
+PLUG_CFG = cfg_parser cfg_lexer cfg_paths cfg_main
+ifeq (@enable_stackify@,yes)
+PLUG_CFG += stackify cfg_stackify
+endif
+
+PLUG_CMIONLY = tptp/tptp_ast python/py_ast microc/mc_ast cfg/cfg_ast
 
 PLUGINS = genequlin dimacs tptp python microc cfg
 
@@ -552,12 +560,12 @@ PLUG_TRANSFORM += hypothesis_selection
 PLUGINS += hypothesis_selection
 
 lib/plugins/hypothesis_selection.cmxs: EXTINCLUDES += -I @OCAMLGRAPHLIB@
-lib/plugins/hypothesis_selection.cmo:  EXTINCLUDES += -I @OCAMLGRAPHLIB@
+lib/plugins/hypothesis_selection.cma:  EXTINCLUDES += -I @OCAMLGRAPHLIB@
 lib/plugins/hypothesis_selection.cmxs: EXTLIBS += graph.cmxa
-lib/plugins/hypothesis_selection.cmo:  EXTOBJS += graph.cmo
+lib/plugins/hypothesis_selection.cma:  EXTOBJS += graph.cma
 ifeq (@enable_ocamlfind@,yes)
 lib/plugins/hypothesis_selection.cmxs: FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
-lib/plugins/hypothesis_selection.cmo:  FLAGS += -package ocamlgraph graph.cmo
+lib/plugins/hypothesis_selection.cma:  FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
 endif
 endif
 
@@ -567,21 +575,35 @@ PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
 	      $(CFGMODULES)
 
-PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
+PLUGDEP = $(addsuffix .dep, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.dep)
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
+PLUGCMI = $(addsuffix .cmi, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.cmi)
 
 PLUGDIRS = parser printer transform tptp python microc cfg
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
-$(PLUGDEP) $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
+ifeq (@enable_stackify@,yes)
+plugins/cfg/stackify.cmx: EXTINCLUDES += -I @OCAMLGRAPHLIB@
+plugins/cfg/stackify.cmo: EXTINCLUDES += -I @OCAMLGRAPHLIB@
+plugins/cfg/stackify.cmx: EXTLIBS += graph.cmxa
+plugins/cfg/stackify.cmo: EXTOBJS += graph.cma
+ifeq (@enable_ocamlfind@,yes)
+plugins/cfg/stackify.cmx: FLAGS += -package ocamlgraph
+plugins/cfg/stackify.cmo: FLAGS += -package ocamlgraph
+lib/plugins/cfg.cmxs: FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
+lib/plugins/cfg.cma:  FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
+endif
+endif
+
+$(PLUGDEP) $(PLUGCMO) $(PLUGCMX) $(PLUGCMI): INCLUDES += $(PLUGINCLUDES)
 
 $(PLUGDEP): $(PLUGGENERATED)
 
-LIBPLUGCMO =  $(PLUGINS:%=lib/plugins/%.cmo)
+LIBPLUGCMA =  $(PLUGINS:%=lib/plugins/%.cma)
 LIBPLUGCMXS = $(PLUGINS:%=lib/plugins/%.cmxs)
 
-plugins.byte: $(LIBPLUGCMO)
+plugins.byte: $(LIBPLUGCMA)
 plugins.opt : $(LIBPLUGCMXS)
 
 lib/plugins:
@@ -591,24 +613,24 @@ lib/plugins/%.cmxs: | lib/plugins
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
-lib/plugins/%.cmo: | lib/plugins
+lib/plugins/%.cma: | lib/plugins
 	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
+	$(HIDE)$(OCAMLC) $(BFLAGS) -a -o $@ $^
 
 $(PLUG_PARSER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/parser/%.cmx
-$(PLUG_PARSER:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/parser/%.cmo
+$(PLUG_PARSER:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/parser/%.cmo
 $(PLUG_PRINTER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/printer/%.cmx
-$(PLUG_PRINTER:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/printer/%.cmo
+$(PLUG_PRINTER:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/printer/%.cmo
 $(PLUG_TRANSFORM:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/transform/%.cmx
-$(PLUG_TRANSFORM:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/transform/%.cmo
+$(PLUG_TRANSFORM:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/transform/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
-lib/plugins/tptp.cmo: $(TPTPCMO)
+lib/plugins/tptp.cma: $(TPTPCMO)
 lib/plugins/python.cmxs: $(PYTHONCMX)
-lib/plugins/python.cmo: $(PYTHONCMO)
+lib/plugins/python.cma: $(PYTHONCMO)
 lib/plugins/microc.cmxs: $(MICROCCMX)
-lib/plugins/microc.cmo: $(MICROCCMO)
+lib/plugins/microc.cma: $(MICROCCMO)
 lib/plugins/cfg.cmxs: $(addsuffix .cmx, $(CFGMODULES))
-lib/plugins/cfg.cmo: $(addsuffix .cmo, $(CFGMODULES))
+lib/plugins/cfg.cma: $(addsuffix .cmo, $(CFGMODULES))
 
 # depend and clean targets
 
@@ -618,12 +640,12 @@ CLEANDIRS += plugins $(addprefix plugins/, $(PLUGDIRS)) lib/plugins
 GENERATED += $(PLUGGENERATED)
 
 uninstall-bin::
-	rm -f $(PLUGINS:%=$(LIBDIR)/why3/plugins/%.cmo)
+	rm -f $(PLUGINS:%=$(LIBDIR)/why3/plugins/%.cma)
 	rm -f $(PLUGINS:%=$(LIBDIR)/why3/plugins/%.cmxs)
 
 install-bin::
 	$(MKDIR_P) $(LIBDIR)/why3/plugins
-	$(INSTALL_DATA) $(wildcard $(LIBPLUGCMO) $(LIBPLUGCMXS)) $(LIBDIR)/why3/plugins
+	$(INSTALL_DATA) $(wildcard $(LIBPLUGCMA) $(LIBPLUGCMXS)) $(LIBDIR)/why3/plugins
 
 ###############
 # Why3 commands
@@ -1282,7 +1304,7 @@ ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy Why3_Map.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 
-ISABELLEREALIZEDRV=drivers/isabelle@ISABELLEVERSION@-realize.drv
+ISABELLEREALIZEDRV=drivers/isabelle-realize.drv
 
 $(ISABELLEVERSIONSPECIFICTARGETS): %: %.@ISABELLEVERSION@
 	$(CMP_CP)
@@ -1346,10 +1368,10 @@ else
   ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
 endif
 
-$(GENERATED_PREFIX_ISABELLE)/realizations.@ISABELLEVERSION@: $(ISABELLELIBS)
+$(GENERATED_PREFIX_ISABELLE)/realizations: $(ISABELLELIBS)
 	$(HIDE)sha1sum $^ | sed -e "s,$(GENERATED_PREFIX_ISABELLE)/,," > $@
 
-update-isabelle: $(GENERATED_PREFIX_ISABELLE)/realizations.@ISABELLEVERSION@
+update-isabelle: $(GENERATED_PREFIX_ISABELLE)/realizations
 
 $(ISABELLELIBS_INT): bin/why3.@OCAMLBEST@ bin/why3realize.$(SHAREDBEST) drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen stdlib/int.mlw
@@ -1634,10 +1656,10 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.con
 	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 \
 		--file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
-		`find stdlib -name "*.mlw" -printf " --file=%p:/%p"` \
+	  `find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
 	+dynlink.js +toplevel.js $<
 
-src/trywhy3/why3_worker.byte: $(WHY3CMA) lib/plugins/python.cmo lib/plugins/microc.cmo \
+src/trywhy3/why3_worker.byte: $(WHY3CMA) $(PYTHONCMO) $(MICROCCMO) \
 		$(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo why3_worker.cmo)
 	$(OCAMLFIND) ocamlc $(filter-out -thread,$(BFLAGS)) -package js_of_ocaml -o $@ -linkpkg $^
 
@@ -1703,6 +1725,8 @@ endif
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.$(SHAREDBEST) plugins $(TOOLS) \
   share/Makefile.config bin/why3extract.$(SHAREDBEST)
+	bin/why3.@OCAMLBEST@ config list-provers | grep -q Alt-Ergo || \
+		bin/why3.@OCAMLBEST@ config detect
 	@echo "=== Check API examples ==="
 	$(MAKE) bench-api
 	@echo "=== Check examples ==="
@@ -1863,9 +1887,10 @@ MODULESTODOC = \
 	parser/ptree_helpers parser/typing parser/mlw_printer \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
+	mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc \
+	mlw/pinterp_core mlw/rac mlw/pinterp mlw/check_ce \
 	session/session_itp session/controller_itp \
-	session/itp_communication session/itp_server \
-	mlw/counterexample mlw/pinterp mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc
+	session/itp_communication session/itp_server
 
 MODULESMLTODOC = parser/ptree
 
@@ -1938,7 +1963,7 @@ STDLIBS = \
 	exn \
 	floating_point fmap function \
 	graph hashtbl \
-	ieee_float int \
+	ieee_float int io \
 	list \
 	map matrix \
 	null number option ocaml \
@@ -2051,6 +2076,10 @@ pl%gins/cfg/cfg_parser.ml pl%gins/cfg/cfg_parser.mli: src/parser/parser_common.m
 	        echo '$*.cmx : $*.cmi'; \
 	        echo '$*.cmi : $*.cmo') $(TOTARGET)
 
+%.dep: %.mli
+	$(SHOW) 'Ocamldep $<'
+	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $(INCLUDES) $< $(TOTARGET)
+
 bin/%.opt:
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
@@ -2128,10 +2157,10 @@ dist: $(MORE_DIST)
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		Makefile.in configure.in \
-		src/*/*.ml src/*/*.ml[iyl4] \
+		src/*/*.ml src/*/*.ml[ily] \
 		plugins/*/*.ml plugins/*/*.ml[ily] \
 		lib/coq/*.v lib/coq/*/*.v \
-		src/server/*.c src/server/*.h \
+		src/server/*.[ch] \
 		examples/use_api/*.ml
 
 #########

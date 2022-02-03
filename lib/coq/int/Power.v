@@ -15,6 +15,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 
+Require Import Lia.
 Require Import Exponentiation.
 
 (* Why3 goal *)
@@ -54,10 +55,11 @@ Qed.
 Lemma Power_s_alt :
   forall (x:Numbers.BinNums.Z) (n:Numbers.BinNums.Z), (0%Z < n)%Z ->
   ((power x n) = (x * (power x (n - 1%Z)%Z))%Z).
+Proof.
 intros x n h1.
-rewrite <- Power_s.
-f_equal; auto with zarith.
-omega.
+rewrite <- Power_s by lia.
+apply f_equal.
+ring.
 Qed.
 
 (* Why3 goal *)
@@ -94,7 +96,7 @@ Lemma Power_comm1 :
   (((power x n) * y)%Z = (y * (power x n))%Z).
 Proof.
 intros x y h1 n h2.
-auto with zarith.
+apply Zmult_comm.
 Qed.
 
 (* Why3 goal *)
@@ -112,6 +114,7 @@ Qed.
 Lemma Power_non_neg :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   (0%Z <= x)%Z /\ (0%Z <= y)%Z -> (0%Z <= (power x y))%Z.
+Proof.
 intros x y (h1,h2).
 now apply Z.pow_nonneg.
 Qed.
@@ -131,6 +134,7 @@ Open Scope Z_scope.
 Lemma Power_monotonic :
   forall (x:Numbers.BinNums.Z) (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z),
   (0%Z < x)%Z /\ (0%Z <= n)%Z /\ (n <= m)%Z -> ((power x n) <= (power x m))%Z.
+Proof.
 intros.
 apply Z.pow_le_mono_r; auto with zarith.
 Qed.

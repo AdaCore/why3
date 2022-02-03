@@ -920,7 +920,8 @@ let simp (t:t) : t
 let radd (a b:t)
   ensures { forall y. rinterp result y = rinterp a y +. rinterp b y }
   raises  { QError -> true }
-= match (a,b) with
+= [@vc:do_not_keep_trace] (* traceability info breaks the proof *)
+  match (a,b) with
   | (n1,d1), (n2,d2) ->
   if d1 = 0 || d2 = 0 then raise QError
   else begin

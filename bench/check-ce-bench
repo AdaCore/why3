@@ -123,6 +123,11 @@ for file in $files; do
     run Z3,4.8.4 $filedir $filebase false 7500000
 done
 
+# Check the reproduction of the experiments by Petion (2018). Use CVC4 because
+# counterexample generation is not reproducible with Z3 (Gitlab issue #584).
+bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.7 \
+  --ce-prover CVC4,1.7,counterexamples --stepslimit 10000 --rac-prover CVC4,1.7
+
 if [ "$success" = true ]; then
     echo "Check-ce bench: success"
     exit 0

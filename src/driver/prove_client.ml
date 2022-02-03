@@ -247,9 +247,9 @@ let read_answers ~blocking =
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | NotConnected ->
-      Format.fprintf fmt "Not connected to the proof server"
+      Format.pp_print_string fmt "Not connected to the proof server"
   | AlreadyConnected ->
-      Format.fprintf fmt "Already connected to the proof server"
+      Format.pp_print_string fmt "Already connected to the proof server"
   | InvalidAnswer s ->
       Format.fprintf fmt "Invalid server answer: %s" s
   | ConnectionError s ->

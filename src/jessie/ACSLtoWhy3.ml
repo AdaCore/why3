@@ -1647,7 +1647,8 @@ let global (theories,lemmas,denv,functions) g =
       Self.not_yet_implemented "global: GType"
 
 
-let print_id fmt id = Format.fprintf fmt "%s" id.Ident.id_string
+let print_id fmt id =
+  Format.pp_print_string fmt id.Ident.id_string
 
 let add_pdecl m d =
   let def = Pdecl.create_let_decl d in

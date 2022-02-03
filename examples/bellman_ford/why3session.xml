@@ -6,9 +6,13 @@
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bellman_ford.mlw"/>
 <theory name="Graph" proved="true">
+ <goal name="s&#39;vc" expl="VC for s" proved="true">
+ <proof prover="4"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
  <goal name="vertices_cardinal_pos" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
@@ -136,7 +140,7 @@
     <proof prover="1"><result status="valid" time="0.09" steps="323"/></proof>
     </goal>
     <goal name="inv2_path&#39;vc.5.1.1" expl="postcondition" proved="true">
-    <proof prover="1" timelimit="5"><result status="valid" time="1.38" steps="5571"/></proof>
+    <proof prover="1" timelimit="5"><result status="valid" time="1.65" steps="5571"/></proof>
     </goal>
    </transf>
    </goal>
@@ -219,7 +223,7 @@
        <proof prover="1"><result status="valid" time="0.15" steps="448"/></proof>
        </goal>
        <goal name="relax&#39;vc.1.0.0.0.0.2" expl="VC for relax" proved="true">
-       <proof prover="1" timelimit="5"><result status="valid" time="1.02" steps="3180"/></proof>
+       <proof prover="1" timelimit="5"><result status="valid" time="1.25" steps="3180"/></proof>
        </goal>
        <goal name="relax&#39;vc.1.0.0.0.0.3" expl="VC for relax" proved="true">
        <proof prover="1"><result status="valid" time="0.02" steps="99"/></proof>
@@ -329,18 +333,18 @@
   <goal name="bellman_ford&#39;vc.6" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="bellman_ford&#39;vc.6.0" expl="VC for bellman_ford" proved="true">
-   <proof prover="3"><result status="valid" time="0.10" steps="31467"/></proof>
+   <proof prover="3"><result status="valid" time="0.10" steps="27851"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.6.1" expl="VC for bellman_ford" proved="true">
-   <proof prover="2"><result status="valid" time="0.99" steps="7429"/></proof>
+   <proof prover="2"><result status="valid" time="0.99" steps="6653"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="bellman_ford&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.04" steps="144"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.04" steps="147"/></proof>
   </goal>
   <goal name="bellman_ford&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.34" steps="1052"/></proof>
+  <proof prover="1"><result status="valid" time="0.34" steps="1061"/></proof>
   </goal>
   <goal name="bellman_ford&#39;vc.9" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
@@ -354,37 +358,37 @@
   <goal name="bellman_ford&#39;vc.12" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="bellman_ford&#39;vc.12.0" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.06" steps="109"/></proof>
+   <proof prover="1"><result status="valid" time="0.06" steps="112"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.1" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.07" steps="193"/></proof>
+   <proof prover="1"><result status="valid" time="0.07" steps="196"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.2" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.04" steps="117"/></proof>
+   <proof prover="1"><result status="valid" time="0.04" steps="120"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.3" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.32" steps="1018"/></proof>
+   <proof prover="1"><result status="valid" time="0.32" steps="1021"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.4" expl="VC for bellman_ford" proved="true">
    <proof prover="1"><result status="valid" time="0.05" steps="27"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.5" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.04" steps="175"/></proof>
+   <proof prover="1"><result status="valid" time="0.04" steps="178"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.6" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.20" steps="693"/></proof>
+   <proof prover="1"><result status="valid" time="0.20" steps="698"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.7" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.14" steps="205"/></proof>
+   <proof prover="1"><result status="valid" time="0.14" steps="208"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.8" expl="VC for bellman_ford" proved="true">
    <proof prover="1"><result status="valid" time="0.08" steps="29"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.9" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.21" steps="728"/></proof>
+   <proof prover="1"><result status="valid" time="0.21" steps="731"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.12.10" expl="VC for bellman_ford" proved="true">
-   <proof prover="1"><result status="valid" time="0.04" steps="199"/></proof>
+   <proof prover="1"><result status="valid" time="0.04" steps="202"/></proof>
    </goal>
   </transf>
   </goal>
@@ -395,24 +399,24 @@
   <proof prover="1"><result status="valid" time="0.03" steps="46"/></proof>
   </goal>
   <goal name="bellman_ford&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.27" steps="1001"/></proof>
+  <proof prover="1"><result status="valid" time="0.27" steps="1015"/></proof>
   </goal>
   <goal name="bellman_ford&#39;vc.16" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.06" steps="20"/></proof>
   </goal>
   <goal name="bellman_ford&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.04" steps="157"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="160"/></proof>
   </goal>
   <goal name="bellman_ford&#39;vc.18" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="bellman_ford&#39;vc.18.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.05" steps="114"/></proof>
+   <proof prover="1"><result status="valid" time="0.05" steps="117"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.18.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.32" steps="1175"/></proof>
+   <proof prover="1"><result status="valid" time="0.32" steps="1179"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.18.2" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.05" steps="115"/></proof>
+   <proof prover="1"><result status="valid" time="0.05" steps="118"/></proof>
    </goal>
    <goal name="bellman_ford&#39;vc.18.3" expl="VC for bellman_ford" proved="true">
    <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>

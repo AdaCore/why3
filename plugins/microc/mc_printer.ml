@@ -16,10 +16,10 @@ open Term
 
 (* microc print_binop *)
 let print_binop fmt = function
-  | Tand           -> fprintf fmt "&&"
-  | Tor            -> fprintf fmt "||"
-  | Timplies       -> fprintf fmt "->"
-  | Tiff           -> fprintf fmt "<->"
+  | Tand           -> pp_print_string fmt "&&"
+  | Tor            -> pp_print_string fmt "||"
+  | Timplies       -> pp_print_string fmt "->"
+  | Tiff           -> pp_print_string fmt "<->"
 
 let rec microc_ext_printer print_any fmt a =
   match a with

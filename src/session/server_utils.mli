@@ -79,15 +79,15 @@ val interp:
   Controller_itp.controller ->
   Session_itp.any option -> string -> command
 
-(* Find the next goal from the current node (using heuristic st).
-   @param st         : use heuristic st
-   @param always_send: if true then always returns something
-   @param proved     : oracle for proved node
-   @param children   : returns the list children of a node
-   @param get_parent : returns the parent of a node
-   @param is_goal    : answer true iff a given node is a goal
-   @param is_pa      : answer true iff a given node is a proof attempt
-   @param node       : node_id
+(** Find the next goal from the current node (using heuristic st).
+   @param st          use heuristic st
+   @param always_send if true then always returns something
+   @param proved      oracle for proved node
+   @param children    returns the list children of a node
+   @param get_parent  returns the parent of a node
+   @param is_goal     answer true iff a given node is a goal
+   @param is_pa       answer true iff a given node is a proof attempt
+   @param node        node_id
 *)
 val get_next_with_strategy:
   st:Itp_communication.next_unproved_node_strat ->

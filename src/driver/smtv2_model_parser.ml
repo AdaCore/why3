@@ -32,7 +32,7 @@ module FromSexp = struct
   let get_string s = String.sub s 1 (String.length s-2)
 
   let rec pp_sexp fmt = function
-    | Atom s -> Format.fprintf fmt "%s" s
+    | Atom s -> Format.pp_print_string fmt s
     | List l -> Format.fprintf fmt "@[@[<hv2>(%a@])@]" Pp.(print_list space pp_sexp) l
 
   let string_of_sexp = Format.asprintf "%a" pp_sexp
@@ -189,10 +189,6 @@ module FromSexp = struct
     | List [n; iret] -> name n, ireturn_type iret
     | sexp -> error sexp "arg"
 
-  let apply_eq = function
-    | List (Atom "=" :: _) -> ()
-    | sexp -> error sexp "apply_eq"
-
   let prover_name name =
     if Strings.has_prefix "@" name then
       let left = String.index name '_' + 1 in
@@ -229,28 +225,10 @@ module FromSexp = struct
     try Float (model_float sexp) with _ ->
       error sexp "value"
 
-  and boolean_expression = function
-    | List [Atom "forall"; args; t] ->
-        ignore (list arg args, term t)
-    | List [Atom "not"; t] ->
-        ignore (term t)
-    | List (Atom "and" :: ts) ->
-        ignore (List.map term ts)
-    | sexp -> error sexp "boolean_expression"
-
   and ite = function
     | List [Atom "ite"; t1; t2; t3] ->
         Tite (term t1, term t2, term t3)
     | sexp -> error sexp "ite"
-
-  and pair_equal = function
-    | List [Atom "="; t1; t2] ->
-        Some (term t1, term t2)
-    | _ -> None
-
-  and let_ = function
-    | List [n; t] -> name n, term t
-    | sexp -> error sexp "let"
 
   and let_term = function
     | List [Atom "let"; List bs; t] ->
@@ -291,21 +269,23 @@ module FromSexp = struct
         Some (n, Dfunction (al, iret, t))
     | _ -> None
 
-  let model = function
-    | [] ->
-        None
-    | [List (Atom "model" :: decls)] | [List decls] ->
-        Some (Mstr.of_list (Lists.map_filter decl decls))
-    | _ ->
-        failwith ("Cannot read S-expression as model: " ^
-                  "must be a single list `(model ...)` or `(...)`")
+  let is_model_decl = function Atom "define-fun" -> true | _ -> false
+
+  let model sexp =
+    if sexp = [] then None else
+    let decls, rest = match sexp with
+      | List (Atom "model" :: decls) :: rest -> decls, rest
+      | List decls :: rest when List.exists (Sexp.exists is_model_decl) decls ->
+          decls, rest
+      | _ -> failwith "Cannot read S-expression as model: model not first" in
+    if List.exists (Sexp.exists is_model_decl) rest then
+      failwith
+        "Cannot read S-expression as model: next model not separated \
+         (missing separator in driver?)";
+    Some (Mstr.of_list (Lists.map_filter decl decls))
 end
 
 (* Parses the model returned by CVC4 and Z3. *)
-
-let debug = Debug.register_info_flag "smtv2_model_parser"
-    ~desc:"Print@ debugging@ messages@ about@ parsing@ model@ \
-           returned@ from@ cvc4@ or@ z3."
 
 (*
 ***************************************************************

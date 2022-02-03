@@ -11,7 +11,7 @@ use int.Int
 
 let rsa (a b: int)
   requires { a >= 2 /\ b >= 2 }
-  = let c = 12166397 in
-    assert { a * b <> c }
+= let c = 12166397 in
+  assert { a * b <> c }
 
 (* 3407 * 3571 = 12166397 *)

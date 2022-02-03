@@ -392,12 +392,14 @@ type params =
   { compute_defs : bool;
     compute_builtin : bool;
     compute_def_set : Term.Sls.t;
+    compute_max_quantifier_domain : int;
   }
 
 type engine =
   { known_map : Decl.decl Ident.Mid.t;
     rules : rule list Mls.t;
     params : params;
+    ls_lt : lsymbol; (* The lsymbol for [int.Int.(<)] *)
   }
 
 
@@ -692,11 +694,95 @@ let rec extract_first n acc l =
       extract_first (n-1) (x::acc) r
     | [] -> assert false
 
+(** If [t1] matches [i1 < vs] or [i1 <= vs] and [t2] matches [vs < i2] or
+    [vs <= i2], then return the bounds [i1(+1), vs, i2(-1)]. The +1/-1 shift the
+    bounds for strict unequalities operators to obtain inclusive bounds. *)
+let bounds ls_lt t1 t2 =
+  let lt order = function (* match [i < vs] or [vs < i], return [i, vs] *)
+    | {t_node= Tapp (ls, [t1; t2])} when ls_equal ls ls_lt -> (
+        assert Ty.(ty_equal (t_type t1) ty_int && ty_equal (t_type t2) ty_int);
+        match order t1 t2 with
+        | {t_node= Tconst (Constant.ConstInt {Number.il_int= i})},
+          {t_node= Tvar vs} ->
+            i, vs
+        | _ -> raise Exit )
+    | _ -> raise Exit in
+  let eq order = function (* match [i = vs] or [vs = i], return [i, vs] *)
+    | {t_node= Tapp (ls, [t1; t2])}
+      when ls_equal ls Term.ps_equ
+        && Ty.ty_equal (t_type t1) Ty.ty_int
+        && Ty.ty_equal (t_type t2) Ty.ty_int -> (
+        match order t1 t2 with
+        | {t_node= Tconst (Constant.ConstInt {Number.il_int= i})},
+          {t_node= Tvar vs} when Ty.ty_equal vs.vs_ty Ty.ty_int ->
+            i, vs
+        | _ -> raise Exit )
+    | _ -> raise Exit in
+  let le order = function (* match [i <= vs] or [vs <= i], return [i, vs] *)
+    | {t_node= Tbinop (Tor, t1, t2)} ->
+        let i, vs = lt order t1 in
+        let i', vs' = eq order t2 in
+        if not (BigInt.eq i i' && vs_equal vs vs') then raise Exit;
+        i, vs
+    | _ -> raise Exit in
+  let bound order shift t = (* match [i op vs] or [vs op i], op is [<] or [<=] *)
+    try le order t with Exit ->
+      let i, vs = lt order t in
+      shift i, vs in
+  let i1, vs  = bound (fun t1 t2 -> t1, t2) BigInt.succ t1 in
+  let i2, vs' = bound (fun t1 t2 -> t2, t1) BigInt.pred t2 in
+  if not (vs_equal vs vs') then raise Exit;
+  i1, vs, i2
+
+(** [reduce_bounded_quant ls_lt limit t sigma st rem] detects a bounded
+    quantification and reduces it to conjunction:
+
+          forall v. a < v < b. t(v)
+      --> f(a+1) /\ ... /\ f(b-1)
+
+    @param ls_lt lsymbol for [int.Int.(<)]
+
+    @param limit Reduce  if the difference between upper and lower bound is at
+    most [limit].
+
+    TODO:
+    - expand to bounded quantifications on range values
+    - compatiblity with reverse direction (forall i. b > i > a -> t)
+    - detect SPARK-style [forall i. if a < i /\ i < b then t else true] *)
+let reduce_bounded_quant ls_lt limit t sigma st rem =
+  match st, rem with (* st = a < vs < b :: _; rem = -> :: forall vs :: _ *)
+  | Term {t_node= Tbinop (Tand, t1, t2)} :: st,
+    ((Kbinop Timplies, _) :: (Kquant (Tforall as quant, [vs], _), _) :: rem |
+     (Kbinop Tand, _)     :: (Kquant (Texists as quant, [vs], _), _) :: rem)
+    when Ty.ty_equal vs.vs_ty Ty.ty_int ->
+      let t_empty, binop = match quant with
+        | Tforall -> t_true, Tand
+        | Texists -> t_false, Tor in
+      let a, vs', b = bounds ls_lt t1 t2 in
+      if not (vs_equal vs vs') then raise Exit;
+      if BigInt.(gt (sub b a) (of_int limit)) then raise Exit;
+      if BigInt.gt a b then (* empty range *)
+        {value_stack= Term t_empty :: st; cont_stack= rem}
+      else
+        let rec loop rem i =
+          if BigInt.lt i a then
+            rem
+          else
+            let t_i = t_const (Constant.int_const i) Ty.ty_int in
+            let rem = (* conjunction for all i > a *)
+              if BigInt.gt i a then (Kbinop binop, t_true) :: rem else rem in
+            let rem = (Keval (t, Mvs.add vs t_i sigma), t_true) :: rem in
+            loop rem (BigInt.pred i) in
+        {value_stack= st; cont_stack= loop rem b}
+  | _ -> raise Exit
 
 let rec reduce engine c =
   match c.value_stack, c.cont_stack with
   | _, [] -> assert false
-  | st, (Keval (t,sigma),orig) :: rem -> reduce_eval engine st t ~orig sigma rem
+  | st, (Keval (t,sigma),orig) :: rem -> (
+      let limit = engine.params.compute_max_quantifier_domain in
+      try reduce_bounded_quant engine.ls_lt limit t sigma st rem with Exit ->
+        reduce_eval engine st t ~orig sigma rem )
   | [], (Kif _, _) :: _ -> assert false
   | v :: st, (Kif(t2,t3,sigma), orig) :: rem ->
     begin
@@ -1295,8 +1381,8 @@ let normalize ?step_limit ~limit engine sigma t0 =
       if n = limit then
         begin
           let t1 = reconstruct c in
-          Warning.emit "reduction of term %a takes more than %d steps, aborted at %a.@."
-            Pretty.print_term t0 limit Pretty.print_term t1;
+          (* Warning.emit "reduction of term %a takes more than %d steps, aborted at %a.@."
+           *   Pretty.print_term t0 limit Pretty.print_term t1; *)
           t1
         end
       else begin
@@ -1324,9 +1410,12 @@ let create p env km =
   if p.compute_builtin
   then get_builtins env
   else Hls.clear builtins;
+  let th = Env.read_theory env ["int"] "Int" in
+  let ls_lt = Theory.ns_find_ls th.Theory.th_export [Ident.op_infix "<"] in
   { known_map = km ;
     rules = Mls.empty;
     params = p;
+    ls_lt;
   }
 
 exception NotARewriteRule of string

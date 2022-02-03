@@ -135,7 +135,7 @@ module type S =
     (** [diff f s1 s2] computes the difference of two sets *)
 
     val fold_left : ('b -> elt -> 'b) -> 'b -> t -> 'b
-    (** same as {!fold} but in the order of {!List.fold_left} *)
+    (** same as {!fold} but in the order of [List.fold_left] *)
 
     val fold2_inter : (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
     (** [fold2_inter f s1 s2 a] computes [(f eN ... (f e1 a) ...)],

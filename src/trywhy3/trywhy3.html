@@ -18,7 +18,7 @@
     <script defer="defer" type="text/javascript"
             src="trywhy3.js"></script>
   </head>
-  <body>
+  <body id="body">
     <div id="why3-main-container" class="why3-container">
       <div id="why3-top-button-bar" class="why3-widget why3-button-bar">
 
@@ -41,11 +41,11 @@
 	<div class="why3-separator" style="width:2em;"></div>
  	<div class="why3-button-group">
 	  <button id="why3-button-undo"  class="why3-button"
-                  title="Undo edit (ctrl-z)">
+                  title="Undo edit (ctrl-Z)">
 	    <span class="fas fa-undo"></span>
 	  </button>
 	  <button id="why3-button-redo"  class="why3-button"
-                  title="Repeat edit (ctrl-y)">
+                  title="Repeat edit (ctrl-shift-Z)">
 	    <span class="fas fa-redo"></span>
 	  </button>
  	</div>
@@ -73,14 +73,14 @@
 	<div class="why3-separator" style="width:2em;"></div>
 
 	<div class="why3-button-group">
-          <button id="why3-button-compile" class="why3-button" title="Verify">
-	    <span class="fas fa-check"></span>
+          <button id="why3-button-compile" class="why3-button" title="Verify (alt-R)">
+	    <span class="fas fa-magic"></span>
 	  </button>
-	  <button id="why3-button-execute" class="why3-button" title="Execute">
-	    <span class="fas fa-cogs"></span>
+	  <button id="why3-button-execute" class="why3-button" title="Execute (alt-E)">
+	    <span class="fas fa-play"></span>
 	  </button>
-	  <button id="why3-button-stop" class="why3-button" title="Interrupt">
-	    <span class="fas fa-ban"></span>
+	  <button id="why3-button-stop" class="why3-button" title="Interrupt (alt-I)">
+	    <span class="fas fa-times-circle"></span>
 	  </button>
 	</div>
 
@@ -128,19 +128,19 @@
     <!-- context menu -->
     <div class="why3-contextmenu why3-widget" id="why3-task-menu">
       <ul>
-	<li id="why3-split-menu-entry"><span class="fas fa-share-alt
-						    why3-icon"></span> Split and prove </li>
-	<li id="why3-prove-menu-entry"><span class="fas fa-check-square
+	<li id="why3-split-menu-entry"><span class="fas fa-project-diagram
+						    why3-icon"></span> Split (alt-space)</li>
+	<li id="why3-prove-menu-entry"><span class="fas fa-magic
 						    why3-icon"></span>
 						    Prove (default) </li>
-	<li id="why3-prove100-menu-entry"><span class="fas fa-check-square
+	<li id="why3-prove1-menu-entry"><span class="fas fa-magic
 						    why3-icon"></span>
 						    Prove (100
 	  steps) </li>
-	<li id="why3-prove1000-menu-entry"><span class="fas fa-check-square
+	<li id="why3-prove2-menu-entry"><span class="fas fa-magic
 							why3-icon"></span>
 	  Prove (1000 steps) </li>
-	<li id="why3-prove5000-menu-entry"><span class="fas fa-check-square
+	<li id="why3-prove3-menu-entry"><span class="fas fa-magic
 							why3-icon"></span>
 	  Prove (5000 steps) </li>
 	<li id="why3-clean-menu-entry"><span class="fas fa-unlink why3-icon"></span>
@@ -169,9 +169,26 @@
                      value="4" /> Number of threads for Alt-Ergo
             </li>
             <li>
-              <input id="why3-input-num-steps" type="number" style="width:4em;" min="1" max="1000"
-                     value="100" /> Number of steps for Alt-Ergo
+              <input id="why3-input-min-steps" type="number" style="width:4em;" min="0" max="10000"
+                     value="10" /> First-attempt step limit
             </li>
+            <li>
+              <input id="why3-input-num-steps" type="number" style="width:4em;" min="1" max="10000"
+                     value="100" /> Default step limit
+            </li>
+            <li>
+              <input id="why3-input-context-steps1" type="number" style="width:4em;" min="1" max="10000"
+                     value="100" /> Right-click menu step limit 1
+            </li>
+            <li>
+              <input id="why3-input-context-steps2" type="number" style="width:4em;" min="1" max="10000"
+                     value="1000" /> Right-click menu step limit 2
+            </li>
+            <li>
+              <input id="why3-input-context-steps3" type="number" style="width:4em;" min="1" max="10000"
+                     value="5000" /> Right-click menu step limit 3
+            </li>
+            
 	  </ul>
 	</div>
 	<div id="why3-about-dialog" class="why3-widget">
@@ -203,11 +220,14 @@
 		Awesome</a> font and CSS toolkit.</li>
 	    <li>The <a href="https://ace.c9.io/"  target="_blank">ACE</a> Web editor.</li>
 	  </ul>
+    Designed by <a href="https://www.lri.fr/~kn/">Nguyễn Kim</a>, Patault Paul and Serré Gaëtan
 	</div>
-	<button id="why3-close-dialog-button"
-		style="float:right;"
+  <p style="text-align: center;">
+    <button id="why3-close-dialog-button"
 		class="why3-button"
-		title="Close"><span class="fas fa-times"></span></button>
+		title="Close">Close</button>
+  </p>
+
       </div>
     </div>
   </body>

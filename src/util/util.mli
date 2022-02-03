@@ -35,19 +35,19 @@ exception FoldSkip
 
 val all_fn : ('a -> bool) -> 'z -> 'a -> bool
 (** [all_fn pr z a] return true if [pr a] is true,
-    otherwise raise FoldSkip *)
+    otherwise raise {!FoldSkip} *)
 
 val any_fn : ('a -> bool) -> 'z -> 'a -> bool
 (** [any_fn pr z a] return false if [pr a] is false,
-    otherwise raise FoldSkip *)
+    otherwise raise {!FoldSkip} *)
 
 val all2_fn : ('a -> 'b -> bool) -> 'z -> 'a -> 'b -> bool
 (** [all2_fn pr z a b] return true if [pr a b] is true,
-    otherwise raise FoldSkip *)
+    otherwise raise {!FoldSkip} *)
 
 val any2_fn : ('a -> 'b -> bool) -> 'z -> 'a -> 'b -> bool
 (** [any2_fn pr z a b] return false if [pr a b] is false,
-    otherwise raise FoldSkip *)
+    otherwise raise {!FoldSkip} *)
 
 type ('z,'a,'c) fold = ('z -> 'a -> 'z) -> 'z -> 'c -> 'z
 
@@ -73,7 +73,7 @@ val ttrue : 'a -> bool
 
 (** [iter_first iter f] returns the first result of [f] that is inhabitated,
     when applied on the elements encountered by iterator [iter]. Generalisation
-    of [Lists.first].
+    of {!Lists.first}.
 
     @raise Not_found if no such element is encountered by the iterator. *)
 val iter_first : (('a -> unit) -> 'b) -> ('a -> 'c option) -> 'c

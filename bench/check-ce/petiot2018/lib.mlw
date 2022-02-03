@@ -1,0 +1,49 @@
+
+(** An integer reference. Monomorphic (instead of ref.Ref) to get counterexamples *)
+module IntRef
+  use int.Int
+
+  type int_ref = {
+    mutable contents: int
+  }
+
+  let int_ref (i: int) : int_ref
+    ensures { result.contents = i }
+  = { contents= i }
+
+  let (:=) (r: int_ref) (i: int) : unit
+    writes { r }
+    ensures { r.contents = i }
+  = r.contents <- i
+
+  function (!) (r: int_ref) : int = r.contents
+
+  let (!) (r: int_ref) : int
+    ensures { result = r.contents }
+  = r.contents
+end
+
+(** An integer array. Monomorphic (instead of array.Array) to get
+    counterexamples, implemented for the concrete execution. *)
+module IntArray
+  use int.Int
+  use map.Map
+
+  type int_array =
+    { length: int; mutable elts: int -> int }
+    (* invariant { 0 <= length } *)
+
+  function ([]) (a: int_array) (i: int) : int = a.elts i
+
+  function make (l: int) (v: int) : int_array = {length= l; elts= fun _ -> v}
+
+  let ([]) (a: int_array) (i: int) : int
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    ensures  { result = Map.get a.elts i }
+  = a.elts i
+
+  let ([]<-) (a: int_array) (i: int) (v: int) : unit writes { a.elts }
+    requires { [@expl:index in array bounds] 0 <= i < a.length }
+    ensures { a.elts = Map.set (old a).elts i v }
+  = a.elts <- let elts = a.elts in (fun j -> if j = i then v else elts j)
+end

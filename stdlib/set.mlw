@@ -127,6 +127,20 @@ module Set
   lemma disjoint_diff_s2:
     forall s1 s2: set 'a. disjoint (diff s1 s2) s2
 
+  (** `{ (x, y) | x in s1 /\ y in s2 }` *)
+  function product (s1: set 'a) (s2: set 'b) : set ('a, 'b)
+  axiom product_def:
+    forall s1: set 'a, s2: set 'b, x : 'a, y : 'b.
+    mem (x, y) (product s1 s2) <-> mem x s1 /\ mem y s2
+
+  (** `{ x | x in s /\ p x }` *)
+  function filter (s: set 'a) (p: 'a -> bool) : set 'a
+  axiom filter_def:
+    forall s: set 'a, p: 'a -> bool, x: 'a. mem x (filter s p) <-> mem x s /\ p x
+
+  lemma subset_filter:
+    forall s: set 'a, p: 'a -> bool. subset (filter s p) s
+
   (** `{ f x | x in U }` *)
   function map (f: 'a -> 'b) (u: set 'a) : set 'b =
     fun (y: 'b) -> exists x: 'a. mem x u /\ y = f x
@@ -180,6 +194,10 @@ module Cardinal
   lemma is_finite_map:
     forall f: 'a -> 'b, s: set 'a. is_finite s -> is_finite (map f s)
 
+  lemma is_finite_product:
+    forall s1: set 'a, s2 : set 'b. is_finite s1 -> is_finite s2 ->
+           is_finite (product s1 s2)
+
   (** `cardinal` function *)
 
   use int.Int
@@ -229,6 +247,9 @@ module Cardinal
     forall f: 'a -> 'b, s: set 'a. is_finite s ->
     cardinal (map f s) <= cardinal s
 
+  lemma cardinal_product:
+    forall s1: set 'a, s2 : set 'b. is_finite s1 -> is_finite s2 ->
+    cardinal (product s1 s2) = cardinal s1 * cardinal s2
 end
 
 (** {2 Finite sets} *)

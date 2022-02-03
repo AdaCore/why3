@@ -9,9 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Wstdlib
-
 (** Theories and Namespaces *)
+
+open Wstdlib
 
 open Ident
 open Ty
@@ -251,7 +251,7 @@ type bad_instance =
   | BadI_field_ghost of tysymbol * vsymbol (* incompatible ghost status *)
   | BadI_field_mut of tysymbol * vsymbol (* incompatible mutability *)
   | BadI_field_inv of tysymbol * vsymbol (* strengthened invariant *)
-  | BadI_ls_type of lsymbol (* lsymbol type mismatch *)
+  | BadI_ls_type of lsymbol * ty * ty (* lsymbol type mismatch *)
   | BadI_ls_kind of lsymbol (* function/predicate mismatch *)
   | BadI_ls_arity of lsymbol (* lsymbol arity mismatch *)
   | BadI_ls_rs of lsymbol (* "val function" -> "function" *)

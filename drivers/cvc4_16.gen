@@ -12,7 +12,7 @@ import "discrimination.gen"
 transformation "inline_trivial"
 transformation "eliminate_builtin"
 transformation "detect_polymorphism"
-transformation "eliminate_definition_if_poly"
+transformation "eliminate_definition_conditionally"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
 transformation "eliminate_literal"
@@ -36,7 +36,7 @@ steps "smt::SmtEngine::resourceUnitsUsed, \\([0-9]+.?[0-9]*\\)" 1
 (*
 specific output message when CVC4 reaches its resource limit
 *)
-steplimitexceeded "driver::sat/unsat, unknown (RESOURCEOUT)"
+steplimitexceeded "unknown (RESOURCEOUT)"
 
 
 (** Extra theories supported by CVC4 *)

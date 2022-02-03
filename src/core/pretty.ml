@@ -88,7 +88,6 @@ module type Printer = sig
     val print_attrs : formatter -> Sattr.t -> unit
     val print_loc : formatter -> Loc.position -> unit
     val print_loc' : formatter -> Loc.position -> unit
-    val print_json_loc : formatter -> Loc.position -> unit
     val print_pkind : formatter -> prop_kind -> unit
     val print_meta_arg : formatter -> meta_arg -> unit
     val print_meta_arg_type : formatter -> meta_arg_type -> unit
@@ -131,8 +130,10 @@ let debug_print_coercions = Debug.register_info_flag "print_coercions"
 let debug_print_qualifs = Debug.register_info_flag "print_qualifs"
   ~desc:"Print@ qualifiers@ of@ identifiers@ in@ error@ messages."*)
 
-let create ?(print_ext_any=(fun (printer: any_pp Pp.pp) -> printer)) sprinter aprinter
-    tprinter pprinter do_forget_all =
+let create
+      ?(print_ext_any = (fun (printer: any_pp Pp.pp) -> printer))
+      ?(do_forget_all = true) ?(shorten_axioms = false)
+      sprinter aprinter tprinter pprinter =
   (module (struct
 
 (* Using a reference for customized external printer. This avoids changing the
@@ -172,15 +173,6 @@ let print_loc fmt l =
 let print_loc' fmt l =
   let (f,l,b,e) = Loc.get l in
   fprintf fmt "%S, line %d, characters %d-%d" f l b e
-
-let print_json_loc fmt loc =
-  let open Json_base in
-  let f, l, b, e = Loc.get loc in
-  fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a;@ %a@]@,}@]"
-    (print_json_field "filename" print_json) (String f)
-    (print_json_field "line" print_json) (Int l)
-    (print_json_field "start-char" print_json) (Int b)
-    (print_json_field "end-char" print_json) (Int e)
 
 let print_id_attrs fmt id =
   if Debug.test_flag debug_print_attrs &&
@@ -270,7 +262,7 @@ let rec print_ty_node ?(ext_printer=true) q pri fmt ty =
       fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
         (print_ty_node q 1) t1 (print_ty_node q 0) t2
   | Tyapp (ts, []) when is_ts_tuple ts ->
-      fprintf fmt "unit"
+      pp_print_string fmt "unit"
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       fprintf fmt "(%a)" (print_list comma (print_ty_node q 0)) tl
   | Tyapp (ts, []) ->
@@ -309,7 +301,7 @@ let unambig_fs fs =
 
 let rec print_pat_node pri fmt p = match p.pat_node with
   | Pwild ->
-      fprintf fmt "_"
+      pp_print_string fmt "_"
   | Pvar v ->
       print_vs fmt v; print_id_attrs fmt v.vs_name
   | Pas (p, v) ->
@@ -330,16 +322,16 @@ let rec print_pat_node pri fmt p = match p.pat_node with
 let print_pat = print_pat_node 0
 
 let print_quant fmt = function
-  | Tforall -> fprintf fmt "forall"
-  | Texists -> fprintf fmt "exists"
+  | Tforall -> pp_print_string fmt "forall"
+  | Texists -> pp_print_string fmt "exists"
 
 let print_binop ~asym fmt = function
-  | Tand when asym -> fprintf fmt "&&"
-  | Tor when asym -> fprintf fmt "||"
-  | Tand -> fprintf fmt "/\\"
-  | Tor -> fprintf fmt "\\/"
-  | Timplies -> fprintf fmt "->"
-  | Tiff -> fprintf fmt "<->"
+  | Tand when asym -> pp_print_string fmt "&&"
+  | Tor when asym -> pp_print_string fmt "||"
+  | Tand -> pp_print_string fmt "/\\"
+  | Tor -> pp_print_string fmt "\\/"
+  | Timplies -> pp_print_string fmt "->"
+  | Tiff -> pp_print_string fmt "<->"
 
 let rec print_term fmt t =
   print_lterm 0 fmt t
@@ -370,8 +362,9 @@ and print_app pri ls fmt tl =
       fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
         s (print_lterm 8) t1
   | Ident.SNprefix s, [t1] ->
-      fprintf fmt (protect_on (pri > 5) "@[%s %a@]")
-        s (print_lterm 6) t1
+      let lspace p = if p.[0] = '*' then " " else "" in
+      fprintf fmt (protect_on (pri > 5) "@[%s%s %a@]")
+        (lspace s) s (print_lterm 6) t1
   | Ident.SNinfix s, [t1;t2] ->
       fprintf fmt (protect_on (pri > 5) "@[%a@ %s %a@]")
         (print_lterm 6) t1 s (print_lterm 6) t2
@@ -423,6 +416,9 @@ and print_tnode ?(ext_printer=true) pri fmt t =
         print_lterm pri fmt (t_attr_set t1.t_attrs t1)
     | Tapp (fs, tl) when is_fs_tuple fs ->
         fprintf fmt "(%a)" (print_list comma print_term) tl
+    | Tapp (fs, [t1;t2]) when ls_equal fs ps_equ ->
+        fprintf fmt (protect_on (pri > 6) "@[%a =@ %a@]")
+          (print_lterm 6) t1 (print_lterm 6) t2
     | Tapp (fs, tl) when unambig_fs fs ->
         print_app pri fs fmt tl
     | Tapp (fs, tl) ->
@@ -458,9 +454,9 @@ and print_tnode ?(ext_printer=true) pri fmt t =
           (print_list comma print_vsty) vl print_tl tl print_term f;
         List.iter forget_var vl
     | Ttrue ->
-        fprintf fmt "true"
+        pp_print_string fmt "true"
     | Tfalse ->
-        fprintf fmt "false"
+        pp_print_string fmt "false"
     | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
       when Sattr.mem Term.asym_split f2.t_attrs ->
         fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a so@ %a@]")
@@ -585,7 +581,8 @@ let print_axiom fmt (pr, f) =
      forget_tvs ())
 
 let print_prop_decl fmt (k,pr,f) =
-  if k == Paxiom && not (Sattr.exists (Ident.attr_equal Ident.useraxiom_attr) pr.pr_name.id_attrs) then
+  if shorten_axioms && k == Paxiom &&
+       not (Sattr.exists (Ident.attr_equal Ident.useraxiom_attr) pr.pr_name.id_attrs) then
     print_axiom fmt (pr, f)
   else
     (fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
@@ -629,13 +626,13 @@ let print_inst_pr fmt (pr1,pr2) =
   fprintf fmt "prop %a = %a" print_pr pr1 print_pr pr2
 
 let print_meta_arg_type fmt = function
-  | MTty       -> fprintf fmt "[type]"
-  | MTtysymbol -> fprintf fmt "[type symbol]"
-  | MTlsymbol  -> fprintf fmt "[function/predicate symbol]"
-  | MTprsymbol -> fprintf fmt "[proposition]"
-  | MTstring   -> fprintf fmt "[string]"
-  | MTint      -> fprintf fmt "[integer]"
-  | MTid    -> fprintf fmt "[identifier]"
+  | MTty       -> pp_print_string fmt "[type]"
+  | MTtysymbol -> pp_print_string fmt "[type symbol]"
+  | MTlsymbol  -> pp_print_string fmt "[function/predicate symbol]"
+  | MTprsymbol -> pp_print_string fmt "[proposition]"
+  | MTstring   -> pp_print_string fmt "[string]"
+  | MTint      -> pp_print_string fmt "[integer]"
+  | MTid       -> pp_print_string fmt "[identifier]"
 
 let print_meta_arg fmt = function
   | MAty ty -> fprintf fmt "type %a" print_ty ty; forget_tvs ()
@@ -643,8 +640,8 @@ let print_meta_arg fmt = function
   | MAls ls -> fprintf fmt "%s %a" (ls_kind ls) print_ls ls
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
   | MAstr s -> fprintf fmt "\"%s\"" s
-  | MAint i -> fprintf fmt "%d" i
-  | MAid i -> fprintf fmt "%a" Ident.print_decoded (id_unique sprinter i)
+  | MAint i -> pp_print_int fmt i
+  | MAid i -> Ident.print_decoded fmt (id_unique sprinter i)
 
 let print_qt fmt th =
   if th.th_path = [] then print_th fmt th else
@@ -725,6 +722,12 @@ let print_goal fmt d =
    | _ -> assert false
 *)
 
+let useful_decl d =
+  match d.d_node with
+  | Dparam ls | Dlogic([ls,_]) ->
+    not (Sattr.mem Ident.unused_attr ls.ls_name.Ident.id_attrs)
+  | _ -> true
+
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in
   let ld = Task.local_decls task ut in
@@ -733,7 +736,8 @@ let print_sequent fmt task =
       | [] -> ()
       | [_] -> ()
       | d :: r ->
-         fprintf fmt "@[%a@]@\n@\n" print_decl d;
+         if useful_decl d then
+           fprintf fmt "@[%a@]@\n@\n" print_decl d;
          aux fmt r
   in
   let rec last fmt l =
@@ -785,12 +789,15 @@ module LegacyPrinter =
     create_ident_printer why3_keywords ~sanitizer:same,
     create_ident_printer why3_keywords ~sanitizer:same
   in
-  create sprinter aprinter tprinter pprinter true))
+  create ~do_forget_all:true ~shorten_axioms:false sprinter aprinter tprinter pprinter))
 
 include LegacyPrinter
 
 
 (* Exception reporting *)
+
+let print_id fmt id =
+  Ident.print_decoded fmt id.id_string
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
@@ -808,13 +815,13 @@ let () = Exn_printer.register
   | Ty.UnboundTypeVar tv ->
       fprintf fmt "Unbound type variable: %a" print_tv tv
   | Ty.UnexpectedProp ->
-      fprintf fmt "Unexpected propositional type"
+      pp_print_string fmt "Unexpected propositional type"
   | Ty.EmptyRange ->
-      fprintf fmt "Empty integer range"
+      pp_print_string fmt "Empty integer range"
   | Ty.BadFloatSpec ->
-      fprintf fmt "Invalid floating point format"
+      pp_print_string fmt "Invalid floating point format"
   | Ty.IllegalTypeParameters ->
-      fprintf fmt "This type cannot have type parameters"
+      pp_print_string fmt "This type cannot have type parameters"
   | Term.BadArity ({ls_args = []} as ls, _) ->
       fprintf fmt "%s %a expects no arguments"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls
@@ -824,7 +831,7 @@ let () = Exn_printer.register
         (if ls.ls_value = None then "Predicate" else "Function")
         print_ls ls i (if i = 1 then "" else "s") app_arg
   | Term.EmptyCase ->
-      fprintf fmt "Empty match expression"
+      pp_print_string fmt "Empty match expression"
   | Term.DuplicateVar vs ->
       fprintf fmt "Variable %a is used twice" print_vsty vs
   | Term.UncoveredVar vs ->
@@ -844,7 +851,7 @@ let () = Exn_printer.register
   | Term.InvalidRealLiteralType ty
   | Term.InvalidStringLiteralType ty when
          (match ty.ty_node with Tyvar _ -> true | _ -> false) ->
-      fprintf fmt "literal has an ambiguous type"
+      pp_print_string fmt "literal has an ambiguous type"
   | Term.InvalidIntegerLiteralType ty ->
       fprintf fmt "Cannot cast an integer literal to type %a" print_ty ty
   | Term.InvalidRealLiteralType ty ->
@@ -906,7 +913,7 @@ let () = Exn_printer.register
   | Decl.ClashIdent id ->
       fprintf fmt "Ident %a is defined twice" Ident.print_decoded id.id_string
   | Decl.EmptyDecl ->
-      fprintf fmt "Empty declaration"
+      pp_print_string fmt "Empty declaration"
   | Decl.EmptyAlgDecl ts ->
       fprintf fmt "Algebraic type %a has no constructors" print_ts ts
   | Decl.EmptyIndDecl ls ->
@@ -920,6 +927,166 @@ let () = Exn_printer.register
         Ident.print_decoded s
   | Decl.NoTerminationProof ls ->
       fprintf fmt "Cannot prove termination for %a" print_ls ls
+  | NonLocal id -> Format.fprintf fmt
+      "Non-local symbol: %a" print_id id
+  | CannotInstantiate id -> Format.fprintf fmt
+      "Cannot instantiate a defined symbol %a" print_id id
+  | BadInstance (BadI id) -> Format.fprintf fmt
+      "Illegal instantiation for symbol %a" print_id id
+  | BadInstance (BadI_ty_vars ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+          extra type variables in the type expression"
+        print_ts ts
+  | BadInstance (BadI_ty_ner ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+          record types cannot be instantiated with type expressions"
+        print_ts ts
+  | BadInstance (BadI_ty_impure ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+          both %a and the refining type expression must be pure"
+        print_ts ts print_ts ts
+  | BadInstance (BadI_ty_arity ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\narity mismatch"
+        print_ts ts
+  | BadInstance (BadI_ty_rec ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        the refining type must be a non-recursive record"
+        print_ts ts
+  | BadInstance (BadI_ty_mut_lhs ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        the refinining type must be mutable"
+        print_ts ts
+  | BadInstance (BadI_ty_mut_rhs ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        the refinining type must be immutable"
+        print_ts ts
+  | BadInstance (BadI_ty_alias ts) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        the added fields are aliased with the original fields"
+        print_ts ts
+  | BadInstance (BadI_field (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        field %a not found in the refinining type"
+        print_ts ts print_vs vs
+  | BadInstance (BadI_field_type (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        incompatible types for field %a"
+        print_ts ts print_vs vs
+  | BadInstance (BadI_field_ghost (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        incompatible ghost status for field %a"
+        print_ts ts print_vs vs
+  | BadInstance (BadI_field_mut (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        incompatible mutability status for field %a"
+        print_ts ts print_vs vs
+  | BadInstance (BadI_field_inv (ts,vs)) -> Format.fprintf fmt
+      "Illegal instantiation for type %a:@\n\
+        field %a must not appear in the refined invariant"
+        print_ts ts print_vs vs
+  | BadInstance (BadI_ls_type (ls,ty1,ty2)) -> Format.fprintf fmt
+      "Illegal instantiation for %s %a:@\ntype mismatch between %a and %a"
+        (if ls.ls_value = None then "predicate" else "function")
+        print_ls ls print_ty_qualified ty1 print_ty_qualified ty2
+  | BadInstance (BadI_ls_kind ls) -> Format.fprintf fmt
+      "Illegal instantiation for %s %a:@\n%s expected"
+        (if ls.ls_value = None then "predicate" else "function")
+        print_ls ls
+        (if ls.ls_value = None then "predicate" else "function")
+  | BadInstance (BadI_ls_arity ls) -> Format.fprintf fmt
+      "Illegal instantiation for %s %a:@\narity mismatch"
+        (if ls.ls_value = None then "predicate" else "function")
+        print_ls ls
+  | BadInstance (BadI_ls_rs ls) -> Format.fprintf fmt
+      "Cannot instantiate %s %a:@\nprogram function %a \
+        must be refined instead"
+        (if ls.ls_value = None then "predicate" else "function")
+        print_ls ls print_ls ls
+  | BadInstance (BadI_rs_arity id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        arity mismatch"
+        print_id id
+  | BadInstance (BadI_rs_type (id,exn)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        %a"
+        print_id id Exn_printer.exn_printer exn
+  | BadInstance (BadI_rs_kind id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        incompatible kind"
+        print_id id
+  | BadInstance (BadI_rs_ghost id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        incompatible ghost status"
+        print_id id
+  | BadInstance (BadI_rs_mask id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        incompatible mask"
+        print_id id
+  | BadInstance (BadI_rs_reads (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced external dependencies: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_writes (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced write effects in variables: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_taints (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced ghost write effects in variables: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_covers (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced region modifications in variables: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_resets (id,svs)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced region resets in variables: %a"
+        print_id id (Pp.print_list Pp.space print_vs) (Svs.elements svs)
+  | BadInstance (BadI_rs_raises (id,sid)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        unreferenced raised exceptions: %a"
+        print_id id (Pp.print_list Pp.space print_id) (Sid.elements sid)
+  | BadInstance (BadI_rs_spoils (id,stv)) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        restricted type variables: %a"
+        print_id id (Pp.print_list Pp.space print_tv) (Stv.elements stv)
+  | BadInstance (BadI_rs_oneway id) -> Format.fprintf fmt
+      "Illegal instantiation for program function %a:@\n\
+        incompatible termination status"
+        print_id id
+  | BadInstance (BadI_xs_type id) -> Format.fprintf fmt
+      "Illegal instantiation for exception %a:@\n\
+        type mismatch"
+        print_id id
+  | BadInstance (BadI_xs_mask id) -> Format.fprintf fmt
+      "Illegal instantiation for exception %a:@\n\
+        incompatible mask"
+        print_id id
+  | CloseTheory ->
+      pp_print_string fmt "Cannot close theory: some namespaces are still open"
+  | NoOpenedNamespace ->
+      pp_print_string fmt "No opened namespaces"
+  | ClashSymbol s ->
+      Format.fprintf fmt "Symbol %s is already defined in the current scope" s
+  | UnknownMeta s ->
+      Format.fprintf fmt "Unknown meta-property %s" s
+  | KnownMeta m ->
+      Format.fprintf fmt "Metaproperty %s is already registered with \
+        a conflicting signature" m.meta_name
+  | BadMetaArity (m,n) ->
+      let i = List.length m.meta_type in
+      Format.fprintf fmt "Metaproperty %s expects %d argument%s but \
+        is applied to %d" m.meta_name i (if i = 1 then "" else "s") n
+  | MetaTypeMismatch (m,t1,t2) ->
+      Format.fprintf fmt "Metaproperty %s expects a %a argument but \
+        is applied to %a"
+        m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
+  | RangeConflict ts ->
+      Format.fprintf fmt "Conflicting definitions for range type %a"
+        print_ts ts
+  | FloatConflict ts ->
+      Format.fprintf fmt "Conflicting definitions for float type %a"
+        print_ts ts
   | _ -> raise exn
   end
 

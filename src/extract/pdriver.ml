@@ -357,7 +357,7 @@ let () = Exn_printer.register (fun fmt exn ->
   | PSymExpected ls -> fprintf fmt
       "%a is not a predicate symbol" Pretty.print_ls ls
   | NoPrinter ->
-      fprintf fmt "Missing printer in driver"
+      pp_print_string fmt "Missing printer in driver"
   | KnownPrinter s ->
       fprintf fmt "Program printer '%s' is already registered" s
   | UnknownPrinter s ->

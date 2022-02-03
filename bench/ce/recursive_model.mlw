@@ -1,0 +1,15 @@
+module Test
+  use int.Int
+
+  type nat = Z | S nat
+
+  val global : nat
+
+  let test (i : int)
+  = assert {
+      let p = (0, 0) in (* <- The tuple introduces polymorphism! *)
+      global <> Z -> i = 0
+    }
+end
+
+(* adapted from https://gitlab.inria.fr/why3/why3/-/issues/578 *)

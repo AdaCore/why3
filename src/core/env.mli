@@ -51,7 +51,7 @@ val register_language : 'a language -> ('b -> 'a) -> 'b language
 
 val add_builtin : 'a language -> (pathname -> 'a) -> unit
 (** [add_builtin lang builtin] adds new builtin libraries to [lang].
-    The [builtin] function is called by [read_library] (below) for any
+    The [builtin] function is called by {!read_library} (below) for any
     library path that starts with "why3" (this prefix is not passed to
     [builtin]). For all library paths not covered by [builtin] it must
     raise [Not_found].
@@ -66,7 +66,7 @@ val add_builtin : 'a language -> (pathname -> 'a) -> unit
 
     If there are several definitions of a builtin library for a given
     language and path, they must be physically identical, otherwise
-    [LibraryConflict] is raised. For example, if an offspring language
+    {!LibraryConflict} is raised. For example, if an offspring language
     provides extended definitions of builtin theories, they must be
     [convert]'ed into exactly the same singleton [theory Mstr.t] maps
     as stored for the base language. *)

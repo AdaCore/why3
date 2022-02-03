@@ -32,12 +32,14 @@ let style_css fname =
 \n.why3doc a:link { color: #416DFF; text-decoration: none }\
 \n.why3doc a:hover { color: red; text-decoration: none; background-color: #5FFF88 }\
 \n.why3doc a:active { color: red; text-decoration: underline }\
+\n.why3doc .attribute { color: #bbb }\
 \n.why3doc .comment { color: #990000 }\
 \n.why3doc .keyword { color: purple; font-weight: bold }\
+\n.why3doc .string { color: #a48 }\
 \n.why3doc .superscript { font-size: smaller }\
 \n.why3doc .subscript { font-size: smaller }\
 \n.why3doc .warning { color: red; font-weight: bold }\
-\n.why3doc .info { margin-left: 3em; margin-right: 3em }\
+\n.why3doc .info { margin-left: 3em; margin-right: 3em; background-color: #dcc; }\
 \n.why3doc .info > p:first-child { margin-top: 0 }\
 \n.why3doc code { color: #465F91 }\
 \n.why3doc h1 { font-size: 20pt; border: 1px solid #000000; margin: 10pt 0; text-align: center; background-color: #90BDFF; padding: 10pt }\

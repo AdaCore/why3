@@ -16,6 +16,8 @@ Require BuiltIn.
 Require HighOrd.
 Require int.Int.
 
+Require Import Lia.
+
 Fixpoint numof_aux (f : Z -> bool) (a : Z) (n : nat) : Z :=
   match n with
     | S n => (numof_aux f a n + (if f (a + (Z.of_nat n)) then 1%Z else 0%Z))%Z
@@ -47,13 +49,13 @@ split ; intros h1.
 - assert (Z.to_nat (b - a) = 0).
   revert h1.
   rewrite <-Z.le_sub_0.
-  destruct (b - a)%Z ; try easy ; intros H ; now elim H. (* TODO: replace by now after 8.4 *)
+  now destruct (b - a)%Z.
   now rewrite H.
 - rewrite S_pred with (m := 0) (n := Z.to_nat (b - a)).
-  2: apply (Z2Nat.inj_lt 0); omega.
+  2: apply (Z2Nat.inj_lt 0); lia.
   rewrite <- Z2Nat.inj_pred.
   simpl numof_aux.
-  rewrite Z2Nat.id by omega.
+  rewrite Z2Nat.id by lia.
   replace (a + Z.pred (b - a))%Z with (b - 1)%Z by (unfold Z.pred ; ring).
   replace (Z.pred (b - a)) with (b - 1 - a)%Z by (unfold Z.pred ; ring).
   split ; intros h2.
@@ -80,12 +82,12 @@ Proof.
   intros p a b h1.
   unfold numof.
   set (x := Z.to_nat (b - a)).
-  rewrite <-Z2Nat.id with (n := (b - a)%Z) by omega.
+  rewrite <-Z2Nat.id with (n := (b - a)%Z) by lia.
   change (0 <= numof_aux p a x <= Z.of_nat x)%Z.
   induction x.
-  simpl; omega.
+  split ; apply Z.le_refl.
   rewrite Nat2Z.inj_succ; simpl numof_aux.
-  case (p (a + Z.of_nat x)%Z); omega.
+  case (p (a + Z.of_nat x)%Z); lia.
 Qed.
 
 (* Why3 goal *)
@@ -101,7 +103,7 @@ Proof.
   intros.
   case (Z.eq_dec b x).
   intro e; rewrite e.
-  rewrite Numof_empty with (a := x) (b := x); omega.
+  rewrite Numof_empty with (a := x) (b := x); lia.
   intro H6.
   refine (_ (proj2 (numof'def p a x) _)).
   intros [H1 H2].
@@ -110,15 +112,15 @@ Proof.
   destruct (Bool.bool_dec (p (x - 1)%Z) true) as [H5|H5].
   rewrite H1, H3, H ; auto with zarith.
   rewrite H2, H4, H ; auto with zarith.
-  clear -H0 H6 ; omega.
-  clear -h1 H0 H6 ; omega.
+  clear -H0 H6 ; lia.
+  clear -h1 H0 H6 ; lia.
 Qed.
 
 Lemma numof_succ: forall p a, numof p a (a + 1) = (if p a then 1%Z else 0%Z).
 Proof.
   intros.
   unfold numof.
-  replace (a + 1 - a)%Z with 1%Z by omega.
+  replace (a + 1 - a)%Z with 1%Z by ring.
   simpl.
   rewrite <-Zplus_0_r_reverse.
   trivial.
@@ -129,8 +131,8 @@ Proof.
   intros.
   replace (numof p (a - 1) a)%Z with (numof p (a - 1) ((a - 1) + 1))%Z.
   apply numof_succ.
-  repeat apply f_equal.
-  omega.
+  apply f_equal.
+  ring.
 Qed.
 
 (* Why3 goal *)
@@ -141,7 +143,7 @@ Lemma Numof_left_no_add :
   ((numof p a b) = (numof p (a + 1%Z)%Z b)).
 Proof.
   intros p a b h1 h2.
-  rewrite Numof_append with (b := (a+1)%Z) by omega.
+  rewrite Numof_append with (b := (a+1)%Z) by lia.
   rewrite (numof_succ p a).
   apply Bool.not_true_is_false in h2.
   rewrite h2; trivial.
@@ -155,7 +157,7 @@ Lemma Numof_left_add :
   ((numof p a b) = (1%Z + (numof p (a + 1%Z)%Z b))%Z).
 Proof.
   intros p a b h1 h2.
-  rewrite Numof_append with (b := (a+1)%Z) by omega.
+  rewrite Numof_append with (b := (a+1)%Z) by lia.
   rewrite (numof_succ p a).
   rewrite h2; trivial.
 Qed.
@@ -173,11 +175,11 @@ Proof.
   pattern b.
   apply Zlt_lower_bound_ind with (z := a); auto with zarith; intros.
   case (Z.eq_dec a x); intro e.
-  rewrite e; apply Numof_empty; omega.
-  rewrite Numof_append with (b := (x - 1)%Z) by omega.
+  rewrite e; apply Numof_empty; lia.
+  rewrite Numof_append with (b := (x - 1)%Z) by lia.
   assert (numof p (x - 1) x = 0)%Z.
   rewrite numof_pred.
-  assert (a <= (x - 1)%Z < x)%Z as H2 by omega.
+  assert (a <= (x - 1)%Z < x)%Z as H2 by lia.
   generalize (H1 (x - 1)%Z H2).
   intro H3; apply Bool.not_true_is_false in H3; rewrite H3; trivial.
   rewrite H2.
@@ -197,11 +199,11 @@ Proof.
   pattern b.
   apply Zlt_lower_bound_ind with (z := a); auto with zarith; intros.
   case (Z.eq_dec a x); intro e.
-  rewrite e; rewrite Zminus_diag; apply Numof_empty; omega.
-  rewrite Numof_append with (b := (x - 1)%Z) by omega.
+  rewrite e; rewrite Zminus_diag; apply Numof_empty; lia.
+  rewrite Numof_append with (b := (x - 1)%Z) by lia.
   assert (numof p (x - 1) x = 1)%Z.
   rewrite numof_pred.
-  assert (a <= (x - 1)%Z < x)%Z as H2 by omega.
+  assert (a <= (x - 1)%Z < x)%Z as H2 by lia.
   generalize (H1 (x - 1)%Z H2).
   intro; rewrite H3; trivial.
   rewrite H2.
@@ -215,10 +217,10 @@ Proof.
   pattern b.
   apply Zlt_lower_bound_ind with (z := a) (x := b); auto with zarith; intros.
   case (Z.eq_dec a x); intro e.
-  rewrite e; rewrite Numof_empty; omega.
-  rewrite Numof_append with (b := (x - 1)%Z) by omega.
+  rewrite e; rewrite Numof_empty; lia.
+  rewrite Numof_append with (b := (x - 1)%Z) by lia.
   apply Z.add_nonneg_nonneg.
-  apply H; omega.
+  apply H; lia.
   rewrite numof_pred.
   case (p (x - 1)%Z); easy.
 Qed.
@@ -229,7 +231,7 @@ Proof.
   generalize h; pattern b.
   apply Zlt_lower_bound_ind with (z := (a + 1)%Z) (x := b); auto with zarith; intros.
   rewrite Z.add_1_r in H0; apply Zle_succ_gt in H0.
-  rewrite Numof_append with (b := (x - 1)%Z) by omega.
+  rewrite Numof_append with (b := (x - 1)%Z) by lia.
   case (Z.eq_dec k (x-1)); intro e.
   rewrite e in H1.
   apply Z.add_nonneg_pos.
@@ -247,7 +249,7 @@ Lemma numof_increasing :
   (i <= j)%Z /\ (j <= k)%Z -> ((numof p i j) <= (numof p i k))%Z.
 Proof.
 intros p i j k (h1,h2).
-rewrite (Numof_append p i j k) by omega.
+rewrite (Numof_append p i j k) by lia.
 rewrite <-Z.le_sub_le_add_l, Zminus_diag.
 apply numof_nat.
 Qed.
@@ -260,7 +262,7 @@ Lemma numof_strictly_increasing :
   ((numof p i j) < (numof p i l))%Z.
 Proof.
 intros p i j k l (h1,(h2,h3)) h4.
-rewrite (Numof_append p i j l) by omega.
+rewrite (Numof_append p i j l) by lia.
 rewrite <-Z.lt_sub_lt_add_l, Zminus_diag.
 apply numof_pos with (k := k); auto with zarith.
 Qed.
@@ -275,13 +277,13 @@ Lemma numof_change_any :
   ((numof p1 a b) <= (numof p2 a b))%Z.
 Proof.
   intros p1 p2 a b.
-  case (Z_lt_le_dec a b); intro; [|rewrite Numof_empty, Numof_empty; omega].
+  case (Z_lt_le_dec a b); intro; [|rewrite Numof_empty, Numof_empty; lia].
   pattern b.
   apply Zlt_lower_bound_ind with (z := a); auto with zarith; intros.
   case (Z.eq_dec a x); intro eq.
-  rewrite eq; rewrite Numof_empty, Numof_empty; omega.
-  rewrite Numof_append with (b := (x-1)%Z) by omega.
-  rewrite Numof_append with (p := p2) (b := (x-1)%Z) by omega.
+  rewrite eq; rewrite Numof_empty, Numof_empty; lia.
+  rewrite Numof_append with (b := (x-1)%Z) by lia.
+  rewrite Numof_append with (p := p2) (b := (x-1)%Z) by lia.
   apply Z.add_le_mono.
   apply H; auto with zarith.
   rewrite numof_pred, numof_pred.
@@ -306,14 +308,14 @@ Proof.
   generalize (Z_le_lt_eq_dec _ _ (numof_change_any p1 p2 a b h3)).
   intro H; destruct H; trivial.
   cut False; auto with zarith.
-  rewrite Numof_append with (b := i) in e by omega.
-  rewrite Numof_append with (p := p2) (b := i) in e by omega.
+  rewrite Numof_append with (b := i) in e by lia.
+  rewrite Numof_append with (p := p2) (b := i) in e by lia.
   rewrite (Numof_left_add _ _ _ h2 h5), (Numof_left_no_add _ _ _ h2 h4) in e.
   assert (forall j : int, (a <= j < i)%Z -> p1 j = true -> p2 j = true) by auto with zarith.
   generalize (numof_change_any p1 p2 _ _ H).
   assert (forall j : int, ((i + 1) <= j < b)%Z -> p1 j = true -> p2 j = true) by auto with zarith.
   generalize (numof_change_any p1 p2 _ _ H0).
-  omega.
+  lia.
 Qed.
 
 Lemma le_ge_eq: forall a b, (a <= b)%Z /\ (b <= a)%Z -> (a = b)%Z.

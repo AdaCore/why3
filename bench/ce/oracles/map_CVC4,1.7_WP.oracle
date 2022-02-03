@@ -1,6 +1,6 @@
 Weakest Precondition
 File "bench/ce/map.mlw", line 8, characters 14-28:
-Goal Postcondition from verification condition test_map'vc.
+Sub-goal Postcondition of goal test_map'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -47,8 +47,8 @@ File map.mlw:
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
 
 File "bench/ce/map.mlw", line 14, characters 14-34:
-Goal Postcondition from verification condition test_map_multidim1'vc.
-Prover result is: Unknown (sat)
+Sub-goal Postcondition of goal test_map_multidim1'vc.
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File map.mlw:
@@ -85,19 +85,12 @@ File map.mlw:
             "value":
              {"type": "Array",
               "val":
-               [{"indice": {"type": "Integer", "val": "0"},
-                 "value":
-                  {"type": "Array",
-                   "val":
-                    [{"indice": {"type": "Integer", "val": "0"},
-                      "value": {"type": "Integer", "val": "0"}},
-                     {"others": {"type": "Integer", "val": "1"}}]}},
-                {"others":
+               [{"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
 
 File "bench/ce/map.mlw", line 19, characters 14-34:
-Goal Postcondition from verification condition test_map_multidim2'vc.
+Sub-goal Postcondition of goal test_map_multidim2'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -111,11 +104,7 @@ File ref.mlw:
             "value":
              {"type": "Array",
               "val":
-               [{"indice": {"type": "Integer", "val": "0"},
-                 "value":
-                  {"type": "Array",
-                   "val": [{"others": {"type": "Integer", "val": "1"}}]}},
-                {"indice": {"type": "Integer", "val": "1"},
+               [{"indice": {"type": "Integer", "val": "1"},
                  "value":
                   {"type": "Array",
                    "val":
@@ -135,11 +124,7 @@ File map.mlw:
             "value":
              {"type": "Array",
               "val":
-               [{"indice": {"type": "Integer", "val": "0"},
-                 "value":
-                  {"type": "Array",
-                   "val": [{"others": {"type": "Integer", "val": "1"}}]}},
-                {"indice": {"type": "Integer", "val": "1"},
+               [{"indice": {"type": "Integer", "val": "1"},
                  "value":
                   {"type": "Array",
                    "val":
@@ -164,7 +149,7 @@ File map.mlw:
                    "val":
                     [{"indice": {"type": "Integer", "val": "0"},
                       "value": {"type": "Integer", "val": "3"}},
-                     {"others": {"type": "Integer", "val": "1"}}]}},
+                     {"others": {"type": "Integer", "val": "0"}}]}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value":
                   {"type": "Array",
@@ -175,6 +160,16 @@ File map.mlw:
                 {"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
+  Line 21:
+    x0 [@introduced] =
+      {"type": "Array", "val": [{"others": {"type": "Integer", "val": "0"}}]}
+  Line 22:
+    x0 [@id:unused] [@introduced] [@model_trace:x0] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Integer", "val": "0"},
+          "value": {"type": "Integer", "val": "3"}},
+         {"others": {"type": "Integer", "val": "0"}}]}
   Line 23:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -190,7 +185,7 @@ File map.mlw:
                    "val":
                     [{"indice": {"type": "Integer", "val": "0"},
                       "value": {"type": "Integer", "val": "3"}},
-                     {"others": {"type": "Integer", "val": "1"}}]}},
+                     {"others": {"type": "Integer", "val": "0"}}]}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value":
                   {"type": "Array",
@@ -203,7 +198,7 @@ File map.mlw:
                    "val": [{"others": {"type": "Integer", "val": "0"}}]}}]}}]}}
 
 File "bench/ce/map.mlw", line 26, characters 14-28:
-Goal Postcondition from verification condition proj_map_test1'vc.
+Sub-goal Postcondition of goal proj_map_test1'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -277,7 +272,7 @@ File map.mlw:
                 {"others": {"type": "Integer", "val": "0"}}]}}]}}
 
 File "bench/ce/map.mlw", line 31, characters 14-28:
-Goal Postcondition from verification condition proj_map_test2'vc.
+Sub-goal Postcondition of goal proj_map_test2'vc.
 Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -351,7 +346,7 @@ File map.mlw:
                 {"others": {"type": "Boolean", "val": false}}]}}]}}
 
 File "bench/ce/map.mlw", line 42, characters 3-31:
-Verification condition t1.
+Goal t1.
 Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -366,7 +361,7 @@ File map.mlw:
          {"others": {"type": "Integer", "val": "0"}}]}
 
 File "bench/ce/map.mlw", line 50, characters 36-64:
-Verification condition g.
+Goal g.
 Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):

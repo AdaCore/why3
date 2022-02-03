@@ -14,6 +14,11 @@
     | Atom of string
     | List of sexp list
 
+  let rec exists p sexp =
+    p sexp || match sexp with
+    | Atom _ -> false
+    | List l -> List.exists (exists p) l
+
   exception Error
 
 (* The parsing state is comprised of a stack and an optional result. During scanning,

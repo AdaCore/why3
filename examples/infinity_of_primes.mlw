@@ -1,0 +1,44 @@
+
+(** A constructive proof that there is an infinity of primes
+
+    The idea is to build the sequence
+      a(O) = 1
+      a(n) = a(n-1) * (a(n-1) + 1)
+    and to show that a(n) has (at least) n distinct prime factors.
+    See http://oeis.org/A007018
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.ComputerDivision
+use number.Divisibility
+use number.Prime
+
+let lemma prime_factor (n: int) : (p: int)
+  requires { n >= 2 }
+  ensures  { prime p }
+  ensures  { divides p n }
+= for p = 2 to n do
+    invariant { forall d. 2 <= d < p -> not (divides d n) }
+    if mod n p = 0 then return p
+  done;
+  return n
+
+use set.Fset
+
+let lemma infinity_of_primes (n: int) : (s: fset int)
+  requires { n >= 0 }
+  ensures  { cardinal s = n }
+  ensures  { forall k. mem k s -> prime k }
+= let ref s = empty in
+  let ref x = 1 in
+  for i = 0 to n-1 do
+    invariant { x >= 1 }
+    invariant { cardinal s = i }
+    invariant { forall k. mem k s -> prime k }
+    invariant { forall k. mem k s -> divides k x }
+    let p = prime_factor (x+1) in
+    x <- x * (x+1);
+    s <- add p s
+  done;
+  s

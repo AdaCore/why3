@@ -1,16 +1,12 @@
 ;; why3.el - GNU Emacs mode for Why3
 
-(defvar why3-mode-hook nil)
-
-(defvar why3-mode-map nil
-  "Keymap for Why3 major mode")
-
-(if why3-mode-map nil
-  (setq why3-mode-map (make-keymap))
-  ;; (define-key why3-mode-map "\C-c\C-c" 'why3-generate-obligations) **)
-  ;; (define-key why3-mode-map "\C-c\C-a" 'why3-find-alternate-file) **)
-  ;; (define-key why3-mode-map "\C-c\C-v" 'why3-viewer) **)
-  (define-key why3-mode-map [(control return)] 'font-lock-fontify-buffer))
+(defvar why3-mode-map
+  (let ((map (make-sparse-keymap)))
+    ;; (define-key map "\C-c\C-c" 'why3-generate-obligations) **)
+    ;; (define-key map "\C-c\C-a" 'why3-find-alternate-file) **)
+    ;; (define-key map "\C-c\C-v" 'why3-viewer) **)
+    (define-key map [(control return)] 'font-lock-fontify-buffer)
+    map))
 
 (setq auto-mode-alist
       (append
@@ -166,30 +162,19 @@
   ))
 
 ;; setting the mode
-(defun why3-mode ()
-  "Major mode for editing Why3 programs.
+(define-derived-mode why3-mode
+  prog-mode "Why3"
+  "Major mode for editing WhyML programs.
 
 \\{why3-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
   ; hilight
-  (set-syntax-table why3-mode-syntax-table)
-  (set (make-local-variable 'font-lock-defaults) '(why3-font-lock-keywords))
-  (set (make-local-variable 'font-lock-multiline) t)
+  (setq-local font-lock-defaults '(why3-font-lock-keywords))
+  (setq-local font-lock-multiline t)
   ; indentation
-  ;(make-local-variable 'indent-line-function)
-  ;(setq indent-line-function 'why3-indent-line)
+  ;(setq-local indent-line-function 'why3-indent-line)
   ; OCaml style comments for comment-region, comment-dwim, etc.
-  (set (make-local-variable 'comment-start) "(*")
-  (set (make-local-variable 'comment-end)   "*)")
-  (setq-local syntax-propertize-function why3--syntax-propertize)
-  ; menu
-  ; providing the mode
-  (setq major-mode 'why3-mode)
-  (setq mode-name "Why3")
-  (use-local-map why3-mode-map)
-  (font-lock-mode 1)
-  ; (why3-menu)
-  (run-hooks 'why3-mode-hook))
+  (setq-local comment-start "(*")
+  (setq-local comment-end   "*)")
+  (setq-local syntax-propertize-function why3--syntax-propertize))
 
 (provide 'why3)

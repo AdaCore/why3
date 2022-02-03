@@ -93,11 +93,11 @@ val used_theories : task -> theory Mid.t
   (** returns a map from theory names to theories themselves *)
 
 val used_symbols : theory Mid.t -> theory Mid.t
-  (** takes the result of [used_theories] and returns
+  (** takes the result of {!used_theories} and returns
       a map from symbol names to their theories of origin *)
 
 val local_decls : task -> theory Mid.t -> decl list
-  (** takes the result of [used_symbols] and returns
+  (** takes the result of {!used_symbols} and returns
       the list of declarations that are not imported
       with those theories or derived thereof *)
 
@@ -114,7 +114,7 @@ val task_goal_fmla  : task -> term
 
 val task_separate_goal : task -> tdecl * task
 (** [task_separate_goal t] returns a pair [(g,t')] where [g] is the
-    goal of the task [t] and [t'] is the rest.  raises [GoalNotFound]
+    goal of the task [t] and [t'] is the rest.  Raises {!GoalNotFound}
     if task [t] has no goal *)
 
 (** {2 Selectors} *)

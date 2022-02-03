@@ -1,0 +1,283 @@
+(** {1 Kleene Algebra Definition and Relational Kleene Algebra }
+
+Author: Quentin Garchery (Université Paris-Saclay)
+*)
+
+module SemiRing
+
+  use int.Int
+
+  type t
+  constant zero : t
+  constant one : t
+  function (+) t t : t
+  function (*) t t : t
+
+  clone export algebra.CommutativeMonoid with type t = t, constant unit = zero,
+  function op = (+), axiom .
+
+  clone algebra.Monoid with type t = t, constant unit = one,
+  function op = (*), axiom .
+
+  axiom Mul_zero_l : forall x. zero * x = zero
+  axiom Mul_zero_r : forall x. x * zero = zero
+
+  axiom Mul_distr_l : forall x y z : t. x * (y + z) = x * y + x * z
+  axiom Mul_distr_r : forall x y z : t. (y + z) * x = y * x + z * x
+
+  let rec ghost function (^) (x : t) (n : int) : t
+    requires { n >= 0 }
+    variant { n }
+  =
+    if n = 0 then pure{one} else let r = x ^ (n-1) in pure {x * r}
+
+  clone int.Exponentiation with type t = t, constant one = one,
+  function (*) = (*), function power = (^), lemma .
+end
+
+
+module Dioid
+
+  clone export SemiRing with axiom .
+
+  axiom Idem : forall x : t. x + x = x
+
+  predicate (<=) (x : t) (y : t) = x + y = y
+
+  lemma le_refl : forall x. x <= x
+
+  lemma le_antisym : forall x y. x <= y -> y <= x -> x = y
+
+  lemma le_trans : forall x y z. x <= y -> y <= z -> x <= z
+
+  lemma zero_le : forall x. zero <= x
+
+  lemma le_compat_add : forall x y z. x <= y -> x + z <= y + z
+
+  lemma le_add : forall x y. x <= x + y
+
+  lemma le_add_le : forall x y z. x <= z -> y <= z -> x + y <= z
+
+  lemma add_le : forall x y z. x + y <= z -> x <= z
+
+  lemma le_compat_add_left : forall x y z. x <= y -> z * x <= z * y
+
+  lemma le_compat_add_right : forall x y z. x <= y -> x * z <= y * z
+end
+
+
+module KleeneAlgebra
+
+  use int.Int
+
+  clone export Dioid with axiom .
+
+  (* We denote x^* as !x *)
+  function (!_) t : t
+
+  axiom Star_unfold_left : forall x. one + x * !x <= !x
+
+  axiom Star_unfold_right : forall x. one + !x * x <= !x
+
+  axiom Star_induct_left : forall x y z. z + x * y <= y -> !x * z <= y
+
+  axiom Star_induct_right : forall x y z. z + y * x <= y -> z * !x <= y
+
+  lemma one_le_star : forall x. one <= !x
+
+  lemma mul_var_le_star : forall x. x * !x <= !x
+
+  lemma var_mul_le_star : forall x. !x * x <= !x
+
+  lemma power_le_star : forall i x. i >= 0 -> x ^ i <= !x
+
+  lemma star_mul_star : forall x. !x * !x = !x
+  by !x + x * !x <= ! x
+
+  lemma star_star : forall x. !(!x) = !x
+
+  lemma star_unfold_left : forall x. one + x * !x = !x
+  by one + x * (one + x * !x) <= one + x * !x
+
+  lemma star_unfold_right : forall x. one + !x * x = !x
+  by one + (one + !x * x) * x <= one + !x * x
+
+  lemma star_le : forall x y. x <= y -> !x <= !y
+  by one + x * !y <= !y
+
+  lemma le_star_left_right : forall x y z. z * x <= y * z -> z * !x <= !y * z
+  by z + (!y * z) * x <= !y * z
+
+  lemma le_star_right_left : forall x y z. x * z <= z * y -> !x * z <= z * !y
+  by z + x * (z * !y) <= z * !y
+
+  lemma slide_left : forall x y. !(x + y) = !x * !(y * !x)
+  by !x <= !(x + y)
+  so y * !x <= !(x + y)
+  so !(y * !x) <= !(!(x + y)) <= !(x + y)
+  so !x * !(y * !x) <= !(x + y)
+  so one + (x + y) * (!x * !(y * !x)) <= !x * !(y * !x)
+  so !(x + y) <= !x * !(y * !x)
+
+  lemma slide_right : forall x y. !(x + y) = !(!x * y) * !x
+  by !x <= !(x + y)
+  so !x * y <= !(x + y)
+  so !(!x * y) <= !(!(x + y)) <= !(x + y)
+  so !(!x * y) * !x <= !(x + y)
+  so one + (!(!x * y) * !x) * (x + y) <= !(!x * y) * !x
+  so !(x + y) <= !(!x * y) * !x
+
+  (** Conway's equality: a way to cut x^* in slices of size x^n *)
+
+  let rec ghost function sum_pow (x : t) (a b: int) : t
+    requires { b >= a >= 0 }
+    variant { b - a }
+  = if b = a then pure{zero} else
+    let m1 = sum_pow x a (b - 1) in
+    let m2 = x ^ (b - 1) in
+    pure {m1 + m2}
+
+  lemma sum_pow_left: forall x a b.
+    b > a >= 0 ->
+    sum_pow x a b = x^a + sum_pow x (Int.(+) a 1) b
+
+  lemma mul_sum_pow: forall x a b.
+    b >= a >= 0 ->
+    sum_pow x a b * x = sum_pow x (Int.(+) a 1) (Int.(+) b 1)
+
+  lemma sum_pow_le_star: forall x a b.
+    b >= a >= 0 ->
+    sum_pow x a b <= !x
+
+  lemma Conway_equality: forall x n.
+    n >= 1 ->
+    !x = !(x^n) * sum_pow x 0 n
+  by !(x^n) * sum_pow x 0 n <= !x
+  so !(x^n) * sum_pow x 0 n * x = !(x^n) * sum_pow x 1 n + !(x^n) * x ^ n
+                                <= !(x^n) * sum_pow x 0 n
+  so one + !(x^n) * sum_pow x 0 n * x <= !(x^n) * sum_pow x 0 n
+end
+
+
+module RelAlgebra
+
+  use int.Int
+
+  use set.Set
+
+  (* Relational Algebra: sets of pairs of the same type *)
+
+  type a
+
+  type t = set (a, a)
+
+  (** Specify zero, one, +, * and ! in terms of membership *)
+
+  constant zero : t = empty
+  lemma zero_def : forall x. not mem x zero
+
+  constant one : t = map (fun a -> (a, a)) all
+  lemma one_def : forall x : a. mem (x, x) one
+
+  let ghost function post (s : t) (x : a)
+    ensures { forall y. mem y result <-> mem (x, y) s }
+  =
+    map (fun p -> let (_, a2) = p in a2)
+    (filter s (fun p -> let (a1, _) = p in pure{a1 = x}))
+
+  let ghost function pre (s : t) (y : a)
+    ensures { forall x. mem x result <-> mem (x, y) s }
+  =
+    map (fun p -> let (a1, _) = p in a1)
+    (filter s (fun p -> let (_, a2) = p in pure {a2 = y}))
+
+  let ghost function (+) (s1 s2 : t)
+    ensures { forall x. mem x result <-> mem x s1 \/ mem x s2 }
+  =
+    union s1 s2
+
+  let ghost function (*) (s1 s2 : t)
+    ensures { forall a1 a2. mem (a1, a2) result <->
+                            exists x. mem (a1, x) s1 /\ mem (x, a2) s2 }
+  =
+    filter all
+    (fun p -> let (a1, a2) = p in
+    not (disjoint (post s1 a1) (pre s2 a2)))
+
+  lemma unit_l : forall x. one * x = x
+  by one * x == x
+
+  lemma unit_r : forall x. x * one = x
+  by x * one == x
+
+  lemma assoc_mul : forall x y z. x * y * z = x * (y * z)
+  by forall e. (mem e (x * y * z) -> mem e (x * (y * z))) /\
+               (mem e (x * (y * z)) -> mem e (x * y * z))
+
+  clone Dioid with type t = t, constant zero = zero,
+  constant one = one, function (+) = (+), function (*) = (*), lemma .
+
+  lemma le_mem : forall x y. x <= y <-> forall u. mem u x -> mem u y
+
+  inductive in_star t (a, a) =
+   | Star_0 : forall x s. in_star s (x, x)
+   | Star_s : forall x y z s. in_star s (x, y) -> mem (y, z) s -> in_star s (x, z)
+
+  let ghost function (!_) (s : t) =
+      filter all (in_star s)
+
+  lemma power_in_star : forall s : t, i, p : (a, a).
+        i >= 0 -> mem p (s ^ i) -> mem p !s
+        by i > 0 -> let (x, z) = p in
+           exists y. (in_star s (x, y) by mem (x, y) (s ^ (i-1)))  /\ mem (y, z) s
+
+  lemma star_in_power : forall s x y.
+        in_star s (x, y) -> (exists i. i >= 0 /\ mem (x, y) (s ^ i))
+
+  lemma star_spec : forall s : t, p : (a, a).
+        mem p !s <-> exists i. i >= 0 /\ mem p (s ^ i)
+
+  lemma star_unfold_l : forall x u. mem u (one + x * !x) -> mem u !x
+  by mem u (x * !x) -> (exists i. i >= 0 /\ mem u (x * x ^ i))
+     by let (u1, u2) = u in
+        exists v. mem (u1, v) x /\ mem (v, u2) !x
+                  so exists i. i >= 0 /\ mem u (x * x ^ i)
+
+  lemma star_unfold_r : forall x u. mem u (one + !x * x) -> mem u !x
+  by mem u (!x * x) -> (exists i. i >= 0 /\ mem u (x ^ i * x))
+     by let (u1, u2) = u in
+     exists v. mem (u1, v) !x /\ mem (v, u2) x
+            so exists i. i >= 0 /\ mem u (x ^ i * x)
+
+  lemma star_induct_left_ind : forall x y z i. i >= 0 ->
+    z + x * y <= y -> x^i * z <= y
+
+  lemma star_induct_left_lem : forall x y z i. i >= 0 ->
+    z + x * y <= y -> forall u. mem u (x^i * z) -> mem u y
+
+  lemma star_induct_left : forall x y z.
+    z + x * y <= y -> !x * z <= y
+  by forall u. mem u (!x * z) -> (exists i. i >= 0 /\ mem u (x^i * z))
+     by let (u1, u2) = u in
+        exists v. mem (u1, v) !x /\ mem (v, u2) z
+                  so exists i. i >= 0 /\ mem u (x^i * z)
+
+  lemma star_induct_right_ind : forall x y z i. i >= 0 ->
+    z + y * x <= y -> z * x^i <= y
+
+  lemma star_induct_right_lem : forall x y z i. i >= 0 ->
+    z + y * x <= y -> forall u. mem u (z * x^i) -> mem u y
+
+  lemma star_induct_right : forall x y z.
+    z + y * x <= y -> z * !x <= y
+  by forall u. mem u (z * !x) -> (exists i. i >= 0 /\ mem u (z * x^i))
+     by let (u1, u2) = u in
+        exists v. mem (u1, v) z /\ mem (v, u2) !x
+                  so exists i. i >= 0 /\ mem u (z * x^i)
+
+  (** Prove that this forms a Kleene Algebra *)
+
+  clone KleeneAlgebra with type t = t, constant zero = zero,
+  constant one = one, function (+) = (+), function (*) = (*),
+  function (!_) = (!_), lemma .
+end

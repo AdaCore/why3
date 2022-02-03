@@ -534,7 +534,7 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
                            + uint64'int rl + radix * uint64'int rh
                   = ul + radix * um + radix * radix * uh }
     returns { _q, rl, rh -> 0 <= uint64'int rl + radix * uint64'int rh < dl + radix * dh }
-  =
+  = [@vc:do_not_keep_trace] (* traceability info breaks the proof *)
     let ghost d = l2i dl + radix * l2i dh in
     let ghost u = l2i ul + radix * (l2i um + radix * l2i uh) in
     let q1 = ref 0 in
@@ -1197,7 +1197,7 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
               + value x sy }
     ensures { value x sy < value y sy }
     ensures { 0 <= result <= 1 }
-  =
+  = [@vc:do_not_keep_trace] (* traceability info breaks the proof *)
     let xp = ref (C.incr x (sx - 2)) in
     let qp = ref (C.incr q (sx - sy)) in
     let dh = C.get_ofs y (sy - 1) in

@@ -578,7 +578,8 @@ module BVConverter_Gen
   function to_uint_small smallBV : int
   function to_uint_big bigBV : int
 
-  val function toBig smallBV : bigBV
+  val function toBig smallBV : bigBV   (* unsigned, that is "zero extend" *)
+  val function stoBig smallBV : bigBV  (* signed, that is "sign extend" *)
   val function toSmall bigBV : smallBV
 
   axiom toSmall_to_uint :
@@ -588,6 +589,8 @@ module BVConverter_Gen
   axiom toBig_to_uint :
     forall x:smallBV.
       to_uint_small x = to_uint_big (toBig x)
+
+  (* TODO: specify stoBig by axioms too *)
 
 end
 

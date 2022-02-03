@@ -1,6 +1,6 @@
 Strongest Postcondition
 File "bench/ce/records_label.mlw", line 12, characters 14-35:
-Goal Postcondition from verification condition record_old_test1'vc.
+Sub-goal Postcondition of goal record_old_test1'vc.
 Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -10,14 +10,14 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "-395"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 11:
     x [@at:'Old:loc:bench/ce/records_label.mlw:12] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "5"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 12:
     old x [@at:'Old] [@at:'Old:loc:bench/ce/records_label.mlw:12]
@@ -25,7 +25,7 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "5"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x [@introduced] [@model_trace:x] =
       {"type": "Record",
@@ -38,7 +38,7 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "0"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "-395"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 14:
     x [@introduced] =
@@ -49,7 +49,7 @@ File records_label.mlw:
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/records_label.mlw", line 22, characters 13-58:
-Goal Assertion from verification condition record_at_test2'vc.
+Sub-goal Assertion of goal record_at_test2'vc.
 Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
@@ -59,7 +59,7 @@ File records_label.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "6058"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "376"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 16:
     x [@at:L:loc:bench/ce/records_label.mlw:22] [@introduced] =
@@ -83,6 +83,12 @@ File records_label.mlw:
           [{"field": "f", "value": {"type": "Integer", "val": "12"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
   Line 22:
+    x [@introduced] [@model_trace:x] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "f", "value": {"type": "Integer", "val": "12"}},
+           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     x at L [@at:L] [@at:L:loc:bench/ce/records_label.mlw:22] [@introduced]
       [@model_trace:x] =
       {"type": "Record",
@@ -97,21 +103,15 @@ File records_label.mlw:
         {"Field":
           [{"field": "f", "value": {"type": "Integer", "val": "6"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
-    x [@introduced] [@model_trace:x] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "12"}},
-           {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
     y [@introduced] [@model_trace:y] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "f", "value": {"type": "Integer", "val": "6058"}},
+          [{"field": "f", "value": {"type": "Integer", "val": "376"}},
            {"field": "g", "value": {"type": "Boolean", "val": false}}]}}
 
 File "bench/ce/records_label.mlw", line 30, characters 13-37:
-Goal Assertion from verification condition several_hats'vc.
+Sub-goal Assertion of goal several_hats'vc.
 Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):

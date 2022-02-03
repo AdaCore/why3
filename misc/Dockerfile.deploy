@@ -41,8 +41,14 @@ RUN make install && \
 
 
 # Stage 3: deployed image; to be cached (for its first layers)
+# Note that the first command after FROM decides which cache is used,
+# so we start with COPY instead of USER to make sure both caches are trivially different.
 
 FROM debian:buster-slim
+
+COPY --from=builder /usr/bin/alt-ergo /usr/local/bin/
+COPY --from=builder /usr/local/bin/cvc4-1.7 /usr/local/bin/
+COPY --from=builder /usr/local/bin/z3-4.8.4 /usr/local/bin/
 
 USER root
 
@@ -53,10 +59,6 @@ RUN apt-get update -yq && \
     apt-get clean
 
 RUN adduser --disabled-password --gecos '' guest
-
-COPY --from=builder /usr/bin/alt-ergo /usr/local/bin/
-COPY --from=builder /usr/local/bin/cvc4-1.7 /usr/local/bin/
-COPY --from=builder /usr/local/bin/z3-4.8.4 /usr/local/bin/
 
 COPY --from=artifact /usr/local/bin/why3 /usr/local/bin/
 COPY --from=artifact /usr/local/lib/why3 /usr/local/lib/why3

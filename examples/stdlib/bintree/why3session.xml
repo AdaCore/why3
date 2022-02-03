@@ -2,20 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="6" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="bintree.mlw"/>
 <theory name="Tree" proved="true">
  <goal name="is_empty&#39;vc" expl="VC for is_empty" proved="true">
- <transf name="split_goal_right" proved="true" >
-  <goal name="is_empty&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5"><result status="valid" time="0.00" steps="3"/></proof>
-  </goal>
-  <goal name="is_empty&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5"><result status="valid" time="0.00" steps="5"/></proof>
-  </goal>
- </transf>
+ <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
  </goal>
 </theory>
 <theory name="Size" proved="true">

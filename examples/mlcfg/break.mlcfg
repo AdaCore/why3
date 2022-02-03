@@ -1,0 +1,49 @@
+module NestedLoops
+use int.Int
+let cfg nested_loops x : () =
+  var a : int;
+  var b : int;
+  var c : int;
+  var d : int;
+  {
+    goto BB0
+  }
+  BB0 {
+    switch (true)
+    | True -> goto B
+    | False -> goto A
+    end
+  }
+  BB1 {
+    switch (True)
+    | True -> goto C
+    | False -> goto D
+    end
+  }
+  C { 
+    c <- c + 1;
+    goto A
+  }
+  D {
+    d <- d + 1;
+    goto BB0
+  }
+  B {
+    b <- b + 1;
+    goto BB1
+  }
+  A {
+    a <- a + 1;
+    return ()
+  }
+(*
+  loop i {
+    b
+    if j {
+      break;
+    }
+    d
+  }
+  a
+*)
+end

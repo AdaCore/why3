@@ -551,3 +551,14 @@ module FunctionVariant
   with test5' (i j: int) variant { i, j }
   = if j = 0 then test5 i else test5' i (j - 1)
 end
+
+module ArrayList
+  use int.Int
+  use array.Array
+  use list.List
+  use array.ToList
+
+  let main () =
+    let f = make 4 0 in
+    to_list f 0 4
+end

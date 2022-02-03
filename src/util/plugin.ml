@@ -22,7 +22,7 @@ let loadfile f =
 
 
 let add_extension p =
-  if Dynlink.is_native then p^".cmxs" else p^".cmo"
+  if Dynlink.is_native then p^".cmxs" else p^".cma"
 
 let load ?dirs p =
   let p = add_extension p in
@@ -49,11 +49,11 @@ type plu =
 
 let check_plugin f =
   let cmxs = Filename.check_suffix f ".cmxs" in
-  let cmo = Filename.check_suffix f ".cmo" in
-  if not cmxs && not cmo
+  let cma = Filename.check_suffix f ".cma" in
+  if not cmxs && not cma
   then Plubad
   else
-    if (if Dynlink.is_native then cmxs else cmo)
+    if (if Dynlink.is_native then cmxs else cma)
     then try loadfile f; Plugood with exn -> Plufail exn
     else Pluother
 

@@ -123,7 +123,7 @@ let () = Exn_printer.register
     | Located (loc,e) ->
         fprintf fmt "%a%a" report_position loc Exn_printer.exn_printer e
     | Message s ->
-        fprintf fmt "%s" s
+        pp_print_string fmt s
     | _ ->
         raise exn)
 

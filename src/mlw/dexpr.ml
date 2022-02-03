@@ -1002,9 +1002,9 @@ let effect_of_dspec dsp =
 (* TODO: add warnings for empty postconditions (anywhere)
     and empty exceptional postconditions (toplevel). *)
 let check_spec inr dsp ecty ({e_loc = loc} as e) =
+  let reg_submap wr1 wr2 = Mreg.submap (Util.const Spv.subset) wr1 wr2 in
   let bad_read  reff eff = not (Spv.subset reff.eff_reads  eff.eff_reads) in
-  let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
-                                           weff.eff_writes eff.eff_writes) in
+  let bad_write weff eff = not (reg_submap weff.eff_writes eff.eff_writes) in
   let bad_raise xeff eff = not (Sxs.subset xeff.eff_raises eff.eff_raises) in
   (* computed effect vs user effect *)
   let uwrl, ue = effect_of_dspec dsp in
@@ -1038,7 +1038,8 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
       which@ is@ left@ out@ in@ the@ specification"
     Pretty.print_vs (Spv.choose (Spv.diff eeff.eff_reads ueff.eff_reads)).pv_vs;
   if check_rw && bad_write eeff ueff then
-    Loc.errorm ?loc:(e_locate_effect (fun eff -> bad_write eff ueff) e)
+    Loc.errorm ?loc:(e_locate_effect (fun eff -> not (reg_submap
+          (Mreg.set_inter eff.eff_writes eeff.eff_writes) ueff.eff_writes)) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
   if ecty.cty_args <> [] && bad_raise eeff ueff then Sxs.iter (fun xs ->
     Loc.errorm ?loc:(e_locate_effect (fun eff -> Sxs.mem xs eff.eff_raises) e)
@@ -1330,8 +1331,6 @@ let get_xs env = function
   | DElexn (n,_) -> Mstr.find_exn (UnboundExn n) n env.xsm
   | DEgexn xs -> xs
 
-let proxy_attrs = Sattr.singleton proxy_attr
-
 type header =
   | LS of let_defn
   | LX of xsymbol
@@ -1397,6 +1396,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       when Sattr.is_empty e.e_attrs ->
         proxy_args ghost ldl (v::vl) plp
     | EA (gh, e) :: plp ->
+        (* Format.eprintf "[Dexpr.mk_proxy_args] e = %a@." print_expr e; *)
         let ld, v  = mk_proxy_decl ~ghost:(ghost || gh) e in
         proxy_args ghost (LS ld :: ldl) (v::vl) plp
     | HD hd :: plp ->
@@ -1408,13 +1408,20 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     let argl = List.map ity_of_dity (drop vl argl) in
     env.cgh, ldl, app s vl argl (ity_of_dity res) in
   let c_app s lpl =
+    (* Format.eprintf "[Dexpr.c_app] s = %a@." print_rs s; *)
     let al = List.map (fun v -> v.pv_ghost) s.rs_cty.cty_args in
     let rec full_app al lpl = match al, lpl with
       | _::al, DA _::lpl -> full_app al lpl
       | al, LD _::lpl -> full_app al lpl
       | [], [] -> true | _ -> false in
     let tpl = is_rs_tuple s && full_app al lpl in
-    apply c_app tpl (env.ghs || env.lgh || rs_ghost s) s al lpl in
+    (*let (ghost,ldl,e) = *)
+    apply c_app tpl (env.ghs || env.lgh || rs_ghost s) s al lpl
+      (* in *)
+    (* Format.eprintf "[Dexpr.c_app] e = %a@." (print_cexp true 0) e; *)
+    (*let ld, v = mk_proxy_decl ~ghost e in
+    (ghost,(LS ld)::ldl,v) *)
+  in
   let c_pur ugh s lpl =
     let loc = Opt.get_def de0.de_loc uloc in
     if not (ugh || env.ghs || env.lgh || env.ugh) then Loc.errorm ?loc
@@ -1690,6 +1697,7 @@ and var_defn uloc env (id,gh,kind,de) =
     | RKfunc | RKpred | RKnone ->
         let e = expr uloc {env with ugh = gh} de in
         e_ghostify env.cgh e in
+  (* Format.eprintf "[Dexpr.var_defn] e = %a@." print_expr e; *)
   let ld, v = let_var id ~ghost:(gh || env.ghs) e in
   ld, add_pvsymbol env v
 

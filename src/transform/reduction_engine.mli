@@ -80,12 +80,15 @@ type params = {
   compute_defs : bool;
   compute_builtin : bool;
   compute_def_set : Term.Sls.t;
+  compute_max_quantifier_domain : int;
 }
 (** Configuration of the engine.
    . [compute_defs]: if set to true, automatically compute symbols using
      known definitions. Otherwise, only symbols in [compute_def_set]
      will be computed.
-   . [compute_builtin]: if set to true, compute builtin functions. *)
+   . [compute_builtin]: if set to true, compute builtin functions.
+   . [compute_max_quantifier_domain]: maximum domain size for the reduction of
+     bounded quantifications *)
 
 val create : params -> Env.env -> Decl.decl Ident.Mid.t -> engine
 (** [create env known_map] creates a reduction engine with
