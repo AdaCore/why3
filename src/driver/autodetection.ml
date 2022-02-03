@@ -157,9 +157,7 @@ module Prover_autodetection_data = struct
         (fp,shortcut)::acc
       ) acc shortcuts
 
-  let read_auto_detection_data main =
-    let filename = Filename.concat (Whyconf.datadir main)
-        "provers-detection-data.conf" in
+  let from_file filename =
     try
       let rc = Rc.from_file filename in
       { skeletons = List.rev (load rc);
@@ -175,6 +173,12 @@ module Prover_autodetection_data = struct
         Loc.errorm "Syntax error in provers-detection-data.conf@."
     | Not_found ->
         Loc.errorm "provers-detection-data.conf not found at %s@." filename
+
+  let read_auto_detection_data main =
+    let filename = Filename.concat (Whyconf.datadir main)
+        "provers-detection-data.conf" in
+    from_file filename
+
 
 
 end
