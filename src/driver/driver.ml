@@ -281,10 +281,12 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv ~input_file ~theory_name:th.th_name.Ident.id_string ~goal_name:"null"
 
-let call_on_buffer ~command ~limit ~gen_new_file ?inplace ~filename
+let call_on_buffer
+      ~command ~libdir ~datadir ~limit ~gen_new_file ?inplace ~filename
     ~printing_info drv buffer =
   Call_provers.call_on_buffer
-    ~command ~limit ~gen_new_file ~res_parser:drv.drv_res_parser
+    ~command ~libdir ~datadir ~limit ~gen_new_file
+    ~res_parser:drv.drv_res_parser
     ~filename ~printing_info ?inplace buffer
 
 (** print'n'prove *)
@@ -414,7 +416,8 @@ let file_name_of_task ?old ?inplace ?interactive drv task =
           ~theory_name:"T"
           ~goal_name:pr.pr_name.id_string
 
-let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
+let prove_task_prepared
+      ~command ~libdir ~datadir ~limit ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
@@ -424,14 +427,19 @@ let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   let gen_new_file, filename =
     file_name_of_task ?old ?inplace ?interactive drv task in
   let get_counterexmp = get_counterexmp task in
-  let res = call_on_buffer ~command ~limit ~gen_new_file ?inplace ~filename
-              ~get_counterexmp ~printing_info drv buf in
+  let res =
+    call_on_buffer
+      ~command ~libdir ~datadir ~limit ~gen_new_file ?inplace ~filename
+      ~get_counterexmp ~printing_info drv buf
+  in
   Buffer.reset buf;
   res
 
-let prove_task ~command ~limit ?old ?inplace ?interactive drv task =
+let prove_task
+      ~command ~libdir ~datadir ~limit ?old ?inplace ?interactive drv task =
   let task = prepare_task drv task in
-  prove_task_prepared ~command ~limit ?interactive ?old ?inplace drv task
+  prove_task_prepared
+    ~command ~libdir ~datadir ~limit ?interactive ?old ?inplace drv task
 
 (* exception report *)
 

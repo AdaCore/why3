@@ -45,9 +45,6 @@ let why3_regexp_of_string s = (* define a regexp in why3 *)
 
 (* lib and shared dirs *)
 
-let default_loadpath =
-  [ Filename.concat Config.datadir "stdlib" ]
-
 let default_conf_file =
   match Config.localdir with
     | None -> Filename.concat (Rc.get_home_dir ()) ".why3.conf"
@@ -210,6 +207,9 @@ let datadir m =
     d
   with Not_found -> m.datadir
 
+let default_loadpath m =
+  [ Filename.concat m.datadir "stdlib" ]
+
 let loadpath m =
   try
     let d = Sys.getenv "WHY3LOADPATH" in
@@ -218,7 +218,7 @@ let loadpath m =
 *)
     Strings.split ':' d
   with Not_found ->
-    let stdlib = if m.stdlib then default_loadpath else [] in
+    let stdlib = if m.stdlib then default_loadpath m else [] in
     m.loadpath@stdlib
 
 let set_loadpath m l = { m with loadpath = l}
@@ -526,13 +526,15 @@ module RC_save = struct
   let set_default_editor default section =
     set_string section "default_editor" default
 
+  let set_dirs ~libdir ~datadir section =
+    let section = set_string section "libdir" libdir in
+    let section = set_string section "datadir" datadir in
+    section
+
   let set_main rc main =
     let section = empty_section in
     let section = set_int section "magic" magicnumber in
-    let section = set_string ~default:empty_main.libdir
-        section "libdir" main.libdir in
-    let section = set_string ~default:empty_main.datadir
-        section "datadir" main.datadir in
+    let section = set_dirs ~libdir:main.libdir ~datadir:main.datadir section in
     let section = set_bool ~default:empty_main.stdlib section "stdlib" main.stdlib in
     let section = set_bool ~default:empty_main.load_default_plugins
         section "load_default_plugins" main.load_default_plugins in
@@ -933,6 +935,12 @@ module User = struct
       main = set_limits config.main time mem j;
     }
 
+  let set_dirs ~libdir ~datadir config =
+    { config with
+      user_rc = update_section config.user_rc "main"
+        @@ RC_save.set_dirs ~libdir ~datadir;
+      main = { config.main with libdir = libdir; datadir = datadir }
+    }
   let set_prover_upgrade_policy config prover target =
     (** kept simple because no auto upgrade policy *)
     let m = Mprover.add prover target config.provers_upgrade_policy in
@@ -1056,19 +1064,20 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | _ -> raise e)
 
 let provers_from_detected_provers :
-  (save_to:string -> Rc.t -> config) ref =
-  ref (fun ~save_to:_ _ -> invalid_arg
+  (config -> Rc.t -> config) ref =
+  ref (fun _ _-> invalid_arg
           "provers_from_detected_provers: Must be filled by Autodetection")
 
 
-let add_builtin_provers config = !provers_from_detected_provers config
+let add_builtin_provers config rc =
+  !provers_from_detected_provers config rc
 
 let init_config ?(extra_config=[]) ofile =
   let save_to,rc = read_config_rc ofile in
-  (* Add the automatic provers, shortcuts, strategy, ... *)
-  let config = add_builtin_provers ~save_to rc in
   (* load the user configuration, priority over automatic values *)
-  let config = read_config_aux config save_to rc in
+  let config = read_config_aux (default_config save_to) save_to rc in
+  (* Add the automatic provers, shortcuts, strategy, ... *)
+  let config = add_builtin_provers config rc in
   (* Add extra-config *)
   let config = List.fold_left add_extra_config config extra_config in
   config

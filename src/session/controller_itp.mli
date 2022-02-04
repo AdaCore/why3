@@ -208,7 +208,7 @@ val register_notifier : (any -> unit) -> unit
  *)
 
 
-val interrupt : unit -> unit
+val interrupt : controller -> unit
 (** discards all scheduled proof attempts or transformations, including
     the ones already running *)
 

@@ -336,7 +336,7 @@ let get_exception_message ses id e =
 (* Command list *)
 (****************)
 
-let interrupt_query _cont _args = C.interrupt (); "interrupted"
+let interrupt_query cont _args = C.interrupt cont; "interrupted"
 
 let commands_table = Hstr.create 17
 
@@ -1414,7 +1414,7 @@ match pa.proof_state with
   let reload_session () : unit =
     let d = get_server_data () in
     (* interrupt all running provers and unfocus before reload *)
-    C.interrupt ();
+    C.interrupt d.cont;
     let _old_focus = !focused_node in
     focused_node := Unfocused;
     clear_tables ();
@@ -1639,7 +1639,7 @@ match pa.proof_state with
     | Get_task(nid,b,loc)          ->
        send_task nid b loc
     | Interrupt_req                ->
-       C.interrupt ()
+       C.interrupt d.cont
     | Reset_proofs_req             ->
        reset_proofs ();
        session_needs_saving := true

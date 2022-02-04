@@ -395,9 +395,13 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
     { limit_time = timelimit;
       limit_mem = memlimit;
       limit_steps = stepslimit } in
+  let libdir = Config.libdir in
+  let datadir = Config.datadir in
   match !opt_output, !opt_command with
     | None, Some command ->
-        let call = Driver.prove_task ~command ~limit drv task in
+        let call =
+          Driver.prove_task ~command ~libdir ~datadir ~limit drv task
+        in
         let res = wait_on_call call in
         let ce = select_ce env th res.pr_models in
         let t = task_goal_fmla task in
