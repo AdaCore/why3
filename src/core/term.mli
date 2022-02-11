@@ -306,6 +306,8 @@ val t_attr_set : ?loc:Loc.position -> Sattr.t -> term -> term
 val t_attr_add : attribute -> term -> term
 val t_attr_remove : attribute -> term -> term
 val t_attr_copy : term -> term -> term
+(** [t_attr_copy src dst] return the term [dst] with attributes and
+   locations augmented with those of term [src] *)
 
 (** Constructors with propositional simplification *)
 
