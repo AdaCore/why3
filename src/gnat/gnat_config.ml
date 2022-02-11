@@ -571,6 +571,7 @@ end = struct
 
   let convert_data =
     ["cvc4",    { add = 15000;  mult = 35  };
+     "cvc5",    { add = 15000;  mult = 35  };
      "z3",      { add = 450000; mult = 800 };
      "altergo", { add = 0;      mult = 1   };
      "colibri", { add = 2000;   mult = 1   };
