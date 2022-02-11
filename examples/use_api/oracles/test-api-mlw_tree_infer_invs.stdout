@@ -230,15 +230,20 @@ Task 1: theory Task
           
           goal f'vc :
             forall x:int.
+             let x'unused = Ref'mk x in
              x <= 100 ->
              x <= 100 /\
              (forall x1:int.
+               let x2 = Ref'mk x1 in
                x1 <= 100 ->
-               (if x1 < 100
-                then forall x2:int.
-                      x2 = (x1 + 1) ->
-                      (0 <= (100 - x1) /\ (100 - x2) < (100 - x1)) /\
-                      x2 <= 100
+               (let x'unused'unused = x2 in
+                if x1 < 100
+                then let r'unused'unused = x2 in
+                     forall x3:int.
+                      let x'unused1 = Ref'mk x3 in
+                      x3 = (x1 + 1) ->
+                      (0 <= (100 - x1) /\ (100 - x3) < (100 - x1)) /\
+                      x3 <= 100
                 else x1 = 100))
 end
 

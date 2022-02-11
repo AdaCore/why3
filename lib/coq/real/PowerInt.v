@@ -18,6 +18,7 @@ Require int.Int.
 Require real.Real.
 Require real.RealInfix.
 
+Require Import Lia.
 Require Import Exponentiation.
 Import Rfunctions.
 
@@ -62,10 +63,12 @@ Lemma Power_s_alt :
   forall (x:Reals.Rdefinitions.R) (n:Numbers.BinNums.Z), (0%Z < n)%Z ->
   ((Reals.Rfunctions.powerRZ x n) =
    (x * (Reals.Rfunctions.powerRZ x (n - 1%Z)%Z))%R).
+Proof.
 intros x n h1.
 rewrite <- Power_s.
-f_equal; omega.
-omega.
+apply f_equal.
+ring.
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -105,6 +108,7 @@ Lemma Power_comm1 :
   ((x * y)%R = (y * x)%R) -> forall (n:Numbers.BinNums.Z), (0%Z <= n)%Z ->
   (((Reals.Rfunctions.powerRZ x n) * y)%R =
    (y * (Reals.Rfunctions.powerRZ x n))%R).
+Proof.
 intros x y h1 n h2.
 apply Rmult_comm.
 Qed.
@@ -125,17 +129,18 @@ Qed.
 Lemma Pow_ge_one :
   forall (x:Reals.Rdefinitions.R) (n:Numbers.BinNums.Z),
   (0%Z <= n)%Z /\ (1%R <= x)%R -> (1%R <= (Reals.Rfunctions.powerRZ x n))%R.
+Proof.
 intros x n (h1,h2).
 generalize h1.
 pattern n; apply Z_lt_induction; auto.
 clear n h1; intros n Hind h1.
-assert (h: (n = 0 \/ 0 < n)%Z) by omega.
+assert (h: (n = 0 \/ 0 < n)%Z) by lia.
 destruct h.
 subst n; rewrite Power_0; auto with *.
-replace n with ((n-1)+1)%Z by omega.
+replace n with ((n-1)+1)%Z by ring.
 rewrite Power_s; auto with zarith.
 assert (h : (1 <= powerRZ x (n-1))%R).
-apply Hind; omega.
+apply Hind; lia.
 replace 1%R with (1*1)%R by auto with real.
 apply Rmult_le_compat; auto with real.
 Qed.

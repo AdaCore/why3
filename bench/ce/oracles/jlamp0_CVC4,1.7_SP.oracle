@@ -109,6 +109,12 @@ File ref.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -179,6 +185,12 @@ File ref.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -240,6 +252,20 @@ Sub-goal Loop invariant preservation of goal p2'vc.
 Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
+File ref.mlw:
+  Line 18:
+    c [@field:0:contents] [@introduced] [@loop:bench/ce/jlamp0.mlw:21:4:157]
+      [@vc:written:21:4:157:bench/ce/jlamp0.mlw] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "8"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -254,13 +280,6 @@ File jlamp0.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 21:
-    [before iteration] a [@field:0:contents] [@introduced]
-      [@loop:bench/ce/jlamp0.mlw:21:4:157]
-      [@vc:written:21:4:157:bench/ce/jlamp0.mlw] =
-      {"type": "Record",
-       "val":
-        {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
     [before iteration] c [@field:0:contents] [@introduced]
       [@loop:bench/ce/jlamp0.mlw:21:4:157]
       [@vc:written:21:4:157:bench/ce/jlamp0.mlw] =
@@ -310,7 +329,7 @@ File jlamp0.mlw:
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 19:
     a [@field:0:contents] [@introduced] [@loop:bench/ce/jlamp0.mlw:21:4:157]
-      [@model_trace:a] [@vc:written:21:4:157:bench/ce/jlamp0.mlw] =
+      [@vc:written:21:4:157:bench/ce/jlamp0.mlw] =
       {"type": "Record",
        "val":
         {"Field":

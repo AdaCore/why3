@@ -31,6 +31,60 @@ module FibonacciLinear
 
 end
 
+module FibonacciTailRecList
+
+  use int.Fibonacci
+  use int.Int
+  use int.Power
+  use list.List
+  use list.Mem
+
+  let rec ghost function sum_fib (l:list int) : int
+    requires { forall n. mem n l -> n >= 0 }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x r -> fib x + sum_fib r
+    end
+
+  let rec ghost function sum_pow (l:list int) : int
+    requires { forall n. mem n l -> n >= 0 }
+    ensures { result >= 0 }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x r -> assert {x >= 0 };
+                  power 2 x + sum_pow r
+    end
+
+  lemma pow_pos : forall x. x >= 0 -> power 3 x > 0
+
+  let rec sum_fib_acc (acc:int) (l:list int) : int
+    requires { forall n. mem n l -> n >= 0 }
+    variant { sum_pow l }
+    ensures { result = acc + sum_fib l }
+  = match l with
+    | Nil -> acc
+    | Cons n r ->
+      assert { n >= 0 };
+      if n <= 1 then sum_fib_acc (acc + n) r
+      else begin
+      let l1 = Cons (n-2) r in
+      assert { forall u. mem u l1 -> u >= 0 };
+      let l2 = Cons (n-1) l1 in
+      assert { forall u. mem u l2 -> u >= 0 };
+      sum_fib_acc acc l2
+      end
+    end
+
+  let fib (n:int) : int
+    requires { n >= 0 }
+    ensures { result = fib n }
+  =
+    sum_fib_acc 0 (Cons n Nil)
+
+end
+
 (** {2 Recursive version, using ghost code} *)
 
 module FibRecGhost

@@ -28,7 +28,7 @@
        "for", FOR; "in", IN;
        "and", AND; "or", OR; "not", NOT;
        "True", TRUE; "False", FALSE; "None", NONE;
-       "from", FROM; "import", IMPORT; "break", BREAK;
+       "from", FROM; "import", IMPORT; "break", BREAK; "continue", CONTINUE;
        (* annotations *)
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET;
        "old", OLD; "at", AT;
@@ -67,14 +67,15 @@
 
 let letter = ['a'-'z' 'A'-'Z']
 let digit = ['0'-'9']
-let ident = letter (letter | digit | '_')*
+let ident = (letter | '_')+ (letter | digit | '_')*
 let integer = ['0'-'9']+
 let space = ' ' | '\t'
 let comment = "#" [^'@''\n'] [^'\n']*
 
 rule next_tokens = parse
-  | '\n'    { new_line lexbuf; update_stack (indentation lexbuf) }
-  | (space | comment)+
+  | '\n' | "#\n"
+            { new_line lexbuf; update_stack (indentation lexbuf) }
+  | space+ | comment
             { next_tokens lexbuf }
   | "\\" space* '\n' space* "#@"?
             { next_tokens lexbuf }
@@ -83,7 +84,16 @@ rule next_tokens = parse
   | "#@"    { raise (Lexing_error "expecting an annotation") }
   | ident as id
             { [id_or_kwd id] }
+  | (ident ("'" ident)+) as id
+            { [QIDENT id] }
+  | "'" (ident as id)
+            { [TVAR id] }
   | '+'     { [PLUS] }
+  | "+="    { [PLUSEQUAL] }
+  | "-="    { [MINUSEQUAL] }
+  | "*="    { [TIMESEQUAL] }
+  | "//="   { [DIVEQUAL] }
+  | "%="    { [MODEQUAL] }
   | '-'     { [MINUS] }
   | '*'     { [TIMES] }
   | "//"    { [DIV] }
@@ -114,7 +124,7 @@ rule next_tokens = parse
 
 (* count the indentation, i.e. the number of space characters from bol *)
 and indentation = parse
-  | (space | comment)* '\n'
+  | (space+ | comment | '#')* '\n'
       (* skip empty lines *)
       { new_line lexbuf; indentation lexbuf }
   | space* as s

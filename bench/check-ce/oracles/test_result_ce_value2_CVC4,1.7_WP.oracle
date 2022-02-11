@@ -1,0 +1,1794 @@
+<check-ce>Check model 0 ("bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "-1"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+            Line 10:
+              x = {"type": "Integer", "val": "-1"}
+            Line 12:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+              result = {"type": "Integer", "val": "0"}
+            Line 13:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 0
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 0
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 10:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test2` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 12:
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 10
+                Line 13:
+                  Property failure at assertion with:
+                    a = {contents= (-1)}
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 10:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test2` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 12:
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 10
+                Line 13:
+                  Property failure at assertion with:
+                    a = {contents= (-1)}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "-1"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+            Line 10:
+              x = {"type": "Integer", "val": "-1"}
+            Line 12:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+              result = {"type": "Integer", "val": "0"}
+            Line 13:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 0
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 0
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 10:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test2` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 12:
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 10
+                Line 13:
+                  Property failure at assertion with:
+                    a = {contents= (-1)}
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 10:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test2` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 12:
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 10
+                Line 13:
+                  Property failure at assertion with:
+                    a = {contents= (-1)}
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+File "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20:
+Sub-goal Assertion of goal test2'vc.
+Prover result is: Unknown (unknown + incomplete) (0.07s, 6505 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File test_result_ce_value2.mlw:
+  Line 3:
+    Constant a initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    a = {contents= 0}
+  Line 10:
+    x = (-1)
+    x = (-1)
+    Execution of main function `test2` with env:
+      a = {contents= 0}
+      x = (-1)
+      zero = 0
+      one = 1
+  Line 12:
+    (giant-step) execution of unimplemented function `id`
+      x = (-1)
+    a = {contents= (-1)}
+    result of `id` = 0
+    Normal execution of function `(<)` with args:
+      _ = 0
+      _ = 10
+  Line 13:
+    Property failure at assertion with:
+      a = {contents= (-1)}
+
+<check-ce>Check model 0 ("bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "0"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+            Line 10:
+              x = {"type": "Integer", "val": "0"}
+            Line 12:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+              result = {"type": "Integer", "val": "43"}
+            Line 15:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    42}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 43
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    42}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 43
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 10:
+                  x = 0
+                  x = 0
+                  Execution of main function `test2` with env:
+                    a = {contents= 0}
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 12:
+                  (giant-step) execution of unimplemented function `id`
+                    x = 0
+                  a = {contents= 42}
+                  result of `id` = 43
+                  Normal execution of function `(<)` with args:
+                    _ = 43
+                    _ = 10
+                Line 15:
+                  Property failure at assertion with:
+                    a = {contents= 42}
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 10:
+                  x = 0
+                  x = 0
+                  Execution of main function `test2` with env:
+                    a = {contents= 0}
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 12:
+                  Giant-step execution of function `id` with args:
+                    x = 0
+                  a = {contents= 42}
+                  result of `id` = 43
+                  Normal execution of function `(<)` with args:
+                    _ = 43
+                    _ = 10
+                Line 15:
+                  Property failure at assertion with:
+                    a = {contents= 42}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "0"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+            Line 10:
+              x = {"type": "Integer", "val": "0"}
+            Line 12:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+              result = {"type": "Integer", "val": "43"}
+            Line 15:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    42}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 43
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    42}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: 43
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 10:
+                  x = 0
+                  x = 0
+                  Execution of main function `test2` with env:
+                    a = {contents= 0}
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 12:
+                  (giant-step) execution of unimplemented function `id`
+                    x = 0
+                  a = {contents= 42}
+                  result of `id` = 43
+                  Normal execution of function `(<)` with args:
+                    _ = 43
+                    _ = 10
+                Line 15:
+                  Property failure at assertion with:
+                    a = {contents= 42}
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 10:
+                  x = 0
+                  x = 0
+                  Execution of main function `test2` with env:
+                    a = {contents= 0}
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 12:
+                  Giant-step execution of function `id` with args:
+                    x = 0
+                  a = {contents= 42}
+                  result of `id` = 43
+                  Normal execution of function `(<)` with args:
+                    _ = 43
+                    _ = 10
+                Line 15:
+                  Property failure at assertion with:
+                    a = {contents= 42}
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+File "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20:
+Sub-goal Assertion of goal test2'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6476 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File test_result_ce_value2.mlw:
+  Line 3:
+    Constant a initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    a = {contents= 0}
+  Line 10:
+    x = 0
+    x = 0
+    Execution of main function `test2` with env:
+      a = {contents= 0}
+      x = 0
+      zero = 0
+      one = 1
+  Line 12:
+    (giant-step) execution of unimplemented function `id`
+      x = 0
+    a = {contents= 42}
+    result of `id` = 43
+    Normal execution of function `(<)` with args:
+      _ = 43
+      _ = 10
+  Line 15:
+    Property failure at assertion with:
+      a = {contents= 42}
+
+<check-ce>Check model 0 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "-1"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "41"}}]}}
+            Line 17:
+              x = {"type": "Integer", "val": "-1"}
+            Line 18:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+            Line 21:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "41"}}]}}
+              result = {"type": "Integer", "val": "51"}
+              result = {"type": "Integer", "val": "0"}
+            Line 22:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
+                                                                    41}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 51
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
+                                                                    41}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 51
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 21:
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 100
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= 41}
+                  result of `id` = 51
+                  Normal execution of function `(>)` with args:
+                    x = 51
+                    y = 50
+                Line 22:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 41}
+                  Normal execution of function `(+)` with args:
+                    _ = 41
+                    _ = 1
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 21:
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 100
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= 41}
+                  result of `id` = 51
+                  Normal execution of function `(>)` with args:
+                    x = 51
+                    y = 50
+                Line 22:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 41}
+                  Normal execution of function `(+)` with args:
+                    _ = 41
+                    _ = 1
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "-1"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "41"}}]}}
+            Line 17:
+              x = {"type": "Integer", "val": "-1"}
+            Line 18:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+            Line 21:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "41"}}]}}
+              result = {"type": "Integer", "val": "51"}
+              result = {"type": "Integer", "val": "0"}
+            Line 22:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
+                                                                    41}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 51
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
+                                                                    41}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 51
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 21:
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 100
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= 41}
+                  result of `id` = 51
+                  Normal execution of function `(>)` with args:
+                    x = 51
+                    y = 50
+                Line 22:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 41}
+                  Normal execution of function `(+)` with args:
+                    _ = 41
+                    _ = 1
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 21:
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 100
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= 41}
+                  result of `id` = 51
+                  Normal execution of function `(>)` with args:
+                    x = 51
+                    y = 50
+                Line 22:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 41}
+                  Normal execution of function `(+)` with args:
+                    _ = 41
+                    _ = 1
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
+Sub-goal Postcondition of goal test3'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6681 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File test_result_ce_value2.mlw:
+  Line 3:
+    Constant a initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    a = {contents= 0}
+  Line 17:
+    x = (-1)
+    x = (-1)
+    Execution of main function `test3` with env:
+      a = {contents= 0}
+      x = (-1)
+      zero = 0
+      one = 1
+  Line 21:
+    (giant-step) execution of unimplemented function `id`
+      x = (-1)
+    a = {contents= (-1)}
+    result of `id` = 0
+    Normal execution of function `(<)` with args:
+      _ = 0
+      _ = 100
+    (giant-step) execution of unimplemented function `id`
+      x = (-1)
+    a = {contents= 41}
+    result of `id` = 51
+    Normal execution of function `(>)` with args:
+      x = 51
+      y = 50
+  Line 22:
+    Normal execution of function `contents` with args:
+      arg = {contents= 41}
+    Normal execution of function `(+)` with args:
+      _ = 41
+      _ = 1
+  Line 18:
+    Property failure at postcondition of `test3` with:
+      a = {contents= 42}
+
+<check-ce>Check model 0 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "-1"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "40"}}]}}
+            Line 17:
+              x = {"type": "Integer", "val": "-1"}
+            Line 18:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+            Line 21:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "40"}}]}}
+              result = {"type": "Integer", "val": "41"}
+              result = {"type": "Integer", "val": "0"}
+            Line 24:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
+                                                                    40}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 41
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
+                                                                    40}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 41
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 21:
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 100
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= 40}
+                  result of `id` = 41
+                  Normal execution of function `(>)` with args:
+                    x = 41
+                    y = 50
+                Line 24:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 40}
+                  Normal execution of function `(+)` with args:
+                    _ = 40
+                    _ = 2
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 21:
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 100
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= 40}
+                  result of `id` = 41
+                  Normal execution of function `(>)` with args:
+                    x = 41
+                    y = 50
+                Line 24:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 40}
+                  Normal execution of function `(+)` with args:
+                    _ = 40
+                    _ = 2
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "-1"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "40"}}]}}
+            Line 17:
+              x = {"type": "Integer", "val": "-1"}
+            Line 18:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+            Line 21:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-1"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "40"}}]}}
+              result = {"type": "Integer", "val": "41"}
+              result = {"type": "Integer", "val": "0"}
+            Line 24:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
+                                                                    40}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 41
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: (-1)
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    (-1)}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: {contents=
+                                                                    40}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 19-23: 41
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 21:
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 100
+                  (giant-step) execution of unimplemented function `id`
+                    x = (-1)
+                  a = {contents= 40}
+                  result of `id` = 41
+                  Normal execution of function `(>)` with args:
+                    x = 41
+                    y = 50
+                Line 24:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 40}
+                  Normal execution of function `(+)` with args:
+                    _ = 40
+                    _ = 2
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = (-1)
+                  x = (-1)
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = (-1)
+                    zero = 0
+                    one = 1
+                Line 21:
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= (-1)}
+                  result of `id` = 0
+                  Normal execution of function `(<)` with args:
+                    _ = 0
+                    _ = 100
+                  Giant-step execution of function `id` with args:
+                    x = (-1)
+                  a = {contents= 40}
+                  result of `id` = 41
+                  Normal execution of function `(>)` with args:
+                    x = 41
+                    y = 50
+                Line 24:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 40}
+                  Normal execution of function `(+)` with args:
+                    _ = 40
+                    _ = 2
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
+Sub-goal Postcondition of goal test3'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6704 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File test_result_ce_value2.mlw:
+  Line 3:
+    Constant a initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    a = {contents= 0}
+  Line 17:
+    x = (-1)
+    x = (-1)
+    Execution of main function `test3` with env:
+      a = {contents= 0}
+      x = (-1)
+      zero = 0
+      one = 1
+  Line 21:
+    (giant-step) execution of unimplemented function `id`
+      x = (-1)
+    a = {contents= (-1)}
+    result of `id` = 0
+    Normal execution of function `(<)` with args:
+      _ = 0
+      _ = 100
+    (giant-step) execution of unimplemented function `id`
+      x = (-1)
+    a = {contents= 40}
+    result of `id` = 41
+    Normal execution of function `(>)` with args:
+      x = 41
+      y = 50
+  Line 24:
+    Normal execution of function `contents` with args:
+      arg = {contents= 40}
+    Normal execution of function `(+)` with args:
+      _ = 40
+      _ = 2
+  Line 18:
+    Property failure at postcondition of `test3` with:
+      a = {contents= 42}
+
+File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
+Sub-goal Postcondition of goal test3'vc.
+Prover result is: Valid (0.02s, 1294 steps).
+
+<check-ce>Check model 0 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "0"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "40"}}]}}
+            Line 17:
+              x = {"type": "Integer", "val": "0"}
+            Line 18:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+            Line 21:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "40"}}]}}
+              result = {"type": "Integer", "val": "100"}
+            Line 24:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    40}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 100
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    40}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 100
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = 0
+                  x = 0
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 21:
+                  (giant-step) execution of unimplemented function `id`
+                    x = 0
+                  a = {contents= 40}
+                  result of `id` = 100
+                  Normal execution of function `(<)` with args:
+                    _ = 100
+                    _ = 100
+              Unknown location:
+                  Normal execution of function `False` with args:
+              File test_result_ce_value2.mlw:
+                Line 24:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 40}
+                  Normal execution of function `(+)` with args:
+                    _ = 40
+                    _ = 2
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = 0
+                  x = 0
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 21:
+                  Giant-step execution of function `id` with args:
+                    x = 0
+                  a = {contents= 40}
+                  result of `id` = 100
+                  Normal execution of function `(<)` with args:
+                    _ = 100
+                    _ = 100
+              Unknown location:
+                  Normal execution of function `False` with args:
+              File test_result_ce_value2.mlw:
+                Line 24:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 40}
+                  Normal execution of function `(+)` with args:
+                    _ = 40
+                    _ = 2
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+<check-ce>Checking model:
+          File test_result_ce_value2.mlw:
+            Line 7:
+              x = {"type": "Integer", "val": "0"}
+            Line 8:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "40"}}]}}
+            Line 17:
+              x = {"type": "Integer", "val": "0"}
+            Line 18:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+            Line 21:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "40"}}]}}
+              result = {"type": "Integer", "val": "100"}
+            Line 24:
+              a =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "42"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    40}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 100
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Value from model for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Value from model for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    40}
+<rac-values>Value from model for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: 100
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = 0
+                  x = 0
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 21:
+                  (giant-step) execution of unimplemented function `id`
+                    x = 0
+                  a = {contents= 40}
+                  result of `id` = 100
+                  Normal execution of function `(<)` with args:
+                    _ = 100
+                    _ = 100
+              Unknown location:
+                  Normal execution of function `False` with args:
+              File test_result_ce_value2.mlw:
+                Line 24:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 40}
+                  Normal execution of function `(+)` with args:
+                    _ = 40
+                    _ = 2
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File test_result_ce_value2.mlw:
+                Line 3:
+                  Constant a initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  a = {contents= 0}
+                Line 17:
+                  x = 0
+                  x = 0
+                  Execution of main function `test3` with env:
+                    a = {contents= 0}
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 21:
+                  Giant-step execution of function `id` with args:
+                    x = 0
+                  a = {contents= 40}
+                  result of `id` = 100
+                  Normal execution of function `(<)` with args:
+                    _ = 100
+                    _ = 100
+              Unknown location:
+                  Normal execution of function `False` with args:
+              File test_result_ce_value2.mlw:
+                Line 24:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 40}
+                  Normal execution of function `(+)` with args:
+                    _ = 40
+                    _ = 2
+                Line 18:
+                  Property failure at postcondition of `test3` with:
+                    a = {contents= 42}
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
+Sub-goal Postcondition of goal test3'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6517 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File test_result_ce_value2.mlw:
+  Line 3:
+    Constant a initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    a = {contents= 0}
+  Line 17:
+    x = 0
+    x = 0
+    Execution of main function `test3` with env:
+      a = {contents= 0}
+      x = 0
+      zero = 0
+      one = 1
+  Line 21:
+    (giant-step) execution of unimplemented function `id`
+      x = 0
+    a = {contents= 40}
+    result of `id` = 100
+    Normal execution of function `(<)` with args:
+      _ = 100
+      _ = 100
+Unknown location:
+    Normal execution of function `False` with args:
+File test_result_ce_value2.mlw:
+  Line 24:
+    Normal execution of function `contents` with args:
+      arg = {contents= 40}
+    Normal execution of function `(+)` with args:
+      _ = 40
+      _ = 2
+  Line 18:
+    Property failure at postcondition of `test3` with:
+      a = {contents= 42}
+

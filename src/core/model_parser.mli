@@ -56,6 +56,8 @@ and proj_name = string
 
 and field_name = string
 
+val compare_model_value : model_value -> model_value -> int
+
 val array_create_constant :
   value : model_value ->
   model_array
@@ -67,11 +69,11 @@ val array_add_element :
   value : model_value ->
   model_array
 (** Adds an element to the array.
-    @param array : the array to that the element will be added
+    @param array the array to that the element will be added
 
-    @param index : the index on which the element will be added.
+    @param index the index on which the element will be added.
 
-    @param value : the value of the element to be added
+    @param value the value of the element to be added
 *)
 
 val float_of_binary : model_float_binary -> model_float
@@ -93,6 +95,8 @@ val debug_force_binary_floats : Debug.flag
 type model_element_kind =
   | Result
   (** Result of a function call (if the counter-example is for postcondition) *)
+  | Call_result of Loc.position
+  (** Result of the function call at the given location *)
   | Old
   (** Old value of function argument (if the counter-example is for
       postcondition) *)
@@ -139,13 +143,13 @@ val create_model_element :
   attrs     : Ident.Sattr.t ->
   model_element
 (** Creates a counter-example model element.
-    @param name : the name of the source-code element
+    @param name the name of the source-code element
 
-    @param value  : counter-example value for the element
+    @param value counter-example value for the element
 
-    @param location : source-code location of the element
+    @param location source-code location of the element
 
-    @param term : why term corresponding to the element
+    @param term why term corresponding to the element
 *)
 
   (** {2 Model definitions} *)
@@ -168,12 +172,18 @@ val get_model_term_attrs : model -> Ident.Sattr.t
 (** {2 Search model elements} *)
 
 val search_model_element_for_id :
-  model -> ?loc:Loc.position -> Ident.ident -> model_element
+  model -> ?loc:Loc.position -> Ident.ident -> model_element option
 (** [search_model_element_for_id m ?loc id] searches for a model element for
-    identifier [id], at the location [id.id_loc], or at [loc], when given.
-    @raise Not_found when there is no such model element. *)
+    identifier [id], at the location [id.id_loc], or at [loc], when given. *)
+
+val search_model_element_call_result :
+  model -> int option -> Loc.position -> model_element option
+(** [search_model_element_call_result m oid loc] searches for a model element
+   that holds the return value for a call with id [oid] at location [loc]. *)
 
 (** {2 Printing the model} *)
+
+val json_model : model -> Json_base.json
 
 val print_model :
   ?filter_similar:bool ->
@@ -188,7 +198,7 @@ val print_model :
       names. The input is information about model element name. The
       output is the name of the model element that should be displayed.
     @param model the counter-example model to print
-    @param print_attrs: when set to true, the name is printed together with the
+    @param print_attrs when set to true, the name is printed together with the
     attrs associated to the specific ident.
 *)
 
@@ -201,25 +211,8 @@ val print_model_human :
   unit
 (** Same as print_model but is intended to be human readable.*)
 
-val print_model_json :
-  ?me_name_trans:(model_element_name -> string) ->
-  ?vc_line_trans:(int -> string) ->
-  Format.formatter ->
-  model ->
-  unit
+val print_model_json : Format.formatter -> model -> unit
 (** Prints counter-example model to json format.
-
-    @param me_name_trans see print_model
-    @param vc_line_trans the transformation from the line number corresponding
-      to the term that triggers VC before splitting VC to the name of JSON field
-      storing counterexample information related to this term. By default, this
-      information is stored in JSON field corresponding to this line, i.e.,
-      the transformation is [string_of_int].
-      Note that the exact line of the construct that triggers VC may not be
-      known. This can happen if the term that triggers VC spans multiple lines
-      and it is splitted.
-      This transformation can be used to store the counterexample information
-      related to this term in dedicated JSON field
 
     The format is the following:
     - counterexample is JSON object with fields indexed by names of files
@@ -229,21 +222,23 @@ val print_model_json :
     - counterexample_line is JSON array (ordered list) with elements
       corresponding to counterexample_element
     - counterexample_element is JSON object with following fields
-      - "name": name of counterexample element
-      - "value": value of counterexample element
-      - "kind": kind of counterexample element:
-        - "result": Result of a function call (if the counter-example is for postcondition)
-        - "old": Old value of function argument (if the counter-example is for postcondition)
-        - "\@X": Value at label X
-        - "before_loop": Value before entering the loop
-        - "previous_iteration": Value in the previous loop iteration
-        - "current_iteration": Value in the current loop iteration
-        - "error_message": The model element represents error message, not source-code element.
-            The error message is saved in the name of the model element
-        - "other"
+      {ul
+      {- "name": name of counterexample element}
+      {- "value": value of counterexample element}
+      {- "kind": kind of counterexample element:
+        {ul
+        {- "result": Result of a function call (if the counter-example is for postcondition)}
+        {- "old": Old value of function argument (if the counter-example is for postcondition)}
+        {- "\@X": Value at label X}
+        {- "before_loop": Value before entering the loop}
+        {- "previous_iteration": Value in the previous loop iteration}
+        {- "current_iteration": Value in the current loop iteration}
+        {- "error_message": The model element represents error message, not source-code element.
+            The error message is saved in the name of the model element}
+        {- "other"}}}}
 
     Example:
-    [
+    {[
       "records.adb": {
           "84": [
             {
@@ -258,7 +253,7 @@ val print_model_json :
             }
           ]
       }
-    ]
+    ]}
 *)
 
 val interleave_with_source :
@@ -348,12 +343,12 @@ val customize_clean : #clean -> unit
 ***************************************************************
 *)
 
-type model_parser = Printer.printer_mapping -> string -> model
+type model_parser = Printer.printing_info -> string -> model
 (** Parses the input string into model elements, estabilishes a mapping between these
    elements and mapping from printer and builds model data structure. The model still has
    to be cleaned using [clean]. *)
 
-type raw_model_parser = Printer.printer_mapping -> string -> model_element list
+type raw_model_parser = Printer.printing_info -> string -> model_element list
 
 val register_remove_field:
   (Ident.Sattr.t * model_value -> Ident.Sattr.t * model_value) -> unit

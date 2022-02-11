@@ -1,0 +1,16 @@
+
+
+use int.Int
+
+val id (x: int) : int
+  ensures { result > x }
+
+let test1 (x:int) =
+  let a = id
+      (id x)
+      + 1 in
+  assert { a <> 42 }
+
+let test1bis (x:int) =
+  let a = id (id x) + 1 in
+  assert { a <> 42 }

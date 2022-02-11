@@ -26,6 +26,7 @@ Require bv.Pow2int.
 Require ieee_float.RoundingMode.
 Require ieee_float.GenericFloat.
 
+Require Import Lia.
 Import Flocq.Core.Core.
 Import Flocq.IEEE754.Binary.
 Import ieee_float.RoundingMode.
@@ -82,7 +83,7 @@ apply Digits.Zpower_gt_Zdigits.
 revert H1.
 generalize (Digits.Zdigits radix2 (Z.pos m)).
 unfold FLT_exp, sb.
-intros ; zify ; omega.
+intros ; lia.
 now apply bpow_le.
 Qed.
 

@@ -33,19 +33,24 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File attributes.mlw:
   Line 17:
-    old x [@at:'Old:loc:bench/ce/attributes.mlw:17] [@call1]
+    old x [@at:'Old] [@at:'Old:loc:bench/ce/attributes.mlw:17] [@call1]
       [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "199"}}]}}
-  Line 21:
-    x [@at:'Old:loc:bench/ce/attributes.mlw:17] [@call1] [@field:0:contents]
-      [@introduced] [@mlw:reference_var] =
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
+    x [@call2] [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "199"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "200"}}]}}
+  Line 21:
+    x [@at:'Old] [@at:'Old:loc:bench/ce/attributes.mlw:17] [@call1]
+      [@field:0:contents] [@introduced] [@mlw:reference_var] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "1"}}]}}
   Line 22:
     x [@call2] [@field:0:contents] [@introduced] [@mlw:reference_var] =
       {"type": "Record",

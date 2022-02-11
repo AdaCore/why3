@@ -17,6 +17,8 @@ Require HighOrd.
 Require int.Int.
 Require set.Fset.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Definition min_elt : set.Fset.fset Numbers.BinNums.Z -> Numbers.BinNums.Z.
 Proof.
@@ -49,18 +51,18 @@ induction l0; intros.
 { destruct H. }
 assert (forall l z, List.fold_left (fun x1 acc : int => if Z_le_dec x1 acc then x1 else acc) l z <= z)%Z.
 {
-  induction l1; intros; simpl; eauto. omega.
-  simpl. destruct Z_le_dec. eauto. eapply Z.le_trans with a0; eauto. omega. 
+  induction l1; intros; simpl; eauto. lia.
+  simpl. destruct Z_le_dec. eauto. eapply Z.le_trans with a0; eauto. lia.
 }
 simpl. destruct Z_le_dec.
 destruct (Z_le_dec z0 x0).
 eapply Z.le_trans with z0. eapply H0. assumption.
-simpl in H. destruct H.  subst. omega.
+simpl in H. destruct H.  subst. lia.
 eapply IHl0; eauto.
 
 destruct (Z_le_dec a x0).
 eapply Z.le_trans with a. eapply H0. assumption.
-simpl in H. destruct H. subst. omega.
+simpl in H. destruct H. subst. lia.
 eapply IHl0; eauto.
 }
 
@@ -79,7 +81,7 @@ rewrite <- Heql. simpl. specialize (H0 l z). intuition.
 
 intros. eapply Heql in H1. eapply (H (List.cons z l) z) in H1; eauto. simpl in H1.
 destruct Z_le_dec. assumption.
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -115,7 +117,7 @@ assert (min_elt (Fset.map (fun x => - x) s) <= -x)%Z.
 {
   eapply H1; eauto. apply Fset.mem_map. assumption.
 }
-omega.
+lia.
 Qed.
 
 Fixpoint seqZ l len : list Numbers.BinNums.Z :=
@@ -133,16 +135,16 @@ Qed.
 Lemma seqZ_le2: forall len x l, List.In x (seqZ l len) -> (x < l + Z.of_nat len)%Z.
 Proof.
 induction len; simpl; intuition idtac.
-- subst. zify. omega.
-- eapply IHlen in H0. zify. omega.
+- subst. lia.
+- eapply IHlen in H0. lia.
 Qed.
 
 Lemma seqZ_rev: forall len x l, (l <= x < l + Z.of_nat len)%Z -> List.In x (seqZ l len).
 Proof.
 induction len; intros; simpl in *.
-+ omega.
++ lia.
 + destruct (Z.eq_dec l x); eauto.
-  right. eapply IHlen; eauto. zify; omega.
+  right. eapply IHlen; eauto. lia.
 Qed.
 
 Lemma seqZ_In_iff: forall l len x, List.In x (seqZ l len) <-> (l <= x <  l + Z.of_nat len)%Z.
@@ -157,7 +159,7 @@ Proof.
 induction len; intros.
 + constructor.
 + simpl. constructor; eauto.
-  intro Habs. eapply seqZ_le in Habs. omega. 
+  intro Habs. eapply seqZ_le in Habs. lia.
 Qed.
 
 Lemma seqZ_length: forall len l, List.length (seqZ l len) = len.
@@ -179,7 +181,7 @@ destruct (Z_le_dec l r).
   - eapply seqZ_NoDup.
   - intros.
     rewrite seqZ_In_iff.
-    rewrite Z2Nat.id; [|omega].
+    rewrite Z2Nat.id; [|lia].
     destruct Z_le_dec.
     * destruct Z_lt_dec. split; intros; [reflexivity|].
       intuition.
@@ -190,7 +192,7 @@ destruct (Z_le_dec l r).
   - constructor.
   - intros.
     destruct Z_le_dec; try destruct Z_lt_dec; intuition.
-    omega.
+    lia.
     inversion H.
     inversion H.
 Qed.
@@ -228,7 +230,7 @@ destruct (Z_le_dec l r).
 + exists (seqZ l (Z.to_nat (r - l)%Z)).
   split. apply seqZ_NoDup.
   intros. rewrite seqZ_In_iff.
-  rewrite Z2Nat.id; [|omega].
+  rewrite Z2Nat.id; [|lia].
   destruct Z_le_dec; try destruct Z_lt_dec; intuition; try inversion H.
 + exists nil. split. constructor.
   simpl. intros. destruct Z_le_dec; try destruct Z_lt_dec; intuition.
@@ -255,15 +257,15 @@ split.
     eapply Nat.le_antisymm.
     + eapply List.NoDup_incl_length. eapply seqZ_NoDup. intro. rewrite H2.
       rewrite seqZ_In_iff. destruct Z_le_dec; try destruct Z_lt_dec; intuition idtac.
-      rewrite Z2Nat.id in H5; omega.
+      rewrite Z2Nat.id in H5; lia.
     + eapply List.NoDup_incl_length. assumption. intro. rewrite H2.
       rewrite seqZ_In_iff. destruct Z_le_dec; try destruct Z_lt_dec; intuition (try discriminate).
-      rewrite Z2Nat.id; omega.
+      rewrite Z2Nat.id; lia.
   }
-  rewrite <- H3. rewrite seqZ_length. rewrite Z2Nat.id; omega.
+  rewrite <- H3. rewrite seqZ_length. rewrite Z2Nat.id; lia.
 + intros. destruct a. 
   destruct x. reflexivity.
   specialize (H2 z). contradict H2. destruct Z_le_dec. 
-  destruct Z_lt_dec. omega. intuition. intuition.
+  destruct Z_lt_dec. lia. intuition. intuition.
 Qed.
 

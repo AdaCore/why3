@@ -20,6 +20,8 @@ API calls
 open Why3
 let config : Whyconf.config = Whyconf.init_config None
 let main : Whyconf.main = Whyconf.get_main config
+let libdir = Whyconf.libdir main
+let datadir = Whyconf.datadir main
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 (* END{buildenv} *)
 
@@ -149,9 +151,13 @@ let () =
       (fun i t ->
        let r =
          Call_provers.wait_on_call
-           (Driver.prove_task ~limit:Call_provers.empty_limit
-                              ~command:alt_ergo.Whyconf.command
-                              alt_ergo_driver t)
+           (Driver.prove_task
+              ~limit:Call_provers.empty_limit
+              ~libdir
+              ~datadir
+              ~command:alt_ergo.Whyconf.command
+              alt_ergo_driver
+              t)
        in
        printf "@[On task %d, alt-ergo answers %a@."
               i (Call_provers.print_prover_result ?json:None) r;

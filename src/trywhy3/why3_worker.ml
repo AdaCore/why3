@@ -263,19 +263,22 @@ let rec why3_prove ?(steps= ~-1) id =
   | l -> List.iter (why3_prove ~steps) l
 
 
-let why3_split id =
+
+let rec why3_split t orig id steps unfold =
+  let open Task in
+  match Trans.apply split_trans orig with
+    | [] -> ()
+    | [ child ] when Why3.Task.task_equal child orig ->
+        if unfold then why3_split t (Trans.apply Inlining.goal orig) id steps false
+    | subtasks ->
+        t.subtasks <- List.map (fun t -> register_task id t) subtasks;
+        List.iter (fun i -> why3_prove i ~steps) t.subtasks
+
+let why3_split steps id =
   let open Task in
   let t = get_info id in
   match t.subtasks with
-    [] ->
-    begin
-      match Trans.apply split_trans (get_task t.task), t.task with
-	[], _ -> ()
-      | [ child ], Task orig when Why3.Task.task_equal child orig -> ()
-      | subtasks, _ ->
-          t.subtasks <- List.map (fun t -> register_task id t) subtasks;
-          List.iter (why3_prove ?steps:None) t.subtasks
-    end
+  | [] -> why3_split t (get_task t.task) id steps true
   | _ -> ()
 
 
@@ -299,7 +302,7 @@ let why3_prove_all () =
      | _ -> ()) Task.task_table
 
 
-let why3_parse_theories theories =
+let why3_parse_theories steps theories =
   let theories =
     Wstdlib.Mstr.fold
       (fun thname th acc ->
@@ -315,30 +318,23 @@ let why3_parse_theories theories =
      W.send (Theory(th_id, th_name));
      let subs = (Task.get_info th_id).Task.subtasks in
      W.send (UpdateStatus( (if subs == [] then StValid else StNew) , th_id));
-     List.iter (fun i -> why3_prove i) subs
+     List.iter (fun i -> why3_prove i ~steps) subs
     ) theories
 
 let why3_execute_one m rs =
   let open Expr in
-  let open Pinterp in
   let e_unit = e_exec (c_app (rs_tuple 0) [] [] (Ity.ity_tuple [])) in
   let (let_defn,pv) = let_var (Ident.id_fresh "o") e_unit in
   let e_rs_unit = e_exec (c_app rs [pv] [] rs.rs_cty.Ity.cty_result) in
   let expr = e_let let_defn e_rs_unit in
   let result =
     try
-      let reduce = rac_reduce_config_lit config env ~trans:"compute_in_goal" () in
-      let rac_config = rac_config ~do_rac:false ~abstract:false ~reduce () in
-      let res = eval_global_fundef rac_config env m [] None expr in
-      asprintf "returns %a" (report_eval_result expr) res
-    with
-    | Contr (ctx, term) ->
-        asprintf "has failed: %a" report_cntr_body (ctx, term)
-    | CannotCompute r ->
-        asprintf "cannot compute (%s)" r.reason
-    | RACStuck (_, l, _) ->
-        asprintf "got stuck at %a"
-          (Pp.print_option_or_default "unknown location" Pretty.print_loc') l in
+      let ctx = Pinterp.mk_ctx (Pinterp.mk_empty_env env m)
+          ~do_rac:false ~giant_steps:false () in
+      let res = Pinterp.exec_global_fundef ctx [] None expr in
+      asprintf "returns %a" (Pinterp.report_eval_result expr) res
+    with Pinterp_core.Incomplete r ->
+      asprintf "cannot compute (%s)" r in
   let {Theory.th_name = th} = m.Pmodule.mod_theory in
   let mod_name = th.Ident.id_string in
   let mod_loc = Opt.get_def Loc.dummy_position th.Ident.id_loc in
@@ -384,14 +380,14 @@ let why3_run f format lang code =
 		      (Printexc.to_string e)))
 
 let handle_message = function
-  | Transform (Split, id) -> why3_split id
+  | Transform (Split steps, id) -> why3_split steps id
   | Transform (Prove steps, id) -> why3_prove ~steps id
   | Transform (Clean, id) -> why3_clean id
   | ProveAll -> why3_prove_all ()
-  | ParseBuffer (format, code) ->
+  | ParseBuffer (format, code, steps) ->
       Task.clear_warnings ();
       Task.clear_table ();
-      why3_run why3_parse_theories format Env.base_language code
+      why3_run (why3_parse_theories steps) format Env.base_language code
   | ExecuteBuffer (format, code) ->
       Task.clear_warnings ();
       Task.clear_table ();

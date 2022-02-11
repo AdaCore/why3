@@ -99,7 +99,7 @@ module MakeOfMap (M: Extmap.S) = struct
   let add_left s e = M.add e () s
   let remove_left s e = M.remove e s
   let print print_elt fmt s =
-    if is_empty s then Format.fprintf fmt "{}" else begin
+    if is_empty s then Format.pp_print_string fmt "{}" else begin
       Format.fprintf fmt "@[<hov 2>{ ";
       Pp.print_iter1 iter Pp.comma print_elt fmt s;
       Format.fprintf fmt "}@]"

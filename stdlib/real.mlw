@@ -142,8 +142,7 @@ module Truncate
   use Real
   use FromInt
 
-  (** truncate: rounds towards zero *)
-
+  (** rounds towards zero *)
   function truncate real : int
 
   axiom Truncate_int :
@@ -169,10 +168,9 @@ module Truncate
   axiom Truncate_monotonic_int2:
     forall x:real, i:int. from_int i <= x -> Int.(<=) i (truncate x)
 
-  (** roundings up and down *)
-
   function floor real : int
   function ceil real : int
+  (** roundings up and down *)
 
   axiom Floor_int :
     forall i:int. floor (from_int i) = i

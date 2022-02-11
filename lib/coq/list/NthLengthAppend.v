@@ -22,6 +22,8 @@ Require option.Option.
 Require list.NthLength.
 Require list.Append.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Lemma nth_append_1 {a:Type} {a_WT:WhyType a} :
   forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a)
@@ -41,7 +43,7 @@ easy.
 intros _.
 apply IHl1.
 assert (i < 1 + Length.length l1)%Z by exact Hi.
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)
@@ -67,9 +69,9 @@ case Zeq_bool.
 intros Hi'.
 exfalso.
 generalize (Length.Length_nonnegative l1).
-omega.
+lia.
 intros _.
 apply IHl1.
-omega.
+lia.
 Qed.
 

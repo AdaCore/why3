@@ -64,9 +64,7 @@ let task2 = None
 let task2 = Task.add_param_decl task2 prop_var_A
 let task2 = Task.add_param_decl task2 prop_var_B
 (* BEGIN{ce_nobuiltin} *)
-let meta_ce = Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
-  ~desc:"Set@ when@ counter-example@ should@ be@ get."
-let task2 = Task.add_meta task2 meta_ce [Theory.MAstr ""]
+let task2 = Task.add_meta task2 Driver.meta_get_counterexmp [Theory.MAstr ""]
 (* END{ce_nobuiltin} *)
 let goal_id2 = Decl.create_prsymbol (Ident.id_fresh "goal2")
 let task2 = Task.add_prop_decl task2 Decl.Pgoal goal_id2 fmla2
@@ -79,6 +77,9 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 let config = Whyconf.init_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
+(* the library and data directories, from the config file *)
+let libdir = Whyconf.libdir main
+let datadir = Whyconf.datadir main
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
@@ -111,8 +112,11 @@ let cvc4_driver : Driver.driver =
 (* calls CVC4 *)
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
-    (Driver.prove_task ~limit:Call_provers.empty_limit
-                       ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
+    (Driver.prove_task
+       ~limit:Call_provers.empty_limit
+       ~libdir
+       ~datadir
+       ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
     cvc4_driver task2)
 
 (* BEGIN{ce_callprover} *)
@@ -122,10 +126,9 @@ let () = printf "@[On task 1, CVC4,1.7 answers %a@."
 
 let () = printf "Model is %t@."
     (fun fmt ->
-       match Counterexample.select_model_last_non_empty
+       match Check_ce.select_model_last_non_empty
                 result1.Call_provers.pr_models with
-       | Some m ->
-           Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None fmt m
+       | Some m -> Model_parser.print_model_json fmt m
        | None -> fprintf fmt "unavailable")
 (* END{ce_callprover} *)
 
@@ -162,23 +165,41 @@ let task =
   | [task] -> task
   | _ -> failwith "Not exactly one task"
 
-let pr =
+let {Call_provers.pr_models= models} =
   Call_provers.wait_on_call
     (Driver.prove_task ~limit:Call_provers.empty_limit
+       ~libdir
+       ~datadir
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
-    cvc4_driver task)
+       cvc4_driver task)
+
+let () = print_endline "\n== Check CE"
 
 (* BEGIN{check_ce} *)
 let () =
-  let reduce_config =
-    let trans = "compute_in_goal" and prover = "cvc4" and try_negate = true in
-    Pinterp.rac_reduce_config_lit ~trans ~prover ~try_negate config env () in
-  let check = true in
-  match Counterexample.select_model ~check ~reduce_config
-          env pm pr.Call_provers.pr_models with
-  | Some model_summary ->
-      printf "%a@." (Counterexample.print_counterexample
-                       ~check_ce:check ?verb_lvl:None ?json:None) model_summary
-  | None ->
-      printf "No model@."
+  let rac = Pinterp.mk_rac ~ignore_incomplete:false
+      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+  let model, clsf = Opt.get_exn (Failure "No good model found")
+      (Check_ce.select_model ~check_ce:true rac env pm models) in
+  printf "%a@." (Check_ce.print_model_classification
+                   ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
 (* END{check_ce} *)
+
+let () = print_endline "\n== RAC execute giant steps\n"
+
+(* BEGIN{check_ce_giant_step} *)
+let () =
+  let model = Opt.get_exn (Failure "No non-empty model")
+      (Check_ce.select_model_last_non_empty models) in
+  let loc = Opt.get_exn (Failure "No model term location")
+      (Model_parser.get_model_term_loc model) in
+  let rs = Opt.get_exn (Failure "No procedure symbol found")
+      (Check_ce.find_rs pm loc) in
+  let rac = Pinterp.mk_rac ~ignore_incomplete:false
+      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+  let oracle = Check_ce.oracle_of_model pm model in
+  let env = Pinterp.mk_empty_env env pm in
+  let ctx = Pinterp.mk_ctx env ~do_rac:true ~rac ~giant_steps:true ~oracle () in
+  let res = Check_ce.rac_execute ctx rs in
+  printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
+(* END{check_ce_giant_step} *)

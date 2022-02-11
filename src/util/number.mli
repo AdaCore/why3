@@ -9,9 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Format
-
 (** General functions for representations of numeric values *)
+
+open Format
 
 exception InvalidConstantLiteral of int * string
 

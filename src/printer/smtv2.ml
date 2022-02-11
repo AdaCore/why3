@@ -169,7 +169,8 @@ type info = {
   info_set_incremental: bool;
   info_supports_reason_unknown : bool;
   mutable info_labels: Sattr.t Mstr.t;
-  mutable incr_list: (prsymbol * term) list;
+  mutable incr_list_axioms: (prsymbol * term) list;
+  mutable incr_list_ldecls: (lsymbol * vsymbol list * term) list;
 }
 
 let debug_print_term message t =
@@ -182,12 +183,12 @@ let debug_print_term message t =
   end
 
 let print_ident info fmt id =
-  fprintf fmt "%s" (id_unique info.info_printer id)
+  pp_print_string fmt (id_unique info.info_printer id)
 
 (** type *)
 
 let print_tv info fmt tv =
-  fprintf fmt "%s" (id_unique info.info_printer tv.tv_name)
+  pp_print_string fmt (id_unique info.info_printer tv.tv_name)
 
 (** print `(par ...)` around the given body to print *)
 let print_par info (* body *) =
@@ -213,7 +214,7 @@ let rec print_type info fmt ty = match ty.ty_node with
   | Tyapp (ts, l) ->
       begin match query_syntax info.info_syn ts.ts_name, l with
       | Some s, _ -> syntax_arguments s (print_type info) fmt l
-      | None, [] -> fprintf fmt "%a" (print_ident info) ts.ts_name
+      | None, [] -> print_ident info fmt ts.ts_name
       | None, _ -> fprintf fmt "(%a %a)" (print_ident info) ts.ts_name
           (print_list space (print_type info)) l
      end
@@ -222,7 +223,7 @@ let print_type info fmt ty = try print_type info fmt ty
   with Unsupported s -> raise (UnsupportedType (ty,s))
 
 let print_type_value info fmt = function
-  | None -> fprintf fmt "Bool"
+  | None -> pp_print_string fmt "Bool"
   | Some ty -> print_type info fmt ty
 
 (** var *)
@@ -230,13 +231,16 @@ let forget_var info v = forget_id info.info_printer v.vs_name
 
 let print_var info fmt {vs_name = id} =
   let n = id_unique info.info_printer id in
-  fprintf fmt "%s" n
+  pp_print_string fmt n
 
 let print_typed_var info fmt vs =
   fprintf fmt "(%a %a)" (print_var info) vs
     (print_type info) vs.vs_ty
 
 let print_var_list info fmt vsl =
+  print_list space (print_var info) fmt vsl
+
+let print_typed_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
 let collect_model_ls info ls =
@@ -276,6 +280,20 @@ let escape c = match c with
   | '\000' .. '\031'
   | '\127' .. '\255' -> Format.sprintf "\\x%02X" (Char.code c)
 
+(* can the type of a value be derived from the type of the arguments? *)
+let unambig_fs version fs =
+  let rec lookup v ty = match ty.ty_node with
+    | Tyvar u when tv_equal u v -> true
+    | _ -> ty_any (lookup v) ty
+  in
+  let lookup v = List.exists (lookup v) fs.ls_args in
+  let rec inspect ty = match ty.ty_node with
+    | Tyvar u when not (lookup u) -> false
+    | _ -> ty_all inspect ty
+  in
+  match version with
+  | V20 | V26 -> true
+  | V26Par ->  inspect (Opt.get fs.ls_value)
 
 (** expr *)
 let rec print_term info fmt t =
@@ -336,20 +354,30 @@ let rec print_term info fmt t =
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		()
 	    end;
-	    fprintf fmt "@[%a@]" (print_ident info) ls.ls_name
+            if unambig_fs info.info_version ls then
+	      fprintf fmt "@[%a@]" (print_ident info) ls.ls_name
+            else
+              fprintf fmt "@[(as %a %a)@]" (print_ident info) ls.ls_name
+                (print_type info) (t_type t)
           | _ ->
-	    fprintf fmt "@[(%a@ %a)@]"
-	      (print_ident info) ls.ls_name
-              (print_list space (print_term info)) tl
-                end
+            if unambig_fs info.info_version ls then
+	      fprintf fmt "@[<hv2>(%a@ %a)@]"
+	        (print_ident info) ls.ls_name
+                (print_list space (print_term info)) tl
+            else
+              fprintf fmt "@[<hv2>((as %a@ %a)@ %a)@]"
+                (print_ident info) ls.ls_name
+                (print_type info) (t_type t)
+                (print_list space (print_term info)) tl
+        end
     end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
-      fprintf fmt "@[(let ((%a %a))@ %a)@]" (print_var info) v
+      fprintf fmt "@[<hv2>(let ((%a %a))@ %a)@]" (print_var info) v
         (print_term info) t1 (print_term info) t2;
       forget_var info v
   | Tif (f1,t1,t2) ->
-      fprintf fmt "@[(ite %a@ %a@ %a)@]"
+      fprintf fmt "@[<hv2>(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_term info) t1 (print_term info) t2
   | Tcase(t, bl) ->
     let ty = t_type t in
@@ -362,7 +390,7 @@ let rec print_term info fmt t =
         | Tvar v -> print_branches info v print_term fmt bl
         | _ ->
           let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-          fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+          fprintf fmt "@[<hv2>(let ((%a @[%a@]))@ %a)@]"
             (print_var info) subject (print_term info) t
             (print_branches info subject print_term) bl;
           forget_var info subject
@@ -391,7 +419,7 @@ and print_fmla info fmt f =
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] ->
               print_ident info fmt ls.ls_name
-          | _ -> fprintf fmt "(%a@ %a)"
+          | _ -> fprintf fmt "@[<hv2>(%a@ %a)@]"
               (print_ident info) ls.ls_name
               (print_list space (print_term info)) tl
         end end
@@ -401,38 +429,38 @@ and print_fmla info fmt f =
       (* TODO trigger dépend des capacités du prover : 2 printers?
       smtwithtriggers/smtstrict *)
       if tl = [] then
-        fprintf fmt "@[(%s@ (%a)@ %a)@]"
+        fprintf fmt "@[<hv2>(%s @[<h>(%a)@]@ %a)@]"
           q
-          (print_var_list info) vl
+          (print_typed_var_list info) vl
           (print_fmla info) f
       else
-        fprintf fmt "@[(%s@ (%a)@ (! %a %a))@]"
+        fprintf fmt "@[<hv2>(%s @[<h>(%a)@]@ (! %a %a))@]"
           q
-          (print_var_list info) vl
+          (print_typed_var_list info) vl
           (print_fmla info) f
           (print_triggers info) tl;
       List.iter (forget_var info) vl
   | Tbinop (Tand, f1, f2) ->
-      fprintf fmt "@[(and@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
+      fprintf fmt "@[<hv2>(and@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Tor, f1, f2) ->
-      fprintf fmt "@[(or@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
+      fprintf fmt "@[<hv2>(or@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Timplies, f1, f2) ->
-      fprintf fmt "@[(=>@ %a@ %a)@]"
+      fprintf fmt "@[<hv2>(=>@ %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Tiff, f1, f2) ->
-      fprintf fmt "@[(=@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
+      fprintf fmt "@[<hv2>(=@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Tnot f ->
-      fprintf fmt "@[(not@ %a)@]" (print_fmla info) f
+      fprintf fmt "@[<hv2>(not@ %a)@]" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tif (f1, f2, f3) ->
-      fprintf fmt "@[(ite %a@ %a@ %a)@]"
+      fprintf fmt "@[<hv2>(ite %a@ %a@ %a)@]"
         (print_fmla info) f1 (print_fmla info) f2 (print_fmla info) f3
   | Tlet (t1, tb) ->
       let v, f2 = t_open_bound tb in
-      fprintf fmt "@[(let ((%a %a))@ %a)@]" (print_var info) v
+      fprintf fmt "@[<hv2>(let ((%a %a))@ %a)@]" (print_var info) v
         (print_term info) t1 (print_fmla info) f2;
       forget_var info v
   | Tcase(t, bl) ->
@@ -446,7 +474,7 @@ and print_fmla info fmt f =
         | Tvar v -> print_branches info v print_fmla fmt bl
         | _ ->
           let subject = create_vsymbol (id_fresh "subject") (t_type t) in
-          fprintf fmt "@[(let ((%a @[%a@]))@ %a)@]"
+          fprintf fmt "@[<hv2>(let ((%a @[%a@]))@ %a)@]"
             (print_var info) subject (print_term info) t
             (print_branches info subject print_fmla) bl;
           forget_var info subject
@@ -467,7 +495,7 @@ and print_boolean_branches info subject pr fmt bl =
       match p1.pat_node with
       | Papp(cs,_) ->
         let csname = if ls_equal cs fs_bool_true then "true" else "false" in
-        fprintf fmt "@[(ite (= %a %s) %a %a)@]"
+        fprintf fmt "@[<hv2>(ite (= %a %s) %a %a)@]"
           (print_term info) subject
           csname
           (pr info) t1
@@ -491,9 +519,9 @@ and print_branches info subject pr fmt bl = match bl with
           else
             begin match info.info_version with
               | V20 | V26 (* It should be the same than V26Par but it was different *) ->
-                  fprintf fmt "@[(ite (is-%a %a) %a %a)@]"
+                  fprintf fmt "@[<hv2>(ite (is-%a %a) %a %a)@]"
               | V26Par ->
-                  fprintf fmt "@[(ite ((_ is %a) %a) %a %a)@]"
+                  fprintf fmt "@[<hv2>(ite ((_ is %a) %a) %a %a)@]"
             end
               (print_ident info) cs.ls_name (print_var info) subject
               (print_branch info subject pr) (cs,args,t)
@@ -509,12 +537,13 @@ and print_branch info subject pr fmt (cs,vars,t) =
     if Mvs.mem v tvs then fprintf fmt "(%a (%a_proj_%d %a))"
       (print_var info) v (print_ident info) cs.ls_name
       !i (print_var info) subject in
-  fprintf fmt "@[(let (%a) %a)@]" (print_list space pr_proj) vars (pr info) t
+  fprintf fmt "@[<hv2>(let (%a) %a)@]" (print_list space pr_proj) vars (pr info) t
 
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
-and print_trigger info fmt e = fprintf fmt "%a" (print_expr info) e
+and print_trigger info fmt e =
+  print_expr info fmt e
 
 and print_triggers info fmt = function
   | [] -> ()
@@ -538,27 +567,76 @@ let print_param_decl info fmt ls =
      *)
     | _  ->
         let tvs = Term.ls_ty_freevars ls in
-        fprintf fmt "@[<hov 2>(declare-fun %a %a)@]@\n@\n"
-          (print_ident info) ls.ls_name
+        fprintf fmt ";; %s@\n@[<v2>(declare-fun %a %a)@]@\n@\n"
+          ls.ls_name.id_string (print_ident info) ls.ls_name
           (print_par info
              (fun fmt -> Format.fprintf fmt "(%a) %a"
                  (print_list space (print_type info)) ls.ls_args
                  (print_type_value info) ls.ls_value)) tvs
 
-let print_logic_decl info fmt (ls,def) =
-  if Mid.mem ls.ls_name info.info_syn then () else begin
+let rec has_quantification f =
+  match f.t_node with
+  | Tquant _ | Teps _ -> true
+  | _ -> Term.t_any has_quantification f
+
+let print_logic_decl_aux flag info fmt (ls,def) =
+  if not (Mid.mem ls.ls_name info.info_syn) then begin
     collect_model_ls info ls;
     let vsl,expr = Decl.open_ls_defn def in
-    let tvs = Term.ls_ty_freevars ls in
-    fprintf fmt "@[<hov 2>(define-fun %a %a)@]@\n@\n"
-      (print_ident info) ls.ls_name
-      (print_par info
-         (fun fmt -> Format.fprintf fmt "(%a) %a %a"
-             (print_var_list info) vsl
-             (print_type_value info) ls.ls_value
-             (print_expr info) expr)) tvs;
-    List.iter (forget_var info) vsl
+    if info.info_incremental && has_quantification expr then begin
+      fprintf fmt ";; %s@\n@[<hov2>(declare-fun %a (%a) %a)@]@\n@\n"
+        ls.ls_name.id_string
+        (print_ident info) ls.ls_name
+        (print_list space (print_type info)) (List.map (fun vs -> vs.vs_ty) vsl)
+        (print_type_value info) ls.ls_value;
+      info.incr_list_ldecls <- (ls, vsl, expr) :: info.incr_list_ldecls
+    end else
+      let tvs = Term.ls_ty_freevars ls in
+      fprintf fmt ";; %s@\n@[<v2>(define-fun%s %a %a)@]@\n@\n"
+        ls.ls_name.id_string flag
+        (print_ident info) ls.ls_name
+        (print_par info
+           (fun fmt -> Format.fprintf fmt "@[<h>(%a) %a@]@ %a"
+               (print_typed_var_list info) vsl
+               (print_type_value info) ls.ls_value
+               (print_expr info) expr)) tvs;
+      List.iter (forget_var info) vsl
   end
+
+let print_logic_decl = print_logic_decl_aux ""
+
+let print_rec_logic_decl info fmt = function
+  | [] -> ()
+  | [ld] ->
+      print_logic_decl_aux "-rec" info fmt ld
+  | l ->
+      let l = List.map (fun (ls,def) ->
+          let vsl,expr = Decl.open_ls_defn def in
+          (ls,vsl,expr)
+        ) l
+      in
+      let print_decl fmt (ls,vsl,_) =
+        if Mid.mem ls.ls_name info.info_syn then () else begin
+          collect_model_ls info ls;
+          let tvs = Term.ls_ty_freevars ls in
+          fprintf fmt "@[<hov 2>(%a %a)@]@\n@\n"
+            (print_ident info) ls.ls_name
+            (print_par info
+               (fun fmt -> Format.fprintf fmt "(%a) %a"
+                   (print_typed_var_list info) vsl
+                   (print_type_value info) ls.ls_value)) tvs;
+        end
+      in
+      let print_term fmt (ls,_,expr) =
+        if Mid.mem ls.ls_name info.info_syn then () else begin
+          fprintf fmt "@[<hov 2>%a@]"
+            (print_expr info) expr
+        end
+      in
+      fprintf fmt "@[<hov 2>(define-funs-rec (%a) (%a))@]@\n@\n"
+        (print_list nothing print_decl) l
+        (print_list nothing print_term) l;
+      List.iter (fun (_,vsl,_) -> List.iter (forget_var info) vsl) l
 
 let print_info_model info =
   (* Prints the content of info.info_model *)
@@ -582,11 +660,11 @@ let print_info_model info =
 
 
 (* TODO factor out print_prop ? *)
-let print_prop info fmt pr f =
+let print_prop info fmt (pr, f) =
   let tvs = Term.t_ty_freevars Ty.Stv.empty f in
-  fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
+  fprintf fmt ";; %s@\n@[<hov 2>(assert@ %a)@]@\n@\n"
     pr.pr_name.id_string (* FIXME? collisions *)
-    (print_par info (fun fmt -> Format.fprintf fmt "%a" (print_fmla info) f)) tvs
+    (print_par info (fun fmt -> print_fmla info fmt f)) tvs
 
 let add_check_sat info fmt =
   if info.info_cntexample && info.info_cntexample_need_push then
@@ -595,49 +673,41 @@ let add_check_sat info fmt =
   if info.info_supports_reason_unknown then
     fprintf fmt "@[(get-info :reason-unknown)@]@\n";
   if info.info_cntexample then
-    fprintf fmt "@[(get-model)@]@\n"
+    fprintf fmt "@[(get-model)@]@\n@\n"
 
-let rec property_on_incremental2 _ f =
-  match f.t_node with
-  | Tquant _ -> true
-  | Teps _ -> true
-  | _ -> Term.t_fold property_on_incremental2 false f
-
-let property_on_incremental2 f =
-  property_on_incremental2 false f
+let print_ldecl_axiom info fmt (ls, vls, t) =
+  fprintf fmt ";; %s@\n" ls.ls_name.id_string;
+  fprintf fmt
+    "@[<hv2>(assert@ @[<hv2>(forall @[(%a)@]@ @[<hv2>(= @[<h>(%a %a)@]@ %a)@])@])@]@\n@\n"
+    (print_typed_var_list info) vls
+    (print_ident info) ls.ls_name
+    (print_var_list info) vls
+    (print_expr info) t
 
 (* TODO if the property doesnt begin with quantifier, then we print it first.
    Else, we print it afterwards. *)
 let print_incremental_axiom info fmt =
-  let l = info.incr_list in
-  List.iter (fun (pr, f) ->
-    if not (property_on_incremental2 f) then
-      print_prop info fmt pr f;
-            ) l;
-  add_check_sat info fmt;
-  List.iter (fun (pr, f) ->
-    if property_on_incremental2 f then
-      print_prop info fmt pr f)
-    l;
+  List.iter (print_prop info fmt) info.incr_list_axioms;
+  List.iter (print_ldecl_axiom info fmt) info.incr_list_ldecls;
   add_check_sat info fmt
 
-let print_prop_decl vc_loc vc_attrs args info fmt k pr f = match k with
+let print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f = match k with
   | Paxiom ->
-      if info.info_incremental then
-        info.incr_list <- (pr, f) :: info.incr_list
+      if info.info_incremental && has_quantification f then
+        info.incr_list_axioms <- (pr, f) :: info.incr_list_axioms
       else
-        print_prop info fmt pr f
+        print_prop info fmt (pr, f)
   | Pgoal ->
       let tvs = Term.t_ty_freevars Ty.Stv.empty f in
       if not (Ty.Stv.is_empty tvs) then unsupported "smt: monomorphise goal must be applied";
-      fprintf fmt "@[(assert@\n";
-      fprintf fmt "@[;; %a@]@\n" (print_ident info) pr.pr_name;
+      fprintf fmt ";; Goal %s@\n" pr.pr_name.id_string;
       (match pr.pr_name.id_loc with
         | None -> ()
-        | Some loc -> fprintf fmt " @[;; %a@]@\n"
+        | Some loc -> fprintf fmt ";; %a@\n"
             Loc.gen_report_position loc);
       info.info_in_goal <- true;
-      fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
+      fprintf fmt "@[(assert@\n";
+      fprintf fmt "  @[(not@ %a))@]@\n@\n" (print_fmla info) f;
       info.info_in_goal <- false;
       add_check_sat info fmt;
 
@@ -647,16 +717,16 @@ let print_prop_decl vc_loc vc_attrs args info fmt k pr f = match k with
 
       let model_list = print_info_model info in
 
-      args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-                                vc_term_loc = vc_loc;
-                                vc_term_attrs = vc_attrs;
-                                queried_terms = model_list;
-                                list_projections = info.list_projs;
-                                list_fields = info.list_field_def;
-                                Printer.list_records = info.list_records;
-                                noarg_constructors = info.noarg_constructors;
-                                set_str = info.info_labels;
-                              }
+      printing_info := Some {
+        vc_term_loc = vc_loc;
+        vc_term_attrs = vc_attrs;
+        queried_terms = model_list;
+        list_projections = info.list_projs;
+        list_fields = info.list_field_def;
+        Printer.list_records = info.list_records;
+        noarg_constructors = info.noarg_constructors;
+        set_str = info.info_labels;
+      }
   | Plemma -> assert false
 
 let print_constructor_decl info fmt (ls,args) =
@@ -723,7 +793,7 @@ let print_sort_decl info fmt (ts,_) =
     (print_ident info) ts.ts_name
     (List.length ts.ts_args)
 
-let print_decl vc_loc vc_attrs args info fmt d =
+let print_decl vc_loc vc_attrs printing_info info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
@@ -731,23 +801,34 @@ let print_decl vc_loc vc_attrs args info fmt d =
   | Ddata dl ->
       begin match info.info_version with
       | V20 ->
-          fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+          fprintf fmt "@[<v2>(declare-datatypes ()@ (%a))@]@\n@\n"
             (print_list space (print_data_decl info)) dl
       | V26 | V26Par ->
-          fprintf fmt "@[<v>(declare-datatypes (%a)@ (%a))@,@]"
+          fprintf fmt "@[<v2>(declare-datatypes (%a)@ (%a))@]@\n@\n"
             (print_list space (print_sort_decl info)) dl
             (print_list space (print_data_def info)) dl
       end
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
-  | Dlogic dl ->
-      print_list nothing (print_logic_decl info) fmt dl
+  | Dlogic dl -> begin
+      match info.info_version with
+      | V20 | V26 ->
+          print_list nothing (print_logic_decl info) fmt dl
+      | V26Par -> begin
+          match dl with
+          | ([(s,_) as dl])
+            when not (Sid.mem s.ls_name (get_decl_syms d)) ->
+              print_logic_decl info fmt dl
+          | dl ->
+              print_rec_logic_decl info fmt dl
+        end
+    end
   | Dind _ -> unsupportedDecl d
       "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl vc_loc vc_attrs args info fmt k pr f
+      print_prop_decl vc_loc vc_attrs printing_info info fmt k pr f
 
 let set_produce_models fmt info =
   if info.info_cntexample then
@@ -771,7 +852,7 @@ let meta_supports_reason_unknown =
 
 
 let print_task version args ?old:_ fmt task =
-  let cntexample = Inlining.get_counterexmp task in
+  let cntexample = Driver.get_counterexmp task in
   let incremental =
     let incr_meta = Task.find_meta_tds task meta_incremental in
     not (Theory.Stdecl.is_empty incr_meta.Task.tds_set)
@@ -811,7 +892,8 @@ let print_task version args ?old:_ fmt task =
     *)
     info_set_incremental = not need_push && incremental;
     info_supports_reason_unknown = supports_reason_unknown;
-    incr_list = [];
+    incr_list_axioms = [];
+    incr_list_ldecls = [];
     }
   in
   print_prelude fmt args.prelude;
@@ -823,7 +905,7 @@ let print_task version args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc vc_attrs args info fmt d
+            begin try print_decl vc_loc vc_attrs args.printing_info info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

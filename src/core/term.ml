@@ -412,7 +412,7 @@ let t_similar t1 t2 =
     | Ttrue, Ttrue | Tfalse, Tfalse -> true
     | _, _ -> false
 
-let t_hash ~trigger ~attr t =
+let t_hash ~trigger ~attr ~const t =
   let rec pat_hash bnd bv p = match p.pat_node with
     | Pwild -> bnd, bv, 0
     | Pvar v -> bnd + 1, Mvs.add v bnd bv, bnd + 1
@@ -449,7 +449,10 @@ let t_hash ~trigger ~attr t =
       | Trm (t,vml) ->
           begin match t.t_node with
           | Tvar v -> vs_hash v
-          | Tconst c -> Hashtbl.hash c
+          | Tconst c when const -> Hashtbl.hash c
+          | Tconst (Constant.ConstInt {Number.il_int = c}) -> Hashtbl.hash c
+          | Tconst (Constant.ConstReal {Number.rl_real = c}) -> Hashtbl.hash c
+          | Tconst (Constant.ConstStr c) -> Hashtbl.hash c
           | Tapp (s,l) ->
               Hashcons.combine_list (t_hash bnd vml) (ls_hash s) l
           | Tif (f,t,e) ->
@@ -498,7 +501,8 @@ let t_hash ~trigger ~attr t =
     end in
   t_hash 0 [] t
 
-let t_hash_generic ~trigger ~attr t = t_hash ~trigger ~attr t
+let t_hash_generic ~trigger ~attr ~const t =
+  t_hash ~trigger ~attr ~const t
 let t_compare_generic ~trigger ~attr ~loc ~const t1 t2=
   t_compare ~trigger ~attr ~loc ~const t1 t2
 let t_equal_generic ~trigger ~attr ~loc ~const t1 t2 =
@@ -520,11 +524,12 @@ let hterm_generic ~trigger ~attr ~loc ~const
     : (module (Exthtbl.S with type key = term)) =
   (module (Exthtbl.Make(struct
       type t = term
-      let hash t = t_hash ~trigger ~attr t
+      let hash t = t_hash ~trigger ~attr ~const t
       let equal t1 t2 = t_compare ~trigger ~attr ~loc ~const t1 t2 = 0
     end)))
 
-let t_hash_strict t = t_hash ~trigger:true ~attr:true t
+let t_hash_strict t =
+  t_hash ~trigger:true ~attr:true ~const:true t
 let t_equal_strict t1 t2 =
   t_compare ~trigger:true ~attr:true ~loc:true ~const:true t1 t2 = 0
 let t_compare_strict t1 t2 =
@@ -537,18 +542,19 @@ module Sterm_strict =
 module Hterm_strict=
   (val (hterm_generic ~trigger:true ~attr:true ~loc:true ~const:true))
 
-let t_hash t = t_hash ~trigger:false ~attr:false t
+let t_hash t =
+  t_hash ~trigger:false ~attr:false ~const:false t
 let t_equal t1 t2 =
-  t_compare ~trigger:false ~attr:false ~loc:false ~const:true t1 t2 = 0
+  t_compare ~trigger:false ~attr:false ~loc:false ~const:false t1 t2 = 0
 let t_compare t1 t2 =
-  t_compare ~trigger:false ~attr:false ~loc:false ~const:true t1 t2
+  t_compare ~trigger:false ~attr:false ~loc:false ~const:false t1 t2
 
 module Mterm =
-  (val (mterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+  (val (mterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
 module Sterm =
-  (val (sterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+  (val (sterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
 module Hterm =
-  (val (hterm_generic ~trigger:false ~attr:false ~loc:false ~const:true))
+  (val (hterm_generic ~trigger:false ~attr:false ~loc:false ~const:false))
 
 (* type checking *)
 
@@ -1619,23 +1625,45 @@ let small t = match t.t_node with
 *)
   | _ -> false
 
-let t_let_simp e ((v,b,t) as bt) =
+let v_copy_unused v =
+  let id = v.vs_name in
+  let attrs = Sattr.singleton Ident.unused_attr in
+  let attrs =
+    try
+      ignore (get_model_trace_attr ~attrs:id.id_attrs); attrs
+    with Not_found ->
+      Sattr.add (create_model_trace_attr id.id_string) attrs
+  in
+  let id' = id_derive ~attrs (id.id_string ^ unused_suffix) id in
+  create_vsymbol id' v.vs_ty
+
+let t_let_simp_keep_var ~keep e ((v,b,t) as bt) =
   let n = t_v_occurs v t in
   if n = 0 then
-    t_subst_unsafe b.bv_subst t else
+    let t = t_subst_unsafe b.bv_subst t in
+    if keep then t_let_close (v_copy_unused v) e t else t
+  else
   if n = 1 || small e then begin
     vs_check v e;
-    t_subst_unsafe (Mvs.add v e b.bv_subst) t
+    let t = t_subst_unsafe (Mvs.add v e b.bv_subst) t in
+    if keep then t_let_close (v_copy_unused v) e t else t
   end else
     t_let e bt
 
-let t_let_close_simp v e t =
+let t_let_simp = t_let_simp_keep_var ~keep:false
+
+let t_let_close_simp_keep_var ~keep v e t =
   let n = t_v_occurs v t in
-  if n = 0 then t else
+  if n = 0 then
+    if keep then t_let_close (v_copy_unused v) e t else t
+  else
   if n = 1 || small e then
-    t_subst_single v e t
+    let t = t_subst_single v e t in
+    if keep then t_let_close (v_copy_unused v) e t else t
   else
     t_let_close v e t
+
+let t_let_close_simp = t_let_close_simp_keep_var ~keep:false
 
 let t_case_simp t bl =
   let e0,tl = match bl with

@@ -29,7 +29,7 @@ module Make(S:sig
   (* utility function that make equivalent classes and
      sum the last component *)
   let sum_list l =
-    let sl = List.sort (fun (i, _) (j, _) -> compare i j) l in
+    let sl = List.sort (fun (i, _) (j, _) -> Var.compare i j) l in
     let rec merge = function
       | [] -> []
       | [b] -> [b]
@@ -84,10 +84,10 @@ module Make(S:sig
     build_var_pool_aux n |> VarPool.of_list
 
   let npool = 10
+  let var_npool = build_var_pool npool
 
   let create_manager () =
-    let var_pool = build_var_pool npool in
-    let vars = Array.of_list (VarPool.elements var_pool
+    let vars = Array.of_list (VarPool.elements var_npool
                               @ tmp_pool) in
     let variable_mapping = Hashtbl.create 512 in
     let apron_mapping = Mterm.empty in
@@ -104,7 +104,7 @@ module Make(S:sig
   let empty_uf_domain = {
     classes = Union_find.empty;
     uf_to_var = TermToVar.empty;
-    var_pool = build_var_pool npool;
+    var_pool = var_npool;
   }
 
   let bottom (man, uf_man) _ =
@@ -320,8 +320,7 @@ module Make(S:sig
       done;
     with Not_found ->
       assert (VarPool.is_empty (VarPool.inter uf_t.var_pool !var_pool));
-      assert (VarPool.equal (VarPool.union uf_t.var_pool !var_pool)
-                (build_var_pool npool))
+      assert (VarPool.equal (VarPool.union uf_t.var_pool !var_pool) var_npool)
 
   let join_uf (man, uf_man) uf_t1 uf_t2 dom_t =
     invariant_uf uf_t1;
@@ -807,10 +806,13 @@ module Make(S:sig
     if Ty.(ty_equal ty ty_bool) then
       match t.t_node with
       | Tconst (Constant.ConstInt n)
-           when BigInt.to_int n.il_int = 1 -> t_bool_true
+           when BigInt.to_int n.Number.il_int = 1 -> t_bool_true
       | Tconst (Constant.ConstInt n)
-           when BigInt.to_int n.il_int = 0 -> t_bool_false
-      | _ -> assert false
+           when BigInt.to_int n.Number.il_int = 0 -> t_bool_false
+      | _ ->
+         Format.eprintf "[Uf_domain.adjust_term] Warning: unexpected Boolean term: '%a'@."
+           Pretty.print_term t;
+         t (* was : assert false *)
     else t
 
   let rec forget_term (man, uf_man) t =

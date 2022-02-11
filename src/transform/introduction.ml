@@ -15,6 +15,7 @@
   for finding the right function in the Why3 API
 *)
 
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -137,11 +138,18 @@ let intro_var (subst, mal) (vs, id) =
   let subst = Mvs.add vs (fs_app ls [] vs.vs_ty) subst in
   (subst, mal), create_param_decl ls
 
-let get_expls f =
-  Sattr.filter (fun a -> Strings.has_prefix "expl:" a.attr_string) f.t_attrs
+let pushed_attr_prefixes = ref ["expl:"; "hyp_name:"]
 
-let get_hyp_names f =
-  Sattr.filter (fun a -> Strings.has_prefix "hyp_name:" a.attr_string) f.t_attrs
+let push_attributes_with_prefix s =
+  pushed_attr_prefixes := s :: !pushed_attr_prefixes
+
+let pushed_attrs f =
+  let add_by_prefix a pushed =
+    let has_prefix s = Strings.has_prefix s a.attr_string in
+    match List.find_opt has_prefix !pushed_attr_prefixes with
+    | Some s -> Mstr.add s a pushed
+    | None -> pushed in
+  Sattr.fold add_by_prefix f.t_attrs Mstr.empty
 
 (* Check if we already have a proposition with the same content.
    If we have a hash-consed one, and it is not yet used in the task,
@@ -159,16 +167,9 @@ let pr_of_premise f =
   let nm = Opt.get_def "H" nm in
   create_prsymbol (id_fresh nm ~attrs:intro_attrs)
 
-let rec intros kn pr axs mal (expl, hyp_name) f =
-  let aux_move attrs fattrs = (* attrs may be [expl] or [hyp_name] *)
-    let attrs = if Sattr.is_empty fattrs then attrs else fattrs in
-    let move f =
-      if Sattr.is_empty fattrs && not (Sattr.is_empty attrs)
-      then t_attr_add (Sattr.min_elt attrs) f else f in
-    attrs, move in
-  let expl, move_expl = aux_move expl (get_expls f) in
-  let hyp_name, move_hyp_name = aux_move hyp_name (get_hyp_names f) in
-  let move_attrs f = move_expl (move_hyp_name f) in
+let rec intros kn pr axs mal old_pushed f =
+  let pushed = Mstr.union (fun _ _ a -> Some a) old_pushed (pushed_attrs f) in
+  let move_attrs f = Mstr.fold (fun _ -> t_attr_add) pushed f in
   match f.t_node with
   (* (f2 \/ True) => _ *)
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },_)
@@ -199,7 +200,7 @@ let rec intros kn pr axs mal (expl, hyp_name) f =
         | Theory.MApr _ :: mal -> mal
         | _ -> mal in
       let _,axs,dl = List.fold_left add (Mvs.empty,axs,[]) fl in
-      List.rev_append dl (intros kn pr axs mal (expl, hyp_name) f2)
+      List.rev_append dl (intros kn pr axs mal pushed f2)
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
       let vsl = List.combine vsl (t_peek_quant fq) in
@@ -207,13 +208,13 @@ let rec intros kn pr axs mal (expl, hyp_name) f =
         Lists.map_fold_left intro_var (Mvs.empty, mal) vsl in
       (* preserve attributes and location of f  *)
       let f = t_attr_copy f (t_subst subst f_t) in
-      dl @ intros kn pr axs mal (expl, hyp_name) f
+      dl @ intros kn pr axs mal pushed f
   | Tlet (t,fb) ->
       let vs, f = t_open_bound fb in
       let ls, mal = ls_of_vs mal vs (t_peek_bound fb) in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
-      d :: intros kn pr axs mal (expl, hyp_name) f
+      d :: intros kn pr axs mal pushed f
   | _ -> [create_prop_decl Pgoal pr (move_attrs f)]
 
 let intros kn mal pr f =
@@ -223,7 +224,7 @@ let intros kn mal pr f =
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   let f = t_ty_subst subst Mvs.empty f in
-  let dl = intros kn pr Sdecl.empty mal (Sattr.empty, Sattr.empty) f in
+  let dl = intros kn pr Sdecl.empty mal Mstr.empty f in
   Mtv.values decls @ dl
 
 let rec introduce hd =
@@ -270,7 +271,8 @@ let rec generalize hd =
   | Theory.Decl {d_node = Dprop (Pgoal,pr,f)} ->
       let pl, task = apply_prev generalize hd in
       if pl = [] then [], Some hd else
-      let expl = get_expls f in
+      let pushed = pushed_attrs f in
+      let f = Mstr.fold (fun _ -> t_attr_remove) pushed f in
       let set_vs vs ls f =
         t_replace (t_app ls [] ls.ls_value) (t_var vs) f in
       let rewind (vl,f) d = match d.d_node with
@@ -289,8 +291,7 @@ let rec generalize hd =
         | _ -> assert false (* never *) in
       let vl, f = List.fold_left rewind ([],f) pl in
       let f = t_forall_close vl [] f in
-      let f = if Sattr.is_empty expl then f else
-              t_attr_add  (Sattr.min_elt expl) f in
+      let f = Mstr.fold (fun _ -> t_attr_add) pushed f in
       [], Task.add_decl task (create_prop_decl Pgoal pr f)
   | Theory.Decl ({d_node =
       ( Dparam ({ls_args = []; ls_value = Some ty} as ls)

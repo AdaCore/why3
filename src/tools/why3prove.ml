@@ -30,7 +30,6 @@ let opt_metas = ref []
 let opt_json : [< `All | `Values ] option ref = ref None
 let opt_check_ce_model = ref false
 let opt_rac_prover = ref None
-let opt_rac_try_negate = ref false
 let opt_rac_timelimit = ref None
 let opt_rac_steplimit = ref None
 let opt_ce_check_verbosity = ref None
@@ -85,7 +84,11 @@ let add_opt_goal x =
   let l = Strings.split '.' x in
   Queue.push (x, l) glist
 
-let add_opt_trans x = opt_trans := x::!opt_trans
+let add_opt_trans x =
+  match String.split_on_char ' ' x with
+  | [] -> assert false
+  | name :: args ->
+      opt_trans := (name, args) :: !opt_trans
 
 let add_opt_meta meta =
   let meta_name, meta_arg =
@@ -177,11 +180,8 @@ let option_list =
      (RAC)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     "<prover> use <prover> to check assertions in RAC when term\n\
-     reduction is insufficient, with optional, comma-\n\
-     separated time and memory limit (e.g. 'cvc4,2,1000')";
-    KLong "rac-try-negate", Hnd0 (fun () -> opt_rac_try_negate := true),
-    " try checking the negated term using the RAC prover when\n\
-     the prover is defined and didn't give a result";
+     reduction is insufficient, with optional, space-\n\
+     separated time and memory limit (e.g. 'cvc4 2 1000')";
     KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
     "<seconds> Time limit in seconds for RAC (with --check-ce)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
@@ -315,18 +315,28 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
   match json with
   | Some `All ->
     let open Json_base in
-    let print_loc fmt (loc, fname) =
+    let loc =
       match loc with
-      | None -> fprintf fmt "{%a}" (print_json_field "filename" print_json) (String fname)
-      | Some loc -> Pretty.print_json_loc fmt loc in
-    let print_term fmt (loc, fname, goal_name, expls) =
-      fprintf fmt "@[@[<hv1>{%a;@ %a;@ %a@]}@]"
-        (print_json_field "loc" print_loc) (loc, fname)
-        (print_json_field "goal_name" print_json) (String goal_name)
-        (print_json_field "explanations" print_json) (List (List.map (fun s -> String s) expls)) in
-    fprintf fmt "@[@[<hv1>{%a;@ %a@]}@]"
-      (print_json_field "term" print_term) (loc, fname, goal_name, expls)
-      (print_json_field "prover-result" (Call_provers.print_prover_result ~json:true)) res
+      | None -> Record ["filename", String fname]
+      | Some loc ->
+          let f, l, b, e = Loc.get loc in
+          Record [
+              "filename", String f;
+              "line", Int l;
+              "start-char", Int b;
+              "end-char", Int e
+            ] in
+    let term =
+      Record [
+          "loc", loc;
+          "goal_name", String goal_name;
+          "explanations", List (List.map (fun s -> String s) expls)
+        ] in
+    print_json fmt
+      (Record [
+           "term", term;
+           "prover-result", Call_provers.json_prover_result res
+         ])
   | None | Some `Values as json ->
     ( match loc with
       | None -> fprintf fmt "File %s:@\n" fname
@@ -340,11 +350,10 @@ let print_result ?json fmt (fname, loc, goal_name, expls, res, ce) =
           expls goal_name );
     fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
       (Call_provers.print_prover_result ~json:false) res;
-    (match ce with
-     | Some ce ->
-        Counterexample.print_counterexample ?verb_lvl:!opt_ce_check_verbosity
-          ~check_ce:!opt_check_ce_model ?json fmt ce
-     | None -> ());
+    Opt.iter
+      (Check_ce.print_model_classification ?json
+         ?verb_lvl:!opt_ce_check_verbosity ~check_ce:!opt_check_ce_model fmt)
+      ce;
     fprintf fmt "@\n"
 
 let unproved = ref false
@@ -353,32 +362,30 @@ let select_ce env th models =
   if models <> [] then
     match Pmodule.restore_module th with
     | pm ->
-        let reduce_config =
-          Pinterp.rac_reduce_config_lit config env
-            ~trans:"compute_in_goal" ?prover:!opt_rac_prover
-            ~try_negate:!opt_rac_try_negate () in
+        let rac = Pinterp.mk_rac ~ignore_incomplete:false
+            (Rac.Why.mk_check_term_lit config env ?why_prover:!opt_rac_prover ()) in
         let timelimit = Opt.map float_of_int !opt_rac_timelimit in
-        Counterexample.select_model ~reduce_config ?timelimit
-          ?steplimit:!opt_rac_steplimit ~check:!opt_check_ce_model
-          ?verb_lvl:!opt_ce_check_verbosity env pm models
+        Check_ce.select_model
+          ?timelimit ?steplimit:!opt_rac_steplimit ?verb_lvl:!opt_ce_check_verbosity
+          ~check_ce:!opt_check_ce_model rac env pm models
     | exception Not_found -> None
   else None
 
-let print_other_models (m, ce_summary) =
+let print_other_models (m, (c, log)) =
   let print_model fmt m =
     let print_attrs = Debug.(test_flag (lookup_flag "print_model_attrs"))  in
     if !opt_json = None then Model_parser.print_model_human fmt m ~print_attrs
     else Model_parser.print_model (* json values *) fmt m ~print_attrs in
-  ( match ce_summary with
-    | Counterexample.(NC _ | SW _ | NCSW _ | BAD) ->
+  ( match c with
+    | Check_ce.(NC | SW | NC_SW | BAD_CE _) ->
         if Debug.test_flag debug_print_original_model then
           printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
     | _ -> () );
-  ( match ce_summary with
-    | Counterexample.(NC log | SW log | NCSW log) ->
+  ( match c with
+    | Check_ce.(NC | SW | NC_SW) ->
         if Debug.test_flag debug_print_derived_model then
           printf "@[<v>Derived model:@\n%a@]@\n@." print_model
-            (Counterexample.model_of_exec_log ~original_model:m log)
+            (Check_ce.model_of_exec_log ~original_model:m log)
     | _ -> () )
 
 let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
@@ -388,9 +395,13 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
     { limit_time = timelimit;
       limit_mem = memlimit;
       limit_steps = stepslimit } in
+  let libdir = Config.libdir in
+  let datadir = Config.datadir in
   match !opt_output, !opt_command with
     | None, Some command ->
-        let call = Driver.prove_task ~command ~limit drv task in
+        let call =
+          Driver.prove_task ~command ~libdir ~datadir ~limit drv task
+        in
         let res = wait_on_call call in
         let ce = select_ce env th res.pr_models in
         let t = task_goal_fmla task in
@@ -405,16 +416,18 @@ let do_task env drv fname tname (th : Theory.theory) (task : Task.task) =
     | Some dir, _ -> output_task drv fname tname th task dir
 
 let do_tasks env drv fname tname th task =
-  let lookup acc t =
-    (try Trans.singleton (Trans.lookup_transform t env) with
-       Trans.UnknownTrans _ -> Trans.lookup_transform_l t env) :: acc
-  in
-  let trans = List.fold_left lookup [] !opt_trans in
-  let apply tasks tr =
-    List.rev (List.fold_left (fun acc task ->
-      List.rev_append (Trans.apply tr task) acc) [] tasks)
-  in
-  let tasks = List.fold_left apply [task] trans in
+  let table = Args_wrapper.build_naming_tables task in
+  let rec apply tasks = function
+    | [] -> tasks
+    | (name, args) :: trans ->
+        let apply_trans =
+          if args = [] then
+            Trans.apply_transform name env
+          else
+            let ffmt = Env.get_format ?format:!opt_parser fname in
+            Trans.apply_transform_args name env args table ffmt in
+        apply (List.concat (List.map apply_trans tasks)) trans in
+  let tasks = apply [task] !opt_trans in
   List.iter (do_task env drv fname tname th) tasks
 
 let do_theory env drv fname tname th glist elist =

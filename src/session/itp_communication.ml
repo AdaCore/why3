@@ -154,21 +154,21 @@ let print_request fmt r =
   | Set_prover_policy(p1,p2)        ->
      fprintf fmt "set prover policy %a -> %a" Whyconf.print_prover p1
              Whyconf.print_prover_upgrade_policy p2
-  | Get_file_contents _f            -> fprintf fmt "get file contents"
-  | Get_first_unproven_node (_,_nid)-> fprintf fmt "get first unproven node"
-  | Find_ident_req _                -> fprintf fmt "find ident"
+  | Get_file_contents _f            -> pp_print_string fmt "get file contents"
+  | Get_first_unproven_node (_,_nid)-> pp_print_string fmt "get first unproven node"
+  | Find_ident_req _                -> pp_print_string fmt "find ident"
   | Get_task(nid,b,loc)             -> fprintf fmt "get task(%d,%b,%b)" nid b loc
-  | Remove_subtree _nid             -> fprintf fmt "remove subtree"
-  | Copy_paste _                    -> fprintf fmt "copy paste"
-  | Save_file_req _                 -> fprintf fmt "save file"
-  | Unfocus_req                     -> fprintf fmt "unfocus"
-  | Save_req                        -> fprintf fmt "save"
-  | Reload_req                      -> fprintf fmt "reload"
-  | Check_need_saving_req           -> fprintf fmt "check need saving"
-  | Exit_req                        -> fprintf fmt "exit"
-  | Interrupt_req                   -> fprintf fmt "interrupt"
-  | Reset_proofs_req                -> fprintf fmt "reset proofs"
-  | Get_global_infos                -> fprintf fmt "get_global_infos"
+  | Remove_subtree _nid             -> pp_print_string fmt "remove subtree"
+  | Copy_paste _                    -> pp_print_string fmt "copy paste"
+  | Save_file_req _                 -> pp_print_string fmt "save file"
+  | Unfocus_req                     -> pp_print_string fmt "unfocus"
+  | Save_req                        -> pp_print_string fmt "save"
+  | Reload_req                      -> pp_print_string fmt "reload"
+  | Check_need_saving_req           -> pp_print_string fmt "check need saving"
+  | Exit_req                        -> pp_print_string fmt "exit"
+  | Interrupt_req                   -> pp_print_string fmt "interrupt"
+  | Reset_proofs_req                -> pp_print_string fmt "reset proofs"
+  | Get_global_infos                -> pp_print_string fmt "get_global_infos"
 
 let print_msg fmt m =
   match m with
@@ -180,11 +180,11 @@ let print_msg fmt m =
   | Query_Info (_ids, s)                         -> fprintf fmt "query info %s" s
   | Query_Error (_ids, s)                        -> fprintf fmt "query error %s" s
   | Information s                                -> fprintf fmt "info %s" s
-  | Task_Monitor _                               -> fprintf fmt "task montor"
+  | Task_Monitor _                               -> pp_print_string fmt "task montor"
   | Parse_Or_Type_Error (_, _, s)                -> fprintf fmt "parse_or_type_error:\n %s" s
   | File_Saved s                                 -> fprintf fmt "file saved %s" s
-  | Error s                                      -> fprintf fmt "%s" s
-  | Open_File_Error s                            -> fprintf fmt "%s" s
+  | Error s                                      -> pp_print_string fmt s
+  | Open_File_Error s                            -> pp_print_string fmt s
 
 (* TODO ad hoc printing. Should reuse print_loc. *)
 let print_loc fmt (loc: Loc.position) =
@@ -199,7 +199,7 @@ let _print_list_loc fmt l =
 
 let print_notify fmt n =
   match n with
-  | Reset_whole_tree -> fprintf fmt "reset whole tree"
+  | Reset_whole_tree -> pp_print_string fmt "reset whole tree"
   | Node_change (ni, nf) ->
       begin
         match nf with
@@ -210,16 +210,16 @@ let print_notify fmt n =
                    ni Controller_itp.print_status st b
       end
   | New_node (ni, pni, _nt,  _nf, _d) -> fprintf fmt "new node = %d, parent = %d" ni pni
-  | Remove _ni                        -> fprintf fmt "remove"
+  | Remove _ni                        -> pp_print_string fmt "remove"
   | Next_Unproven_Node_Id (ni, nj)    -> fprintf fmt "next unproven node_id from %d is %d" ni nj
-  | Initialized _gi                   -> fprintf fmt "initialized"
+  | Initialized _gi                   -> pp_print_string fmt "initialized"
   | Saving_needed b                   -> fprintf fmt "saving needed=%b" b
-  | Saved                             -> fprintf fmt "saved"
+  | Saved                             -> pp_print_string fmt "saved"
   | Message msg                       ->
       print_msg fmt msg
   | Dead s                            -> fprintf fmt "dead :%s" s
   | File_contents (f, _s, _, _)       -> fprintf fmt "file contents %s" f
-  | Source_and_ce (_, _list_loc, _gl, _) -> fprintf fmt "source and ce"
+  | Source_and_ce (_, _list_loc, _gl, _) -> pp_print_string fmt "source and ce"
   | Task (ni, _s, list_loc, g_loc, _lang) ->
       fprintf fmt "task for node_ID %d which contains a list of %d locations. Goal_location = %a"
         ni (List.length list_loc)

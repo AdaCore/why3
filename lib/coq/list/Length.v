@@ -16,6 +16,8 @@ Require BuiltIn.
 Require int.Int.
 Require list.List.
 
+Require Import Lia.
+
 (* Why3 assumption *)
 Fixpoint length {a:Type} {a_WT:WhyType a}
   (l:Init.Datatypes.list a) {struct l}: Numbers.BinNums.Z :=
@@ -54,6 +56,6 @@ unfold length. fold length.
 intros H.
 exfalso.
 generalize (Length_nonnegative t).
-omega.
+lia.
 Qed.
 

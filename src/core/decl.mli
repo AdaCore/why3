@@ -168,6 +168,7 @@ exception DuplicateRecordField of lsymbol
 val decl_map : (term -> term) -> decl -> decl
 
 val decl_fold : ('a -> term -> 'a) -> 'a -> decl -> 'a
+(** open recursion style. Need a Why3.Term.fold for looking at subterms *)
 
 val decl_map_fold : ('a -> term -> 'a * term) -> 'a -> decl -> 'a * decl
 

@@ -72,7 +72,7 @@ let option_list =
     " replay only if session is obsolete";
     KLong "merging-only", Hnd0 (fun () -> opt_merging_only := true),
     " check merging of session";
-    Key ('P', "prove"),
+    Key ('P', "prover"),
     Hnd1 (AString, fun s -> opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
     "<prover> restrict replay to given prover";
     KLong "smoke-detector", HndOpt (ASymbol ["none";"top";"deep"], set_opt_smoke),

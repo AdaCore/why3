@@ -438,7 +438,7 @@ val clone_post_result :
 val result_id :
   ?loc:Loc.position -> ?attrs:Sattr.t -> ?ql:post list -> unit -> preid
 (** [result_id ?loc ?ql ()] returns a fresh pre-identifier whose name
-   is appropriately chosen with respect to the optionality given list
+   is appropriately chosen with respect to the optionally given list
    of post-conditions (["result"] by default, as hard-coded in this
    module implementation). *)
 

@@ -22,7 +22,7 @@ let print_option f fmt = function
   | Some x -> f fmt x
 
 let print_option_or_default default f fmt = function
-  | None -> fprintf fmt "%s" default
+  | None -> pp_print_string fmt default
   | Some x -> f fmt x
 
 let rec print_list_pre sep print fmt = function
@@ -39,7 +39,7 @@ let print_list sep print fmt = function
   | x :: r -> print fmt x; print_list_pre sep print fmt r
 
 let print_list_or_default default sep print fmt = function
-  | [] -> fprintf fmt "%s" default
+  | [] -> pp_print_string fmt default
   | l -> print_list sep print fmt l
 
 let print_list_par sep pr fmt l =
@@ -92,9 +92,9 @@ let empty_formatted : formatted = ""
 let dot fmt () = fprintf fmt ".@ "
 let comma fmt () = fprintf fmt ",@ "
 let star fmt () = fprintf fmt "*@ "
-let simple_comma fmt () = fprintf fmt ", "
-let underscore fmt () = fprintf fmt "_"
-let slash fmt () = fprintf fmt "/"
+let simple_comma fmt () = pp_print_string fmt ", "
+let underscore fmt () = pp_print_string fmt "_"
+let slash fmt () = pp_print_string fmt "/"
 let semi fmt () = fprintf fmt ";@ "
 let colon fmt () = fprintf fmt ":@ "
 let space fmt () = fprintf fmt "@ "
@@ -104,14 +104,14 @@ let equal fmt () = fprintf fmt "@ =@ "
 let newline fmt () = fprintf fmt "@\n"
 let newline2 fmt () = fprintf fmt "@\n@\n"
 let arrow fmt () = fprintf fmt "@ -> "
-let lbrace fmt () = fprintf fmt "{"
-let rbrace fmt () = fprintf fmt "}"
-let lsquare fmt () = fprintf fmt "["
-let rsquare fmt () = fprintf fmt "]"
-let lparen fmt () = fprintf fmt "("
-let rparen fmt () = fprintf fmt ")"
-let lchevron fmt () = fprintf fmt "<"
-let rchevron fmt () = fprintf fmt ">"
+let lbrace fmt () = pp_print_string fmt "{"
+let rbrace fmt () = pp_print_string fmt "}"
+let lsquare fmt () = pp_print_string fmt "["
+let rsquare fmt () = pp_print_string fmt "]"
+let lparen fmt () = pp_print_string fmt "("
+let rparen fmt () = pp_print_string fmt ")"
+let lchevron fmt () = pp_print_string fmt "<"
+let rchevron fmt () = pp_print_string fmt ">"
 let nothing _fmt _ = ()
 let string = pp_print_string
 let float = pp_print_float

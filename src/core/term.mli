@@ -147,14 +147,15 @@ and trigger = term list list
 (** {2 Generic term equality} *)
 
 (**   flags enable comparison of the respective feature:
-  - [trigger]: triggers in qauntified terms
+  - [trigger]: triggers in quantified terms
   - [attr]: attributes
   - [loc]: source locations
-  - [const]: when false constants of the same mathematical
-  value are considered equal
+  - [const]: when false, mathematically equal constants are considered equal,
+    even if written differently
 *)
 
-val t_hash_generic : trigger:bool -> attr:bool -> term -> int
+val t_hash_generic :
+  trigger:bool -> attr:bool -> const:bool -> term -> int
 val t_compare_generic :
   trigger:bool -> attr:bool -> loc:bool -> const:bool
                -> term -> term -> int
@@ -182,7 +183,7 @@ module Mterm_strict : Extmap.S with type key = term
 module Sterm_strict : Extset.S with type M.key = term
 module Hterm_strict : Exthtbl.S with type key = term
 
-(** {2 Term equality modulo alpha-equivalence, attributes, triggers, and locations} *)
+(** {2 Term equality modulo alpha-equivalence, attributes, triggers, locations, and constant syntax} *)
 
 val t_equal : term -> term -> bool
 val t_compare : term -> term -> int
@@ -308,8 +309,23 @@ val t_attr_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
 
+val t_let_close_simp : vsymbol -> term -> term -> term
+(** [t_let_close_simp v t1 t2] constructs the term [let v=t1
+   in t2] but if the term [t1] is simple enough, then it produces the
+   equivalent term [t2[v<-t2]] instead.  *)
+
+val t_let_close_simp_keep_var : keep:bool -> vsymbol -> term -> term -> term
+(** [t_let_close_simp_keep_var v t1 t2] does the same as
+   [t_let_close_simp] but when the second term is simple enough and
+   [keep] is true, it produces the term [let v=t1 in t2[v<-t2]],
+   keeping thus the variable [v] even if it is not used after the [in]
+   *)
+
 val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
+(** similar to [t_let_close_simp] but on a [term_bound] *)
+val t_let_simp_keep_var : keep:bool -> term -> term_bound -> term
+(** similar to [t_let_close_simp_keep_var] but on a [term_bound] *)
 val t_case_simp : term -> term_branch list -> term
 val t_quant_simp : quant -> term_quant -> term
 val t_forall_simp : term_quant -> term
@@ -328,7 +344,6 @@ val t_and_asym_simp_l : term list -> term
 val t_or_asym_simp : term -> term -> term
 val t_or_asym_simp_l : term list -> term
 
-val t_let_close_simp : vsymbol -> term -> term -> term
 val t_case_close_simp : term -> (pattern * term) list -> term
 val t_quant_close_simp : quant -> vsymbol list -> trigger -> term -> term
 val t_forall_close_simp : vsymbol list -> trigger -> term -> term
@@ -525,7 +540,7 @@ val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
     the same renaming is simultaneously applied to the variables of
     the substitution [mv] (both domain and codomain).
     Example: [t_subst_types {'a -> int} {x:'a -> t:'a} (f x)]
-       returns ({z:int -> t:int},(f z))   *)
+       returns [({z:int -> t:int},(f z))]   *)
 
 (** {2 Find free variables and type variables} *)
 

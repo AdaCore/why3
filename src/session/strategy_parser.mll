@@ -94,6 +94,7 @@
       match s with
       | "%t" -> None
       | "%m" -> None
+      | "%s" -> None
       | _ ->
           error "unable to parse %s argument '%s'" msg s
 
@@ -116,6 +117,7 @@ let call = 'c' | "call"
 let transform = 't' | "transform"
 let timelimit = integer | "%t"
 let memlimit = integer | "%m"
+let steplimit = integer | "%s"
 
 rule scan code = parse
   | space+
@@ -129,6 +131,7 @@ rule scan code = parse
       { add_instr code (Igoto (find_label code id));
         scan code lexbuf }
   | call space+ (ident as p) space+ (timelimit as t) space+ (memlimit as m)
+         (space+ (steplimit as s))?
       { let p = prover code p in
         let t = integer "timelimit" t in
         if t <> None && Opt.get t <= 0 then
@@ -136,7 +139,10 @@ rule scan code = parse
         let m = integer "memlimit" m in
         if m <> None && Opt.get m <= 0 then
           error "memlimit %d is invalid" (Opt.get m);
-        add_instr code (Icall_prover (p.Whyconf.prover, t, m));
+        let s = integer "steplimit" (Opt.get_def "%s" s) in
+        if s <> None && Opt.get s < 0 then
+          error "steplimit %d is invalid" (Opt.get s);
+        add_instr code (Icall_prover (p.Whyconf.prover, t, m, s));
         scan code lexbuf }
   | transform space+ (ident as t) space+ (ident as l)
       { transform code t;

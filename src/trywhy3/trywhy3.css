@@ -268,7 +268,7 @@ body {
     z-index:102;
     flex-grow:0;
     box-shadow:0pt 0pt 5pt #333;
-    padding: 1em;
+    padding: 2em;
 }
 
 #why3-dialog-panel .why3-dialog div.why3-widget {
@@ -296,6 +296,7 @@ body {
     padding-left:1em;
     padding-top:1em;
 }
+
 /* tasks icons */
 .why3-task-pending {
     color: blue;
@@ -308,6 +309,13 @@ body {
 }
 .why3-task-selected {
     background:rgba(250,220,90,0.7);
+}
+
+.why3-task-button-i:hover {
+    color:black;
+    transform: scale(1.2);
+    -webkit-transform: scale(1.2); /* Safari */
+    -ms-transform: scale(1.2);     /* IE */
 }
 
 /* ACE Editor */
@@ -373,6 +381,18 @@ body {
     background-image: linear-gradient(to bottom, #eee, #ccc);
     border-radius:3pt;
     border: solid 1pt #aaa;
+}
+
+.why3-button:hover {
+  background-image: linear-gradient(to bottom, rgb(196, 196, 196), rgb(160, 160, 160))
+}
+
+.why3-button:active {
+  background-image: linear-gradient(to bottom, rgb(160, 160, 160), rgb(116, 116, 116))
+}
+
+.why3-button.why3-inactive:hover {
+  background-image: linear-gradient(to bottom, #eee, #ccc);
 }
 
 .why3-button,

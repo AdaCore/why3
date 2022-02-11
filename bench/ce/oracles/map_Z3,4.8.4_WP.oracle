@@ -1,7 +1,7 @@
 Weakest Precondition
 File "bench/ce/map.mlw", line 8, characters 14-28:
 Sub-goal Postcondition of goal test_map'vc.
-Prover result is: Unknown (sat)
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File map.mlw:
@@ -16,6 +16,14 @@ File map.mlw:
               "val":
                [{"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "7"},
+                 "value": {"type": "Integer", "val": "8"}},
+                {"indice": {"type": "Integer", "val": "9"},
+                 "value": {"type": "Integer", "val": "10"}},
+                {"indice": {"type": "Integer", "val": "18"},
+                 "value": {"type": "Integer", "val": "19"}},
+                {"indice": {"type": "Integer", "val": "24"},
+                 "value": {"type": "Integer", "val": "25"}},
                 {"others": {"type": "Integer", "val": "2"}}]}}]}}
   Line 8:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -30,6 +38,14 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "7"},
+                 "value": {"type": "Integer", "val": "8"}},
+                {"indice": {"type": "Integer", "val": "9"},
+                 "value": {"type": "Integer", "val": "10"}},
+                {"indice": {"type": "Integer", "val": "18"},
+                 "value": {"type": "Integer", "val": "19"}},
+                {"indice": {"type": "Integer", "val": "24"},
+                 "value": {"type": "Integer", "val": "25"}},
                 {"others": {"type": "Integer", "val": "2"}}]}}]}}
   Line 10:
     x [@field:0:contents] [@introduced] =
@@ -44,11 +60,19 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "7"},
+                 "value": {"type": "Integer", "val": "8"}},
+                {"indice": {"type": "Integer", "val": "9"},
+                 "value": {"type": "Integer", "val": "10"}},
+                {"indice": {"type": "Integer", "val": "18"},
+                 "value": {"type": "Integer", "val": "19"}},
+                {"indice": {"type": "Integer", "val": "24"},
+                 "value": {"type": "Integer", "val": "25"}},
                 {"others": {"type": "Integer", "val": "2"}}]}}]}}
 
 File "bench/ce/map.mlw", line 14, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim1'vc.
-Prover result is: Unknown (sat)
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File map.mlw:
@@ -61,7 +85,14 @@ File map.mlw:
             "value":
              {"type": "Array",
               "val":
-               [{"indice": {"type": "Integer", "val": "1"},
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "61"},
+                      "value": {"type": "Integer", "val": "60"}},
+                     {"others": {"type": "Integer", "val": "62"}}]}},
+                {"indice": {"type": "Integer", "val": "1"},
                  "value":
                   {"type": "Array",
                    "val":
@@ -69,7 +100,55 @@ File map.mlw:
                       "value": {"type": "Integer", "val": "2"}},
                      {"indice": {"type": "Integer", "val": "1"},
                       "value": {"type": "Integer", "val": "2"}},
+                     {"indice": {"type": "Integer", "val": "40"},
+                      "value": {"type": "Integer", "val": "66"}},
+                     {"indice": {"type": "Integer", "val": "61"},
+                      "value": {"type": "Integer", "val": "65"}},
+                     {"indice": {"type": "Integer", "val": "63"},
+                      "value": {"type": "Integer", "val": "64"}},
                      {"others": {"type": "Integer", "val": "3"}}]}},
+                {"indice": {"type": "Integer", "val": "70"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "56"},
+                      "value": {"type": "Integer", "val": "58"}},
+                     {"others": {"type": "Integer", "val": "59"}}]}},
+                {"indice": {"type": "Integer", "val": "71"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "51"},
+                      "value": {"type": "Integer", "val": "53"}},
+                     {"others": {"type": "Integer", "val": "54"}}]}},
+                {"indice": {"type": "Integer", "val": "74"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "35"},
+                      "value": {"type": "Integer", "val": "37"}},
+                     {"others": {"type": "Integer", "val": "38"}}]}},
+                {"indice": {"type": "Integer", "val": "76"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "29"},
+                      "value": {"type": "Integer", "val": "28"}},
+                     {"others": {"type": "Integer", "val": "30"}}]}},
+                {"indice": {"type": "Integer", "val": "78"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "19"},
+                      "value": {"type": "Integer", "val": "21"}},
+                     {"others": {"type": "Integer", "val": "22"}}]}},
+                {"indice": {"type": "Integer", "val": "81"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "6"},
+                      "value": {"type": "Integer", "val": "5"}},
+                     {"others": {"type": "Integer", "val": "7"}}]}},
                 {"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "4"}}]}}]}}]}}
@@ -90,6 +169,12 @@ File map.mlw:
                       "value": {"type": "Integer", "val": "2"}},
                      {"indice": {"type": "Integer", "val": "1"},
                       "value": {"type": "Integer", "val": "2"}},
+                     {"indice": {"type": "Integer", "val": "40"},
+                      "value": {"type": "Integer", "val": "66"}},
+                     {"indice": {"type": "Integer", "val": "61"},
+                      "value": {"type": "Integer", "val": "65"}},
+                     {"indice": {"type": "Integer", "val": "63"},
+                      "value": {"type": "Integer", "val": "64"}},
                      {"others": {"type": "Integer", "val": "3"}}]}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value":
@@ -99,7 +184,55 @@ File map.mlw:
                       "value": {"type": "Integer", "val": "2"}},
                      {"indice": {"type": "Integer", "val": "1"},
                       "value": {"type": "Integer", "val": "2"}},
+                     {"indice": {"type": "Integer", "val": "40"},
+                      "value": {"type": "Integer", "val": "66"}},
+                     {"indice": {"type": "Integer", "val": "61"},
+                      "value": {"type": "Integer", "val": "65"}},
+                     {"indice": {"type": "Integer", "val": "63"},
+                      "value": {"type": "Integer", "val": "64"}},
                      {"others": {"type": "Integer", "val": "3"}}]}},
+                {"indice": {"type": "Integer", "val": "70"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "56"},
+                      "value": {"type": "Integer", "val": "58"}},
+                     {"others": {"type": "Integer", "val": "59"}}]}},
+                {"indice": {"type": "Integer", "val": "71"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "51"},
+                      "value": {"type": "Integer", "val": "53"}},
+                     {"others": {"type": "Integer", "val": "54"}}]}},
+                {"indice": {"type": "Integer", "val": "74"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "35"},
+                      "value": {"type": "Integer", "val": "37"}},
+                     {"others": {"type": "Integer", "val": "38"}}]}},
+                {"indice": {"type": "Integer", "val": "76"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "29"},
+                      "value": {"type": "Integer", "val": "28"}},
+                     {"others": {"type": "Integer", "val": "30"}}]}},
+                {"indice": {"type": "Integer", "val": "78"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "19"},
+                      "value": {"type": "Integer", "val": "21"}},
+                     {"others": {"type": "Integer", "val": "22"}}]}},
+                {"indice": {"type": "Integer", "val": "81"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "6"},
+                      "value": {"type": "Integer", "val": "5"}},
+                     {"others": {"type": "Integer", "val": "7"}}]}},
                 {"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "4"}}]}}]}}]}}
@@ -120,6 +253,12 @@ File map.mlw:
                       "value": {"type": "Integer", "val": "2"}},
                      {"indice": {"type": "Integer", "val": "1"},
                       "value": {"type": "Integer", "val": "2"}},
+                     {"indice": {"type": "Integer", "val": "40"},
+                      "value": {"type": "Integer", "val": "66"}},
+                     {"indice": {"type": "Integer", "val": "61"},
+                      "value": {"type": "Integer", "val": "65"}},
+                     {"indice": {"type": "Integer", "val": "63"},
+                      "value": {"type": "Integer", "val": "64"}},
                      {"others": {"type": "Integer", "val": "3"}}]}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value":
@@ -129,14 +268,62 @@ File map.mlw:
                       "value": {"type": "Integer", "val": "2"}},
                      {"indice": {"type": "Integer", "val": "1"},
                       "value": {"type": "Integer", "val": "2"}},
+                     {"indice": {"type": "Integer", "val": "40"},
+                      "value": {"type": "Integer", "val": "66"}},
+                     {"indice": {"type": "Integer", "val": "61"},
+                      "value": {"type": "Integer", "val": "65"}},
+                     {"indice": {"type": "Integer", "val": "63"},
+                      "value": {"type": "Integer", "val": "64"}},
                      {"others": {"type": "Integer", "val": "3"}}]}},
+                {"indice": {"type": "Integer", "val": "70"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "56"},
+                      "value": {"type": "Integer", "val": "58"}},
+                     {"others": {"type": "Integer", "val": "59"}}]}},
+                {"indice": {"type": "Integer", "val": "71"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "51"},
+                      "value": {"type": "Integer", "val": "53"}},
+                     {"others": {"type": "Integer", "val": "54"}}]}},
+                {"indice": {"type": "Integer", "val": "74"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "35"},
+                      "value": {"type": "Integer", "val": "37"}},
+                     {"others": {"type": "Integer", "val": "38"}}]}},
+                {"indice": {"type": "Integer", "val": "76"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "29"},
+                      "value": {"type": "Integer", "val": "28"}},
+                     {"others": {"type": "Integer", "val": "30"}}]}},
+                {"indice": {"type": "Integer", "val": "78"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "19"},
+                      "value": {"type": "Integer", "val": "21"}},
+                     {"others": {"type": "Integer", "val": "22"}}]}},
+                {"indice": {"type": "Integer", "val": "81"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "6"},
+                      "value": {"type": "Integer", "val": "5"}},
+                     {"others": {"type": "Integer", "val": "7"}}]}},
                 {"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "4"}}]}}]}}]}}
 
 File "bench/ce/map.mlw", line 19, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim2'vc.
-Prover result is: Unknown (sat)
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -152,7 +339,18 @@ File ref.mlw:
                [{"indice": {"type": "Integer", "val": "0"},
                  "value":
                   {"type": "Array",
-                   "val": [{"others": {"type": "Integer", "val": "5"}}]}},
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "0"},
+                      "value": {"type": "Integer", "val": "61"}},
+                     {"indice": {"type": "Integer", "val": "21"},
+                      "value": {"type": "Integer", "val": "57"}},
+                     {"indice": {"type": "Integer", "val": "48"},
+                      "value": {"type": "Integer", "val": "58"}},
+                     {"indice": {"type": "Integer", "val": "55"},
+                      "value": {"type": "Integer", "val": "59"}},
+                     {"indice": {"type": "Integer", "val": "56"},
+                      "value": {"type": "Integer", "val": "60"}},
+                     {"others": {"type": "Integer", "val": "5"}}]}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value":
                   {"type": "Array",
@@ -160,6 +358,34 @@ File ref.mlw:
                     [{"indice": {"type": "Integer", "val": "1"},
                       "value": {"type": "Integer", "val": "3"}},
                      {"others": {"type": "Integer", "val": "2"}}]}},
+                {"indice": {"type": "Integer", "val": "65"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "51"},
+                      "value": {"type": "Integer", "val": "53"}},
+                     {"others": {"type": "Integer", "val": "54"}}]}},
+                {"indice": {"type": "Integer", "val": "66"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "42"},
+                      "value": {"type": "Integer", "val": "44"}},
+                     {"others": {"type": "Integer", "val": "45"}}]}},
+                {"indice": {"type": "Integer", "val": "67"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "37"},
+                      "value": {"type": "Integer", "val": "39"}},
+                     {"others": {"type": "Integer", "val": "40"}}]}},
+                {"indice": {"type": "Integer", "val": "74"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "7"},
+                      "value": {"type": "Integer", "val": "6"}},
+                     {"others": {"type": "Integer", "val": "8"}}]}},
                 {"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "4"}}]}}]}}]}}
@@ -176,7 +402,18 @@ File map.mlw:
                [{"indice": {"type": "Integer", "val": "0"},
                  "value":
                   {"type": "Array",
-                   "val": [{"others": {"type": "Integer", "val": "5"}}]}},
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "0"},
+                      "value": {"type": "Integer", "val": "61"}},
+                     {"indice": {"type": "Integer", "val": "21"},
+                      "value": {"type": "Integer", "val": "57"}},
+                     {"indice": {"type": "Integer", "val": "48"},
+                      "value": {"type": "Integer", "val": "58"}},
+                     {"indice": {"type": "Integer", "val": "55"},
+                      "value": {"type": "Integer", "val": "59"}},
+                     {"indice": {"type": "Integer", "val": "56"},
+                      "value": {"type": "Integer", "val": "60"}},
+                     {"others": {"type": "Integer", "val": "5"}}]}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value":
                   {"type": "Array",
@@ -184,6 +421,34 @@ File map.mlw:
                     [{"indice": {"type": "Integer", "val": "1"},
                       "value": {"type": "Integer", "val": "3"}},
                      {"others": {"type": "Integer", "val": "2"}}]}},
+                {"indice": {"type": "Integer", "val": "65"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "51"},
+                      "value": {"type": "Integer", "val": "53"}},
+                     {"others": {"type": "Integer", "val": "54"}}]}},
+                {"indice": {"type": "Integer", "val": "66"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "42"},
+                      "value": {"type": "Integer", "val": "44"}},
+                     {"others": {"type": "Integer", "val": "45"}}]}},
+                {"indice": {"type": "Integer", "val": "67"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "37"},
+                      "value": {"type": "Integer", "val": "39"}},
+                     {"others": {"type": "Integer", "val": "40"}}]}},
+                {"indice": {"type": "Integer", "val": "74"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "7"},
+                      "value": {"type": "Integer", "val": "6"}},
+                     {"others": {"type": "Integer", "val": "8"}}]}},
                 {"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "4"}}]}}]}}]}}
@@ -202,6 +467,14 @@ File map.mlw:
                    "val":
                     [{"indice": {"type": "Integer", "val": "0"},
                       "value": {"type": "Integer", "val": "3"}},
+                     {"indice": {"type": "Integer", "val": "21"},
+                      "value": {"type": "Integer", "val": "57"}},
+                     {"indice": {"type": "Integer", "val": "48"},
+                      "value": {"type": "Integer", "val": "58"}},
+                     {"indice": {"type": "Integer", "val": "55"},
+                      "value": {"type": "Integer", "val": "59"}},
+                     {"indice": {"type": "Integer", "val": "56"},
+                      "value": {"type": "Integer", "val": "60"}},
                      {"others": {"type": "Integer", "val": "5"}}]}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value":
@@ -210,9 +483,67 @@ File map.mlw:
                     [{"indice": {"type": "Integer", "val": "1"},
                       "value": {"type": "Integer", "val": "3"}},
                      {"others": {"type": "Integer", "val": "2"}}]}},
+                {"indice": {"type": "Integer", "val": "65"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "51"},
+                      "value": {"type": "Integer", "val": "53"}},
+                     {"others": {"type": "Integer", "val": "54"}}]}},
+                {"indice": {"type": "Integer", "val": "66"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "42"},
+                      "value": {"type": "Integer", "val": "44"}},
+                     {"others": {"type": "Integer", "val": "45"}}]}},
+                {"indice": {"type": "Integer", "val": "67"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "37"},
+                      "value": {"type": "Integer", "val": "39"}},
+                     {"others": {"type": "Integer", "val": "40"}}]}},
+                {"indice": {"type": "Integer", "val": "74"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "7"},
+                      "value": {"type": "Integer", "val": "6"}},
+                     {"others": {"type": "Integer", "val": "8"}}]}},
                 {"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "4"}}]}}]}}]}}
+  Line 21:
+    x0 [@introduced] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Integer", "val": "0"},
+          "value": {"type": "Integer", "val": "61"}},
+         {"indice": {"type": "Integer", "val": "21"},
+          "value": {"type": "Integer", "val": "57"}},
+         {"indice": {"type": "Integer", "val": "48"},
+          "value": {"type": "Integer", "val": "58"}},
+         {"indice": {"type": "Integer", "val": "55"},
+          "value": {"type": "Integer", "val": "59"}},
+         {"indice": {"type": "Integer", "val": "56"},
+          "value": {"type": "Integer", "val": "60"}},
+         {"others": {"type": "Integer", "val": "5"}}]}
+  Line 22:
+    x0 [@id:unused] [@introduced] [@model_trace:x0] =
+      {"type": "Array",
+       "val":
+        [{"indice": {"type": "Integer", "val": "0"},
+          "value": {"type": "Integer", "val": "3"}},
+         {"indice": {"type": "Integer", "val": "21"},
+          "value": {"type": "Integer", "val": "57"}},
+         {"indice": {"type": "Integer", "val": "48"},
+          "value": {"type": "Integer", "val": "58"}},
+         {"indice": {"type": "Integer", "val": "55"},
+          "value": {"type": "Integer", "val": "59"}},
+         {"indice": {"type": "Integer", "val": "56"},
+          "value": {"type": "Integer", "val": "60"}},
+         {"others": {"type": "Integer", "val": "5"}}]}
   Line 23:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -228,6 +559,14 @@ File map.mlw:
                    "val":
                     [{"indice": {"type": "Integer", "val": "0"},
                       "value": {"type": "Integer", "val": "3"}},
+                     {"indice": {"type": "Integer", "val": "21"},
+                      "value": {"type": "Integer", "val": "57"}},
+                     {"indice": {"type": "Integer", "val": "48"},
+                      "value": {"type": "Integer", "val": "58"}},
+                     {"indice": {"type": "Integer", "val": "55"},
+                      "value": {"type": "Integer", "val": "59"}},
+                     {"indice": {"type": "Integer", "val": "56"},
+                      "value": {"type": "Integer", "val": "60"}},
                      {"others": {"type": "Integer", "val": "5"}}]}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value":
@@ -236,13 +575,41 @@ File map.mlw:
                     [{"indice": {"type": "Integer", "val": "1"},
                       "value": {"type": "Integer", "val": "3"}},
                      {"others": {"type": "Integer", "val": "2"}}]}},
+                {"indice": {"type": "Integer", "val": "65"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "51"},
+                      "value": {"type": "Integer", "val": "53"}},
+                     {"others": {"type": "Integer", "val": "54"}}]}},
+                {"indice": {"type": "Integer", "val": "66"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "42"},
+                      "value": {"type": "Integer", "val": "44"}},
+                     {"others": {"type": "Integer", "val": "45"}}]}},
+                {"indice": {"type": "Integer", "val": "67"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "37"},
+                      "value": {"type": "Integer", "val": "39"}},
+                     {"others": {"type": "Integer", "val": "40"}}]}},
+                {"indice": {"type": "Integer", "val": "74"},
+                 "value":
+                  {"type": "Array",
+                   "val":
+                    [{"indice": {"type": "Integer", "val": "7"},
+                      "value": {"type": "Integer", "val": "6"}},
+                     {"others": {"type": "Integer", "val": "8"}}]}},
                 {"others":
                   {"type": "Array",
                    "val": [{"others": {"type": "Integer", "val": "4"}}]}}]}}]}}
 
 File "bench/ce/map.mlw", line 26, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test1'vc.
-Prover result is: Unknown (sat)
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -257,6 +624,14 @@ File ref.mlw:
               "val":
                [{"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "7"},
+                 "value": {"type": "Integer", "val": "8"}},
+                {"indice": {"type": "Integer", "val": "9"},
+                 "value": {"type": "Integer", "val": "10"}},
+                {"indice": {"type": "Integer", "val": "18"},
+                 "value": {"type": "Integer", "val": "19"}},
+                {"indice": {"type": "Integer", "val": "24"},
+                 "value": {"type": "Integer", "val": "25"}},
                 {"others": {"type": "Integer", "val": "2"}}]}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
@@ -271,6 +646,14 @@ File ref.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "7"},
+                 "value": {"type": "Integer", "val": "8"}},
+                {"indice": {"type": "Integer", "val": "9"},
+                 "value": {"type": "Integer", "val": "10"}},
+                {"indice": {"type": "Integer", "val": "18"},
+                 "value": {"type": "Integer", "val": "19"}},
+                {"indice": {"type": "Integer", "val": "24"},
+                 "value": {"type": "Integer", "val": "25"}},
                 {"others": {"type": "Integer", "val": "2"}}]}}]}}
 File map.mlw:
   Line 25:
@@ -284,6 +667,14 @@ File map.mlw:
               "val":
                [{"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "7"},
+                 "value": {"type": "Integer", "val": "8"}},
+                {"indice": {"type": "Integer", "val": "9"},
+                 "value": {"type": "Integer", "val": "10"}},
+                {"indice": {"type": "Integer", "val": "18"},
+                 "value": {"type": "Integer", "val": "19"}},
+                {"indice": {"type": "Integer", "val": "24"},
+                 "value": {"type": "Integer", "val": "25"}},
                 {"others": {"type": "Integer", "val": "2"}}]}}]}}
   Line 26:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
@@ -298,6 +689,14 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "7"},
+                 "value": {"type": "Integer", "val": "8"}},
+                {"indice": {"type": "Integer", "val": "9"},
+                 "value": {"type": "Integer", "val": "10"}},
+                {"indice": {"type": "Integer", "val": "18"},
+                 "value": {"type": "Integer", "val": "19"}},
+                {"indice": {"type": "Integer", "val": "24"},
+                 "value": {"type": "Integer", "val": "25"}},
                 {"others": {"type": "Integer", "val": "2"}}]}}]}}
   Line 28:
     x [@field:0:contents] [@introduced] =
@@ -312,11 +711,19 @@ File map.mlw:
                  "value": {"type": "Integer", "val": "3"}},
                 {"indice": {"type": "Integer", "val": "1"},
                  "value": {"type": "Integer", "val": "3"}},
+                {"indice": {"type": "Integer", "val": "7"},
+                 "value": {"type": "Integer", "val": "8"}},
+                {"indice": {"type": "Integer", "val": "9"},
+                 "value": {"type": "Integer", "val": "10"}},
+                {"indice": {"type": "Integer", "val": "18"},
+                 "value": {"type": "Integer", "val": "19"}},
+                {"indice": {"type": "Integer", "val": "24"},
+                 "value": {"type": "Integer", "val": "25"}},
                 {"others": {"type": "Integer", "val": "2"}}]}}]}}
 
 File "bench/ce/map.mlw", line 31, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test2'vc.
-Prover result is: Unknown (sat)
+Prover result is: Unknown or time/memory/step limit.
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ref.mlw:
@@ -328,7 +735,12 @@ File ref.mlw:
           [{"field": "contents",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Boolean", "val": false}}]}}]}}
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "5"},
+                 "value": {"type": "Boolean", "val": false}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
   Line 20:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -337,7 +749,14 @@ File ref.mlw:
           [{"field": "contents",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Boolean", "val": false}}]}}]}}
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "5"},
+                 "value": {"type": "Boolean", "val": false}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
 File map.mlw:
   Line 30:
     x [@field:0:contents] [@introduced] =
@@ -347,7 +766,12 @@ File map.mlw:
           [{"field": "contents",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Boolean", "val": false}}]}}]}}
+              "val":
+               [{"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "5"},
+                 "value": {"type": "Boolean", "val": false}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
   Line 31:
     x [@field:0:contents] [@introduced] [@model_trace:x] =
       {"type": "Record",
@@ -356,7 +780,14 @@ File map.mlw:
           [{"field": "contents",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Boolean", "val": false}}]}}]}}
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "5"},
+                 "value": {"type": "Boolean", "val": false}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
   Line 33:
     x [@field:0:contents] [@introduced] =
       {"type": "Record",
@@ -365,7 +796,14 @@ File map.mlw:
           [{"field": "contents",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Boolean", "val": false}}]}}]}}
+              "val":
+               [{"indice": {"type": "Integer", "val": "0"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "1"},
+                 "value": {"type": "Boolean", "val": true}},
+                {"indice": {"type": "Integer", "val": "5"},
+                 "value": {"type": "Boolean", "val": false}},
+                {"others": {"type": "Boolean", "val": false}}]}}]}}
 
 File "bench/ce/map.mlw", line 42, characters 3-31:
 Goal t1.

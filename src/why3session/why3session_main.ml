@@ -29,8 +29,6 @@ let cmds =
 *)
   ]
 
-let exec_name = Filename.basename Sys.argv.(0)
-
 let print_commands fmt =
   let maxl = List.fold_left
     (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds in

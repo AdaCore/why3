@@ -56,7 +56,7 @@ module Bitwalker
                        (C32_64.toBig (BV32.sub (63:BV32.t) left)) }
       let mask =
         BV64.lsl_bv (1:BV64.t)
-          (C32_64.toBig (BV32.usub_check (63:BV32.t) left))
+          (C32_64.toBig (BV32.u_sub (63:BV32.t) left))
       in
       match flag with
       | True -> BV64.bw_or value mask
@@ -105,7 +105,7 @@ module Bitwalker
         result = BV8.nth_bv
                    byte (BV8.sub (7:BV8.t) (C8_32.toSmall left))}
     let mask =
-      BV32.lsl_bv (1:BV32.t) (BV32.usub_check (7:BV32.t) left)
+      BV32.lsl_bv (1:BV32.t) (BV32.u_sub (7:BV32.t) left)
     in
     not (BV32.eq (BV32.bw_and (C8_32.toBig byte) mask) BV32.zeros)
     end
@@ -116,7 +116,7 @@ module Bitwalker
     requires { BV32.t'int left < 8 * length addr }
     ensures  { result = nth8_stream addr (BV32.t'int left) }
   =
-    peek_8bit_bv (addr[ BV32.to_uint (BV32.udiv_check left (8:BV32.t)) ]) (BV32.urem_check left (8:BV32.t))
+    peek_8bit_bv (addr[ BV32.to_uint (BV32.u_div left (8:BV32.t)) ]) (BV32.u_rem left (8:BV32.t))
 
   (* return a bitvector of 64 bits with its `len` bits of the right
     set to the bits between `start` and `start+len` of `addr` *)
@@ -133,14 +133,14 @@ module Bitwalker
       /\
       (forall i:int. BV32.t'int len <= i < 64 -> BV64.nth result i = False) }
   =
-    if (BV32.to_uint (BV32.uadd_check start len) > ( 8 *length addr ))
+    if (BV32.to_uint (BV32.u_add start len) > ( 8 *length addr ))
     then
       BV64.zeros
     else
 
     let retval = ref BV64.zeros in
     let i = ref BV32.zeros in
-    let lstart = BV32.usub_check (64:BV32.t) len in
+    let lstart = BV32.u_sub (64:BV32.t) len in
 
     while BV32.ult !i len do variant{ BV32.t'int len - BV32.t'int !i }
     invariant {0 <= BV32.t'int !i <= BV32.t'int len}
@@ -154,10 +154,10 @@ module Bitwalker
                  BV64.nth !retval j
                = False}
 
-      let flag = peek_8bit_array addr (BV32.uadd_check start !i) in
-      retval := poke_64bit_bv !retval (BV32.uadd_check lstart !i) flag;
+      let flag = peek_8bit_array addr (BV32.u_add start !i) in
+      retval := poke_64bit_bv !retval (BV32.u_add lstart !i) flag;
 
-      i := BV32.uadd_check !i (1:BV32.t);
+      i := BV32.u_add !i (1:BV32.t);
 
     done;
 
@@ -172,7 +172,7 @@ module Bitwalker
      ensures {result = BV64.nth_bv value
                        (BV64.sub (63:BV64.t) (C32_64.toBig left))}
        let mask = BV64.lsl_bv (1:BV64.t)
-                  (C32_64.toBig (BV32.usub_check (63:BV32.t) left)) in
+                  (C32_64.toBig (BV32.u_sub (63:BV32.t) left)) in
        not (BV64.eq (BV64.bw_and value mask) BV64.zeros)
      end
 
@@ -200,7 +200,7 @@ module Bitwalker
              = BV8.nth_bv byte (C8_32.toSmall i) }
     ensures { BV8.nth_bv result (BV8.sub (7:BV8.t) (C8_32.toSmall left))
             = flag }
-      let mask = BV8.lsl_bv (1:BV8.t) (BV8.usub_check (7:BV8.t) (C8_32.toSmall left)) in
+      let mask = BV8.lsl_bv (1:BV8.t) (BV8.u_sub (7:BV8.t) (C8_32.toSmall left)) in
       match flag with
       | True -> BV8.bw_or byte mask
       | False -> BV8.bw_and byte (BV8.bw_not mask)
@@ -215,8 +215,8 @@ module Bitwalker
                nth8_stream addr i = nth8_stream (old addr) i}
     ensures  { nth8_stream addr (BV32.t'int left) = flag }
   =
-    let i = BV32.udiv_check left (8:BV32.t) in
-    let k = BV32.urem_check left (8:BV32.t) in
+    let i = BV32.u_div left (8:BV32.t) in
+    let k = BV32.u_rem left (8:BV32.t) in
     addr[BV32.to_uint i] <- poke_8bit addr[BV32.to_uint i] k flag
 
   let poke (start : BV32.t) (len : BV32.t) (addr : array BV8.t) (value : BV64.t) : int
@@ -241,7 +241,7 @@ module Bitwalker
                 nth8_stream addr i
               = nth8_stream (old addr) i) }
   =
-    if BV32.to_uint (BV32.uadd_check start len) > 8 * length addr
+    if BV32.to_uint (BV32.u_add start len) > 8 * length addr
     then
       -1                        (*error: invalid_bit_sequence*)
     else
@@ -251,7 +251,7 @@ module Bitwalker
       -2                        (*error: value_too_big*)
     else
 
-    let lstart = BV32.usub_check (64:BV32.t) len in
+    let lstart = BV32.u_sub (64:BV32.t) len in
     let i = ref BV32.zeros in
 
     while BV32.ult !i len do variant { BV32.t'int len - BV32.t'int !i }
@@ -266,9 +266,9 @@ module Bitwalker
                  nth8_stream addr j
                = nth8_stream (old addr) j }
 
-      let flag = peek_64bit value (BV32.uadd_check lstart !i) in
+      let flag = peek_64bit value (BV32.u_add lstart !i) in
 
-      poke_8bit_array addr (BV32.uadd_check start !i) flag;
+      poke_8bit_array addr (BV32.u_add start !i) flag;
 
       assert {nth8_stream addr (BV32.t'int start + BV32.t'int !i)
             = BV64.nth value ((BV32.t'int len - BV32.t'int !i - 1))};
@@ -278,7 +278,7 @@ module Bitwalker
                    nth8_stream addr k
                  = BV64.nth value (BV32.t'int start + BV32.t'int len - k - 1)};
 
-      i := BV32.uadd_check !i (1:BV32.t);
+      i := BV32.u_add !i (1:BV32.t);
     done;
 
     0

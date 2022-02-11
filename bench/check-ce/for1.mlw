@@ -1,8 +1,8 @@
 use int.Int
-use ref.Ref
+
 let f ()
   ensures { result = 2 }
-  = let ref x = 0 in
+= let ref x = 0 in
     for i = 0 to 1 do
       invariant { x >= 0 }
       x <- x + 1

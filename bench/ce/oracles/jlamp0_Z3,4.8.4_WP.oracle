@@ -10,25 +10,25 @@ File jlamp0.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
   Line 8:
     b [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "6"}}]}}
   Line 11:
     a [@field:0:contents] [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "16"}}]}}
   Line 12:
     a [@field:0:contents] [@introduced] [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "contents", "value": {"type": "Integer", "val": "3"}}]}}
+          [{"field": "contents", "value": {"type": "Integer", "val": "16"}}]}}
 
 File "bench/ce/jlamp0.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
@@ -140,6 +140,12 @@ File ref.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -199,6 +205,12 @@ File ref.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "10"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "12"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -258,6 +270,12 @@ File ref.mlw:
        "val":
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "2"}}]}}
+  Line 20:
+    c [@field:0:contents] [@introduced] =
+      {"type": "Record",
+       "val":
+        {"Field":
+          [{"field": "contents", "value": {"type": "Integer", "val": "4"}}]}}
 File jlamp0.mlw:
   Line 6:
     a [@field:0:contents] [@introduced] =
@@ -325,8 +343,8 @@ File jlamp0.mlw:
         {"Field":
           [{"field": "contents", "value": {"type": "Integer", "val": "0"}}]}}
   Line 19:
-    a [@field:0:contents] [@introduced] [@loop:bench/ce/jlamp0.mlw:21:4:157]
-      [@model_trace:a] =
+    a [@field:0:contents] [@introduced]
+      [@loop:bench/ce/jlamp0.mlw:21:4:157] =
       {"type": "Record",
        "val":
         {"Field":

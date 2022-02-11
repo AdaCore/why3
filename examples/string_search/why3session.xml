@@ -29,34 +29,34 @@
   <proof prover="2"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
   <goal name="occurs&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="186"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="188"/></proof>
   </goal>
   <goal name="occurs&#39;vc.7" expl="loop invariant preservation" proved="true">
   <transf name="rewrite" proved="true" arg1="&lt;-" arg2="concat_substring">
    <goal name="occurs&#39;vc.7.0" expl="loop invariant preservation" proved="true">
-   <proof prover="2" timelimit="5"><result status="valid" time="3.49" steps="6929"/></proof>
+   <proof prover="2" timelimit="5"><result status="valid" time="3.49" steps="5928"/></proof>
    </goal>
    <goal name="occurs&#39;vc.7.1" expl="rewrite premises" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="37"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="39"/></proof>
    </goal>
    <goal name="occurs&#39;vc.7.2" expl="rewrite premises" proved="true">
-   <proof prover="2"><result status="valid" time="0.02" steps="37"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="39"/></proof>
    </goal>
    <goal name="occurs&#39;vc.7.3" expl="rewrite premises" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="37"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="39"/></proof>
    </goal>
    <goal name="occurs&#39;vc.7.4" expl="rewrite premises" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="37"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="39"/></proof>
    </goal>
    <goal name="occurs&#39;vc.7.5" expl="rewrite premises" proved="true">
-   <proof prover="2"><result status="valid" time="0.02" steps="37"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="39"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="occurs&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.06" steps="244"/></proof>
   </goal>
-  <goal name="occurs&#39;vc.9" expl="postcondition" proved="true">
+  <goal name="occurs&#39;vc.9" expl="VC for occurs" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="24571"/></proof>
   </goal>
  </transf>
@@ -75,13 +75,13 @@
   <proof prover="1"><result status="valid" time="0.02" steps="25411"/></proof>
   </goal>
   <goal name="search1&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
-  </goal>
-  <goal name="search1&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
+  <goal name="search1&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="32"/></proof>
+  </goal>
   <goal name="search1&#39;vc.5" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="116"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="118"/></proof>
   </goal>
   <goal name="search1&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
@@ -118,14 +118,14 @@
   <goal name="search2&#39;vc.4" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="search2&#39;vc.4.0" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="30"/></proof>
    </goal>
    <goal name="search2&#39;vc.4.1" expl="postcondition" proved="true">
    <transf name="unfold" proved="true" arg1="matches">
     <goal name="search2&#39;vc.4.1.0" expl="postcondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="search2&#39;vc.4.1.0.0" expl="postcondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.02" steps="28530"/></proof>
+     <proof prover="1"><result status="valid" time="0.02" steps="29511"/></proof>
      </goal>
     </transf>
     </goal>
@@ -134,10 +134,10 @@
   </transf>
   </goal>
   <goal name="search2&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="167"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="169"/></proof>
   </goal>
   <goal name="search2&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="34"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
   <goal name="search2&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
@@ -179,7 +179,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="143"/></proof>
   </goal>
   <goal name="make_table&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="489"/></proof>
+  <proof prover="2"><result status="valid" time="0.11" steps="489"/></proof>
   </goal>
   <goal name="make_table&#39;vc.8" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="322"/></proof>
@@ -233,76 +233,76 @@
   <proof prover="1"><result status="valid" time="0.03" steps="90559"/></proof>
   </goal>
   <goal name="search&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="search&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="search&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="35"/></proof>
-  </goal>
-  <goal name="search&#39;vc.6" expl="integer overflow" proved="true">
-  <proof prover="1"><result status="valid" time="0.04" steps="96355"/></proof>
-  </goal>
-  <goal name="search&#39;vc.7" expl="postcondition" proved="true">
+  <goal name="search&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
-  <goal name="search&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="138"/></proof>
+  <goal name="search&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
-  <goal name="search&#39;vc.9" expl="integer overflow" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="104687"/></proof>
+  <goal name="search&#39;vc.6" expl="integer overflow" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="99140"/></proof>
   </goal>
-  <goal name="search&#39;vc.10" expl="precondition" proved="true">
+  <goal name="search&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="41"/></proof>
   </goal>
+  <goal name="search&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="142"/></proof>
+  </goal>
+  <goal name="search&#39;vc.9" expl="integer overflow" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="104789"/></proof>
+  </goal>
+  <goal name="search&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="45"/></proof>
+  </goal>
   <goal name="search&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="93559"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="93699"/></proof>
   </goal>
   <goal name="search&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="50"/></proof>
   </goal>
   <goal name="search&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="43"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="49"/></proof>
   </goal>
   <goal name="search&#39;vc.14" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="search&#39;vc.14.0" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="39"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="45"/></proof>
    </goal>
    <goal name="search&#39;vc.14.1" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.02" steps="39"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="45"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="search&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="50"/></proof>
   </goal>
   <goal name="search&#39;vc.16" expl="integer overflow" proved="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="140493"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="140635"/></proof>
   </goal>
   <goal name="search&#39;vc.17" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="198"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="206"/></proof>
   </goal>
   <goal name="search&#39;vc.18" expl="loop variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="116"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="122"/></proof>
   </goal>
   <goal name="search&#39;vc.19" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="151"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="159"/></proof>
   </goal>
   <goal name="search&#39;vc.20" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.37" steps="884"/></proof>
+  <proof prover="2"><result status="valid" time="0.37" steps="906"/></proof>
   </goal>
   <goal name="search&#39;vc.21" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5"><result status="valid" time="0.01" steps="31"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
   <goal name="search&#39;vc.22" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="search&#39;vc.22.0" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="107"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="109"/></proof>
    </goal>
    <goal name="search&#39;vc.22.1" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="29"/></proof>
+   <proof prover="2"><result status="valid" time="0.01" steps="31"/></proof>
    </goal>
   </transf>
   </goal>

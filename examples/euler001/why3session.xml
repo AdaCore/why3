@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -16,7 +17,7 @@
  <proof prover="4"><path name="euler001_DivModHints_mod_succ_1_1.v"/><result status="valid" time="0.39"/></proof>
  </goal>
  <goal name="mod_succ_2" proved="true">
- <proof prover="4"><path name="euler001_DivModHints_mod_succ_2_1.v"/><result status="valid" time="0.46"/></proof>
+ <proof prover="4"><path name="euler001_DivModHints_mod_succ_2_1.v"/><result status="valid" time="0.30"/></proof>
  </goal>
  <goal name="div_succ_1" proved="true">
  <proof prover="1" timelimit="30"><result status="valid" time="0.04"/></proof>
@@ -123,7 +124,7 @@
  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="bench&#39;vc" expl="VC for bench" proved="true">
- <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
 </theory>
 </file>

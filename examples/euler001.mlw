@@ -186,17 +186,11 @@ module Euler001
   (** for extraction *)
 
 (*
-  use string.Char
   use io.StdIO
   use ref.Ref
 
-  let go ()
-   ensures { !cur_linenum = (old !cur_linenum) + 1 }
-  =
-    print_char (chr 71); (* G *)
-    print_char (chr 79); (* O *)
-    print_char (chr 58); (* : *)
-    print_char (chr 32); (*   *)
+  let go () =
+    print_string "GO: ";
     print_int (run ());
     print_newline ()
 *)

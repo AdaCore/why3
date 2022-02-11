@@ -81,14 +81,14 @@ let escape_string s =
   end
 
 let print_rc_value fmt = function
-  | RCint i -> fprintf fmt "%d" i
+  | RCint i -> pp_print_int fmt i
   | RCbool b -> fprintf fmt "%B" b
   | RCfloat f -> fprintf fmt "%f" f
   | RCstring (s,false) ->
     fprintf fmt "\"%s\"" (escape_string s)
   | RCstring (s,true) ->
     fprintf fmt "\"%s\"" (String.escaped s)
-  | RCident s -> fprintf fmt "%s" s
+  | RCident s -> pp_print_string fmt s
 
 let () = Exn_printer.register (fun fmt e -> match e with
   (* | SyntaxError -> *)

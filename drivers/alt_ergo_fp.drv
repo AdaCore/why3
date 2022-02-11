@@ -6,7 +6,6 @@ transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
 transformation "eliminate_literal"
 transformation "eliminate_epsilon"
-transformation "eliminate_let_term"
 
 transformation "split_premise_right"
 transformation "simplify_formula"
@@ -40,11 +39,11 @@ theory real.MinMax
 end
 
 theory real.PowerInt
-  syntax function power "pow_real_int(%1, %2)"
+  syntax function power "(%1 **. %2)"
 end
 
 theory real.PowerReal
-  syntax function pow "pow_real_real(%1, %2)"
+  syntax function pow "(%1 **. %2)"
 end
 
 theory real.Square

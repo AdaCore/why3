@@ -33,7 +33,7 @@ let print_proofAttemptID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
-  mutable theory_parent_name    : fileID;
+  theory_parent_name            : fileID;
   mutable theory_is_detached    : bool;
 }
 
@@ -411,11 +411,16 @@ let set_obsolete s paid b =
   pa.proof_obsolete <- b
  *)
 
-let check_if_already_exists s pid t args =
-    let sub_transfs = get_transformations s pid in
-    List.exists (fun tr_id ->
+let get_transformation s pid t args =
+  let sub_transfs = get_transformations s pid in
+  List.find (fun tr_id ->
       get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
       not (is_detached s (ATn tr_id))) sub_transfs
+
+let check_if_already_exists s pid t args =
+  match get_transformation s pid t args with
+  | _ -> true
+  | exception Not_found -> false
 
 (* Iterations functions on the session tree *)
 
@@ -1285,7 +1290,22 @@ let get_version (xml: Xml.t) =
 
 module ReadShapes (C:Compress.S) = struct
 
-let shape = Buffer.create 97
+let input_line =
+  let shape = Buffer.create 97 in
+  fun ch ->
+  Buffer.clear shape;
+  try
+    while true do
+      let c = C.input_char ch in
+      if c = '\n' then raise Exit;
+      Buffer.add_char shape c
+    done;
+    assert false
+  with
+  | End_of_file ->
+     raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
+  | Exit -> Buffer.contents shape
+
 
 let read_sum_and_shape ch =
   let sum = Bytes.create 32 in
@@ -1304,38 +1324,19 @@ let read_sum_and_shape ch =
   end;
   if try C.input_char ch <> ' ' with End_of_file -> true then
     raise (ShapesFileError "shapes files corrupted (space missing), ignored");
-  Buffer.clear shape;
-  try
-    while true do
-      let c = C.input_char ch in
-      if c = '\n' then raise Exit;
-      Buffer.add_char shape c
-    done;
-    assert false
-  with
-  | End_of_file ->
-     raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
-  | Exit -> Bytes.unsafe_to_string sum, Buffer.contents shape
+  let shape = input_line ch in
+  Bytes.unsafe_to_string sum, shape
 
 (* Read the first part of the shapes: a list of shapes which are then referred
    as H1 ... Hn in the shape corresponding to tasks *)
 let rec read_global_buffer gs ch =
-  Buffer.clear shape;
-  try
-    while true do
-      let c = C.input_char ch in
-      if c = '\n' then raise Exit;
-      Buffer.add_char shape c
-    done;
-    assert false
-  with
-  | End_of_file ->
-      raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
-  | Exit ->
-      let g_shape = Buffer.contents shape in
-      Buffer.clear shape;
-      if g_shape <> "" then
-        (Termcode.Gshape.add_shape_g gs g_shape; read_global_buffer gs ch)
+  let g_shape = input_line ch in
+  if g_shape <> "" then
+    begin
+      if not (Strings.has_prefix "(*" g_shape) then
+        Termcode.Gshape.add_shape_g gs g_shape;
+      read_global_buffer gs ch
+    end
 
   let sum_shape_version = ref None
 
@@ -1586,7 +1587,7 @@ let () = Exn_printer.register
     (fun fmt e ->
       match e with
       | NoProgress ->
-          Format.fprintf fmt "The transformation made no progress.\n"
+          Format.pp_print_string fmt "The transformation made no progress.\n"
       | _ -> raise e)
 
 let apply_trans_to_goal ~allow_no_effect s env name args id =
@@ -1935,7 +1936,6 @@ open Format
 let save_string = Pp.html_string
 
 type save_ctxt = {
-  prover_ids : int PHprover.t;
   provers : (int * int * int * int) Mprover.t;
   ch_shapes : Compress.Compress_z.out_channel;
 }
@@ -2061,7 +2061,7 @@ let save_result fmt r =
 let save_status fmt s =
   match s with
   | Some result -> save_result fmt result
-  | None -> fprintf fmt "<undone/>"
+  | None -> pp_print_string fmt "<undone/>"
 
 let save_file_path fmt p =
   List.iter
@@ -2180,10 +2180,15 @@ let save fname shfname session =
     begin
       (* In version SV6 or higher, first save the list of variables that are
          referenced in shapes. *)
+      let s =
+        Format.asprintf
+          "(* shapes version: %a *)\n"
+          Termcode.pp_sum_shape_version session.shapes.shape_version in
+      Compress.Compress_z.output_string chsh s;
       Termcode.Gshape.write_shape_to_file session.shapes.session_global_shapes chsh;
       Compress.Compress_z.output_string chsh "\n";
     end;
-  let ctxt = { prover_ids = prover_ids; provers = provers; ch_shapes = chsh } in
+  let ctxt = { provers = provers; ch_shapes = chsh } in
   Hfile.iter (save_file session ctxt fmt) session.session_files;
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";

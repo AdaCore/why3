@@ -84,7 +84,6 @@ let add_filter_prover s = Stack.push (read_opt_prover s) filter_prover
 
 type filter_three = | FT_Yes | FT_No | FT_All
 
-let opt_filter_archived = ref FT_No
 let opt_filter_obsolete = ref FT_All
 let opt_filter_verified = ref FT_All
 
@@ -114,8 +113,6 @@ let filter_spec =
     "[<name>,<version>[,<alternative>]|<id>] select proof attempts containing this prover";
     KLong "filter-obsolete", opt_three opt_filter_obsolete,
     "[yes|no] select only (non-)obsolete goals";
-    KLong "filter-archived", opt_three opt_filter_archived,
-    "[yes|all] select only archived goals";
     KLong "filter-verified", opt_three opt_filter_verified,
     "[yes|no] select only (non-)verified goals";
     KLong "filter-status",
@@ -127,7 +124,6 @@ let filter_spec =
 type filters =
     { provers : C.Sprover.t; (* if empty : every provers *)
       obsolete : filter_three;
-      archived : filter_three;
       verified : filter_three;
       status : Call_provers.prover_answer list; (* if empty : any answer *)
     }
@@ -158,7 +154,6 @@ let read_filter_spec whyconf : filters * bool =
   Stack.iter iter filter_prover;
   {provers = !s;
    obsolete = !opt_filter_obsolete;
-   archived = !opt_filter_archived;
    verified = !opt_filter_verified;
    status = !opt_status;
   },!should_exit
