@@ -53,13 +53,14 @@ let is_infinite_ty inf_ts ma_map =
 
 (** Compile match patterns *)
 
-let rec rewriteT t = match t.t_node with
+let rec rewriteT t0 = match t0.t_node with
   | Tcase (t,bl) ->
       let t = rewriteT t in
       let mk_b b = let p,t = t_open_branch b in [p], rewriteT t in
       let mk_case = t_case_close and mk_let = t_let_close_simp in
-      Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl)
-  | _ -> t_map rewriteT t
+      let res = Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl) in
+      t_attr_copy t0 res
+  | _ -> t_map rewriteT t0
 
 let compile_match = Trans.decl (fun d -> [decl_map rewriteT d]) None
 
@@ -120,14 +121,19 @@ let rec rewriteT kn state t = match t.t_node with
         | Some { ty_node = Tyapp (ts,_) } -> ts
         | _ -> Printer.unsupportedTerm t uncompiled
       in
-      begin match List.map find (find_constructors kn ts) with
+      let res =
+        begin match List.map find (find_constructors kn ts) with
         | [t] -> t
         | tl  -> t_app (Mts.find ts state.mt_map) (t1::tl) t.t_ty
-      end
+        end
+      in
+      (* Preserve attributes and location of t *)
+      t_attr_copy t res
   | _ ->
       TermTF.t_map (rewriteT kn state) (rewriteF kn state Svs.empty true) t
 
-and rewriteF kn state av sign f = match f.t_node with
+and rewriteF kn state av sign f =
+  match f.t_node with
   | Tcase (t1,bl) ->
       let t1 = rewriteT kn state t1 in
       let av' = Mvs.set_diff av (t_vars t1) in
@@ -168,7 +174,9 @@ and rewriteF kn state av sign f = match f.t_node with
         | _ -> Printer.unsupportedTerm f uncompiled
       in
       let op = if sign then t_and_simp else t_or_simp in
-      Lists.map_join_left find op (find_constructors kn ts)
+      let res = Lists.map_join_left find op (find_constructors kn ts) in
+      (* Preserve attributes and location of f *)
+      t_attr_copy f res
   | Tquant (q, bf) when (q = Tforall && sign) || (q = Texists && not sign) ->
       let vl, tr, f1, close = t_open_quant_cb bf in
       let tr = TermTF.tr_map (rewriteT kn state)
