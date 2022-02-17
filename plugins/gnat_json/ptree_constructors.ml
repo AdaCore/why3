@@ -39,6 +39,13 @@ let mk_term ?loc t =
 let mk_pat ?loc p =
   { pat_desc = p; pat_loc = get_pos ?loc () }
 
+let rec qualid_equal a b =
+  match a, b with
+  | Qident a, Qident b -> a.id_str = b.id_str
+  | Qdot (a_prefix, a_id), Qdot (b_prefix, b_id) ->
+      qualid_equal a_prefix b_prefix && a_id.id_str = b_id.id_str
+  | _ -> false
+
 module Ty = struct
   type t = pty
   let mk_var id = PTtyvar id
@@ -154,7 +161,16 @@ module T = struct
   let mk = mk_term
   let mk_truth ?loc b = mk ?loc (if b then Ttrue else Tfalse)
   let mk_const ?loc i = mk ?loc (Tconst i)
-  let mk_idapp ?loc f li = mk ?loc (Tidapp (f, li))
+
+  let mk_idapp ?loc f li =
+    match li with
+    | [ { term_desc = Trecord l } ] ->
+      begin try
+        let _, t = List.find (fun (k, _) -> qualid_equal k f) l in
+        t
+      with Not_found -> mk ?loc (Tidapp (f, li)) end
+    | _ -> mk ?loc (Tidapp (f, li))
+
   let mk_apply ?loc t1 t2 = mk ?loc (Tapply (t1, t2))
   let mk_var ?loc x = mk ?loc (Tident x)
   let mk_cast ?loc t pty = mk ?loc (Tcast (t, pty))

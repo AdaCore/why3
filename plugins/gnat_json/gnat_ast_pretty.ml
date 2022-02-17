@@ -535,9 +535,12 @@ and pp_record_update fmt (n : record_update_id) =
   let Record_update r = n.desc in
   Format.fprintf fmt "@[{%a with %a}@]" pp_why_node r.name (pp_print_list ~pp_sep:Why3.Pp.semi pp_why_node) (r.updates.elt0 :: r.updates.elts)
 
+and pp_binding_ref fmt (n : binding_ref_id) =
+  let Binding_ref r = n.desc in
+  Format.fprintf fmt "(let ref %a@ =@ @[<hov2 >%a@]@ in@ %a)"
+    pp_why_node r.name pp_why_node r.def pp_why_node r.context
 
 and pp_effects fmt (_ : effects_id) = Format.fprintf fmt "--pp_effects NOT IMPLEMENTED"
-and pp_binding_ref fmt (_ : binding_ref_id) = Format.fprintf fmt "--pp_binding_ref NOT IMPLEMENTED"
 
 let pp_file fmt f =
   pp_print_list ~pp_sep:Why3.Pp.newline2 pp_why_node fmt f.theory_declarations
