@@ -710,7 +710,7 @@ let get_and_register_variable ctx ?def ?loc id ity =
   let gens = [
     gen_model_variable ctx ?loc id ity;
     gen_default def;
-    gen_type_default ~really:(is_ignore_id id) ctx ity;
+    gen_type_default ~really:true (* (is_ignore_id id) *) ctx ity;
   ] in
   let value = get_value' ctx_desc oloc gens in
   register_used_value ctx.env oloc id value;
@@ -735,7 +735,7 @@ let get_and_register_param ctx id ity =
   let ctx_desc = asprintf "parameter `%a`" print_decoded id.id_string in
   let gens = [
     gen_model_variable ctx id ity;
-    gen_type_default ~really:(is_ignore_id id) ctx ity;
+    gen_type_default ~really:true (* (is_ignore_id id) *) ctx ity;
   ] in
   let value = get_value' ctx_desc id.id_loc gens in
   register_used_value ctx.env id.id_loc id value;
