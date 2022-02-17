@@ -95,7 +95,7 @@ AC_ARG_ENABLE(re,
 # pp_sexp
 
 AC_ARG_ENABLE(pp-sexp,
-    AS_HELP_STRING([--disable-pp-sexp], [disable S-expression output for why3pp (requires findlib and ppx_sexp_conv)]),,
+    AS_HELP_STRING([--disable-pp-sexp], [disable S-expression output for why3pp]),,
     enable_pp_sexp=yes)
 
 # IDE
@@ -125,6 +125,12 @@ AC_ARG_ENABLE(pvs-libs,
 AC_ARG_ENABLE(isabelle-libs,
     AS_HELP_STRING([--disable-isabelle-libs], [do not build Isabelle realizations]),,
     enable_isabelle_libs=yes)
+
+# MLMPFR
+
+AC_ARG_ENABLE(mpfr,
+    AS_HELP_STRING([--disable-mpfr], [disable support for MPFR]),,
+    enable_mpfr=yes)
 
 # hypothesis selection
 
@@ -766,42 +772,36 @@ elif test "$enable_js_of_ocaml" != yes; then
    reason_web_ide=" (Javascript support not available)"
 fi
 
-# Mlmpfr
-MLMPFR_LINK=
-if test "$enable_js_of_ocaml" != no; then
-   found_mlmpfr=no
-   reason_mlmpfr=" (Cannot allow mlmpfr with js_of_ocaml) "
+# MLMPFR
+if test "$enable_mpfr" != yes; then
+   reason_mpfr=" (disabled by user)"
+elif test "$enable_ocamlfind" != yes; then
+   enable_mpfr=no
+   reason_mpfr=" (ocamlfind not available)"
+elif test "$enable_js_of_ocaml" != no; then
+   enable_mpfr=no
+   reason_mpfr=" (incompatible with js_of_ocaml) "
 else
-   if test "$enable_ocamlfind" = yes; then
-      DIR=$($OCAMLFIND query mlmpfr)
-      if test -n "$DIR"; then
-         echo "ocamlfind found mlmpfr in $DIR"
-         # Test that mpfr version is higher than 4.0.0 (because of
-         # Faithful constructor incompatibility).
-         MPFR_VER=$(grep -q "4.0.0" $DIR/META 2> /dev/null)
-         EXIT_CODE=$?
-         if test $EXIT_CODE = 0; then
-            MLMPFRINCLUDE="-I $DIR"
-            MLMPFR=mlmpfr
-            found_mlmpfr=yes
-            MLMPFR_LINK="-cclib -lmpfr"
-            AC_CHECK_FILE($DIR/mlmpfr.cma,,found_mlmpfr=yes)
-         else
-            reason_mlmpfr=" (Version of mlmpfr is not 4.0.0) "
-            found_mlmpfr=no
-         fi
-      else
-         reason_mlmpfr=" (mlmpfr not found)"
-         found_mlmpfr=no
-      fi
+   DIR=$($OCAMLFIND query mlmpfr)
+   if test -n "$DIR"; then
+      echo "ocamlfind found mlmpfr in $DIR"
+      # Test that MPFR version is higher than 4.0.0 (because of
+      # Faithful constructor incompatibility).
+      MPFRVERSION=$($OCAMLFIND query -format "%v" mlmpfr)
+      AX_VERSION_GE([$MPFRVERSION], 4.0.0, [], [
+         enable_mpfr=no
+         reason_mpfr=" (mlmpfr >= 4.0.0 not found)"])
+      AC_CHECK_FILE($DIR/mlmpfr.cma,, [
+         enable_mpfr=no
+         reason_mpfr=" (mlmpfr not found)"])
    else
-      reason_mlmpfr=" (ocamlfind not available) "
-      found_mlmpfr=no
+      reason_mpfr=" (mlmpfr not found)"
+      enable_mpfr=no
    fi
 fi
-if test "$found_mlmpfr" = no; then
-   MLMPFRINCLUDE=
-   MLMPFR=
+
+if test "$enable_mpfr" = yes; then
+   MLMPFR=mlmpfr
 fi
 
 # checking for statmemprof
@@ -1103,10 +1103,8 @@ AC_SUBST(SEXPLIB)
 AC_SUBST(SEXPLIBPPX)
 
 AC_SUBST(NUMINCLUDE)
-AC_SUBST(MLMPFRINCLUDE)
 AC_SUBST(MLMPFR)
-AC_SUBST(MLMPFR_LINK)
-AC_SUBST(found_mlmpfr)
+AC_SUBST(enable_mpfr)
 
 AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)
@@ -1213,7 +1211,7 @@ echo "    Memory profiling        : $enable_statmemprof$reason_statmemprof"
 echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    S-expr for why3pp       : $enable_pp_sexp$reason_no_pp_sexp"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
-echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
+echo "    MPFR support            : $enable_mpfr$reason_mpfr"
 echo "    Re support              : $enable_re$reason_re"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
