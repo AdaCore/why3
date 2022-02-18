@@ -997,12 +997,21 @@ and exec_expr' ctx e =
       | Capp (rs, pvsl) when
           Opt.map is_prog_constant (Mid.find_opt rs.rs_name ctx.env.pmodule.Pmodule.mod_known)
           = Some true ->
+          Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: EXEC CAPP %a@]@." pp_indent print_rs rs;
           if ctx.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
             let cntr_ctx = mk_cntr_ctx ctx ?loc:e.e_loc ~desc Vc.expl_pre in
             check_terms ctx.rac cntr_ctx cty.cty_pre );
           assert (cty.cty_args = [] && pvsl = []);
-          let v = Lazy.force (Mrs.find rs ctx.env.rsenv) in
+          let v =
+            match find_definition ctx.env rs with
+            | Builtin f ->
+                Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
+                ( match f rs [] with
+                  | Some v -> v
+                  | None -> incomplete "cannot compute result of builtin `%a`"
+                              Ident.print_decoded rs.rs_name.id_string )
+            | _ -> Lazy.force (Mrs.find rs ctx.env.rsenv) in
           if ctx.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
             let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
