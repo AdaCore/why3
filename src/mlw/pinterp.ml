@@ -940,7 +940,7 @@ and exec_expr' ctx e =
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
-        Normal (value ty_real (Vfloat (Mlmpfr_wrapper.make_from_str s)))
+        Normal (value (ty_of_ity e.e_ity) (Vfloat (Mlmpfr_wrapper.make_from_str s)))
   | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
   | Eexec (ce, cty) -> begin
       (* TODO (When) do we have to check the contracts in cty? When ce <> Capp? *)
