@@ -189,7 +189,7 @@ let eval_float :
     incomplete "mlmpfr wrapper is not implemented"
 
 type 'a real_arity =
-  | Modeconst : Big_real.real real_arity
+  | Modeconst : (unit -> Big_real.real) real_arity
   | Mode1r : (Big_real.real -> Big_real.real) real_arity
   | Mode2r : (Big_real.real -> Big_real.real -> Big_real.real) real_arity
   | Mode_relr : (Big_real.real -> Big_real.real -> bool) real_arity
@@ -201,7 +201,7 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
     | Mode1r, [Vreal r] -> Some (real_value (op r))
     | Mode2r, [Vreal r1; Vreal r2] -> Some (real_value (op r1 r2))
     | Mode_relr, [Vreal r1; Vreal r2] -> Some (bool_value (op r1 r2))
-    | Modeconst, [] -> Some (real_value op)
+    | Modeconst, [] -> Some (real_value (op ()))
     | _ -> incomplete "arity error in real operation"
   with
   | Big_real.Undetermined ->
@@ -346,7 +346,7 @@ let built_in_modules () =
       "sqrt",          eval_real Mode1r Big_real.sqrt
     ];
     builtin ["real"] "Trigonometry" [
-      "pi",            eval_real Modeconst (Big_real.pi ())
+      "pi",            eval_real Modeconst Big_real.pi
     ];
     builtin ["real"] "ExpLog" [
       "exp",           eval_real Mode1r Big_real.exp;
