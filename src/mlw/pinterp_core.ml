@@ -1062,7 +1062,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
       Opt.iter (ty_equal_check ty) t.t_ty;
       vsenv, t
   | Vreal _ | Vfloat _ | Vfloat_mode _ -> (* TODO *)
-      Format.kasprintf failwith "term_of_value: %a" print_value v
+      vsenv, t_undefined ty
   | Vproj (ls, x) ->
       (* TERM: epsilon v. rs v = x *)
       let vs = create_vsymbol (id_fresh "v") ty in
