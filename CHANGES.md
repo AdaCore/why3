@@ -1,5 +1,11 @@
 :x: marks a potential source of incompatibility
 
+Version 1.4.1, February 18, 2022
+--------------------------------
+
+Bug fixes
+  * fixed usage of various dependencies: `menhir`, `camlzip`, `ppx_deriving`, `coq-flocq`, `mlmpfr`
+
 Provers
   * support for Alt-Ergo 2.4.1 (released July 28, 2021)
 
