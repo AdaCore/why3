@@ -922,6 +922,9 @@ if test "$enable_coq_support" = yes; then
       8.14*)
          coq_compat_version="COQ814"
          ;;
+      8.15*)
+         coq_compat_version="COQ815"
+         ;;
       *)
          enable_coq_support=no
          AC_MSG_WARN(You need Coq 8.7 or later; Coq discarded)
@@ -948,7 +951,7 @@ if test "$enable_coq_libs" = yes; then
    AC_MSG_CHECKING([for Flocq])
    AS_IF(
      [ echo "Require Import Flocq.Version BinNat." \
-            "Goal (30100 <= Flocq_version)%N. easy. Qed." > conftest.v
+            "Goal (30100 <= Flocq_version /\ Flocq_version < 40000)%N. easy. Qed." > conftest.v
        "$COQC" conftest.v > conftest.err ],
      [ AC_MSG_RESULT(yes) ],
      [ AC_MSG_RESULT(no)
