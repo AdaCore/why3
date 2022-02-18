@@ -133,7 +133,9 @@ let is_vc_term ~vc_term_loc ~vc_term_attrs ctx t =
         | Tquant (_, tq) -> let _,_,t = t_open_quant tq in has_vc_term_loc t
         | Tlet (_, tb) -> let _,t = t_open_bound tb in has_vc_term_loc t
         | _ -> false in
-      Sattr.mem ctx.attr vc_term_attrs &&
+      (* FIXME: this check is too strong, because the user may have added their own
+         "expl:..." attribute *)
+      (Sattr.mem ctx.attr vc_term_attrs || true ) &&
       match ctx.loc with
       | Some loc -> Loc.equal loc vc_term_loc
       | None -> has_vc_term_loc t
