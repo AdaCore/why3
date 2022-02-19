@@ -90,8 +90,11 @@ module R
 
   use real.Trigonometry
 
-  let bench3 () =
-    (pi, sqrt (pi))
-
+  let bench3 ()
+    raises { BenchFailure -> false }
+  =
+    let y = sqrt pi in
+    if y < 1.77245385090551 || y > 1.77245385090552 then raise BenchFailure;
+    y
 
 end

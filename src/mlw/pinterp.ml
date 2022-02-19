@@ -189,7 +189,7 @@ let eval_float :
     incomplete "mlmpfr wrapper is not implemented"
 
 type 'a real_arity =
-  | Modeconst : Big_real.real real_arity
+  | Modeconst : (unit -> Big_real.real) real_arity
   | Mode1r : (Big_real.real -> Big_real.real) real_arity
   | Mode2r : (Big_real.real -> Big_real.real -> Big_real.real) real_arity
   | Mode_relr : (Big_real.real -> Big_real.real -> bool) real_arity
@@ -201,7 +201,7 @@ let eval_real : type a. a real_arity -> a -> rsymbol -> value list -> value opti
     | Mode1r, [Vreal r] -> Some (real_value (op r))
     | Mode2r, [Vreal r1; Vreal r2] -> Some (real_value (op r1 r2))
     | Mode_relr, [Vreal r1; Vreal r2] -> Some (bool_value (op r1 r2))
-    | Modeconst, [] -> Some (real_value op)
+    | Modeconst, [] -> Some (real_value (op ()))
     | _ -> incomplete "arity error in real operation"
   with
   | Big_real.Undetermined ->
@@ -346,7 +346,7 @@ let built_in_modules () =
       "sqrt",          eval_real Mode1r Big_real.sqrt
     ];
     builtin ["real"] "Trigonometry" [
-      "pi",            eval_real Modeconst (Big_real.pi ())
+      "pi",            eval_real Modeconst Big_real.pi
     ];
     builtin ["real"] "ExpLog" [
       "exp",           eval_real Mode1r Big_real.exp;
@@ -940,7 +940,7 @@ and exec_expr' ctx e =
       else
         let c = Constant.ConstReal r in
         let s = Format.asprintf "%a" Constant.print_def c in
-        Normal (value ty_real (Vfloat (Mlmpfr_wrapper.make_from_str s)))
+        Normal (value (ty_of_ity e.e_ity) (Vfloat (Mlmpfr_wrapper.make_from_str s)))
   | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
   | Eexec (ce, cty) -> begin
       (* TODO (When) do we have to check the contracts in cty? When ce <> Capp? *)
@@ -997,12 +997,21 @@ and exec_expr' ctx e =
       | Capp (rs, pvsl) when
           Opt.map is_prog_constant (Mid.find_opt rs.rs_name ctx.env.pmodule.Pmodule.mod_known)
           = Some true ->
+          Debug.dprintf debug_trace_exec "@[<h>%tEVAL EXPR: EXEC CAPP %a@]@." pp_indent print_rs rs;
           if ctx.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
             let cntr_ctx = mk_cntr_ctx ctx ?loc:e.e_loc ~desc Vc.expl_pre in
             check_terms ctx.rac cntr_ctx cty.cty_pre );
           assert (cty.cty_args = [] && pvsl = []);
-          let v = Lazy.force (Mrs.find rs ctx.env.rsenv) in
+          let v =
+            match find_definition ctx.env rs with
+            | Builtin f ->
+                Debug.dprintf debug_trace_exec "@[<hv2>%tEXEC CALL %a: BUILTIN@]@." pp_indent print_rs rs;
+                ( match f rs [] with
+                  | Some v -> v
+                  | None -> incomplete "cannot compute result of builtin `%a`"
+                              Ident.print_decoded rs.rs_name.id_string )
+            | _ -> Lazy.force (Mrs.find rs ctx.env.rsenv) in
           if ctx.do_rac then (
             let desc = asprintf "of `%a`" print_rs rs in
             let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
