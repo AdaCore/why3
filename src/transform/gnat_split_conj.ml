@@ -174,7 +174,7 @@ let rec unfold_right n env f =
       t_attr_copy f (t_forall (close vsl trl (unfold_right n env f1)))
   | Tapp (ls, tl) ->
     let tl = List.map (unfold_right n env) tl in
-    if should_unfold ls && Mls.mem ls env then
+    if should_unfold ls then
       let f = t_attr_copy f (t_unfold f.t_loc env ls tl f.t_ty) in
       unfold_right (n-1) env f
     else
@@ -329,9 +329,9 @@ let () =
 let () =
   let trans =
     Trans.compose_l
-      (Trans.singleton unfold_trans)
+      Introduction.split_vc
       (Trans.compose_l
-        Introduction.split_vc
+        (Trans.singleton unfold_trans)
           split_conj)
   in
   Trans.register_transform_l "split_vc_conj" trans

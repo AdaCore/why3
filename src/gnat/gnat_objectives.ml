@@ -182,9 +182,12 @@ let strategy =
   match Gnat_config.proof_mode with
   | Gnat_config.Per_Path -> ["path_split"; Gnat_split_conj.split_conj_name]
   | Gnat_config.Per_Check ->
+      if Gnat_config.giant_step_rac then
         ["split_vc_conj"]
+      else
+        ["split_goal_wp_conj"]
   | _ ->
-      ["split_vc_conj";
+      ["split_goal_wp_conj";
        Gnat_split_disj.split_disj_name]
 
 let parent_transform_name s goal =
