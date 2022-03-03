@@ -959,15 +959,6 @@ let remove_all_valid_ce_attempt s =
 (* exception Goal_Found of goal *)
 exception PA_Found of Session_itp.proofAttemptID
 
-let is_most_appropriate_prover obj_rec prover =
-  if obj_rec.counter_example then begin
-    match Gnat_config.prover_ce with
-    | Some p -> prover = p
-    | _ -> true
-  end else
-    List.exists (fun p -> p = prover)
-    Gnat_config.provers
-
 let select_appropriate_proof_attempt obj_rec pa =
 (* helper function that helps finding the most appropriate proof attempt. In
   the normal case, we want to have an unsuccessful proof attempt of the
@@ -978,11 +969,10 @@ let select_appropriate_proof_attempt obj_rec pa =
     if obj_rec.counter_example then
       match Gnat_config.prover_ce with
       | Some p -> pa.Session_itp.prover = p
-      | _ -> finished_but_not_valid_or_unedited pa &&
-          is_most_appropriate_prover obj_rec pa.Session_itp.prover
+      | _ -> finished_but_not_valid_or_unedited pa
     else
       finished_but_not_valid_or_unedited pa &&
-      is_most_appropriate_prover obj_rec pa.Session_itp.prover
+        List.exists (fun p -> p = pa.Session_itp.prover) Gnat_config.provers
 
 let session_find_unproved_pa c obj =
   let obj_rec = Gnat_expl.HCheck.find explmap obj in
