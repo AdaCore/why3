@@ -532,7 +532,6 @@ let register_result c goal result : 'a * 'b =
            (* The goal will be scheduled to get a counterexample *)
            obj_rec.not_proved <- true;
            obj_rec.counter_example <- true;
-           GoalSet.add obj_rec.to_be_proved goal;
            (* The goal will be scheduled manually in Gnat_main.handle_result
               so it is not put to the obj_rec.to_be_scheduled *)
            obj, Counter_Example
