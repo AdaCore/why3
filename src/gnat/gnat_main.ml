@@ -77,17 +77,18 @@ let rec handle_vc_result c goal result =
        prover_result  the actual proof result, to extract statistics
    *)
    let obj, status = C.register_result c goal result in
-
    match status with
    | Gnat_objectives.Proved -> ()
    | Gnat_objectives.Not_Proved -> ()
    | Gnat_objectives.Work_Left ->
        List.iter (create_manual_or_schedule c obj) (Gnat_objectives.next obj)
    | Gnat_objectives.Counter_Example ->
-     (* In this case, counterexample prover will be never None *)
+     (* In this case, counterexample prover and VC will be never None *)
      let prover_ce = (Opt.get Gnat_config.prover_ce) in
-     C.schedule_goal_with_prover c ~callback:(interpret_result c) goal
-       prover_ce
+     match Gnat_objectives.ce_goal obj with
+     | None -> assert false
+     | Some g ->
+       C.schedule_goal_with_prover c ~callback:(interpret_result c) g prover_ce
 
 and interpret_result c pa pas =
    (* callback function for the scheduler, here we filter if an interesting
@@ -201,28 +202,34 @@ let report_messages c obj =
       let (stats, stat_checker) = C.Save_VCs.extract_stats c obj in
       Gnat_report.Proved (stats, stat_checker)
     else
-      let unproved_pa = C.session_find_unproved_pa c obj in
-      let unproved_goal =
-        (* In some cases (replay) no proofattempt proves the goal but we still
-           want a task to be able to extract the expl from it. *)
-        if unproved_pa = None then
-          C.session_find_unproved_goal c obj
-        else
-          Opt.map (fun pa -> Session_itp.get_proof_attempt_parent s pa) unproved_pa
-      in
       let model =
-        match Opt.map (Session_itp.get_proof_attempt_node s) unproved_pa with
-        | Some { Session_itp.proof_state = Some pr; parent } ->
+        let ce_pa = C.session_find_ce_pa c obj in
+        match ce_pa with
+        | None -> None
+        | Some pa ->
+          let ce_pan = Session_itp.get_proof_attempt_node s pa in
+          match ce_pan.Session_itp.proof_state with
+          | None -> None
+          | Some pr ->
             let not_step_limit (pa,_) = pa <> Call_provers.StepLimitExceeded in
             let models = List.filter not_step_limit pr.Call_provers.pr_models in
             let model = Check_ce.select_model_last_non_empty models in
-            Opt.map (fun m -> m, maybe_giant_step_rac c parent m) model
-        | _ -> None
+            match model with
+            | None -> None
+            | Some m ->
+              Some
+                (Gnat_counterexamples.post_clean#model m,
+                 maybe_giant_step_rac c ce_pan.Session_itp.parent m)
       in
-      let model =
-        Opt.map (fun (m,st) -> Gnat_counterexamples.post_clean#model m, st)
-          model in
+      let unproved_pa = C.session_find_unproved_pa c obj in
       let manual_info = Opt.bind unproved_pa (Gnat_manual.manual_proof_info s) in
+      let unproved_goal =
+        (* In some cases (replay) no proofattempt proves the goal but we still
+           want a task to be able to extract the expl from it. *)
+        match unproved_pa with
+        | None -> C.session_find_unproved_goal c obj
+        | Some pa -> Some (Session_itp.get_proof_attempt_parent s pa)
+      in
       let extra_info =
         match unproved_goal with
         | None -> { Gnat_expl.pretty_node = None; inlined = None }

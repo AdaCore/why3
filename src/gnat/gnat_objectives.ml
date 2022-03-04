@@ -73,10 +73,8 @@ type objective_rec =
      mutable not_proved : bool;
    (* when a goal is not proved, the objective is marked "not proved" by
     * setting this boolean to "true" *)
-     mutable counter_example : bool;
-   (* when a goal is not proved and a counterexample for the goal should
-    * be got, the objective is marked "counterexample" by setting this
-    * boolean to "true" *)
+     mutable counter_example : goal_id option;
+   (* when a goal is not proved, store the counterexample VC in this field *)
    }
 (* an objective consists of to be scheduled and to be proved goals *)
 
@@ -85,7 +83,7 @@ let empty_objective () =
      to_be_proved    = GoalSet.empty ();
      toplevel        = GoalSet.empty ();
      not_proved      = false;
-     counter_example = false
+     counter_example = None
    }
 
 (* The state of the module consists of these mutable structures *)
@@ -204,13 +202,12 @@ let next objective =
    in
    build [] Gnat_config.parallel
 
+let ce_transform = "introduce_premises"
+
 let strategy =
   match Gnat_config.proof_mode with
   | Gnat_config.Per_Path -> ["path_split"; Gnat_split_conj.split_conj_name]
   | Gnat_config.Per_Check ->
-      if Gnat_config.giant_step_rac then
-        ["split_vc_conj"]
-      else
         ["split_goal_wp_conj"]
   | _ ->
       ["split_goal_wp_conj";
@@ -218,8 +215,8 @@ let strategy =
 
 let parent_transform_name s goal =
    match Session_itp.get_proof_parent s goal with
-   | Session_itp.Trans trid    -> Session_itp.get_transf_name s trid
-   | Session_itp.Theory _theory -> assert false
+   | Session_itp.Trans trid    -> Some (Session_itp.get_transf_name s trid)
+   | Session_itp.Theory _theory -> None
 
 let rev_strategy = List.rev strategy
 
@@ -261,7 +258,7 @@ let find_next_transformation s (goal: goal_id) =
      was applied *)
   let subtransf = Session_itp.get_transformations s goal in
   if subtransf = [] then
-    try next_transform (parent_transform_name s goal)
+    try next_transform (Opt.get (parent_transform_name s goal))
     with Not_found ->
       Gnat_util.abort_with_message ~internal:true
         "unknown transformation found"
@@ -276,7 +273,7 @@ let is_full_split_goal ses (goal: goal_id) =
       applied to it (that we could follow) *)
   if not (Session_itp.get_transformations ses goal = []) then false
   else
-    let tr_name = parent_transform_name ses goal in
+    let tr_name = Opt.get (parent_transform_name ses goal) in
     not (List.mem tr_name strategy) || tr_name = last_transform
 
 let has_already_been_applied s trans (goal: goal_id) =
@@ -375,13 +372,17 @@ let init_cont () =
 
 let objective_status obj =
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
-   if obj_rec.counter_example then Counter_Example
+   if obj_rec.counter_example <> None then Counter_Example
    else if GoalSet.is_empty obj_rec.to_be_proved then
      if obj_rec.not_proved then Not_Proved else Proved
    else if GoalSet.is_empty obj_rec.to_be_scheduled then
       Not_Proved
    else
       Work_Left
+
+let ce_goal obj =
+   let obj_rec = Gnat_expl.HCheck.find explmap obj in
+   obj_rec.counter_example
 
 let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
   (* Check whether the goal has been tried already *)
@@ -495,10 +496,26 @@ let further_split (c: Controller_itp.controller) (goal: goal_id) =
    in
    split (find_next_transformation c.Controller_itp.controller_session goal)
 
+let add_ce_goal c goal =
+   let s = c.Controller_itp.controller_session in
+   if has_already_been_applied s ce_transform goal then ()
+   else
+     C.schedule_transformation c goal ce_transform []
+       ~callback:(fun _ -> ())
+       ~notification:(fun _ -> ());
+    let tr_list = Session_itp.get_transformations s goal in
+    try
+      let tr = List.find (fun x -> Session_itp.get_transf_name s x = ce_transform) tr_list in
+      let tasks = Session_itp.get_sub_tasks s tr in
+      match tasks with
+      | [x] -> x
+      | _ -> goal
+    with Not_found -> goal
+
 let register_result c goal result : 'a * 'b =
    let obj = get_objective goal in
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
-   if obj_rec.counter_example then
+   if obj_rec.counter_example <> None then
      (* The prover run was scheduled just to get counterexample *)
      obj, Not_Proved
    else
@@ -549,7 +566,9 @@ let register_result c goal result : 'a * 'b =
          if Gnat_config.counterexamples then begin
            (* The goal will be scheduled to get a counterexample *)
            obj_rec.not_proved <- true;
-           obj_rec.counter_example <- true;
+           let ce_goal = add_ce_goal c goal in
+           obj_rec.counter_example <- Some ce_goal;
+           GoalMap.add goalmap ce_goal (get_vc_info goal);
            (* The goal will be scheduled manually in Gnat_main.handle_result
               so it is not put to the obj_rec.to_be_scheduled *)
            obj, Counter_Example
@@ -968,18 +987,11 @@ let remove_all_valid_ce_attempt s =
 (* exception Goal_Found of goal *)
 exception PA_Found of Session_itp.proofAttemptID
 
-let select_appropriate_proof_attempt obj_rec pa =
-(* helper function that helps finding the most appropriate proof attempt. In
-  the normal case, we want to have an unsuccessful proof attempt of the
-  counter example prover. If a CE prover is not available, we want a proof
-  attempt that corresponds to a selected prover. *)
+let select_appropriate_proof_attempt pa =
+(* helper function that helps finding the most appropriate proof attempt. We
+   want a proof attempt that corresponds to a selected prover. *)
   if pa.Session_itp.proof_obsolete then false
   else
-    if obj_rec.counter_example then
-      match Gnat_config.prover_ce with
-      | Some p -> pa.Session_itp.prover = p
-      | _ -> finished_but_not_valid_or_unedited pa
-    else
       finished_but_not_valid_or_unedited pa &&
         List.exists (fun p -> p = pa.Session_itp.prover) Gnat_config.provers
 
@@ -995,7 +1007,7 @@ let session_find_unproved_pa c obj =
           let pa_ids_list = Session_itp.get_proof_attempt_ids session g in
           Whyconf.Hprover.iter (fun _ panid ->
             let pa = Session_itp.get_proof_attempt_node session panid in
-            if select_appropriate_proof_attempt obj_rec pa then
+            if select_appropriate_proof_attempt pa then
               raise (PA_Found panid)) pa_ids_list
     | _ -> () in
 
@@ -1008,16 +1020,34 @@ let session_find_unproved_pa c obj =
   with PA_Found p ->
     Some p
 
+let session_find_ce_pa c obj =
+  let obj_rec = Gnat_expl.HCheck.find explmap obj in
+  let session = c.Controller_itp.controller_session in
+  match obj_rec.counter_example with
+  | None ->
+  None
+  | Some g ->
+    let pa_ids_list = Session_itp.get_proof_attempt_ids session g in
+    try
+      Whyconf.Hprover.iter (fun _ panid -> raise (PA_Found panid)) pa_ids_list;
+      None
+    with PA_Found p -> Some p
+
 exception Found_goal_id of Session_itp.proofNodeID
 
 let session_find_unproved_goal c obj =
 
   let obj_rec = Gnat_expl.HCheck.find explmap obj in
   let session = c.Controller_itp.controller_session in
+  let is_ce_goal g =
+    match parent_transform_name session g with
+    | Some tr when tr = ce_transform -> true
+    | _ -> false
+  in
   let traversal_function () g =
     match g with
     | Session_itp.APn g ->
-        if not (Session_itp.pn_proved session g) then
+        if not (Session_itp.pn_proved session g) && (not (is_ce_goal g)) then
           raise (Found_goal_id g)
     | _ -> () in
 

@@ -101,6 +101,8 @@ val all_provers_tried : Session_itp.session -> goal_id -> bool
 val objective_status : objective -> status
 (* query the status of the objective *)
 
+val ce_goal : objective -> goal_id option
+
 val init_cont : unit -> Controller_itp.controller
 (* Makes a new controller with session *)
 
@@ -190,8 +192,11 @@ val remove_all_valid_ce_attempt: Session_itp.session -> unit
 val session_find_unproved_pa :
     Controller_itp.controller -> objective -> Session_itp.proofAttemptID option
 (* find the first unproved (not obsolete) proof attempt in a session which is
- *  in subforest of objective. If counter examples are activated, this will
- *  return a CE proof attempt, if any *)
+ *  in subforest of objective. *)
+
+val session_find_ce_pa :
+    Controller_itp.controller -> objective -> Session_itp.proofAttemptID option
+(* Find the proof attempt related to the counter example, if any *)
 
 val session_find_unproved_goal :
     Controller_itp.controller -> objective -> Session_itp.proofNodeID option
