@@ -10,6 +10,7 @@
 (********************************************************************)
 
 val version : string
+val editor : string
 val libdir : string
 val datadir : string
 val localdir : string option

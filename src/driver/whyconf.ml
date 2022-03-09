@@ -300,8 +300,7 @@ let empty_main =
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
-    default_editor = (try Sys.getenv "EDITOR" ^ " %f"
-                      with Not_found -> "editor %f");
+    default_editor = Config.editor ^ " %f"
   }
 
 exception ConfigFailure of string (* filename *) * string
