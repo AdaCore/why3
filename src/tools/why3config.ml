@@ -135,7 +135,7 @@ module ShowConfig = struct
     Rc.to_channel stdout rc
 
   let cmd = {
-      cmd_desc = "show the full configution";
+      cmd_desc = "show the full configuration";
       cmd_usage = "\nShow the full configuration.";
       cmd_name = "show";
       cmd_run = run;
