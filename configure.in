@@ -162,6 +162,10 @@ AC_ARG_ENABLE(emacs-compilation,
     AS_HELP_STRING([--disable-emacs-compilation], [do not compile why3.elc]),,
     enable_emacs_compilation=yes)
 
+# default editor
+
+AC_ARG_VAR(EDITOR, [default editor])
+
 # either relocation or local, not both
 if test "$enable_relocation" = yes ; then
 if test "$enable_local" = yes ; then
@@ -1083,6 +1087,22 @@ if test "$enable_frama_c" = yes; then
 fi
 
 VERSION=$PACKAGE_VERSION
+
+# default editor
+
+if test -z "$EDITOR"; then
+   case `uname -s` in
+   Darwin)
+      EDITOR=open
+      ;;
+   MINGW*)
+      EDITOR="cmd.exe -c start"
+      ;;
+   *)
+      EDITOR=xdg-open
+      ;;
+   esac
+fi
 
 # substitutions to perform
 AC_SUBST(VERSION)
