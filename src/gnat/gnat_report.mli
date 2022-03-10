@@ -113,10 +113,9 @@ type prover_stat =
 type stats = prover_stat Whyconf.Hprover.t
 
 type result_info =
-  | Proved of stats * int * int
-  (* extra information about the run. The first integer is the number of
-     subgoals proven by transformations (except trivial_true).
-     The second integer is the number of subgoals proven by trivial_true. *)
+  | Proved of stats * int
+  (* extra information about the run. The integer is the number of
+     subgoals proven by transformations. *)
   | Not_Proved of
       Gnat_expl.extra_info *     (* VC Info for the unproved goal *)
       (Model_parser.model * Check_ce.rac_result option) option *

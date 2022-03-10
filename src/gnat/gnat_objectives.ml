@@ -152,6 +152,32 @@ let add_clone derive goal =
    let obj = get_vc_info derive in
    add_to_objective ~toplevel:false obj goal
 
+let trivial_prover =
+  { Whyconf.prover_name = "Trivial";
+    prover_version = "1.0" ;
+    prover_altern = "trivial"
+  }
+
+let trivial_resource_limit =
+  { Call_provers.limit_time = 1;
+    limit_mem = 1000;
+    limit_steps = 1;
+  }
+
+let trivial_result =
+  { Call_provers.pr_answer = Call_provers.Valid;
+    pr_status = Unix.WEXITED 1;
+    pr_output = "unsat";
+    pr_time   = 0.0;
+    pr_steps = 1;
+    pr_models = []
+  }
+
+let add_trivial_proof s goal_id =
+  let _ = Session_itp.graft_proof_attempt s goal_id trivial_prover ~limit:trivial_resource_limit in
+  Session_itp.update_proof_attempt (fun _ -> ()) s goal_id trivial_prover trivial_result;
+  Session_itp.update_goal_node (fun _ -> ()) s goal_id
+
 
 let add_to_objective = add_to_objective ~toplevel:true
 (* we mask the add_to_objective function here and fix it's toplevel argument to
@@ -429,14 +455,6 @@ module Make (S: Controller_itp.Scheduler) = struct
 
 module C = Controller_itp.Make(S)
 
-let apply_trivial c goal_id =
-  try C.schedule_transformation c goal_id "trivial_true" []
-        ~callback:(fun _ -> ()) ~notification:(fun _ -> ())
-  with
-  (* Ignore errors. If this fails because it is not applied at the right place
-     (already applied or detached), just do nothing. *)
-  | C.GoalNodeDetached _ | C.TransAlreadyExists _ -> ()
-
 let further_split (c: Controller_itp.controller) (goal: goal_id) =
    (* check which was the last transformation applied to the goal and
       apply the next one on the list. Note that this may have already been done
@@ -684,10 +702,7 @@ module Save_VCs = struct
                       max_time = pr.Call_provers.pr_time;
                       max_steps = pr.Call_provers.pr_steps }
 
-  let is_trivial_trans s tnid =
-    Session_itp.get_transf_name s tnid = "trivial_true"
-
-  let rec extract_stat_goal c stat stat_checkers stat_trivial goal =
+  let rec extract_stat_goal c stat stat_checkers goal =
     (* Not obsolete and valid *)
     assert (is_valid c goal);
     let ses = c.Controller_itp.controller_session in
@@ -703,12 +718,9 @@ module Save_VCs = struct
             let subtasks = Session_itp.get_sub_tasks ses tnid in
             (* The transformation proved the goal *)
             if subtasks = [] then
-              if is_trivial_trans c.Controller_itp.controller_session tnid then
-                stat_trivial := !stat_trivial + 1
-              else
                 stat_checkers := !stat_checkers + 1
             else
-              List.iter (extract_stat_goal c stat stat_checkers stat_trivial) subtasks;
+              List.iter (extract_stat_goal c stat stat_checkers) subtasks;
 
           (* need to exit here so once we found a transformation that proves
            * the goal, don't try further *)
@@ -719,13 +731,11 @@ module Save_VCs = struct
   let extract_stats c (obj : objective) =
     (* Hold the stats for provers *)
     let stats = Whyconf.Hprover.create 5 in
-    (* stat_checker = number of goal proved by a transformation (except trivial_true)
-       stat_trivial = number of goal proved specifically by trivial_true *)
+    (* stat_checker = number of goal proved by a transformation *)
     let stat_checkers = ref 0 in
-    let stat_trivial = ref 0 in
     let obj_rec = Gnat_expl.HCheck.find explmap obj in
-    GoalSet.iter (extract_stat_goal c stats stat_checkers stat_trivial) obj_rec.toplevel;
-    (stats, !stat_checkers, !stat_trivial)
+    GoalSet.iter (extract_stat_goal c stats stat_checkers) obj_rec.toplevel;
+    (stats, !stat_checkers)
 
   let count_map : (int ref) Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 
@@ -1081,7 +1091,8 @@ and replay_goal c goal =
       let pa_prover =
         (Session_itp.get_proof_attempt_node session pa).Session_itp.prover in
       let prover =
-        try
+        if pa_prover = trivial_prover then None
+        else try
           Some (List.find (fun p -> p = pa_prover) Gnat_config.provers)
         with Not_found ->
           Gnat_report.add_warning

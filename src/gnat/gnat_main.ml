@@ -24,19 +24,34 @@ open Gnat_scheduler
 
 module C = Gnat_objectives.Make (Gnat_scheduler)
 
+let rec is_trivial fml =
+   let open Term in
+   (* Check wether the formula is trivial.  *)
+   match fml.t_node with
+   | Ttrue -> true
+   | Tquant (_,tq) ->
+         let _,_,t = t_open_quant tq in
+         is_trivial t
+   | Tlet (_,tb) ->
+         let _, t = t_open_bound tb in
+         is_trivial t
+   | Tbinop (Timplies,_,t2) ->
+         is_trivial t2
+   | Tcase (_,tbl) ->
+         List.for_all (fun b ->
+            let _, t = t_open_branch b in
+            is_trivial t) tbl
+   | _ -> false
+
 let register_goal cont goal_id =
   (* Register the goal by extracting the explanation and trace. If the goal is
-   * trivial, do not register. We check triviality by adding a transformation
-     that only succeed on trivial goals. *)
-  C.apply_trivial cont goal_id;
+   * trivial, do not register. For trivial goals, we register a dummy proof
+   * attempt that succeeded. *)
   let s = cont.Controller_itp.controller_session in
   let task = Session_itp.get_task s goal_id in
   let fml = Task.task_goal_fmla task in
-  let is_trivial =
-    Session_itp.pn_proved s goal_id &&
-    let tr_list = Session_itp.get_transformations s goal_id in
-    List.exists (fun x -> Session_itp.get_transf_name s x = "trivial_true") tr_list
-  in
+  let is_trivial = is_trivial fml in
+  if is_trivial then Gnat_objectives.add_trivial_proof s goal_id;
   match is_trivial, Gnat_expl.search_labels fml with
   | true, None ->
       Gnat_objectives.set_not_interesting goal_id
@@ -183,9 +198,8 @@ let report_messages c obj =
   let s = c.Controller_itp.controller_session in
   let result =
     if C.session_proved_status c obj then
-      let (stats, stat_checker, stat_trivial) =
-        C.Save_VCs.extract_stats c obj in
-      Gnat_report.Proved (stats, stat_checker, stat_trivial)
+      let (stats, stat_checker) = C.Save_VCs.extract_stats c obj in
+      Gnat_report.Proved (stats, stat_checker)
     else
       let unproved_pa = C.session_find_unproved_pa c obj in
       let unproved_goal =

@@ -11,7 +11,7 @@ type prover_stat =
 type stats = prover_stat Whyconf.Hprover.t
 
 type result_info =
-  | Proved of stats * int * int
+  | Proved of stats * int
   | Not_Proved of
        Gnat_expl.extra_info *
        (Model_parser.model * Check_ce.rac_result option) option *
@@ -21,7 +21,6 @@ type msg =
   { result        : bool;
     stats         : stats option;
     stats_checker : int;
-    stats_trivial : int;
     check_tree    : Json_base.json;
     extra_info    : Gnat_expl.extra_info;
     cntexmp_model : (Model_parser.model * Check_ce.rac_result option) option;
@@ -58,10 +57,10 @@ let adapt_stats statsopt =
 let register check check_tree result =
   let valid, extra_info, stats, model, manual =
     match result with
-    | Proved (stats, stats_checker, stat_trivial) ->
+    | Proved (stats, stats_checker) ->
         true,
         {Gnat_expl.pretty_node = None; inlined = None},
-        Some (stats, stats_checker, stat_trivial),
+        Some (stats, stats_checker),
         None,
         None
     | Not_Proved (extra_info, model, manual) ->
@@ -69,15 +68,13 @@ let register check check_tree result =
   in
   if (Gnat_expl.HCheck.mem msg_set check) then assert false
   else begin
-    let stats_g = Opt.map (fun x -> let (stats, _, _) = x in stats) stats in
-    let stats_checker = Opt.map (fun x -> let (_, sc, _) = x in sc) stats in
-    let stats_trivial = Opt.map (fun x -> let (_, _, st) = x in st) stats in
+    let stats_g = Opt.map (fun x -> let (stats, _) = x in stats) stats in
+    let stats_checker = Opt.map (fun x -> let (_, sc) = x in sc) stats in
     let msg =
     { result        = valid;
       extra_info    = extra_info;
       stats         = adapt_stats stats_g;
       stats_checker = Opt.get_def 0 stats_checker;
-      stats_trivial = Opt.get_def 0 stats_trivial;
       check_tree    = check_tree;
       cntexmp_model = model;
       manual_proof  = manual } in
@@ -144,21 +141,16 @@ let print_prover_stats fmt stat =
    (print_json_field "max_steps" int) stat.max_steps
    (print_json_field "max_time" standard_float) stat.max_time
 
-let print_stats fmt (stats, stat_checker, stat_trivial) =
+let print_stats fmt (stats, stat_checker) =
   (* Print the stats for goal solved by transformations as a fake prover. *)
   let fake_prover_ch =
     Whyconf.{prover_name = "Checker"; prover_version = ""; prover_altern = ""}
-  in
-  let fake_prover_tr =
-    Whyconf.{prover_name = "Trivial"; prover_version = ""; prover_altern = ""}
   in
   match stats with
   | None -> ()
   | Some s ->
     if stat_checker <> 0 then
       Whyconf.Hprover.add s fake_prover_ch {count = stat_checker; max_steps = 0; max_time = 0.0};
-    if stat_trivial <> 0 then
-      Whyconf.Hprover.add s fake_prover_tr {count = stat_trivial; max_steps = 0; max_time = 0.0};
     let kv_list = Whyconf.Hprover.fold (fun k v acc -> (k,v)::acc) s [] in
     let get_name pr = pr.Whyconf.prover_name in
     Format.fprintf fmt ", ";
@@ -189,7 +181,7 @@ let print_json_msg fmt (check, m) =
     (print_json_field "result" bool) m.result
     (print_json_field "check_tree" Json_base.print_json) m.check_tree
     print_extra_info m.extra_info
-    print_stats (m.stats, m.stats_checker, m.stats_trivial)
+    print_stats (m.stats, m.stats_checker)
     print_cntexmp_model m.cntexmp_model
     print_manual_proof_info m.manual_proof
 

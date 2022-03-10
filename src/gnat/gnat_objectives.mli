@@ -69,6 +69,8 @@ val is_not_interesting : goal_id -> bool
 val is_interesting : goal_id -> bool
 (* query the "interesting" bit *)
 
+val add_trivial_proof : Session_itp.session -> goal_id -> unit
+
 val get_objective : goal_id -> objective
 (* get the objective associated with a goal_id *)
 val get_extra_info   : goal_id -> Gnat_expl.extra_info
@@ -123,11 +125,6 @@ end
 
 module Make (S: Controller_itp.Scheduler) : sig
 
-
-val apply_trivial: Controller_itp.controller -> goal_id -> unit
-(* Apply the transformation that recognize if a goal ends by true. If it ends
-   by true, add this to the session *)
-
 val register_result : Controller_itp.controller -> goal_id -> bool -> objective * status
 (* Register the result of a prover for a given goal_id, and return the updated
  * status of the objective, as well as the objective itself *)
@@ -163,11 +160,9 @@ module Save_VCs : sig
    (* Provide saving of VCs, traces *)
 
    val extract_stats :
-     Controller_itp.controller -> objective -> Gnat_report.stats * int * int
+     Controller_itp.controller -> objective -> Gnat_report.stats * int
    (* The second field of the return tuple is the number of goal proved by a
-      transformation that is not trivial_true (Checker prover).
-      The third field of the return tuple is the number of goals proved by
-      exactly trivial_true (Trivial prover).*)
+      transformation that is not trivial_true (Checker prover). *)
 
    val vc_file : goal_id -> string
    (* get the file name for a given goal *)
