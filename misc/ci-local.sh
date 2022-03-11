@@ -11,15 +11,13 @@ if test "$COMPILER" != "system"; then
     eval `opam env`
 fi
 
-export OCAMLRUNPARAM=o=20,O=200
-
 section_start configure Configuration
 ./autogen.sh
 ./configure --enable-local
 section_stop configure
 
 section_start build Building
-make
+make -j2
 section_stop build
 
 while test $# -gt 0
