@@ -47,7 +47,7 @@ module DetectProvers = struct
 
   let cmd = {
       cmd_desc = "detect installed provers";
-      cmd_usage = "\nDetect installed provers.";
+      cmd_usage = "\nDetect installed provers and register them into the configuration file.";
       cmd_name = "detect";
       cmd_run = run;
       cmd_anon_fun = None;
@@ -83,7 +83,7 @@ module AddProver = struct
 
   let cmd = {
       cmd_desc = "add prover";
-      cmd_usage = "<name> <path> [shortcut]\nDetect prover <name> at <path> and register it.";
+      cmd_usage = "<name> <path> [shortcut]\nDetect prover <name> at <path> and register it into the configuration file.";
       cmd_name = "add-prover";
       cmd_run = run;
       cmd_anon_fun = Some (fun s -> args := s :: !args);
@@ -101,8 +101,8 @@ module ListProvers = struct
       (get_provers config)
 
   let cmd = {
-      cmd_desc = "list all the detected provers";
-      cmd_usage = "\nList all the provers present in why3.conf.";
+      cmd_desc = "list all the registered provers";
+      cmd_usage = "\nList all the provers registered in the configuration file.";
       cmd_name = "list-provers";
       cmd_run = run;
       cmd_anon_fun = None;
