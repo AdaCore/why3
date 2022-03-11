@@ -131,10 +131,10 @@ The available subcommands are as follows:
    Manually register a prover.
 
 :why3:tool:`config detect`
-   Automatically detect installed provers.
+   Automatically detect installed provers and register them.
 
 :why3:tool:`config list-provers`
-   List the provers described in :file:`why3.conf`.
+   List the provers registered in :file:`why3.conf`.
 
 :why3:tool:`config list-supported-provers`
    List the names of all supported provers.
