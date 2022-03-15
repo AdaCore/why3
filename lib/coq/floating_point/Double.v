@@ -27,24 +27,28 @@ Require Import floating_point.GenFloat.
 Definition round :
   floating_point.Rounding.mode -> Reals.Rdefinitions.R ->
   Reals.Rdefinitions.R.
+Proof.
 exact (round 53 1024).
 Defined.
 
 (* Why3 goal *)
 Definition value :
   floating_point.DoubleFormat.double -> Reals.Rdefinitions.R.
+Proof.
 exact (value 53 1024).
 Defined.
 
 (* Why3 goal *)
 Definition exact :
   floating_point.DoubleFormat.double -> Reals.Rdefinitions.R.
+Proof.
 exact (exact 53 1024).
 Defined.
 
 (* Why3 goal *)
 Definition model :
   floating_point.DoubleFormat.double -> Reals.Rdefinitions.R.
+Proof.
 exact (model 53 1024).
 Defined.
 
@@ -62,14 +66,24 @@ Definition total_error (x:floating_point.DoubleFormat.double) :
 Definition no_overflow (m:floating_point.Rounding.mode)
     (x:Reals.Rdefinitions.R) : Prop :=
   ((Reals.Rbasic_fun.Rabs (round m x)) <=
-   (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
+   179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368%R)%R.
+
+Lemma max_double_eq: (179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368 = max 53 1024)%R.
+Proof.
+unfold max, Defs.F2R.
+simpl Raux.bpow.
+now rewrite <- mult_IZR.
+Qed.
 
 (* Why3 goal *)
 Lemma Bounded_real_no_overflow :
   forall (m:floating_point.Rounding.mode) (x:Reals.Rdefinitions.R),
   ((Reals.Rbasic_fun.Rabs x) <=
-   (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R ->
+   179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368%R)%R ->
   no_overflow m x.
+Proof.
+unfold no_overflow.
+rewrite max_double_eq.
 exact (Bounded_real_no_overflow 53 1024 (refl_equal true) (refl_equal true)).
 Qed.
 
@@ -78,6 +92,7 @@ Lemma Round_monotonic :
   forall (m:floating_point.Rounding.mode) (x:Reals.Rdefinitions.R)
     (y:Reals.Rdefinitions.R),
   (x <= y)%R -> ((round m x) <= (round m y))%R.
+Proof.
 now apply Round_monotonic.
 Qed.
 
@@ -86,6 +101,7 @@ Lemma Round_idempotent :
   forall (m1:floating_point.Rounding.mode) (m2:floating_point.Rounding.mode)
     (x:Reals.Rdefinitions.R),
   ((round m1 (round m2 x)) = (round m2 x)).
+Proof.
 now apply Round_idempotent.
 Qed.
 
@@ -94,6 +110,7 @@ Lemma Round_value :
   forall (m:floating_point.Rounding.mode)
     (x:floating_point.DoubleFormat.double),
   ((round m (value x)) = (value x)).
+Proof.
 now apply Round_value.
 Qed.
 
@@ -101,7 +118,9 @@ Qed.
 Lemma Bounded_value :
   forall (x:floating_point.DoubleFormat.double),
   ((Reals.Rbasic_fun.Rabs (value x)) <=
-   (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
+   179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368%R)%R.
+Proof.
+rewrite max_double_eq.
 now apply Bounded_value.
 Qed.
 
@@ -119,6 +138,7 @@ Qed.
 Lemma Round_down_le :
   forall (x:Reals.Rdefinitions.R),
   ((round floating_point.Rounding.Down x) <= x)%R.
+Proof.
 now apply Round_down_le.
 Qed.
 
@@ -126,6 +146,7 @@ Qed.
 Lemma Round_up_ge :
   forall (x:Reals.Rdefinitions.R),
   (x <= (round floating_point.Rounding.Up x))%R.
+Proof.
 now apply Round_up_ge.
 Qed.
 
@@ -134,6 +155,7 @@ Lemma Round_down_neg :
   forall (x:Reals.Rdefinitions.R),
   ((round floating_point.Rounding.Down (-x)%R) =
    (-(round floating_point.Rounding.Up x))%R).
+Proof.
 now apply Round_down_neg.
 Qed.
 
@@ -142,6 +164,7 @@ Lemma Round_up_neg :
   forall (x:Reals.Rdefinitions.R),
   ((round floating_point.Rounding.Up (-x)%R) =
    (-(round floating_point.Rounding.Down x))%R).
+Proof.
 now apply Round_up_neg.
 Qed.
 
@@ -149,6 +172,7 @@ Qed.
 Definition round_logic :
   floating_point.Rounding.mode -> Reals.Rdefinitions.R ->
   floating_point.DoubleFormat.double.
+Proof.
 exact (round_logic 53 1024 (refl_equal true) (refl_equal true)).
 Defined.
 
@@ -157,6 +181,8 @@ Lemma Round_logic_def :
   forall (m:floating_point.Rounding.mode) (x:Reals.Rdefinitions.R),
   no_overflow m x -> ((value (round_logic m x)) = (round m x)).
 Proof.
+unfold no_overflow.
+rewrite max_double_eq.
 exact (Round_logic_def 53 1024 (refl_equal true) (refl_equal true)).
 Qed.
 
