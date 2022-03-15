@@ -904,15 +904,19 @@ if test "$enable_coq_support" = yes; then
    case $COQVERSION in
       8.7*)
          coq_compat_version="COQ87"
+         enable_coq_fp_libs=no
          ;;
       8.8*)
          coq_compat_version="COQ88"
+         enable_coq_fp_libs=no
          ;;
       8.9*)
          coq_compat_version="COQ89"
+         enable_coq_fp_libs=no
          ;;
       8.10*)
          coq_compat_version="COQ810"
+         enable_coq_fp_libs=no
          ;;
       8.11*)
          coq_compat_version="COQ811"
@@ -935,6 +939,9 @@ if test "$enable_coq_support" = yes; then
          reason_coq_support=" (need version >= 8.7)"
          ;;
    esac
+   if test "$enable_coq_fp_libs" = no; then
+      reason_coq_fp_libs= " (Coq < 8.11)"
+   fi
 fi
 
 if test "$enable_coq_support" = yes; then
@@ -948,20 +955,21 @@ fi
 
 if test "$enable_coq_support" = no; then
    enable_coq_libs=no
+   enable_coq_fp_libs=no
    COQVERSION=
 fi
 
-if test "$enable_coq_libs" = yes; then
+if test "$enable_coq_fp_libs" = yes; then
    AC_MSG_CHECKING([for Flocq])
    AS_IF(
      [ echo "Require Import Flocq.Version BinNat." \
-            "Goal (30100 <= Flocq_version /\ Flocq_version < 40000)%N. easy. Qed." > conftest.v
+            "Goal (30400 <= Flocq_version)%N. easy. Qed." > conftest.v
        "$COQC" conftest.v > conftest.err ],
      [ AC_MSG_RESULT(yes) ],
      [ AC_MSG_RESULT(no)
        enable_coq_fp_libs=no
        AC_MSG_WARN(Cannot find Flocq.)
-       reason_coq_fp_libs=" (Flocq >= 3.1 not found)" ])
+       reason_coq_fp_libs=" (Flocq >= 3.4 not found)" ])
    rm -f conftest.v conftest.vo conftest.err
 fi
 

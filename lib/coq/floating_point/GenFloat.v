@@ -23,7 +23,7 @@ Require floating_point.Rounding.
 
 Require Import Lia.
 Require Import Flocq.Core.Core.
-Require Import Flocq.IEEE754.Binary.
+Require Import Flocq.IEEE754.BinarySingleNaN.
 Require Import int.Abs.
 
 Section GenFloat.
@@ -76,8 +76,8 @@ destruct y as (y,yv,ye,ym).
 destruct (Req_EM_T xe ye) as [He|He]...
 destruct (Req_EM_T xm ym) as [Hm|Hm]...
 rewrite He, Hm.
-destruct x as [xs|xs|xs xm'|xs xm' xe' xH] ;
-  destruct y as [ys|ys|ys ym'|ys ym' ye' yH]...
+destruct x as [xs|xs| |xs xm' xe' xH] ;
+  destruct y as [ys|ys| |ys ym' ye' yH]...
 clear.
 destruct (Bool.bool_dec xs ys) as [->|Hs].
 now left.
@@ -92,23 +92,7 @@ right.
 apply t_inv.
 intros H _ _.
 now injection H.
-clear.
-destruct (Bool.bool_dec xs ys) as [->|Hs].
-destruct (Pos.eq_dec xm' ym') as [Hm'|Hm'].
-left.
-apply f_equal3 ; try easy.
-revert e; rewrite Hm'; intros e.
-now rewrite (eqbool_irrelevance _ e0 e).
-right.
-apply t_inv.
-intros H _ _.
-injection H.
-contradict Hm'.
-now rewrite Hm'.
-right.
-apply t_inv.
-intros H _ _.
-now injection H.
+now left.
 destruct (Req_EM_T xv yv) as [Hv|Hv].
 left.
 apply f_equal3 ; try easy.
@@ -122,7 +106,7 @@ Qed.
 
 Record t_strict: Set := mk_fp_strict {
   datum :> t;
-  finite : is_finite prec emax (binary datum) = true
+  finite : is_finite (binary datum) = true
 }.
 
 Import Rounding.
@@ -141,23 +125,11 @@ Definition r_to_fp rnd x : binary_float prec emax :=
   let e := cexp radix2 fexp r in
   binary_normalize prec emax Hprec' Hemax' rnd m e false.
 
-Lemma is_finite_FF2B :
-  forall f H,
-  is_finite prec emax (FF2B prec emax f H) =
-    match f with
-    | F754_finite _ _ _ => true
-    | F754_zero _ => true
-    | _ => false
-    end.
-Proof.
-now intros [| | |].
-Qed.
-
 Theorem r_to_fp_correct :
   forall rnd x,
   let r := round radix2 fexp (round_mode rnd) x in
   (Rabs r < bpow radix2 emax)%R ->
-  is_finite prec emax (r_to_fp rnd x) = true /\
+  is_finite (r_to_fp rnd x) = true /\
   r_to_fp rnd x = r :>R.
 Proof with auto with typeclass_instances.
 intros rnd x r Bx.
