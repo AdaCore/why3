@@ -45,6 +45,8 @@ if test "$files" = "" ; then
     files="$dir/ce/*.mlw"
 fi
 
+failed=""
+
 colorize() {
     if command -v pygmentize &> /dev/null; then
         pygmentize -ldiff
@@ -110,6 +112,7 @@ run () {
                 echo "$f"
                 echo diff -u "${oracle_file}" "$f.out"
                 diff -u "${oracle_file}" "$f.out"|colorize
+	              failed="$failed$f\n"
                 success=false
             fi
         fi
@@ -122,11 +125,14 @@ for file in $files; do
     printf "Running provers on $filedir/$filebase.mlw\n";
     run CVC4,1.7 $filedir $filebase true  150000
     run CVC4,1.7 $filedir $filebase false 150000
-    run Z3,4.8.4 $filedir $filebase true  7500000
-    run Z3,4.8.4 $filedir $filebase false 7500000
+    run Z3,4.8.10 $filedir $filebase true  7500000
+    run Z3,4.8.10 $filedir $filebase false 7500000
 done
-if $success; then
+
+if [ "$success" = true ]; then
+    echo "ce-bench: success"
     exit 0
 else
+    printf "\nce-bench: failed for the following files\n$failed\n"
     exit 1
 fi
