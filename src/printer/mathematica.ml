@@ -125,7 +125,6 @@ let number_format = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> pp_print_string fmt i),
-         (fun fmt i n -> fprintf fmt "(%s*%s)" i n),
          (fun fmt i n -> fprintf fmt "(%s/%s)" i n));
   }
 

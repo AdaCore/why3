@@ -85,7 +85,6 @@ let number_format = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> fprintf fmt "%s.0" i),
-         (fun fmt i n -> fprintf fmt "(* %s.0 %s.0)" i n),
          (fun fmt i n -> fprintf fmt "(/ %s.0 %s.0)" i n));
   }
 

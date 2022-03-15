@@ -272,7 +272,6 @@ let number_format info = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> fprintf fmt "%s%%R" i),
-         (fun fmt i n -> fprintf fmt "(%s * %s)%%R" i n),
          (fun fmt i n -> fprintf fmt "(%s / %s)%%R" i n));
   }
 
