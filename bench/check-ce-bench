@@ -130,8 +130,7 @@ else
     exitvalue=1
 fi
 
-# Check the reproduction of the experiments by Petiot (2018). Use CVC4 because
-# counterexample generation is not reproducible with Z3 (Gitlab issue #584).
+# Check the reproduction of the experiments by Petiot (2018).
 if $updateoracle; then
   updatearg="--updateoracle"
 else
@@ -141,9 +140,9 @@ bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.7 \
   --ce-prover CVC4,1.7,counterexamples --stepslimit 10000 --rac-prover CVC4,1.7 \
   $updatearg
 if [ $? = 1 ]; then exitvalue=1; fi
-# bench/check-ce/petiot2018/experiments.sh --prover Z3,4.8.4 \
-#   --ce-prover Z3,4.8.4,counterexamples --stepslimit 10000 --rac-prover Z3,4.8.4 \
-#   $updatearg
-# if [ $? = 1 ]; then exitvalue=1; fi
+bench/check-ce/petiot2018/experiments.sh --prover Z3,4.8.4 \
+  --ce-prover Z3,4.8.4,counterexamples --stepslimit 500000 --rac-prover Z3,4.8.4 \
+  $updatearg
+if [ $? = 1 ]; then exitvalue=1; fi
 
 exit $exitvalue

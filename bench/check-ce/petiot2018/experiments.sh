@@ -76,7 +76,8 @@ really () {
 
 # Clean experiment output
 clean () {
-    sed 's/ ([0-9.]\+s, [0-9]\+ steps)\././'
+    sed 's/ ([0-9.]\+s, [0-9]\+ steps)\././' | \
+    sed -r 's/Valid \(.*$/Valid/'
 }
 
 # Run why3 prove with CE checking on sub-goal $1 in file $2
@@ -98,6 +99,7 @@ why3provece () {
 # Run an experiment with name $1. The program modifications are read from stdin.
 # Stdout and stderr of the calls to why3 goes to stdout and will be piped to
 # outfiles in under $outbase/, progress goes to stderr.
+echo "Running experiments for prover $prover"
 experiment () {
     experiment=$1
     echo -n "Experiment $experiment:" >&2
@@ -168,6 +170,7 @@ for filebase in "${filebases[@]}"; do
   if $updateoracle; then
     echo "Updating oracle for ${filebase}, prover ${prover}"
     echo mv "${out_file}" "${oracle_file}"
+    mv "${out_file}" "${oracle_file}"
   else
     echo "Checking differences between output and oracle for ${filebase}"
     if [ "$str_oracle" = "$str_out" ] ; then
@@ -185,9 +188,9 @@ for filebase in "${filebases[@]}"; do
 done
 
 if [ "$success" = true ]; then
-    echo "Petiot (2018) experiments: success"
+    echo "Petiot (2018) experiments with prover $prover: success"
     exit 0
 else
-    printf "\nPetiot (2018) experiments: failed\n$failed\n"
+    printf "\nPetiot (2018) experiments with prover $prover: failed\n$failed\n"
     exit 1
 fi
