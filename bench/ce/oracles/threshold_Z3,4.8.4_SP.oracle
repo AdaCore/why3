@@ -9,20 +9,20 @@ File threshold.mlw:
     max [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "2"}}
     min [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "2147483647"}}
   Line 11:
     max [@introduced] [@model_trace:max] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "2"}}
     min [@introduced] [@model_trace:min] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "2147483647"}}
 
 File "bench/ce/threshold.mlw", line 9, characters 13-33:
 Sub-goal Postcondition of goal f'vc.
@@ -34,37 +34,37 @@ File threshold.mlw:
     max [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "-2147479006"}}
     min [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "2"}}
     n [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "-2147482893"}}
   Line 9:
     max [@introduced] [@model_trace:max] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "-2147479006"}}
     min [@introduced] [@model_trace:min] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "2"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "2"}}
   Line 11:
     _x [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "-2147479004"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "2"}}
 
 File "bench/ce/threshold.mlw", line 30, characters 11-24:
 Sub-goal Arithmetic overflow of goal f'vc.

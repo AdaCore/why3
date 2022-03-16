@@ -62,7 +62,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 30:
-    x [@introduced] = {"type": "Integer", "val": "400"}
+    x [@introduced] = {"type": "Integer", "val": "65361"}
     y [@introduced] = {"type": "Integer", "val": "175"}
 
 File "bench/ce/int_overflow.mlw", line 36, characters 54-67:
@@ -92,8 +92,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 40:
-    x [@introduced] = {"type": "Integer", "val": "48"}
-    y [@introduced] = {"type": "Integer", "val": "175"}
+    x [@introduced] = {"type": "Integer", "val": "54"}
+    y [@introduced] = {"type": "Integer", "val": "65482"}
 
 File "bench/ce/int_overflow.mlw", line 49, characters 33-49:
 Goal test_overflow_int32.
@@ -102,7 +102,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 48:
-    x [@introduced] = {"type": "Integer", "val": "400"}
+    x [@introduced] = {"type": "Integer", "val": "2147483473"}
     y [@introduced] = {"type": "Integer", "val": "175"}
 
 File "bench/ce/int_overflow.mlw", line 54, characters 48-64:
@@ -112,8 +112,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int_overflow.mlw:
   Line 53:
-    x [@introduced] = {"type": "Integer", "val": "48"}
-    y [@introduced] = {"type": "Integer", "val": "175"}
+    x [@introduced] = {"type": "Integer", "val": "54"}
+    y [@introduced] = {"type": "Integer", "val": "2147483594"}
 
 File "bench/ce/int_overflow.mlw", line 59, characters 88-108:
 Goal test_overflow_int32_bis_inline.
