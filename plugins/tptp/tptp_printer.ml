@@ -104,7 +104,6 @@ let number_format = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> fprintf fmt "$to_real(%s)" i),
-         (fun fmt i n -> fprintf fmt "$product($to_real(%s),$to_real(%s))" i n),
          (fun fmt i n -> fprintf fmt "$quotient($to_real(%s),$to_real(%s))" i n));
 }
 
@@ -113,7 +112,6 @@ let number_format_metitarski = {
     Number.frac_real_support =
       `Custom
         ((fun fmt i -> pp_print_string fmt i),
-         (fun fmt i n -> fprintf fmt "(%s * %s)" i n),
          (fun fmt i n -> fprintf fmt "(%s / %s)" i n));
   }
 
