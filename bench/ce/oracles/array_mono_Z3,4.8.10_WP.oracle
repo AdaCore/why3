@@ -14,19 +14,31 @@ File array_mono.mlw:
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
   Line 35:
     a [@introduced] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
   Line 36:
     a [@introduced] [@model_trace:a] =
       {"type": "Record",
        "val":
         {"Field":
-          [{"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
+          [{"field": "elts",
+            "value":
+             {"type": "Array",
+              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+           {"field": "length", "value": {"type": "Integer", "val": "0"}}]}}
 
 File "bench/ce/array_mono.mlw", line 41, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.

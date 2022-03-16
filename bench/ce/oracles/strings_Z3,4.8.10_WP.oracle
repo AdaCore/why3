@@ -24,8 +24,8 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 8:
-    s1 [@introduced] = {"type": "String", "val": "!0!"}
-    s2 [@introduced] = {"type": "String", "val": "!1!"}
+    s1 [@introduced] = {"type": "String", "val": "\u0000"}
+    s2 [@introduced] = {"type": "String", "val": "\u0002"}
 
 File "bench/ce/strings.mlw", line 9, characters 38-55:
 Goal T4.
@@ -132,7 +132,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 18:
-    s [@introduced] = {"type": "String", "val": ""}
+    s [@introduced] = {"type": "String", "val": "!0!"}
 
 File "bench/ce/strings.mlw", line 19, characters 22-34:
 Goal T14.
@@ -141,7 +141,7 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File strings.mlw:
   Line 19:
-    s [@introduced] = {"type": "String", "val": ""}
+    s [@introduced] = {"type": "String", "val": "!0!"}
 
 File "bench/ce/strings.mlw", line 20, characters 24-45:
 Goal T15.

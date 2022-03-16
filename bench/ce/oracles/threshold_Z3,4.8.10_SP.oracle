@@ -14,6 +14,10 @@ File threshold.mlw:
       {"proj_name": "int32'int",
        "type": "Proj",
        "value": {"type": "Integer", "val": "0"}}
+    n [@introduced] =
+      {"proj_name": "int32'int",
+       "type": "Proj",
+       "value": {"type": "Integer", "val": "0"}}
   Line 11:
     max [@introduced] [@model_trace:max] =
       {"proj_name": "int32'int",
@@ -34,37 +38,37 @@ File threshold.mlw:
     max [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "-1"}}
     min [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "0"}}
     n [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "-1"}}
   Line 9:
     max [@introduced] [@model_trace:max] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "0"}}
+       "value": {"type": "Integer", "val": "-1"}}
     min [@introduced] [@model_trace:min] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "0"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "0"}}
   Line 11:
     _x [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "-1"}}
     result [@introduced] =
       {"proj_name": "int32'int",
        "type": "Proj",
-       "value": {"type": "Integer", "val": "1"}}
+       "value": {"type": "Integer", "val": "0"}}
 
 File "bench/ce/threshold.mlw", line 30, characters 11-24:
 Sub-goal Arithmetic overflow of goal f'vc.
@@ -73,13 +77,14 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 26:
-    max [@introduced] = {"type": "Integer", "val": "2147495941"}
-    min [@introduced] = {"type": "Integer", "val": "2147483651"}
+    max [@introduced] = {"type": "Integer", "val": "2147524228"}
+    min [@introduced] = {"type": "Integer", "val": "2147516419"}
+    n [@introduced] = {"type": "Integer", "val": "0"}
   Line 30:
     max [@introduced] [@model_trace:max] =
-      {"type": "Integer", "val": "2147495941"}
+      {"type": "Integer", "val": "2147524228"}
     min [@introduced] [@model_trace:min] =
-      {"type": "Integer", "val": "2147483651"}
+      {"type": "Integer", "val": "2147516419"}
 
 File "bench/ce/threshold.mlw", line 27, characters 13-45:
 Sub-goal Postcondition of goal f'vc.
@@ -88,15 +93,16 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File threshold.mlw:
   Line 26:
-    max [@introduced] = {"type": "Integer", "val": "0"}
-    min [@introduced] = {"type": "Integer", "val": "787335"}
-    n [@introduced] = {"type": "Integer", "val": "1"}
+    max [@introduced] = {"type": "Integer", "val": "131072"}
+    min [@introduced] = {"type": "Integer", "val": "1341089699"}
+    n [@introduced] = {"type": "Integer", "val": "131073"}
   Line 27:
-    max [@introduced] [@model_trace:max] = {"type": "Integer", "val": "0"}
+    max [@introduced] [@model_trace:max] =
+      {"type": "Integer", "val": "131072"}
     min [@introduced] [@model_trace:min] =
-      {"type": "Integer", "val": "787335"}
-    result [@introduced] = {"type": "Integer", "val": "787335"}
+      {"type": "Integer", "val": "1341089699"}
+    result [@introduced] = {"type": "Integer", "val": "1341089699"}
   Line 30:
-    _x [@introduced] = {"type": "Integer", "val": "787335"}
-    result [@introduced] = {"type": "Integer", "val": "787335"}
+    _x [@introduced] = {"type": "Integer", "val": "1341220771"}
+    result [@introduced] = {"type": "Integer", "val": "1341089699"}
 

@@ -7,7 +7,7 @@ module Test
 
   let test (i : int)
   = assert {
-      let p = (0, 0) in (* <- The tuple introduces polymorphism! *)
+      let _p = (0, 0) in (* <- The tuple introduces polymorphism! *)
       global <> Z -> i = 0
     }
 end

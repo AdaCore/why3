@@ -14,7 +14,7 @@ File record_map.mlw:
             "val":
              {"Field":
                [{"field": ".field_f",
-                 "value": {"type": "Integer", "val": "1"}},
+                 "value": {"type": "Integer", "val": "2"}},
                 {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
   Line 42:
     map_rec [@introduced] [@model_projected] [@model_trace:map_rec] =
@@ -25,11 +25,11 @@ File record_map.mlw:
             "val":
              {"Field":
                [{"field": ".field_f",
-                 "value": {"type": "Integer", "val": "1"}},
+                 "value": {"type": "Integer", "val": "2"}},
                 {"field": "g", "value": {"type": "Boolean", "val": false}}]}}}]}
   Line 44:
     result [@id:unused] [@introduced] [@model_trace:result] =
-      {"type": "Integer", "val": "1"}
+      {"type": "Integer", "val": "2"}
 
 File "bench/ce/record_map.mlw", line 47, characters 12-22:
 Sub-goal Postcondition of goal record_map_proj_test2'vc.
@@ -45,7 +45,7 @@ File record_map.mlw:
           [{"field": "f_map",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+              "val": [{"others": {"type": "Integer", "val": "2"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 47:
     rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
@@ -55,11 +55,11 @@ File record_map.mlw:
           [{"field": "f_map",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+              "val": [{"others": {"type": "Integer", "val": "2"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 49:
     result [@id:unused] [@introduced] [@model_trace:result] =
-      {"type": "Integer", "val": "1"}
+      {"type": "Integer", "val": "2"}
 
 File "bench/ce/record_map.mlw", line 54, characters 12-31:
 Sub-goal Postcondition of goal record_map_proj_test3'vc.
@@ -75,7 +75,7 @@ File record_map.mlw:
           [{"field": "f_map",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+              "val": [{"others": {"type": "Integer", "val": "2"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 53:
     rec_map [@introduced] [@model_projected] =
@@ -85,7 +85,7 @@ File record_map.mlw:
           [{"field": "f_map",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 54:
     re_rec_map [@introduced] [@model_projected] [@model_trace:re_rec_map] =
@@ -95,7 +95,7 @@ File record_map.mlw:
           [{"field": "f_map",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
+              "val": [{"others": {"type": "Integer", "val": "2"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
     rec_map [@introduced] [@model_projected] [@model_trace:rec_map] =
       {"type": "Record",
@@ -104,7 +104,7 @@ File record_map.mlw:
           [{"field": "f_map",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
   Line 56:
     result [@id:unused] [@introduced] [@model_trace:result] =
@@ -114,6 +114,6 @@ File record_map.mlw:
           [{"field": "f_map",
             "value":
              {"type": "Array",
-              "val": [{"others": {"type": "Integer", "val": "0"}}]}},
+              "val": [{"others": {"type": "Integer", "val": "1"}}]}},
            {"field": "g_bool", "value": {"type": "Boolean", "val": false}}]}}
 
