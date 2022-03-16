@@ -1,6 +1,6 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
 Sub-goal Postcondition of goal g1'vc.
-Prover result is: Valid (0.01s, 56 steps).
+Prover result is: Valid (0.02s, 56 steps).
 
 File "bench/check-ce/func_call5.mlw", line 14, characters 10-14:
 Sub-goal Precondition of goal f1'vc.
@@ -72,26 +72,95 @@ Prover result is: Valid (0.01s, 86 steps).
                   Execution of main function terminated normally
             - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
               
+<check-ce>Check model 1 ("bench/check-ce/func_call5.mlw", line 15, characters 11-17)
+<check-ce>Checking model:
+          File func_call5.mlw:
+            Line 8:
+              x = {"type": "Integer", "val": "176"}
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "177"}}]}}
+            Line 11:
+              x = {"type": "Integer", "val": "176"}
+            Line 14:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "177"}}]}}
+            Line 15:
+              x = {"type": "Integer", "val": "176"}
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "177"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 176
+<rac-values>No value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 176
+<check-ce>Result of checking model 1: INCOMPLETE
+            - Concrete RAC: NORMAL
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File func_call5.mlw:
+                Line 11:
+                  x = 176
+                  x = 176
+                  Execution of main function `f1` with env:
+                    x = 176
+                    zero = 0
+                    one = 1
+                Line 14:
+                  Normal execution of function `g1` with args:
+                    y = 176
+                Line 9:
+                  Normal execution of function `ref` with args:
+                    contents = 176
+                  Normal execution of function `ref'mk` with args:
+                    contents = 176
+                Line 11:
+                  Execution of main function terminated normally
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+              
 <check-ce-summary>Results:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+- Selected model 1: INCOMPLETE
   - Concrete RAC: NORMAL
   - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
 File "bench/check-ce/func_call5.mlw", line 15, characters 11-17:
 Sub-goal Assertion of goal f1'vc.
-Prover result is: Step limit exceeded (0.99s).
+Prover result is: Unknown (unknown) (1.31s, 7500000 steps).
 The following counterexample model could not be verified
   (abstract RAC terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
 File func_call5.mlw:
   Line 8:
-    x = 1
-    z = 2
+    x = 176 (0XB0)
+    z = 177 (0XB1)
   Line 11:
-    x = 1
+    x = 176 (0XB0)
   Line 14:
-    z = 2
+    z = 177 (0XB1)
   Line 15:
-    x = 1
-    z = 2
+    x = 176 (0XB0)
+    z = 177 (0XB1)
 
 <check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 21, characters 11-17)
 <check-ce>Checking model:
@@ -166,13 +235,89 @@ File func_call5.mlw:
                   Property failure at assertion with:
                     x = 0
                     z = {contents= 1}
+<check-ce>Check model 1 ("bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+<check-ce>Checking model:
+          File func_call5.mlw:
+            Line 19:
+              x = {"type": "Integer", "val": "175"}
+            Line 21:
+              x = {"type": "Integer", "val": "175"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 175
+<rac-values>Value computed from postcondition for return value of call to g2 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14: {contents=
+                                                                    176}
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 175
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File func_call5.mlw:
+                Line 19:
+                  x = 175
+                  x = 175
+                  Execution of main function `f2` with env:
+                    x = 175
+                    zero = 0
+                    one = 1
+                Line 20:
+                  Normal execution of function `g2` with args:
+                    y = 175
+                Line 17:
+                  Normal execution of function `(+)` with args:
+                    _ = 175
+                    _ = 1
+                  Normal execution of function `ref` with args:
+                    contents = 176
+                  Normal execution of function `ref'mk` with args:
+                    contents = 176
+                Line 21:
+                  Property failure at assertion with:
+                    x = 175
+                    z = {contents= 176}
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File func_call5.mlw:
+                Line 19:
+                  x = 175
+                  x = 175
+                  Execution of main function `f2` with env:
+                    x = 175
+                    zero = 0
+                    one = 1
+                Line 20:
+                  Giant-step execution of function `g2` with args:
+                    y = 175
+                  result of `g2` = {contents= 176}
+                Line 21:
+                  Property failure at assertion with:
+                    x = 175
+                    z = {contents= 176}
 <check-ce-summary>Results:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
 File "bench/check-ce/func_call5.mlw", line 21, characters 11-17:
 Sub-goal Assertion of goal f2'vc.
-Prover result is: Step limit exceeded (0.82s).
+Prover result is: Unknown (unknown) (1.20s, 7500000 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
