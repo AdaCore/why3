@@ -102,7 +102,7 @@ run () {
 	    echo "FAILED!"
 	    echo "diff is the following:"
 	    echo "$f"
-	    diff -u <(echo "$str_oracle") <(echo "$str_out")|colorize
+	    (diff -u <(echo "$str_oracle") <(echo "$str_out") || [ $? -eq 1 ])|colorize
 	    failed="$failed$f\n"
 	    success=false
 	fi
@@ -122,16 +122,28 @@ for file in $files; do
     run Z3,4.8.4 $filedir $filebase true  7500000
     run Z3,4.8.4 $filedir $filebase false 7500000
 done
-
-# Check the reproduction of the experiments by Petion (2018). Use CVC4 because
-# counterexample generation is not reproducible with Z3 (Gitlab issue #584).
-bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.7 \
-  --ce-prover CVC4,1.7,counterexamples --stepslimit 10000 --rac-prover CVC4,1.7
-
 if [ "$success" = true ]; then
     echo "Check-ce bench: success"
-    exit 0
+    exitvalue=0
 else
     printf "\nCheck-ce bench: failed\n$failed\n"
-    exit 1
+    exitvalue=1
 fi
+
+# Check the reproduction of the experiments by Petiot (2018). Use CVC4 because
+# counterexample generation is not reproducible with Z3 (Gitlab issue #584).
+if $updateoracle; then
+  updatearg="--updateoracle"
+else
+  updatearg=""
+fi
+bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.7 \
+  --ce-prover CVC4,1.7,counterexamples --stepslimit 10000 --rac-prover CVC4,1.7 \
+  $updatearg
+if [ $? = 1 ]; then exitvalue=1; fi
+# bench/check-ce/petiot2018/experiments.sh --prover Z3,4.8.4 \
+#   --ce-prover Z3,4.8.4,counterexamples --stepslimit 10000 --rac-prover Z3,4.8.4 \
+#   $updatearg
+# if [ $? = 1 ]; then exitvalue=1; fi
+
+exit $exitvalue

@@ -12,9 +12,10 @@ why3="bin/why3"
 outbase="$(dirname $0)"
 libdir="$(dirname $0)"
 only=""
+updateoracle=false
 
 usage () {
-    echo "Usage: $0 [--help] [--prover PROVER] [--ce-prover CE_PROVER] [--stepslimit STEPS] [--rac-prover RAC_PROVER] [--only PROGRAM] [--outdir OUTDIR]"
+    echo "Usage: $0 [--help] [--prover PROVER] [--ce-prover CE_PROVER] [--stepslimit STEPS] [--rac-prover RAC_PROVER] [--only PROGRAM] [--outdir OUTDIR] [--updateoracle]"
     (echo "PROVER is used to prove the unmodified programs (default:"
      echo "$prover), CE_PROVER is used to generate counterexamples in the"
      echo "modified programs (default: $proverce). STEPS is used as option"
@@ -52,6 +53,10 @@ while [ "$#" != 0 ]; do
         --outdir)
             outbase="$2"
             shift 2
+            ;;
+        --updateoracle)
+            updateoracle=true
+            shift 1
             ;;
         --help)
             usage
@@ -143,4 +148,46 @@ R1	26	(* empty *)	:41@precondition
 R4	40	a[!i] <- a[!i] + 2;	:41@precondition
 EOF
 
-git diff --exit-code "*.out"
+colorize() {
+    if command -v pygmentize &> /dev/null; then
+        pygmentize -ldiff
+    else
+        cat
+    fi
+}
+
+success=true
+failed=""
+filebases=('binary_search' 'isqrt' 'rgf')
+
+for filebase in "${filebases[@]}"; do
+  oracle_file="$outbase/oracles/${filebase}_${prover}.oracle"
+  out_file="$outbase/${filebase}.out"
+  str_oracle=$(tr -d ' \n' < "${oracle_file}")
+  str_out=$(tr -d ' \n' < "${out_file}")
+  if $updateoracle; then
+    echo "Updating oracle for ${filebase}, prover ${prover}"
+    echo mv "${out_file}" "${oracle_file}"
+  else
+    echo "Checking differences between output and oracle for ${filebase}"
+    if [ "$str_oracle" = "$str_out" ] ; then
+      echo "OK"
+    else
+      echo "FAILED!"
+      echo "diff is the following:"
+      echo "$outbase/${filebase}"
+      echo diff -u "${oracle_file}" "${out_file}"
+      (diff -u "${oracle_file}" "${out_file}" || [ $? -eq 1 ])|colorize
+	    failed="$failed$filebase\n"
+	    success=false
+    fi
+  fi
+done
+
+if [ "$success" = true ]; then
+    echo "Petiot (2018) experiments: success"
+    exit 0
+else
+    printf "\nPetiot (2018) experiments: failed\n$failed\n"
+    exit 1
+fi
