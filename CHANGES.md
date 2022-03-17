@@ -2,39 +2,34 @@
 
 Standard library
   * deeply revised library `mach.bv` for bitvectors operations in
-    programs with many renamings. Pre- and post-conditions are not
-    expressed both in terms of mathematical integers and in terms of
-    purely bit-vector formulas, thanks to conversion to 128 bits :x:
+    programs. Pre- and post-conditions are now expressed both in terms
+    of mathematical integers and in terms of purely bit-vector
+    formulas, thanks to conversion to 128 bits :x:
 
-API
-  * improved documentation of [Ptree]
+WhyML language
+  * generalized witness expressions for type invariant
 
-Python front-end
-  * added break and continue
+Python language
+  * added `break` and `continue`
   * added range with one, two or three argument(s)
   * added slice (`list[i1:i2]`)
-  * added negative index (`list[n], with -len(list) ≤ n < len(list)`)
-  * added lists methods:
-    * `list.append(n)`
-    * `list.pop()`
-    * `list.clear()`
-    * `list.sort()`
-    * `list.reverse()`
+  * added negative index (`list[n]`, with `-len(list) ≤ n < len(list)`)
+  * added list methods:
+      - `list.append(n)`
+      - `list.pop()`
+      - `list.clear()`
+      - `list.sort()`
+      - `list.reverse()`
   * added `is_permutation(list1, list2)` predicate
   * added assignment operators `+=`, `-=`, `*=`, `//=`, `%=`
   * functions can now return `bool` and `list`
 
-TryWhy3
-  * graphical modifications
-  * the contextual menu steps are now configurable
-  * the prove button now splits the VCs if they are not proven with "first-attempt steps limit"
-  * added a split and a prove button next to each task
-  * added examples for python and micro-c
-  * added `index_{language}.txt` in `examples` directory in order to list all examples path for each languages
-  * added `config.json` in `examples` directory in order to configure the number of steps for each settings
-
-Input Formats
-  * Witness expression for type invariant is generalized (#286,!428)
+Web interface TryWhy3
+  * step limits from the contextual menu are now configurable in `examples/config.json`
+  * "prove" now splits the VCs if they are not proven after `first_attempt_step_limit` steps
+  * added some "split" and "prove" buttons next to each task
+  * generalized `examples/index.txt` to `index_{language}.txt`, so as to support per-language examples
+  * added some examples for Python and Micro-C
 
 Provers
   * support for Coq 8.15.0 (released Jan 13, 2022)
@@ -52,7 +47,7 @@ Provers
 Version 1.4.0, March 13, 2021
 -----------------------------
 
-WhyML
+WhyML language
   * sub-namespaces are now allowed in `for each` loops; see Section 7.4.7 of the manual
   * function literals are now supported; see Sections 7.3.2 and 7.4.9 of the manual
 
