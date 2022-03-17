@@ -350,7 +350,7 @@ why3_vc Cos_plus_pi by auto
 
 why3_vc Pi_double_precision_bounds
 proof -
-  have "7074237752028440 / 2251799813685248 < pi"
+  have "884279719003555 / 281474976710656 < pi"
     by (approximation 57)
   then show ?C1 by simp
   have "pi < 7074237752028441 / 2251799813685248"

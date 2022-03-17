@@ -15,7 +15,13 @@ The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File list.mlw:
   Line 16:
-    l [@introduced] = {"type": "Apply", "val": {"apply": "Nil", "list": []}}
+    l [@introduced] =
+      {"type": "Apply",
+       "val":
+        {"apply": "Cons",
+         "list":
+          [{"type": "Integer", "val": "13"},
+           {"type": "Apply", "val": {"apply": "Nil", "list": []}}]}}
 
 File "bench/ce/list.mlw", line 25, characters 30-43:
 Goal g1.

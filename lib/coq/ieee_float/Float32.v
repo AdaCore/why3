@@ -28,7 +28,7 @@ Require ieee_float.GenericFloat.
 
 Require Import Lia.
 Import Flocq.Core.Core.
-Import Flocq.IEEE754.Binary.
+Import Flocq.IEEE754.BinarySingleNaN.
 Import ieee_float.RoundingMode.
 Import ieee_float.GenericFloat.
 
@@ -60,9 +60,9 @@ intros x _.
 apply Rabs_le_inv.
 change 340282346638528859811704183484516925440%Z with (16777215 * 20282409603651670423947251286016)%Z.
 rewrite mult_IZR.
-change (Rabs (B2R _ _ x) <= F2R (Float radix2 (Zpower radix2 24 - 1) (127 - 23)))%R.
-destruct x as [s|s|s|s m e H] ;
-  try (simpl ; rewrite Rabs_R0 ; now apply F2R_ge_0).
+change (Rbasic_fun.Rabs (B2R x) <= F2R (Float radix2 (Zpower radix2 24 - 1) (127 - 23)))%R.
+destruct x as [s|s| |s m e H] ;
+  try (simpl ; rewrite Rbasic_fun.Rabs_R0 ; now apply F2R_ge_0).
 simpl.
 rewrite <- F2R_Zabs.
 rewrite abs_cond_Zopp.
@@ -79,7 +79,7 @@ apply (Z.lt_le_pred (Z.abs (Zpos m)) (Zpower radix2 24)).
 apply Digits.Zpower_gt_Zdigits.
 revert H1.
 generalize (Digits.Zdigits radix2 (Z.pos m)).
-unfold FLT_exp, sb.
+unfold SpecFloat.fexp, FLT_exp, sb.
 intros ; lia.
 now apply bpow_le.
 Qed.
@@ -291,12 +291,11 @@ Proof.
 Defined.
 
 Lemma max_real_cst :
-  max_real 8 24 = (33554430 * 10141204801825835211973625643008)%R.
+  max_real 8 24 = 340282346638528859811704183484516925440%R.
 Proof.
-  change (33554430 * 10141204801825835211973625643008)%R
-    with (F2R (Float radix2 (16777215 * Zpower radix2 (104 - 103)) 103)).
-  rewrite <- F2R_change_exp by easy.
-  now rewrite <- max_real_is_F2R.
+  rewrite <- max_real_is_F2R.
+  change (F2R (Float radix2 _ _)) with (IZR 16777215 * IZR (Zpower 2 104))%R.
+  now rewrite <- mult_IZR.
 Qed.
 
 (* Why3 goal *)
@@ -307,16 +306,16 @@ Defined.
 
 (* Why3 goal *)
 Lemma max_real_int :
-  ((33554430 * 10141204801825835211973625643008)%R = (BuiltIn.IZR max_int)).
+  (340282346638528859811704183484516925440%R = (BuiltIn.IZR max_int)).
 Proof.
   unfold max_int.
-  now rewrite mult_IZR.
+  now apply IZR_eq.
 Qed.
 
 (* Why3 assumption *)
 Definition in_range (x:Reals.Rdefinitions.R) : Prop :=
-  ((-(33554430 * 10141204801825835211973625643008)%R)%R <= x)%R /\
-  (x <= (33554430 * 10141204801825835211973625643008)%R)%R.
+  ((-340282346638528859811704183484516925440%R)%R <= x)%R /\
+  (x <= 340282346638528859811704183484516925440%R)%R.
 
 (* Why3 assumption *)
 Definition in_int_range (i:Numbers.BinNums.Z) : Prop :=
@@ -635,20 +634,20 @@ Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   | ieee_float.RoundingMode.RTN =>
       (is_positive x ->
        t'isFinite x /\
-       ((t'real x) = (33554430 * 10141204801825835211973625643008)%R)) /\
+       ((t'real x) = 340282346638528859811704183484516925440%R)) /\
       (~ is_positive x -> is_infinite x)
   | ieee_float.RoundingMode.RTP =>
       (is_positive x -> is_infinite x) /\
       (~ is_positive x ->
        t'isFinite x /\
-       ((t'real x) = (-(33554430 * 10141204801825835211973625643008)%R)%R))
+       ((t'real x) = (-340282346638528859811704183484516925440%R)%R))
   | ieee_float.RoundingMode.RTZ =>
       (is_positive x ->
        t'isFinite x /\
-       ((t'real x) = (33554430 * 10141204801825835211973625643008)%R)) /\
+       ((t'real x) = 340282346638528859811704183484516925440%R)) /\
       (~ is_positive x ->
        t'isFinite x /\
-       ((t'real x) = (-(33554430 * 10141204801825835211973625643008)%R)%R))
+       ((t'real x) = (-340282346638528859811704183484516925440%R)%R))
   | ieee_float.RoundingMode.RNA|ieee_float.RoundingMode.RNE => is_infinite x
   end.
 
@@ -859,7 +858,7 @@ Lemma fma_finite_rev :
   forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t) (z:t),
   t'isFinite (fma m x y z) -> t'isFinite x /\ t'isFinite y /\ t'isFinite z.
 Proof.
-  apply fma_finite_rev.
+  now apply fma_finite_rev.
 Qed.
 
 (* Why3 goal *)
@@ -920,7 +919,7 @@ Proof.
   intros m x y r.
   unfold no_overflow, in_range, overflow_value.
   rewrite <- max_real_cst.
-  apply add_special.
+  now apply add_special.
 Qed.
 
 (* Why3 goal *)
@@ -943,7 +942,7 @@ Proof.
   intros m x y r.
   unfold no_overflow, in_range, overflow_value.
   rewrite <- max_real_cst.
-  apply sub_special.
+  now apply sub_special.
 Qed.
 
 (* Why3 goal *)
@@ -964,7 +963,7 @@ Proof.
   intros m x y r.
   unfold no_overflow, in_range, overflow_value.
   rewrite <- max_real_cst.
-  apply mul_special.
+  now apply mul_special.
 Qed.
 
 (* Why3 goal *)
@@ -984,7 +983,7 @@ Proof.
   intros m x y r.
   unfold no_overflow, in_range, overflow_value.
   rewrite <- max_real_cst.
-  apply div_special.
+  now apply div_special.
 Qed.
 
 (* Why3 goal *)
@@ -1047,7 +1046,7 @@ Proof.
   intros m x y z r.
   unfold no_overflow, in_range, overflow_value.
   rewrite <- max_real_cst.
-  apply fma_special.
+  now apply fma_special.
 Qed.
 
 (* Why3 goal *)
@@ -1172,7 +1171,7 @@ Lemma add_int :
   forall (x:t) (y:t) (m:ieee_float.RoundingMode.mode), is_int x ->
   is_int y -> t'isFinite (add m x y) -> is_int (add m x y).
 Proof.
-  apply add_int.
+  now apply add_int.
 Qed.
 
 (* Why3 goal *)
@@ -1180,7 +1179,7 @@ Lemma sub_int :
   forall (x:t) (y:t) (m:ieee_float.RoundingMode.mode), is_int x ->
   is_int y -> t'isFinite (sub m x y) -> is_int (sub m x y).
 Proof.
-  apply sub_int.
+  now apply sub_int.
 Qed.
 
 (* Why3 goal *)
@@ -1188,7 +1187,7 @@ Lemma mul_int :
   forall (x:t) (y:t) (m:ieee_float.RoundingMode.mode), is_int x ->
   is_int y -> t'isFinite (mul m x y) -> is_int (mul m x y).
 Proof.
-  apply mul_int.
+  now apply mul_int.
 Qed.
 
 (* Why3 goal *)
@@ -1347,7 +1346,7 @@ Lemma RNA_down :
   ((roundToIntegral ieee_float.RoundingMode.RNA x) =
    (roundToIntegral ieee_float.RoundingMode.RTN x)).
 Proof.
-  apply RNA_down.
+  now apply RNA_down.
 Qed.
 
 (* Why3 goal *)
@@ -1361,7 +1360,7 @@ Lemma RNA_up :
   ((roundToIntegral ieee_float.RoundingMode.RNA x) =
    (roundToIntegral ieee_float.RoundingMode.RTP x)).
 Proof.
-  apply RNA_up.
+  now apply RNA_up.
 Qed.
 
 (* Why3 goal *)
@@ -1376,7 +1375,7 @@ Lemma RNA_down_tie :
   ((roundToIntegral ieee_float.RoundingMode.RNA x) =
    (roundToIntegral ieee_float.RoundingMode.RTN x)).
 Proof.
-  apply RNA_down_tie.
+  now apply RNA_down_tie.
 Qed.
 
 (* Why3 goal *)
@@ -1391,7 +1390,7 @@ Lemma RNA_up_tie :
   ((roundToIntegral ieee_float.RoundingMode.RNA x) =
    (roundToIntegral ieee_float.RoundingMode.RTP x)).
 Proof.
-  apply RNA_up_tie.
+  now apply RNA_up_tie.
 Qed.
 
 (* Why3 goal *)

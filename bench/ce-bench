@@ -123,6 +123,8 @@ for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
+    # 150000 steps for CVC4 takes around 1 second
+    # 7500000 steps for Z3 takes around 1 second
     run CVC4,1.7 $filedir $filebase true  150000
     run CVC4,1.7 $filedir $filebase false 150000
     run Z3,4.8.10 $filedir $filebase true  7500000
