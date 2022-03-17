@@ -1445,14 +1445,16 @@ let () =
   let load_config s =
     let lb = Lexing.from_string s in
     let config = Json_parser.value (fun x -> Json_lexer.read x) lb in
-    let default_steps = Json_base.get_int_field config "default_step_limit" in
-    let min_steps = Json_base.get_int_field config "first_attempt_step_limit" in
+    let step_config = Json_base.get_field config "step_limit" in
+    let default_steps = Json_base.get_int_field step_config "default" in
+    let min_steps = Json_base.get_int_field step_config "first_attempt" in
     Dialogs.input_num_steps ##. value := js_string_of_int default_steps;
     Dialogs.input_min_steps ##. value := js_string_of_int min_steps;
     Controller.alt_ergo_default_steps := default_steps;
     Controller.alt_ergo_min_steps := min_steps;
+    let menu_steps = Json_base.get_list_field step_config "menu" in
     for i = 0 to 2 do
-      let value = Json_base.get_int_field config (Printf.sprintf "menu_step_limit%d" (i+1)) in
+      let value = Json_base.get_int (List.nth menu_steps i) in
       ContextMenu.alt_ergo_context_steps.(i) <- value;
       Dialogs.input_context_steps.(i) ##. value := js_string_of_int value
     done;
