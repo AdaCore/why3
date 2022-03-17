@@ -97,8 +97,6 @@ module Task =
       with
         Not_found -> None
 
-    let get_parent_id id = (get_info id).parent_id
-
     let mk_loc (f, a,b,c) =
       if f = temp_file_name then
         Some (a,b,c)
@@ -294,14 +292,6 @@ let why3_clean id =
   with
     Not_found -> ()
 
-let why3_prove_all () =
-  Hashtbl.iter
-    (fun _ info ->
-     match info.Task.task with
-     | Task.Theory _ -> List.iter (fun i -> why3_prove i) info.Task.subtasks
-     | _ -> ()) Task.task_table
-
-
 let why3_parse_theories steps theories =
   let theories =
     Wstdlib.Mstr.fold
@@ -383,7 +373,6 @@ let handle_message = function
   | Transform (Split steps, id) -> why3_split steps id
   | Transform (Prove steps, id) -> why3_prove ~steps id
   | Transform (Clean, id) -> why3_clean id
-  | ProveAll -> why3_prove_all ()
   | ParseBuffer (format, code, steps) ->
       Task.clear_warnings ();
       Task.clear_table ();

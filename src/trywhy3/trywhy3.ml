@@ -19,8 +19,6 @@ module Dom = Js_of_ocaml.Dom
 module File = Js_of_ocaml.File
 module Worker = Js_of_ocaml.Worker
 module Dom_html = Js_of_ocaml.Dom_html
-module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
-
 
 let (!!) = Js.string
 
@@ -87,9 +85,6 @@ module Buttons = struct
   let enable b =
     b ##. disabled := Js._false;
     b ##. classList ## remove !!"why3-inactive"
-
-  let toggle b =
-    if Js.to_bool (b ##. disabled) then enable b else disable b
 
   let change b v =
     if v = Js.to_bool (b ##. disabled) then
@@ -161,10 +156,6 @@ module Editor =
     let mk_range l1 c1 l2 c2 =
       new%js Ace.range l1 c1 l2 c2
 
-    let set_selection_range r =
-      let selection = editor ## getSelection in
-      selection ## setSelectionRange r Js._false
-
     let add_marker cls r =
       editor ## getSession ## addMarker r cls !!"text" Js._false
 
@@ -221,12 +212,6 @@ module Editor =
       | None -> ()
       end;
       error_marker := new_m
-
-    let has_focus () =
-      let ac = Dom_html.document ##. activeElement in
-      match Js.Opt.to_option ac with
-          | Some ac when Js.to_string (ac ##. id) = "why3-editor" -> assert false
-          | _ -> assert false
 
   end
 
@@ -1305,12 +1290,6 @@ module Controller =
               (get_why3_worker()) ## postMessage (marshal (Transform(tr, id))))
             TaskList.task_selection;
           TaskList.clear_task_selection ()
-        end
-
-    let why3_prove_all () =
-      if is_idle () then begin
-          why3_busy := true;
-          (get_why3_worker()) ## postMessage (marshal ProveAll)
         end
 
     let stop () =
