@@ -1470,12 +1470,6 @@ let () =
                                 else !!"column");
         Js._true)
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. trywhy3"
-End:
-*)
-
 let () =
   let load_config s =
     let lb = Lexing.from_string s in
@@ -1500,3 +1494,9 @@ let () =
           (fun r -> r ## text))
       (fun s -> load_config (Js.to_string s)))
     (fun _ -> ());
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. trywhy3"
+End:
+*)
