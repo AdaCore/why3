@@ -782,15 +782,14 @@ let handle_why3_message o =
   | Result sl ->
       TaskList.clear ();
       let ul = Dom_html.createUl doc in
+      ul ## setAttribute !!"id" !!"why3-exec-list";
       Dom.appendChild TaskList.task_list ul;
-      List.iter (fun (s : string) ->
-          let msg = ref s in
-          if (String.sub s ((String.length s) - 9) 8) = "globals:" then
-            msg := String.sub s 0 ((String.length s) - 10);
-
+      List.iter (fun s ->
+          let verb = Dom_html.createPre doc in
+          verb ##. innerText := Js.string s;
           let li = Dom_html.createLi doc in
-          li ##. innerHTML := (Js.string !msg);
-          Dom.appendChild ul li;) sl
+          Dom.appendChild li verb;
+          Dom.appendChild ul li) sl
 
   | Theory (th_id, th_name) ->
       TaskList.add_theory_id th_id;
