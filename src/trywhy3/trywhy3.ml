@@ -320,19 +320,16 @@ module FormatList = struct
 
   let handle _ =
     let i = select_format ##. selectedIndex in
-    if i > 0 then
-      begin
-        let name =
-          match List.nth_opt !formats (i - 1) with
-          | Some (name, ext :: _) ->
-              Editor.name := Js.string ("test." ^ ext);
-              name
-          | Some (name, []) -> name
-          | _ -> "" in
-        change_mode name;
-        selected_format := name;
-        change_url name
-      end
+    let name =
+      match List.nth_opt !formats i with
+      | Some (name, ext :: _) ->
+          Editor.name := Js.string ("test." ^ ext);
+          name
+      | Some (name, []) -> name
+      | _ -> "" in
+    change_mode name;
+    selected_format := name;
+    change_url name
 
   let add_format text =
     let option = Dom_html.createOption Dom_html.document in
@@ -347,11 +344,11 @@ module FormatList = struct
     change_url name
 
   let set_format name idx =
-    if idx = 0 then
+    if idx = -1 then
       match !formats with
       | (name, _) :: _ ->
-          if select_format ##. selectedIndex = 0 then
-            set_format name idx
+          if select_format ##. selectedIndex = -1 then
+            set_format name 0
       | [] -> ()
     else set_format name idx
 
@@ -365,8 +362,8 @@ module FormatList = struct
       | (name, exts) :: l ->
           if List.mem ext exts then (name, i)
           else aux (i + 1) l
-      | [] -> ("", 0) in
-    let (name, idx) = aux 1 !formats in
+      | [] -> ("", -1) in
+    let (name, idx) = aux 0 !formats in
     set_format name idx
 
   let set_format name =
@@ -374,8 +371,8 @@ module FormatList = struct
       | (n, _) :: l ->
           if n = name then (name, i)
           else aux (i + 1) l
-      | _ -> ("", 0) in
-    let (name, idx) = aux 1 !formats in
+      | _ -> ("", -1) in
+    let (name, idx) = aux 0 !formats in
     set_format name idx
 
   let add_formats l =
@@ -390,7 +387,7 @@ module FormatList = struct
         else
           set_format !selected_format
       else
-        let () = select_format ##. selectedIndex := 1 in
+        let () = select_format ##. selectedIndex := 0 in
         ignore (handle ())
 
   let enable () =
