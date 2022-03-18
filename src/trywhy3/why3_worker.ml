@@ -97,8 +97,6 @@ module Task =
       with
         Not_found -> None
 
-    let get_parent_id id = (get_info id).parent_id
-
     let mk_loc (f, a,b,c) =
       if f = temp_file_name then
         Some (a,b,c)
@@ -294,14 +292,6 @@ let why3_clean id =
   with
     Not_found -> ()
 
-let why3_prove_all () =
-  Hashtbl.iter
-    (fun _ info ->
-     match info.Task.task with
-     | Task.Theory _ -> List.iter (fun i -> why3_prove i) info.Task.subtasks
-     | _ -> ()) Task.task_table
-
-
 let why3_parse_theories steps theories =
   let theories =
     Wstdlib.Mstr.fold
@@ -327,18 +317,23 @@ let why3_execute_one m rs =
   let (let_defn,pv) = let_var (Ident.id_fresh "o") e_unit in
   let e_rs_unit = e_exec (c_app rs [pv] [] rs.rs_cty.Ity.cty_result) in
   let expr = e_let let_defn e_rs_unit in
+  let output = Buffer.create 17 in
+  Sys_js.set_channel_flusher stdout (fun v -> Buffer.add_string output v);
+  let {Theory.th_name = th} = m.Pmodule.mod_theory in
+  let mod_name = th.Ident.id_string in
   let result =
     try
       let ctx = Pinterp.mk_ctx (Pinterp.mk_empty_env env m)
           ~do_rac:false ~giant_steps:false () in
       let res = Pinterp.exec_global_fundef ctx [] None expr in
-      asprintf "returns %a" (Pinterp.report_eval_result expr) res
+      Format.print_flush ();
+      asprintf "@[<v>%s.main produces@,%a@,output:@,%s@]"
+        mod_name (Pinterp.report_eval_result expr) res
+        (Buffer.contents output)
     with Pinterp_core.Incomplete r ->
-      asprintf "cannot compute (%s)" r in
-  let {Theory.th_name = th} = m.Pmodule.mod_theory in
-  let mod_name = th.Ident.id_string in
+      asprintf "%s.main cannot compute (%s)" mod_name r in
   let mod_loc = Opt.get_def Loc.dummy_position th.Ident.id_loc in
-  (mod_loc, mod_name ^ ".main " ^ result)
+  (mod_loc, result)
 
 let why3_execute modules =
   let mods =
@@ -383,7 +378,6 @@ let handle_message = function
   | Transform (Split steps, id) -> why3_split steps id
   | Transform (Prove steps, id) -> why3_prove ~steps id
   | Transform (Clean, id) -> why3_clean id
-  | ProveAll -> why3_prove_all ()
   | ParseBuffer (format, code, steps) ->
       Task.clear_warnings ();
       Task.clear_table ();

@@ -9,11 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
-module Js = Js_of_ocaml.Js
+open Js_of_ocaml
 
 type id = int
 type loc = int * int * int * int
-type why3_loc = string * (int * int * int) (* kind, line, column, length *)
+type why3_loc = string * (int * int * int)
 type status = StNew | StValid | StUnknown
 type transform = Prove of int | Split of int | Clean
 
@@ -25,11 +25,10 @@ type why3_command =
   | GetFormats
 
 type why3_output =
-  | Error of string (* msg *)
-  | ErrorLoc of loc * string (* loc * msg *)
-  | Theory of id * string (* Theory (id, name) *)
+  | Error of string
+  | ErrorLoc of loc * string
+  | Theory of id * string
   | Task of id * id * string * string * why3_loc list * string * int
-  (* id, parent id, expl, code, location list, pretty, steps*)
   | Result of string list
   | UpdateStatus of status * id
   | Warning of ((int*int) * string) list
@@ -39,8 +38,5 @@ type why3_output =
 type prover_command = id * string * int
 type prover_output = Valid | Unknown of string | Invalid of string
 
-let marshal a =
-  Js.string (String.escaped (Marshal.to_string a [Marshal.No_sharing; Marshal.Compat_32]))
-
-let unmarshal a =
-  Marshal.from_string (Scanf.unescaped (Js.to_string a)) 0
+val marshal : 'a -> Js.js_string Js.t
+val unmarshal : Js.js_string Js.t -> 'a

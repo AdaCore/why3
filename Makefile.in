@@ -202,6 +202,7 @@ endif
 .PHONY: pvs install-pvs uninstall-pvs clean-pvs
 .PHONY: install-isabelle
 .PHONY: plugins plugins.byte plugins.opt
+.PHONY: trywhy3 clean-trywhy3
 
 .SUFFIXES:
 
@@ -1611,8 +1612,6 @@ install_local:: bin/why3doc.$(SHAREDBEST)
 # trywhy3
 #########
 
-.PHONY: trywhy3
-
 ifeq ($(DEBUGJS),yes)
  JSOO_DEBUG=--pretty --debug-info --source-map
  JS_MAPS=trywhy3.map why3_worker.map
@@ -1627,14 +1626,15 @@ TRYWHY3MODULES = $(addprefix src/trywhy3/, $(TRYWHY3_FILES))
 
 TRYWHY3DEP = $(addsuffix .dep, $(TRYWHY3MODULES))
 TRYWHY3CMO = $(addsuffix .cmo, $(TRYWHY3MODULES))
+TRYWHY3CMI = $(addsuffix .cmi, $(TRYWHY3MODULES))
 
-$(TRYWHY3DEP) $(TRYWHY3CMO): INCLUDES += -I src/trywhy3
+$(TRYWHY3DEP) $(TRYWHY3CMO) $(TRYWHY3CMI): INCLUDES += -I src/trywhy3
 
 TRYWHY3_PACK = \
 	trywhy3.js trywhy3.html trywhy3.css \
 	why3_worker.js alt-ergo-worker.js \
 	README.md examples/ \
-	trywhy3_custom.css gen_index.sh \
+	trywhy3_custom.css \
 	ace-builds/src-min-noconflict/ace.js \
 	ace-builds/src-min-noconflict/mode-why3.js \
 	ace-builds/src-min-noconflict/mode-python.js \
@@ -1673,7 +1673,8 @@ $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo): BFLAGS += -package 
 
 $(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
-TRYWHY3JSON = $(addprefix src/trywhy3/, json_base.ml json_parser.ml json_lexer.ml)
+TRYWHY3JSON_FILES = json_base json_parser json_lexer
+TRYWHY3JSON = $(TRYWHY3JSON_FILES:%=src/trywhy3/%.ml) $(TRYWHY3JSON_FILES:%=src/trywhy3/%.mli)
 
 $(TRYWHY3JSON): src/trywhy3/%: src/util/%
 	cp $< $@
@@ -1684,10 +1685,12 @@ $(TRYWHY3DEP): $(TRYWHY3JSON)
 
 MAKEINC += $(TRYWHY3DEP)
 
-clean::
+clean-trywhy3:
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte \
 	  src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte \
 	  trywhy3.tar.gz
+
+clean:: clean-trywhy3
 
 CLEANDIRS += src/trywhy3
 
