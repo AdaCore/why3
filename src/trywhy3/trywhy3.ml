@@ -406,7 +406,6 @@ end
 
 module ExampleList = struct
 
-    let has_been_updated = ref false
     let select_example = getElement AsHtml.select "why3-select-example"
     let example_label = getElement AsHtml.span "why3-example-label"
     let set_loading_label b =
@@ -416,10 +415,12 @@ module ExampleList = struct
       else
         example_label ##. className := !!"fas fa-book why3-icon"
 
-    let selected_index = ref 0
+    let config = ref Json_base.Null
+
+    let selected_index = ref (-1)
     let unselect () =
-      selected_index := 0;
-      select_example ##. selectedIndex := 0
+      selected_index := -1;
+      select_example ##. selectedIndex := -1
 
     let handle () =
       let filename url =
@@ -436,7 +437,7 @@ module ExampleList = struct
         Editor.set_value s;
         Editor.name := name;
         Editor.editor ## focus in
-      begin match Js.Opt.to_option (sessionStorage ## getItem (url)) with
+      begin match Js.Opt.to_option (sessionStorage ## getItem url) with
       | Some s -> set_content s
       | None ->
           let upd mlw =
@@ -464,54 +465,25 @@ module ExampleList = struct
       option ##. innerHTML := text;
       Dom.appendChild select_example option
 
-    let reset_example () =
+    let update () =
       select_example ##. innerHTML := !!"";
-      add_example !!"" !!""
-
-    let update_example () =
-      let format = !FormatList.selected_format in
-      let upd content =
-        let current_example_id = select_example ##. selectedIndex in
-        let current_example = Js.Opt.get ((select_example ##. options) ## item current_example_id) (fun () -> raise Not_found) in
-        let current_example_url = Js.to_string (current_example ##. value) in
-        let current_example_text = Js.to_string (current_example ##. innerHTML) in
-
-        if !has_been_updated then begin
-          select_example ##. innerHTML := !!""
-        end;
-        let len = String.length current_example_url in
-        if len > 9 then begin
-          add_example !!current_example_text !!current_example_url;
-        end;
-        let examples = content ## split !!"\n" in
-        let examples = Js.to_array (Js.str_array examples) in
-        for i = 0 to Array.length examples / 2 - 1 do
-          let url = !!"examples/" ## concat examples.(2*i+1) in
-          if Js.to_string url <> current_example_url then begin
-            add_example examples.(2*i) url
-          end
-        done;
-        set_loading_label false
-      in
-
-      let file =
-        match format with
-          | "micro-C" -> "index_c.txt"
-          | "python" -> "index_python.txt"
-          | _ -> "index_whyml.txt"
-      in
-
-      set_loading_label true;
-      Promise.catch
-        (Promise.bind_unit
-          (Promise.bind (Fetch.fetch (Js.string (Printf.sprintf "examples/%s" file)))
-              (fun r -> r ## text))
-          (fun s -> upd s))
-        (fun _ -> set_loading_label false)
+      let i = ref 0 in
+      begin match Json_base.get_field !config !FormatList.selected_format with
+      | Json_base.Record list ->
+          List.iter (fun (s, url) ->
+              let url = !!"examples/" ## concat (Js.string (Json_base.get_string url)) in
+              add_example (Js.string s) url;
+              incr i
+            ) list
+      | _ -> log "no example list"
+      | exception Not_found -> log "no example list"
+      end;
+      set_loading_label false;
+      select_example ##. disabled := Js.bool (!i = 0);
+      unselect ()
 
     let () =
-      Editor.callback := (fun () -> if not !has_been_updated then (has_been_updated := true; update_example ()));
-      select_example ##. onchange := Dom.handler (fun _ -> update_example (); handle ())
+      select_example ##. onchange := Dom.handler handle
 
     let enable () =
       select_example ##. disabled := Js._false
@@ -750,7 +722,9 @@ let handle_why3_message o =
           TaskList.add_has_to_be_splitted id
       end
 
-  | Formats l -> FormatList.add_formats l
+  | Formats l ->
+      FormatList.add_formats l;
+      ExampleList.update ()
 
   | UpdateStatus(st, id) ->
       try
@@ -874,7 +848,7 @@ module ToolBar = struct
         FormatList.resolve_format name;
         Editor.name := name;
         Editor.set_value content;
-        ExampleList.update_example ();
+        ExampleList.update ();
         Js._true
 
   let open_ = getElement AsHtml.input "why3-open"
@@ -1232,8 +1206,7 @@ module Controller = struct
                   push_task id code steps
               | Idle ->
                   why3_busy := false;
-                  if is_idle () then ToolBar.enable_toolbar ();
-                  ExampleList.update_example ()
+                  if is_idle () then ToolBar.enable_toolbar ()
               | _ -> () in
             Js._false);
       worker
@@ -1389,9 +1362,7 @@ let () =
   Dialogs.(set_onchange radio_wide) (fun _ -> Panel.set_wide true);
   Dialogs.(set_onchange radio_column) (fun _ -> Panel.set_wide false);
 
-  FormatList.(set_onchange select_format) (fun () ->
-      if not !ExampleList.has_been_updated then ExampleList.reset_example ();
-      ExampleList.update_example ())
+  FormatList.(set_onchange select_format) ExampleList.update
 
 let () =
   let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
@@ -1458,7 +1429,9 @@ let () =
       ContextMenu.alt_ergo_context_steps.(i) <- value;
       Dialogs.input_context_steps.(i) ##. value := js_string_of_int value
     done;
-    ContextMenu.change_prove_context ()
+    ContextMenu.change_prove_context ();
+    ExampleList.config := Json_base.get_field config "examples";
+    ExampleList.update ()
   in
 
   Promise.catch

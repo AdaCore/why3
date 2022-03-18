@@ -28,7 +28,7 @@ Web interface TryWhy3
   * step limits from the contextual menu are now configurable in `examples/config.json`
   * "prove" now splits the VCs if they are not proven after `step_limit.first_attempt` steps
   * added some "split" and "prove" buttons next to each task
-  * generalized `examples/index.txt` to `index_{language}.txt`, so as to support per-language examples
+  * moved the example list to `config.json` and made it per-language
   * added some examples for Python and Micro-C
 
 Provers

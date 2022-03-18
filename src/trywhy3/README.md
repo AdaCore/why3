@@ -56,9 +56,5 @@ Customization
   * To change the look and feel of the rest of the application, edit
     the file `trywhy3_custom.css`.
 
-  * To add some predefined examples, put some `.mlw` files in the
-    `examples/` subdirectory and generate an index as follows:
-
-        cp some_file.mlw examples/
-        cd examples/
-        ../gen_index.sh *.mlw > index.txt
+  * To add some predefined examples, put the files in the `examples/`
+    subdirectory and modify `examples/config.json` accordingly.
