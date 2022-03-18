@@ -25,10 +25,10 @@ Python language
   * functions can now return `bool` and `list`
 
 Web interface TryWhy3
-  * step limits from the contextual menu are now configurable in `examples/config.json`
-  * "prove" now splits the VCs if they are not proven after `step_limit.first_attempt` steps
+  * step limits are now configurable in the HTML file
+  * "prove" now splits the VCs if they are not proven after "First-attempt limit" steps
   * added some "split" and "prove" buttons next to each task
-  * moved the example list to `config.json` and made it per-language
+  * moved the example list to `examples/config.json` and made it per-language
   * added some examples for Python and Micro-C
 
 Provers

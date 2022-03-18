@@ -56,5 +56,8 @@ Customization
   * To change the look and feel of the rest of the application, edit
     the file `trywhy3_custom.css`.
 
+  * To change the default step limits, edit the `#why3-setting-dialog`
+    part of `trywhy3.html`.
+
   * To add some predefined examples, put the files in the `examples/`
     subdirectory and modify `examples/config.json` accordingly.

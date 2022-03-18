@@ -57,7 +57,52 @@ let addMouseEventListener prevent o (e : Js.js_string Js.t) f =
                     inject cb;
                     inject Js._false |])
 
+module Session = struct
 
+  let localStorage =
+    check_def "localStorage" (Dom_html.window ##. localStorage)
+
+  let save_view_mode m =
+    localStorage ## setItem !!"why3-view-mode" m
+
+  let save_buffer lang name content =
+    localStorage ## setItem !!"why3-buffer-lang" lang;
+    localStorage ## setItem !!"why3-buffer-name" name;
+    localStorage ## setItem !!"why3-buffer-content" content
+
+  let get_item s def =
+    Js.Opt.get (localStorage ## getItem s) (fun () -> def)
+
+  let load_view_mode () =
+    get_item !!"why3-view-mode" !!"wide"
+
+  let load_buffer () =
+    let lang = get_item !!"why3-buffer-lang" !!"" in
+    let name = get_item !!"why3-buffer-name" !!"" in
+    let buffer = get_item !!"why3-buffer-content" !!"" in
+    (lang, name, buffer)
+
+  let to_save = ref []
+
+  let attach input store =
+    let default = input ##. value in
+    to_save := (input, store, default) :: !to_save;
+    let v = get_item store default in
+    input ##. value := v;
+    v
+
+  let save () =
+    List.iter (fun (input, store, default) ->
+        let v = input ##. value in
+        if Js.to_string v = Js.to_string default then
+          localStorage ## removeItem store
+        else
+          localStorage ## setItem store v;
+        (* some browsers remember values upon reload, thus corrupting default settings *)
+        input ##. value := default
+      ) !to_save
+
+end
 
 module Buttons = struct
 
@@ -238,6 +283,41 @@ module Tabs = struct
 
 end
 
+module Dialogs = struct
+
+  let dialog_panel = getElement AsHtml.div "why3-dialog-panel"
+  let setting_dialog = getElement AsHtml.div "why3-setting-dialog"
+  let about_dialog = getElement AsHtml.div "why3-about-dialog"
+  let button_close = getElement AsHtml.button "why3-close-dialog-button"
+  let input_num_threads = getElement AsHtml.input "why3-input-num-threads"
+  let input_num_steps = getElement AsHtml.input "why3-input-num-steps"
+  let input_min_steps = getElement AsHtml.input "why3-input-min-steps"
+  let radio_wide = getElement AsHtml.input "why3-radio-wide"
+  let radio_column = getElement AsHtml.input "why3-radio-column"
+
+  let input_context_steps =
+    let t = Array.make 3 input_num_steps in
+    for i = 0 to 2 do
+      let id = Printf.sprintf "why3-input-context-steps%d" (i+1) in
+      t.(i) <- getElement AsHtml.input id
+    done;
+    t
+
+
+  let all_dialogs = [ setting_dialog; about_dialog ]
+  let show diag () =
+    dialog_panel ##. style ##. display := !!"flex";
+    diag ##. style ##. display := !!"inline-block";
+    diag ## focus
+
+  let close () =
+    List.iter (fun d -> d ##. style ##. display := !!"none") all_dialogs;
+    dialog_panel ##. style ##. display := !!"none"
+
+  let set_onchange o f =
+    o ##. onchange := Dom.handler (fun _ -> f o; Js._false)
+end
+
 module ContextMenu = struct
 
     let task_menu = getElement AsHtml.div "why3-task-menu"
@@ -245,7 +325,15 @@ module ContextMenu = struct
     let prove_menu_entry = getElement AsHtml.li "why3-prove-menu-entry"
     let clean_menu_entry = getElement AsHtml.li "why3-clean-menu-entry"
     let enabled = ref true
-    let alt_ergo_context_steps = Array.make 3 0
+
+    let alt_ergo_context_steps =
+      let get i =
+        let v =
+          Session.attach Dialogs.input_context_steps.(i)
+            (Js.string (Printf.sprintf "why3-context-steps%d" i)) in
+        int_of_js_string v in
+      Array.init 3 get
+
     let prove_menu_entries =
       let t = Array.make 3 prove_menu_entry in
       for i = 0 to 2 do
@@ -287,7 +375,9 @@ module ContextMenu = struct
     let get_context_step i =
       alt_ergo_context_steps.(i)
 
-    let () = addMouseEventListener false task_menu !!"mouseleave" (fun _ -> hide())
+    let () =
+      change_prove_context ();
+      addMouseEventListener false task_menu !!"mouseleave" (fun _ -> hide())
 
   end
 
@@ -926,40 +1016,6 @@ module Panel = struct
             else Js._true)
   end
 
-module Dialogs = struct
-
-    let dialog_panel = getElement AsHtml.div "why3-dialog-panel"
-    let setting_dialog = getElement AsHtml.div "why3-setting-dialog"
-    let about_dialog = getElement AsHtml.div "why3-about-dialog"
-    let button_close = getElement AsHtml.button "why3-close-dialog-button"
-    let input_num_threads = getElement AsHtml.input "why3-input-num-threads"
-    let input_num_steps = getElement AsHtml.input "why3-input-num-steps"
-    let input_min_steps = getElement AsHtml.input "why3-input-min-steps"
-    let radio_wide = getElement AsHtml.input "why3-radio-wide"
-    let radio_column = getElement AsHtml.input "why3-radio-column"
-    let input_context_steps =
-      let t = Array.make 3 input_num_steps in
-      for i = 0 to 2 do
-        let id = Printf.sprintf "why3-input-context-steps%d" (i+1) in
-        t.(i) <- getElement AsHtml.input id
-      done;
-      t
-
-
-    let all_dialogs = [ setting_dialog; about_dialog ]
-    let show diag () =
-      dialog_panel ##. style ##. display := !!"flex";
-      diag ##. style ##. display := !!"inline-block";
-      diag ## focus
-
-    let close () =
-      List.iter (fun d -> d ##. style ##. display := !!"none") all_dialogs;
-      dialog_panel ##. style ##. display := !!"none"
-
-    let set_onchange o f =
-      o ##. onchange := Dom.handler (fun _ -> f o; Js._false)
-  end
-
 module KeyBinding = struct
 
   let callbacks = Array.init 255 (fun _ -> Array.make 16 None)
@@ -991,86 +1047,25 @@ module KeyBinding = struct
 
 end
 
-module Session = struct
-
-  let localStorage =
-    check_def "localStorage" (Dom_html.window ##. localStorage)
-
-  let save_num_threads i =
-    localStorage ## setItem !!"why3-num-threads" (js_string_of_int i)
-
-  let save_num_steps i =
-    localStorage ## setItem !!"why3-num-steps" (js_string_of_int i)
-
-  let save_min_steps i =
-    localStorage ## setItem !!"why3-min-steps" (js_string_of_int i)
-
-  let save_context_steps steps =
-    for i = 0 to 2 do
-      let id = Js.string (Printf.sprintf "why3-context-steps%d" i) in
-      localStorage ## setItem id (js_string_of_int steps.(i))
-    done
-
-  let save_view_mode m =
-    localStorage ## setItem !!"why3-view-mode" m
-
-  let save_buffer lang name content =
-    localStorage ## setItem !!"why3-buffer-lang" lang;
-    localStorage ## setItem !!"why3-buffer-name" name;
-    localStorage ## setItem !!"why3-buffer-content" content
-
-  let get_item s def =
-    Js.Opt.get (localStorage ## getItem s) (fun () -> def)
-
-  let load_num_threads () =
-    int_of_js_string (get_item !!"why3-num-threads" !!"4")
-
-  let load_num_steps () =
-    int_of_js_string (get_item !!"why3-num-steps" !!"100")
-
-  let load_min_steps () =
-    int_of_js_string (get_item !!"why3-min-steps" !!"10")
-
-  let load_context_steps steps =
-    let default_steps = [|100; 1000; 5000|] in
-    for i = 0 to 2 do
-      let id = Js.string (Printf.sprintf "why3-context-steps%d" i) in
-      let d_steps = js_string_of_int default_steps.(i) in
-      steps.(i) <- int_of_js_string (get_item id d_steps)
-    done
-
-  let load_view_mode () =
-    get_item !!"why3-view-mode" !!"wide"
-
-  let load_buffer () =
-    let lang= get_item !!"why3-buffer-lang" !!"" in
-    let name = get_item !!"why3-buffer-name" !!"" in
-    let buffer = get_item !!"why3-buffer-content" !!"" in
-    (lang, name, buffer)
-
-  let init () =
-    Dialogs.input_num_threads ##. value := js_string_of_int (load_num_threads ());
-    Dialogs.input_num_steps ##. value := js_string_of_int (load_num_steps ());
-    Dialogs.input_min_steps ##. value := js_string_of_int (load_min_steps ());
-    load_context_steps ContextMenu.alt_ergo_context_steps;
-    for i = 0 to 2 do
-      Dialogs.input_context_steps.(i) ##. value :=
-        js_string_of_int ContextMenu.alt_ergo_context_steps.(i)
-    done;
-    ContextMenu.change_prove_context ()
-
-end
-
 module Controller = struct
 
     let task_queue  = Queue.create ()
 
     let first_task = ref true
     type 'a status = Free of 'a | Busy of 'a * Worker_proto.id | Absent
-    let num_workers = Session.load_num_threads ()
-    let alt_ergo_default_steps = ref (Session.load_num_steps ())
-    let alt_ergo_min_steps = ref (Session.load_min_steps ())
-    let alt_ergo_workers = ref (Array.make num_workers Absent)
+
+    let alt_ergo_default_steps =
+      let v = Session.attach Dialogs.input_num_steps !!"why3-num-steps" in
+      ref (int_of_js_string v)
+
+    let alt_ergo_min_steps =
+      let v = Session.attach Dialogs.input_min_steps !!"why3-min-steps" in
+      ref (int_of_js_string v)
+
+    let alt_ergo_workers =
+      let v = Session.attach Dialogs.input_num_threads !!"why3-num-threads" in
+      ref (Array.make (int_of_js_string v) Absent)
+
     let why3_busy = ref false
     let why3_worker = ref None
 
@@ -1271,8 +1266,6 @@ end
 (* Initialisation *)
 let () =
 
-  Session.init ();
-
   ToolBar.add_action Buttons.button_open ToolBar.open_;
   KeyBinding.add_global ~ctrl:Js._true 79 ToolBar.open_;
 
@@ -1401,33 +1394,15 @@ let () =
     Dom.handler (fun _ ->
         Session.save_buffer (Js.string !FormatList.selected_format)
           !Editor.name (Editor.get_value ());
-        Session.save_num_threads (Array.length !Controller.alt_ergo_workers);
-        Session.save_num_steps !Controller.alt_ergo_default_steps;
-        Session.save_min_steps !Controller.alt_ergo_min_steps;
-        Session.save_context_steps ContextMenu.alt_ergo_context_steps;
         Session.save_view_mode (if Panel.is_wide () then !!"wide"
                                 else !!"column");
+        Session.save ();
         Js._true)
 
 let () =
   let load_config s =
     let lb = Lexing.from_string s in
-    let config = Json_parser.value (fun x -> Json_lexer.read x) lb in
-    let step_config = Json_base.get_field config "step_limit" in
-    let default_steps = Json_base.get_int_field step_config "default" in
-    let min_steps = Json_base.get_int_field step_config "first_attempt" in
-    Dialogs.input_num_steps ##. value := js_string_of_int default_steps;
-    Dialogs.input_min_steps ##. value := js_string_of_int min_steps;
-    Controller.alt_ergo_default_steps := default_steps;
-    Controller.alt_ergo_min_steps := min_steps;
-    let menu_steps = Json_base.get_list_field step_config "menu" in
-    for i = 0 to 2 do
-      let value = Json_base.get_int (List.nth menu_steps i) in
-      ContextMenu.alt_ergo_context_steps.(i) <- value;
-      Dialogs.input_context_steps.(i) ##. value := js_string_of_int value
-    done;
-    ContextMenu.change_prove_context ();
-    ExampleList.config := Json_base.get_field config "examples";
+    ExampleList.config := Json_parser.value (fun x -> Json_lexer.read x) lb;
     ExampleList.update ()
   in
 
