@@ -268,11 +268,12 @@ module Tabs = struct
         List.iter (fun tab ->
             tab ##. onclick :=
               Dom.handler (fun _ev ->
-                  let () =
-                    if Js.to_bool (tab ##. classList ## contains !!"why3-inactive") then
+                  if Js.to_bool (tab ##. classList ## contains !!"why3-inactive") then begin
                       List.iter (fun t ->
-                          ignore (t ##. classList ## toggle !!"why3-inactive")
-                        ) labels in
+                          ignore (t ##. classList ## add !!"why3-inactive")
+                        ) labels;
+                      tab ##. classList ## remove !!"why3-inactive"
+                    end;
                   Js._false)
           ) labels)
       tab_groups
