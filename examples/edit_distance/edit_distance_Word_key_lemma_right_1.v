@@ -14,55 +14,81 @@ Parameter char_WhyType : WhyType char.
 Existing Instance char_WhyType.
 
 (* Why3 assumption *)
-Definition word := (list char).
+Definition word := Init.Datatypes.list char.
 
 (* Why3 assumption *)
-Inductive dist : (list char) -> (list char) -> Z -> Prop :=
-  | dist_eps : (dist nil nil 0%Z)
-  | dist_add_left : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
-      w2 n) -> forall (a:char), (dist (cons a w1) w2 (n + 1%Z)%Z)
-  | dist_add_right : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
-      w2 n) -> forall (a:char), (dist w1 (cons a w2) (n + 1%Z)%Z)
-  | dist_context : forall (w1:(list char)) (w2:(list char)) (n:Z), (dist w1
-      w2 n) -> forall (a:char), (dist (cons a w1) (cons a w2) n).
+Inductive dist: Init.Datatypes.list char -> Init.Datatypes.list char ->
+  Numbers.BinNums.Z -> Prop :=
+  | dist_eps : dist Init.Datatypes.nil Init.Datatypes.nil 0%Z
+  | dist_add_left :
+      forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char)
+        (n:Numbers.BinNums.Z),
+      dist w1 w2 n -> forall (a:char),
+      dist (Init.Datatypes.cons a w1) w2 (n + 1%Z)%Z
+  | dist_add_right :
+      forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char)
+        (n:Numbers.BinNums.Z),
+      dist w1 w2 n -> forall (a:char),
+      dist w1 (Init.Datatypes.cons a w2) (n + 1%Z)%Z
+  | dist_context :
+      forall (w1:Init.Datatypes.list char) (w2:Init.Datatypes.list char)
+        (n:Numbers.BinNums.Z),
+      dist w1 w2 n -> forall (a:char),
+      dist (Init.Datatypes.cons a w1) (Init.Datatypes.cons a w2) n.
 
 (* Why3 assumption *)
-Definition min_dist (w1:(list char)) (w2:(list char)) (n:Z): Prop := (dist w1
-  w2 n) /\ forall (m:Z), (dist w1 w2 m) -> (n <= m)%Z.
+Definition min_dist (w1:Init.Datatypes.list char)
+    (w2:Init.Datatypes.list char) (n:Numbers.BinNums.Z) : Prop :=
+  dist w1 w2 n /\ (forall (m:Numbers.BinNums.Z), dist w1 w2 m -> (n <= m)%Z).
 
 (* Why3 assumption *)
-Fixpoint last_char (a:char) (u:(list char)) {struct u}: char :=
+Fixpoint last_char (a:char) (u:Init.Datatypes.list char) {struct u}: char :=
   match u with
-  | nil => a
-  | (cons c u') => (last_char c u')
+  | Init.Datatypes.nil => a
+  | Init.Datatypes.cons c u' => last_char c u'
   end.
 
 (* Why3 assumption *)
-Fixpoint but_last (a:char) (u:(list char)) {struct u}: (list char) :=
+Fixpoint but_last (a:char)
+  (u:Init.Datatypes.list char) {struct u}: Init.Datatypes.list char :=
   match u with
-  | nil => nil
-  | (cons c u') => (cons a (but_last c u'))
+  | Init.Datatypes.nil => Init.Datatypes.nil
+  | Init.Datatypes.cons c u' => Init.Datatypes.cons a (but_last c u')
   end.
 
-Axiom first_last_explicit : forall (u:(list char)) (a:char),
-  ((List.app (but_last a u) (cons (last_char a u) nil)) = (cons a u)).
+Axiom first_last_explicit :
+  forall (u:Init.Datatypes.list char) (a:char),
+  ((Init.Datatypes.app (but_last a u)
+    (Init.Datatypes.cons (last_char a u) Init.Datatypes.nil))
+   = (Init.Datatypes.cons a u)).
 
-Axiom first_last : forall (a:char) (u:(list char)), exists v:(list char),
-  exists b:char, ((List.app v (cons b nil)) = (cons a u)) /\
+Axiom first_last :
+  forall (a:char) (u:Init.Datatypes.list char),
+  exists v:Init.Datatypes.list char, exists b:char,
+  ((Init.Datatypes.app v (Init.Datatypes.cons b Init.Datatypes.nil)) =
+   (Init.Datatypes.cons a u)) /\
   ((list.Length.length v) = (list.Length.length u)).
+
+Require Import Lia.
 
 Lemma app_comm_cons: forall {A:Type} {A_WT:WhyType A} (x y : list A) (a: A),
    cons a (app x y) = app (cons a x) y.
+Proof.
 simpl; auto.
 Qed.
 
 (* Why3 goal *)
-Theorem key_lemma_right : forall (w1:(list char)) (w'2:(list char)) (m:Z)
-  (a:char), (dist w1 w'2 m) -> forall (w2:(list char)),
-  (w'2 = (cons a w2)) -> exists u1:(list char), exists v1:(list char),
-  exists k:Z, (w1 = (List.app u1 v1)) /\ ((dist v1 w2 k) /\
-  ((k + (list.Length.length u1))%Z <= (m + 1%Z)%Z)%Z).
+Theorem key_lemma_right :
+  forall (w1:Init.Datatypes.list char) (w'2:Init.Datatypes.list char)
+    (m:Numbers.BinNums.Z) (a:char),
+  dist w1 w'2 m -> forall (w2:Init.Datatypes.list char),
+  (w'2 = (Init.Datatypes.cons a w2)) ->
+  exists u1:Init.Datatypes.list char, exists v1:Init.Datatypes.list char,
+  exists k:Numbers.BinNums.Z,
+  (w1 = (Init.Datatypes.app u1 v1)) /\
+  dist v1 w2 k /\ ((k + (list.Length.length u1))%Z <= (m + 1%Z)%Z)%Z.
 (* Why3 intros w1 w'2 m a h1 w2 h2. *)
+Proof.
 intros w1 w'2 m a H; elim H.
 (* 1. [dist_eps]: absurd *)
 intros; discriminate H0.
@@ -81,21 +107,20 @@ rewrite app_comm_cons.
 rewrite <- Hc.
 rewrite <- Append.Append_assoc; reflexivity.
 apply dist_add_left; assumption.
-omega.
+lia.
 (* 3. [dist_add_right]: direct *)
 intros.
 exists nil; exists w0; exists n.
 repeat split.
 inversion H2.
 rewrite <- H5; assumption.
-simpl; omega.
+simpl; lia.
 (* 4. [dist_context]: direct *)
 intros.
 inversion H2.
 exists (cons a nil); exists w0; exists n.
 repeat split.
 rewrite <- H5; assumption.
-simpl; omega.
+simpl; lia.
 Qed.
-
 

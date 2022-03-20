@@ -18,7 +18,7 @@ Require floating_point.Rounding.
 Require floating_point.SingleFormat.
 Require floating_point.Single.
 
-Require Import Interval.Interval_tactic.
+Require Import Interval.Tactic.
 
 (* Why3 goal *)
 Theorem my_cosine'vc :
@@ -27,10 +27,11 @@ Theorem my_cosine'vc :
   ((Reals.Rbasic_fun.Rabs
     ((1%R -
       (((floating_point.Single.value x) * (floating_point.Single.value x))%R
-       * (5 / 10)%R)%R)%R
+       * (1 / 2)%R)%R)%R
      - (Reals.Rtrigo_def.cos (floating_point.Single.value x)))%R)
    <= (1 / 16777216)%R)%R.
+(* Why3 intros x h1. *)
 Proof.
 intros x h1.
-interval with (i_bisect_diff (Single.value x)).
+interval with (i_bisect (Single.value x), i_autodiff (Single.value x)).
 Qed.
