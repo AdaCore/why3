@@ -81,7 +81,7 @@ run () {
     else
         prover="$1,counterexamples"
     fi
-    $dir/../bin/why3"$suffix" prove -a split_vc -P $prover --stepslimit=$steps  \
+    $dir/../bin/why3"$suffix" prove -a split_vc -P $prover --stepslimit=$steps --timelimit=0 \
             "${file_path}.mlw" --json-model-values --debug=print_model_attrs${wp_sp} | \
         sed -e "s|$whydata|WHY3DATA|g" -e "s|$whylib|WHY3LIB|g" | \
         # This ad hoc sed removes any timing information from counterexamples output.
@@ -123,12 +123,31 @@ for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
-    # 150000 steps for CVC4 takes around 1 second
-    # 7500000 steps for Z3 takes around 1 second
-    run CVC4,1.7 $filedir $filebase true  150000
-    run CVC4,1.7 $filedir $filebase false 150000
-    run Z3,4.8.10 $filedir $filebase true  7500000
-    run Z3,4.8.10 $filedir $filebase false 7500000
+    cvc4steps=150000
+    case "$filebase" in
+      "bv32")
+        z3steps=2500000
+        ;;
+      "int_overflow")
+        z3steps=400000
+        ;;
+      "floats")
+        z3steps=400000
+        ;;
+      "strings")
+        z3steps=3000
+        ;;
+      "threshold")
+        z3steps=2500000
+        ;;
+      *)
+        z3steps=7500000
+        ;;
+    esac
+    run CVC4,1.7 $filedir $filebase true  $cvc4steps
+    run CVC4,1.7 $filedir $filebase false $cvc4steps
+    run Z3,4.8.10 $filedir $filebase true  $z3steps
+    run Z3,4.8.10 $filedir $filebase false $z3steps
 done
 
 if [ "$success" = true ]; then
