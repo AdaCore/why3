@@ -6,14 +6,17 @@ Standard library
     of mathematical integers and in terms of purely bit-vector
     formulas, thanks to conversion to 128 bits :x:
 
+Core
+  * equality of numeric literals is now semantic, i.e., independent of the radix :x:
+
 WhyML language
-  * generalized witness expressions for type invariant
+  * generalized witness expressions for type invariants
 
 Python language
   * added `break` and `continue`
-  * added range with one, two or three argument(s)
-  * added slice (`list[i1:i2]`)
-  * added negative index (`list[n]`, with `-len(list) ≤ n < len(list)`)
+  * added range with one, two, or three arguments
+  * added slice, i.e., `list[i1:i2]`
+  * added negative index, i.e., `list[n]` with `-len(list) ≤ n < len(list)`
   * added list methods:
       - `list.append(n)`
       - `list.pop()`
@@ -24,12 +27,27 @@ Python language
   * added assignment operators `+=`, `-=`, `*=`, `//=`, `%=`
   * functions can now return `bool` and `list`
 
+IDE
+  * strategies now support step limits, passed as the third integer argument to the `call` command
+
 Web interface TryWhy3
   * step limits are now configurable in the HTML file
   * "prove" now splits the VCs if they are not proven after "First-attempt limit" steps
   * added some "split" and "prove" buttons next to each task
   * moved the example list to `examples/config.json` and made it per-language
   * added some examples for Python and Micro-C
+  * the Alt-Ergo worker is now the upstream one
+
+Tools
+  * options `why3 --list-*` have been moved to a dedicated tool `why3 show`,
+    e.g., `why3 show metas`
+  * added `why3 show attributes` to list all the known attributes
+  * `why3 prove` now supports transformations that require an argument
+  * `why3 execute` now supports `io.StdIO` and `debug.Debug`
+
+Coq realizations
+  * floating-point theories are now built on top of Flocq's `BinarySingleNaN`
+    formalization (requires Flocq >= 3.4 and Coq >= 8.11) :x:
 
 Provers
   * support for Coq 8.15.0 (released Jan 13, 2022)
