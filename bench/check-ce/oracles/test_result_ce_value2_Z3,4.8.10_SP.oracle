@@ -122,13 +122,44 @@
                 Line 13:
                   Property failure at assertion with:
                     a = {contents= (-1)}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+<check-ce>Checking model:
+          
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9
+<check-ce>Result of checking model 1: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+              
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+              
 <check-ce-summary>Results:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 13, characters 14-20:
 Sub-goal Assertion of goal test2'vc.
-Prover result is: Step limit exceeded (1.15s).
+Prover result is: Unknown (unknown) (0.39s, 3000050 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -292,13 +323,44 @@ File test_result_ce_value2.mlw:
                 Line 15:
                   Property failure at assertion with:
                     a = {contents= 42}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+<check-ce>Checking model:
+          
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 10, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9
+<check-ce>Result of checking model 1: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+              
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+              
 <check-ce-summary>Results:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 12, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 15, characters 14-20:
 Sub-goal Assertion of goal test2'vc.
-Prover result is: Step limit exceeded (1.00s).
+Prover result is: Unknown (unknown) (0.35s, 3000052 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -514,13 +576,44 @@ File test_result_ce_value2.mlw:
                 Line 18:
                   Property failure at postcondition of `test3` with:
                     a = {contents= 42}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+<check-ce>Checking model:
+          
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9
+<check-ce>Result of checking model 1: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+              
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+              
 <check-ce-summary>Results:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Step limit exceeded (1.04s).
+Prover result is: Unknown (unknown) (0.35s, 3000084 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -749,13 +842,44 @@ File test_result_ce_value2.mlw:
                 Line 18:
                   Property failure at postcondition of `test3` with:
                     a = {contents= 42}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+<check-ce>Checking model:
+          
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9
+<check-ce>Result of checking model 1: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+              
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+              
 <check-ce-summary>Results:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Step limit exceeded (0.66s).
+Prover result is: Unknown (unknown) (0.36s, 3000086 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -810,7 +934,7 @@ File test_result_ce_value2.mlw:
 
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Valid (0.01s, 67 steps).
+Prover result is: Valid (0.01s, 74 steps).
 
 <check-ce>Check model 0 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
 <check-ce>Checking model:
@@ -967,13 +1091,44 @@ Prover result is: Valid (0.01s, 67 steps).
                 Line 18:
                   Property failure at postcondition of `test3` with:
                     a = {contents= 42}
+<check-ce>Check model 1 ("bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+<check-ce>Checking model:
+          
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15 at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 10-15: 0
+<rac-values>RHS evaluated for global `a` at "bench/check-ce/test_result_ce_value2.mlw", line 3, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `x` at "bench/check-ce/test_result_ce_value2.mlw", line 17, characters 11-12: 0
+<rac-values>Type default value for variable `a` at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9 at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9
+<check-ce>Result of checking model 1: INCOMPLETE
+            - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+              
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+              
 <check-ce-summary>Results:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to id at "bench/check-ce/test_result_ce_value2.mlw", line 21, characters 5-9)
 File "bench/check-ce/test_result_ce_value2.mlw", line 18, characters 12-19:
 Sub-goal Postcondition of goal test3'vc.
-Prover result is: Step limit exceeded (0.77s).
+Prover result is: Unknown (unknown) (0.38s, 3000060 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
