@@ -20,6 +20,8 @@ val opt_extra_expl_prefix : Getopt.opt
 val goal_expl_task:
   root:bool -> Task.task -> Ident.ident * string * Task.task
 
+val add_extra_expl_prefix : string -> unit
+
 val search_attrs :
   (Ident.Sattr.t -> 'a list) -> Term.term -> 'a list
   (* [search_attrs callback f] traverses [f] in a top-down manner and calls the
