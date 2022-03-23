@@ -1,0 +1,217 @@
+File "bench/check-ce/multifile1.mlw", line 6, characters 14-24:
+Sub-goal Postcondition of goal decr'vc.
+Prover result is: Valid (0.02s, 26 steps).
+
+<check-ce>Check model 0 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+<check-ce>Checking model:
+          File multifile1.mlw:
+            Line 6:
+              x = {"type": "Integer", "val": "2"}
+            Line 9:
+              x = {"type": "Integer", "val": "2"}
+            Line 10:
+              result = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "2"}
+            Line 11:
+              result = {"type": "Integer", "val": "2"}
+              result = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
+<rac-values>Value from model for return value of call to decr at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
+<check-ce>Result of checking model 0: SW
+            - Concrete RAC: NORMAL
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File multifile1.mlw:
+                Line 9:
+                  x = 2
+                  x = 2
+                  Execution of main function `incr` with env:
+                    x = 2
+                    zero = 0
+                    one = 1
+                Line 11:
+                  Normal execution of function `decr` with args:
+                    x = 2
+                Line 7:
+                  Normal execution of function `(-)` with args:
+                    x = 2
+                    y = 1
+              File int.mlw:
+                Line 23:
+                  Normal execution of function `(-_)` with args:
+                    _ = 1
+                  Normal execution of function `(+)` with args:
+                    _ = 2
+                    _ = (-1)
+              File multifile1.mlw:
+                Line 11:
+                  Normal execution of function `(+)` with args:
+                    _ = 1
+                    _ = 2
+                Line 9:
+                  Execution of main function terminated normally
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File multifile1.mlw:
+                Line 9:
+                  x = 2
+                  x = 2
+                  Execution of main function `incr` with env:
+                    x = 2
+                    zero = 0
+                    one = 1
+                Line 11:
+                  Giant-step execution of function `decr` with args:
+                    x = 2
+                  result of `decr` = 0
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 2
+                Line 10:
+                  Property failure at postcondition of `incr` with:
+                    x = 2
+                    result = 2
+<check-ce>Check model 1 ("bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+<check-ce>Checking model:
+          File multifile1.mlw:
+            Line 6:
+              x = {"type": "Integer", "val": "2"}
+            Line 9:
+              x = {"type": "Integer", "val": "2"}
+            Line 10:
+              result = {"type": "Integer", "val": "0"}
+              x = {"type": "Integer", "val": "2"}
+            Line 11:
+              result = {"type": "Integer", "val": "2"}
+              result = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
+<rac-values>Value from model for return value of call to decr at "bench/check-ce/multifile1.mlw", line 11, characters 4-10 at "bench/check-ce/multifile1.mlw", line 11, characters 4-10: 0
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/multifile1.mlw", line 9, characters 12-13: 2
+<check-ce>Result of checking model 1: SW
+            - Concrete RAC: NORMAL
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File multifile1.mlw:
+                Line 9:
+                  x = 2
+                  x = 2
+                  Execution of main function `incr` with env:
+                    x = 2
+                    zero = 0
+                    one = 1
+                Line 11:
+                  Normal execution of function `decr` with args:
+                    x = 2
+                Line 7:
+                  Normal execution of function `(-)` with args:
+                    x = 2
+                    y = 1
+              File int.mlw:
+                Line 23:
+                  Normal execution of function `(-_)` with args:
+                    _ = 1
+                  Normal execution of function `(+)` with args:
+                    _ = 2
+                    _ = (-1)
+              File multifile1.mlw:
+                Line 11:
+                  Normal execution of function `(+)` with args:
+                    _ = 1
+                    _ = 2
+                Line 9:
+                  Execution of main function terminated normally
+            - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File multifile1.mlw:
+                Line 9:
+                  x = 2
+                  x = 2
+                  Execution of main function `incr` with env:
+                    x = 2
+                    zero = 0
+                    one = 1
+                Line 11:
+                  Giant-step execution of function `decr` with args:
+                    x = 2
+                  result of `decr` = 0
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 2
+                Line 10:
+                  Property failure at postcondition of `incr` with:
+                    x = 2
+                    result = 2
+<check-ce-summary>Results:
+- Selected model 0: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+- Checked model 1: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/multifile1.mlw", line 10, characters 14-24)
+File "bench/check-ce/multifile1.mlw", line 10, characters 14-24:
+Sub-goal Postcondition of goal incr'vc.
+Prover result is: Unknown (sat) (0.00s, 914 steps).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File multifile1.mlw:
+  Line 9:
+    x = 2
+    x = 2
+    Execution of main function `incr` with env:
+      x = 2
+      zero = 0
+      one = 1
+  Line 11:
+    Giant-step execution of function `decr` with args:
+      x = 2
+    result of `decr` = 0
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 2
+  Line 10:
+    Property failure at postcondition of `incr` with:
+      x = 2
+      result = 2
+

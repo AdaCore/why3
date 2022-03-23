@@ -1,0 +1,570 @@
+File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid (0.02s, 69 steps).
+
+<check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
+<check-ce>Checking model:
+          File underspec.mlw:
+            Line 16:
+              i = {"type": "Integer", "val": "0"}
+              x1 =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-401"}}]}}
+            Line 17:
+              x1 =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-400"}}]}}
+              x1 =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-400"}}]}}
+            Line 18:
+              result = {"type": "Boolean", "val": true}
+            Line 19:
+              x1 =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "-400"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/underspec.mlw", line 14, characters 17-18 at "bench/check-ce/underspec.mlw", line 14, characters 17-18: {contents=
+                                                                    0}
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/underspec.mlw", line 15, characters 17-18 at "bench/check-ce/underspec.mlw", line 15, characters 17-18: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `x1` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+                                                                    (-401)}
+<rac-values>Type default value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+                                                                    0}
+<rac-values>Value from model for variable `i` at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 0
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 0: SW
+            - Concrete RAC: NORMAL
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
+              File underspec.mlw:
+                Line 13:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                Line 14:
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                Line 15:
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                Line 16:
+                  Normal iteration of loop
+                Line 18:
+                  Normal execution of function `(=)` with args:
+                    x = 0
+                    y = 0
+                Line 19:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 1
+                Line 16:
+                  Normal iteration of loop
+                Line 18:
+                  Normal execution of function `(=)` with args:
+                    x = 1
+                    y = 0
+                Line 21:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 1
+                Line 13:
+                  Execution of main function terminated normally
+            - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/underspec.mlw", line 17, characters 18-33)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
+              File underspec.mlw:
+                Line 13:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                Line 14:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 15:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 16:
+                  Giant-step iteration of loop
+                  x1 = {contents= (-401)}
+                  x2 = {contents= 0}
+                  i = 0
+                  Giant-step iteration of loop
+                Line 18:
+                  Normal execution of function `(=)` with args:
+                    x = 0
+                    y = 0
+                Line 19:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= (-401)}
+                  Normal execution of function `(+)` with args:
+                    _ = (-401)
+                    _ = 1
+                Line 17:
+                  Property failure at loop invariant preservation with:
+                    x1 = {contents= (-400)}
+                    i = 1
+<check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 17, characters 27-33)
+<check-ce>Checking model:
+          
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/underspec.mlw", line 14, characters 17-18 at "bench/check-ce/underspec.mlw", line 14, characters 17-18: {contents=
+                                                                    0}
+<rac-values>Value computed from postcondition for return value of call to ref at "bench/check-ce/underspec.mlw", line 15, characters 17-18 at "bench/check-ce/underspec.mlw", line 15, characters 17-18: {contents=
+                                                                    0}
+<rac-values>Type default value for variable `x1` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+                                                                    0}
+<rac-values>Type default value for variable `x2` at "bench/check-ce/underspec.mlw", line 16, characters 4-139 at "bench/check-ce/underspec.mlw", line 16, characters 4-139: {contents=
+                                                                    0}
+<rac-values>Default value for variable `i` at "bench/check-ce/underspec.mlw", line 16, characters 8-9: 2
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 1: BAD_CE
+            - Concrete RAC: NORMAL
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
+              File underspec.mlw:
+                Line 13:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                Line 14:
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                Line 15:
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                Line 16:
+                  Normal iteration of loop
+                Line 18:
+                  Normal execution of function `(=)` with args:
+                    x = 0
+                    y = 0
+                Line 19:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 1
+                Line 16:
+                  Normal iteration of loop
+                Line 18:
+                  Normal execution of function `(=)` with args:
+                    x = 1
+                    y = 0
+                Line 21:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 1
+                Line 13:
+                  Execution of main function terminated normally
+            - Abstract RAC: STUCK (failure in loop invariant preservation after last iteration at "bench/check-ce/underspec.mlw", line 17, characters 18-33)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              Unknown location:
+                  _ = ()
+              File underspec.mlw:
+                Line 13:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    _ = ()
+                    zero = 0
+                    one = 1
+                Line 14:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 15:
+                  Giant-step execution of function `ref` with args:
+                    contents = 0
+                  result of `ref` = {contents= 0}
+                Line 16:
+                  Giant-step iteration of loop
+                  x1 = {contents= 0}
+                  x2 = {contents= 0}
+                  i = 2
+                Line 17:
+                  Execution got stuck at loop invariant preservation after last iteration with:
+                    x1 = {contents= 0}
+                    i = 2
+<check-ce-summary>Results:
+- Selected model 0: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (loop invariant preservation at "bench/check-ce/underspec.mlw", line 17, characters 18-33)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: STUCK (failure in loop invariant preservation after last iteration at "bench/check-ce/underspec.mlw", line 17, characters 18-33)
+File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Unknown (unknown) (0.38s, 3000094 steps).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
+File underspec.mlw:
+  Line 13:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+      zero = 0
+      one = 1
+  Line 14:
+    Giant-step execution of function `ref` with args:
+      contents = 0
+    result of `ref` = {contents= 0}
+  Line 15:
+    Giant-step execution of function `ref` with args:
+      contents = 0
+    result of `ref` = {contents= 0}
+  Line 16:
+    Giant-step iteration of loop
+    x1 = {contents= (-401)}
+    x2 = {contents= 0}
+    i = 0
+    Giant-step iteration of loop
+  Line 18:
+    Normal execution of function `(=)` with args:
+      x = 0
+      y = 0
+  Line 19:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-401)}
+    Normal execution of function `(+)` with args:
+      _ = (-401)
+      _ = 1
+  Line 17:
+    Property failure at loop invariant preservation with:
+      x1 = {contents= (-400)}
+      i = 1
+
+File "bench/check-ce/underspec.mlw", line 17, characters 27-33:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Valid (0.01s, 2768 steps).
+
+File "bench/check-ce/underspec.mlw", line 41, characters 14-23:
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Valid (0.01s, 168 steps).
+
+<check-ce>Check model 0 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
+<check-ce>Checking model:
+          File underspec.mlw:
+            Line 41:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+            Line 45:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "0"}}]}}
+            Line 46:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+            Line 47:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/underspec.mlw", line 37, characters 11-16 at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/underspec.mlw", line 37, characters 10-11: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value from model for variable `z` at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: {contents=
+                                                                    2}
+<rac-values>Type default value for return value of call to g at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: ()
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/underspec.mlw", line 37, characters 11-16 at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/underspec.mlw", line 37, characters 10-11: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 0: SW
+            - Concrete RAC: NORMAL
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File underspec.mlw:
+                Line 37:
+                  Constant z initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  z = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File underspec.mlw:
+                Line 44:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    z = {contents= 0}
+                    _ = ()
+                    zero = 0
+                    one = 1
+                Line 46:
+                  Normal execution of function `Tuple0` with args:
+                  Normal execution of function `g` with args:
+                    _ = ()
+                Line 42:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 1
+                Line 44:
+                  Execution of main function terminated normally
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File underspec.mlw:
+                Line 37:
+                  Constant z initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  z = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File underspec.mlw:
+                Line 44:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    z = {contents= 0}
+                    _ = ()
+                    zero = 0
+                    one = 1
+                Line 46:
+                  Normal execution of function `Tuple0` with args:
+                  Giant-step execution of function `g` with args:
+                    _ = ()
+                  z = {contents= 2}
+                  result of `g` = ()
+                Line 47:
+                  Property failure at assertion with:
+                    z = {contents= 2}
+<check-ce>Check model 1 ("bench/check-ce/underspec.mlw", line 47, characters 13-18)
+<check-ce>Checking model:
+          
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/underspec.mlw", line 37, characters 11-16 at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/underspec.mlw", line 37, characters 10-11: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Type default value for variable `z` at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8: {contents=
+                                                                    0}
+<rac-values>No value for return value of call to g at "bench/check-ce/underspec.mlw", line 46, characters 4-8 at "bench/check-ce/underspec.mlw", line 46, characters 4-8
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/underspec.mlw", line 37, characters 11-16 at "bench/check-ce/underspec.mlw", line 37, characters 11-16: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/underspec.mlw", line 37, characters 10-11: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 1: INCOMPLETE
+            - Concrete RAC: NORMAL
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File underspec.mlw:
+                Line 37:
+                  Constant z initialization
+                  (giant-step) execution of unimplemented function with args:
+                  result = 0
+                  Normal execution of function `ref` with args:
+                    contents = 0
+                  Normal execution of function `ref'mk` with args:
+                    contents = 0
+                  z = {contents= 0}
+              Unknown location:
+                  _ = ()
+              File underspec.mlw:
+                Line 44:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    z = {contents= 0}
+                    _ = ()
+                    zero = 0
+                    one = 1
+                Line 46:
+                  Normal execution of function `Tuple0` with args:
+                  Normal execution of function `g` with args:
+                    _ = ()
+                Line 42:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(+)` with args:
+                    _ = 0
+                    _ = 1
+                Line 44:
+                  Execution of main function terminated normally
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
+              
+<check-ce-summary>Results:
+- Selected model 0: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/underspec.mlw", line 47, characters 13-18)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g at "bench/check-ce/underspec.mlw", line 46, characters 4-8)
+File "bench/check-ce/underspec.mlw", line 47, characters 13-18:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (0.36s, 3000045 steps).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File underspec.mlw:
+  Line 37:
+    Constant z initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    z = {contents= 0}
+Unknown location:
+    _ = ()
+File underspec.mlw:
+  Line 44:
+    _ = ()
+    Execution of main function `f` with env:
+      z = {contents= 0}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 46:
+    Normal execution of function `Tuple0` with args:
+    Giant-step execution of function `g` with args:
+      _ = ()
+    z = {contents= 2}
+    result of `g` = ()
+  Line 47:
+    Property failure at assertion with:
+      z = {contents= 2}
+

@@ -1,0 +1,139 @@
+<check-ce>Check model 0 ("bench/check-ce/614.mlw", line 5, characters 20-36)
+<check-ce>Checking model:
+          File 614.mlw:
+            Line 4:
+              x = {"type": "Integer", "val": "0"}
+            Line 5:
+              x = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/614.mlw", line 4, characters 7-8: 0
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/614.mlw", line 4, characters 7-8: 0
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC: FAILURE (check at "bench/check-ce/614.mlw", line 5, characters 20-36)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File 614.mlw:
+                Line 4:
+                  x = 0
+                  x = 0
+                  Execution of main function `f` with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Property failure at check with:
+                    x = 0
+            - Abstract RAC: FAILURE (check at "bench/check-ce/614.mlw", line 5, characters 20-36)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File 614.mlw:
+                Line 4:
+                  x = 0
+                  x = 0
+                  Execution of main function `f` with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Property failure at check with:
+                    x = 0
+<check-ce>Check model 1 ("bench/check-ce/614.mlw", line 5, characters 20-36)
+<check-ce>Checking model:
+          File 614.mlw:
+            Line 4:
+              x = {"type": "Integer", "val": "0"}
+            Line 5:
+              x = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/614.mlw", line 4, characters 7-8: 0
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/614.mlw", line 4, characters 7-8: 0
+<check-ce>Result of checking model 1: NC
+            - Concrete RAC: FAILURE (check at "bench/check-ce/614.mlw", line 5, characters 20-36)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File 614.mlw:
+                Line 4:
+                  x = 0
+                  x = 0
+                  Execution of main function `f` with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Property failure at check with:
+                    x = 0
+            - Abstract RAC: FAILURE (check at "bench/check-ce/614.mlw", line 5, characters 20-36)
+              File int.mlw:
+                Line 13:
+                  Constant zero initialization
+                  zero = 0
+                Line 14:
+                  Constant one initialization
+                  one = 1
+              File 614.mlw:
+                Line 4:
+                  x = 0
+                  x = 0
+                  Execution of main function `f` with env:
+                    x = 0
+                    zero = 0
+                    one = 1
+                Line 5:
+                  Property failure at check with:
+                    x = 0
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (check at "bench/check-ce/614.mlw", line 5, characters 20-36)
+  - Abstract RAC: FAILURE (check at "bench/check-ce/614.mlw", line 5, characters 20-36)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (check at "bench/check-ce/614.mlw", line 5, characters 20-36)
+  - Abstract RAC: FAILURE (check at "bench/check-ce/614.mlw", line 5, characters 20-36)
+File "bench/check-ce/614.mlw", line 5, characters 20-36:
+Sub-goal E of goal f'vc.
+Prover result is: Unknown (sat) (0.00s, 693 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File 614.mlw:
+  Line 4:
+    x = 0
+    x = 0
+    Execution of main function `f` with env:
+      x = 0
+      zero = 0
+      one = 1
+  Line 5:
+    Property failure at check with:
+      x = 0
+

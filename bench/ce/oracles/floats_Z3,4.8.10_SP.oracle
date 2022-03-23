@@ -1,4 +1,4 @@
-Weakest Precondition
+Strongest Postcondition
 File "bench/ce/floats.mlw", line 5, characters 24-36:
 Goal g1.
 Prover result is: Unknown or time/memory/step limit.
@@ -11,7 +11,10 @@ File floats.mlw:
   Line 5:
     x [@introduced] =
       {"type": "Float",
-       "val": {"cons": "Float_hexa", "str_hexa": "0x1.000002p0", "value": 1}}
+       "val":
+        {"cons": "Float_hexa",
+         "str_hexa": "-0x1.000002p-126",
+         "value": -1.17549e-38}}
 
 File "bench/ce/floats.mlw", line 7, characters 24-37:
 Goal g2.
@@ -25,7 +28,10 @@ File floats.mlw:
   Line 7:
     x [@introduced] =
       {"type": "Float",
-       "val": {"cons": "Float_hexa", "str_hexa": "0x1.000002p0", "value": 1}}
+       "val":
+        {"cons": "Float_hexa",
+         "str_hexa": "-0x0.000002p-127",
+         "value": -7.00649e-46}}
 
 File "bench/ce/floats.mlw", line 9, characters 24-42:
 Goal g3.
@@ -37,7 +43,7 @@ File ieee_float.mlw:
     max_int  = {"type": "Integer", "val": "0"}
 File floats.mlw:
   Line 9:
-    x [@introduced] = {"type": "Float", "val": {"cons": "Plus_zero"}}
+    x [@introduced] = {"type": "Float", "val": {"cons": "Minus_zero"}}
 
 File "bench/ce/floats.mlw", line 11, characters 24-43:
 Goal g4.
@@ -67,9 +73,7 @@ File floats.mlw:
     x [@introduced] =
       {"type": "Float",
        "val":
-        {"cons": "Float_hexa",
-         "str_hexa": "0x1.040000p32",
-         "value": 4.36208e+09}}
+        {"cons": "Float_hexa", "str_hexa": "0x1.500020p3", "value": 10.5}}
 
 File "bench/ce/floats.mlw", line 15, characters 24-30:
 Goal g6.
@@ -97,8 +101,8 @@ File floats.mlw:
       {"type": "Float",
        "val":
         {"cons": "Float_hexa",
-         "str_hexa": "0x1.dffffep25",
-         "value": 6.29146e+07}}
+         "str_hexa": "-0x1.000000p64",
+         "value": -1.84467e+19}}
 
 File "bench/ce/floats.mlw", line 19, characters 24-60:
 Goal g8.
@@ -115,19 +119,6 @@ File floats.mlw:
 File "bench/ce/floats.mlw", line 21, characters 40-70:
 Goal g9.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-File ieee_float.mlw:
-  Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
-File floats.mlw:
-  Line 21:
-    x [@introduced] =
-      {"type": "Float",
-       "val":
-        {"cons": "Float_hexa",
-         "str_hexa": "0x0.000002p-127",
-         "value": 7.00649e-46}}
 
 File "bench/ce/floats.mlw", line 23, characters 24-98:
 Goal g10.
@@ -146,54 +137,58 @@ File floats.mlw:
 
 File "bench/ce/floats.mlw", line 31, characters 24-36:
 Goal g1.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
   Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
+    max_int  = {"type": "Integer", "val": "1"}
 File floats.mlw:
   Line 31:
     x [@introduced] =
       {"type": "Float",
        "val":
-        {"cons": "Float_hexa", "str_hexa": "0x1.0000000000001p0", "value": 1}}
+        {"cons": "Float_hexa",
+         "str_hexa": "-0x1.0000000000001p-1022",
+         "value": -2.22507e-308}}
 
 File "bench/ce/floats.mlw", line 33, characters 24-37:
 Goal g2.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
   Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
+    max_int  = {"type": "Integer", "val": "1"}
 File floats.mlw:
   Line 33:
     x [@introduced] =
       {"type": "Float",
        "val":
-        {"cons": "Float_hexa", "str_hexa": "0x1.0000000000001p0", "value": 1}}
+        {"cons": "Float_hexa",
+         "str_hexa": "-0x0.0000000000001p-1023",
+         "value": -0}}
 
 File "bench/ce/floats.mlw", line 35, characters 24-42:
 Goal g3.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
   Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
+    max_int  = {"type": "Integer", "val": "1"}
 File floats.mlw:
   Line 35:
-    x [@introduced] = {"type": "Float", "val": {"cons": "Plus_zero"}}
+    x [@introduced] = {"type": "Float", "val": {"cons": "Minus_zero"}}
 
 File "bench/ce/floats.mlw", line 37, characters 24-43:
 Goal g4.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
   Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
+    max_int  = {"type": "Integer", "val": "1"}
 File floats.mlw:
   Line 37:
     x [@introduced] =
@@ -205,29 +200,29 @@ File floats.mlw:
 
 File "bench/ce/floats.mlw", line 39, characters 24-43:
 Goal g5.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
   Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
+    max_int  = {"type": "Integer", "val": "1"}
 File floats.mlw:
   Line 39:
     x [@introduced] =
       {"type": "Float",
        "val":
         {"cons": "Float_hexa",
-         "str_hexa": "0x1.0000000000000p64",
-         "value": 1.84467e+19}}
+         "str_hexa": "0x1.3000000000002p3",
+         "value": 9.5}}
 
 File "bench/ce/floats.mlw", line 41, characters 24-30:
 Goal g6.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
   Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
+    max_int  = {"type": "Integer", "val": "1"}
 File floats.mlw:
   Line 41:
     x [@introduced] = {"type": "Float", "val": {"cons": "Not_a_number"}}
@@ -235,28 +230,15 @@ File floats.mlw:
 File "bench/ce/floats.mlw", line 43, characters 40-64:
 Goal g7.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-File ieee_float.mlw:
-  Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
-File floats.mlw:
-  Line 43:
-    x [@introduced] =
-      {"type": "Float",
-       "val":
-        {"cons": "Float_hexa",
-         "str_hexa": "0x1.fffffffffffffp56",
-         "value": 1.44115e+17}}
 
 File "bench/ce/floats.mlw", line 45, characters 24-60:
 Goal g8.
-Prover result is: Unknown or time/memory/step limit.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
   Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
+    max_int  = {"type": "Integer", "val": "1"}
 File floats.mlw:
   Line 45:
     x [@introduced] = {"type": "Float", "val": {"cons": "Plus_infinity"}}
@@ -264,19 +246,6 @@ File floats.mlw:
 File "bench/ce/floats.mlw", line 47, characters 40-70:
 Goal g9.
 Prover result is: Unknown or time/memory/step limit.
-The following counterexample model has not been verified
-  (not checking CE model, missing option --check-ce):
-File ieee_float.mlw:
-  Line 224:
-    max_int  = {"type": "Integer", "val": "0"}
-File floats.mlw:
-  Line 47:
-    x [@introduced] =
-      {"type": "Float",
-       "val":
-        {"cons": "Float_hexa",
-         "str_hexa": "0x0.0000000000001p-1023",
-         "value": 0}}
 
 File "bench/ce/floats.mlw", line 49, characters 24-98:
 Goal g10.

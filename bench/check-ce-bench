@@ -80,7 +80,8 @@ run () {
     steps=$5
     # Call why3 prove to create CE (and accept return value of 2 for unproven goals)
     ($dir/../bin/why3"$suffix" prove --apply-transform=split_vc \
-       --prover="$prover" --stepslimit=$steps --check-ce --verbosity=5 \
+       --prover="$prover" --stepslimit=$steps  --timelimit=0 \
+       --check-ce --verbosity=5 \
        --library="$2" "${file_path}.mlw" \
        --debug=check-ce,check-ce-summary,rac-values \
        || [ $? -eq 2 ]) 2>&1 \
@@ -102,7 +103,8 @@ run () {
 	    echo "FAILED!"
 	    echo "diff is the following:"
 	    echo "$f"
-	    diff -u <(echo "$str_oracle") <(echo "$str_out")|colorize
+	    (diff -u <(echo "$str_oracle") <(echo "$str_out") \
+        || [ $? -eq 1 ])|colorize
 	    failed="$failed$f\n"
 	    success=false
 	fi
@@ -117,10 +119,12 @@ for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
-    run CVC4,1.7 $filedir $filebase true   150000
-    run CVC4,1.7 $filedir $filebase false  150000
-    run Z3,4.8.4 $filedir $filebase true  7500000
-    run Z3,4.8.4 $filedir $filebase false 7500000
+    cvc4steps=150000
+    z3steps=3000000
+    run CVC4,1.7 $filedir $filebase true   $cvc4steps
+    run CVC4,1.7 $filedir $filebase false  $cvc4steps
+    run Z3,4.8.10 $filedir $filebase true  $z3steps
+    run Z3,4.8.10 $filedir $filebase false $z3steps
 done
 
 # Check the reproduction of the experiments by Petion (2018). Use CVC4 because
@@ -129,9 +133,9 @@ bench/check-ce/petiot2018/experiments.sh --prover CVC4,1.7 \
   --ce-prover CVC4,1.7,counterexamples --stepslimit 10000 --rac-prover CVC4,1.7
 
 if [ "$success" = true ]; then
-    echo "Check-ce bench: success"
+    echo "check-ce-bench: success"
     exit 0
 else
-    printf "\nCheck-ce bench: failed\n$failed\n"
+    printf "\ncheck-ce-bench: failed for the following files\n$failed\n"
     exit 1
 fi
